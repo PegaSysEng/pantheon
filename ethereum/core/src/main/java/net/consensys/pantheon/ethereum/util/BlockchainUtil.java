@@ -25,7 +25,7 @@ public class BlockchainUtil {
    * @param blockchain our local copy of the blockchain
    * @param headers the list of remote headers, within which we are searching for an insertion point
    * @param ascendingHeaderOrder whether the headers are sorted in ascending or descending order
-   * @return the insertion point
+   * @return index of the highest known header, or an empty value if no header is known
    */
   public static OptionalInt findHighestKnownBlockIndex(
       final Blockchain blockchain,
