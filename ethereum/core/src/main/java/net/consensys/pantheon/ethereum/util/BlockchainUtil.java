@@ -17,13 +17,13 @@ public class BlockchainUtil {
   private BlockchainUtil() {}
 
   /**
-   * Using the API of Collections.binarySearch, when it fails to find the given search key,
-   * <tt>null</tt>, in the header list, returns a negative value that is equivalent to <tt>-
-   * insertion point - 1</tt>, where insertion point is defined as the index at which the search key
-   * would be inserted into the list.
+   * General purpose utility to process a list of headers and a blockchain, sussing out which header
+   * in the input list is simultaneously the highest order block number and a direct match with one
+   * of the headers of the local chain. The point being to determine the point of departure in fork
+   * situations.
    *
    * @param blockchain our local copy of the blockchain
-   * @param headers the list of remote headers, within which we are searching for an insertion point
+   * @param headers the list of remote headers
    * @param ascendingHeaderOrder whether the headers are sorted in ascending or descending order
    * @return index of the highest known header, or an empty value if no header is known
    */
