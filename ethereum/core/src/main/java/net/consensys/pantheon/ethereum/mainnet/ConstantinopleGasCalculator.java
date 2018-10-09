@@ -5,6 +5,8 @@ import net.consensys.pantheon.ethereum.vm.MessageFrame;
 import net.consensys.pantheon.util.bytes.Bytes32;
 import net.consensys.pantheon.util.uint.UInt256;
 
+import java.util.function.Supplier;
+
 public class ConstantinopleGasCalculator extends SpuriousDragonGasCalculator {
 
   private static final Gas SSTORE_NO_OP_COST = Gas.of(200);
@@ -26,11 +28,14 @@ public class ConstantinopleGasCalculator extends SpuriousDragonGasCalculator {
 
   @Override
   public Gas getStorageCost(
-      final UInt256 originalValue, final UInt256 currentValue, final UInt256 newValue) {
+      final Supplier<UInt256> originalValueSupplier,
+      final UInt256 currentValue,
+      final UInt256 newValue) {
 
     if (currentValue.equals(newValue)) {
       return SSTORE_NO_OP_COST;
     } else {
+      final UInt256 originalValue = originalValueSupplier.get();
       if (originalValue.equals(currentValue)) {
         return originalValue.isZero()
             ? SSTORE_FIRST_DIRTY_NEW_STORAGE_COST
@@ -43,11 +48,14 @@ public class ConstantinopleGasCalculator extends SpuriousDragonGasCalculator {
 
   @Override
   public Gas getStorageRefundAmount(
-      final UInt256 originalValue, final UInt256 currentValue, final UInt256 newValue) {
+      final Supplier<UInt256> originalValueSupplier,
+      final UInt256 currentValue,
+      final UInt256 newValue) {
 
     if (currentValue.equals(newValue)) {
       return Gas.ZERO;
     } else {
+      final UInt256 originalValue = originalValueSupplier.get();
       if (originalValue.equals(currentValue)) {
         if (originalValue.isZero()) {
           return Gas.ZERO;

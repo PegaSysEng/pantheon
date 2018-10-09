@@ -25,6 +25,8 @@ import net.consensys.pantheon.ethereum.vm.operations.Sha3Operation;
 import net.consensys.pantheon.util.bytes.BytesValue;
 import net.consensys.pantheon.util.uint.UInt256;
 
+import java.util.function.Supplier;
+
 /**
  * Provides various gas cost lookups and calculations used during block processing.
  *
@@ -332,22 +334,23 @@ public interface GasCalculator {
   /**
    * Returns the cost for an SSTORE operation.
    *
-   * @param originalValue the value in the affected storage location prior to this transaction
+   * @param originalValue supplies the value from prior to this transaction
    * @param currentValue the current value in the affected storage location
    * @param newValue the new value to be stored
    * @return the gas cost for the SSTORE operation
    */
-  Gas getStorageCost(UInt256 originalValue, UInt256 currentValue, UInt256 newValue);
+  Gas getStorageCost(Supplier<UInt256> originalValue, UInt256 currentValue, UInt256 newValue);
 
   /**
    * Returns the refund amount for an SSTORE operation.
    *
-   * @param originalValue the value in the affected storage location prior to this transaction
+   * @param originalValue supplies the value from prior to this transaction
    * @param currentValue the current value in the affected storage location
    * @param newValue the new value to be stored
    * @return the gas refund for the SSTORE operation
    */
-  Gas getStorageRefundAmount(UInt256 originalValue, UInt256 currentValue, UInt256 newValue);
+  Gas getStorageRefundAmount(
+      Supplier<UInt256> originalValue, UInt256 currentValue, UInt256 newValue);
 
   /**
    * Returns the refund amount for deleting an account in a {@link SelfDestructOperation}.

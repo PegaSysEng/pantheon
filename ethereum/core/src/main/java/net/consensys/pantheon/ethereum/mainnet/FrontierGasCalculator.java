@@ -12,6 +12,8 @@ import net.consensys.pantheon.util.bytes.Bytes32;
 import net.consensys.pantheon.util.bytes.BytesValue;
 import net.consensys.pantheon.util.uint.UInt256;
 
+import java.util.function.Supplier;
+
 public class FrontierGasCalculator implements GasCalculator {
 
   private static final Gas TX_DATA_ZERO_COST = Gas.of(4L);
@@ -399,7 +401,7 @@ public class FrontierGasCalculator implements GasCalculator {
 
   @Override
   public Gas getStorageCost(
-      final UInt256 originalValue, final UInt256 currentValue, final UInt256 newValue) {
+      final Supplier<UInt256> originalValue, final UInt256 currentValue, final UInt256 newValue) {
     return !newValue.isZero() && currentValue.isZero()
         ? STORAGE_SET_GAS_COST
         : STORAGE_RESET_GAS_COST;
@@ -407,7 +409,7 @@ public class FrontierGasCalculator implements GasCalculator {
 
   @Override
   public Gas getStorageRefundAmount(
-      final UInt256 originalValue, final UInt256 currentValue, final UInt256 newValue) {
+      final Supplier<UInt256> originalValue, final UInt256 currentValue, final UInt256 newValue) {
     return newValue.isZero() && !currentValue.isZero() ? STORAGE_RESET_REFUND_AMOUNT : Gas.ZERO;
   }
 

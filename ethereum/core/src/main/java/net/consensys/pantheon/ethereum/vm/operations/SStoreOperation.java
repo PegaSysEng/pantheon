@@ -28,9 +28,9 @@ public class SStoreOperation extends AbstractOperation {
     // Setting storage value to non-zero from zero (i.e. nothing currently at this location) vs.
     // resetting an existing value.
     final UInt256 currentValue = account.getStorageValue(key);
-    final UInt256 originalValue = getOriginalValue(frame, key);
 
-    return gasCalculator().getStorageCost(originalValue, currentValue, newValue);
+    return gasCalculator()
+        .getStorageCost(() -> getOriginalValue(frame, key), currentValue, newValue);
   }
 
   @Override
@@ -45,7 +45,8 @@ public class SStoreOperation extends AbstractOperation {
     final UInt256 originalValue = getOriginalValue(frame, key);
     final UInt256 currentValue = account.getStorageValue(key);
     frame.incrementGasRefund(
-        gasCalculator().getStorageRefundAmount(originalValue, currentValue, value));
+        gasCalculator()
+            .getStorageRefundAmount(() -> getOriginalValue(frame, key), currentValue, value));
 
     account.setStorageValue(key.copy(), value.copy());
   }
