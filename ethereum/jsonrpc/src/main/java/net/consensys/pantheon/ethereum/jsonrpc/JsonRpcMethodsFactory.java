@@ -1,6 +1,6 @@
 package net.consensys.pantheon.ethereum.jsonrpc;
 
-import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import net.consensys.pantheon.ethereum.chain.Blockchain;
 import net.consensys.pantheon.ethereum.core.Synchronizer;
 import net.consensys.pantheon.ethereum.core.TransactionPool;
@@ -83,7 +83,7 @@ public class JsonRpcMethodsFactory {
       final Synchronizer synchronizer,
       final TransactionPool transactionPool,
       final ProtocolSchedule<?> protocolSchedule,
-      final EthHashMiningCoordinator miningCoordinator,
+      final AbstractMiningCoordinator<?, ?> miningCoordinator,
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApis> rpcApis) {
     final BlockchainQueries blockchainQueries =
@@ -113,7 +113,7 @@ public class JsonRpcMethodsFactory {
       final ProtocolSchedule<?> protocolSchedule,
       final FilterManager filterManager,
       final TransactionPool transactionPool,
-      final EthHashMiningCoordinator miningCoordinator,
+      final AbstractMiningCoordinator<?, ?> miningCoordinator,
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApis> rpcApis) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();

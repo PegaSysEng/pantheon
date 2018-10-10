@@ -2,7 +2,6 @@ package net.consensys.pantheon.controller;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import net.consensys.pantheon.consensus.clique.blockcreation.CliqueBlockMiner;
 import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.consensus.common.VoteProposer;
 import net.consensys.pantheon.consensus.common.VoteTally;
@@ -20,7 +19,6 @@ import net.consensys.pantheon.consensus.ibft.protocol.Istanbul64ProtocolManager;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
 import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
-import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
 import net.consensys.pantheon.ethereum.core.BlockHashFunction;
@@ -93,7 +91,7 @@ public class IbftPantheonController implements PantheonController<IbftContext, I
     this.closer = closer;
   }
 
-  public static PantheonController<IbftContext> init(
+  public static PantheonController<IbftContext, IbftBlockMiner> init(
       final Path home,
       final GenesisConfig<IbftContext> genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,

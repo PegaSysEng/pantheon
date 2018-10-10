@@ -6,6 +6,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
 import net.consensys.pantheon.ethereum.blockcreation.DefaultBlockScheduler;
+import net.consensys.pantheon.ethereum.blockcreation.EthHashBlockMiner;
 import net.consensys.pantheon.ethereum.blockcreation.EthHashMinerExecutor;
 import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.blockcreation.MiningParameters;
@@ -75,7 +76,8 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
     this.close = close;
   }
 
-  public static PantheonController<Void> mainnet(final Path home) throws IOException {
+  public static PantheonController<Void, EthHashBlockMiner> mainnet(final Path home)
+      throws IOException {
     final MiningParameters miningParams = new MiningParameters(null, null, null, false);
     final KeyPair nodeKeys = loadKeyPair(home);
     return init(
@@ -87,7 +89,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
         nodeKeys);
   }
 
-  public static PantheonController<Void> init(
+  public static PantheonController<Void, EthHashBlockMiner> init(
       final Path home,
       final GenesisConfig<Void> genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,

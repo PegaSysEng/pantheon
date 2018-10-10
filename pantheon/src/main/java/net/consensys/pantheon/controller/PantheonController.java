@@ -1,9 +1,5 @@
 package net.consensys.pantheon.controller;
 
-import io.vertx.core.json.JsonObject;
-import java.io.Closeable;
-import java.io.IOException;
-import java.nio.file.Path;
 import net.consensys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import net.consensys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
@@ -20,12 +16,18 @@ import net.consensys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import net.consensys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import net.consensys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 
-public interface PantheonController<
-    C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>> extends Closeable {
+import java.io.Closeable;
+import java.io.IOException;
+import java.nio.file.Path;
+
+import io.vertx.core.json.JsonObject;
+
+public interface PantheonController<C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>>
+    extends Closeable {
 
   String DATABASE_PATH = "database";
 
-  static PantheonController<?> fromConfig(
+  static PantheonController<?, ?> fromConfig(
       final SynchronizerConfiguration syncConfig,
       final String configContents,
       final Path pantheonHome,

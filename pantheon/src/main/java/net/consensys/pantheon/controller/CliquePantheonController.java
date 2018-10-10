@@ -11,7 +11,6 @@ import net.consensys.pantheon.consensus.common.VoteProposer;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
 import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
-import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
 import net.consensys.pantheon.ethereum.core.BlockHashFunction;
@@ -39,7 +38,8 @@ import java.nio.file.Path;
 
 import org.apache.logging.log4j.Logger;
 
-public class CliquePantheonController implements PantheonController<CliqueContext, CliqueBlockMiner> {
+public class CliquePantheonController
+    implements PantheonController<CliqueContext, CliqueBlockMiner> {
 
   private static final Logger LOG = getLogger();
   private final GenesisConfig<CliqueContext> genesisConfig;
@@ -68,7 +68,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     this.closer = closer;
   }
 
-  public static PantheonController<CliqueContext> init(
+  public static PantheonController<CliqueContext, CliqueBlockMiner> init(
       final Path home,
       final GenesisConfig<CliqueContext> genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
@@ -154,7 +154,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   }
 
   @Override
-  public AbstractMiningCoordinator<C, M> getMiningCoordinator() {
+  public AbstractMiningCoordinator<CliqueContext, CliqueBlockMiner> getMiningCoordinator() {
     return null;
   }
 

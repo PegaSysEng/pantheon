@@ -46,14 +46,17 @@ public class EthHashMiningCoordinator extends AbstractMiningCoordinator<Void, Et
     }
   }
 
+  @Override
   public void setCoinbase(final Address coinbase) {
     executor.setCoinbase(coinbase);
   }
 
+  @Override
   public Optional<Address> getCoinbase() {
     return executor.getCoinbase();
   }
 
+  @Override
   public Optional<Long> hashesPerSecond() {
     final Optional<Long> currentHashesPerSecond =
         currentRunningMiner.flatMap(EthHashBlockMiner::getHashesPerSecond);
@@ -66,10 +69,12 @@ public class EthHashMiningCoordinator extends AbstractMiningCoordinator<Void, Et
     }
   }
 
+  @Override
   public Optional<EthHashSolverInputs> getWorkDefinition() {
     return currentRunningMiner.flatMap(EthHashBlockMiner::getWorkDefinition);
   }
 
+  @Override
   public boolean submitWork(final EthHashSolution solution) {
     synchronized (this) {
       return currentRunningMiner.map(miner -> miner.submitWork(solution)).orElse(false);

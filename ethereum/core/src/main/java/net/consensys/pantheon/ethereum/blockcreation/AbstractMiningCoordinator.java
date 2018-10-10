@@ -4,9 +4,12 @@ import net.consensys.pantheon.ethereum.chain.BlockAddedEvent;
 import net.consensys.pantheon.ethereum.chain.BlockAddedEvent.EventType;
 import net.consensys.pantheon.ethereum.chain.BlockAddedObserver;
 import net.consensys.pantheon.ethereum.chain.Blockchain;
+import net.consensys.pantheon.ethereum.core.Address;
 import net.consensys.pantheon.ethereum.core.Block;
 import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.core.Wei;
+import net.consensys.pantheon.ethereum.mainnet.EthHashSolution;
+import net.consensys.pantheon.ethereum.mainnet.EthHashSolverInputs;
 import net.consensys.pantheon.util.Subscribers;
 import net.consensys.pantheon.util.bytes.BytesValue;
 
@@ -82,6 +85,31 @@ public abstract class AbstractMiningCoordinator<
 
   public void setExtraData(final BytesValue extraData) {
     executor.setExtraData(extraData);
+  }
+
+  public void setCoinbase(final Address coinbase) {
+    throw new UnsupportedOperationException(
+        "Current consensus mechanism prevents" + " setting coinbase.");
+  }
+
+  public Optional<Address> getCoinbase() {
+    throw new UnsupportedOperationException(
+        "Current consensus mechanism prevents" + " querying of coinbase.");
+  }
+
+  public Optional<Long> hashesPerSecond() {
+    throw new UnsupportedOperationException(
+        "Current consensus mechanism prevents querying " + "of hashrate.");
+  }
+
+  public Optional<EthHashSolverInputs> getWorkDefinition() {
+    throw new UnsupportedOperationException(
+        "Current consensus mechanism prevents querying " + "work definition.");
+  }
+
+  public boolean submitWork(final EthHashSolution solution) {
+    throw new UnsupportedOperationException(
+        "Current consensus mechanism prevents submission of work" + " solutions.");
   }
 
   public interface MinedBlockObserver {

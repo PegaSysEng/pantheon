@@ -1,6 +1,6 @@
 package net.consensys.pantheon.ethereum.jsonrpc.internal.methods.miner;
 
-import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import net.consensys.pantheon.ethereum.core.Address;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -10,11 +10,11 @@ import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessR
 
 public class MinerSetCoinbase implements JsonRpcMethod {
 
-  private final EthHashMiningCoordinator miningCoordinator;
+  private final AbstractMiningCoordinator<?, ?> miningCoordinator;
   private final JsonRpcParameter parameters;
 
   public MinerSetCoinbase(
-      final EthHashMiningCoordinator miningCoordinator, final JsonRpcParameter parameters) {
+      final AbstractMiningCoordinator<?, ?> miningCoordinator, final JsonRpcParameter parameters) {
     this.miningCoordinator = miningCoordinator;
     this.parameters = parameters;
   }
