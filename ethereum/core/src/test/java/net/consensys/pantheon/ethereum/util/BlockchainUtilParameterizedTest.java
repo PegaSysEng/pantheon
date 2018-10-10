@@ -31,8 +31,7 @@ public class BlockchainUtilParameterizedTest {
   private static final BlockDataGenerator blockDataGenerator = new BlockDataGenerator();
   private static final Random random = new Random(666);
 
-  private static final int chainHeight = 50;
-  private final int headerRequestSize;
+  private static final int chainHeight = 89;
   private final int commonAncestorHeight;
   private static Block genesisBlock;
   private static KeyValueStorage localKvStore;
@@ -41,9 +40,7 @@ public class BlockchainUtilParameterizedTest {
   private KeyValueStorage remoteKvStore;
   private DefaultMutableBlockchain remoteBlockchain;
 
-  public BlockchainUtilParameterizedTest(
-      final int headerRequestSize, final int commonAncestorHeight) {
-    this.headerRequestSize = headerRequestSize;
+  public BlockchainUtilParameterizedTest(final int commonAncestorHeight) {
     this.commonAncestorHeight = commonAncestorHeight;
   }
 
@@ -75,17 +72,14 @@ public class BlockchainUtilParameterizedTest {
             genesisBlock, remoteKvStore, MainnetBlockHashFunction::createHash);
   }
 
-  @Parameterized.Parameters(name = "requestSize={0}, commonAncestor={1}")
+  @Parameterized.Parameters(name = "commonAncestor={0}")
   public static Collection<Object[]> parameters() {
-    final int[] requestSizes = {5, 13, chainHeight, chainHeight * 2};
     final List<Object[]> params = new ArrayList<>();
-    for (final int requestSize : requestSizes) {
-      params.add(new Object[] {requestSize, 0});
-      params.add(new Object[] {requestSize, chainHeight});
-      params.add(new Object[] {requestSize, random.nextInt(chainHeight - 1) + 1});
-      params.add(new Object[] {requestSize, random.nextInt(chainHeight - 1) + 1});
-      params.add(new Object[] {requestSize, random.nextInt(chainHeight - 1) + 1});
-    }
+    params.add(new Object[] {0});
+    params.add(new Object[] {chainHeight});
+    params.add(new Object[] {random.nextInt(chainHeight - 1) + 1});
+    params.add(new Object[] {random.nextInt(chainHeight - 1) + 1});
+    params.add(new Object[] {random.nextInt(chainHeight - 1) + 1});
     return params;
   }
 
