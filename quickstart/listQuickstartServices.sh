@@ -20,14 +20,20 @@ rpcMapping=`docker-compose ${COMPOSE_CONFIG_FILE_OPTION} port rpcnode 8545`
 wsMapping=`docker-compose ${COMPOSE_CONFIG_FILE_OPTION} port rpcnode 8546`
 explorerMapping=`docker-compose ${COMPOSE_CONFIG_FILE_OPTION} port explorer 3000`
 
-# replaces the mix explorer rpc endpoint by ours
-docker-compose ${COMPOSE_CONFIG_FILE_OPTION} exec ${EXPLORER_SERVICE} /bin/sed -i \
-"s/fallbackUrlPlaceHolder/http:\/\/localhost:${rpcMapping##*:}/g" \
-src/constants/index.js
+#Check if we run in a tty before using exec and otherwise set $TERM as it fails if not set.
+if [ ! -t 1 ] ;
+then
+  export TERM=xterm-color
+fi
 
-docker-compose ${COMPOSE_CONFIG_FILE_OPTION} exec ${EXPLORER_SERVICE} /bin/sed -i \
+# replaces the mix explorer rpc endpoint by ours
+`docker-compose ${COMPOSE_CONFIG_FILE_OPTION} exec -T ${EXPLORER_SERVICE} /bin/sed -i \
+"s/fallbackUrlPlaceHolder/http:\/\/localhost:${rpcMapping##*:}/g" \
+src/constants/index.js`
+
+`docker-compose ${COMPOSE_CONFIG_FILE_OPTION} exec -T ${EXPLORER_SERVICE} /bin/sed -i \
 "s/rpcHostPlaceHolder/http:\/\/localhost:${rpcMapping##*:}/g" \
-src/components/App.js
+src/components/App.js`
 
 # Displays links to exposed services
 ORANGE='\033[0;33m'
@@ -41,9 +47,9 @@ echo "JSON-RPC ${BOLD}WebSocket${NORMAL}${CYAN} service endpoint : ${ORANGE}http
 
 while [ "$(curl -m 1 -s -o /dev/null -w ''%{http_code}'' http://localhost:${explorerMapping##*:})" != "200" ]
 do
-    dots=$dots"."
-    printf "${CYAN} Block explorer is starting, please wait ${ORANGE}$dots${NORMAL}\\r"
-    sleep 1
+  dots=$dots"."
+  printf "${CYAN} Block explorer is starting, please wait ${ORANGE}$dots${NORMAL}\\r"
+  sleep 1
 done
 
 echo "${CYAN}Web block explorer address          : ${ORANGE}http://localhost:${explorerMapping##*:}${CYAN}   *                                                                             "
