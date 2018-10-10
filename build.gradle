@@ -177,18 +177,6 @@ allprojects {
 
 task deploy() {}
 
-task integrationTest(type: Test){
-  for(TaskContainer taskList : subprojects.tasks){
-    try {
-      def subProjectIntegrationTask = taskList.getByName('integrationTest')
-
-      if (subProjectIntegrationTask != null) {
-        dependsOn subProjectIntegrationTask
-      }
-    }catch(UnknownTaskException e){
-    }
-  }
-}
 
 subprojects {
 
@@ -413,6 +401,19 @@ if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
 
 apply plugin: 'net.researchgate.release'
 
+task integrationTest(type: Test){
+  for(TaskContainer taskList : subprojects.tasks){
+    try {
+      def subProjectIntegrationTask = taskList.getByName('integrationTest')
+
+      if (subProjectIntegrationTask != null) {
+        dependsOn subProjectIntegrationTask
+      }
+    }catch(UnknownTaskException e){
+    }
+  }
+}
+
 release {
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
   tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
@@ -422,7 +423,6 @@ release {
   buildTasks = [
     'build',
     'integrationTest',
-    'acceptanceTest --tests Web3Sha3AcceptanceTest --tests PantheonClusterAcceptanceTest --tests MiningAcceptanceTest',
     'referenceTest',
     'checkLicenses',
     'javadoc'
