@@ -13,6 +13,7 @@ import net.consensys.pantheon.ethereum.core.Hash;
 import net.consensys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import net.consensys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import net.consensys.pantheon.tests.acceptance.dsl.account.Account;
+import net.consensys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +44,7 @@ import org.web3j.utils.Async;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
-public class PantheonNode implements AutoCloseable {
+public class PantheonNode implements AutoCloseable, Node {
 
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();
@@ -346,5 +347,10 @@ public class PantheonNode implements AutoCloseable {
     }
 
     return eth;
+  }
+
+  @Override
+  public <T> T execute(final Transaction<T> transaction) {
+    return transaction.execute(web3j());
   }
 }
