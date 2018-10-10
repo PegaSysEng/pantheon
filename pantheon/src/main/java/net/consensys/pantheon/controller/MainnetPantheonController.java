@@ -7,7 +7,7 @@ import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
 import net.consensys.pantheon.ethereum.blockcreation.DefaultBlockScheduler;
 import net.consensys.pantheon.ethereum.blockcreation.EthHashMinerExecutor;
-import net.consensys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.blockcreation.MiningParameters;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
@@ -53,7 +53,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
   private final Synchronizer synchronizer;
 
   private final TransactionPool transactionPool;
-  private final MiningCoordinator miningCoordinator;
+  private final EthHashMiningCoordinator miningCoordinator;
   private final Runnable close;
 
   public MainnetPantheonController(
@@ -63,7 +63,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final Synchronizer synchronizer,
       final KeyPair keyPair,
       final TransactionPool transactionPool,
-      final MiningCoordinator miningCoordinator,
+      final EthHashMiningCoordinator miningCoordinator,
       final Runnable close) {
     this.genesisConfig = genesisConfig;
     this.protocolContext = protocolContext;
@@ -138,8 +138,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
                 MainnetBlockHeaderValidator.TIMESTAMP_TOLERANCE_S,
                 new SystemClock()));
 
-    final MiningCoordinator miningCoordinator =
-        new MiningCoordinator(protocolContext.getBlockchain(), executor);
+    final EthHashMiningCoordinator miningCoordinator =
+        new EthHashMiningCoordinator(protocolContext.getBlockchain(), executor);
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
     if (miningParams.isMiningEnabled()) {
       miningCoordinator.enable();
@@ -196,7 +196,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
   }
 
   @Override
-  public MiningCoordinator getMiningCoordinator() {
+  public EthHashMiningCoordinator getMiningCoordinator() {
     return miningCoordinator;
   }
 

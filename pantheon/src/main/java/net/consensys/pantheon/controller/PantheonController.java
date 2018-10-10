@@ -4,7 +4,7 @@ import net.consensys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import net.consensys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
-import net.consensys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.blockcreation.MiningParameters;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.core.Synchronizer;
@@ -82,5 +82,5 @@ public interface PantheonController<C> extends Closeable {
 
   TransactionPool getTransactionPool();
 
-  MiningCoordinator getMiningCoordinator();
+  EthHashMiningCoordinator getMiningCoordinator();
 }

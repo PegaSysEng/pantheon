@@ -7,7 +7,7 @@ import net.consensys.pantheon.consensus.ibft.jsonrpc.IbftJsonRpcMethodsFactory;
 import net.consensys.pantheon.controller.PantheonController;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
-import net.consensys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.chain.Blockchain;
 import net.consensys.pantheon.ethereum.core.Synchronizer;
 import net.consensys.pantheon.ethereum.core.TransactionPool;
@@ -124,7 +124,7 @@ public class RunnerBuilder {
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
-    final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
+    final EthHashMiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
@@ -185,7 +185,7 @@ public class RunnerBuilder {
       final NetworkRunner networkRunner,
       final Synchronizer synchronizer,
       final TransactionPool transactionPool,
-      final MiningCoordinator miningCoordinator,
+      final EthHashMiningCoordinator miningCoordinator,
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApis> jsonRpcApis) {
     final Map<String, JsonRpcMethod> methods =

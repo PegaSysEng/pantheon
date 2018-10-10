@@ -9,7 +9,7 @@ import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.consensus.common.VoteProposer;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
-import net.consensys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
 import net.consensys.pantheon.ethereum.core.BlockHashFunction;
@@ -152,7 +152,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   }
 
   @Override
-  public MiningCoordinator getMiningCoordinator() {
+  public EthHashMiningCoordinator getMiningCoordinator() {
     return null;
   }
 

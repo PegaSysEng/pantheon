@@ -17,7 +17,7 @@ import net.consensys.pantheon.consensus.ibft.protocol.Istanbul64Protocol;
 import net.consensys.pantheon.consensus.ibft.protocol.Istanbul64ProtocolManager;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
-import net.consensys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
 import net.consensys.pantheon.ethereum.core.BlockHashFunction;
@@ -215,7 +215,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   }
 
   @Override
-  public MiningCoordinator getMiningCoordinator() {
+  public EthHashMiningCoordinator getMiningCoordinator() {
     return null;
   }
 
