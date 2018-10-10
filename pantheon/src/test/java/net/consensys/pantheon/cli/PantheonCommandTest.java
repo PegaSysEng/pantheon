@@ -227,7 +227,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyBoolean(),
             anyInt());
 
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
+    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
 
