@@ -409,19 +409,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void syncModeOptionMustBeUsed() {
-
-    parseCommand("--sync-mode", "FAST");
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
-
-    parseCommand("--sync-mode", "FULL");
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
   public void maxTrailingPeersMustBeUsed() {
     parseCommand("--max-trailing-peers", "3");
     verify(mockSyncConfBuilder).maxTrailingPeers(3);
