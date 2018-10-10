@@ -27,6 +27,7 @@ public class ConstantinopleGasCalculator extends SpuriousDragonGasCalculator {
   }
 
   @Override
+  // As per https://eips.ethereum.org/EIPS/eip-1283
   public Gas calculateStorageCost(
       final Supplier<UInt256> originalValueSupplier,
       final UInt256 currentValue,
@@ -47,6 +48,7 @@ public class ConstantinopleGasCalculator extends SpuriousDragonGasCalculator {
   }
 
   @Override
+  // As per https://eips.ethereum.org/EIPS/eip-1283
   public Gas calculateStorageRefundAmount(
       final Supplier<UInt256> originalValueSupplier,
       final UInt256 currentValue,
