@@ -22,7 +22,7 @@ def buildAliases = ['dev': [
     'build',
     'checkLicenses',
     'javadoc'
-  ]]
+ ]]
 
 def expandedTaskList = []
 gradle.startParameter.taskNames.each {
@@ -401,6 +401,9 @@ if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
   throw new GradleException("ethereum/referencetests/src/test/resources/README.md missing: please clone submodules (git submodule update --init --recursive)")
 }
 
+task releaseBuild {
+  dependsOn build, integrationTest, acceptanceTest --tests Web3Sha3AcceptanceTest --tests PantheonClusterAcceptanceTest --tests MiningAcceptanceTest, referenceTest, checkLicenses, javadoc
+}
 
 apply plugin: 'net.researchgate.release'
 
@@ -410,7 +413,7 @@ release {
   newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
   tagTemplate = '${version}'
   versionPropertyFile = 'gradle.properties'
-  buildTasks = ['build']
+  buildTasks = ['releaseBuild']
 
   git {
     requireBranch = 'release-pipeline'
