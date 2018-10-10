@@ -13,6 +13,8 @@ plugins {
 
 apply from: './versions.gradle'
 
+group = 'net.consensys.pantheon'
+
 defaultTasks 'build', 'checkLicenses', 'javadoc'
 
 def buildAliases = ['dev': [
@@ -418,7 +420,10 @@ release {
 bintray {
   user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
   key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
-  publications = ['mavenArtifact']
+  filesSpec {
+    from 'build/distributions'
+    into '.'
+  }
   pkg {
     repo = "pegasys-repo"
     name = "pegasys"
