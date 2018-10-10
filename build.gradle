@@ -177,9 +177,18 @@ allprojects {
 
 task deploy() {}
 
+task integrationTest(type: Test){
+  for(TaskContainer taskList : subprojects.tasks){
+    try {
+      def subProjectIntegrationTask = taskList.getByName('integrationTest')
 
-
-
+      if (subProjectIntegrationTask != null) {
+        dependsOn subProjectIntegrationTask
+      }
+    }catch(UnknownTaskException e){
+    }
+  }
+}
 
 subprojects {
 
