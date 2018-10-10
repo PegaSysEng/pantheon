@@ -414,7 +414,7 @@ task integrationTest(type: Test){
   }
 }
 
-task referenceTest(type: Test){ dependsOn ":ethereum:core:referenceTest" }
+task referenceTest(type: Test){ dependsOn ":pantheon:ethereum:core:referenceTest" }
 
 release {
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
