@@ -39,7 +39,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
     BytesValue get(final BlockHeader parent);
   }
 
-  private static final Logger LOG = LogManager.getLogger(AbstractBlockCreator.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   protected final Address coinbase;
 

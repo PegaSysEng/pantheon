@@ -13,7 +13,7 @@ public class IbftEventQueue {
   private final BlockingQueue<IbftEvent> queue = new LinkedBlockingQueue<>();
 
   private static final int MAX_QUEUE_SIZE = 1000;
-  private static final Logger LOG = LogManager.getLogger(IbftEventQueue.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   /**
    * Put an Ibft event onto the queue

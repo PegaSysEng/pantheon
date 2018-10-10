@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ProposerSelector {
 
-  private static final Logger LOG = LogManager.getLogger(ProposerSelector.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final Blockchain blockchain;
 

@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 
 final class NettyPeerConnection implements PeerConnection {
 
-  private static final Logger LOG = LogManager.getLogger(NettyPeerConnection.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final ChannelHandlerContext ctx;
   private final PeerInfo peerInfo;

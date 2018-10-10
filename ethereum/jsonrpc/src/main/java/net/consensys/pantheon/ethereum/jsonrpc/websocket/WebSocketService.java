@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 
 public class WebSocketService {
 
-  private static final Logger LOG = LogManager.getLogger(WebSocketService.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private static final InetSocketAddress EMPTY_SOCKET_ADDRESS = new InetSocketAddress("0.0.0.0", 0);
 

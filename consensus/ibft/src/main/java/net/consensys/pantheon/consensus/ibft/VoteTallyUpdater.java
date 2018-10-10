@@ -1,7 +1,5 @@
 package net.consensys.pantheon.consensus.ibft;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
 import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.consensus.common.VoteTally;
 import net.consensys.pantheon.consensus.common.VoteType;
@@ -12,6 +10,7 @@ import net.consensys.pantheon.util.bytes.BytesValue;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -20,7 +19,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class VoteTallyUpdater {
 
-  private static final Logger LOG = getLogger(VoteTallyUpdater.class);
+  private static final Logger LOG = LogManager.getLogger();
   private static final Address NO_VOTE_SUBJECT = Address.wrap(BytesValue.wrap(new byte[20]));
 
   private final EpochManager epochManager;

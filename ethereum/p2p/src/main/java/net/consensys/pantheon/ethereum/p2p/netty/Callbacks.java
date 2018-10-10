@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Callbacks {
-  private static final Logger LOG = LogManager.getLogger(Callbacks.class);
+  private static final Logger LOG = LogManager.getLogger();
   private static final Subscribers<Consumer<Message>> NO_SUBSCRIBERS = new Subscribers<>();
 
   private final Map<Capability, Subscribers<Consumer<Message>>> callbacks;

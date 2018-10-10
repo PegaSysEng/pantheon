@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
  *     format</a>
  */
 public class Capability {
-  private static final Logger LOG = LogManager.getLogger(Capability.class);
+  private static final Logger LOG = LogManager.getLogger();
   private final String name;
   private final int version;
 

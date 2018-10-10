@@ -25,7 +25,7 @@ import org.rocksdb.WriteOptions;
 
 public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
 
-  private static final Logger LOG = LogManager.getLogger(RocksDbKeyValueStorage.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final Options options;
   private final TransactionDBOptions txOptions;

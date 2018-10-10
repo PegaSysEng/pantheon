@@ -22,7 +22,7 @@ public class Runner implements AutoCloseable {
 
   static final String KEY_PATH = "key";
 
-  private static final Logger LOG = LogManager.getLogger(Runner.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final Vertx vertx;
 

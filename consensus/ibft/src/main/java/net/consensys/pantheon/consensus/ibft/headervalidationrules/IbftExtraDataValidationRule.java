@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class IbftExtraDataValidationRule implements AttachedBlockHeaderValidationRule<IbftContext> {
 
-  private static final Logger LOG = LogManager.getLogger(IbftExtraDataValidationRule.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final boolean validateCommitSeals;
 

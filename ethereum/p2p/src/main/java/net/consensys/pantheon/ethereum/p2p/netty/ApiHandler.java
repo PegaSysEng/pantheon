@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 final class ApiHandler extends SimpleChannelInboundHandler<MessageData> {
 
-  private static final Logger LOG = LogManager.getLogger(ApiHandler.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final CapabilityMultiplexer multiplexer;
   private final AtomicBoolean waitingForPong;

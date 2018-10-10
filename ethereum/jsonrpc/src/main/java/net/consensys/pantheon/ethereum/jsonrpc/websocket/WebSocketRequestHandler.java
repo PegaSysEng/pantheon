@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 public class WebSocketRequestHandler {
 
-  private static final Logger LOG = LogManager.getLogger(WebSocketRequestHandler.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final Vertx vertx;
   private final Map<String, JsonRpcMethod> methods;

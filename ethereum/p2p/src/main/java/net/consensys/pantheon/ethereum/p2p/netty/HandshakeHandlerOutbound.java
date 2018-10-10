@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 public final class HandshakeHandlerOutbound extends AbstractHandshakeHandler {
 
-  private static final Logger LOG = LogManager.getLogger(HandshakeHandlerOutbound.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final ByteBuf first;
 

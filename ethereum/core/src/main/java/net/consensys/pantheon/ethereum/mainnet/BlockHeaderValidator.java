@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 public class BlockHeaderValidator<C> {
 
-  private static final Logger LOG = LogManager.getLogger(BlockHeaderValidator.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final List<Rule<C>> rules;
 

@@ -1,17 +1,16 @@
 package net.consensys.pantheon.controller;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
 import net.consensys.pantheon.crypto.SECP256K1;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class KeyPairUtil {
-  private static final Logger LOG = getLogger();
+  private static final Logger LOG = LogManager.getLogger();
 
   public static SECP256K1.KeyPair loadKeyPair(final Path home) throws IOException {
     final File keyFile = home.resolve("key").toFile();

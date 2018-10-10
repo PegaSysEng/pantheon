@@ -15,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 final class WireKeepAlive extends ChannelDuplexHandler {
-  private static final Logger LOG = LogManager.getLogger(WireKeepAlive.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final AtomicBoolean waitingForPong;
 

@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 public class EthSendRawTransaction implements JsonRpcMethod {
 
-  private static final Logger LOG = LogManager.getLogger(EthSendRawTransaction.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final TransactionPool transactionPool;
   private final JsonRpcParameter parameters;

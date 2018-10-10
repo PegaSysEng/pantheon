@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MainnetBlockBodyValidator<C> implements BlockBodyValidator<C> {
 
-  private static final Logger LOG = LogManager.getLogger(MainnetBlockBodyValidator.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private static final int MAX_OMMERS = 2;
 

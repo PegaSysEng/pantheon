@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class SubscriptionManager extends AbstractVerticle {
 
-  private static final Logger LOG = LogManager.getLogger(SubscriptionManager.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   public static final String EVENTBUS_REMOVE_SUBSCRIPTIONS_ADDRESS =
       "SubscriptionManager::removeSubscriptions";

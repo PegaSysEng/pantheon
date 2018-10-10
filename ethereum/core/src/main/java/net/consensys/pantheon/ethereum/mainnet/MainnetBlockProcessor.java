@@ -28,7 +28,7 @@ public class MainnetBlockProcessor implements BlockProcessor {
         TransactionProcessor.Result result, WorldState worldState, long gasUsed);
   }
 
-  private static final Logger LOG = LogManager.getLogger(MainnetBlockProcessor.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private static final int MAX_GENERATION = 6;
 

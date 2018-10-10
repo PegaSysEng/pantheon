@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MainnetTransactionProcessor implements TransactionProcessor {
 
-  private static final Logger LOG = LogManager.getLogger(MainnetTransactionProcessor.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private final GasCalculator gasCalculator;
 

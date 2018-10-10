@@ -87,7 +87,7 @@ import org.apache.logging.log4j.Logger;
  */
 public final class NettyP2PNetwork implements P2PNetwork {
 
-  private static final Logger LOG = LogManager.getLogger(NettyP2PNetwork.class);
+  private static final Logger LOG = LogManager.getLogger();
   private static final int TIMEOUT_SECONDS = 30;
 
   final Map<Capability, Subscribers<Consumer<Message>>> protocolCallbacks =

@@ -45,7 +45,7 @@ import org.apache.logging.log4j.Logger;
 
 public class JsonRpcHttpService {
 
-  private static final Logger LOG = LogManager.getLogger(JsonRpcHttpService.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private static final InetSocketAddress EMPTY_SOCKET_ADDRESS = new InetSocketAddress("0.0.0.0", 0);
   private static final String APPLICATION_JSON = "application/json";
