@@ -8,6 +8,7 @@ plugins {
   id 'net.ltgt.errorprone' version '0.6'
   id 'me.champeau.gradle.jmh' version '0.4.5' apply false
   id 'com.jfrog.bintray' version '1.7.3'
+  id 'net.researchgate.release' version '2.6.0'
 }
 
 apply from: './versions.gradle'
@@ -47,8 +48,6 @@ def _strListCmdArg(name) {
   return _strListCmdArg(name, null)
 }
 
-def baseVersion = '0.8.0'
-project.version = baseVersion + '-SNAPSHOT'
 
 allprojects {
   apply plugin: 'java-library'
@@ -398,4 +397,23 @@ configure(subprojects.findAll {it.name != 'errorprone-checks'}) {
 
 if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
   throw new GradleException("ethereum/referencetests/src/test/resources/README.md missing: please clone submodules (git submodule update --init --recursive)")
+}
+
+apply plugin: 'net.researchgate.release'
+
+release {
+  //TODO - remove after testing (Clique is currently a SNAPSHOT)
+  failOnSnapshotDependencies = false
+
+  preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
+  tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
+  newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
+  tagTemplate = '${version}'
+  versionPropertyFile = 'gradle.properties'
+  buildTasks = ['build']
+
+  git {
+    requireBranch = 'release-pipeline'
+    pushToRemote = 'origin'
+  }
 }
