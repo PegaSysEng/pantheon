@@ -423,6 +423,7 @@ release {
   buildTasks = [
     'build',
     'integrationTest',
+    'referenceTest',
     'checkLicenses',
     'javadoc'
   ]
