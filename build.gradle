@@ -401,6 +401,7 @@ if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
   throw new GradleException("ethereum/referencetests/src/test/resources/README.md missing: please clone submodules (git submodule update --init --recursive)")
 }
 
+
 apply plugin: 'net.researchgate.release'
 
 release {
@@ -416,6 +417,8 @@ release {
     pushToRemote = 'origin'
   }
 }
+
+afterReleaseBuild.dependsOn bintrayUpload
 
 bintray {
   user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
