@@ -21,6 +21,7 @@ import net.consensys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStora
 import net.consensys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import net.consensys.pantheon.util.bytes.Bytes32;
 import net.consensys.pantheon.util.bytes.BytesValue;
+import net.consensys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayDeque;
 
@@ -76,6 +77,21 @@ public class ExtCodeHashOperationTest {
     assertThat(executeOperation(REQUESTED_ADDRESS)).isEqualTo(Hash.hash(code));
   }
 
+  @Test
+  public void shouldZeroOutLeftMostBitsToGetAddress() {
+    // If EXTCODEHASH of A is X, then EXTCODEHASH of A + 2**160 is X.
+    final BytesValue code = BytesValue.fromHexString("0xabcdef");
+    worldStateUpdater.getOrCreate(REQUESTED_ADDRESS).setCode(code);
+    final Bytes32 value =
+        Words.fromAddress(REQUESTED_ADDRESS)
+            .asUInt256()
+            .plus(UInt256.of(2).pow(UInt256.of(160)))
+            .getBytes();
+    final MessageFrame frame = createMessageFrame(value);
+    operation.execute(frame);
+    assertThat(frame.getStackItem(0)).isEqualTo(Hash.hash(code));
+  }
+
   private Bytes32 executeOperation(final Address requestedAddress) {
     final MessageFrame frame = createMessageFrame(requestedAddress);
     operation.execute(frame);
@@ -83,6 +99,11 @@ public class ExtCodeHashOperationTest {
   }
 
   private MessageFrame createMessageFrame(final Address requestedAddress) {
+    final Bytes32 stackItem = Words.fromAddress(requestedAddress);
+    return createMessageFrame(stackItem);
+  }
+
+  private MessageFrame createMessageFrame(final Bytes32 stackItem) {
     final MessageFrame frame =
         new MessageFrame.Builder()
             .type(Type.MESSAGE_CALL)
@@ -104,7 +125,7 @@ public class ExtCodeHashOperationTest {
             .completer(messageFrame -> {})
             .build();
 
-    frame.pushStackItem(Words.fromAddress(requestedAddress));
+    frame.pushStackItem(stackItem);
     return frame;
   }
 }
