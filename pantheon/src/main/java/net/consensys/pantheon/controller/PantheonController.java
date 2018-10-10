@@ -1,10 +1,16 @@
 package net.consensys.pantheon.controller;
 
+import io.vertx.core.json.JsonObject;
+import java.io.Closeable;
+import java.io.IOException;
+import java.nio.file.Path;
 import net.consensys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import net.consensys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
-import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
+import net.consensys.pantheon.ethereum.blockcreation.BlockMiner;
 import net.consensys.pantheon.ethereum.blockcreation.MiningParameters;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.core.Synchronizer;
@@ -14,13 +20,8 @@ import net.consensys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import net.consensys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import net.consensys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.nio.file.Path;
-
-import io.vertx.core.json.JsonObject;
-
-public interface PantheonController<C> extends Closeable {
+public interface PantheonController<
+    C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>> extends Closeable {
 
   String DATABASE_PATH = "database";
 
@@ -82,5 +83,5 @@ public interface PantheonController<C> extends Closeable {
 
   TransactionPool getTransactionPool();
 
-  EthHashMiningCoordinator getMiningCoordinator();
+  AbstractMiningCoordinator<C, M> getMiningCoordinator();
 }

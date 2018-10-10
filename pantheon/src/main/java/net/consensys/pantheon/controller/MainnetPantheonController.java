@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.Logger;
 
-public class MainnetPantheonController implements PantheonController<Void> {
+public class MainnetPantheonController implements PantheonController<Void, EthHashBlockMiner> {
 
   private static final Logger LOG = getLogger();
   public static final int MAINNET_NETWORK_ID = 1;

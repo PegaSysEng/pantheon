@@ -2,6 +2,7 @@ package net.consensys.pantheon.controller;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import net.consensys.pantheon.consensus.clique.blockcreation.CliqueBlockMiner;
 import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.consensus.common.VoteProposer;
 import net.consensys.pantheon.consensus.common.VoteTally;
@@ -11,12 +12,14 @@ import net.consensys.pantheon.consensus.ibft.IbftProcessor;
 import net.consensys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import net.consensys.pantheon.consensus.ibft.IbftStateMachine;
 import net.consensys.pantheon.consensus.ibft.VoteTallyUpdater;
+import net.consensys.pantheon.consensus.ibft.blockcreation.IbftBlockMiner;
 import net.consensys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import net.consensys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
 import net.consensys.pantheon.consensus.ibft.protocol.Istanbul64Protocol;
 import net.consensys.pantheon.consensus.ibft.protocol.Istanbul64ProtocolManager;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import net.consensys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
@@ -51,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.Logger;
 
-public class IbftPantheonController implements PantheonController<IbftContext> {
+public class IbftPantheonController implements PantheonController<IbftContext, IbftBlockMiner> {
 
   private static final int DEFAULT_ROUND_EXPIRY_MILLISECONDS = 10000;
   private static final Logger LOG = getLogger();
@@ -215,7 +218,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   }
 
   @Override
-  public EthHashMiningCoordinator getMiningCoordinator() {
+  public AbstractMiningCoordinator<IbftContext, IbftBlockMiner> getMiningCoordinator() {
     return null;
   }
 

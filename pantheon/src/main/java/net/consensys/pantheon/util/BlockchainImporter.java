@@ -5,6 +5,8 @@ import static java.lang.String.format;
 
 import net.consensys.pantheon.controller.PantheonController;
 import net.consensys.pantheon.ethereum.ProtocolContext;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
+import net.consensys.pantheon.ethereum.blockcreation.BlockMiner;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
 import net.consensys.pantheon.ethereum.core.Address;
@@ -90,9 +92,9 @@ public class BlockchainImporter extends BlockImporter {
    * @return the import result
    * @throws IOException On Failure
    */
-  public <C> BlockImporter.ImportResult importBlockchain(
+  public <C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>> BlockImporter.ImportResult importBlockchain(
       final Path dataFilePath,
-      final PantheonController<C> pantheonController,
+      final PantheonController<C, M> pantheonController,
       final boolean isSkipHeaderValidation,
       final int metricsIntervalSec,
       final int accountCommitInterval,
@@ -152,8 +154,8 @@ public class BlockchainImporter extends BlockImporter {
    *     combination with isSkipBlocks
    * @return the import result
    */
-  private <C> BlockImporter.ImportResult importBlockchain(
-      final PantheonController<C> pantheonController,
+  private <C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>> BlockImporter.ImportResult importBlockchain(
+      final PantheonController<C, M> pantheonController,
       final FileRLPInput rlp,
       final Boolean isSkipBlocks,
       final int metricsIntervalSec,
@@ -311,8 +313,8 @@ public class BlockchainImporter extends BlockImporter {
    * @param <C> the consensus context type
    * @return root hash of the world state
    */
-  private <C> Hash importWorldState(
-      final PantheonController<C> pantheonController,
+  private <C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>> Hash importWorldState(
+      final PantheonController<C, M> pantheonController,
       final FileRLPInput rlp,
       final int metricsIntervalSec,
       final int accountCommitInterval) {
@@ -470,8 +472,8 @@ public class BlockchainImporter extends BlockImporter {
    * @param worldStateRootHash calculated world state's root hash
    * @param <C> the consensus context type
    */
-  private <C> void validateWorldStateRootHash(
-      final PantheonController<C> pantheonController, final Hash worldStateRootHash) {
+  private <C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>> void validateWorldStateRootHash(
+      final PantheonController<C, M> pantheonController, final Hash worldStateRootHash) {
     final ProtocolContext<C> context = pantheonController.getProtocolContext();
     final MutableBlockchain blockchain = context.getBlockchain();
     final Optional<BlockHeader> header = blockchain.getBlockHeader(blockchain.getChainHeadHash());
