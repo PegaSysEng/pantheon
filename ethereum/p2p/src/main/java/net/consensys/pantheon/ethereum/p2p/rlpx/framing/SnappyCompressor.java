@@ -32,4 +32,14 @@ public class SnappyCompressor implements Compressor {
       throw new CompressionException("Snappy decompression failed", e);
     }
   }
+
+  @Override
+  public int uncompressedLength(final byte[] compressed) {
+    checkArgument(compressed != null, "input data must not be null");
+    try {
+      return Snappy.uncompressedLength(compressed);
+    } catch (final IOException e) {
+      throw new CompressionException("Snappy uncompressedLength failed", e);
+    }
+  }
 }

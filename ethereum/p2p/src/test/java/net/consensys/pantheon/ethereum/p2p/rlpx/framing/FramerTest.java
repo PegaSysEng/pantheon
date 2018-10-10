@@ -27,7 +27,7 @@ public class FramerTest {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @Test
-  public void shouldThrowExceptionWhenMessageTooLong() {
+  public void shouldThrowExceptionWhenFramingMessageTooLong() {
     final byte[] aes = {
       0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa,
       0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2, 0xa, 0x2
@@ -47,6 +47,60 @@ public class FramerTest {
 
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> framer.frame(ethMessage))
+        .withMessageContaining("Message size in excess of maximum length.");
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenDeframingCompressedMessageTooLong() throws IOException {
+    // This is a circular test.
+    //
+    // This test frames a too-large message; it then impersonates the sending end
+    // by swapping the ingress and egress MACs and frames the plaintext messages.
+    // The expected result is an exception on deframing not relating to encryption.
+    //
+    final JsonNode td = MAPPER.readTree(FramerTest.class.getResource("/peer1.json"));
+    final HandshakeSecrets secrets = secretsFrom(td, false);
+    final Framer framer = new Framer(secrets);
+    framer.enableCompression();
+
+    final byte[] byteArray = new byte[0x1000000];
+    final ByteBuf buf = wrappedBuffer(byteArray);
+    final MessageData ethMessage = new RawMessage(0x00, buf);
+    final ByteBuf framedMesasge = framer.frame(ethMessage, Integer.MAX_VALUE);
+
+    final HandshakeSecrets deframeSecrets = secretsFrom(td, true);
+    final Framer deframer = new Framer(deframeSecrets);
+    deframer.enableCompression();
+
+    assertThatExceptionOfType(IllegalStateException.class)
+        .isThrownBy(() -> deframer.deframe(framedMesasge))
+        .withMessageContaining("Message size in excess of maximum length.");
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenDeframingUncompressedMessageTooLong() throws IOException {
+    // This is a circular test.
+    //
+    // This test frames a too-large message; it then impersonates the sending end
+    // by swapping the ingress and egress MACs and frames the plaintext messages.
+    // The expected result is an exception on deframing not relating to encryption.
+    //
+    final JsonNode td = MAPPER.readTree(FramerTest.class.getResource("/peer2.json"));
+    final HandshakeSecrets secrets = secretsFrom(td, false);
+    final Framer framer = new Framer(secrets);
+    framer.disableCompression();
+
+    final byte[] byteArray = new byte[0x1000000];
+    final ByteBuf buf = wrappedBuffer(byteArray);
+    final MessageData ethMessage = new RawMessage(0x00, buf);
+    final ByteBuf framedMesasge = framer.frame(ethMessage, Integer.MAX_VALUE);
+
+    final HandshakeSecrets deframeSecrets = secretsFrom(td, true);
+    final Framer deframer = new Framer(deframeSecrets);
+    deframer.disableCompression();
+
+    assertThatExceptionOfType(IllegalStateException.class)
+        .isThrownBy(() -> deframer.deframe(framedMesasge))
         .withMessageContaining("Message size in excess of maximum length.");
   }
 

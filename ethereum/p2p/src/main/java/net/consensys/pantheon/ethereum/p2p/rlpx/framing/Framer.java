@@ -212,7 +212,6 @@ public class Framer {
    *
    * @param f The buffer containing
    * @param frameSize The expected
-   * @return
    */
   private MessageData processFrame(final ByteBuf f, final int frameSize) {
     final int pad = padding16(frameSize);
@@ -242,16 +241,23 @@ public class Framer {
     final int id = idbv.isZero() || idbv.size() == 0 ? 0 : idbv.get(0);
 
     // Write message data to ByteBuf, decompressing as necessary
-    ByteBuf data;
+    final ByteBuf data;
     if (compressionEnabled) {
       // Decompress data before writing to ByteBuf
       final byte[] compressedMessageData = Arrays.copyOfRange(frameData, 1, frameData.length - pad);
+      // Check message length
+      Preconditions.checkState(
+          compressor.uncompressedLength(compressedMessageData) < LENGTH_MAX_MESSAGE_FRAME,
+          "Message size in excess of maximum length.");
       final byte[] decompressedMessageData = compressor.decompress(compressedMessageData);
       data = NetworkMemoryPool.allocate(decompressedMessageData.length);
       data.writeBytes(decompressedMessageData);
     } else {
       // Move data to a ByteBuf
       final int messageLength = frameSize - LENGTH_MESSAGE_ID;
+      // Check message length
+      Preconditions.checkState(
+          messageLength < LENGTH_MAX_MESSAGE_FRAME, "Message size in excess of maximum length.");
       data = NetworkMemoryPool.allocate(messageLength);
       data.writeBytes(frameData, 1, messageLength);
     }
@@ -275,8 +281,21 @@ public class Framer {
    * @return The framed message, as byte buffer.
    */
   public synchronized ByteBuf frame(final MessageData message) {
+    return frame(message, LENGTH_MAX_MESSAGE_FRAME);
+  }
+
+  /**
+   * Frames a message for sending to an RLPx peer, encrypting it and calculating the appropriate
+   * MACs.
+   *
+   * @param message The message to frame.
+   * @param maxMessageSize The maximum size of the message.
+   * @throws IllegalArgumentException if the message is longer than maxMessageSize
+   * @return The framed message, as byte buffer.
+   */
+  synchronized ByteBuf frame(final MessageData message, final int maxMessageSize) {
     Preconditions.checkArgument(
-        message.getSize() < LENGTH_MAX_MESSAGE_FRAME, "Message size in excess of maximum length.");
+        message.getSize() < maxMessageSize, "Message size in excess of maximum length.");
     // Compress message
     if (compressionEnabled) {
       try {
