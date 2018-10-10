@@ -61,7 +61,7 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements Runnable {
-  private static final Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
 
   private static final int DEFAULT_MAX_PEERS = 25;
 
@@ -375,7 +375,7 @@ public class PantheonCommand implements Runnable {
         webSocketConfiguration());
   }
 
-  PantheonController<?> buildController() {
+  PantheonController<?, ?> buildController() {
     try {
       return controllerBuilder.build(
           buildSyncConfig(syncMode),
@@ -418,7 +418,7 @@ public class PantheonCommand implements Runnable {
 
   // Blockchain synchronisation from peers.
   private void synchronize(
-      final PantheonController<?> controller,
+      final PantheonController<?, ?> controller,
       final boolean noPeerDiscovery,
       final Collection<String> bootstrapNodes,
       final int maxPeers,
