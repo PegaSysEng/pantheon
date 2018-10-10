@@ -415,6 +415,32 @@ release {
   }
 }
 
+apply plugin: 'maven-publish'
+
+publishing {
+  publications {
+    mavenArtifact(MavenPublication) {
+      from components.java
+      pom.withXml {
+        asNode().children().last() + {
+          resolveStrategy = Closure.DELEGATE_FIRST
+          name 'Pantheon'
+          description 'A java implementation of an Ethereum node'
+          url 'https://github.com/PegaSysEng/pantheon'
+          scm { url 'https://github.com/PegaSysEng/pantheon' }
+          licenses {
+            license {
+              name 'The Apache Software License, Version 2.0'
+              url 'http://www.apache.org/license/LICENSE-2.0.txt'
+              distribution 'repo'
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 bintray {
   user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
   key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
