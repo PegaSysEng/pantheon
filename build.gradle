@@ -414,6 +414,12 @@ task integrationTest(type: Test){
   }
 }
 
+task referenceTest(type: Test){
+  def ethereumCore = subprojects.tasks.getByName('core')
+  def referenceTests = ethereumCore.getByName('referenceTest')
+  dependsOn referenceTests
+}
+
 release {
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
   tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
