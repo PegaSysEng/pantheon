@@ -30,7 +30,7 @@ public class SStoreOperation extends AbstractOperation {
     final UInt256 currentValue = account.getStorageValue(key);
 
     return gasCalculator()
-        .getStorageCost(() -> getOriginalValue(frame, key), currentValue, newValue);
+        .calculateStorageCost(() -> getOriginalValue(frame, key), currentValue, newValue);
   }
 
   @Override
@@ -46,7 +46,7 @@ public class SStoreOperation extends AbstractOperation {
     final UInt256 currentValue = account.getStorageValue(key);
     frame.incrementGasRefund(
         gasCalculator()
-            .getStorageRefundAmount(() -> getOriginalValue(frame, key), currentValue, value));
+            .calculateStorageRefundAmount(() -> getOriginalValue(frame, key), currentValue, value));
 
     account.setStorageValue(key.copy(), value.copy());
   }

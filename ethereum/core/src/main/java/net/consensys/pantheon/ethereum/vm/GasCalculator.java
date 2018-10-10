@@ -339,7 +339,7 @@ public interface GasCalculator {
    * @param newValue the new value to be stored
    * @return the gas cost for the SSTORE operation
    */
-  Gas getStorageCost(Supplier<UInt256> originalValue, UInt256 currentValue, UInt256 newValue);
+  Gas calculateStorageCost(Supplier<UInt256> originalValue, UInt256 currentValue, UInt256 newValue);
 
   /**
    * Returns the refund amount for an SSTORE operation.
@@ -349,7 +349,7 @@ public interface GasCalculator {
    * @param newValue the new value to be stored
    * @return the gas refund for the SSTORE operation
    */
-  Gas getStorageRefundAmount(
+  Gas calculateStorageRefundAmount(
       Supplier<UInt256> originalValue, UInt256 currentValue, UInt256 newValue);
 
   /**

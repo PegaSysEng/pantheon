@@ -400,7 +400,7 @@ public class FrontierGasCalculator implements GasCalculator {
   }
 
   @Override
-  public Gas getStorageCost(
+  public Gas calculateStorageCost(
       final Supplier<UInt256> originalValue, final UInt256 currentValue, final UInt256 newValue) {
     return !newValue.isZero() && currentValue.isZero()
         ? STORAGE_SET_GAS_COST
@@ -408,7 +408,7 @@ public class FrontierGasCalculator implements GasCalculator {
   }
 
   @Override
-  public Gas getStorageRefundAmount(
+  public Gas calculateStorageRefundAmount(
       final Supplier<UInt256> originalValue, final UInt256 currentValue, final UInt256 newValue) {
     return newValue.isZero() && !currentValue.isZero() ? STORAGE_RESET_REFUND_AMOUNT : Gas.ZERO;
   }

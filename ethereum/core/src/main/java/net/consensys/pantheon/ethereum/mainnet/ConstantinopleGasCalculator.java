@@ -27,7 +27,7 @@ public class ConstantinopleGasCalculator extends SpuriousDragonGasCalculator {
   }
 
   @Override
-  public Gas getStorageCost(
+  public Gas calculateStorageCost(
       final Supplier<UInt256> originalValueSupplier,
       final UInt256 currentValue,
       final UInt256 newValue) {
@@ -47,7 +47,7 @@ public class ConstantinopleGasCalculator extends SpuriousDragonGasCalculator {
   }
 
   @Override
-  public Gas getStorageRefundAmount(
+  public Gas calculateStorageRefundAmount(
       final Supplier<UInt256> originalValueSupplier,
       final UInt256 currentValue,
       final UInt256 newValue) {

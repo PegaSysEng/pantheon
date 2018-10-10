@@ -74,13 +74,14 @@ public class ConstantinopleSstoreGasTest {
 
   @Test
   public void shouldChargeCorrectGas() {
-    assertThat(gasCalculator.getStorageCost(() -> originalValue, currentValue, newValue))
+    assertThat(gasCalculator.calculateStorageCost(() -> originalValue, currentValue, newValue))
         .isEqualTo(expectedGasCost);
   }
 
   @Test
   public void shouldRefundCorrectGas() {
-    assertThat(gasCalculator.getStorageRefundAmount(() -> originalValue, currentValue, newValue))
+    assertThat(
+            gasCalculator.calculateStorageRefundAmount(() -> originalValue, currentValue, newValue))
         .isEqualTo(expectedGasRefund);
   }
 }
