@@ -1,7 +1,7 @@
 package net.consensys.pantheon.ethereum.blockcreation;
 
 import net.consensys.pantheon.ethereum.ProtocolContext;
-import net.consensys.pantheon.ethereum.blockcreation.MiningCoordinator.MinedBlockObserver;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator.MinedBlockObserver;
 import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.mainnet.EthHashBlockCreator;
 import net.consensys.pantheon.ethereum.mainnet.EthHashSolution;
@@ -18,9 +18,7 @@ import java.util.Optional;
  * <p>All other aspects of mining (i.e. pre-block delays, block creation and importing to the chain)
  * are all conducted by the parent class.
  */
-public class EthHashBlockMiner extends BlockMiner<Void> {
-
-  private final EthHashBlockCreator blockCreator;
+public class EthHashBlockMiner extends BlockMiner<Void, EthHashBlockCreator> {
 
   public EthHashBlockMiner(
       final EthHashBlockCreator blockCreator,
@@ -30,7 +28,6 @@ public class EthHashBlockMiner extends BlockMiner<Void> {
       final AbstractBlockScheduler scheduler,
       final BlockHeader parentHeader) {
     super(blockCreator, protocolSchedule, protocolContext, observers, scheduler, parentHeader);
-    this.blockCreator = blockCreator;
   }
 
   public Optional<EthHashSolverInputs> getWorkDefinition() {

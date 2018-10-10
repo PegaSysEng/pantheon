@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import net.consensys.pantheon.ethereum.ProtocolContext;
-import net.consensys.pantheon.ethereum.blockcreation.MiningCoordinator.MinedBlockObserver;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator.MinedBlockObserver;
 import net.consensys.pantheon.ethereum.core.Block;
 import net.consensys.pantheon.ethereum.core.BlockBody;
 import net.consensys.pantheon.ethereum.core.BlockHeaderTestFixture;
@@ -23,7 +23,7 @@ import net.consensys.pantheon.util.Subscribers;
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
-public class EthHashBlockMinerTest {
+public class BlockMinerTest {
 
   @Test
   @SuppressWarnings("unchecked")
@@ -50,7 +50,7 @@ public class EthHashBlockMinerTest {
     final MinedBlockObserver observer = mock(MinedBlockObserver.class);
     final DefaultBlockScheduler scheduler = mock(DefaultBlockScheduler.class);
     when(scheduler.waitUntilNextBlockCanBeMined(any())).thenReturn(5L);
-    final EthHashBlockMiner miner =
+    final BlockMiner<Void, EthHashBlockCreator> miner =
         new EthHashBlockMiner(
             blockCreator,
             protocolSchedule,
@@ -88,7 +88,7 @@ public class EthHashBlockMinerTest {
     final MinedBlockObserver observer = mock(MinedBlockObserver.class);
     final DefaultBlockScheduler scheduler = mock(DefaultBlockScheduler.class);
     when(scheduler.waitUntilNextBlockCanBeMined(any())).thenReturn(5L);
-    final EthHashBlockMiner miner =
+    final BlockMiner<Void, EthHashBlockCreator> miner =
         new EthHashBlockMiner(
             blockCreator,
             protocolSchedule,
