@@ -77,20 +77,14 @@ public class BlockchainUtilParameterizedTest {
 
   @Parameterized.Parameters(name = "requestSize={0}, commonAncestor={1}")
   public static Collection<Object[]> parameters() {
-    final int[] requestSizes = {5, 12, chainHeight, chainHeight * 2};
+    final int[] requestSizes = {5, 13, chainHeight, chainHeight * 2};
     final List<Object[]> params = new ArrayList<>();
     for (final int requestSize : requestSizes) {
-      for (int i = 0; i <= chainHeight; i++) {
-        if (i == 0) {
-          params.add(new Object[] {requestSize, i});
-        }
-        if (i == random.nextInt(chainHeight - 1) + 1) {
-          params.add(new Object[] {requestSize, i});
-        }
-        if (i == chainHeight) {
-          params.add(new Object[] {requestSize, i});
-        }
-      }
+      params.add(new Object[] {requestSize, 0});
+      params.add(new Object[] {requestSize, chainHeight});
+      params.add(new Object[] {requestSize, random.nextInt(chainHeight - 1) + 1});
+      params.add(new Object[] {requestSize, random.nextInt(chainHeight - 1) + 1});
+      params.add(new Object[] {requestSize, random.nextInt(chainHeight - 1) + 1});
     }
     return params;
   }

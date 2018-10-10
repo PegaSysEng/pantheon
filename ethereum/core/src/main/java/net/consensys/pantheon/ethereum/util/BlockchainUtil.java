@@ -8,10 +8,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 
-/**
- * General purpose utility to search for the last matching header (common ancestor) between the
- * instance blockchain variable and a provided list of headers.
- */
 public class BlockchainUtil {
 
   private BlockchainUtil() {}
