@@ -7,7 +7,7 @@ plugins {
   id 'com.github.hierynomus.license' version '0.14.0'
   id 'net.ltgt.errorprone' version '0.6'
   id 'me.champeau.gradle.jmh' version '0.4.5' apply false
-  id 'com.jfrog.bintray' version '1.7.3'
+  id 'com.jfrog.bintray' version '1.8.4'
   id 'net.researchgate.release' version '2.6.0'
 }
 
@@ -402,9 +402,6 @@ if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
 apply plugin: 'net.researchgate.release'
 
 release {
-  //TODO - remove after testing (Clique is currently a SNAPSHOT)
-  failOnSnapshotDependencies = false
-
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
   tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
   newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
@@ -415,5 +412,19 @@ release {
   git {
     requireBranch = 'release-pipeline'
     pushToRemote = 'origin'
+  }
+}
+
+bintray {
+  user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+  key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
+  publications = ['mavenArtifact']
+  pkg {
+    repo = "pegasys-repo"
+    name = "pegasys"
+    userOrg = "consensys"
+    licenses = ["Apache-2.0"]
+    vcsUrl = "https://github.com/PegaSysEng/pantheon"
+    version { name = project.version }
   }
 }
