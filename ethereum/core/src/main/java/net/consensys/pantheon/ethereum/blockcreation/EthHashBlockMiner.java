@@ -18,19 +18,16 @@ import java.util.Optional;
  * <p>All other aspects of mining (i.e. pre-block delays, block creation and importing to the chain)
  * are all conducted by the parent class.
  */
-public class EthHashBlockMiner extends BlockMiner<Void> {
-
-  private final EthHashBlockCreator blockCreator;
+public class EthHashBlockMiner extends BlockMiner<Void, EthHashBlockCreator> {
 
   public EthHashBlockMiner(
       final EthHashBlockCreator blockCreator,
       final ProtocolSchedule<Void> protocolSchedule,
       final ProtocolContext<Void> protocolContext,
       final Subscribers<MinedBlockObserver> observers,
-      final BaseBlockScheduler scheduler,
+      final AbstractBlockScheduler scheduler,
       final BlockHeader parentHeader) {
     super(blockCreator, protocolSchedule, protocolContext, observers, scheduler, parentHeader);
-    this.blockCreator = blockCreator;
   }
 
   public Optional<EthHashSolverInputs> getWorkDefinition() {
