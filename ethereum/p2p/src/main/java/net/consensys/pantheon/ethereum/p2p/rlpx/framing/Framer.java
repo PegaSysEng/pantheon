@@ -15,6 +15,7 @@ import net.consensys.pantheon.util.bytes.BytesValue;
 
 import java.util.Arrays;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import org.bouncycastle.crypto.BlockCipher;
@@ -255,9 +256,6 @@ public class Framer {
     } else {
       // Move data to a ByteBuf
       final int messageLength = frameSize - LENGTH_MESSAGE_ID;
-      // Check message length
-      Preconditions.checkState(
-          messageLength < LENGTH_MAX_MESSAGE_FRAME, "Message size in excess of maximum length.");
       data = NetworkMemoryPool.allocate(messageLength);
       data.writeBytes(frameData, 1, messageLength);
     }
@@ -281,21 +279,8 @@ public class Framer {
    * @return The framed message, as byte buffer.
    */
   public synchronized ByteBuf frame(final MessageData message) {
-    return frame(message, LENGTH_MAX_MESSAGE_FRAME);
-  }
-
-  /**
-   * Frames a message for sending to an RLPx peer, encrypting it and calculating the appropriate
-   * MACs.
-   *
-   * @param message The message to frame.
-   * @param maxMessageSize The maximum size of the message.
-   * @throws IllegalArgumentException if the message is longer than maxMessageSize
-   * @return The framed message, as byte buffer.
-   */
-  synchronized ByteBuf frame(final MessageData message, final int maxMessageSize) {
     Preconditions.checkArgument(
-        message.getSize() < maxMessageSize, "Message size in excess of maximum length.");
+        message.getSize() < LENGTH_MAX_MESSAGE_FRAME, "Message size in excess of maximum length.");
     // Compress message
     if (compressionEnabled) {
       try {
@@ -320,7 +305,8 @@ public class Framer {
     }
   }
 
-  private ByteBuf frameAndReleaseMessage(final MessageData message) {
+  @VisibleForTesting
+  ByteBuf frameAndReleaseMessage(final MessageData message) {
     try {
       final int frameSize = message.getSize() + LENGTH_MESSAGE_ID;
       final int pad = padding16(frameSize);
