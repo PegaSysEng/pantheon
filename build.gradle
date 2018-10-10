@@ -348,9 +348,19 @@ applicationDistribution.into("bin") {
   fileMode = 0755
 }
 
-applicationDistribution.into("") { from("LICENSE") }
+distributions {
+  main {
+    contents {
+      from("./LICENSE") { into "." }
+      from("build/reports/license/license-dependency.html") { into "." }
+    }
+  }
+}
+
+installDist { dependsOn checkLicenses }
 
 distTar {
+  dependsOn checkLicenses
   doFirst {
     delete fileTree(dir: 'build/distributions', include: '*.tar.gz')
   }
@@ -359,6 +369,7 @@ distTar {
 }
 
 distZip {
+  dependsOn checkLicenses
   doFirst {
     delete fileTree(dir: 'build/distributions', include: '*.zip')
   }
