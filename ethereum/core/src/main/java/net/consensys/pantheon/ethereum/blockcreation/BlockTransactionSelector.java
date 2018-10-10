@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class BlockTransactionSelector {
 
-  private static final Logger LOGGER = LogManager.getLogger(MainnetBlockProcessor.class);
+  private static final Logger LOG = LogManager.getLogger(MainnetBlockProcessor.class);
   private final Wei minTransactionGasPrice;
 
   private static final double MIN_BLOCK_OCCUPANCY_RATIO = 0.8;

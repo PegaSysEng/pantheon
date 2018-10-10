@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class VoteTallyUpdater {
 
-  private static final Logger LOGGER = getLogger(VoteTallyUpdater.class);
+  private static final Logger LOG = getLogger(VoteTallyUpdater.class);
   private static final Address NO_VOTE_SUBJECT = Address.wrap(BytesValue.wrap(new byte[20]));
 
   private final EpochManager epochManager;
@@ -38,7 +38,7 @@ public class VoteTallyUpdater {
   public VoteTally buildVoteTallyFromBlockchain(final Blockchain blockchain) {
     final long chainHeadBlockNumber = blockchain.getChainHeadBlockNumber();
     final long epochBlockNumber = epochManager.getLastEpochBlock(chainHeadBlockNumber);
-    LOGGER.info("Loading validator voting state starting from block {}", epochBlockNumber);
+    LOG.info("Loading validator voting state starting from block {}", epochBlockNumber);
     final BlockHeader epochBlock = blockchain.getBlockHeader(epochBlockNumber).get();
     final List<Address> initialValidators =
         IbftExtraData.decode(epochBlock.getExtraData()).getValidators();
