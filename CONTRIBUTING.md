@@ -9,8 +9,8 @@ Welcome to the Pantheon repository!  The following is a set of guidelines for co
 [I just have a quick question](#i-just-have-a-quick-question)
 
 Before You start
-  * [Pantheon Architecture](documentation/architecture/architecture.md)
-  * [Java Modules](documentation/architecture/java-modules.md)
+  * [Pantheon Architecture](docs/architecture/architecture.md)
+  * [Java Modules](docs/architecture/java-modules.md)
 
 [How To Contribute](#how-to-contribute)
   * [Reporting Bugs](#reporting-bugs)
@@ -276,4 +276,4 @@ Please open an issue on `PegasysEng/Pantheon` if you have suggestions for new la
 [Wiki]: https://github.com/PegaSysEng/pantheon/wiki
 [Debugging Wiki]: https://github.com/PegaSysEng/pantheon/wiki/Debugging
 [CLA.md]: /CLA.md
-[code-reviews.md]: /documentation/community/code-reviews.md
+[code-reviews.md]: /docs/community/code-reviews.md

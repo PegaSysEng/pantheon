@@ -33,8 +33,8 @@ Instructions for how to get started with developing on the Orion codebase. Pleas
 [contribution guidelines](CONTRIBUTING.md) for more detail on how to submit a pull request (PR).
 
 * [Installation](wiki/Installation)
-* [Checking out and building](documentation/development/building.md)
-* [Running Pantheon via Gradle](documentation/development/running-with-gradle.md)
-* [Code Coverage](documentation/development/code-coverage.md)
-* [Logging](documentation/development/logging.md)
+* [Checking out and building](docs/development/building.md)
+* [Running Pantheon via Gradle](docs/development/running-with-gradle.md)
+* [Code Coverage](docs/development/code-coverage.md)
+* [Logging](docs/development/logging.md)
 
