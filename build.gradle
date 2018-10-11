@@ -403,18 +403,38 @@ apply plugin: 'net.researchgate.release'
 
 task integrationTest(type: Test){
   for(TaskContainer taskList : subprojects.tasks){
+    def subProjectIntegrationTask = taskList.findByName('integrationTest')
+
+    if (subProjectIntegrationTask != null) {
+      dependsOn subProjectIntegrationTask
+    }
+  }
+}
+
+task rt(type: GradleBuild){
+  for(TaskContainer taskList : subprojects.tasks){
     try {
-      def subProjectIntegrationTask = taskList.getByName('integrationTest')
+
+      def tests = taskList.findByName('integrationTest')
+
+      println "****"
+      println tests
+
+      def subProjectIntegrationTask = taskList.getByName('referenceTest')
+
+      println "****"
+      println subProjectIntegrationTask
 
       if (subProjectIntegrationTask != null) {
         dependsOn subProjectIntegrationTask
       }
     }catch(UnknownTaskException e){
+      println "****"
+      println taskList.names
+      println " "
     }
   }
 }
-
-task referenceTest(type: Test){ dependsOn ":pantheon:ethereum:core:referenceTest" }
 
 release {
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
@@ -425,7 +445,6 @@ release {
   buildTasks = [
     'build',
     'integrationTest',
-    'referenceTest',
     'checkLicenses',
     'javadoc'
   ]
