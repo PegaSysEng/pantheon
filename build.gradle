@@ -229,7 +229,7 @@ subprojects {
 
   task integrationTest(type: Test, dependsOn:["compileTestJava"]){
     group = "verification"
-    description = "Runs the Pantheon Integration Test"
+    description = "Runs the Pantheon integration tests"
 
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
