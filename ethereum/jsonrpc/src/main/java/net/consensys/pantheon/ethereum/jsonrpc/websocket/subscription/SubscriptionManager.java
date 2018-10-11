@@ -70,13 +70,25 @@ public class SubscriptionManager extends AbstractVerticle {
   }
 
   public boolean unsubscribe(final UnsubscribeRequest request) {
-    LOG.debug("Unsubscribe request subscriptionId = {}", request.getSubscriptionId());
+    final Long subscriptionId = request.getSubscriptionId();
+    final String connectionId = request.getConnectionId();
 
-    if (!subscriptions.containsKey(request.getSubscriptionId())) {
-      throw new SubscriptionNotFoundException(request.getSubscriptionId());
+    LOG.debug("Unsubscribe request subscriptionId = {}", subscriptionId);
+
+    if (!subscriptions.containsKey(subscriptionId)) {
+      throw new SubscriptionNotFoundException(subscriptionId);
     }
 
-    destroySubscription(request.getSubscriptionId(), request.getConnectionId());
+    /*
+     If the connection doesn't own the subscription, we throw a not found exception to avoid
+     exposing information from others (e.g. scanning existing subscription ids)
+    */
+    if (connectionSubscriptionsMap.get(connectionId) == null
+        || !connectionSubscriptionsMap.get(connectionId).contains(subscriptionId)) {
+      throw new SubscriptionNotFoundException(subscriptionId);
+    }
+
+    destroySubscription(subscriptionId, connectionId);
 
     return true;
   }
