@@ -11,6 +11,7 @@ import net.consensys.pantheon.ethereum.core.TransactionReceipt;
 import net.consensys.pantheon.ethereum.core.Wei;
 import net.consensys.pantheon.ethereum.core.WorldState;
 import net.consensys.pantheon.ethereum.core.WorldUpdater;
+import net.consensys.pantheon.ethereum.vm.BlockHashLookup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class MainnetBlockProcessor implements BlockProcessor {
         TransactionProcessor.Result result, WorldState worldState, long gasUsed);
   }
 
-  private static final Logger LOGGER = LogManager.getLogger(MainnetBlockProcessor.class);
+  private static final Logger LOG = LogManager.getLogger();
 
   private static final int MAX_GENERATION = 6;
 
@@ -94,12 +95,10 @@ public class MainnetBlockProcessor implements BlockProcessor {
     long gasUsed = 0;
     final List<TransactionReceipt> receipts = new ArrayList<>();
 
-    for (int i = 0; i < transactions.size(); ++i) {
-      final Transaction transaction = transactions.get(i);
-
+    for (final Transaction transaction : transactions) {
       final long remainingGasBudget = blockHeader.getGasLimit() - gasUsed;
       if (Long.compareUnsigned(transaction.getGasLimit(), remainingGasBudget) > 0) {
-        LOGGER.warn(
+        LOG.warn(
             "Transaction processing error: transaction gas limit {} exceeds available block budget remaining {}",
             transaction.getGasLimit(),
             remainingGasBudget);
@@ -107,11 +106,17 @@ public class MainnetBlockProcessor implements BlockProcessor {
       }
 
       final WorldUpdater worldStateUpdater = worldState.updater();
+      final BlockHashLookup blockHashLookup = new BlockHashLookup(blockHeader, blockchain);
       final Address miningBeneficiary =
           miningBeneficiaryCalculator.calculateBeneficiary(blockHeader);
       final TransactionProcessor.Result result =
           transactionProcessor.processTransaction(
-              blockchain, worldStateUpdater, blockHeader, transaction, miningBeneficiary);
+              blockchain,
+              worldStateUpdater,
+              blockHeader,
+              transaction,
+              miningBeneficiary,
+              blockHashLookup);
       if (result.isInvalid()) {
         return Result.failed();
       }
@@ -131,10 +136,6 @@ public class MainnetBlockProcessor implements BlockProcessor {
     return Result.successful(receipts);
   }
 
-  protected Address calculateFeeRecipient(final BlockHeader header) {
-    return header.getCoinbase();
-  }
-
   private boolean rewardCoinbase(
       final MutableWorldState worldState,
       final ProcessableBlockHeader header,
@@ -149,7 +150,7 @@ public class MainnetBlockProcessor implements BlockProcessor {
     coinbase.incrementBalance(coinbaseReward);
     for (final BlockHeader ommerHeader : ommers) {
       if (ommerHeader.getNumber() - header.getNumber() > MAX_GENERATION) {
-        LOGGER.warn(
+        LOG.warn(
             "Block processing error: ommer block number {} more than {} generations current block number {}",
             ommerHeader.getNumber(),
             MAX_GENERATION,

@@ -101,11 +101,12 @@ public class VMReferenceTest extends AbstractRetryingTest {
     final ProtocolSpec<Void> protocolSpec =
         MainnetProtocolSpecs.frontier(new MutableProtocolSchedule<>());
 
+    final TestBlockchain blockchain = new TestBlockchain(execEnv.getBlockHeader().getNumber());
     final MessageFrame frame =
         MessageFrame.builder()
             .type(MessageFrame.Type.MESSAGE_CALL)
             .messageFrameStack(new ArrayDeque<>())
-            .blockchain(new TestBlockchain())
+            .blockchain(blockchain)
             .worldState(worldState.updater())
             .initialGas(spec.getExec().getGas())
             .contract(execEnv.getAccountAddress())
@@ -120,6 +121,8 @@ public class VMReferenceTest extends AbstractRetryingTest {
             .blockHeader(execEnv.getBlockHeader())
             .depth(execEnv.getDepth())
             .completer(c -> {})
+            .miningBeneficiary(execEnv.getBlockHeader().getCoinbase())
+            .blockHashLookup(new BlockHashLookup(execEnv.getBlockHeader(), blockchain))
             .build();
 
     // This is normally set inside the containing message executing the code.

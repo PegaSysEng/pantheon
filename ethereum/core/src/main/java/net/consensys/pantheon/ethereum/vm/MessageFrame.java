@@ -175,6 +175,7 @@ public class MessageFrame {
 
   // Machine state fields.
   private Gas gasRemaining;
+  private final BlockHashLookup blockHashLookup;
   private int pc;
   private final Memory memory;
   private final OperandStack stack;
@@ -200,6 +201,7 @@ public class MessageFrame {
   private final ProcessableBlockHeader blockHeader;
   private final int depth;
   private final Deque<MessageFrame> messageFrameStack;
+  private final Address miningBeneficiary;
 
   // Miscellaneous fields.
   private final EnumSet<ExceptionalHaltReason> exceptionalHaltReasons =
@@ -229,12 +231,15 @@ public class MessageFrame {
       final ProcessableBlockHeader blockHeader,
       final int depth,
       final boolean isStatic,
-      final Consumer<MessageFrame> completer) {
+      final Consumer<MessageFrame> completer,
+      final Address miningBeneficiary,
+      final BlockHashLookup blockHashLookup) {
     this.type = type;
     this.blockchain = blockchain;
     this.messageFrameStack = messageFrameStack;
     this.worldState = worldState;
     this.gasRemaining = initialGas;
+    this.blockHashLookup = blockHashLookup;
     this.pc = 0;
     this.memory = new Memory();
     this.stack = new PreAllocatedOperandStack(MAX_STACK_SIZE);
@@ -257,6 +262,7 @@ public class MessageFrame {
     this.state = State.NOT_STARTED;
     this.isStatic = isStatic;
     this.completer = completer;
+    this.miningBeneficiary = miningBeneficiary;
   }
 
   /**
@@ -771,6 +777,19 @@ public class MessageFrame {
     return exceptionalHaltReasons;
   }
 
+  /**
+   * Returns the current miningBeneficiary (aka coinbase)
+   *
+   * @return the current mining beneficiary
+   */
+  public Address getMiningBeneficiary() {
+    return miningBeneficiary;
+  }
+
+  public BlockHashLookup getBlockHashLookup() {
+    return blockHashLookup;
+  }
+
   public Operation getCurrentOperation() {
     return currentOperation;
   }
@@ -799,6 +818,8 @@ public class MessageFrame {
     private int depth = -1;
     private boolean isStatic = false;
     private Consumer<MessageFrame> completer;
+    private Address miningBeneficiary;
+    private BlockHashLookup blockHashLookup;
 
     public Builder type(final Type type) {
       this.type = type;
@@ -890,6 +911,16 @@ public class MessageFrame {
       return this;
     }
 
+    public Builder miningBeneficiary(final Address miningBeneficiary) {
+      this.miningBeneficiary = miningBeneficiary;
+      return this;
+    }
+
+    public Builder blockHashLookup(final BlockHashLookup blockHashLookup) {
+      this.blockHashLookup = blockHashLookup;
+      return this;
+    }
+
     private void validate() {
       checkState(type != null, "Missing message frame type");
       checkState(blockchain != null, "Missing message frame blockchain");
@@ -908,6 +939,8 @@ public class MessageFrame {
       checkState(blockHeader != null, "Missing message frame block header");
       checkState(depth > -1, "Missing message frame depth");
       checkState(completer != null, "Missing message frame completer");
+      checkState(miningBeneficiary != null, "Missing mining beneficiary");
+      checkState(blockHashLookup != null, "Missing block hash lookup");
     }
 
     public MessageFrame build() {
@@ -931,7 +964,9 @@ public class MessageFrame {
           blockHeader,
           depth,
           isStatic,
-          completer);
+          completer,
+          miningBeneficiary,
+          blockHashLookup);
     }
   }
 }

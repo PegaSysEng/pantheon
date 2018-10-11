@@ -10,9 +10,9 @@ import net.consensys.pantheon.ethereum.core.Transaction;
 import net.consensys.pantheon.ethereum.core.TransactionReceipt;
 import net.consensys.pantheon.ethereum.core.Wei;
 import net.consensys.pantheon.ethereum.core.WorldUpdater;
-import net.consensys.pantheon.ethereum.mainnet.MainnetBlockProcessor;
 import net.consensys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import net.consensys.pantheon.ethereum.mainnet.TransactionProcessor;
+import net.consensys.pantheon.ethereum.vm.BlockHashLookup;
 
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class BlockTransactionSelector {
 
-  private static final Logger LOGGER = LogManager.getLogger(MainnetBlockProcessor.class);
+  private static final Logger LOG = LogManager.getLogger();
   private final Wei minTransactionGasPrice;
 
   private static final double MIN_BLOCK_OCCUPANCY_RATIO = 0.8;
@@ -147,10 +147,16 @@ public class BlockTransactionSelector {
     }
 
     final WorldUpdater worldStateUpdater = worldState.updater();
+    final BlockHashLookup blockHashLookup = new BlockHashLookup(processableBlockHeader, blockchain);
 
     final TransactionProcessor.Result result =
         transactionProcessor.processTransaction(
-            blockchain, worldStateUpdater, processableBlockHeader, transaction, miningBeneficiary);
+            blockchain,
+            worldStateUpdater,
+            processableBlockHeader,
+            transaction,
+            miningBeneficiary,
+            blockHashLookup);
 
     if (!result.isInvalid()) {
       worldStateUpdater.commit();

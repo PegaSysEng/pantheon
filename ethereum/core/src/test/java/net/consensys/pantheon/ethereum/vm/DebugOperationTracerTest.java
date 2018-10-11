@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import net.consensys.pantheon.ethereum.core.Address;
+import net.consensys.pantheon.ethereum.core.AddressHelpers;
+import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import net.consensys.pantheon.ethereum.core.Gas;
 import net.consensys.pantheon.ethereum.core.MutableAccount;
@@ -188,10 +190,12 @@ public class DebugOperationTracerTest {
   }
 
   private MessageFrame.Builder validMessageFrameBuilder() {
+    final BlockHeader blockHeader = new BlockHeaderTestFixture().number(1).buildHeader();
+    final TestBlockchain blockchain = new TestBlockchain(blockHeader.getNumber());
     return MessageFrame.builder()
         .type(MessageFrame.Type.MESSAGE_CALL)
         .messageFrameStack(new ArrayDeque<>())
-        .blockchain(new TestBlockchain())
+        .blockchain(blockchain)
         .worldState(worldUpdater)
         .initialGas(INITIAL_GAS)
         .contract(calculateAddressWithRespectTo(Address.ID, 1))
@@ -203,9 +207,11 @@ public class DebugOperationTracerTest {
         .value(Wei.of(30))
         .apparentValue(Wei.of(35))
         .code(new Code())
-        .blockHeader(new BlockHeaderTestFixture().buildHeader())
+        .blockHeader(blockHeader)
         .depth(DEPTH)
-        .completer(c -> {});
+        .completer(c -> {})
+        .miningBeneficiary(AddressHelpers.ofValue(0))
+        .blockHashLookup(new BlockHashLookup(blockHeader, blockchain));
   }
 
   private Map<UInt256, UInt256> setupStorageForCapture(final MessageFrame frame) {

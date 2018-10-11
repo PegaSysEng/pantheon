@@ -4,6 +4,8 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 import net.consensys.pantheon.controller.PantheonController;
 import net.consensys.pantheon.ethereum.ProtocolContext;
+import net.consensys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
+import net.consensys.pantheon.ethereum.blockcreation.BlockMiner;
 import net.consensys.pantheon.ethereum.chain.GenesisConfig;
 import net.consensys.pantheon.ethereum.chain.MutableBlockchain;
 import net.consensys.pantheon.ethereum.core.Block;
@@ -32,11 +34,13 @@ public class BlockImporter {
    * @param blocks Path to the file containing the blocks
    * @param pantheonController the PantheonController that defines blockchain behavior
    * @param <C> the consensus context type
+   * @param <M> the type of miner being used within the executing pantheon
    * @return the import result
    * @throws IOException On Failure
    */
-  public <C> BlockImporter.ImportResult importBlockchain(
-      final Path blocks, final PantheonController<C> pantheonController) throws IOException {
+  public <C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>>
+      BlockImporter.ImportResult importBlockchain(
+          final Path blocks, final PantheonController<C, M> pantheonController) throws IOException {
     final ProtocolSchedule<C> protocolSchedule = pantheonController.getProtocolSchedule();
     final ProtocolContext<C> context = pantheonController.getProtocolContext();
     final GenesisConfig<C> genesis = pantheonController.getGenesisConfig();
