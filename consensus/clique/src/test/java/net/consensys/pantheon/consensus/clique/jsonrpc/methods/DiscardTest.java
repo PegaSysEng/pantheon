@@ -3,8 +3,8 @@ package net.consensys.pantheon.consensus.clique.jsonrpc.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import net.consensys.pantheon.consensus.common.Vote;
 import net.consensys.pantheon.consensus.common.VoteProposer;
-import net.consensys.pantheon.consensus.common.VoteProposer.Vote;
 import net.consensys.pantheon.ethereum.core.Address;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
@@ -12,8 +12,6 @@ import net.consensys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParame
 import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponseType;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-
-import java.util.Optional;
 
 import org.junit.Test;
 
@@ -29,7 +27,7 @@ public class DiscardTest {
 
     final JsonRpcResponse response = discard.response(requestWithParams(a0));
 
-    assertThat(proposer.get(a0)).isEqualTo(Optional.empty());
+    assertThat(proposer.get(a0)).isEqualTo(Vote.emptyVote());
     assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
     final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
     assertThat(successResponse.getResult()).isEqualTo(true);
@@ -45,7 +43,7 @@ public class DiscardTest {
 
     final JsonRpcResponse response = discard.response(requestWithParams(a0));
 
-    assertThat(proposer.get(a0)).isEqualTo(Optional.empty());
+    assertThat(proposer.get(a0)).isEqualTo(Vote.emptyVote());
     assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
     final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
     assertThat(successResponse.getResult()).isEqualTo(true);
@@ -61,7 +59,7 @@ public class DiscardTest {
 
     final JsonRpcResponse response = discard.response(requestWithParams(a0));
 
-    assertThat(proposer.get(a0)).isEqualTo(Optional.empty());
+    assertThat(proposer.get(a0)).isEqualTo(Vote.emptyVote());
     assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
     final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
     assertThat(successResponse.getResult()).isEqualTo(true);
@@ -79,8 +77,8 @@ public class DiscardTest {
 
     final JsonRpcResponse response = discard.response(requestWithParams(a0));
 
-    assertThat(proposer.get(a0)).isEqualTo(Optional.empty());
-    assertThat(proposer.get(a1)).isEqualTo(Optional.of(Vote.AUTH));
+    assertThat(proposer.get(a0)).isEqualTo(Vote.emptyVote());
+    assertThat(proposer.get(a1)).isEqualTo(Vote.authVote(a1));
     assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
     final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
     assertThat(successResponse.getResult()).isEqualTo(true);
