@@ -9,8 +9,10 @@ import net.consensys.pantheon.tests.acceptance.dsl.account.Account;
 import net.consensys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
 
   private PantheonNode minerNode;

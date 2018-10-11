@@ -11,10 +11,12 @@ import net.consensys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import net.consensys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.exceptions.ClientConnectionException;
 
+@Ignore
 public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
   private PantheonNode rpcEnabledNode;
