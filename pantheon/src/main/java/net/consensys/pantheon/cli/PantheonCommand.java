@@ -61,7 +61,7 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements Runnable {
-  private static final Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOG = LogManager.getLogger();
 
   private static final int DEFAULT_MAX_PEERS = 25;
 
@@ -182,12 +182,14 @@ public class PantheonCommand implements Runnable {
   )
   private final Integer maxTrailingPeers = Integer.MAX_VALUE;
 
-  @Option(
-    names = {"--sync-mode"},
-    paramLabel = MANDATORY_MODE_FORMAT_HELP,
-    description =
-        "Synchronization mode (Value can be one of ${COMPLETION-CANDIDATES}, default: ${DEFAULT-VALUE})"
-  )
+  // TODO: Re-enable as per NC-1057/NC-1681
+  //  @Option(
+  //    names = {"--sync-mode"},
+  //    paramLabel = MANDATORY_MODE_FORMAT_HELP,
+  //    description =
+  //        "Synchronization mode (Value can be one of ${COMPLETION-CANDIDATES}, default:
+  // ${DEFAULT-VALUE})"
+  //  )
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
   // Boolean option to indicate if the client have to sync against the ottoman test network
