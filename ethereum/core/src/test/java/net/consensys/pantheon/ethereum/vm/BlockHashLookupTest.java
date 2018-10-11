@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import net.consensys.pantheon.ethereum.chain.Blockchain;
@@ -23,7 +25,7 @@ public class BlockHashLookupTest {
   private static final int CURRENT_BLOCK_NUMBER = 256;
   private final Blockchain blockchain = mock(Blockchain.class);
   private final BlockHeader[] headers = new BlockHeader[CURRENT_BLOCK_NUMBER];
-  private BlockHashLookup cache;
+  private BlockHashLookup lookup;
 
   @Before
   public void setUp() {
@@ -34,7 +36,7 @@ public class BlockHashLookupTest {
       headers[i] = header;
       parentHeader = headers[i];
     }
-    cache =
+    lookup =
         new BlockHashLookup(
             createHeader(CURRENT_BLOCK_NUMBER, headers[headers.length - 1]), blockchain);
   }
@@ -62,8 +64,38 @@ public class BlockHashLookupTest {
     assertHashForBlockNumber(CURRENT_BLOCK_NUMBER - 1);
   }
 
+  @Test
+  public void shouldReturnEmptyHashWhenRequestedBlockNotOnChain() {
+    assertThat(lookup.getBlockHash(CURRENT_BLOCK_NUMBER + 20)).isEqualTo(Hash.ZERO);
+  }
+
+  @Test
+  public void shouldReturnEmptyHashWhenParentBlockNotOnChain() {
+    final BlockHashLookup lookupWithUnavailableParent =
+        new BlockHashLookup(
+            new BlockHeaderTestFixture().number(CURRENT_BLOCK_NUMBER + 20).buildHeader(),
+            blockchain);
+    assertThat(lookupWithUnavailableParent.getBlockHash(CURRENT_BLOCK_NUMBER)).isEqualTo(Hash.ZERO);
+  }
+
+  @Test
+  public void shouldGetParentHashFromCurrentBlock() {
+    assertHashForBlockNumber(CURRENT_BLOCK_NUMBER - 1);
+    verifyZeroInteractions(blockchain);
+  }
+
+  @Test
+  public void shouldCacheBlockHashesWhileIteratingBackToPreviousHeader() {
+    assertHashForBlockNumber(CURRENT_BLOCK_NUMBER - 4);
+    assertHashForBlockNumber(CURRENT_BLOCK_NUMBER - 1);
+    verify(blockchain).getBlockHeader(headers[CURRENT_BLOCK_NUMBER - 1].getHash());
+    verify(blockchain).getBlockHeader(headers[CURRENT_BLOCK_NUMBER - 2].getHash());
+    verify(blockchain).getBlockHeader(headers[CURRENT_BLOCK_NUMBER - 3].getHash());
+    verifyNoMoreInteractions(blockchain);
+  }
+
   private void assertHashForBlockNumber(final int blockNumber) {
-    assertThat(cache.getBlockHash(blockNumber)).isEqualTo(headers[blockNumber].getHash());
+    assertThat(lookup.getBlockHash(blockNumber)).isEqualTo(headers[blockNumber].getHash());
   }
 
   private BlockHeader createHeader(final int blockNumber, final BlockHeader parentHeader) {

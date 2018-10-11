@@ -1,7 +1,6 @@
 package net.consensys.pantheon.ethereum.vm;
 
 import net.consensys.pantheon.ethereum.chain.Blockchain;
-import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.core.Hash;
 import net.consensys.pantheon.ethereum.core.ProcessableBlockHeader;
 import net.consensys.pantheon.ethereum.vm.operations.BlockHashOperation;
@@ -19,18 +18,12 @@ import java.util.Map;
  */
 public class BlockHashLookup {
 
-  private BlockHeader searchStartHeader;
+  private ProcessableBlockHeader searchStartHeader;
   private final Blockchain blockchain;
   private final Map<Long, Hash> hashByNumber = new HashMap<>();
 
   public BlockHashLookup(final ProcessableBlockHeader currentBlock, final Blockchain blockchain) {
-    this.searchStartHeader =
-        blockchain
-            .getBlockHeader(currentBlock.getParentHash())
-            .orElseThrow(
-                () ->
-                    new IllegalStateException(
-                        "Attempting to process a block header without parent being on chain"));
+    this.searchStartHeader = currentBlock;
     this.blockchain = blockchain;
     hashByNumber.put(currentBlock.getNumber() - 1, currentBlock.getParentHash());
   }
@@ -40,11 +33,12 @@ public class BlockHashLookup {
     if (cachedHash != null) {
       return cachedHash;
     }
-    while (searchStartHeader != null && searchStartHeader.getNumber() != blockNumber) {
-      hashByNumber.put(searchStartHeader.getNumber(), searchStartHeader.getHash());
-      hashByNumber.put(searchStartHeader.getNumber() - 1, searchStartHeader.getParentHash());
+    while (searchStartHeader != null && searchStartHeader.getNumber() - 1 > blockNumber) {
       searchStartHeader = blockchain.getBlockHeader(searchStartHeader.getParentHash()).orElse(null);
+      if (searchStartHeader != null) {
+        hashByNumber.put(searchStartHeader.getNumber() - 1, searchStartHeader.getParentHash());
+      }
     }
-    return hashByNumber.get(blockNumber);
+    return hashByNumber.getOrDefault(blockNumber, Hash.ZERO);
   }
 }
