@@ -96,7 +96,7 @@ public class GeneralStateReferenceTestTools {
     final WorldUpdater worldStateUpdater = worldState.updater();
     final TransactionProcessor.Result result =
         processor.processTransaction(
-            new TestBlockchain(),
+            new TestBlockchain(blockHeader.getNumber()),
             worldStateUpdater,
             blockHeader,
             transaction,

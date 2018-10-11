@@ -105,7 +105,7 @@ public class VMReferenceTest extends AbstractRetryingTest {
         MessageFrame.builder()
             .type(MessageFrame.Type.MESSAGE_CALL)
             .messageFrameStack(new ArrayDeque<>())
-            .blockchain(new TestBlockchain())
+            .blockchain(new TestBlockchain(execEnv.getBlockHeader().getNumber()))
             .worldState(worldState.updater())
             .initialGas(spec.getExec().getGas())
             .contract(execEnv.getAccountAddress())
