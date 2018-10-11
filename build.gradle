@@ -414,7 +414,7 @@ bintray {
   }
   pkg {
     repo = "pegasys-repo"
-    name = "pegasys"
+    name = "pantheon"
     userOrg = "consensys"
     licenses = ["Apache-2.0"]
     vcsUrl = "https://github.com/PegaSysEng/pantheon"
