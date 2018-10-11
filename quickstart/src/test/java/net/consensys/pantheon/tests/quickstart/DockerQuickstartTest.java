@@ -37,7 +37,6 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Async;
 
 public class DockerQuickstartTest {
-
   private static final String PROJECT_ROOT =
       Paths.get(System.getProperty("user.dir")).getParent().toString();
   private static final String DOCKER_COMPOSE_PROJECT_PREFIX = "quickstart_";

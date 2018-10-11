@@ -22,6 +22,7 @@ services:
   node:
     image: quickstart/pantheon:latest
     command: ["--dev-mode"]
+
     volumes:
       - public-keys:/opt/pantheon/public-keys
     depends_on:
