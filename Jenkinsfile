@@ -87,10 +87,4 @@ stage('Pantheon tests') {
             }
         }
     }
-    docker.image('docker:18.06.0-ce-dind').withRun('--privileged') {
-        stage('Docker quickstart Tests') {
-            sh 'apk add --no-cache py-pip && pip install docker-compose'
-            sh './gradlew --no-daemon --parallel dockerQuickstartTest'
-        }
-    }
 }
