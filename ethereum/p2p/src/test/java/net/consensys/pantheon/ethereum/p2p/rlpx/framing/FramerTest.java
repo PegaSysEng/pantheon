@@ -68,15 +68,14 @@ public class FramerTest {
     final ByteBuf buf = wrappedBuffer(byteArray);
 
     final MessageData ethMessage = new RawMessage(0x00, buf);
-    final ByteBuf framedMesasge = framer.frameAndReleaseMessage(ethMessage);
-    ;
+    final ByteBuf framedMessage = framer.frameAndReleaseMessage(ethMessage);
 
     final HandshakeSecrets deframeSecrets = secretsFrom(td, true);
     final Framer deframer = new Framer(deframeSecrets);
     deframer.enableCompression();
 
     assertThatExceptionOfType(IllegalStateException.class)
-        .isThrownBy(() -> deframer.deframe(framedMesasge))
+        .isThrownBy(() -> deframer.deframe(framedMessage))
         .withMessageContaining("Message size in excess of maximum length.");
   }
 
