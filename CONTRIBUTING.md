@@ -50,7 +50,7 @@ Before creating bug reports, please check the [before-submitting-a-bug-report](#
 #### Before Submitting A Bug Report
 * **Confirm the problem** is reproducible in the latest version of the software
 * **Check the [Debugging Wiki]**. You might be able to find the cause of the problem and fix things yourself. 
-* **Perform a [cursory search of project issues](https://github.com/search?q=+is%3Aissue+repo%3AConsenSys/Pantheon)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
+* **Perform a [cursory search of project issues](https://github.com/search?q=+is%3Aissue+repo%3APegasysEng/Pantheon)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Bug Report?
 Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).  Issues should and provide the following information by filling in the [ISSUE-TEMPLATE.md](.github/issue_template.md).
@@ -89,7 +89,7 @@ Before creating enhancement suggestions, please check the [before-submitting-an-
 #### Before Submitting An Enhancement Suggestion
 
 * **Check the [Debugging Wiki].** You might be able to find the cause of the problem and fix things yourself. 
-* **Perform a [cursory search of project issues](https://github.com/search?q=+is%3Aissue+repo%3AConsenSys/Pantheon)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
+* **Perform a [cursory search of project issues](https://github.com/search?q=+is%3Aissue+repo%3APegasysEng/Pantheon)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Enhancement Suggestion?
 
@@ -202,7 +202,7 @@ This section lists the labels we use to help us track and manage issues and pull
 
 The labels are loosely grouped by their purpose, but it's not required that every issue have a label from every group or that an issue can't have more than one label from the same group.
 
-Please open an issue on `ConsenSys/Pantheon` if you have suggestions for new labels.
+Please open an issue on `PegasysEng/Pantheon` if you have suggestions for new labels.
 
 #### Type of Issue and Issue State
 
@@ -243,33 +243,33 @@ Please open an issue on `ConsenSys/Pantheon` if you have suggestions for new lab
 | `requires-changes` | [search][search-label-requires-changes] | Pull requests which need to be updated based on review comments and then reviewed again. |
 
 
-[search-label-enhancement]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Aenhancement
-[search-label-bug]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Abug
-[search-label-question]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Aquestion
-[search-label-feedback]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Afeedback
-[search-label-help-wanted]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Ahelp-wanted
-[search-label-beginner]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Abeginner
-[search-label-more-information-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Amore-information-needed
-[search-label-needs-reproduction]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Aneeds-reproduction
-[search-label-triage-help-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Atriage-help-needed
-[search-label-windows]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Awindows
-[search-label-linux]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Alinux
-[search-label-mac]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Amac
-[search-label-documentation]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Adocumentation
-[search-label-performance]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Aperformance
-[search-label-security]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Asecurity
-[search-label-api]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Aapi
+[search-label-enhancement]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aenhancement
+[search-label-bug]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abug
+[search-label-question]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aquestion
+[search-label-feedback]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Afeedback
+[search-label-help-wanted]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ahelp-wanted
+[search-label-beginner]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abeginner
+[search-label-more-information-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Amore-information-needed
+[search-label-needs-reproduction]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aneeds-reproduction
+[search-label-triage-help-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Atriage-help-needed
+[search-label-windows]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awindows
+[search-label-linux]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Alinux
+[search-label-mac]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Amac
+[search-label-documentation]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Adocumentation
+[search-label-performance]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aperformance
+[search-label-security]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Asecurity
+[search-label-api]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aapi
 
-[search-label-blocked]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Ablocked
-[search-label-duplicate]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Aduplicate
-[search-label-wontfix]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Awontfix
-[search-label-invalid]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3AConsenSys%2FPantheon+label%3Ainvalid
-[search-label-work-in-progress]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3AConsenSys%2FPantheon+label%3Awork-in-progress
-[search-label-needs-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3AConsenSys%2FPantheon+label%3Aneeds-review
-[search-label-under-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3AConsenSys%2FPantheon+label%3Aunder-review
-[search-label-requires-changes]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3AConsenSys%2FPantheon+label%3Arequires-changes
-[beginner]:https://github.com/search?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3Abeginner+label%3Ahelp-wanted+repo%3AConsenSys%2FPantheon+sort%3Acomments-desc
-[help-wanted]:https://github.com/search?q=is%3Aopen+is%3Aissue+label%3Ahelp-wanted+repo%3AConsenSys%2FPantheon+sort%3Acomments-desc+-label%3Abeginner
+[search-label-blocked]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ablocked
+[search-label-duplicate]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aduplicate
+[search-label-wontfix]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awontfix
+[search-label-invalid]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ainvalid
+[search-label-work-in-progress]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Awork-in-progress
+[search-label-needs-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Aneeds-review
+[search-label-under-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Aunder-review
+[search-label-requires-changes]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Arequires-changes
+[beginner]:https://github.com/search?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3Abeginner+label%3Ahelp-wanted+repo%3APegasysEng%2FPantheon+sort%3Acomments-desc
+[help-wanted]:https://github.com/search?q=is%3Aopen+is%3Aissue+label%3Ahelp-wanted+repo%3APegasysEng%2FPantheon+sort%3Acomments-desc+-label%3Abeginner
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
 [Gitter]: https://gitter.im/Pantheon
