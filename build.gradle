@@ -376,10 +376,10 @@ task releaseIntegrationTest(type: Test){
   }
 }
 
-task releaseReferenceTest(type: GradleBuild, dependsOn : ':ethereum:core:referenceTests'){
+task releaseReferenceTest(type: Test, dependsOn : ':ethereum:core:referenceTests'){
 }
 
-task releaseAcceptanceTest(type: GradleBuild, dependsOn : ':acceptance-tests:acceptanceTest') {}
+task releaseAcceptanceTest(type: Test, dependsOn : ':acceptance-tests:acceptanceTest') {}
 
 release {
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
