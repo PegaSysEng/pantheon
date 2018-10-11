@@ -418,6 +418,9 @@ bintray {
     userOrg = "consensys"
     licenses = ["Apache-2.0"]
     vcsUrl = "https://github.com/PegaSysEng/pantheon"
-    version { name = project.version }
+    version {
+      name = project.version
+      released  = new Date()
+    }
   }
 }
