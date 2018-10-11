@@ -376,15 +376,7 @@ task releaseIntegrationTest(type: GradleBuild){
   }
 }
 
-task rts(type: GradleBuild){
-  for(TaskContainer taskList : subprojects.tasks){
-    def subProjectReferenceTestTask = taskList.findByName('referenceTests')
-
-    //TODO this is NOT picking up the Reference tests
-    if (subProjectReferenceTestTask != null) {
-      dependsOn subProjectReferenceTestTask
-    }
-  }
+task releaseReferenceTest(type: GradleBuild, dependsOn : ':ethereum:core:referenceTests'){
 }
 
 task releaseAcceptanceTest(type: GradleBuild, dependsOn : ':acceptance-tests:acceptanceTest') {}
@@ -399,6 +391,7 @@ release {
     'build',
     'releaseIntegrationTest',
     'releaseAcceptanceTest',
+    'releaseReferenceTest',
     'checkLicenses',
     'javadoc'
   ]
