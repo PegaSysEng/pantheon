@@ -130,10 +130,9 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
       final ProcessableBlockHeader blockHeader,
       final Transaction transaction,
       final Address miningBenficiary,
-      final OperationTracer operationTracer) {
+      final OperationTracer operationTracer,
+      final BlockHashLookup blockHashLookup) {
     LOG.trace("Starting execution of {}", transaction);
-
-    final BlockHashLookup blockHashLookup = new BlockHashLookup(blockHeader, blockchain);
 
     ValidationResult<TransactionInvalidReason> validationResult =
         transactionValidator.validate(transaction);
