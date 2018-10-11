@@ -366,7 +366,7 @@ if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
 
 apply plugin: 'net.researchgate.release'
 
-task releaseIntegrationTest(type: GradleBuild){
+task releaseIntegrationTest(type: Test){
   for(TaskContainer taskList : subprojects.tasks){
     def subProjectIntegrationTask = taskList.findByName('integrationTest')
 
