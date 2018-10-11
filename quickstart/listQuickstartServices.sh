@@ -9,7 +9,6 @@ if [ ! -f gradlew ]; then
     exit 1
 fi
 
-
 COMPOSE_CONFIG_FILE_OPTION="-f ${QUICKSTART_FOLDER}/docker-compose.yml"
 EXPLORER_SERVICE=explorer
 
