@@ -401,7 +401,7 @@ if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
 
 apply plugin: 'net.researchgate.release'
 
-task integrationTest(type: Test){
+task releaseIntegrationTest(type: GradleBuild){
   for(TaskContainer taskList : subprojects.tasks){
     def subProjectIntegrationTask = taskList.findByName('integrationTest')
 
@@ -411,24 +411,18 @@ task integrationTest(type: Test){
   }
 }
 
-task rt(type: GradleBuild){
+task rts(type: GradleBuild){
   for(TaskContainer taskList : subprojects.tasks){
-    try {
+    def subProjectReferenceTestTask = taskList.findByName('referenceTests')
 
-      def subProjectReferenceTestTask = taskList.findByName('referenceTest')
-
-      println "****"
-      println subProjectReferenceTestTask
-
-      if (subProjectReferenceTestTask != null) {
-        dependsOn subProjectReferenceTestTask
-      }
-    }catch(UnknownTaskException e){
-      println "****"
-      println taskList.names
-      println " "
+    //TODO this is NOT picking up the Reference tests
+    if (subProjectReferenceTestTask != null) {
+      dependsOn subProjectReferenceTestTask
     }
   }
+}
+
+task releaseAcceptanceTest(type: GradleBuild){ dependsOn ':acceptance-tests:acceptanceTest' //TODO launch arguments are not propagated, all AT are being run
 }
 
 release {
@@ -439,7 +433,8 @@ release {
   versionPropertyFile = 'gradle.properties'
   buildTasks = [
     'build',
-    'integrationTest',
+    'releaseIntegrationTest',
+    'releaseAcceptanceTest',
     'checkLicenses',
     'javadoc'
   ]
