@@ -263,41 +263,6 @@ subprojects {
 
     dependencies { jmh 'org.apache.logging.log4j:log4j-api' }
   }
-
-  afterEvaluate {
-    if (project.jar.enabled) {
-      publishing {
-        publications {
-          MavenDeployment(MavenPublication) {
-            from components.java
-            groupId 'net.consensys.pantheon'
-            artifactId project.jar.baseName
-            version project.version
-          }
-        }
-      }
-
-      bintray {
-        user = System.getenv('BINTRAY_USER')
-        key = System.getenv('BINTRAY_KEY')
-        publications = ['MavenDeployment']
-        pkg {
-          repo = rootProject.name.toLowerCase()
-          name = rootProject.name.capitalize()
-          userOrg = 'consensys'
-          licenses = ['Apache-2.0']
-          version {
-            name = project.version
-            desc = rootProject.name.capitalize() + ' distribution'
-            released  = new Date()
-            vcsTag = project.version
-          }
-        }
-      }
-
-      deploy.dependsOn bintrayUpload
-    }
-  }
 }
 
 jar { enabled = false }
@@ -422,8 +387,7 @@ task rts(type: GradleBuild){
   }
 }
 
-task releaseAcceptanceTest(type: GradleBuild){ dependsOn ':acceptance-tests:acceptanceTest' //TODO launch arguments are not propagated, all AT are being run
-}
+task releaseAcceptanceTest(type: GradleBuild, dependsOn : ':acceptance-tests:acceptanceTest') {}
 
 release {
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
