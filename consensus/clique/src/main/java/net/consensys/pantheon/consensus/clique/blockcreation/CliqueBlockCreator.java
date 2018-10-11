@@ -3,6 +3,8 @@ package net.consensys.pantheon.consensus.clique.blockcreation;
 import net.consensys.pantheon.consensus.clique.CliqueBlockHashing;
 import net.consensys.pantheon.consensus.clique.CliqueContext;
 import net.consensys.pantheon.consensus.clique.CliqueExtraData;
+import net.consensys.pantheon.consensus.common.VoteTally;
+import net.consensys.pantheon.consensus.common.VoteType;
 import net.consensys.pantheon.crypto.SECP256K1;
 import net.consensys.pantheon.crypto.SECP256K1.KeyPair;
 import net.consensys.pantheon.ethereum.ProtocolContext;
@@ -18,13 +20,18 @@ import net.consensys.pantheon.ethereum.core.Util;
 import net.consensys.pantheon.ethereum.core.Wei;
 import net.consensys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import net.consensys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
+import net.consensys.pantheon.util.bytes.BytesValue;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
 
   private final KeyPair nodeKeys;
   private final ProtocolSchedule<CliqueContext> protocolSchedule;
+  private final ProtocolContext<CliqueContext> protocolContext;
 
   public CliqueBlockCreator(
       final Address coinbase,
@@ -48,6 +55,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
         parentHeader);
     this.nodeKeys = nodeKeys;
     this.protocolSchedule = protocolSchedule;
+    this.protocolContext = protocolContext;
   }
 
   /**
@@ -64,11 +72,29 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
 
+    final Optional<BlockHeader> optionalParentHeader =
+        protocolContext.getBlockchain().getBlockHeader(sealableBlockHeader.getParentHash());
+    final BlockHeader parentHeader =
+        optionalParentHeader.orElseThrow(
+            () -> new IllegalStateException("Block being created does not have a parent."));
+    final CliqueContext cliqueContext = protocolContext.getConsensusState();
+    final VoteTally voteTally = cliqueContext.getVoteTallyCache().getVoteTallyAtBlock(parentHeader);
+
+    final Optional<Map.Entry<Address, VoteType>> vote =
+        cliqueContext
+            .getVoteProposer()
+            .getVote(Util.publicKeyToAddress(nodeKeys.getPublicKey()), voteTally);
+
+    final long nonce = vote.map(Entry::getValue).map(VoteType::getNonceValue).orElse(0L);
+    final Address coinbase =
+        vote.map(Entry::getKey).orElse(Address.wrap(BytesValue.wrap(new byte[20])));
+
     final BlockHeaderBuilder builder =
         BlockHeaderBuilder.create()
             .populateFrom(sealableBlockHeader)
             .mixHash(Hash.ZERO)
-            .nonce(0)
+            .nonce(nonce)
+            .coinbase(coinbase)
             .blockHashFunction(blockHashFunction);
 
     final CliqueExtraData sealedExtraData = constructSignedExtraData(builder.buildBlockHeader());
