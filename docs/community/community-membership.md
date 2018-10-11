@@ -116,7 +116,7 @@ The Project Sponsor role provides a user with the ability to contribute addition
 - Approval of new users to the Approver role, and access to Circle reports.
 
 ## Open Source Circle
-The Open Source Circle is a group provides open source software support to projects.
+The Open Source Circle is a group that provides open source software support to projects.
 **Defined by:** **TODO:** Where do we document this?
 
 ### Requirements
