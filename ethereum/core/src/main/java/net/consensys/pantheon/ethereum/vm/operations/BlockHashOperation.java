@@ -48,13 +48,6 @@ public class BlockHashOperation extends AbstractOperation {
       final BlockHashLookup blockHashLookup =
           new BlockHashLookup(frame.getBlockHeader(), frame.getBlockchain());
       final Hash blockHash = blockHashLookup.getBlockHash(soughtBlock);
-      if (blockHash == null) {
-        throw new IllegalArgumentException(
-            "Unable to find hash of block "
-                + soughtBlock
-                + " while importing block "
-                + currentBlockNumber);
-      }
       frame.pushStackItem(blockHash);
     }
   }
