@@ -45,8 +45,7 @@ public class BlockHashOperation extends AbstractOperation {
         || soughtBlock > mostRecentBlockNumber) {
       frame.pushStackItem(Bytes32.ZERO);
     } else {
-      final BlockHashLookup blockHashLookup =
-          new BlockHashLookup(frame.getBlockHeader(), frame.getBlockchain());
+      final BlockHashLookup blockHashLookup = frame.getBlockHashLookup();
       final Hash blockHash = blockHashLookup.getBlockHash(soughtBlock);
       frame.pushStackItem(blockHash);
     }
