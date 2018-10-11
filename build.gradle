@@ -56,7 +56,6 @@ allprojects {
   apply plugin: 'io.spring.dependency-management'
   apply plugin: 'jacoco'
   apply plugin: 'net.ltgt.errorprone'
-  apply plugin: 'com.jfrog.bintray'
   apply from: "${rootDir}/gradle/versions.gradle"
   apply from: "${rootDir}/gradle/check-licenses.gradle"
 
@@ -403,6 +402,8 @@ release {
 }
 
 afterReleaseBuild.dependsOn bintrayUpload
+
+apply plugin: 'com.jfrog.bintray'
 
 bintray {
   user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
