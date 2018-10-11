@@ -415,18 +415,13 @@ task rt(type: GradleBuild){
   for(TaskContainer taskList : subprojects.tasks){
     try {
 
-      def tests = taskList.findByName('integrationTest')
+      def subProjectReferenceTestTask = taskList.findByName('referenceTest')
 
       println "****"
-      println tests
+      println subProjectReferenceTestTask
 
-      def subProjectIntegrationTask = taskList.getByName('referenceTest')
-
-      println "****"
-      println subProjectIntegrationTask
-
-      if (subProjectIntegrationTask != null) {
-        dependsOn subProjectIntegrationTask
+      if (subProjectReferenceTestTask != null) {
+        dependsOn subProjectReferenceTestTask
       }
     }catch(UnknownTaskException e){
       println "****"
