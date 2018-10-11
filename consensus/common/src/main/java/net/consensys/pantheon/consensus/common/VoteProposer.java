@@ -2,23 +2,15 @@ package net.consensys.pantheon.consensus.common;
 
 import net.consensys.pantheon.ethereum.core.Address;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /** Container for pending votes and selecting a vote for new blocks */
 public class VoteProposer {
-  public enum Vote {
-    AUTH,
-    DROP
-  }
 
   private final Map<Address, Vote> proposals = new ConcurrentHashMap<>();
-  private final AtomicInteger votePosition = new AtomicInteger(0);
 
   /**
    * Identifies an address that should be voted into the validator pool
@@ -26,7 +18,7 @@ public class VoteProposer {
    * @param address The address to be voted in
    */
   public void auth(final Address address) {
-    proposals.put(address, Vote.AUTH);
+    proposals.put(address, Vote.authVote(address));
   }
 
   /**
@@ -35,7 +27,7 @@ public class VoteProposer {
    * @param address The address to be voted out
    */
   public void drop(final Address address) {
-    proposals.put(address, Vote.DROP);
+    proposals.put(address, Vote.dropVote(address));
   }
 
   /**
@@ -52,34 +44,34 @@ public class VoteProposer {
     proposals.clear();
   }
 
-  public Optional<Vote> get(final Address address) {
-    return Optional.ofNullable(proposals.get(address));
+  public Vote get(final Address address) {
+    return Optional.ofNullable(proposals.get(address)).orElse(Vote.emptyVote());
   }
 
   private boolean voteNotYetCast(
       final Address localAddress,
-      final Address voteAddress,
       final Vote vote,
       final Collection<Address> validators,
       final VoteTally tally) {
 
     // Pre evaluate if we have a vote outstanding to auth or drop the target address
-    final boolean votedAuth = tally.getOutstandingAddVotesFor(voteAddress).contains(localAddress);
+    final boolean votedAuth =
+        tally.getOutstandingAddVotesFor(vote.getAddress()).contains(localAddress);
     final boolean votedDrop =
-        tally.getOutstandingRemoveVotesFor(voteAddress).contains(localAddress);
+        tally.getOutstandingRemoveVotesFor(vote.getAddress()).contains(localAddress);
 
     // if they're a validator, we want to see them dropped, and we haven't voted to drop them yet
-    if (validators.contains(voteAddress) && !votedDrop && vote == Vote.DROP) {
+    if (validators.contains(vote.getAddress()) && !votedDrop && vote.isDrop()) {
       return true;
       // or if we've previously voted to auth them and we want to drop them
-    } else if (votedAuth && vote == Vote.DROP) {
+    } else if (votedAuth && vote.isDrop()) {
       return true;
       // if they're not currently a validator and we want to see them authed and we haven't voted to
       // auth them yet
-    } else if (!validators.contains(voteAddress) && !votedAuth && vote == Vote.AUTH) {
+    } else if (!validators.contains(vote.getAddress()) && !votedAuth && vote.isAuth()) {
       return true;
       // or if we've previously voted to drop them and we want to see them authed
-    } else if (votedDrop && vote == Vote.AUTH) {
+    } else if (votedDrop && vote.isAuth()) {
       return true;
     }
 
@@ -94,29 +86,18 @@ public class VoteProposer {
    * @return Either an address with the vote (auth or drop) or no vote if we have no valid pending
    *     votes
    */
-  public Optional<Map.Entry<Address, Vote>> getVote(
-      final Address localAddress, final VoteTally tally) {
+  public Vote getVote(final Address localAddress, final VoteTally tally) {
     final Collection<Address> validators = tally.getCurrentValidators();
-    final List<Map.Entry<Address, Vote>> validVotes = new ArrayList<>();
 
-    proposals
-        .entrySet()
-        .forEach(
-            proposal -> {
-              if (voteNotYetCast(
-                  localAddress, proposal.getKey(), proposal.getValue(), validators, tally)) {
-                validVotes.add(proposal);
-              }
-            });
-
-    if (validVotes.isEmpty()) {
-      return Optional.empty();
+    // search through the proposals for the first valid vote we haven't cast yet
+    for (final Vote vote : proposals.values()) {
+      if (voteNotYetCast(localAddress, vote, validators, tally)) {
+        // soon as we find one jump out
+        return vote;
+      }
     }
 
-    // Get the next position in the voting queue we should propose
-    final int currentVotePosition = votePosition.updateAndGet(i -> ++i % validVotes.size());
-
-    // Get a vote from the valid votes and return it
-    return Optional.of(validVotes.get(currentVotePosition));
+    // if we didn't find a valid uncast vote, return no vote
+    return Vote.emptyVote();
   }
 }
