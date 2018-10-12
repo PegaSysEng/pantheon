@@ -55,12 +55,12 @@ public class BlockchainReferenceTestTools {
     // Known bad test.
     params.blacklist("RevertPrecompiledTouch_d0g0v0_(EIP158|Byzantium)");
 
-    // Uncle block timestamps in the future (will be good again come Nov 28 2018)
-    params.blacklist("futureUncleTimestampDifficultyDrop2");
-    params.blacklist("futureUncleTimestampDifficultyDrop");
-
     // Consumes a huge amount of memory
     params.blacklist("static_Call1MB1024Calldepth_d1g0v0_Byzantium");
+
+    // Pantheon is incorrectly rejecting Uncle block timestamps in the future
+    params.blacklist("futureUncleTimestampDifficultyDrop2");
+    params.blacklist("futureUncleTimestampDifficultyDrop");
 
     // Needs investigation
     params.blacklist("RevertInCreateInInit_d0g0v0_Byzantium");
