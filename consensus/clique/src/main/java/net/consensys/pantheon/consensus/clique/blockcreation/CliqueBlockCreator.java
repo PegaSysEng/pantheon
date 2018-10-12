@@ -32,6 +32,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
   private final KeyPair nodeKeys;
   private final ProtocolSchedule<CliqueContext> protocolSchedule;
   private final ProtocolContext<CliqueContext> protocolContext;
+  private final BlockHeader parentHeader;
 
   public CliqueBlockCreator(
       final Address coinbase,
@@ -56,6 +57,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
     this.nodeKeys = nodeKeys;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
+    this.parentHeader = parentHeader;
   }
 
   /**
@@ -74,9 +76,6 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
 
     final Optional<BlockHeader> optionalParentHeader =
         protocolContext.getBlockchain().getBlockHeader(sealableBlockHeader.getParentHash());
-    final BlockHeader parentHeader =
-        optionalParentHeader.orElseThrow(
-            () -> new IllegalStateException("Block being created does not have a parent."));
     final CliqueContext cliqueContext = protocolContext.getConsensusState();
     final VoteTally voteTally = cliqueContext.getVoteTallyCache().getVoteTallyAtBlock(parentHeader);
 
