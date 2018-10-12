@@ -109,7 +109,7 @@ public class DockerQuickstartTest {
     assertThat(web3HttpClient).isNotNull();
   }
 
-  private void populateServicesAndEndpoints(String line) {
+  private void populateServicesAndEndpoints(final String line) {
     // We check that the output of the script displays the right endpoints and services states
     // each endpoint and service will be stored in a map for later use.
 
