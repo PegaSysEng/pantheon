@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
 
-import org.junit.Ignore;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.web3j.generated.EventEmitter;
@@ -14,6 +13,7 @@ import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.core.methods.request.EthFilter;

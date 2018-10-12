@@ -3,12 +3,12 @@ package tech.pegasys.pantheon.tests.acceptance.mining;
 import static org.web3j.utils.Convert.Unit.ETHER;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
 
-import org.junit.Ignore;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore
