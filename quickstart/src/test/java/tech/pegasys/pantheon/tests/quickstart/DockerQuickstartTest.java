@@ -44,7 +44,7 @@ public class DockerQuickstartTest {
   private static final int DEFAULT_HTTP_RPC_PORT = 8545;
   private static final int DEFAULT_WS_RPC_PORT = 8546;
   private static final String DEFAULT_RPC_HOST =
-      Optional.ofNullable(System.getenv("DIND_PORT_2375_TCP_ADDR")).orElse("localhost");
+      Optional.ofNullable(System.getenv("DOCKER_PORT_2375_TCP_ADDR")).orElse("localhost");
   private static final String DEFAULT_HTTP_RPC_HOST = "http://" + DEFAULT_RPC_HOST;
   private static final Map<ServicesIdentifier, Service> services =
       new EnumMap<>(ServicesIdentifier.class);

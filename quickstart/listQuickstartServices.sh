@@ -11,7 +11,7 @@ fi
 
 COMPOSE_CONFIG_FILE_OPTION="-f ${QUICKSTART_FOLDER}/docker-compose.yml"
 EXPLORER_SERVICE=explorer
-HOST=${DIND_PORT_2375_TCP_ADDR:-"localhost"}
+HOST=${DOCKER_PORT_2375_TCP_ADDR:-"localhost"}
 
 # Displays services list with port mapping
 docker-compose ${COMPOSE_CONFIG_FILE_OPTION} ps
