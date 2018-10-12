@@ -60,14 +60,14 @@ def generateTestFiles(FileTree jsonPath, File resourcesPath, File templateFile, 
   fileSets.each { fileSet ->
     def resPath = resourcesPath.getPath().replaceAll("\\\\", "/")
     def name = fileSet.find({ !it.getName().toString().startsWith(".")}).getPath().toString()
-      .replaceAll("\\\\", "/")
-      .replaceAll(resPath + "/", "")
-      .replaceAll(pathstrip, "")
-      .replaceAll(".json", "")
-      .replaceAll("/", "_")
-      .replaceAll("\\^", "")
-      .replaceAll("\\-", "")
-      .replaceAll("\\+", "")
+    .replaceAll("\\\\", "/")
+    .replaceAll(resPath + "/", "")
+    .replaceAll(pathstrip, "")
+    .replaceAll(".json", "")
+    .replaceAll("/", "_")
+    .replaceAll("\\^", "")
+    .replaceAll("\\-", "")
+    .replaceAll("\\+", "")
 
     def paths = []
     fileSet.each { testJsonFile ->
