@@ -5,12 +5,12 @@ import static net.consensys.pantheon.controller.MainnetPantheonController.MAINNE
 import static net.consensys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 import static net.consensys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.RINKEBY_BOOTSTRAP_NODES;
 
+import com.google.common.base.Preconditions;
+import com.google.common.io.Resources;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Objects;
-
-import com.google.common.io.Resources;
 
 public class EthNetworkConfig {
   private static final String MAINNET_GENESIS = "mainnet.json";
@@ -21,6 +21,8 @@ public class EthNetworkConfig {
 
   public EthNetworkConfig(
       final URI genesisConfig, final int networkId, final Collection<?> bootNodes) {
+    Preconditions.checkNotNull(genesisConfig);
+    Preconditions.checkNotNull(bootNodes);
     this.genesisConfig = genesisConfig;
     this.networkId = networkId;
     this.bootNodes = bootNodes;
