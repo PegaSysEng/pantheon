@@ -1,7 +1,8 @@
 package net.consensys.pantheon.consensus.clique.jsonrpc.methods;
 
-import static net.consensys.pantheon.consensus.clique.CliqueHelpers.getValidatorsOfBlock;
+import static net.consensys.pantheon.consensus.clique.CliqueHelpers.getValidatorsForLastEpochBlock;
 
+import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.core.Hash;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
@@ -14,16 +15,22 @@ import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorRes
 import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CliqueGetSignersAtHash implements JsonRpcMethod {
   public static final String CLIQUE_GET_SIGNERS_AT_HASH = "clique_getSignersAtHash";
   private final BlockchainQueries blockchainQueries;
+  private final EpochManager epochManager;
   private final JsonRpcParameter parameters;
 
   public CliqueGetSignersAtHash(
-      final BlockchainQueries blockchainQueries, final JsonRpcParameter parameter) {
+      final BlockchainQueries blockchainQueries,
+      final EpochManager epochManager,
+      final JsonRpcParameter parameter) {
     this.blockchainQueries = blockchainQueries;
+    this.epochManager = epochManager;
     this.parameters = parameter;
   }
 
@@ -34,15 +41,19 @@ public class CliqueGetSignersAtHash implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final Optional<BlockHeader> blockHeader = blockHeader(request);
-    return blockHeader
-        .<JsonRpcResponse>map(
-            bh -> new JsonRpcSuccessResponse(request.getId(), getValidatorsOfBlock(bh)))
+    final Optional<Long> blockNumber = blockNumber(request);
+    return blockNumber
+        .flatMap(b -> getValidatorsForLastEpochBlock(b, epochManager, blockchainQueries))
+        .map(addresses -> addresses.stream().map(Objects::toString).collect(Collectors.toList()))
+        .<JsonRpcResponse>map(addresses -> new JsonRpcSuccessResponse(request.getId(), addresses))
         .orElse(new JsonRpcErrorResponse(request.getId(), JsonRpcError.INTERNAL_ERROR));
   }
 
-  private Optional<BlockHeader> blockHeader(final JsonRpcRequest request) {
+  private Optional<Long> blockNumber(final JsonRpcRequest request) {
     final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
-    return blockchainQueries.blockByHash(hash).map(BlockWithMetadata::getHeader);
+    return blockchainQueries
+        .blockByHash(hash)
+        .map(BlockWithMetadata::getHeader)
+        .map(BlockHeader::getNumber);
   }
 }

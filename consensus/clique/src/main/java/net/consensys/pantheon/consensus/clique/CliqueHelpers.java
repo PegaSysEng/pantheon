@@ -1,15 +1,18 @@
 package net.consensys.pantheon.consensus.clique;
 
 import net.consensys.pantheon.consensus.clique.blockcreation.CliqueProposerSelector;
+import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.consensus.common.ValidatorProvider;
 import net.consensys.pantheon.consensus.common.VoteTally;
 import net.consensys.pantheon.ethereum.ProtocolContext;
 import net.consensys.pantheon.ethereum.chain.Blockchain;
 import net.consensys.pantheon.ethereum.core.Address;
 import net.consensys.pantheon.ethereum.core.BlockHeader;
-import net.consensys.pantheon.util.bytes.BytesValue;
+import net.consensys.pantheon.ethereum.jsonrpc.internal.queries.BlockWithMetadata;
+import net.consensys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CliqueHelpers {
 
@@ -18,10 +21,17 @@ public class CliqueHelpers {
     return CliqueBlockHashing.recoverProposerAddress(header, extraData);
   }
 
-  public static List<Address> getValidatorsOfBlock(final BlockHeader header) {
-    final BytesValue extraData = header.getExtraData();
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(extraData);
-    return cliqueExtraData.getValidators();
+  public static Optional<List<Address>> getValidatorsForLastEpochBlock(
+      final long blockNumber,
+      final EpochManager epochManager,
+      final BlockchainQueries blockchainQueries) {
+    final long lastEpochBlock = epochManager.getLastEpochBlock(blockNumber);
+    return blockchainQueries
+        .blockByNumber(lastEpochBlock)
+        .map(BlockWithMetadata::getHeader)
+        .map(BlockHeader::getExtraData)
+        .map(CliqueExtraData::decode)
+        .map(CliqueExtraData::getValidators);
   }
 
   public static Address getProposerForBlockAfter(
