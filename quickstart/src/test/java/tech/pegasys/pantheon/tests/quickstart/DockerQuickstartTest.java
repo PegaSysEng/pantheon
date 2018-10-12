@@ -63,6 +63,7 @@ public class DockerQuickstartTest {
     processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
     // redirect only error output to logs as we want to be able to
     // keep the standard output available for reading
+    processBuilder.inheritIO();
     // processBuilder.redirectError(Redirect.INHERIT);
     Process process = processBuilder.start();
 

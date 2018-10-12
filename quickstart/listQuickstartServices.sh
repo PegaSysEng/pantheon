@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh -x
 
 QUICKSTART_FOLDER=quickstart
 
