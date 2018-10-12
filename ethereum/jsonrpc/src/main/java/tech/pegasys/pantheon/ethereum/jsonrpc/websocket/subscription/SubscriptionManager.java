@@ -85,7 +85,7 @@ public class SubscriptionManager extends AbstractVerticle {
     return true;
   }
 
-  private boolean connectionOwnsSubscription(Long subscriptionId, String connectionId) {
+  private boolean connectionOwnsSubscription(final Long subscriptionId, final String connectionId) {
     return connectionSubscriptionsMap.get(connectionId) != null
         && connectionSubscriptionsMap.get(connectionId).contains(subscriptionId);
   }

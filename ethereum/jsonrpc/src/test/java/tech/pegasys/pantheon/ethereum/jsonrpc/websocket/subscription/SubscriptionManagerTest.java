@@ -214,7 +214,7 @@ public class SubscriptionManagerTest {
     assertThat(thrown).isInstanceOf(SubscriptionNotFoundException.class);
   }
 
-  private SubscribeRequest subscribeRequest(String connectionId) {
+  private SubscribeRequest subscribeRequest(final String connectionId) {
     return new SubscribeRequest(SubscriptionType.SYNCING, null, null, connectionId);
   }
 }
