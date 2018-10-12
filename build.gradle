@@ -241,12 +241,6 @@ subprojects {
   if (file('src/jmh').directory) {
     apply plugin: 'me.champeau.gradle.jmh'
 
-    jmhCompileGeneratedClasses {
-      options.compilerArgs += [
-        '-XepDisableAllChecks'
-      ]
-    }
-
     jmh {
       // Allows to control JMH execution directly from the command line. I typical execution may look
       // like:
@@ -311,8 +305,7 @@ applicationDefaultJvmArgs = [
   "-Dpantheon.home=PANTHEON_HOME",
   // We shutdown log4j ourselves, as otherwise his shutdown hook runs before our own and whatever
   // happens during shutdown is not logged.
-  "-Dlog4j.shutdownHookEnabled=false",
-  "-Djava.security.egd=file:/dev/urandom"
+  "-Dlog4j.shutdownHookEnabled=false"
 ]
 
 run {
@@ -348,9 +341,19 @@ applicationDistribution.into("bin") {
   fileMode = 0755
 }
 
-applicationDistribution.into("") { from("LICENSE") }
+distributions {
+  main {
+    contents {
+      from("./LICENSE") { into "." }
+      from("build/reports/license/license-dependency.html") { into "." }
+    }
+  }
+}
+
+installDist { dependsOn checkLicenses }
 
 distTar {
+  dependsOn checkLicenses
   doFirst {
     delete fileTree(dir: 'build/distributions', include: '*.tar.gz')
   }
@@ -359,6 +362,7 @@ distTar {
 }
 
 distZip {
+  dependsOn checkLicenses
   doFirst {
     delete fileTree(dir: 'build/distributions', include: '*.zip')
   }
