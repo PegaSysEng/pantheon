@@ -1,6 +1,8 @@
 package net.consensys.pantheon.consensus.clique.jsonrpc;
 
 import net.consensys.pantheon.consensus.clique.CliqueContext;
+import net.consensys.pantheon.consensus.clique.CliqueVoteTallyUpdater;
+import net.consensys.pantheon.consensus.clique.VoteTallyCache;
 import net.consensys.pantheon.consensus.clique.jsonrpc.methods.CliqueGetSigners;
 import net.consensys.pantheon.consensus.clique.jsonrpc.methods.CliqueGetSignersAtHash;
 import net.consensys.pantheon.consensus.clique.jsonrpc.methods.Discard;
@@ -27,11 +29,14 @@ public class CliqueJsonRpcMethodsFactory {
     final JsonRpcParameter jsonRpcParameter = new JsonRpcParameter();
     final VoteProposer voteProposer = context.getConsensusState().getVoteProposer();
     final EpochManager epochManager = context.getConsensusState().getEpochManager();
+    final CliqueVoteTallyUpdater cliqueVoteTallyUpdater = new CliqueVoteTallyUpdater(epochManager);
+    final VoteTallyCache voteTallyCache =
+        new VoteTallyCache(blockchain, cliqueVoteTallyUpdater, epochManager);
 
     final CliqueGetSigners cliqueGetSigners =
-        new CliqueGetSigners(blockchainQueries, epochManager, jsonRpcParameter);
+        new CliqueGetSigners(blockchainQueries, voteTallyCache, jsonRpcParameter);
     final CliqueGetSignersAtHash cliqueGetSignersAtHash =
-        new CliqueGetSignersAtHash(blockchainQueries, epochManager, jsonRpcParameter);
+        new CliqueGetSignersAtHash(blockchainQueries, voteTallyCache, jsonRpcParameter);
     final Propose proposeRpc = new Propose(voteProposer, jsonRpcParameter);
     final Discard discardRpc = new Discard(voteProposer, jsonRpcParameter);
 

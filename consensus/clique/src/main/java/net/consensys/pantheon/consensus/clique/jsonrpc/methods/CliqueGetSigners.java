@@ -1,12 +1,12 @@
 package net.consensys.pantheon.consensus.clique.jsonrpc.methods;
 
-import static net.consensys.pantheon.consensus.clique.CliqueHelpers.getValidatorsForLastEpochBlock;
-
-import net.consensys.pantheon.consensus.common.EpochManager;
+import net.consensys.pantheon.consensus.clique.VoteTallyCache;
+import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import net.consensys.pantheon.ethereum.jsonrpc.internal.queries.BlockWithMetadata;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
@@ -20,15 +20,15 @@ import java.util.stream.Collectors;
 public class CliqueGetSigners implements JsonRpcMethod {
   public static final String CLIQUE_GET_SIGNERS = "clique_getSigners";
   private final BlockchainQueries blockchainQueries;
-  private final EpochManager epochManager;
+  private final VoteTallyCache voteTallyCache;
   private final JsonRpcParameter parameters;
 
   public CliqueGetSigners(
       final BlockchainQueries blockchainQueries,
-      final EpochManager epochManager,
+      final VoteTallyCache voteTallyCache,
       final JsonRpcParameter parameter) {
     this.blockchainQueries = blockchainQueries;
-    this.epochManager = epochManager;
+    this.voteTallyCache = voteTallyCache;
     this.parameters = parameter;
   }
 
@@ -39,17 +39,19 @@ public class CliqueGetSigners implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final long blockNumber = blockNumber(request);
-    return getValidatorsForLastEpochBlock(blockNumber, epochManager, blockchainQueries)
+    final Optional<BlockHeader> blockHeader = blockHeader(request);
+    return blockHeader
+        .map(bh -> voteTallyCache.getVoteTallyAtBlock(bh).getCurrentValidators())
         .map(addresses -> addresses.stream().map(Objects::toString).collect(Collectors.toList()))
         .<JsonRpcResponse>map(addresses -> new JsonRpcSuccessResponse(request.getId(), addresses))
         .orElse(new JsonRpcErrorResponse(request.getId(), JsonRpcError.INTERNAL_ERROR));
   }
 
-  private long blockNumber(final JsonRpcRequest request) {
+  private Optional<BlockHeader> blockHeader(final JsonRpcRequest request) {
     final Optional<BlockParameter> blockParameter =
         parameters.optional(request.getParams(), 0, BlockParameter.class);
     final long latest = blockchainQueries.headBlockNumber();
-    return blockParameter.map(b -> b.getNumber().orElse(latest)).orElse(latest);
+    final long blockNumber = blockParameter.map(b -> b.getNumber().orElse(latest)).orElse(latest);
+    return blockchainQueries.blockByNumber(blockNumber).map(BlockWithMetadata::getHeader);
   }
 }

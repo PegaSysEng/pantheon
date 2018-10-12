@@ -1,11 +1,15 @@
 package net.consensys.pantheon.consensus.clique.jsonrpc.methods;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static net.consensys.pantheon.ethereum.core.Address.fromHexString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import net.consensys.pantheon.consensus.common.EpochManager;
+import net.consensys.pantheon.consensus.clique.VoteTallyCache;
+import net.consensys.pantheon.consensus.common.VoteTally;
+import net.consensys.pantheon.ethereum.core.Address;
 import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import net.consensys.pantheon.ethereum.core.Hash;
@@ -33,16 +37,17 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class CliqueGetSignersTest {
   private CliqueGetSigners method;
   private BlockHeader blockHeader;
-  private List<String> validators;
+  private List<Address> validators;
+  private List<String> validatorAsStrings;
 
   @Mock private BlockchainQueries blockchainQueries;
-  @Mock private BlockWithMetadata<TransactionWithMetadata, Hash> block;
-  @Mock private BlockWithMetadata<TransactionWithMetadata, Hash> epochBlock;
-  @Mock private EpochManager epochManager;
+  @Mock private VoteTallyCache voteTallyCache;
+  @Mock private BlockWithMetadata<TransactionWithMetadata, Hash> blockWithMetadata;
+  @Mock private VoteTally voteTally;
 
   @Before
   public void setup() {
-    method = new CliqueGetSigners(blockchainQueries, epochManager, new JsonRpcParameter());
+    method = new CliqueGetSigners(blockchainQueries, voteTallyCache, new JsonRpcParameter());
 
     final byte[] genesisBlockExtraData =
         Hex.decode(
@@ -53,9 +58,10 @@ public class CliqueGetSignersTest {
 
     validators =
         asList(
-            "0x42eb768f2244c8811c63729a21a3569731535f06",
-            "0x7ffc57839b00206d1ad20c69a1981b489f772031",
-            "0xb279182d99e65703f0076e4812653aab85fca0f0");
+            fromHexString("0x42eb768f2244c8811c63729a21a3569731535f06"),
+            fromHexString("0x7ffc57839b00206d1ad20c69a1981b489f772031"),
+            fromHexString("0xb279182d99e65703f0076e4812653aab85fca0f0"));
+    validatorAsStrings = validators.stream().map(Object::toString).collect(toList());
   }
 
   @Test
@@ -69,12 +75,13 @@ public class CliqueGetSignersTest {
     final JsonRpcRequest request = new JsonRpcRequest("2.0", "clique_getSigners", new Object[] {});
 
     when(blockchainQueries.headBlockNumber()).thenReturn(3065995L);
-    when(epochManager.getLastEpochBlock(3065995L)).thenReturn(300000L);
-    when(blockchainQueries.blockByNumber(300000L)).thenReturn(Optional.of(epochBlock));
-    when(epochBlock.getHeader()).thenReturn(blockHeader);
+    when(blockchainQueries.blockByNumber(3065995L)).thenReturn(Optional.of(blockWithMetadata));
+    when(blockWithMetadata.getHeader()).thenReturn(blockHeader);
+    when(voteTallyCache.getVoteTallyAtBlock(blockHeader)).thenReturn(voteTally);
+    when(voteTally.getCurrentValidators()).thenReturn(validators);
 
     final JsonRpcSuccessResponse response = (JsonRpcSuccessResponse) method.response(request);
-    assertEquals(validators, response.getResult());
+    assertEquals(validatorAsStrings, response.getResult());
   }
 
   @Test
@@ -83,12 +90,13 @@ public class CliqueGetSignersTest {
     final JsonRpcRequest request =
         new JsonRpcRequest("2.0", "clique_getSigners", new Object[] {"0x2EC88B"});
 
-    when(epochManager.getLastEpochBlock(3065995L)).thenReturn(300000L);
-    when(blockchainQueries.blockByNumber(300000L)).thenReturn(Optional.of(epochBlock));
-    when(epochBlock.getHeader()).thenReturn(blockHeader);
+    when(blockchainQueries.blockByNumber(3065995L)).thenReturn(Optional.of(blockWithMetadata));
+    when(blockWithMetadata.getHeader()).thenReturn(blockHeader);
+    when(voteTallyCache.getVoteTallyAtBlock(blockHeader)).thenReturn(voteTally);
+    when(voteTally.getCurrentValidators()).thenReturn(validators);
 
     final JsonRpcSuccessResponse response = (JsonRpcSuccessResponse) method.response(request);
-    assertEquals(validators, response.getResult());
+    assertEquals(validatorAsStrings, response.getResult());
   }
 
   @Test
@@ -96,8 +104,7 @@ public class CliqueGetSignersTest {
     final JsonRpcRequest request =
         new JsonRpcRequest("2.0", "clique_getSigners", new Object[] {"0x1234"});
 
-    when(epochManager.getLastEpochBlock(4660)).thenReturn(300000L);
-    when(blockchainQueries.blockByNumber(300000L)).thenReturn(Optional.empty());
+    when(blockchainQueries.blockByNumber(4660)).thenReturn(Optional.empty());
 
     final JsonRpcErrorResponse response = (JsonRpcErrorResponse) method.response(request);
     assertThat(response.getError().name()).isEqualTo(JsonRpcError.INTERNAL_ERROR.name());
