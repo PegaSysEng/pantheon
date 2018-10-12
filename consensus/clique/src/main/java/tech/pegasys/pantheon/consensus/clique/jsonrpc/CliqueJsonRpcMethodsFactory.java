@@ -46,8 +46,8 @@ public class CliqueJsonRpcMethodsFactory {
     return rpcMethods;
   }
 
-  private VoteTallyCache createVoteTallyCache(ProtocolContext<CliqueContext> context,
-      MutableBlockchain blockchain) {
+  private VoteTallyCache createVoteTallyCache(
+      final ProtocolContext<CliqueContext> context, final MutableBlockchain blockchain) {
     final EpochManager epochManager = context.getConsensusState().getEpochManager();
     final CliqueVoteTallyUpdater cliqueVoteTallyUpdater = new CliqueVoteTallyUpdater(epochManager);
     return new VoteTallyCache(blockchain, cliqueVoteTallyUpdater, epochManager);
