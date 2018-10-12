@@ -1,7 +1,6 @@
 package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
-import static tech.pegasys.pantheon.consensus.clique.CliqueHelpers.getValidatorsOfBlock;
-
+import tech.pegasys.pantheon.consensus.clique.VoteTallyCache;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -14,16 +13,22 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CliqueGetSigners implements JsonRpcMethod {
   public static final String CLIQUE_GET_SIGNERS = "clique_getSigners";
   private final BlockchainQueries blockchainQueries;
+  private final VoteTallyCache voteTallyCache;
   private final JsonRpcParameter parameters;
 
   public CliqueGetSigners(
-      final BlockchainQueries blockchainQueries, final JsonRpcParameter parameter) {
+      final BlockchainQueries blockchainQueries,
+      final VoteTallyCache voteTallyCache,
+      final JsonRpcParameter parameter) {
     this.blockchainQueries = blockchainQueries;
+    this.voteTallyCache = voteTallyCache;
     this.parameters = parameter;
   }
 
@@ -36,8 +41,9 @@ public class CliqueGetSigners implements JsonRpcMethod {
   public JsonRpcResponse response(final JsonRpcRequest request) {
     final Optional<BlockHeader> blockHeader = blockHeader(request);
     return blockHeader
-        .<JsonRpcResponse>map(
-            bh -> new JsonRpcSuccessResponse(request.getId(), getValidatorsOfBlock(bh)))
+        .map(bh -> voteTallyCache.getVoteTallyAtBlock(bh).getCurrentValidators())
+        .map(addresses -> addresses.stream().map(Objects::toString).collect(Collectors.toList()))
+        .<JsonRpcResponse>map(addresses -> new JsonRpcSuccessResponse(request.getId(), addresses))
         .orElse(new JsonRpcErrorResponse(request.getId(), JsonRpcError.INTERNAL_ERROR));
   }
 
