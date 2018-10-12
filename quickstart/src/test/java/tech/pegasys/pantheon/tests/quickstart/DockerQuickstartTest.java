@@ -1,10 +1,10 @@
-package net.consensys.pantheon.tests.quickstart;
+package tech.pegasys.pantheon.tests.quickstart;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import net.consensys.pantheon.PantheonInfo;
-import net.consensys.pantheon.tests.quickstart.DockerQuickstartTest.Service.ExposedPort;
+import tech.pegasys.pantheon.PantheonInfo;
+import tech.pegasys.pantheon.tests.quickstart.DockerQuickstartTest.Service.ExposedPort;
 
 import java.io.BufferedReader;
 import java.io.File;
