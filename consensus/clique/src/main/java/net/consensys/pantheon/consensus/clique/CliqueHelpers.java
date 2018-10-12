@@ -21,7 +21,7 @@ public class CliqueHelpers {
     return CliqueBlockHashing.recoverProposerAddress(header, extraData);
   }
 
-  public static Optional<List<Address>> getValidatorsForBlockNumber(
+  public static Optional<List<Address>> getValidatorsForLastEpochBlock(
       final long blockNumber,
       final EpochManager epochManager,
       final BlockchainQueries blockchainQueries) {

@@ -1,6 +1,6 @@
 package net.consensys.pantheon.consensus.clique.jsonrpc.methods;
 
-import static net.consensys.pantheon.consensus.clique.CliqueHelpers.getValidatorsForBlockNumber;
+import static net.consensys.pantheon.consensus.clique.CliqueHelpers.getValidatorsForLastEpochBlock;
 
 import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
@@ -40,7 +40,7 @@ public class CliqueGetSigners implements JsonRpcMethod {
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
     final long blockNumber = blockNumber(request);
-    return getValidatorsForBlockNumber(blockNumber, epochManager, blockchainQueries)
+    return getValidatorsForLastEpochBlock(blockNumber, epochManager, blockchainQueries)
         .map(addresses -> addresses.stream().map(Objects::toString).collect(Collectors.toList()))
         .<JsonRpcResponse>map(addresses -> new JsonRpcSuccessResponse(request.getId(), addresses))
         .orElse(new JsonRpcErrorResponse(request.getId(), JsonRpcError.INTERNAL_ERROR));
