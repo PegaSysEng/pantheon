@@ -405,8 +405,6 @@ release {
   }
 }
 
-afterReleaseBuild.dependsOn bintrayUpload
-
 apply plugin: 'com.jfrog.bintray'
 
 bintray {
@@ -428,3 +426,7 @@ bintray {
     }
   }
 }
+
+afterReleaseBuild.dependsOn bintrayUpload
+bintrayUpload.mustRunAfter(distTar)
+bintrayUpload.mustRunAfter(distZip)
