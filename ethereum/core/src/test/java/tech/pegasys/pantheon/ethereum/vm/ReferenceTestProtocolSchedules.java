@@ -34,7 +34,8 @@ public class ReferenceTestProtocolSchedules {
             protocolSchedule -> MainnetProtocolSpecs.byzantium(CHAIN_ID, protocolSchedule)));
     builder.put(
         "Constantinople",
-        createSchedule(protocolSchedule -> MainnetProtocolSpecs.constantinople(CHAIN_ID, protocolSchedule)));
+        createSchedule(
+            protocolSchedule -> MainnetProtocolSpecs.constantinople(CHAIN_ID, protocolSchedule)));
     return new ReferenceTestProtocolSchedules(builder.build());
   }
 

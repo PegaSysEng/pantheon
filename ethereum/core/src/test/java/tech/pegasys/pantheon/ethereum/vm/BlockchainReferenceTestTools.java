@@ -87,7 +87,9 @@ public class BlockchainReferenceTestTools {
             schedule.getByBlockNumber(block.getHeader().getNumber());
         final BlockImporter<Void> blockImporter = protocolSpec.getBlockImporter();
         final boolean imported =
-            blockImporter.importBlock(context, block, HeaderValidationMode.FULL);
+            blockImporter.importBlock(context, block,
+                "NoProof".equalsIgnoreCase(spec.getSealEngine()) ? HeaderValidationMode.LIGHT
+                    : HeaderValidationMode.FULL);
 
         assertThat(imported).isEqualTo(candidateBlock.isValid());
       } catch (final RLPException e) {
