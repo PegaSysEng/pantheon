@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +43,8 @@ public class DockerQuickstartTest {
   private static final String DOCKER_COMPOSE_PROJECT_PREFIX = "quickstart_";
   private static final int DEFAULT_HTTP_RPC_PORT = 8545;
   private static final int DEFAULT_WS_RPC_PORT = 8546;
-  private static final String DEFAULT_RPC_HOST = "localhost";
+  private static final String DEFAULT_RPC_HOST =
+      Optional.ofNullable(System.getenv("DIND_PORT_2375_TCP_ADDR")).orElse("localhost");
   private static final String DEFAULT_HTTP_RPC_HOST = "http://" + DEFAULT_RPC_HOST;
   private static final Map<ServicesIdentifier, Service> services =
       new EnumMap<>(ServicesIdentifier.class);

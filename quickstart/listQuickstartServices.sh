@@ -11,6 +11,7 @@ fi
 
 COMPOSE_CONFIG_FILE_OPTION="-f ${QUICKSTART_FOLDER}/docker-compose.yml"
 EXPLORER_SERVICE=explorer
+HOST=${DIND_PORT_2375_TCP_ADDR:-"localhost"}
 
 # Displays services list with port mapping
 docker-compose ${COMPOSE_CONFIG_FILE_OPTION} ps
@@ -42,15 +43,15 @@ BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
 echo "${CYAN}****************************************************************"
-echo "JSON-RPC ${BOLD}HTTP${NORMAL}${CYAN} service endpoint      : ${ORANGE}http://localhost:${rpcMapping##*:}${CYAN}   *"
-echo "JSON-RPC ${BOLD}WebSocket${NORMAL}${CYAN} service endpoint : ${ORANGE}http://localhost:${wsMapping##*:}${CYAN}   *"
+echo "JSON-RPC ${BOLD}HTTP${NORMAL}${CYAN} service endpoint      : ${ORANGE}http://${HOST}:${rpcMapping##*:}${CYAN}   *"
+echo "JSON-RPC ${BOLD}WebSocket${NORMAL}${CYAN} service endpoint : ${ORANGE}http://${HOST}:${wsMapping##*:}${CYAN}   *"
 
-while [ "$(curl -m 1 -s -o /dev/null -w ''%{http_code}'' http://localhost:${explorerMapping##*:})" != "200" ]
+while [ "$(curl -m 1 -s -o /dev/null -w ''%{http_code}'' http://${HOST}:${explorerMapping##*:})" != "200" ]
 do
   dots=$dots"."
   printf "${CYAN} Block explorer is starting, please wait ${ORANGE}$dots${NORMAL}\\r"
   sleep 1
 done
 
-echo "${CYAN}Web block explorer address          : ${ORANGE}http://localhost:${explorerMapping##*:}${CYAN}   *                                                                             "
+echo "${CYAN}Web block explorer address          : ${ORANGE}http://${HOST}:${explorerMapping##*:}${CYAN}   *                                                                             "
 echo "****************************************************************${NORMAL}"
