@@ -1,12 +1,11 @@
 package net.consensys.pantheon.consensus.clique.jsonrpc.methods;
 
 import static java.util.Arrays.asList;
-import static net.consensys.pantheon.ethereum.core.Address.fromHexString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import net.consensys.pantheon.ethereum.core.Address;
+import net.consensys.pantheon.consensus.common.EpochManager;
 import net.consensys.pantheon.ethereum.core.BlockHeader;
 import net.consensys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import net.consensys.pantheon.ethereum.core.Hash;
@@ -34,15 +33,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class CliqueGetSignersTest {
   private CliqueGetSigners method;
   private BlockHeader blockHeader;
-  private List<Address> validators;
+  private List<String> validators;
 
   @Mock private BlockchainQueries blockchainQueries;
-
-  @Mock private BlockWithMetadata<TransactionWithMetadata, Hash> blockWithMetadata;
+  @Mock private BlockWithMetadata<TransactionWithMetadata, Hash> block;
+  @Mock private BlockWithMetadata<TransactionWithMetadata, Hash> epochBlock;
+  @Mock private EpochManager epochManager;
 
   @Before
   public void setup() {
-    method = new CliqueGetSigners(blockchainQueries, new JsonRpcParameter());
+    method = new CliqueGetSigners(blockchainQueries, epochManager, new JsonRpcParameter());
 
     final byte[] genesisBlockExtraData =
         Hex.decode(
@@ -53,9 +53,9 @@ public class CliqueGetSignersTest {
 
     validators =
         asList(
-            fromHexString("0x42eb768f2244c8811c63729a21a3569731535f06"),
-            fromHexString("0x7ffc57839b00206d1ad20c69a1981b489f772031"),
-            fromHexString("0xb279182d99e65703f0076e4812653aab85fca0f0"));
+            "0x42eb768f2244c8811c63729a21a3569731535f06",
+            "0x7ffc57839b00206d1ad20c69a1981b489f772031",
+            "0xb279182d99e65703f0076e4812653aab85fca0f0");
   }
 
   @Test
@@ -69,12 +69,12 @@ public class CliqueGetSignersTest {
     final JsonRpcRequest request = new JsonRpcRequest("2.0", "clique_getSigners", new Object[] {});
 
     when(blockchainQueries.headBlockNumber()).thenReturn(3065995L);
-    when(blockchainQueries.blockByNumber(3065995L)).thenReturn(Optional.of(blockWithMetadata));
-    when(blockWithMetadata.getHeader()).thenReturn(blockHeader);
+    when(epochManager.getLastEpochBlock(3065995L)).thenReturn(300000L);
+    when(blockchainQueries.blockByNumber(300000L)).thenReturn(Optional.of(epochBlock));
+    when(epochBlock.getHeader()).thenReturn(blockHeader);
 
     final JsonRpcSuccessResponse response = (JsonRpcSuccessResponse) method.response(request);
-    final List<Address> result = (List<Address>) response.getResult();
-    assertEquals(validators, result);
+    assertEquals(validators, response.getResult());
   }
 
   @Test
@@ -83,12 +83,12 @@ public class CliqueGetSignersTest {
     final JsonRpcRequest request =
         new JsonRpcRequest("2.0", "clique_getSigners", new Object[] {"0x2EC88B"});
 
-    when(blockchainQueries.blockByNumber(3065995L)).thenReturn(Optional.of(blockWithMetadata));
-    when(blockWithMetadata.getHeader()).thenReturn(blockHeader);
+    when(epochManager.getLastEpochBlock(3065995L)).thenReturn(300000L);
+    when(blockchainQueries.blockByNumber(300000L)).thenReturn(Optional.of(epochBlock));
+    when(epochBlock.getHeader()).thenReturn(blockHeader);
 
     final JsonRpcSuccessResponse response = (JsonRpcSuccessResponse) method.response(request);
-    final List<Address> result = (List<Address>) response.getResult();
-    assertEquals(validators, result);
+    assertEquals(validators, response.getResult());
   }
 
   @Test
@@ -96,7 +96,8 @@ public class CliqueGetSignersTest {
     final JsonRpcRequest request =
         new JsonRpcRequest("2.0", "clique_getSigners", new Object[] {"0x1234"});
 
-    when(blockchainQueries.blockByNumber(4660)).thenReturn(Optional.empty());
+    when(epochManager.getLastEpochBlock(4660)).thenReturn(300000L);
+    when(blockchainQueries.blockByNumber(300000L)).thenReturn(Optional.empty());
 
     final JsonRpcErrorResponse response = (JsonRpcErrorResponse) method.response(request);
     assertThat(response.getError().name()).isEqualTo(JsonRpcError.INTERNAL_ERROR.name());

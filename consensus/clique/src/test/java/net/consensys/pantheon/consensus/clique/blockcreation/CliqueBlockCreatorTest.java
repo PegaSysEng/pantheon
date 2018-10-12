@@ -78,9 +78,7 @@ public class CliqueBlockCreatorTest {
 
     final VoteTallyCache voteTallyCache = mock(VoteTallyCache.class);
     when(voteTallyCache.getVoteTallyAtBlock(any())).thenReturn(new VoteTally(validatorList));
-    voteProposer = new VoteProposer();
-    final CliqueContext cliqueContext = new CliqueContext(voteTallyCache, voteProposer);
-
+    final CliqueContext cliqueContext = new CliqueContext(voteTallyCache, new VoteProposer(), null);
     protocolContext = new ProtocolContext<>(blockchain, stateArchive, cliqueContext);
 
     // Add a block above the genesis
