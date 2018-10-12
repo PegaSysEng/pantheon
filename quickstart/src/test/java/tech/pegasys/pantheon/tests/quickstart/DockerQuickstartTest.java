@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -64,7 +63,7 @@ public class DockerQuickstartTest {
     processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
     // redirect only error output to logs as we want to be able to
     // keep the standard output available for reading
-    processBuilder.redirectError(Redirect.INHERIT);
+    // processBuilder.redirectError(Redirect.INHERIT);
     Process process = processBuilder.start();
 
     int exitValue = process.waitFor();
@@ -84,7 +83,6 @@ public class DockerQuickstartTest {
     // We check that the output of the script displays the right endpoints and services states
     // each endpoint and service will be stored in a map for later use.
     while ((line = reader.readLine()) != null) {
-      LOG.error(line);
       for (EndpointsIdentifier endpointsIdentifier : EndpointsIdentifier.values()) {
         Matcher regexMatcher = endpointsIdentifier.pattern.matcher(line);
         if (regexMatcher.find()) {
