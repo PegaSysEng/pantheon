@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -27,8 +28,6 @@ import io.vertx.core.http.WebSocket;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -39,7 +38,6 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Async;
 
 public class DockerQuickstartTest {
-  private static final Logger LOG = LogManager.getLogger();
 
   private static final String PROJECT_ROOT =
       Paths.get(System.getProperty("user.dir")).getParent().toString();
@@ -57,25 +55,19 @@ public class DockerQuickstartTest {
 
   @BeforeClass
   public static void runPantheonPrivateNetwork() throws IOException, InterruptedException {
-    final String command = "quickstart/runPantheonPrivateNetwork.sh";
-    LOG.info("Starting quickstart network with {} before tests", command);
-    ProcessBuilder processBuilder = new ProcessBuilder(command);
+    ProcessBuilder processBuilder = new ProcessBuilder("quickstart/runPantheonPrivateNetwork.sh");
     processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
     // redirect only error output to logs as we want to be able to
     // keep the standard output available for reading
-    processBuilder.inheritIO();
-    // processBuilder.redirectError(Redirect.INHERIT);
+    processBuilder.redirectError(Redirect.INHERIT);
     Process process = processBuilder.start();
 
     int exitValue = process.waitFor();
 
     if (exitValue != 0) {
       // check for errors, error messages and causes are redirected to logs already
-      LOG.error(process.getErrorStream());
-      throw new RuntimeException("execution of script " + command + " failed!");
+      throw new RuntimeException("execution of script failed!");
     }
-
-    LOG.error(process.getInputStream());
 
     BufferedReader reader =
         new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8));
@@ -84,15 +76,6 @@ public class DockerQuickstartTest {
     // We check that the output of the script displays the right endpoints and services states
     // each endpoint and service will be stored in a map for later use.
     while ((line = reader.readLine()) != null) {
-      for (EndpointsIdentifier endpointsIdentifier : EndpointsIdentifier.values()) {
-        Matcher regexMatcher = endpointsIdentifier.pattern.matcher(line);
-        if (regexMatcher.find()) {
-          String endpoint = regexMatcher.group(1);
-          endpoints.put(endpointsIdentifier, endpoint);
-        }
-      }
-
-      assertThat(endpoints).isNullOrEmpty();
 
       for (ServicesIdentifier servicesIdentifier : ServicesIdentifier.values()) {
         Matcher regexMatcher = servicesIdentifier.pattern.matcher(line);
@@ -110,6 +93,16 @@ public class DockerQuickstartTest {
       }
 
       assertThat(services).isNullOrEmpty();
+
+      for (EndpointsIdentifier endpointsIdentifier : EndpointsIdentifier.values()) {
+        Matcher regexMatcher = endpointsIdentifier.pattern.matcher(line);
+        if (regexMatcher.find()) {
+          String endpoint = regexMatcher.group(1);
+          endpoints.put(endpointsIdentifier, endpoint);
+        }
+      }
+
+      assertThat(endpoints).isNullOrEmpty();
     }
 
     web3HttpClient =
@@ -130,10 +123,8 @@ public class DockerQuickstartTest {
 
   @AfterClass
   public static void removePantheonPrivateNetwork() throws IOException, InterruptedException {
-    final String command = "quickstart/removePantheonPrivateNetwork.sh";
-    LOG.info("Stopping and removing quickstart network with {} after tests", command);
-
-    ProcessBuilder processBuilder = new ProcessBuilder(command);
+    ProcessBuilder processBuilder =
+        new ProcessBuilder("quickstart/removePantheonPrivateNetwork.sh");
     processBuilder.inheritIO(); // redirect all output to logs
     processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
     Process process = processBuilder.start();
@@ -141,7 +132,7 @@ public class DockerQuickstartTest {
     int exitValue = process.waitFor();
     if (exitValue != 0) {
       // check for errors, all output and then also error messages and causes are redirected to logs
-      throw new RuntimeException("execution of script " + command + " failed!");
+      throw new RuntimeException("execution of script failed!");
     }
   }
 
@@ -280,10 +271,10 @@ public class DockerQuickstartTest {
     ServicesIdentifier() {
       pattern =
           Pattern.compile(
-              "^("
+              "(^"
                   + DOCKER_COMPOSE_PROJECT_PREFIX
                   + this.name().toLowerCase()
-                  + "_[0-9]+)\\s+.+\\s{3}(\\w+)\\s+(.+)$",
+                  + "_[0-9]+)\\s+.+\\s{3,}(\\w+)\\s+(.+)",
               Pattern.DOTALL);
     }
   }
