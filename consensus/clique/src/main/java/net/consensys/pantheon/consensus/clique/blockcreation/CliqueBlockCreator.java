@@ -30,9 +30,6 @@ import java.util.function.Function;
 public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
 
   private final KeyPair nodeKeys;
-  private final ProtocolSchedule<CliqueContext> protocolSchedule;
-  private final ProtocolContext<CliqueContext> protocolContext;
-  private final BlockHeader parentHeader;
 
   public CliqueBlockCreator(
       final Address coinbase,
@@ -55,9 +52,6 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
         Util.publicKeyToAddress(nodeKeys.getPublicKey()),
         parentHeader);
     this.nodeKeys = nodeKeys;
-    this.protocolSchedule = protocolSchedule;
-    this.protocolContext = protocolContext;
-    this.parentHeader = parentHeader;
   }
 
   /**
