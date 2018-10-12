@@ -28,6 +28,8 @@ import io.vertx.core.http.WebSocket;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -38,6 +40,8 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Async;
 
 public class DockerQuickstartTest {
+  private static final Logger LOG = LogManager.getLogger();
+
   private static final String PROJECT_ROOT =
       Paths.get(System.getProperty("user.dir")).getParent().toString();
   private static final String DOCKER_COMPOSE_PROJECT_PREFIX = "quickstart_";
@@ -75,6 +79,8 @@ public class DockerQuickstartTest {
     // We check that the output of the script displays the right endpoints and services states
     // each endpoint and service will be stored in a map for later use.
     while ((line = reader.readLine()) != null) {
+      LOG.info(line);
+
       for (EndpointsIdentifier endpointsIdentifier : EndpointsIdentifier.values()) {
         Matcher regexMatcher = endpointsIdentifier.pattern.matcher(line);
         if (regexMatcher.find()) {
