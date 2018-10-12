@@ -1,20 +1,25 @@
 package net.consensys.pantheon.ethereum.core;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
 
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Gas;
+import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
 import tech.pegasys.pantheon.ethereum.vm.Code;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame.Type;
+import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class MessageFrameTestFixture {
@@ -23,8 +28,8 @@ public class MessageFrameTestFixture {
 
   private Type type = Type.MESSAGE_CALL;
   private Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
-  private Blockchain blockchain;
-  private WorldUpdater worldState;
+  private Optional<Blockchain> blockchain = Optional.empty();
+  private Optional<WorldUpdater> worldState = Optional.empty();
   private Gas initialGas = Gas.MAX_VALUE;
   private Address address = DEFAUT_ADDRESS;
   private Address sender = DEFAUT_ADDRESS;
@@ -34,8 +39,11 @@ public class MessageFrameTestFixture {
   private Wei value = Wei.ZERO;
   private BytesValue inputData = BytesValue.EMPTY;
   private Code code = new Code(BytesValue.EMPTY);
-  private BlockHeader blockHeader = new BlockHeaderTestFixture().buildHeader();
+  private final List<Bytes32> stackItems = new ArrayList<>();
+  private Optional<BlockHeader> blockHeader = Optional.empty();
   private int depth = 0;
+  private Optional<BlockHashLookup> blockHashLookup = Optional.empty();
+  private ExecutionContextTestFixture executionContextTestFixture;
 
   public MessageFrameTestFixture type(final Type type) {
     this.type = type;
@@ -48,12 +56,17 @@ public class MessageFrameTestFixture {
   }
 
   public MessageFrameTestFixture blockchain(final Blockchain blockchain) {
-    this.blockchain = blockchain;
+    this.blockchain = Optional.of(blockchain);
     return this;
   }
 
   public MessageFrameTestFixture worldState(final WorldUpdater worldState) {
-    this.worldState = worldState;
+    this.worldState = Optional.of(worldState);
+    return this;
+  }
+
+  public MessageFrameTestFixture worldState(final MutableWorldState worldState) {
+    this.worldState = Optional.of(worldState.updater());
     return this;
   }
 
@@ -103,7 +116,7 @@ public class MessageFrameTestFixture {
   }
 
   public MessageFrameTestFixture blockHeader(final BlockHeader blockHeader) {
-    this.blockHeader = blockHeader;
+    this.blockHeader = Optional.of(blockHeader);
     return this;
   }
 
@@ -112,27 +125,60 @@ public class MessageFrameTestFixture {
     return this;
   }
 
+  public MessageFrameTestFixture pushStackItem(final Bytes32 item) {
+    stackItems.add(item);
+    return this;
+  }
+
+  public MessageFrameTestFixture blockHashLookup(final BlockHashLookup blockHashLookup) {
+    this.blockHashLookup = Optional.of(blockHashLookup);
+    return this;
+  }
+
   public MessageFrame build() {
-    return MessageFrame.builder()
-        .type(type)
-        .messageFrameStack(messageFrameStack)
-        .blockchain(blockchain)
-        .worldState(worldState)
-        .initialGas(initialGas)
-        .address(address)
-        .originator(originator)
-        .gasPrice(gasPrice)
-        .inputData(inputData)
-        .sender(sender)
-        .value(value)
-        .apparentValue(value)
-        .contract(contract)
-        .code(code)
-        .blockHeader(blockHeader)
-        .depth(depth)
-        .completer(c -> {})
-        .miningBeneficiary(blockHeader.getCoinbase())
-        .blockHashLookup(new BlockHashLookup(blockHeader, blockchain))
-        .build();
+    final Blockchain blockchain = this.blockchain.orElseGet(this::createDefaultBlockchain);
+    final BlockHeader blockHeader =
+        this.blockHeader.orElseGet(() -> blockchain.getBlockHeader(0).get());
+    final MessageFrame frame =
+        MessageFrame.builder()
+            .type(type)
+            .messageFrameStack(messageFrameStack)
+            .blockchain(blockchain)
+            .worldState(worldState.orElseGet(this::createDefaultWorldState))
+            .initialGas(initialGas)
+            .address(address)
+            .originator(originator)
+            .gasPrice(gasPrice)
+            .inputData(inputData)
+            .sender(sender)
+            .value(value)
+            .apparentValue(value)
+            .contract(contract)
+            .code(code)
+            .blockHeader(blockHeader)
+            .depth(depth)
+            .completer(c -> {})
+            .miningBeneficiary(blockHeader.getCoinbase())
+            .blockHashLookup(
+                blockHashLookup.orElseGet(() -> new BlockHashLookup(blockHeader, blockchain)))
+            .build();
+    stackItems.forEach(frame::pushStackItem);
+    return frame;
+  }
+
+  private WorldUpdater createDefaultWorldState() {
+    return getOrCreateExecutionContextTestFixture().getStateArchive().getMutable().updater();
+  }
+
+  private Blockchain createDefaultBlockchain() {
+    return getOrCreateExecutionContextTestFixture().getBlockchain();
+  }
+
+  private ExecutionContextTestFixture getOrCreateExecutionContextTestFixture() {
+    // Avoid creating a test fixture if the test supplies the blockchain and worldstate.
+    if (executionContextTestFixture == null) {
+      executionContextTestFixture = new ExecutionContextTestFixture();
+    }
+    return executionContextTestFixture;
   }
 }
