@@ -29,11 +29,11 @@ fi
 
 # replaces the mix explorer rpc endpoint by ours
 `docker-compose ${COMPOSE_CONFIG_FILE_OPTION} exec -T ${EXPLORER_SERVICE} /bin/sed -i \
-"s/fallbackUrlPlaceHolder/http:\/\/localhost:${rpcMapping##*:}/g" \
+"s/fallbackUrlPlaceHolder/http:\/\/${HOST}:${rpcMapping##*:}/g" \
 src/constants/index.js`
 
 `docker-compose ${COMPOSE_CONFIG_FILE_OPTION} exec -T ${EXPLORER_SERVICE} /bin/sed -i \
-"s/rpcHostPlaceHolder/http:\/\/localhost:${rpcMapping##*:}/g" \
+"s/rpcHostPlaceHolder/http:\/\/${HOST}:${rpcMapping##*:}/g" \
 src/components/App.js`
 
 # Displays links to exposed services
