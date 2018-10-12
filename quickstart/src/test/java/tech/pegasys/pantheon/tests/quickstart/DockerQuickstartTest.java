@@ -31,14 +31,13 @@ import okhttp3.Response;
 import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Async;
 
-@Ignore
 public class DockerQuickstartTest {
 
   private static final String PROJECT_ROOT =
@@ -49,15 +48,29 @@ public class DockerQuickstartTest {
   private static final String DEFAULT_RPC_HOST =
       Optional.ofNullable(System.getenv("DOCKER_PORT_2375_TCP_ADDR")).orElse("localhost");
   private static final String DEFAULT_HTTP_RPC_HOST = "http://" + DEFAULT_RPC_HOST;
-  private static final Map<ServicesIdentifier, Service> services =
-      new EnumMap<>(ServicesIdentifier.class);
-  private static final Map<EndpointsIdentifier, String> endpoints =
+  private final Map<ServicesIdentifier, Service> services = new EnumMap<>(ServicesIdentifier.class);
+  private final Map<EndpointsIdentifier, String> endpoints =
       new EnumMap<>(EndpointsIdentifier.class);
-  private static Web3j web3HttpClient;
+  private Web3j web3HttpClient;
 
   @BeforeClass
   public static void runPantheonPrivateNetwork() throws IOException, InterruptedException {
     ProcessBuilder processBuilder = new ProcessBuilder("quickstart/runPantheonPrivateNetwork.sh");
+    processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
+    processBuilder.inheritIO(); // redirect all output to logs
+    Process process = processBuilder.start();
+
+    int exitValue = process.waitFor();
+
+    if (exitValue != 0) {
+      // check for errors, error messages and causes are redirected to logs already
+      throw new RuntimeException("execution of script failed!");
+    }
+  }
+
+  @Before
+  public void listQuickstartServices() throws IOException, InterruptedException {
+    ProcessBuilder processBuilder = new ProcessBuilder("quickstart/listQuickstartServices.sh");
     processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
     // redirect only error output to logs as we want to be able to
     // keep the standard output available for reading
@@ -73,39 +86,12 @@ public class DockerQuickstartTest {
 
     BufferedReader reader =
         new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8));
-    String line;
 
-    // We check that the output of the script displays the right endpoints and services states
-    // each endpoint and service will be stored in a map for later use.
-    while ((line = reader.readLine()) != null) {
+    reader.lines().forEach(this::populateServicesAndEndpoints);
+    reader.close();
 
-      for (ServicesIdentifier servicesIdentifier : ServicesIdentifier.values()) {
-        Matcher regexMatcher = servicesIdentifier.pattern.matcher(line);
-        if (regexMatcher.find()) {
-          Service service = new Service();
-          service.name = regexMatcher.group(1);
-          service.state = regexMatcher.group(2).toLowerCase();
-          String portMappings[] = regexMatcher.group(3).split(",", -1);
-          for (String mapping : portMappings) {
-            ExposedPort port = new ExposedPort(mapping);
-            service.exposedPorts.put(port.internalPort, port);
-          }
-          services.put(servicesIdentifier, service);
-        }
-      }
-
-      assertThat(services).isNullOrEmpty();
-
-      for (EndpointsIdentifier endpointsIdentifier : EndpointsIdentifier.values()) {
-        Matcher regexMatcher = endpointsIdentifier.pattern.matcher(line);
-        if (regexMatcher.find()) {
-          String endpoint = regexMatcher.group(1);
-          endpoints.put(endpointsIdentifier, endpoint);
-        }
-      }
-
-      assertThat(endpoints).isNullOrEmpty();
-    }
+    assertThat(services).isNotNull().isNotEmpty();
+    assertThat(endpoints).isNotNull().isNotEmpty();
 
     web3HttpClient =
         Web3j.build(
@@ -123,6 +109,40 @@ public class DockerQuickstartTest {
     assertThat(web3HttpClient).isNotNull();
   }
 
+  private void populateServicesAndEndpoints(String line) {
+    // We check that the output of the script displays the right endpoints and services states
+    // each endpoint and service will be stored in a map for later use.
+
+    for (ServicesIdentifier servicesIdentifier : ServicesIdentifier.values()) {
+      Matcher regexMatcher = servicesIdentifier.pattern.matcher(line);
+      if (regexMatcher.find()) {
+        Service service = new Service();
+        service.name = regexMatcher.group(1);
+        service.state = regexMatcher.group(2).toLowerCase();
+        String portMappings[] = regexMatcher.group(3).split(",", -1);
+        for (String mapping : portMappings) {
+          ExposedPort port = new ExposedPort(mapping);
+          service.exposedPorts.put(port.internalPort, port);
+        }
+        services.put(servicesIdentifier, service);
+      }
+    }
+
+    for (EndpointsIdentifier endpointsIdentifier : EndpointsIdentifier.values()) {
+      Matcher regexMatcher = endpointsIdentifier.pattern.matcher(line);
+      if (regexMatcher.find()) {
+        String endpoint = regexMatcher.group(1);
+        endpoints.put(endpointsIdentifier, endpoint);
+      }
+    }
+  }
+
+  @After
+  public void closeConnections() {
+    assertThat(web3HttpClient).isNotNull();
+    web3HttpClient.shutdown();
+  }
+
   @AfterClass
   public static void removePantheonPrivateNetwork() throws IOException, InterruptedException {
     ProcessBuilder processBuilder =
@@ -136,12 +156,6 @@ public class DockerQuickstartTest {
       // check for errors, all output and then also error messages and causes are redirected to logs
       throw new RuntimeException("execution of script failed!");
     }
-  }
-
-  @After
-  public void closeConnections() {
-    assertThat(web3HttpClient).isNotNull();
-    web3HttpClient.shutdown();
   }
 
   @Test
