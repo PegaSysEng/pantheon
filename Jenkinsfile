@@ -42,7 +42,7 @@ node {
                     sh './gradlew --no-daemon --parallel integrationTest'
                 }
                 stage('Acceptance Tests') {
-                    sh './gradlew --no-daemon --parallel acceptanceTest --tests Web3Sha3AcceptanceTest --tests PantheonClusterAcceptanceTest --tests MiningAcceptanceTest'
+                    sh './gradlew --no-daemon --parallel acceptanceTest'
                 }
                 stage('Check Licenses') {
                     sh './gradlew --no-daemon --parallel checkLicenses'
@@ -50,9 +50,6 @@ node {
                 stage('Check javadoc') {
                     sh './gradlew --no-daemon --parallel javadoc'
                 }
-                // stage('Smoke test') {
-                //     sh 'DOCKER_HOST=$DOCKER_PORT DOCKER_HOSTNAME=docker ./gradlew --no-daemon smokeTest'
-                // }
                 stage('Jacoco root report') {
                     sh './gradlew --no-daemon jacocoRootReport'
                 }
