@@ -58,7 +58,9 @@ public class DockerQuickstartTest {
 
   @BeforeClass
   public static void runPantheonPrivateNetwork() throws IOException, InterruptedException {
-    ProcessBuilder processBuilder = new ProcessBuilder("quickstart/runPantheonPrivateNetwork.sh");
+    final String command = "quickstart/runPantheonPrivateNetwork.sh";
+    LOG.info("Starting quickstart network with {} before tests", command);
+    ProcessBuilder processBuilder = new ProcessBuilder(command);
     processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
     // redirect only error output to logs as we want to be able to
     // keep the standard output available for reading
@@ -69,8 +71,11 @@ public class DockerQuickstartTest {
 
     if (exitValue != 0) {
       // check for errors, error messages and causes are redirected to logs already
-      throw new RuntimeException("execution of script failed!");
+      LOG.error(process.getErrorStream());
+      throw new RuntimeException("execution of script " + command + " failed!");
     }
+
+    LOG.error(process.getInputStream());
 
     BufferedReader reader =
         new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8));
@@ -79,8 +84,7 @@ public class DockerQuickstartTest {
     // We check that the output of the script displays the right endpoints and services states
     // each endpoint and service will be stored in a map for later use.
     while ((line = reader.readLine()) != null) {
-      LOG.info(line);
-
+      LOG.error(line);
       for (EndpointsIdentifier endpointsIdentifier : EndpointsIdentifier.values()) {
         Matcher regexMatcher = endpointsIdentifier.pattern.matcher(line);
         if (regexMatcher.find()) {
@@ -127,9 +131,10 @@ public class DockerQuickstartTest {
 
   @AfterClass
   public static void removePantheonPrivateNetwork() throws IOException, InterruptedException {
+    final String command = "quickstart/removePantheonPrivateNetwork.sh";
+    LOG.info("Stopping and removing quickstart network with {} after tests", command);
 
-    ProcessBuilder processBuilder =
-        new ProcessBuilder("quickstart/removePantheonPrivateNetwork.sh");
+    ProcessBuilder processBuilder = new ProcessBuilder(command);
     processBuilder.inheritIO(); // redirect all output to logs
     processBuilder.directory(new File(PROJECT_ROOT)); // going up one level is the project root
     Process process = processBuilder.start();
@@ -137,7 +142,7 @@ public class DockerQuickstartTest {
     int exitValue = process.waitFor();
     if (exitValue != 0) {
       // check for errors, all output and then also error messages and causes are redirected to logs
-      throw new RuntimeException("execution of script failed!");
+      throw new RuntimeException("execution of script " + command + " failed!");
     }
   }
 
