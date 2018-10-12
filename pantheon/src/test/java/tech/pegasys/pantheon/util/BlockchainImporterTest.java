@@ -1,0 +1,74 @@
+package tech.pegasys.pantheon.util;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
+
+import tech.pegasys.pantheon.controller.MainnetPantheonController;
+import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.blockcreation.EthHashBlockMiner;
+import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
+import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
+import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.util.uint.UInt256;
+
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Path;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+/** Tests for {@link BlockchainImporter}. */
+public final class BlockchainImporterTest {
+
+  @Rule public final TemporaryFolder folder = new TemporaryFolder();
+
+  BlockchainImporter blockImporter = new BlockchainImporter();
+
+  @Test
+  public void blockImport() throws Exception {
+    final URL importFileURL =
+        getClass()
+            .getClassLoader()
+            .getResource("tech/pegasys/pantheon/ethereum/jsonrpc/json-rpc-test.bin");
+    assertThat(importFileURL).isNotNull();
+
+    final Path source = new File(importFileURL.toURI()).toPath();
+    final Path target = folder.newFolder().toPath();
+
+    final URL genesisJsonUrl =
+        getClass()
+            .getClassLoader()
+            .getResource("tech/pegasys/pantheon/ethereum/jsonrpc/jsonRpcTestGenesis.json");
+    assertThat(genesisJsonUrl).isNotNull();
+    final String genesisJson = Resources.toString(genesisJsonUrl, Charsets.UTF_8);
+    final KeyPair keyPair = loadKeyPair(target);
+
+    final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
+    final MiningParameters miningParams = new MiningParametersTestBuilder().enabled(false).build();
+    final GenesisConfig<Void> genesisConfig = GenesisConfig.fromJson(genesisJson, protocolSchedule);
+    final PantheonController<Void, EthHashBlockMiner> ctrl =
+        MainnetPantheonController.init(
+            target,
+            genesisConfig,
+            SynchronizerConfiguration.builder().build(),
+            miningParams,
+            10,
+            keyPair);
+    final BlockchainImporter.ImportResult result =
+        blockImporter.importBlockchain(source, ctrl, true, 1, 1, false, false, null);
+    System.out.println(source);
+    System.out.println(target);
+
+    System.out.println(result);
+    assertThat(result.count).isEqualTo(33);
+    assertThat(result.td).isEqualTo(UInt256.of(4357120));
+  }
+}
