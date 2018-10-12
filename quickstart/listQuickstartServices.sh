@@ -45,13 +45,19 @@ NORMAL=$(tput sgr0)
 echo "${CYAN}****************************************************************"
 echo "JSON-RPC ${BOLD}HTTP${NORMAL}${CYAN} service endpoint      : ${ORANGE}http://${HOST}:${rpcMapping##*:}${CYAN}   *"
 echo "JSON-RPC ${BOLD}WebSocket${NORMAL}${CYAN} service endpoint : ${ORANGE}http://${HOST}:${wsMapping##*:}${CYAN}   *"
-
-while [ "$(curl -m 1 -s -o /dev/null -w ''%{http_code}'' http://${HOST}:${explorerMapping##*:})" != "200" ]
+dots=""
+maxRetryCount=50
+while [ "$(curl -m 1 -s -o /dev/null -w ''%{http_code}'' http://${HOST}:${explorerMapping##*:})" != "200" ] && [ ${#dots} -le ${maxRetryCount} ]
 do
   dots=$dots"."
   printf "${CYAN} Block explorer is starting, please wait ${ORANGE}$dots${NORMAL}\\r"
   sleep 1
 done
 
-echo "${CYAN}Web block explorer address          : ${ORANGE}http://${HOST}:${explorerMapping##*:}${CYAN}   *                                                                             "
-echo "****************************************************************${NORMAL}"
+if [ ${#dots} -gt ${maxRetryCount} ]; then
+  (>&2 echo "${ORANGE}ERROR: Web block explorer is not started !${CYAN}   *                                                                             ")
+  echo "****************************************************************${NORMAL}"
+else
+  echo "${CYAN}Web block explorer address          : ${ORANGE}http://${HOST}:${explorerMapping##*:}${CYAN}   *                                                                             "
+  echo "****************************************************************${NORMAL}"
+fi
