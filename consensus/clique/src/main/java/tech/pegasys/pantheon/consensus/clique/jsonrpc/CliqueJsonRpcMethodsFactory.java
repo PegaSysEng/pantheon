@@ -26,13 +26,10 @@ public class CliqueJsonRpcMethodsFactory {
     final WorldStateArchive worldStateArchive = context.getWorldStateArchive();
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
+    final VoteProposer voteProposer = context.getConsensusState().getVoteProposer();
     final JsonRpcParameter jsonRpcParameter = new JsonRpcParameter();
-    final VoteProposer voteProposer;
-    voteProposer = context.getConsensusState().getVoteProposer();
-    final EpochManager epochManager = context.getConsensusState().getEpochManager();
-    final CliqueVoteTallyUpdater cliqueVoteTallyUpdater = new CliqueVoteTallyUpdater(epochManager);
-    final VoteTallyCache voteTallyCache =
-        new VoteTallyCache(blockchain, cliqueVoteTallyUpdater, epochManager);
+    // Must create our own voteTallyCache as using this would pollute the main voteTallyCache
+    final VoteTallyCache voteTallyCache = createVoteTallyCache(context, blockchain);
 
     final CliqueGetSigners cliqueGetSigners =
         new CliqueGetSigners(blockchainQueries, voteTallyCache, jsonRpcParameter);
@@ -47,5 +44,12 @@ public class CliqueJsonRpcMethodsFactory {
     rpcMethods.put(proposeRpc.getName(), proposeRpc);
     rpcMethods.put(discardRpc.getName(), discardRpc);
     return rpcMethods;
+  }
+
+  private VoteTallyCache createVoteTallyCache(ProtocolContext<CliqueContext> context,
+      MutableBlockchain blockchain) {
+    final EpochManager epochManager = context.getConsensusState().getEpochManager();
+    final CliqueVoteTallyUpdater cliqueVoteTallyUpdater = new CliqueVoteTallyUpdater(epochManager);
+    return new VoteTallyCache(blockchain, cliqueVoteTallyUpdater, epochManager);
   }
 }

@@ -39,7 +39,7 @@ public class CliqueGetSignersAtHash implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final Optional<BlockHeader> blockHeader = blockNumber(request);
+    final Optional<BlockHeader> blockHeader = determineBlockHeader(request);
     return blockHeader
         .map(bh -> voteTallyCache.getVoteTallyAtBlock(bh).getCurrentValidators())
         .map(addresses -> addresses.stream().map(Objects::toString).collect(Collectors.toList()))
@@ -47,7 +47,7 @@ public class CliqueGetSignersAtHash implements JsonRpcMethod {
         .orElse(new JsonRpcErrorResponse(request.getId(), JsonRpcError.INTERNAL_ERROR));
   }
 
-  private Optional<BlockHeader> blockNumber(final JsonRpcRequest request) {
+  private Optional<BlockHeader> determineBlockHeader(final JsonRpcRequest request) {
     final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
     return blockchainQueries.blockByHash(hash).map(BlockWithMetadata::getHeader);
   }

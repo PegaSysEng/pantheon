@@ -1,6 +1,7 @@
 package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
