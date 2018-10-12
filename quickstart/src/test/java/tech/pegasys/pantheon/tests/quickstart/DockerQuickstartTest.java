@@ -32,11 +32,13 @@ import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Async;
 
+@Ignore
 public class DockerQuickstartTest {
 
   private static final String PROJECT_ROOT =
