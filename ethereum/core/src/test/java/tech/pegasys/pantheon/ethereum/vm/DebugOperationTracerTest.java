@@ -7,17 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason.INSUFFICIENT_GAS;
 
-import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
-
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Gas;
@@ -30,6 +19,17 @@ import tech.pegasys.pantheon.ethereum.vm.OperationTracer.ExecuteOperation;
 import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltException;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.uint.UInt256;
+
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+
+import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DebugOperationTracerTest {

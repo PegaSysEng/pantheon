@@ -1,12 +1,5 @@
 package tech.pegasys.pantheon.ethereum.core;
 
-import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
-
-import java.math.BigInteger;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.function.Consumer;
-
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetMessageCallProcessor;
@@ -17,6 +10,13 @@ import tech.pegasys.pantheon.ethereum.vm.Code;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.ethereum.vm.OperationTracer;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.math.BigInteger;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.function.Consumer;
+
+import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
 
 public class TestCodeExecutor {
 

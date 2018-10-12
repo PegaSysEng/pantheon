@@ -6,11 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
-
-import com.google.common.base.Strings;
-import org.junit.After;
-import org.junit.Test;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -21,6 +16,11 @@ import tech.pegasys.pantheon.ethereum.vm.operations.BlockHashOperation;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
+
+import com.google.common.base.Strings;
+import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
+import org.junit.After;
+import org.junit.Test;
 
 public class BlockHashOperationTest {
 

@@ -3,9 +3,6 @@ package tech.pegasys.pantheon.ethereum.vm.operations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
-
-import org.junit.Test;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
@@ -24,6 +21,9 @@ import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
+
+import net.consensys.pantheon.ethereum.core.MessageFrameTestFixture;
+import org.junit.Test;
 
 public class ExtCodeHashOperationTest {
 
