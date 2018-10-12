@@ -83,6 +83,8 @@ public class DockerQuickstartTest {
         }
       }
 
+      assertThat(endpoints).isNullOrEmpty();
+
       for (ServicesIdentifier servicesIdentifier : ServicesIdentifier.values()) {
         Matcher regexMatcher = servicesIdentifier.pattern.matcher(line);
         if (regexMatcher.find()) {
@@ -97,6 +99,8 @@ public class DockerQuickstartTest {
           services.put(servicesIdentifier, service);
         }
       }
+
+      assertThat(services).isNullOrEmpty();
     }
 
     web3HttpClient =
@@ -111,6 +115,8 @@ public class DockerQuickstartTest {
                         .externalPort),
             2000,
             Async.defaultExecutorService());
+
+    assertThat(web3HttpClient).isNotNull();
   }
 
   @AfterClass

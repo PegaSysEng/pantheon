@@ -55,7 +55,7 @@ do
 done
 
 if [ ${#dots} -gt ${maxRetryCount} ]; then
-  (>&2 echo "${ORANGE}ERROR: Web block explorer is not started !${CYAN}   *                                                                             ")
+  (>&2 echo "${ORANGE}ERROR: Web block explorer is not started at http://${HOST}:${explorerMapping##*:}$ !${CYAN}   *                                                                             ")
   echo "****************************************************************${NORMAL}"
 else
   echo "${CYAN}Web block explorer address          : ${ORANGE}http://${HOST}:${explorerMapping##*:}${CYAN}   *                                                                             "
