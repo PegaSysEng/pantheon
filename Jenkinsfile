@@ -73,13 +73,13 @@ stage('Pantheon tests') {
                 docker.image('pegasyseng/pantheon-build:0.0.1').inside("--link ${d.id}:docker") {
                     try {
                         stage('Docker quickstart Tests') {
-                            sh 'DOCKER_HOST=tcp://docker:2375 ./gradlew --no-daemon --parallel dockerQuickstartTest'
+                            sh 'DOCKER_HOST=tcp://docker:2375 ./gradlew --no-daemon --parallel clean dockerQuickstartTest'
                         }
                     } finally {
                         archiveArtifacts '**/build/test-results/**'
                         archiveArtifacts '**/build/reports/**'
 
-                        junit '**/build/test-results/**/TEST*.xml'
+                        junit '**/build/test-results/**/*.xml'
                     }
                 }
             }
