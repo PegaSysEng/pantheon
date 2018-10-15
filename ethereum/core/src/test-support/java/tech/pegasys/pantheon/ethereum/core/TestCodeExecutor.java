@@ -6,10 +6,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetMessageCallProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.PrecompileContractRegistry;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
-import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
 import tech.pegasys.pantheon.ethereum.vm.Code;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame.Type;
 import tech.pegasys.pantheon.ethereum.vm.OperationTracer;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -50,8 +48,7 @@ public class TestCodeExecutor {
             .nonce(0)
             .build();
     final MessageFrame initialFrame =
-        MessageFrame.builder()
-            .type(Type.MESSAGE_CALL)
+        new MessageFrameTestFixture()
             .messageFrameStack(messageFrameStack)
             .blockchain(fixture.getBlockchain())
             .worldState(worldState)
@@ -63,13 +60,9 @@ public class TestCodeExecutor {
             .inputData(transaction.getPayload())
             .sender(SENDER_ADDRESS)
             .value(transaction.getValue())
-            .apparentValue(transaction.getValue())
             .code(new Code(BytesValue.fromHexString(code)))
             .blockHeader(blockHeader)
             .depth(0)
-            .completer(c -> {})
-            .miningBeneficiary(blockHeader.coinbase)
-            .blockHashLookup(new BlockHashLookup(blockHeader, fixture.getBlockchain()))
             .build();
     messageFrameStack.addFirst(initialFrame);
 

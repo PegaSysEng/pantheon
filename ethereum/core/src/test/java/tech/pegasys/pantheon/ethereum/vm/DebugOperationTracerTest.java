@@ -5,14 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static tech.pegasys.pantheon.ethereum.core.AddressHelpers.calculateAddressWithRespectTo;
 import static tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason.INSUFFICIENT_GAS;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Gas;
+import tech.pegasys.pantheon.ethereum.core.MessageFrameTestFixture;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
@@ -21,10 +19,8 @@ import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
 import tech.pegasys.pantheon.ethereum.vm.OperationTracer.ExecuteOperation;
 import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltException;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.util.ArrayDeque;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
@@ -189,29 +185,16 @@ public class DebugOperationTracerTest {
     return tracer.getTraceFrames().get(0);
   }
 
-  private MessageFrame.Builder validMessageFrameBuilder() {
+  private MessageFrameTestFixture validMessageFrameBuilder() {
     final BlockHeader blockHeader = new BlockHeaderTestFixture().number(1).buildHeader();
     final TestBlockchain blockchain = new TestBlockchain(blockHeader.getNumber());
-    return MessageFrame.builder()
-        .type(MessageFrame.Type.MESSAGE_CALL)
-        .messageFrameStack(new ArrayDeque<>())
-        .blockchain(blockchain)
-        .worldState(worldUpdater)
+    return new MessageFrameTestFixture()
         .initialGas(INITIAL_GAS)
-        .contract(calculateAddressWithRespectTo(Address.ID, 1))
-        .address(calculateAddressWithRespectTo(Address.ID, 2))
-        .originator(calculateAddressWithRespectTo(Address.ID, 3))
+        .worldState(worldUpdater)
         .gasPrice(Wei.of(25))
-        .inputData(BytesValue.EMPTY)
-        .sender(calculateAddressWithRespectTo(Address.ID, 4))
-        .value(Wei.of(30))
-        .apparentValue(Wei.of(35))
-        .code(new Code())
         .blockHeader(blockHeader)
-        .depth(DEPTH)
-        .completer(c -> {})
-        .miningBeneficiary(AddressHelpers.ofValue(0))
-        .blockHashLookup(new BlockHashLookup(blockHeader, blockchain));
+        .blockchain(blockchain)
+        .depth(DEPTH);
   }
 
   private Map<UInt256, UInt256> setupStorageForCapture(final MessageFrame frame) {
