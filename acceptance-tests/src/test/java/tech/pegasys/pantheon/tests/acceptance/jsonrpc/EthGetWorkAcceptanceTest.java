@@ -1,14 +1,15 @@
 package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
+
+import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.protocol.core.methods.response.EthGetWork;
-import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
 
 public class EthGetWorkAcceptanceTest extends AcceptanceTestBase {
 
@@ -33,6 +34,4 @@ public class EthGetWorkAcceptanceTest extends AcceptanceTestBase {
     EthGetWork response = fullNode.web3j().ethGetWork().send();
     assertThat(response.hasError()).isTrue();
   }
-
 }
-

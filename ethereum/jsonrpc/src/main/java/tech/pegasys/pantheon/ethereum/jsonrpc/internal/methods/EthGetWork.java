@@ -1,16 +1,16 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
+import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolverInputs;
+
 import java.util.Optional;
 import javax.xml.bind.DatatypeConverter;
-import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
-import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolverInputs;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 
 public class EthGetWork implements JsonRpcMethod {
 
@@ -36,10 +36,10 @@ public class EthGetWork implements JsonRpcMethod {
       if (rawResult.getDagSeed() != 0) {
         seedHashString = blockchain.getBlockHashByNumber(rawResult.getDagSeed()).get().toString();
       }
-      String [] result = {
-          "0x" + DatatypeConverter.printHexBinary(rawResult.getPrePowHash()).toLowerCase(),
-          seedHashString,
-          rawResult.getTarget().toHexString()
+      String[] result = {
+        "0x" + DatatypeConverter.printHexBinary(rawResult.getPrePowHash()).toLowerCase(),
+        seedHashString,
+        rawResult.getTarget().toHexString()
       };
       return new JsonRpcSuccessResponse(req.getId(), result);
     } else {
@@ -47,6 +47,3 @@ public class EthGetWork implements JsonRpcMethod {
     }
   }
 }
-
-
-
