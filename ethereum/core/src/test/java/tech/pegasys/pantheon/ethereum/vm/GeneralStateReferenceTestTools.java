@@ -35,8 +35,7 @@ public class GeneralStateReferenceTestTools {
   static {
     final String eips =
         System.getProperty(
-            "test.ethereum.state.eips",
-            "Frontier,Homestead,EIP150,EIP158,Byzantium,Constantinople");
+            "test.ethereum.state.eips", "Frontier,Homestead,EIP150,EIP158,Byzantium");
     EIPS_TO_RUN = Arrays.asList(eips.split(","));
   }
 

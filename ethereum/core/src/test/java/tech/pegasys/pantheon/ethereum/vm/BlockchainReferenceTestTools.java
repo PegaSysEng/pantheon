@@ -31,7 +31,7 @@ public class BlockchainReferenceTestTools {
         System.getProperty(
             "test.ethereum.blockchain.eips",
             "FrontierToHomesteadAt5,HomesteadToEIP150At5,HomesteadToDaoAt5,EIP158ToByzantiumAt5,"
-                + "Frontier,Homestead,EIP150,EIP158,Byzantium,Constantinople");
+                + "Frontier,Homestead,EIP150,EIP158,Byzantium");
     NETWORKS_TO_RUN = Arrays.asList(networks.split(","));
   }
 
