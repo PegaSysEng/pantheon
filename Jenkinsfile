@@ -79,7 +79,7 @@ stage('Pantheon tests') {
                         archiveArtifacts '**/build/test-results/**'
                         archiveArtifacts '**/build/reports/**'
 
-                        junit '**/build/test-results/**/*.xml'
+                        junit '**/build/test-results/**/TEST*.xml'
                     }
                 }
             }
