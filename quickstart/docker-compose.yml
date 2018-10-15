@@ -39,8 +39,8 @@ services:
     depends_on:
       - bootnode
     ports:
-      - "8545"
-      - "8546"
+      - "8545:8545"
+      - "8546:8546"
   explorer:
     build:
       context: explorer
@@ -48,6 +48,6 @@ services:
     depends_on:
       - rpcnode
     ports:
-      - "3000"
+      - "3000:3000"
 volumes:
   public-keys:
