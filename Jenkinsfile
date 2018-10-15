@@ -71,8 +71,15 @@ stage('Pantheon tests') {
             checkout scm
             docker.image('docker:18.06.0-ce-dind').withRun('--privileged') { d ->
                 docker.image('pegasyseng/pantheon-build:0.0.1').inside("--link ${d.id}:docker") {
-                    stage('Docker quickstart Tests') {
-                        sh 'DOCKER_HOST=tcp://docker:2375 ./gradlew --no-daemon --parallel dockerQuickstartTest'
+                    try {
+                        stage('Docker quickstart Tests') {
+                            sh 'DOCKER_HOST=tcp://docker:2375 ./gradlew --no-daemon --parallel dockerQuickstartTest'
+                        }
+                    } finally {
+                        archiveArtifacts 'build/test-results/**'
+                        archiveArtifacts 'build/reports/**'
+
+                        junit 'build/test-results/**/*.xml'
                     }
                 }
             }

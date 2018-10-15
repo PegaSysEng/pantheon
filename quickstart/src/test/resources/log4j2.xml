@@ -5,8 +5,8 @@
   </Properties>
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} | %t | %-5level | %c{1} | %msg%n" />
-    </Console>
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSSZZZ} | %t | %-5level | %c{1} | %msg%n" />
+  </Console>
   </Appenders>
   <Loggers>
     <Root level="${sys:root.log.level}">
