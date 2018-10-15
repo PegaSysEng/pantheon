@@ -76,10 +76,10 @@ stage('Pantheon tests') {
                             sh 'DOCKER_HOST=tcp://docker:2375 ./gradlew --no-daemon --parallel dockerQuickstartTest'
                         }
                     } finally {
-                        archiveArtifacts 'build/test-results/**'
-                        archiveArtifacts 'build/reports/**'
+                        archiveArtifacts '**/build/test-results/**'
+                        archiveArtifacts '**/build/reports/**'
 
-                        junit 'build/test-results/**/*.xml'
+                        junit '**/build/test-results/**/*.xml'
                     }
                 }
             }
