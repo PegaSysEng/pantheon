@@ -1,15 +1,18 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter;
 
-import java.util.ArrayList;
-import java.util.List;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /** Tracks new pending transactions that have arrived in the transaction pool */
-class PendingTransactionFilter {
+class PendingTransactionFilter extends Filter {
 
   private final List<Hash> transactionHashes = new ArrayList<>();
 
-  PendingTransactionFilter() {}
+  PendingTransactionFilter(final String id) {
+    super(id);
+  }
 
   void addTransactionHash(final Hash hash) {
     transactionHashes.add(hash);

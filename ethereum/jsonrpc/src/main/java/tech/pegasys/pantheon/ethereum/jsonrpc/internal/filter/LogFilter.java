@@ -1,11 +1,12 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter;
 
-import java.util.ArrayList;
-import java.util.List;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 
-class LogFilter {
+import java.util.ArrayList;
+import java.util.List;
+
+class LogFilter extends Filter {
 
   private final BlockParameter fromBlock;
   private final BlockParameter toBlock;
@@ -14,7 +15,11 @@ class LogFilter {
   private final List<LogWithMetadata> logs = new ArrayList<>();
 
   LogFilter(
-      final BlockParameter fromBlock, final BlockParameter toBlock, final LogsQuery logsQuery) {
+      final String id,
+      final BlockParameter fromBlock,
+      final BlockParameter toBlock,
+      final LogsQuery logsQuery) {
+    super(id);
     this.fromBlock = fromBlock;
     this.toBlock = toBlock;
     this.logsQuery = logsQuery;

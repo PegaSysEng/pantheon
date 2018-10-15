@@ -38,23 +38,23 @@ public class FilterManagerLogFilterTest {
   @Mock private Blockchain blockchain;
   @Mock private BlockchainQueries blockchainQueries;
   @Mock private TransactionPool transactionPool;
+  private final FilterRepository filterRepository = new FilterRepository();
 
   @Before
   public void setupTest() {
     when(blockchainQueries.getBlockchain()).thenReturn(blockchain);
     this.filterManager =
-        new FilterManager(blockchainQueries, transactionPool, new FilterIdGenerator());
+        new FilterManager(
+            blockchainQueries, transactionPool, new FilterIdGenerator(), filterRepository);
   }
 
   @Test
   public void installUninstallNewLogFilter() {
-    assertThat(filterManager.logFilterCount()).isEqualTo(0);
-
     final String filterId = filterManager.installLogFilter(latest(), latest(), logsQuery());
-    assertThat(filterManager.logFilterCount()).isEqualTo(1);
+    assertThat(filterRepository.exists(filterId)).isTrue();
 
     assertThat(filterManager.uninstallFilter(filterId)).isTrue();
-    assertThat(filterManager.logFilterCount()).isEqualTo(0);
+    assertThat(filterRepository.exists(filterId)).isFalse();
 
     assertThat(filterManager.blockChanges(filterId)).isNull();
   }

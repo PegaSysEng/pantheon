@@ -12,31 +12,25 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.annotations.VisibleForTesting;
 
 /** Manages JSON-RPC filter events. */
 public class FilterManager {
 
-  private final Map<String, BlockFilter> blockFilters = new ConcurrentHashMap<>();
-
-  private final Map<String, PendingTransactionFilter> pendingTransactionFilters =
-      new ConcurrentHashMap<>();
-
-  private final Map<String, LogFilter> logFilters = new ConcurrentHashMap<>();
-
   private final FilterIdGenerator filterIdGenerator;
-
+  private final FilterRepository filterRepository;
   private final BlockchainQueries blockchainQueries;
 
   public FilterManager(
       final BlockchainQueries blockchainQueries,
       final TransactionPool transactionPool,
-      final FilterIdGenerator filterIdGenerator) {
+      final FilterIdGenerator filterIdGenerator,
+      final FilterRepository filterRepository) {
     this.filterIdGenerator = filterIdGenerator;
+    this.filterRepository = filterRepository;
     checkNotNull(blockchainQueries.getBlockchain());
     blockchainQueries.getBlockchain().observeBlockAdded(this::recordBlockEvent);
     transactionPool.addTransactionListener(this::recordPendingTransactionEvent);
@@ -50,7 +44,7 @@ public class FilterManager {
    */
   public String installBlockFilter() {
     final String filterId = filterIdGenerator.nextId();
-    blockFilters.put(filterId, new BlockFilter());
+    filterRepository.save(new BlockFilter(filterId));
     return filterId;
   }
 
@@ -61,7 +55,7 @@ public class FilterManager {
    */
   public String installPendingTransactionFilter() {
     final String filterId = filterIdGenerator.nextId();
-    pendingTransactionFilters.put(filterId, new PendingTransactionFilter());
+    filterRepository.save(new PendingTransactionFilter(filterId));
     return filterId;
   }
 
@@ -76,7 +70,7 @@ public class FilterManager {
   public String installLogFilter(
       final BlockParameter fromBlock, final BlockParameter toBlock, final LogsQuery logsQuery) {
     final String filterId = filterIdGenerator.nextId();
-    logFilters.put(filterId, new LogFilter(fromBlock, toBlock, logsQuery));
+    filterRepository.save(new LogFilter(filterId, fromBlock, toBlock, logsQuery));
     return filterId;
   }
 
@@ -87,15 +81,19 @@ public class FilterManager {
    * @return {@code true} if the filter was successfully removed; otherwise {@code false}
    */
   public boolean uninstallFilter(final String filterId) {
-    return blockFilters.remove(filterId) != null
-        || pendingTransactionFilters.remove(filterId) != null
-        || logFilters.remove(filterId) != null;
+    if (filterRepository.exists(filterId)) {
+      filterRepository.delete(filterId);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void recordBlockEvent(final BlockAddedEvent event, final Blockchain blockchain) {
     final Hash blockHash = event.getBlock().getHash();
+    Collection<BlockFilter> blockFilters = filterRepository.getFiltersOfType(BlockFilter.class);
     blockFilters.forEach(
-        (filterId, filter) -> {
+        (filter) -> {
           synchronized (filter) {
             filter.addBlockHash(blockHash);
           }
@@ -105,8 +103,9 @@ public class FilterManager {
   }
 
   private void checkBlockchainForMatchingLogsForFilters() {
+    Collection<LogFilter> logFilters = filterRepository.getFiltersOfType(LogFilter.class);
     logFilters.forEach(
-        (filterId, filter) -> {
+        (filter) -> {
           final long headBlockNumber = blockchainQueries.headBlockNumber();
           final long toBlockNumber =
               filter.getToBlock().getNumber().orElse(blockchainQueries.headBlockNumber());
@@ -118,12 +117,14 @@ public class FilterManager {
 
   @VisibleForTesting
   void recordPendingTransactionEvent(final Transaction transaction) {
+    Collection<PendingTransactionFilter> pendingTransactionFilters =
+        filterRepository.getFiltersOfType(PendingTransactionFilter.class);
     if (pendingTransactionFilters.isEmpty()) {
       return;
     }
 
     pendingTransactionFilters.forEach(
-        (filterId, filter) -> {
+        (filter) -> {
           synchronized (filter) {
             filter.addTransactionHash(transaction.hash());
           }
@@ -137,7 +138,7 @@ public class FilterManager {
    * @return the new block hashes that have occurred since the filter was last checked
    */
   public List<Hash> blockChanges(final String filterId) {
-    final BlockFilter filter = blockFilters.get(filterId);
+    final BlockFilter filter = filterRepository.getFilter(filterId, BlockFilter.class).orElse(null);
     if (filter == null) {
       return null;
     }
@@ -157,7 +158,8 @@ public class FilterManager {
    * @return the new pending transaction hashes that have occurred since the filter was last checked
    */
   public List<Hash> pendingTransactionChanges(final String filterId) {
-    final PendingTransactionFilter filter = pendingTransactionFilters.get(filterId);
+    final PendingTransactionFilter filter =
+        filterRepository.getFilter(filterId, PendingTransactionFilter.class).orElse(null);
     if (filter == null) {
       return null;
     }
@@ -171,7 +173,7 @@ public class FilterManager {
   }
 
   public List<LogWithMetadata> logsChanges(final String filterId) {
-    final LogFilter filter = logFilters.get(filterId);
+    final LogFilter filter = filterRepository.getFilter(filterId, LogFilter.class).orElse(null);
     if (filter == null) {
       return null;
     }
@@ -185,7 +187,7 @@ public class FilterManager {
   }
 
   public List<LogWithMetadata> logs(final String filterId) {
-    final LogFilter filter = logFilters.get(filterId);
+    final LogFilter filter = filterRepository.getFilter(filterId, LogFilter.class).orElse(null);
     if (filter == null) {
       return null;
     }
@@ -196,20 +198,5 @@ public class FilterManager {
         filter.getToBlock().getNumber().orElse(blockchainQueries.headBlockNumber());
 
     return blockchainQueries.matchingLogs(fromBlockNumber, toBlockNumber, filter.getLogsQuery());
-  }
-
-  @VisibleForTesting
-  int blockFilterCount() {
-    return blockFilters.size();
-  }
-
-  @VisibleForTesting
-  int pendingTransactionFilterCount() {
-    return pendingTransactionFilters.size();
-  }
-
-  @VisibleForTesting
-  int logFilterCount() {
-    return logFilters.size();
   }
 }
