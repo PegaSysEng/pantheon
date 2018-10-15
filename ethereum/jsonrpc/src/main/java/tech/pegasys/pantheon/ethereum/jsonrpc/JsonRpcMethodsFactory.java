@@ -36,6 +36,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleByBloc
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleByBlockNumberAndIndex;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleCountByBlockHash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleCountByBlockNumber;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetWork;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthMining;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewBlockFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewFilter;
@@ -167,7 +168,8 @@ public class JsonRpcMethodsFactory {
           new EthMining<>(miningCoordinator),
           new EthCoinbase(miningCoordinator),
           new EthProtocolVersion(supportedCapabilities),
-          new EthGasPrice<>(miningCoordinator));
+          new EthGasPrice<>(miningCoordinator),
+          new EthGetWork(miningCoordinator, blockchainQueries));
     }
     if (rpcApis.contains(RpcApis.DEBUG)) {
       final BlockReplay blockReplay =
