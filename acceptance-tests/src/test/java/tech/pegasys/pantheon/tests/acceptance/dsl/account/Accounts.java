@@ -1,9 +1,6 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.account;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.web3j.utils.Convert.toWei;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
@@ -49,28 +46,5 @@ public class Accounts {
 
   public Account createAccount(final String accountName) {
     return Account.create(accountName);
-  }
-
-  public void waitForAccountBalance(
-      final Account account, final int etherAmount, final PantheonNode node) {
-    waitForAccountBalance(account, String.valueOf(etherAmount), Unit.ETHER, node);
-  }
-
-  public void waitForAccountBalance(
-      final Account account,
-      final String expectedBalance,
-      final Unit balanceUnit,
-      final PantheonNode node) {
-    LOG.info(
-        "Waiting for {} to have a balance of {} {} on node {}",
-        account.getName(),
-        expectedBalance,
-        balanceUnit,
-        node.getName());
-
-    waitFor(
-        () ->
-            assertThat(node.getAccountBalance(account))
-                .isEqualTo(toWei(expectedBalance, balanceUnit).toBigIntegerExact()));
   }
 }

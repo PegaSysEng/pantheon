@@ -8,10 +8,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class MiningAcceptanceTest extends AcceptanceTestBase {
 
   private PantheonNode minerNode;
@@ -24,23 +22,23 @@ public class MiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactions() {
-    final Account fromAccount = accounts.createAccount("account1", "50", ETHER, minerNode);
-    final Account toAccount = accounts.createAccount("account2", "0", ETHER, minerNode);
-    accounts.waitForAccountBalance(fromAccount, 50, minerNode);
+    final Account sender = accounts.createAccount("account1", "50", ETHER, minerNode);
+    final Account receiver = accounts.createAccount("account2", "0", ETHER, minerNode);
+    cluster.awaitPropagation(sender, 50);
 
-    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 1));
-    accounts.waitForAccountBalance(toAccount, 1, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
+    cluster.awaitPropagation(receiver, 1);
 
-    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 2));
-    accounts.waitForAccountBalance(toAccount, 3, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
+    cluster.awaitPropagation(receiver, 3);
 
-    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 3));
-    accounts.waitForAccountBalance(toAccount, 6, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
+    cluster.awaitPropagation(receiver, 6);
 
-    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 4));
-    accounts.waitForAccountBalance(toAccount, 10, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 4));
+    cluster.awaitPropagation(receiver, 10);
 
-    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 5));
-    accounts.waitForAccountBalance(toAccount, 15, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 5));
+    cluster.awaitPropagation(receiver, 15);
   }
 }
