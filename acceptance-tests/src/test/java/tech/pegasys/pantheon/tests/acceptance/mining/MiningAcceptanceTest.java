@@ -4,6 +4,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectAccountBalance;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
@@ -26,21 +27,21 @@ public class MiningAcceptanceTest extends AcceptanceTestBase {
     final Account sender = accounts.createAccount("account1");
     final Account receiver = accounts.createAccount("account2");
     minerNode.execute(transactions.createTransfer(sender, 50));
-    cluster.awaitPropagation(sender, 50);
+    cluster.verify(new ExpectAccountBalance(sender, 50));
 
     minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
-    cluster.awaitPropagation(receiver, 1);
+    cluster.verify(new ExpectAccountBalance(receiver, 1));
 
     minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
-    cluster.awaitPropagation(receiver, 3);
+    cluster.verify(new ExpectAccountBalance(receiver, 3));
 
     minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
-    cluster.awaitPropagation(receiver, 6);
+    cluster.verify(new ExpectAccountBalance(receiver, 6));
 
     minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 4));
-    cluster.awaitPropagation(receiver, 10);
+    cluster.verify(new ExpectAccountBalance(receiver, 10));
 
     minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 5));
-    cluster.awaitPropagation(receiver, 15);
+    cluster.verify(new ExpectAccountBalance(receiver, 15));
   }
 }

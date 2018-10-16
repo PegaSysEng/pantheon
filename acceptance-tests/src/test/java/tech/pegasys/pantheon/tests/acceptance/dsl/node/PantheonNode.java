@@ -169,6 +169,7 @@ public class PantheonNode implements Node, AutoCloseable {
     }
   }
 
+  @Override
   public BigInteger getAccountBalance(final Account account) {
     try {
       final EthGetBalance balanceResponse =

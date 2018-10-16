@@ -1,11 +1,9 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.web3j.utils.Convert.toWei;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.web3j.utils.Convert.Unit;
 
 public class Cluster implements AutoCloseable {
 
@@ -78,25 +75,9 @@ public class Cluster implements AutoCloseable {
     }
   }
 
-  public void awaitPropagation(final Account account, final int expectedBalance) {
-    awaitPropagation(account, String.valueOf(expectedBalance), Unit.ETHER);
-  }
-
-  public void awaitPropagation(
-      final Account account, final String expectedBalance, final Unit balanceUnit) {
-
-    for (final PantheonNode node : nodes.values()) {
-      LOG.info(
-          "Waiting for {} to have a balance of {} {} on node {}",
-          account.getName(),
-          expectedBalance,
-          balanceUnit,
-          node.getName());
-
-      waitFor(
-          () ->
-              assertThat(node.getAccountBalance(account))
-                  .isEqualTo(toWei(expectedBalance, balanceUnit).toBigIntegerExact()));
+  public void verify(final Condition expected) {
+    for (final Node node : nodes.values()) {
+      expected.verify(node);
     }
   }
 }

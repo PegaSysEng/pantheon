@@ -7,6 +7,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectAccountBalance;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.pubsub.Subscription;
 import tech.pegasys.pantheon.tests.acceptance.dsl.pubsub.WebSocket;
@@ -52,7 +53,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     final Subscription lightForkSubscription = minerWebSocket.subscribe();
 
     final Hash lightForkEvent = minerNode.execute(transactions.createTransfer(accountOne, 5));
-    cluster.awaitPropagation(accountOne, 5);
+    cluster.verify(new ExpectAccountBalance(accountOne, 5));
 
     minerWebSocket.verifyTotalEventsReceived(1);
     lightForkSubscription.verifyEventReceived(lightForkEvent);
@@ -75,13 +76,13 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
 
     final Hash heavyForkEventOne =
         minerNodeTwo.execute(transactions.createTransfer(heavyForkBenefactor, accountTwo, 1));
-    cluster.awaitPropagation(accountTwo, 1);
+    cluster.verify(new ExpectAccountBalance(accountTwo, 1));
     final Hash heavyForkEventTwo =
         minerNodeTwo.execute(transactions.createTransfer(heavyForkBenefactor, accountTwo, 2));
-    cluster.awaitPropagation(accountTwo, 1 + 2);
+    cluster.verify(new ExpectAccountBalance(accountTwo, 1 + 2));
     final Hash heavyForkEventThree =
         minerNodeTwo.execute(transactions.createTransfer(heavyForkBenefactor, accountTwo, 3));
-    cluster.awaitPropagation(accountTwo, 1 + 2 + 3);
+    cluster.verify(new ExpectAccountBalance(accountTwo, 1 + 2 + 3));
 
     heavyForkWebSocket.verifyTotalEventsReceived(3);
     heavyForkSubscription.verifyEventReceived(heavyForkEventOne);
@@ -111,7 +112,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     final Hash mergedForksEventOne =
         minerNodeTwo.execute(
             transactions.createTransfer(accounts.getSecondaryBenefactor(), accountTwo, 3));
-    cluster.awaitPropagation(accountTwo, 9);
+    cluster.verify(new ExpectAccountBalance(accountTwo, 9));
 
     minerMergedForksWebSocket.verifyTotalEventsReceived(1);
     minerMergedForksSubscription.verifyEventReceived(lightForkEvent);
@@ -124,13 +125,13 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     // Check that account two (funded in heavier chain) can be mined on miner one (from lighter
     // chain)
     final Hash mergedForksEventTwo = minerNode.execute(transactions.createTransfer(accountTwo, 3));
-    cluster.awaitPropagation(accountTwo, 9 + 3);
+    cluster.verify(new ExpectAccountBalance(accountTwo, 9 + 3));
 
     // Check that account one (funded in lighter chain) can be mined on miner two (from heavier
     // chain)
     final Hash mergedForksEventThree =
         minerNodeTwo.execute(transactions.createTransfer(accountOne, 2));
-    cluster.awaitPropagation(accountOne, 5 + 2);
+    cluster.verify(new ExpectAccountBalance(accountOne, 5 + 2));
 
     minerMergedForksWebSocket.verifyTotalEventsReceived(1 + 1 + 1);
     minerMergedForksSubscription.verifyEventReceived(mergedForksEventTwo);
@@ -148,7 +149,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     final Subscription minerSubscription = minerWebSocket.subscribe();
 
     final Hash event = minerNode.execute(transactions.createTransfer(accountOne, 4));
-    cluster.awaitPropagation(accountOne, 4);
+    cluster.verify(new ExpectAccountBalance(accountOne, 4));
 
     minerWebSocket.verifyTotalEventsReceived(1);
     minerSubscription.verifyEventReceived(event);
@@ -161,7 +162,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     final Subscription archiveSubscription = archiveWebSocket.subscribe();
 
     final Hash event = minerNode.execute(transactions.createTransfer(accountOne, 23));
-    cluster.awaitPropagation(accountOne, 23);
+    cluster.verify(new ExpectAccountBalance(accountOne, 23));
 
     archiveWebSocket.verifyTotalEventsReceived(1);
     archiveSubscription.verifyEventReceived(event);
@@ -178,7 +179,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     final Subscription archiveSubscriptionThree = archiveWebSocket.subscribe();
 
     final Hash event = minerNode.execute(transactions.createTransfer(accountOne, 30));
-    cluster.awaitPropagation(accountOne, 30);
+    cluster.verify(new ExpectAccountBalance(accountOne, 30));
 
     minerWebSocket.verifyTotalEventsReceived(2);
     minerSubscriptionOne.verifyEventReceived(event);
@@ -201,14 +202,14 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     final Subscription minerSubscription = minerWebSocket.subscribe();
 
     final Hash eventOne = minerNode.execute(transactions.createTransfer(accountOne, 1));
-    cluster.awaitPropagation(accountOne, 1);
+    cluster.verify(new ExpectAccountBalance(accountOne, 1));
 
     minerWebSocket.verifyTotalEventsReceived(1);
     minerSubscription.verifyEventReceived(eventOne);
 
     final Hash eventTwo = minerNode.execute(transactions.createTransfer(accountOne, 4));
     final Hash eventThree = minerNode.execute(transactions.createTransfer(accountOne, 5));
-    cluster.awaitPropagation(accountOne, 1 + 4 + 5);
+    cluster.verify(new ExpectAccountBalance(accountOne, 1 + 4 + 5));
 
     minerWebSocket.verifyTotalEventsReceived(3);
     minerSubscription.verifyEventReceived(eventTwo);
@@ -223,14 +224,14 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
 
     final Hash eventOne = minerNode.execute(transactions.createTransfer(accountOne, 2));
     final Hash eventTwo = minerNode.execute(transactions.createTransfer(accountOne, 5));
-    cluster.awaitPropagation(accountOne, 2 + 5);
+    cluster.verify(new ExpectAccountBalance(accountOne, 2 + 5));
 
     archiveWebSocket.verifyTotalEventsReceived(2);
     archiveSubscription.verifyEventReceived(eventOne);
     archiveSubscription.verifyEventReceived(eventTwo);
 
     final Hash eventThree = minerNode.execute(transactions.createTransfer(accountOne, 8));
-    cluster.awaitPropagation(accountOne, 2 + 5 + 8);
+    cluster.verify(new ExpectAccountBalance(accountOne, 2 + 5 + 8));
 
     archiveWebSocket.verifyTotalEventsReceived(3);
     archiveSubscription.verifyEventReceived(eventThree);
@@ -248,7 +249,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
 
     final Hash eventOne = minerNode.execute(transactions.createTransfer(accountOne, 10));
     final Hash eventTwo = minerNode.execute(transactions.createTransfer(accountOne, 5));
-    cluster.awaitPropagation(accountOne, 10 + 5);
+    cluster.verify(new ExpectAccountBalance(accountOne, 10 + 5));
 
     minerWebSocket.verifyTotalEventsReceived(4);
     minerSubscriptionOne.verifyEventReceived(eventOne);

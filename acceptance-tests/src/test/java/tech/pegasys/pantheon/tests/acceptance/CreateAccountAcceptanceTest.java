@@ -6,6 +6,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectAccountBalance;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
@@ -29,6 +30,6 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
   public void shouldCreateAnAccount() {
     final Account account = accounts.createAccount("a-new-account");
     minerNode.execute(transactions.createTransfer(account, 20));
-    cluster.awaitPropagation(account, "20", ETHER);
+    cluster.verify(new ExpectAccountBalance(account, "20", ETHER));
   }
 }
