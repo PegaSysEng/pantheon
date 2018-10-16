@@ -30,6 +30,6 @@ public class FilterTest {
     filter.setExpireTime(Instant.now().minus(Duration.ofDays(1)));
     filter.resetExpireTime();
 
-    assertThat(filter.getExpireTime()).isBefore(Instant.now().plus(Duration.ofMinutes(10)));
+    assertThat(filter.getExpireTime()).isBeforeOrEqualTo(Instant.now().plus(Duration.ofMinutes(10)));
   }
 }
