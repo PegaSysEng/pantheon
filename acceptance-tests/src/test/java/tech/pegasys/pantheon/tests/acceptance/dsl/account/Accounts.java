@@ -1,15 +1,10 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.account;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
-import org.apache.logging.log4j.Logger;
 import org.web3j.utils.Convert.Unit;
 
 public class Accounts {
-
-  private static final Logger LOG = getLogger();
 
   private final Account richBenefactorOne;
   private final Account richBenefactorTwo;
