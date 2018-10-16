@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.utils.Convert.toWei;
 
 import net.consensys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-
 import org.apache.logging.log4j.Logger;
 import org.web3j.utils.Convert.Unit;
 

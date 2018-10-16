@@ -7,12 +7,20 @@ import org.junit.After;
 
 public class AcceptanceTestBase {
 
-  protected Cluster cluster = new Cluster();
-  protected Accounts accounts = new Accounts();
-  protected JsonRpc jsonRpc = new JsonRpc(cluster);
+  protected final Accounts accounts;
+  protected final Cluster cluster;
+  protected final Transactions transactions;
+  protected final JsonRpc jsonRpc;
+
+  protected AcceptanceTestBase() {
+    accounts = new Accounts();
+    cluster = new Cluster();
+    transactions = new Transactions(accounts);
+    jsonRpc = new JsonRpc(cluster);
+  }
 
   @After
-  public void tearDownAcceptanceTestBase() throws Exception {
+  public void tearDownAcceptanceTestBase() {
     cluster.close();
   }
 }

@@ -1,11 +1,10 @@
 package net.consensys.pantheon.tests.acceptance.dsl.transaction;
 
-import net.consensys.pantheon.tests.acceptance.dsl.account.Account;
-import net.consensys.pantheon.tests.acceptance.dsl.account.Accounts;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import net.consensys.pantheon.tests.acceptance.dsl.account.Account;
+import net.consensys.pantheon.tests.acceptance.dsl.account.Accounts;
 import org.web3j.utils.Convert.Unit;
 
 public class Transactions {

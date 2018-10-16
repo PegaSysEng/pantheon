@@ -28,19 +28,19 @@ public class MiningAcceptanceTest extends AcceptanceTestBase {
     final Account toAccount = accounts.createAccount("account2", "0", ETHER, minerNode);
     accounts.waitForAccountBalance(fromAccount, 50, minerNode);
 
-    accounts.incrementalTransfer(fromAccount, toAccount, 1, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 1));
     accounts.waitForAccountBalance(toAccount, 1, minerNode);
 
-    accounts.incrementalTransfer(fromAccount, toAccount, 2, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 2));
     accounts.waitForAccountBalance(toAccount, 3, minerNode);
 
-    accounts.incrementalTransfer(fromAccount, toAccount, 3, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 3));
     accounts.waitForAccountBalance(toAccount, 6, minerNode);
 
-    accounts.incrementalTransfer(fromAccount, toAccount, 4, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 4));
     accounts.waitForAccountBalance(toAccount, 10, minerNode);
 
-    accounts.incrementalTransfer(fromAccount, toAccount, 5, minerNode);
+    minerNode.execute(transactions.createIncrementalTransfers(fromAccount, toAccount, 5));
     accounts.waitForAccountBalance(toAccount, 15, minerNode);
   }
 }
