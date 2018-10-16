@@ -1,9 +1,5 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.account;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-
-import org.web3j.utils.Convert.Unit;
-
 public class Accounts {
 
   private final Account richBenefactorOne;
@@ -26,17 +22,6 @@ public class Accounts {
 
   public Account getPrimaryBenefactor() {
     return richBenefactorOne;
-  }
-
-  public Account createAccount(
-      final String accountName,
-      final String initialBalance,
-      final Unit initialBalanceUnit,
-      final PantheonNode createOnNode) {
-    final Account account = Account.create(accountName);
-    createOnNode.transferFunds(richBenefactorOne, account, initialBalance, initialBalanceUnit);
-
-    return account;
   }
 
   public Account createAccount(final String accountName) {
