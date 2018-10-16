@@ -18,14 +18,14 @@ ENTRYPOINT ["/opt/pantheon/bin/pantheon"]
 # How to use this image:
 
 # first build it (use the name and tig you like) :
-# docker build -t MyPantheon:myTag .
+# docker build -t mypantheon:myTag .
 
 # then run pantheon:
 # as a simple node with sync on mainnet with a volume for data (keeps the database between runs) and that's all:
-# docker run -d --mount source=pantheon_database,target=/opt/pantheon/database --name myPantheon myPantheon:myTag
+# docker run -d --mount source=pantheon_database,target=/opt/pantheon/database --name myPantheon mypantheon:myTag
 # or
 # as a simple node with sync on mainnet with a volume for data (keeps the database between runs) and  HTTP/WS RPC access :
 # docker run -d --mount source=pantheon_database,target=/opt/pantheon/database \
-# --name myPantheon -p 8545:8545 -p 8546:8546 myPantheon:myTag \
+# --name myPantheon -p 8545:8545 -p 8546:8546 mypantheon:myTag \
 # --rpc-enabled --rpc-listen=0.0.0.0:8545 --rpc-cors-origins=mydomain.tld \
 # --ws-enabled -ws-listen=0.0.0.0:8546
