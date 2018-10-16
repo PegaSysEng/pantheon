@@ -6,14 +6,9 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 import static org.web3j.utils.Numeric.toHexString;
 
-import tech.pegasys.pantheon.controller.KeyPairUtil;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-
+import com.google.common.base.MoreObjects;
+import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,10 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
-import com.google.common.base.MoreObjects;
-import com.google.common.io.MoreFiles;
-import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.Logger;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.web3j.crypto.RawTransaction;
@@ -42,6 +33,14 @@ import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.controller.KeyPairUtil;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
 public class PantheonNode implements AutoCloseable {
 
@@ -60,6 +59,8 @@ public class PantheonNode implements AutoCloseable {
   private final boolean jsonRpcEnabled;
   private final boolean wsRpcEnabled;
   private final Properties portsProperties = new Properties();
+  private final EthNetworkConfig ethNetworkConfig;
+  private final boolean devMode;
 
   private List<String> bootnodes = new ArrayList<>();
   private Eth eth;
@@ -71,10 +72,15 @@ public class PantheonNode implements AutoCloseable {
       final int p2pPort,
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
-      final WebSocketConfiguration webSocketConfiguration)
-      throws IOException {
+      final WebSocketConfiguration webSocketConfiguration,
+      final EthNetworkConfig ethNetworkConfig,
+      final boolean devMode,
+      final Optional<Path> keyPath
+  ) throws IOException {
+    Path homeDirectory = Files.createTempDirectory("acctest");
+    copyKey(keyPath, homeDirectory);
     this.name = name;
-    this.homeDirectory = Files.createTempDirectory("acctest");
+    this.homeDirectory = homeDirectory;
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.p2pPort = p2pPort;
     this.miningParameters = miningParameters;
@@ -82,7 +88,19 @@ public class PantheonNode implements AutoCloseable {
     this.webSocketConfiguration = webSocketConfiguration;
     this.jsonRpcEnabled = jsonRpcConfiguration.isEnabled();
     this.wsRpcEnabled = webSocketConfiguration.isEnabled();
+    this.ethNetworkConfig = ethNetworkConfig;
+    this.devMode = devMode;
     LOG.info("Created PantheonNode {}", this.toString());
+  }
+
+  private void copyKey(Optional<Path> keyPath, Path homeDirectory) {
+    keyPath.ifPresent(key -> {
+      try {
+        Files.copy(key, homeDirectory.resolve("key"));
+      } catch (IOException e) {
+        throw new RuntimeException("Can't copy node0_key file to data directory", e);
+      }
+    });
   }
 
   public String getName() {
@@ -302,6 +320,15 @@ public class PantheonNode implements AutoCloseable {
     return miningParameters;
   }
 
+  public EthNetworkConfig getEthNetworkConfig() {
+    return ethNetworkConfig;
+  }
+
+
+  public boolean isDevMode() {
+    return devMode;
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
@@ -347,4 +374,5 @@ public class PantheonNode implements AutoCloseable {
 
     return eth;
   }
+
 }

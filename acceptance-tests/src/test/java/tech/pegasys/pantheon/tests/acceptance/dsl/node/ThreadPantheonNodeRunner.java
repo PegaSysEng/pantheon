@@ -1,28 +1,21 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import static tech.pegasys.pantheon.cli.EthNetworkConfig.mainnet;
-
-import tech.pegasys.pantheon.Runner;
-import tech.pegasys.pantheon.RunnerBuilder;
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
-import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
-import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
-
+import io.vertx.core.Vertx;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.Runner;
+import tech.pegasys.pantheon.RunnerBuilder;
+import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
+import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 
 public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
-
-  private static final int NETWORK_ID = 10;
 
   private final Logger LOG = LogManager.getLogger();
   private final Map<String, Runner> pantheonRunners = new HashMap<>();
@@ -36,18 +29,16 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
 
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
-    final EthNetworkConfig ethNetworkConfig =
-        new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build();
     PantheonController<?, ?> pantheonController;
     try {
       pantheonController =
           builder.build(
               new Builder().build(),
               node.homeDirectory(),
-              ethNetworkConfig,
+              node.getEthNetworkConfig(),
               false,
               node.getMiningParameters(),
-              true);
+              node.isDevMode());
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
     }

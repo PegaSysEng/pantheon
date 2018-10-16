@@ -90,6 +90,10 @@ public class EthNetworkConfig {
     }
   }
 
+  public static EthNetworkConfig defaultConfig() {
+    return mainnet();
+  }
+
   public static class Builder {
 
     private URI genesisConfig;

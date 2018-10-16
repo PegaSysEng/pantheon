@@ -4,18 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.utils.Convert.toWei;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.utils.Convert.Unit;
+import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
 public class Cluster implements AutoCloseable {
 
@@ -67,7 +65,10 @@ public class Cluster implements AutoCloseable {
             config.getSocketPort(),
             config.getMiningParameters(),
             config.getJsonRpcConfiguration(),
-            config.getWebSocketConfiguration());
+            config.getWebSocketConfiguration(),
+            config.getEthNetworkConfig(),
+            config.isDevMode(),
+            config.getKeyPath());
     config.closeSocket();
     return node;
   }
