@@ -69,7 +69,7 @@ public class GeneralStateReferenceTestTools {
     // Gas integer value is too large to construct a valid transaction.
     params.blacklist("OverflowGasRequire");
     // Consumes a huge amount of memory
-    params.blacklist("static_Call1MB1024Calldepth-Byzantium");
+    params.blacklist("static_Call1MB1024Calldepth-(Byzantium|Constantinople)");
 
     // Needs investigation (tests pass in other clients)
     params.blacklist("createNameRegistratorPerTxsNotEnoughGas-Frontier\\[0\\]");
