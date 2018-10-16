@@ -10,32 +10,32 @@ abstract class Filter {
   private static final Duration DEFAULT_EXPIRE_DURATION = Duration.ofMinutes(10);
 
   private final String id;
-  private Instant expireDate;
+  private Instant expireTime;
 
   Filter(final String id) {
     this.id = id;
-    resetExpireDate();
+    resetExpireTime();
   }
 
   String getId() {
     return id;
   }
 
-  void resetExpireDate() {
-    this.expireDate = Instant.now().plus(DEFAULT_EXPIRE_DURATION);
+  void resetExpireTime() {
+    this.expireTime = Instant.now().plus(DEFAULT_EXPIRE_DURATION);
   }
 
   boolean isExpired() {
-    return Instant.now().isAfter(expireDate);
+    return Instant.now().isAfter(expireTime);
   }
 
   @VisibleForTesting
-  void setExpireDate(final Instant expireDate) {
-    this.expireDate = expireDate;
+  void setExpireTime(final Instant expireTime) {
+    this.expireTime = expireTime;
   }
 
   @VisibleForTesting
-  Instant getExpireDate() {
-    return expireDate;
+  Instant getExpireTime() {
+    return expireTime;
   }
 }

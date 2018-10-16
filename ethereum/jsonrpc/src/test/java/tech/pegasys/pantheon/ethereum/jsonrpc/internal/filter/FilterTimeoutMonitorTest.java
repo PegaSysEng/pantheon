@@ -35,7 +35,9 @@ public class FilterTimeoutMonitorTest {
 
     timeoutMonitor.checkFilters();
 
+    verify(filterRepository).getFilters();
     verify(filterRepository).delete("foo");
+    verifyNoMoreInteractions(filterRepository);
   }
 
   @Test

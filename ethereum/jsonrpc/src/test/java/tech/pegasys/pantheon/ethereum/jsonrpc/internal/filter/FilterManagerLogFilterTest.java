@@ -160,7 +160,7 @@ public class FilterManagerLogFilterTest {
 
     filterManager.logsChanges("foo");
 
-    verify(filter).resetExpireDate();
+    verify(filter).resetExpireTime();
   }
 
   @Test
@@ -170,7 +170,7 @@ public class FilterManagerLogFilterTest {
 
     filterManager.logs("foo");
 
-    verify(filter).resetExpireDate();
+    verify(filter).resetExpireTime();
   }
 
   private LogWithMetadata logWithMetadata() {

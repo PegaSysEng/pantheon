@@ -21,6 +21,8 @@ import io.vertx.core.AbstractVerticle;
 /** Manages JSON-RPC filter events. */
 public class FilterManager extends AbstractVerticle {
 
+  private static final int FILTER_TIMEOUT_CHECK_TIMER = 10000;
+
   private final FilterIdGenerator filterIdGenerator;
   private final FilterRepository filterRepository;
   private final BlockchainQueries blockchainQueries;
@@ -50,7 +52,7 @@ public class FilterManager extends AbstractVerticle {
 
   private void startFilterTimeoutTimer() {
     vertx.setPeriodic(
-        10000,
+        FILTER_TIMEOUT_CHECK_TIMER,
         timerId ->
             vertx.executeBlocking(
                 future -> new FilterTimeoutMonitor(filterRepository).checkFilters(), result -> {}));
@@ -166,7 +168,7 @@ public class FilterManager extends AbstractVerticle {
     synchronized (filter) {
       hashes = new ArrayList<>(filter.blockHashes());
       filter.clearBlockHashes();
-      filter.resetExpireDate();
+      filter.resetExpireTime();
     }
     return hashes;
   }
@@ -188,7 +190,7 @@ public class FilterManager extends AbstractVerticle {
     synchronized (filter) {
       hashes = new ArrayList<>(filter.transactionHashes());
       filter.clearTransactionHashes();
-      filter.resetExpireDate();
+      filter.resetExpireTime();
     }
     return hashes;
   }
@@ -203,7 +205,7 @@ public class FilterManager extends AbstractVerticle {
     synchronized (filter) {
       logs = new ArrayList<>(filter.logs());
       filter.clearLogs();
-      filter.resetExpireDate();
+      filter.resetExpireTime();
     }
     return logs;
   }
@@ -213,7 +215,7 @@ public class FilterManager extends AbstractVerticle {
     if (filter == null) {
       return null;
     } else {
-      filter.resetExpireDate();
+      filter.resetExpireTime();
     }
 
     final long fromBlockNumber =

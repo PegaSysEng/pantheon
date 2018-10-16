@@ -196,7 +196,7 @@ public class FilterManagerTest {
 
     filterManager.blockChanges("foo");
 
-    verify(filter).resetExpireDate();
+    verify(filter).resetExpireTime();
   }
 
   @Test
@@ -208,7 +208,7 @@ public class FilterManagerTest {
 
     filterManager.pendingTransactionChanges("foo");
 
-    verify(filter).resetExpireDate();
+    verify(filter).resetExpireTime();
   }
 
   private Hash appendBlockToBlockchain() {
