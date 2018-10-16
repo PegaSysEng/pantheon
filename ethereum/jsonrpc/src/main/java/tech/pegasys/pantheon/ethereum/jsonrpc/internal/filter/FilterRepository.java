@@ -1,5 +1,6 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,10 @@ public class FilterRepository {
   private final Map<String, Filter> filters = new ConcurrentHashMap<>();
 
   public FilterRepository() {}
+
+  Collection<Filter> getFilters() {
+    return new ArrayList<>(filters.values());
+  }
 
   <T extends Filter> Collection<T> getFiltersOfType(final Class<T> filterClass) {
     return filters
@@ -59,5 +64,9 @@ public class FilterRepository {
 
   void delete(final String id) {
     filters.remove(id);
+  }
+
+  void deleteAll() {
+    filters.clear();
   }
 }

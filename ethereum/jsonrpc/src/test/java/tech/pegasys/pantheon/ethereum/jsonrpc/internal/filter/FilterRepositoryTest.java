@@ -20,6 +20,23 @@ public class FilterRepositoryTest {
   }
 
   @Test
+  public void getFiltersShouldReturnAllFilters() {
+    BlockFilter filter1 = new BlockFilter("foo");
+    BlockFilter filter2 = new BlockFilter("bar");
+    repository.save(filter1);
+    repository.save(filter2);
+
+    Collection<Filter> filters = repository.getFilters();
+
+    assertThat(filters).containsExactlyInAnyOrderElementsOf(Lists.newArrayList(filter1, filter2));
+  }
+
+  @Test
+  public void getFiltersShouldReturnEmptyListWhenRepositoryIsEmpty() {
+    assertThat(repository.getFilters()).isEmpty();
+  }
+
+  @Test
   public void saveShouldAddFilterToRepository() {
     BlockFilter filter = new BlockFilter("id");
     repository.save(filter);
@@ -142,5 +159,33 @@ public class FilterRepositoryTest {
   @Test
   public void existsShouldReturnFalseForEmptyRepository() {
     assertThat(repository.exists("id")).isFalse();
+  }
+
+  @Test
+  public void deleteExistingFilterShouldDeleteSuccessfully() {
+    BlockFilter filter = new BlockFilter("foo");
+    repository.save(filter);
+    repository.delete(filter.getId());
+
+    assertThat(repository.exists(filter.getId())).isFalse();
+  }
+
+  @Test
+  public void deleteAbsentFilterDoesNothing() {
+    assertThat(repository.exists("foo")).isFalse();
+    repository.delete("foo");
+  }
+
+  @Test
+  public void deleteAllShouldClearFilters() {
+    BlockFilter filter1 = new BlockFilter("foo");
+    BlockFilter filter2 = new BlockFilter("biz");
+    repository.save(filter1);
+    repository.save(filter2);
+
+    repository.deleteAll();
+
+    assertThat(repository.exists(filter1.getId())).isFalse();
+    assertThat(repository.exists(filter2.getId())).isFalse();
   }
 }

@@ -16,9 +16,10 @@ import java.util.Collection;
 import java.util.List;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.vertx.core.AbstractVerticle;
 
 /** Manages JSON-RPC filter events. */
-public class FilterManager {
+public class FilterManager extends AbstractVerticle {
 
   private final FilterIdGenerator filterIdGenerator;
   private final FilterRepository filterRepository;
@@ -35,6 +36,24 @@ public class FilterManager {
     blockchainQueries.getBlockchain().observeBlockAdded(this::recordBlockEvent);
     transactionPool.addTransactionListener(this::recordPendingTransactionEvent);
     this.blockchainQueries = blockchainQueries;
+  }
+
+  @Override
+  public void start() {
+    startFilterTimeoutTimer();
+  }
+
+  @Override
+  public void stop() {
+    filterRepository.deleteAll();
+  }
+
+  private void startFilterTimeoutTimer() {
+    vertx.setPeriodic(
+        10000,
+        timerId ->
+            vertx.executeBlocking(
+                future -> new FilterTimeoutMonitor(filterRepository).checkFilters(), result -> {}));
   }
 
   /**
@@ -147,6 +166,7 @@ public class FilterManager {
     synchronized (filter) {
       hashes = new ArrayList<>(filter.blockHashes());
       filter.clearBlockHashes();
+      filter.resetExpireDate();
     }
     return hashes;
   }
@@ -168,6 +188,7 @@ public class FilterManager {
     synchronized (filter) {
       hashes = new ArrayList<>(filter.transactionHashes());
       filter.clearTransactionHashes();
+      filter.resetExpireDate();
     }
     return hashes;
   }
@@ -182,6 +203,7 @@ public class FilterManager {
     synchronized (filter) {
       logs = new ArrayList<>(filter.logs());
       filter.clearLogs();
+      filter.resetExpireDate();
     }
     return logs;
   }
@@ -190,6 +212,8 @@ public class FilterManager {
     final LogFilter filter = filterRepository.getFilter(filterId, LogFilter.class).orElse(null);
     if (filter == null) {
       return null;
+    } else {
+      filter.resetExpireDate();
     }
 
     final long fromBlockNumber =

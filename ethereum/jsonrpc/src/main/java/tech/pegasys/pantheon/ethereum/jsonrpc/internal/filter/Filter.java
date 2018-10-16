@@ -1,9 +1,13 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+
+import com.google.common.annotations.VisibleForTesting;
 
 abstract class Filter {
+
+  private static final Duration DEFAULT_EXPIRE_DURATION = Duration.ofMinutes(10);
 
   private final String id;
   private Instant expireDate;
@@ -18,10 +22,20 @@ abstract class Filter {
   }
 
   void resetExpireDate() {
-    this.expireDate = Instant.now().plus(15, ChronoUnit.MINUTES);
+    this.expireDate = Instant.now().plus(DEFAULT_EXPIRE_DURATION);
   }
 
   boolean isExpired() {
-    return expireDate.isAfter(Instant.now());
+    return Instant.now().isAfter(expireDate);
+  }
+
+  @VisibleForTesting
+  void setExpireDate(final Instant expireDate) {
+    this.expireDate = expireDate;
+  }
+
+  @VisibleForTesting
+  Instant getExpireDate() {
+    return expireDate;
   }
 }
