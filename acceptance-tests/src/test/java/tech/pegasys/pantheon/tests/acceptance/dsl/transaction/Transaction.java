@@ -1,4 +1,4 @@
-package net.consensys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
 import org.web3j.protocol.Web3j;
 

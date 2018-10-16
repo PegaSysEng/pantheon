@@ -13,6 +13,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +44,7 @@ import org.web3j.utils.Async;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
-public class PantheonNode implements AutoCloseable {
+public class PantheonNode implements Node, AutoCloseable {
 
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();
@@ -346,5 +347,10 @@ public class PantheonNode implements AutoCloseable {
     }
 
     return eth;
+  }
+
+  @Override
+  public <T> T execute(final Transaction<T> transaction) {
+    return transaction.execute(web3j());
   }
 }

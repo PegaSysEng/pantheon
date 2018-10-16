@@ -1,9 +1,10 @@
-package net.consensys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+
+import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.consensys.pantheon.ethereum.core.Hash;
 import org.web3j.protocol.Web3j;
 
 public class TransferTransactionSet implements Transaction<List<Hash>> {

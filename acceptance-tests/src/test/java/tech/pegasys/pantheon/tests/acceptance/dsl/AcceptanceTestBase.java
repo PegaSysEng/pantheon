@@ -2,6 +2,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 
 import org.junit.After;
 
