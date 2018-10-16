@@ -15,13 +15,6 @@ public class TransferTransactionSet implements Transaction<List<Hash>> {
     this.transactions = transactions;
   }
 
-  /**
-   * Transfer funds in separate transactions (1 eth increments). This is a strategy to increase the
-   * total of transactions.
-   *
-   * @param node where the transactions will be executed.
-   * @return always <code>null</code>.
-   */
   @Override
   public List<Hash> execute(final Web3j node) {
     final List<Hash> hashes = new ArrayList<>();
