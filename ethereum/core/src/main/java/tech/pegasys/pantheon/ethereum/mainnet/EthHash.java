@@ -24,7 +24,7 @@ public final class EthHash {
 
   public static final BigInteger TARGET_UPPER_BOUND = BigInteger.valueOf(2).pow(256);
 
-  private static final int EPOCH_LENGTH = 30000;
+  public static final int EPOCH_LENGTH = 30000;
 
   private static final int DATASET_INIT_BYTES = 1 << 30;
 
@@ -46,7 +46,7 @@ public final class EthHash {
 
   private static final int ACCESSES = 64;
 
-  private static final ThreadLocal<MessageDigest> KECCAK_256 =
+  public static final ThreadLocal<MessageDigest> KECCAK_256 =
       ThreadLocal.withInitial(
           () -> {
             try {
@@ -200,7 +200,7 @@ public final class EthHash {
    */
   public static int[] mkCache(final int cacheSize, final long block) {
     final MessageDigest keccak512 = KECCAK_512.get();
-    keccak512.update(seed(block));
+    keccak512.update(DirectAcyclicGraphSeed.dagSeed(block));
     final int rows = cacheSize / HASH_BYTES;
     final byte[] cache = new byte[rows * HASH_BYTES];
     try {
@@ -281,22 +281,6 @@ public final class EthHash {
       }
     }
     return true;
-  }
-
-  private static byte[] seed(final long block) {
-    final byte[] seed = new byte[32];
-    if (Long.compareUnsigned(block, EPOCH_LENGTH) >= 0) {
-      final MessageDigest keccak256 = KECCAK_256.get();
-      for (int i = 0; i < Long.divideUnsigned(block, EPOCH_LENGTH); ++i) {
-        keccak256.update(seed);
-        try {
-          keccak256.digest(seed, 0, seed.length);
-        } catch (final DigestException ex) {
-          throw new IllegalStateException(ex);
-        }
-      }
-    }
-    return seed;
   }
 
   private static int readLittleEndianInt(final byte[] buffer, final int offset) {
