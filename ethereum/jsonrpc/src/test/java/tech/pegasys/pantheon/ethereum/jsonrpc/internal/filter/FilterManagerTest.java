@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
@@ -36,14 +35,10 @@ public class FilterManagerTest {
   private Block currentBlock;
   private FilterManager filterManager;
 
-  @Mock
-  private Blockchain blockchain;
-  @Mock
-  private BlockchainQueries blockchainQueries;
-  @Mock
-  private TransactionPool transactionPool;
-  @Spy
-  final FilterRepository filterRepository = new FilterRepository();
+  @Mock private Blockchain blockchain;
+  @Mock private BlockchainQueries blockchainQueries;
+  @Mock private TransactionPool transactionPool;
+  @Spy final FilterRepository filterRepository = new FilterRepository();
 
   @Before
   public void setupTest() {
