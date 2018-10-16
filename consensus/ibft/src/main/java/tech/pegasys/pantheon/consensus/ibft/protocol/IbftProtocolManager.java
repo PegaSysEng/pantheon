@@ -3,6 +3,7 @@ package tech.pegasys.pantheon.consensus.ibft.protocol;
 import tech.pegasys.pantheon.consensus.ibft.IbftEvent;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
 import tech.pegasys.pantheon.consensus.ibft.IbftEvents;
+import tech.pegasys.pantheon.consensus.ibft.IbftMessages;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
@@ -11,6 +12,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,8 +64,10 @@ public class IbftProtocolManager implements ProtocolManager {
    */
   @Override
   public void processMessage(final Capability cap, final Message message) {
-    final IbftEvent messageEvent = IbftEvents.fromMessage(message);
-    ibftEventQueue.add(messageEvent);
+    final Optional<IbftEvent> optionalIbftEvent =
+        IbftMessages.fromMessage(message).map(IbftEvents::fromMessage);
+
+    optionalIbftEvent.ifPresent(ibftEventQueue::add);
   }
 
   @Override
