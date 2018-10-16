@@ -1,10 +1,12 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
@@ -34,10 +36,14 @@ public class FilterManagerTest {
   private Block currentBlock;
   private FilterManager filterManager;
 
-  @Mock private Blockchain blockchain;
-  @Mock private BlockchainQueries blockchainQueries;
-  @Mock private TransactionPool transactionPool;
-  @Spy final FilterRepository filterRepository = new FilterRepository();
+  @Mock
+  private Blockchain blockchain;
+  @Mock
+  private BlockchainQueries blockchainQueries;
+  @Mock
+  private TransactionPool transactionPool;
+  @Spy
+  final FilterRepository filterRepository = new FilterRepository();
 
   @Before
   public void setupTest() {
@@ -123,15 +129,11 @@ public class FilterManagerTest {
 
   @Test
   public void installUninstallPendingTransactionFilter() {
-    //    assertThat(filterManager.pendingTransactionFilterCount()).isEqualTo(0);
-    //
-    //    final String filterId = filterManager.installPendingTransactionFilter();
-    //    assertThat(filterManager.pendingTransactionFilterCount()).isEqualTo(1);
-    //
-    //    assertThat(filterManager.uninstallFilter(filterId)).isTrue();
-    //    assertThat(filterManager.pendingTransactionFilterCount()).isEqualTo(0);
-    //
-    //    assertThat(filterManager.pendingTransactionChanges(filterId)).isNull();
+    final String filterId = filterManager.installPendingTransactionFilter();
+    verify(filterRepository).save(any(Filter.class));
+
+    assertThat(filterManager.uninstallFilter(filterId)).isTrue();
+    verify(filterRepository).delete(eq(filterId));
   }
 
   @Test
