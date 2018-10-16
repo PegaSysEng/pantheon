@@ -28,7 +28,6 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldCreateAnAccount() {
     final Account account = accounts.createAccount("account1", "20", ETHER, fullNode);
-    accounts.waitForAccountBalance(account, "20", ETHER, minerNode);
-    accounts.waitForAccountBalance(account, "20", ETHER, fullNode);
+    cluster.awaitPropagation(account, "20", ETHER);
   }
 }
