@@ -419,3 +419,67 @@ bintray {
 afterReleaseBuild.dependsOn bintrayUpload
 bintrayUpload.mustRunAfter(distTar)
 bintrayUpload.mustRunAfter(distZip)
+
+task dockerHubUpload{
+
+  def user = project.hasProperty('dockerHubUser') ? project.property('dockerHubUser') : System.getenv('DOCKER_HUB_USER')
+  def pass = project.hasProperty('dockerHubPass') ? project.property('dockerHubPass') : System.getenv('DOCKER_HUB_PASS')
+  def imageName = "${user}/pantheon"
+  def tags = [
+    "latest",
+    "${project.version}"
+  ]
+
+  doFirst {
+    exec {
+      //build the image
+      setExecutable("docker")
+      setArgs([
+        "build",
+        "-t",
+        "${imageName}",
+        "."
+      ])
+    }
+  }
+  doLast {
+    // login to Docker Hub
+    exec {
+      standardInput = new ByteArrayInputStream("${pass}".getBytes())
+      setExecutable("docker")
+      setArgs([
+        "login",
+        "--username",
+        "${user}",
+        "--password-stdin"
+      ])
+    }
+
+    for (tag in tags ) {
+      //tag images
+      exec {
+        setExecutable("docker")
+        setArgs([
+          "tag",
+          "${imageName}",
+          "${imageName}:${tag}"
+        ])
+      }
+      // push images
+      exec {
+        setExecutable("docker")
+        setArgs([
+          "push",
+          "${imageName}:${tag}"
+        ])
+      }
+    }
+
+    // logout
+    exec {
+      setExecutable("docker")
+      setArgs(["logout"])
+    }
+  }
+}
+dockerHubUpload.mustRunAfter(bintrayUpload)
