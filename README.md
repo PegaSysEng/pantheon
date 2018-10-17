@@ -1,9 +1,9 @@
 # Pantheon Ethereum Client
- [![Build Status](http://forge-jenkins.kellstrand.com:8080/job/PegaSysEng%20Pantheon/job/master/badge/icon)](http://forge-jenkins.kellstrand.com:8080/job/PegaSysEng%20Pantheon/job/master/)
+ [![Build Status](https://jenkins.pegasys.tech/job/Pantheon/job/master/badge/icon)](https://jenkins.pegasys.tech/job/Pantheon/job/master/)
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/PegasysEng/pantheon/blob/master/LICENSE)
  [ ![Download](https://api.bintray.com/packages/consensys/pegasys-repo/pantheon/images/download.svg) ](https://bintray.com/consensys/pegasys-repo/pantheon/_latestVersion)
  
- TODO: Update Download links once artifacts are on bintray
+Pantheon is an Apache 2.0 licensed, MainNet compatible, Ethereum client written in Java. 
 
 ## Pantheon Users
 
@@ -29,7 +29,7 @@ User and reference documentation available on the Wiki includes:
 * [Installation Wiki]
 
 ### Development
-Instructions for how to get started with developing on the Orion codebase. Please also read the 
+Instructions for how to get started with developing on the Pantheon codebase. Please also read the
 [contribution guidelines](CONTRIBUTING.md) for more detail on how to submit a pull request (PR).
 
 * [Installation Wiki]
