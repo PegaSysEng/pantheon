@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.testutil;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -50,10 +62,8 @@ public class JsonTestParameters<S, T> {
     // memory when we run a single test, but it's not the case we're trying to optimize.
     private final List<Object[]> testParameters = new ArrayList<>(256);
 
-    public void add(final String name, final S value) {
-      if (includes(name)) {
-        testParameters.add(new Object[] {name, value});
-      }
+    public void add(final String name, final S value, final boolean runTest) {
+      testParameters.add(new Object[] {name, value, runTest && includes(name)});
     }
 
     private boolean includes(final String name) {
@@ -104,7 +114,7 @@ public class JsonTestParameters<S, T> {
 
   public static <T> JsonTestParameters<T, T> create(final Class<T> testCaseSpec) {
     return new JsonTestParameters<>(testCaseSpec, testCaseSpec)
-        .generator((name, testCase, collector) -> collector.add(name, testCase));
+        .generator((name, testCase, collector) -> collector.add(name, testCase, true));
   }
 
   public static <S, T> JsonTestParameters<S, T> create(
@@ -187,13 +197,13 @@ public class JsonTestParameters<S, T> {
     for (final String path : paths) {
       final URL url = classLoader.getResource(path);
       checkState(url != null, "Cannot find test directory " + path);
-      Path dir;
+      final Path dir;
       try {
         dir = Paths.get(url.toURI());
       } catch (final URISyntaxException e) {
         throw new RuntimeException("Problem converting URL to URI " + url, e);
       }
-      try (Stream<Path> s = Files.walk(dir)) {
+      try (final Stream<Path> s = Files.walk(dir)) {
         s.map(Path::toFile)
             .filter(f -> f.getPath().endsWith(".json"))
             .filter(f -> !fileExcludes.contains(f.getName()))

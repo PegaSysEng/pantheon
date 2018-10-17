@@ -88,6 +88,7 @@ allprojects {
         exclude '**/generalstate/GeneralStateReferenceTest*.java'
         exclude '**/generalstate/GeneralStateRegressionReferenceTest*.java'
         exclude '**/blockchain/BlockchainReferenceTest*.java'
+        exclude '**/pantheon/PantheonInfo.java'
         exclude '**/.gradle/**'
       }
       removeUnusedImports()
@@ -95,6 +96,7 @@ allprojects {
       importOrder 'tech.pegasys', 'java', ''
       trimTrailingWhitespace()
       endWithNewline()
+      licenseHeaderFile "${rootDir}/gradle/spotless.java.license"
     }
     groovyGradle {
       target '*.gradle'
@@ -285,22 +287,8 @@ startScripts {
 }
 
 dependencies {
-  compile project(':ethereum:evmtool')
   compile project(':pantheon')
   errorprone 'com.google.errorprone:error_prone_core:2.3.1'
-}
-
-task createEVMToolApp(type: CreateStartScripts) {
-  outputDir = startScripts.outputDir
-  mainClassName = 'tech.pegasys.pantheon.EVMTool'
-  applicationName = 'evm'
-  classpath = startScripts.classpath
-}
-
-applicationDistribution.into("bin") {
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-  from(createEVMToolApp)
-  fileMode = 0755
 }
 
 distributions {
