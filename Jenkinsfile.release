@@ -1,0 +1,24 @@
+pipeline {
+    agent {
+        docker { image 'pegasyseng/pantheon-build:0.0.2' }
+    }
+    stages {
+        stage('Release') {
+            steps {
+                sshagent(
+                    credentials: ['pegasys-admin-github-ssh-private-key']
+                ) {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'pegasys-bintray',
+                            usernameVariable: 'BINTRAY_USER',
+                            passwordVariable: 'BINTRAY_KEY'
+                        )
+                    ]) {
+                        sh './gradlew release'
+                    }
+                }
+            }
+        }
+    }
+}
