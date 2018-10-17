@@ -1,16 +1,27 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.mainnet.DirectAcyclicGraphSeed;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolverInputs;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -27,17 +38,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class EthGetWorkTest {
 
   private EthGetWork method;
-  private final String JSON_RPC_VERSION = "2.0";
   private final String ETH_METHOD = "eth_getWork";
   private final String hexValue =
       "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
 
   @Mock private EthHashMiningCoordinator miningCoordinator;
-  @Mock private BlockchainQueries blockChain;
 
   @Before
   public void setUp() {
-    method = new EthGetWork(miningCoordinator, blockChain);
+    method = new EthGetWork(miningCoordinator);
   }
 
   @Test
@@ -72,18 +81,12 @@ public class EthGetWorkTest {
             UInt256.fromHexString(hexValue), DatatypeConverter.parseHexBinary(hexValue), 30000);
     final String[] expectedValue = {
       "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-      "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "0x" + DatatypeConverter.printHexBinary(DirectAcyclicGraphSeed.dagSeed(30000)).toLowerCase(),
       "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
     };
     final JsonRpcResponse expectedResponse =
         new JsonRpcSuccessResponse(request.getId(), expectedValue);
     when(miningCoordinator.getWorkDefinition()).thenReturn(Optional.of(values));
-    when(blockChain.getBlockHashByNumber(30000))
-        .thenReturn(
-            Optional.of(
-                Hash.fromHexString(
-                    "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")));
-
     JsonRpcResponse actualResponse = method.response(request);
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
   }
@@ -92,7 +95,7 @@ public class EthGetWorkTest {
   public void shouldReturnErrorOnNoneMiningNode() {
     final JsonRpcRequest request = requestWithParams();
     final JsonRpcResponse expectedResponse =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INTERNAL_ERROR);
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.NO_MINING_WORK_FOUND);
     when(miningCoordinator.getWorkDefinition()).thenReturn(Optional.empty());
 
     JsonRpcResponse actualResponse = method.response(request);
@@ -100,6 +103,6 @@ public class EthGetWorkTest {
   }
 
   private JsonRpcRequest requestWithParams(final Object... params) {
-    return new JsonRpcRequest(JSON_RPC_VERSION, ETH_METHOD, params);
+    return new JsonRpcRequest("2.0", ETH_METHOD, params);
   }
 }

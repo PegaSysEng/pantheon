@@ -179,7 +179,7 @@ public class JsonRpcMethodsFactory {
           new EthCoinbase(miningCoordinator),
           new EthProtocolVersion(supportedCapabilities),
           new EthGasPrice<>(miningCoordinator),
-          new EthGetWork(miningCoordinator, blockchainQueries));
+          new EthGetWork(miningCoordinator));
     }
     if (rpcApis.contains(RpcApis.DEBUG)) {
       final BlockReplay blockReplay =
