@@ -31,7 +31,7 @@ public class BlockchainReferenceTestTools {
         System.getProperty(
             "test.ethereum.blockchain.eips",
             "FrontierToHomesteadAt5,HomesteadToEIP150At5,HomesteadToDaoAt5,EIP158ToByzantiumAt5,"
-                + "Frontier,Homestead,EIP150,EIP158,Byzantium");
+                + "Frontier,Homestead,EIP150,EIP158,Byzantium,Constantinople");
     NETWORKS_TO_RUN = Arrays.asList(networks.split(","));
   }
 
@@ -49,12 +49,13 @@ public class BlockchainReferenceTestTools {
     }
 
     // TODO: Determine and implement cross-chain validation prevention.
-    params.blacklist("ChainAtoChainB_BlockHash_(Frontier|Homestead|EIP150|EIP158|Byzantium)");
+    params.blacklist(
+        "ChainAtoChainB_BlockHash_(Frontier|Homestead|EIP150|EIP158|Byzantium|Constantinople)");
     // Known bad test.
     params.blacklist("RevertPrecompiledTouch_d0g0v0_(EIP158|Byzantium)");
 
     // Consumes a huge amount of memory
-    params.blacklist("static_Call1MB1024Calldepth_d1g0v0_Byzantium");
+    params.blacklist("static_Call1MB1024Calldepth_d1g0v0_(Byzantium|Constantinople)");
 
     // Pantheon is incorrectly rejecting Uncle block timestamps in the future
     params.blacklist("futureUncleTimestampDifficultyDrop2");
@@ -63,6 +64,52 @@ public class BlockchainReferenceTestTools {
     // Needs investigation
     params.blacklist("RevertInCreateInInit_d0g0v0_Byzantium");
     params.blacklist("RevertInCreateInInit_d0g0v0_Constantinople");
+
+    // Constantinople failures to investigate
+    params.blacklist("badOpcodes_d115g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024PreCalls_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBombPreCall_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Callcode1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Callcode1024OOG_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Delegatecall1024OOG_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Callcode1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024PreCalls_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("create2collisionStorage_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("create2collisionStorage_d1g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("create2collisionStorage_d2g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("RevertInCreateInInitCreate2_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CreateMessageReverted_d0g1v0_Constantinople\\[Constantinople\\]");
+    params.blacklist(
+        "returndatasize_following_successful_create_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CreateMessageRevertedOOGInInit_d0g1v0_Constantinople\\[Constantinople\\]");
+    params.blacklist(
+        "returndatacopy_0_0_following_successful_create_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024OOG_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024PreCalls_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBombPreCall_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Delegatecall1024_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1MB1024Calldepth_d0g1v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("LoopCallsThenRevert_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("LoopCallsDepthThenRevert2_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("LoopCallsDepthThenRevert_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("LoopCallsDepthThenRevert3_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("LoopDelegateCallsDepthThenRevert_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("LoopCallsThenRevert_d0g1v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("Call1024OOG_d0g1v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("static_Call1024PreCalls2_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("ABAcalls2_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBombLog2_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBomb0_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBombLog_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBomb2_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBomb3_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("ABAcalls3_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("CallRecursiveBomb1_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist(
+        "CallRecursiveBomb0_OOG_atMaxCallDepth_d0g0v0_Constantinople\\[Constantinople\\]");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {
