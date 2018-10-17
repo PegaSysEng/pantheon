@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.vm;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,92 +88,21 @@ public class BlockchainReferenceTestTools {
     params.blacklist("Callcode1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Call1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Call1024PreCalls_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2InitCodes_d4g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2InitCodes_d5g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("Create2OnDepth1023_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d6g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d7g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist(
-        "create2collisionSelfdestructedRevert_d2g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("create2collisionStorage_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("create2collisionStorage_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist(
-        "create2collisionSelfdestructedRevert_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist(
-        "create2collisionSelfdestructedRevert_d1g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("create2collisionStorage_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d7g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("RevertInCreateInInitCreate2_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist(
-        "call_outsize_then_create2_successful_then_returndatasize_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d10g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d11g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d9g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d5g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("CreateMessageReverted_d0g1v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d4g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d5g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionNonce_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionNonce_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist(
-        "Create2OOGafterInitCodeReturndata2_d0g1v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("Create2Recursive_d0g1v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2SmartInitCode_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2SmartInitCode_d1g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist(
         "returndatasize_following_successful_create_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionCode_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("RevertDepthCreate2OOG_d1g1v1_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2InitCodes_d8g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d3g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("RevertDepthCreateAddressCollision_d1g1v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2InitCodes_d6g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2InitCodes_d7g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2InitCodes_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2checkFieldsInInitcode_d4g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2checkFieldsInInitcode_d5g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("RevertDepthCreateAddressCollision_d1g1v1_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2checkFieldsInInitcode_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("Create2Recursive_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2checkFieldsInInitcode_d6g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionBalance_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructedOOG_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("RevertDepthCreate2OOG_d1g1v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionBalance_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionCode_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2noCash_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2callPrecompiles_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionNonce_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructed_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("Create2OnDepth1024_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionCode2_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionCode2_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructed2_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructed2_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructed_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d3g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("CreateMessageRevertedOOGInInit_d0g1v0_Constantinople\\[Constantinople\\]");
     params.blacklist(
-        "call_then_create2_successful_then_returndatasize_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructed_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("CREATE2_Suicide_d8g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("Create2OOGafterInitCode_d0g1v0_Constantinople\\[Constantinople\\]");
-    params.blacklist(
         "returndatacopy_0_0_following_successful_create_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2checkFieldsInInitcode_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionBalance_d2g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionBalance_d3g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructedOOG_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionSelfdestructedOOG_d1g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Call1024OOG_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Call1024PreCalls_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("CallRecursiveBombPreCall_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Delegatecall1024_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Call1024BalanceTooLow_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionCode_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Call1MB1024Calldepth_d0g1v0_Constantinople\\[Constantinople\\]");
     params.blacklist("LoopCallsThenRevert_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("LoopCallsDepthThenRevert2_d0g0v0_Constantinople\\[Constantinople\\]");
@@ -181,9 +122,6 @@ public class BlockchainReferenceTestTools {
     params.blacklist("CallRecursiveBomb1_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist(
         "CallRecursiveBomb0_OOG_atMaxCallDepth_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("suicideStorageCheckVCreate2_Constantinople\\[Constantinople\\]");
-    params.blacklist(
-        "create2collisionwithSelfdestructSameBlock_Constantinople\\[Constantinople\\]");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {

@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -32,6 +44,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>> {
   private static final Logger LOG = LogManager.getLogger();
+  private static final int DEFAULT_RETRIES = 3;
 
   private final EthContext ethContext;
   private final ProtocolSchedule<C> protocolSchedule;
@@ -43,8 +56,9 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
   private CompleteBlocksTask(
       final ProtocolSchedule<C> protocolSchedule,
       final EthContext ethContext,
-      final List<BlockHeader> headers) {
-    super(ethContext);
+      final List<BlockHeader> headers,
+      final int maxRetries) {
+    super(ethContext, maxRetries);
     checkArgument(headers.size() > 0, "Must supply a non-empty headers list");
     this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
@@ -56,8 +70,16 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
   public static <C> CompleteBlocksTask<C> forHeaders(
       final ProtocolSchedule<C> protocolSchedule,
       final EthContext ethContext,
+      final List<BlockHeader> headers,
+      final int maxRetries) {
+    return new CompleteBlocksTask<>(protocolSchedule, ethContext, headers, maxRetries);
+  }
+
+  public static <C> CompleteBlocksTask<C> forHeaders(
+      final ProtocolSchedule<C> protocolSchedule,
+      final EthContext ethContext,
       final List<BlockHeader> headers) {
-    return new CompleteBlocksTask<>(protocolSchedule, ethContext, headers);
+    return new CompleteBlocksTask<>(protocolSchedule, ethContext, headers, DEFAULT_RETRIES);
   }
 
   @Override
