@@ -66,7 +66,6 @@ public class BlockchainReferenceTestTools {
     params.blacklist("RevertInCreateInInit_d0g0v0_Constantinople");
 
     // Constantinople failures to investigate
-    params.blacklist("SstoreCallToSelfSubRefundBelowZero_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("badOpcodes_d115g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("Call1024PreCalls_d0g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("CallRecursiveBombPreCall_d0g0v0_Constantinople\\[Constantinople\\]");
