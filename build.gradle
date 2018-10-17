@@ -388,7 +388,7 @@ release {
   ]
 
   git {
-    requireBranch = 'release-pipeline'
+    requireBranch = 'wip-release'
     pushToRemote = 'origin'
   }
 }
