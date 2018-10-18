@@ -402,7 +402,7 @@ bintray {
   filesSpec {
     from distTar.destinationDir.path
     from distZip.destinationDir.path
-    into '.'
+    into ''
   }
   pkg {
     repo = "pegasys-repo"
