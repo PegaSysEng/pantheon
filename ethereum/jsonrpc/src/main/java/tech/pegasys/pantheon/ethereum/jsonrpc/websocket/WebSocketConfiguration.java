@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.websocket;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -73,6 +74,11 @@ public class WebSocketConfiguration {
 
   public void setRpcApis(final Collection<RpcApi> rpcApis) {
     this.rpcApis = rpcApis;
+  }
+
+  public void addRpcApi(final RpcApi rpcApi) {
+    this.rpcApis = new ArrayList<>(rpcApis);
+    rpcApis.add(rpcApi);
   }
 
   @Override

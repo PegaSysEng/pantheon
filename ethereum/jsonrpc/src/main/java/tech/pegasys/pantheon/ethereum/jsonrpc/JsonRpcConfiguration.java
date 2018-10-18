@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -84,6 +85,11 @@ public class JsonRpcConfiguration {
 
   public void setRpcApis(final Collection<RpcApi> rpcApis) {
     this.rpcApis = rpcApis;
+  }
+
+  public void addRpcApi(final RpcApi rpcApi) {
+    this.rpcApis = new ArrayList<>(rpcApis);
+    rpcApis.add(rpcApi);
   }
 
   @Override

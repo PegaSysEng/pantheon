@@ -21,8 +21,9 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.WEB3;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
-public abstract class RpcApis {
+public class RpcApis {
   public static final RpcApi ETH = new ETH();
   public static final RpcApi DEBUG = new DEBUG();
   public static final RpcApi MINER = new MINER();
@@ -31,19 +32,19 @@ public abstract class RpcApis {
 
   public static final Collection<RpcApi> DEFAULT_JSON_RPC_APIS = Arrays.asList(ETH, NET, WEB3);
 
-  public static final RpcApi valueOf(final String name) {
+  public static final Optional<RpcApi> valueOf(final String name) {
     if (name.equals(ETH.name())) {
-      return ETH;
+      return Optional.of(ETH);
     } else if (name.equals(DEBUG.name())) {
-      return DEBUG;
+      return Optional.of(DEBUG);
     } else if (name.equals(MINER.name())) {
-      return MINER;
+      return Optional.of(MINER);
     } else if (name.equals(NET.name())) {
-      return NET;
+      return Optional.of(NET);
     } else if (name.equals(WEB3.name())) {
-      return WEB3;
+      return Optional.of(WEB3);
     } else {
-      throw new IllegalArgumentException("Unknown RpcApi " + name);
+      return Optional.empty();
     }
   }
 

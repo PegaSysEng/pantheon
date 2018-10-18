@@ -242,7 +242,7 @@ public class RunnerBuilder {
       @SuppressWarnings("unchecked")
       final ProtocolContext<CliqueContext> cliqueProtocolContext =
           (ProtocolContext<CliqueContext>) context;
-      methods.putAll(new CliqueJsonRpcMethodsFactory().methods(cliqueProtocolContext));
+      methods.putAll(new CliqueJsonRpcMethodsFactory().methods(cliqueProtocolContext, jsonRpcApis));
     }
 
     if (context.getConsensusState() instanceof IbftContext) {
@@ -250,7 +250,7 @@ public class RunnerBuilder {
       @SuppressWarnings("unchecked")
       final ProtocolContext<IbftContext> ibftProtocolContext =
           (ProtocolContext<IbftContext>) context;
-      methods.putAll(new IbftJsonRpcMethodsFactory().methods(ibftProtocolContext));
+      methods.putAll(new IbftJsonRpcMethodsFactory().methods(ibftProtocolContext, jsonRpcApis));
     }
     return methods;
   }
