@@ -148,6 +148,10 @@ public class ProtocolSpec<C> {
     return blockHeaderValidator;
   }
 
+  public BlockHeaderValidator<C> getOmmerValidator() {
+    return blockHeaderValidator;
+  }
+
   /**
    * Returns the block body validator used in this specification.
    *
