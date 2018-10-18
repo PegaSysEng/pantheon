@@ -95,9 +95,8 @@ public class ProtocolSpecBuilder<T> {
   }
 
   public ProtocolSpecBuilder<T> ommerValidatorBuilder(
-          final Function<DifficultyCalculator<T>, BlockHeaderValidator<T>>
-                  blockHeaderValidatorBuilder) {
-    this.blockHeaderValidatorBuilder = blockHeaderValidatorBuilder;
+      final Function<DifficultyCalculator<T>, BlockHeaderValidator<T>> ommerValidatorBuilder) {
+    this.ommerValidatorBuilder = ommerValidatorBuilder;
     return this;
   }
 
@@ -164,6 +163,7 @@ public class ProtocolSpecBuilder<T> {
 
   public <R> ProtocolSpecBuilder<R> changeConsensusContextType(
       final Function<DifficultyCalculator<R>, BlockHeaderValidator<R>> blockHeaderValidatorBuilder,
+      final Function<DifficultyCalculator<R>, BlockHeaderValidator<R>> ommerValidatorBuilder,
       final Function<ProtocolSchedule<R>, BlockBodyValidator<R>> blockBodyValidatorBuilder,
       final BlockImporterBuilder<R> blockImporterBuilder,
       final DifficultyCalculator<R> difficultyCalculator) {
@@ -176,9 +176,7 @@ public class ProtocolSpecBuilder<T> {
         .messageCallProcessorBuilder(messageCallProcessorBuilder)
         .transactionProcessorBuilder(transactionProcessorBuilder)
         .blockHeaderValidatorBuilder(blockHeaderValidatorBuilder)
-
-            .ommerValidatorBuilder(blockHeaderValidatorBuilder)
-
+        .ommerValidatorBuilder(ommerValidatorBuilder)
         .blockBodyValidatorBuilder(blockBodyValidatorBuilder)
         .blockProcessorBuilder(blockProcessorBuilder)
         .blockImporterBuilder(blockImporterBuilder)
@@ -225,15 +223,12 @@ public class ProtocolSpecBuilder<T> {
     final TransactionProcessor transactionProcessor =
         transactionProcessorBuilder.apply(
             gasCalculator, transactionValidator, contractCreationProcessor, messageCallProcessor);
+
     final BlockHeaderValidator<T> blockHeaderValidator =
         blockHeaderValidatorBuilder.apply(difficultyCalculator);
 
-
-
     final BlockHeaderValidator<T> ommerValidator =
-            blockHeaderValidatorBuilder.apply(difficultyCalculator);
-
-
+        ommerValidatorBuilder.apply(difficultyCalculator);
 
     final BlockBodyValidator<T> blockBodyValidator =
         blockBodyValidatorBuilder.apply(protocolSchedule);
@@ -251,6 +246,7 @@ public class ProtocolSpecBuilder<T> {
         transactionValidator,
         transactionProcessor,
         blockHeaderValidator,
+        ommerValidator,
         blockBodyValidator,
         blockProcessor,
         blockImporter,

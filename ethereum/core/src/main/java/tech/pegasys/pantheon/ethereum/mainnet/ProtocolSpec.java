@@ -30,6 +30,8 @@ public class ProtocolSpec<C> {
 
   private final BlockHeaderValidator<C> blockHeaderValidator;
 
+  private final BlockHeaderValidator<C> ommerValidator;
+
   private final BlockBodyValidator<C> blockBodyValidator;
 
   private final BlockImporter<C> blockImporter;
@@ -54,6 +56,7 @@ public class ProtocolSpec<C> {
    * @param transactionValidator the transaction validator to use
    * @param transactionProcessor the transaction processor to use
    * @param blockHeaderValidator the block header validator to use
+   * @param ommerValidator voilà
    * @param blockBodyValidator the block body validator to use
    * @param blockProcessor the block processor to use
    * @param blockImporter the block importer to use
@@ -70,6 +73,7 @@ public class ProtocolSpec<C> {
       final TransactionValidator transactionValidator,
       final TransactionProcessor transactionProcessor,
       final BlockHeaderValidator<C> blockHeaderValidator,
+      final BlockHeaderValidator<C> ommerValidator,
       final BlockBodyValidator<C> blockBodyValidator,
       final BlockProcessor blockProcessor,
       final BlockImporter<C> blockImporter,
@@ -84,6 +88,9 @@ public class ProtocolSpec<C> {
     this.transactionValidator = transactionValidator;
     this.transactionProcessor = transactionProcessor;
     this.blockHeaderValidator = blockHeaderValidator;
+
+    this.ommerValidator = ommerValidator;
+
     this.blockBodyValidator = blockBodyValidator;
     this.blockProcessor = blockProcessor;
     this.blockImporter = blockImporter;
@@ -149,7 +156,7 @@ public class ProtocolSpec<C> {
   }
 
   public BlockHeaderValidator<C> getOmmerValidator() {
-    return blockHeaderValidator;
+    return ommerValidator;
   }
 
   /**

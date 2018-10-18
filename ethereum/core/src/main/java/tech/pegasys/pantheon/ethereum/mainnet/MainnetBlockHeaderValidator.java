@@ -47,17 +47,17 @@ public final class MainnetBlockHeaderValidator {
         .build();
   }
 
-  private static BlockHeaderValidator.Builder<Void> createOmmerValidator(
+  static BlockHeaderValidator<Void> createOmmerValidator(
       final DifficultyCalculator<Void> difficultyCalculator) {
     return new BlockHeaderValidator.Builder<Void>()
         .addRule(new CalculatedDifficultyValidationRule<>(difficultyCalculator))
         .addRule(new AncestryValidationRule())
         .addRule(new GasLimitRangeAndDeltaValidationRule(MIN_GAS_LIMIT, MAX_GAS_LIMIT))
         .addRule(new GasUsageValidationRule())
-        // .addRule(new NotTooLate(MINIMUM_SECONDS_SINCE_PARENT))
-        .addRule(new NotTooSoon(TIMESTAMP_TOLERANCE_S))
+        .addRule(new NotTooLate(MINIMUM_SECONDS_SINCE_PARENT))
         .addRule(new ExtraDataMaxLengthValidationRule(BlockHeader.MAX_EXTRA_DATA_BYTES))
-        .addRule(new ProofOfWorkValidationRule());
+        .addRule(new ProofOfWorkValidationRule())
+        .build();
   }
 
   private static BlockHeaderValidator.Builder<Void> createValidator(
