@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.vm;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +43,7 @@ public class BlockchainReferenceTestTools {
         System.getProperty(
             "test.ethereum.blockchain.eips",
             "FrontierToHomesteadAt5,HomesteadToEIP150At5,HomesteadToDaoAt5,EIP158ToByzantiumAt5,"
-                + "Frontier,Homestead,EIP150,EIP158,Byzantium");
+                + "Frontier,Homestead,EIP150,EIP158,Byzantium,Constantinople");
     NETWORKS_TO_RUN = Arrays.asList(networks.split(","));
   }
 
@@ -49,12 +61,13 @@ public class BlockchainReferenceTestTools {
     }
 
     // TODO: Determine and implement cross-chain validation prevention.
-    params.blacklist("ChainAtoChainB_BlockHash_(Frontier|Homestead|EIP150|EIP158|Byzantium)");
+    params.blacklist(
+        "ChainAtoChainB_BlockHash_(Frontier|Homestead|EIP150|EIP158|Byzantium|Constantinople)");
     // Known bad test.
     params.blacklist("RevertPrecompiledTouch_d0g0v0_(EIP158|Byzantium)");
 
     // Consumes a huge amount of memory
-    params.blacklist("static_Call1MB1024Calldepth_d1g0v0_Byzantium");
+    params.blacklist("static_Call1MB1024Calldepth_d1g0v0_(Byzantium|Constantinople)");
 
     // Pantheon is incorrectly rejecting Uncle block timestamps in the future
     params.blacklist("futureUncleTimestampDifficultyDrop2");
@@ -63,6 +76,12 @@ public class BlockchainReferenceTestTools {
     // Needs investigation
     params.blacklist("RevertInCreateInInit_d0g0v0_Byzantium");
     params.blacklist("RevertInCreateInInit_d0g0v0_Constantinople");
+
+    // Constantinople failures to investigate
+    params.blacklist("create2collisionStorage_d0g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("create2collisionStorage_d1g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("create2collisionStorage_d2g0v0_Constantinople\\[Constantinople\\]");
+    params.blacklist("RevertInCreateInInitCreate2_d0g0v0_Constantinople\\[Constantinople\\]");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {

@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
@@ -16,6 +28,9 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterRepository;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
@@ -127,6 +142,8 @@ public class RunnerBuilder {
     final AbstractMiningCoordinator<?, ?> miningCoordinator =
         pantheonController.getMiningCoordinator();
 
+    final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
+
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
       final Map<String, JsonRpcMethod> jsonRpcMethods =
@@ -139,7 +156,8 @@ public class RunnerBuilder {
               transactionPool,
               miningCoordinator,
               supportedCapabilities,
-              jsonRpcConfiguration.getRpcApis());
+              jsonRpcConfiguration.getRpcApis(),
+              filterManager);
       jsonRpcHttpService =
           Optional.of(new JsonRpcHttpService(vertx, jsonRpcConfiguration, jsonRpcMethods));
     }
@@ -156,7 +174,8 @@ public class RunnerBuilder {
               transactionPool,
               miningCoordinator,
               supportedCapabilities,
-              webSocketConfiguration.getRpcApis());
+              webSocketConfiguration.getRpcApis(),
+              filterManager);
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(vertx, context.getBlockchain(), transactionPool);
@@ -179,6 +198,18 @@ public class RunnerBuilder {
         vertx, networkRunner, jsonRpcHttpService, webSocketService, pantheonController, dataDir);
   }
 
+  private FilterManager createFilterManager(
+      final Vertx vertx, final ProtocolContext<?> context, final TransactionPool transactionPool) {
+    FilterManager filterManager =
+        new FilterManager(
+            new BlockchainQueries(context.getBlockchain(), context.getWorldStateArchive()),
+            transactionPool,
+            new FilterIdGenerator(),
+            new FilterRepository());
+    vertx.deployVerticle(filterManager);
+    return filterManager;
+  }
+
   private Map<String, JsonRpcMethod> jsonRpcMethods(
       final ProtocolContext<?> context,
       final ProtocolSchedule<?> protocolSchedule,
@@ -188,7 +219,8 @@ public class RunnerBuilder {
       final TransactionPool transactionPool,
       final AbstractMiningCoordinator<?, ?> miningCoordinator,
       final Set<Capability> supportedCapabilities,
-      final Collection<RpcApis> jsonRpcApis) {
+      final Collection<RpcApis> jsonRpcApis,
+      final FilterManager filterManager) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -202,7 +234,8 @@ public class RunnerBuilder {
                 protocolSchedule,
                 miningCoordinator,
                 supportedCapabilities,
-                jsonRpcApis);
+                jsonRpcApis,
+                filterManager);
 
     if (context.getConsensusState() instanceof CliqueContext) {
       // This is checked before entering this if branch

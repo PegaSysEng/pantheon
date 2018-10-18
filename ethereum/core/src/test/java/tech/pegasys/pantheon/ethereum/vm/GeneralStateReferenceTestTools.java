@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.vm;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +47,8 @@ public class GeneralStateReferenceTestTools {
   static {
     final String eips =
         System.getProperty(
-            "test.ethereum.state.eips", "Frontier,Homestead,EIP150,EIP158,Byzantium");
+            "test.ethereum.state.eips",
+            "Frontier,Homestead,EIP150,EIP158,Byzantium,Constantinople");
     EIPS_TO_RUN = Arrays.asList(eips.split(","));
   }
 
@@ -68,7 +81,7 @@ public class GeneralStateReferenceTestTools {
     // Gas integer value is too large to construct a valid transaction.
     params.blacklist("OverflowGasRequire");
     // Consumes a huge amount of memory
-    params.blacklist("static_Call1MB1024Calldepth-Byzantium");
+    params.blacklist("static_Call1MB1024Calldepth-(Byzantium|Constantinople)");
 
     // Needs investigation (tests pass in other clients)
     params.blacklist("createNameRegistratorPerTxsNotEnoughGas-Frontier\\[0\\]");
@@ -130,6 +143,14 @@ public class GeneralStateReferenceTestTools {
     params.blacklist("UserTransactionGasLimitIsTooLowWhenZeroCost-Frontier");
     params.blacklist("UserTransactionGasLimitIsTooLowWhenZeroCost-Homestead");
     params.blacklist("ecmul_0-3_5616_28000_96-Byzantium\\[3\\]");
+
+    // Constantinople failures to investigate
+    params.blacklist("RevertInCreateInInitCreate2-Constantinople");
+    params.blacklist("create2collisionStorage-Constantinople\\[0\\]");
+    params.blacklist("create2collisionStorage-Constantinople\\[1\\]");
+    params.blacklist("create2collisionStorage-Constantinople\\[2\\]");
+    params.blacklist("RevertInCreateInInit-Constantinople");
+    params.blacklist("ecmul_0-3_5616_28000_96-Constantinople\\[3\\]");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {
