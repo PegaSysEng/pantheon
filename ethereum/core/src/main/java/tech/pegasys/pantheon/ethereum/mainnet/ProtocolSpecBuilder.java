@@ -34,6 +34,9 @@ public class ProtocolSpecBuilder<T> {
   private Function<GasCalculator, EVM> evmBuilder;
   private Function<GasCalculator, TransactionValidator> transactionValidatorBuilder;
   private Function<DifficultyCalculator<T>, BlockHeaderValidator<T>> blockHeaderValidatorBuilder;
+
+  private Function<DifficultyCalculator<T>, BlockHeaderValidator<T>> ommerValidatorBuilder;
+
   private Function<ProtocolSchedule<T>, BlockBodyValidator<T>> blockBodyValidatorBuilder;
   private BiFunction<GasCalculator, EVM, AbstractMessageProcessor> contractCreationProcessorBuilder;
   private Function<GasCalculator, PrecompileContractRegistry> precompileContractRegistryBuilder;
@@ -87,6 +90,13 @@ public class ProtocolSpecBuilder<T> {
   public ProtocolSpecBuilder<T> blockHeaderValidatorBuilder(
       final Function<DifficultyCalculator<T>, BlockHeaderValidator<T>>
           blockHeaderValidatorBuilder) {
+    this.blockHeaderValidatorBuilder = blockHeaderValidatorBuilder;
+    return this;
+  }
+
+  public ProtocolSpecBuilder<T> ommerValidatorBuilder(
+          final Function<DifficultyCalculator<T>, BlockHeaderValidator<T>>
+                  blockHeaderValidatorBuilder) {
     this.blockHeaderValidatorBuilder = blockHeaderValidatorBuilder;
     return this;
   }
@@ -166,6 +176,9 @@ public class ProtocolSpecBuilder<T> {
         .messageCallProcessorBuilder(messageCallProcessorBuilder)
         .transactionProcessorBuilder(transactionProcessorBuilder)
         .blockHeaderValidatorBuilder(blockHeaderValidatorBuilder)
+
+            .ommerValidatorBuilder(blockHeaderValidatorBuilder)
+
         .blockBodyValidatorBuilder(blockBodyValidatorBuilder)
         .blockProcessorBuilder(blockProcessorBuilder)
         .blockImporterBuilder(blockImporterBuilder)
@@ -214,6 +227,14 @@ public class ProtocolSpecBuilder<T> {
             gasCalculator, transactionValidator, contractCreationProcessor, messageCallProcessor);
     final BlockHeaderValidator<T> blockHeaderValidator =
         blockHeaderValidatorBuilder.apply(difficultyCalculator);
+
+
+
+    final BlockHeaderValidator<T> ommerValidator =
+            blockHeaderValidatorBuilder.apply(difficultyCalculator);
+
+
+
     final BlockBodyValidator<T> blockBodyValidator =
         blockBodyValidatorBuilder.apply(protocolSchedule);
     final BlockProcessor blockProcessor =
