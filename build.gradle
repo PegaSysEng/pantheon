@@ -482,4 +482,5 @@ task dockerHubUpload{
     }
   }
 }
-dockerHubUpload.mustRunAfter(bintrayUpload)
+
+afterReleaseBuild.dependsOn dockerHubUpload
