@@ -390,6 +390,7 @@ release {
   git {
     requireBranch = 'wip-release'
     pushToRemote = 'origin'
+    pushToBranchPrefix = 'turnips-'
   }
 }
 
