@@ -103,6 +103,20 @@ allprojects {
       greclipse().configFile(rootProject.file('gradle/formatter.properties'))
       endWithNewline()
     }
+
+    // Below this line are currently only license header tasks
+    format 'groovy', {
+        target '**/*.groovy'
+        licenseHeaderFile "${rootDir}/gradle/spotless.java.license", 'import'
+    }
+    format 'bash', {
+      target '**/*.sh'
+      licenseHeaderFile "${rootDir}/gradle/spotless.bash.license", '#!/bin'
+    }
+    format 'sol', {
+      target '**/*.sol'
+      licenseHeaderFile "${rootDir}/gradle/spotless.java.license", '^(pragma|contract)'
+    }
   }
 
   tasks.withType(JavaCompile) {
