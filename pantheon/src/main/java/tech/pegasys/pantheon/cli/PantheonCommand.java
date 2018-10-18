@@ -25,7 +25,8 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
+import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.util.BlockImporter;
@@ -93,19 +94,19 @@ public class PantheonCommand implements Runnable {
 
   private static final String CONFIG_FILE_OPTION_NAME = "--config";
 
-  public static class RpcApisEnumConverter implements ITypeConverter<RpcApis> {
+  public static class RpcApisEnumConverter implements ITypeConverter<RpcApi> {
     @Override
-    public RpcApis convert(final String s) throws RpcApisEnumConvertionException {
+    public RpcApi convert(final String s) throws RpcApisEnumConversionException {
       try {
         return RpcApis.valueOf(s.trim().toUpperCase());
       } catch (final IllegalArgumentException e) {
-        throw new RpcApisEnumConvertionException("Invalid value: " + s);
+        throw new RpcApisEnumConversionException("Invalid value: " + s);
       }
     }
   }
 
-  public static class RpcApisEnumConvertionException extends Exception {
-    RpcApisEnumConvertionException(final String s) {
+  public static class RpcApisEnumConversionException extends Exception {
+    RpcApisEnumConversionException(final String s) {
       super(s);
     }
   }
@@ -268,7 +269,7 @@ public class PantheonCommand implements Runnable {
     converter = RpcApisEnumConverter.class,
     description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}"
   )
-  private final Collection<RpcApis> rpcApis = Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
+  private final Collection<RpcApi> rpcApis = Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
 
   @Option(
     names = {"--ws-enabled"},
@@ -294,7 +295,7 @@ public class PantheonCommand implements Runnable {
     converter = RpcApisEnumConverter.class,
     description = "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}"
   )
-  private final Collection<RpcApis> wsApis = Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
+  private final Collection<RpcApi> wsApis = Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
 
   @Option(
     names = {"--dev-mode"},
