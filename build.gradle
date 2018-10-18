@@ -386,7 +386,7 @@ release {
   ]
 
   git {
-    requireBranch = 'release'
+    requireBranch = 'wip-release'
     pushToRemote = 'origin'
     pushToBranchPrefix = project.version + '-'
   }
