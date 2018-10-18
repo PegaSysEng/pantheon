@@ -5,11 +5,7 @@ https://github.com/PegaSysEng/pantheon/blob/master/CONTRIBUTING.md#your-first-co
 https://github.com/PegaSysEng/pantheon/blob/master/CONTRIBUTING.md#pull-request-labels
 -->
 
-# PR Details
-
-<!--- Provide a general summary of your changes in the Title above -->
-
-## Description
+## PR Description
 
 <!--- Describe your changes in detail -->
 
@@ -19,8 +15,6 @@ Fixes #
 ## Related Issue
 
 <!--- This project only accepts pull requests related to open issues -->
-<!--- If suggesting a new feature or change, please discuss it in an issue first -->
-<!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
 <!--- Please link to the issue here: -->
 
 ## Types of changes
