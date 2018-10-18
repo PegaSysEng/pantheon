@@ -9,6 +9,7 @@ dependencies {
   testImplementation project(':ethereum:jsonrpc')
   testImplementation project(':pantheon')
   testImplementation project(':util')
+  testImplementation project(':consensus:clique')
 
   testImplementation project( path: ':ethereum:core', configuration: 'testSupportArtifacts')
   testImplementation 'junit:junit'

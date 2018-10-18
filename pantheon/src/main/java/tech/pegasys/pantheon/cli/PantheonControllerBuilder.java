@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.cli;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
@@ -24,8 +23,6 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-
-import com.google.common.io.Resources;
 
 public class PantheonControllerBuilder {
 

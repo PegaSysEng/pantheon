@@ -14,21 +14,23 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static tech.pegasys.pantheon.cli.EthNetworkConfig.mainnet;
 
-import io.vertx.core.Vertx;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import io.vertx.core.Vertx;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
@@ -46,7 +48,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
 
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
-    final EthNetworkConfig ethNetworkConfig = node.ethNetworkConfig().orElse(new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build());
+    final EthNetworkConfig ethNetworkConfig =
+        node.ethNetworkConfig()
+            .orElse(new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build());
     PantheonController<?, ?> pantheonController;
     try {
       pantheonController =

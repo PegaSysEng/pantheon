@@ -18,14 +18,15 @@ import static tech.pegasys.pantheon.controller.MainnetPantheonController.MAINNET
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.RINKEBY_BOOTSTRAP_NODES;
 
-import com.google.common.base.Preconditions;
-import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Supplier;
+
+import com.google.common.base.Preconditions;
+import com.google.common.io.Resources;
 
 public class EthNetworkConfig {
   private static final String MAINNET_GENESIS = "mainnet.json";
@@ -87,11 +88,13 @@ public class EthNetworkConfig {
   }
 
   public static EthNetworkConfig mainnet() {
-    return new EthNetworkConfig(() -> jsonConfig(MAINNET_GENESIS), MAINNET_NETWORK_ID, MAINNET_BOOTSTRAP_NODES);
+    return new EthNetworkConfig(
+        () -> jsonConfig(MAINNET_GENESIS), MAINNET_NETWORK_ID, MAINNET_BOOTSTRAP_NODES);
   }
 
   public static EthNetworkConfig rinkeby() {
-    return new EthNetworkConfig(() -> jsonConfig(RINKEBY_GENESIS), RINKEBY_NETWORK_ID, RINKEBY_BOOTSTRAP_NODES);
+    return new EthNetworkConfig(
+        () -> jsonConfig(RINKEBY_GENESIS), RINKEBY_NETWORK_ID, RINKEBY_BOOTSTRAP_NODES);
   }
 
   private static String jsonConfig(final String resourceName) {

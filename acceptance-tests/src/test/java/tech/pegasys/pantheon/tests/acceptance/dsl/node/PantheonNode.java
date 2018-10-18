@@ -17,9 +17,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.io.MoreFiles;
-import com.google.common.io.RecursiveDeleteOption;
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.controller.KeyPairUtil;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,6 +41,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.Logger;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.web3j.protocol.Web3j;
@@ -41,16 +53,6 @@ import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
-import tech.pegasys.pantheon.controller.KeyPairUtil;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class PantheonNode implements Node, AutoCloseable {
 
@@ -83,8 +85,8 @@ public class PantheonNode implements Node, AutoCloseable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final boolean devMode,
-      final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig
-  ) throws IOException {
+      final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig)
+      throws IOException {
     final Path homeDirectory = Files.createTempDirectory("acctest");
     this.name = name;
     this.homeDirectory = homeDirectory;
@@ -307,8 +309,6 @@ public class PantheonNode implements Node, AutoCloseable {
     return Address.extract(Hash.hash(keyPair.getPrivateKey().getEncodedBytes()));
   }
 
-
-
   public boolean isDevMode() {
     return devMode;
   }
@@ -363,7 +363,7 @@ public class PantheonNode implements Node, AutoCloseable {
     return genesisConfig;
   }
 
-  public void ethNetworkConfig(Optional<EthNetworkConfig> ethNetworkConfig) {
+  public void ethNetworkConfig(final Optional<EthNetworkConfig> ethNetworkConfig) {
     this.ethNetworkConfig = ethNetworkConfig;
   }
 

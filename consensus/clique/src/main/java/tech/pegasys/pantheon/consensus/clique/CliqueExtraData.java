@@ -15,9 +15,6 @@ package tech.pegasys.pantheon.consensus.clique;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Optional;
 import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
 import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -25,6 +22,11 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
+
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
 
 /**
  * Represents the data structure stored in the extraData field of the BlockHeader used when
@@ -98,11 +100,12 @@ public class CliqueExtraData {
 
   public static String createGenesisExtraDataString(final List<PrivateKey> privKeys) {
     List<Address> validators = convertPrivKeysToAddresses(privKeys);
-    CliqueExtraData cliqueExtraData = new CliqueExtraData(BytesValue.wrap(new byte[32]),
-        null, validators);
+    CliqueExtraData cliqueExtraData =
+        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validators);
     BytesValue output = cliqueExtraData.encode();
     return output.toString();
   }
+
   private static List<Address> convertPrivKeysToAddresses(final List<PrivateKey> privKeys) {
     List<Address> validators = Lists.newArrayList();
     for (PrivateKey privKey : privKeys) {
