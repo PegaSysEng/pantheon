@@ -21,6 +21,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.AncestryVali
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ConstantFieldValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasLimitRangeAndDeltaValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasUsageValidationRule;
+import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.NotTooLate;
+import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.NotTooSoon;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 public class IbftBlockHeaderValidationRulesetFactory {
@@ -55,7 +57,8 @@ public class IbftBlockHeaderValidationRulesetFactory {
         .addRule(new AncestryValidationRule())
         .addRule(new GasUsageValidationRule())
         .addRule(new GasLimitRangeAndDeltaValidationRule(5000, 0x7fffffffffffffffL))
-        .addRule(new TimestampValidationRule(1, secondsBetweenBlocks))
+        .addRule(new NotTooSoon(1))
+        .addRule(new NotTooLate(secondsBetweenBlocks))
         .addRule(
             new ConstantFieldValidationRule<>(
                 "MixHash", BlockHeader::getMixHash, IbftHelpers.EXPECTED_MIX_HASH))
