@@ -30,8 +30,9 @@ dependencies {
 }
 
 test {
-  if (JavaVersion.current().isJava8()) {
-    jvmArgs "-Xbootclasspath/p:${configurations.epJavac.asPath}"
-  }
+  enabled = JavaVersion.current().isJava8()
+
+  jvmArgs "-Xbootclasspath/p:${configurations.epJavac.asPath}"
+
   testLogging { showStandardStreams = true }
 }
