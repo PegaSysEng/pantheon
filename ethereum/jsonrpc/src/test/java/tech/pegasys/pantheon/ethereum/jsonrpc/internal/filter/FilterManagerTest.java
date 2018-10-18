@@ -1,6 +1,23 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
@@ -13,12 +30,14 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,6 +50,7 @@ public class FilterManagerTest {
   @Mock private Blockchain blockchain;
   @Mock private BlockchainQueries blockchainQueries;
   @Mock private TransactionPool transactionPool;
+  @Spy final FilterRepository filterRepository = new FilterRepository();
 
   @Before
   public void setupTest() {
@@ -38,7 +58,8 @@ public class FilterManagerTest {
     this.blockGenerator = new BlockDataGenerator();
     this.currentBlock = blockGenerator.genesisBlock();
     this.filterManager =
-        new FilterManager(blockchainQueries, transactionPool, new FilterIdGenerator());
+        new FilterManager(
+            blockchainQueries, transactionPool, new FilterIdGenerator(), filterRepository);
   }
 
   @Test
@@ -48,13 +69,11 @@ public class FilterManagerTest {
 
   @Test
   public void installUninstallNewBlockFilter() {
-    assertThat(filterManager.blockFilterCount()).isEqualTo(0);
-
     final String filterId = filterManager.installBlockFilter();
-    assertThat(filterManager.blockFilterCount()).isEqualTo(1);
+    assertThat(filterRepository.exists(filterId)).isTrue();
 
     assertThat(filterManager.uninstallFilter(filterId)).isTrue();
-    assertThat(filterManager.blockFilterCount()).isEqualTo(0);
+    assertThat(filterRepository.exists(filterId)).isFalse();
 
     assertThat(filterManager.blockChanges(filterId)).isNull();
   }
@@ -117,15 +136,11 @@ public class FilterManagerTest {
 
   @Test
   public void installUninstallPendingTransactionFilter() {
-    assertThat(filterManager.pendingTransactionFilterCount()).isEqualTo(0);
-
     final String filterId = filterManager.installPendingTransactionFilter();
-    assertThat(filterManager.pendingTransactionFilterCount()).isEqualTo(1);
+    verify(filterRepository).save(any(Filter.class));
 
     assertThat(filterManager.uninstallFilter(filterId)).isTrue();
-    assertThat(filterManager.pendingTransactionFilterCount()).isEqualTo(0);
-
-    assertThat(filterManager.pendingTransactionChanges(filterId)).isNull();
+    verify(filterRepository).delete(eq(filterId));
   }
 
   @Test
@@ -182,6 +197,30 @@ public class FilterManagerTest {
     expectedHashes2.add(transactionHash4);
     assertThat(filterManager.pendingTransactionChanges(filterId1)).isEqualTo(expectedHashes1);
     assertThat(filterManager.pendingTransactionChanges(filterId2)).isEqualTo(expectedHashes2);
+  }
+
+  @Test
+  public void getBlockChangesShouldResetFilterExpireDate() {
+    BlockFilter filter = spy(new BlockFilter("foo"));
+    doReturn(Optional.of(filter))
+        .when(filterRepository)
+        .getFilter(eq("foo"), eq(BlockFilter.class));
+
+    filterManager.blockChanges("foo");
+
+    verify(filter).resetExpireTime();
+  }
+
+  @Test
+  public void getPendingTransactionsChangesShouldResetFilterExpireDate() {
+    PendingTransactionFilter filter = spy(new PendingTransactionFilter("foo"));
+    doReturn(Optional.of(filter))
+        .when(filterRepository)
+        .getFilter(eq("foo"), eq(PendingTransactionFilter.class));
+
+    filterManager.pendingTransactionChanges("foo");
+
+    verify(filter).resetExpireTime();
   }
 
   private Hash appendBlockToBlockchain() {

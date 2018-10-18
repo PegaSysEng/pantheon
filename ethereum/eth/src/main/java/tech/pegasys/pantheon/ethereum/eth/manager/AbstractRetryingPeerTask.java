@@ -1,5 +1,18 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.MaxRetriesReachedException;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeerTask;
 import tech.pegasys.pantheon.util.ExceptionUtils;
@@ -14,9 +27,12 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
 
   private static final Logger LOG = LogManager.getLogger();
   private final EthContext ethContext;
+  private final int maxRetries;
+  private int requestCount = 0;
 
-  public AbstractRetryingPeerTask(final EthContext ethContext) {
+  public AbstractRetryingPeerTask(final EthContext ethContext, final int maxRetries) {
     this.ethContext = ethContext;
+    this.maxRetries = maxRetries;
   }
 
   @Override
@@ -25,7 +41,12 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
       // Return if task is done
       return;
     }
+    if (requestCount > maxRetries) {
+      result.get().completeExceptionally(new MaxRetriesReachedException());
+      return;
+    }
 
+    requestCount += 1;
     executePeerTask()
         .whenComplete(
             (peerResult, error) -> {

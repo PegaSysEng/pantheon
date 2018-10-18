@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.p2p.netty;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -209,7 +221,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
             connection -> {
               // Reject incoming connections if we've reached our limit
               if (connections.size() >= maxPeers) {
-                LOG.info(
+                LOG.debug(
                     "Disconnecting incoming connection because connection limit of {} has been reached: {}",
                     maxPeers,
                     connection.getPeer().getNodeId());
@@ -223,7 +235,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
               }
 
               onConnectionEstablished(connection);
-              LOG.info(
+              LOG.debug(
                   "Successfully accepted connection from {}", connection.getPeer().getNodeId());
               logConnections();
             });
@@ -290,9 +302,9 @@ public final class NettyP2PNetwork implements P2PNetwork {
           pendingConnections.decrementAndGet();
           if (t == null) {
             onConnectionEstablished(connection);
-            LOG.info("Connection established to peer: {}", peer.getId());
+            LOG.debug("Connection established to peer: {}", peer.getId());
           } else {
-            LOG.warn("Failed to connect to peer {}: {}", peer.getId(), t);
+            LOG.debug("Failed to connect to peer {}: {}", peer.getId(), t);
           }
           logConnections();
         });
@@ -300,7 +312,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
   }
 
   private void logConnections() {
-    LOG.info(
+    LOG.debug(
         "Connections: {} pending, {} active connections.",
         pendingConnections.get(),
         connections.size());

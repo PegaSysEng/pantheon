@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -67,7 +79,7 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
 
   @Override
   public Account getOriginalAccount(final Address address) {
-    return world.get(address);
+    return world.getOriginalAccount(address);
   }
 
   @Override
@@ -160,9 +172,10 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
     @Nullable private BytesValue updatedCode; // Null if the underlying code has not been updated.
     @Nullable private Hash updatedCodeHash;
 
-    // Only contains update storage entries, but may contains entry with a value of 0 to signify
+    // Only contains updated storage entries, but may contains entry with a value of 0 to signify
     // deletion.
     private final SortedMap<UInt256, UInt256> updatedStorage;
+    private boolean storageWasCleared = false;
 
     UpdateTrackingAccount(final Address address) {
       checkNotNull(address);
@@ -281,6 +294,9 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
       if (value != null) {
         return value;
       }
+      if (storageWasCleared) {
+        return UInt256.ZERO;
+      }
 
       // We haven't updated the key-value yet, so either it's a new account and it doesn't have the
       // key, or we should query the underlying storage for its existing value (which might be 0).
@@ -316,14 +332,24 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
     }
 
     @Override
+    public void clearStorage() {
+      storageWasCleared = true;
+      updatedStorage.clear();
+    }
+
+    public boolean getStorageWasCleared() {
+      return storageWasCleared;
+    }
+
+    @Override
     public String toString() {
+      String storage = updatedStorage.isEmpty() ? "[not updated]" : updatedStorage.toString();
+      if (updatedStorage.isEmpty() && storageWasCleared) {
+        storage = "[cleared]";
+      }
       return String.format(
           "%s -> {nonce: %s, balance:%s, code:%s, storage:%s }",
-          address,
-          nonce,
-          balance,
-          updatedCode == null ? "[not updated]" : updatedCode,
-          updatedStorage.isEmpty() ? "[not updated]" : updatedStorage);
+          address, nonce, balance, updatedCode == null ? "[not updated]" : updatedCode, storage);
     }
   }
 
@@ -391,6 +417,9 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
         existing.setBalance(update.getBalance());
         if (update.codeWasUpdated()) {
           existing.setCode(update.getCode());
+        }
+        if (update.getStorageWasCleared()) {
+          existing.clearStorage();
         }
         update.getUpdatedStorage().forEach(existing::setStorageValue);
       }

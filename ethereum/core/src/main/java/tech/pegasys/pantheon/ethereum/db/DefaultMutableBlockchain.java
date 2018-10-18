@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.db;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -17,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -340,8 +353,10 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
         throw new IllegalStateException("Blockchain is missing genesis block data.");
       }
       if (!genesisHash.get().equals(genesisBlock.getHash())) {
-        throw new IllegalArgumentException(
-            "Supplied genesis block does not match stored chain data.");
+        throw new InvalidConfigurationException(
+            "Supplied genesis block does not match stored chain data.\n"
+                + "Please ensure the integrity of the file: \'pantheon/ethereum/core/src/main/resources/mainnet.json\'.\n"
+                + "To set a custom genesis file employ the runtime option \'--genesis=PATH_TO_FILE\'.");
       }
     }
   }

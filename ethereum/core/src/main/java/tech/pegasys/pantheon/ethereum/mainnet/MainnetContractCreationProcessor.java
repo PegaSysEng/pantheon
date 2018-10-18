@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.ethereum.core.Account;
@@ -76,10 +88,6 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
     final MutableAccount sender = frame.getWorldState().getMutable(frame.getSenderAddress());
     sender.decrementBalance(frame.getValue());
 
-    // TODO: Fix when tests are upstreamed or remove from test suit.
-    // EIP-68 mandates that contract creations cannot collide any more.
-    // While that EIP has been deferred, the General State reference tests
-    // incorrectly include this even in early hard forks.
     final MutableAccount contract = frame.getWorldState().getOrCreate(frame.getContractAddress());
     if (accountExists(contract)) {
       LOG.trace(
@@ -89,6 +97,7 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
     } else {
       contract.incrementBalance(frame.getValue());
       contract.setNonce(initialContractNonce);
+      contract.clearStorage();
       frame.setState(MessageFrame.State.CODE_EXECUTING);
     }
   }

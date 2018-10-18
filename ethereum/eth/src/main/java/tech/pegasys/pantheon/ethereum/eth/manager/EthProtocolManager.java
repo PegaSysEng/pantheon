@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -176,7 +188,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
             blockchain.getChainHeadHash(),
             genesisHash);
     try {
-      LOG.info("Sending status message to {}.", peer);
+      LOG.debug("Sending status message to {}.", peer);
       peer.send(status);
       peer.registerStatusSent();
     } catch (final PeerNotConnected peerNotConnected) {
@@ -191,13 +203,13 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final boolean initiatedByPeer) {
     ethPeers.registerDisconnect(connection);
     if (initiatedByPeer) {
-      LOG.info(
+      LOG.debug(
           "Peer requested to be disconnected ({}), {} peers left: {}",
           reason,
           ethPeers.peerCount(),
           ethPeers);
     } else {
-      LOG.info(
+      LOG.debug(
           "Disconnecting from peer ({}), {} peers left: {}",
           reason,
           ethPeers.peerCount(),
@@ -214,7 +226,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     final StatusMessage status = StatusMessage.readFrom(data);
     try {
       if (status.networkId() != networkId) {
-        LOG.info("Disconnecting from peer with mismatched network id: {}", status.networkId());
+        LOG.debug("Disconnecting from peer with mismatched network id: {}", status.networkId());
         peer.disconnect(DisconnectReason.SUBPROTOCOL_TRIGGERED);
       } else if (!status.genesisHash().equals(genesisHash)) {
         LOG.warn(
@@ -223,7 +235,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
             status.genesisHash());
         peer.disconnect(DisconnectReason.SUBPROTOCOL_TRIGGERED);
       } else {
-        LOG.info("Received status message from {}: {}", peer, status);
+        LOG.debug("Received status message from {}: {}", peer, status);
         peer.registerStatusReceived(status.bestHash(), status.totalDifficulty());
       }
     } catch (final RLPException e) {

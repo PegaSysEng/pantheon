@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
 import static java.util.Arrays.asList;
@@ -35,6 +47,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List<BlockHeader>> {
   private static final Logger LOG = LogManager.getLogger();
+  private static final int DEFAULT_RETRIES = 3;
 
   private final EthContext ethContext;
   private final ProtocolContext<C> protocolContext;
@@ -52,8 +65,9 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,
       final BlockHeader referenceHeader,
-      final int segmentLength) {
-    super(ethContext);
+      final int segmentLength,
+      final int maxRetries) {
+    super(ethContext, maxRetries);
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
@@ -70,14 +84,30 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,
       final BlockHeader referenceHeader,
+      final int segmentLength,
+      final int maxRetries) {
+    return new DownloadHeaderSequenceTask<>(
+        protocolSchedule, protocolContext, ethContext, referenceHeader, segmentLength, maxRetries);
+  }
+
+  public static <C> DownloadHeaderSequenceTask<C> endingAtHeader(
+      final ProtocolSchedule<C> protocolSchedule,
+      final ProtocolContext<C> protocolContext,
+      final EthContext ethContext,
+      final BlockHeader referenceHeader,
       final int segmentLength) {
     return new DownloadHeaderSequenceTask<>(
-        protocolSchedule, protocolContext, ethContext, referenceHeader, segmentLength);
+        protocolSchedule,
+        protocolContext,
+        ethContext,
+        referenceHeader,
+        segmentLength,
+        DEFAULT_RETRIES);
   }
 
   @Override
   protected CompletableFuture<?> executePeerTask() {
-    LOG.info(
+    LOG.debug(
         "Downloading headers from {} to {}.", startingBlockNumber, referenceHeader.getNumber() - 1);
     final CompletableFuture<List<BlockHeader>> task =
         downloadHeaders().thenCompose(this::processHeaders);
@@ -85,7 +115,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
         (r, t) -> {
           // We're done if we've filled all requested headers
           if (r != null && r.size() == segmentLength) {
-            LOG.info(
+            LOG.debug(
                 "Finished downloading headers from {} to {}.",
                 startingBlockNumber,
                 referenceHeader.getNumber() - 1);

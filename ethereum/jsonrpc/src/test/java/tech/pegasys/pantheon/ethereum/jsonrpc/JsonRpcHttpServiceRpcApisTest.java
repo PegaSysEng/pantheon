@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
 import static java.util.Collections.singletonList;
@@ -9,7 +21,6 @@ import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
@@ -130,7 +141,7 @@ public class JsonRpcHttpServiceRpcApisTest {
     }
   }
 
-  private JsonRpcConfiguration createJsonRpcConfigurationWithRpcApis(final RpcApis... rpcApis) {
+  private JsonRpcConfiguration createJsonRpcConfigurationWithRpcApis(final RpcApi... rpcApis) {
     final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
     config.setCorsAllowedDomains(singletonList("*"));
     config.setPort(0);
@@ -140,7 +151,7 @@ public class JsonRpcHttpServiceRpcApisTest {
     return config;
   }
 
-  private JsonRpcHttpService createJsonRpcHttpServiceWithRpcApis(final RpcApis... rpcApis) {
+  private JsonRpcHttpService createJsonRpcHttpServiceWithRpcApis(final RpcApi... rpcApis) {
     return createJsonRpcHttpServiceWithRpcApis(createJsonRpcConfigurationWithRpcApis(rpcApis));
   }
 

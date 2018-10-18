@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -18,13 +30,15 @@ public interface BlockBodyValidator<C> {
    * @param receipts The receipts that correspond to the blocks transactions
    * @param worldStateRootHash The rootHash defining the world state after processing this block and
    *     all of its transactions.
+   * @param ommerValidationMode The validation mode to use for ommer headers
    * @return {@code true} if valid; otherwise {@code false}
    */
   boolean validateBody(
       ProtocolContext<C> context,
       Block block,
       List<TransactionReceipt> receipts,
-      Hash worldStateRootHash);
+      Hash worldStateRootHash,
+      final HeaderValidationMode ommerValidationMode);
 
   /**
    * Validates that the block body is valid, but skips state root validation.
@@ -32,8 +46,12 @@ public interface BlockBodyValidator<C> {
    * @param context The context to validate against
    * @param block The block to validate
    * @param receipts The receipts that correspond to the blocks transactions
+   * @param ommerValidationMode The validation mode to use for ommer headers
    * @return {@code true} if valid; otherwise {@code false}
    */
   boolean validateBodyLight(
-      ProtocolContext<C> context, Block block, List<TransactionReceipt> receipts);
+      ProtocolContext<C> context,
+      Block block,
+      List<TransactionReceipt> receipts,
+      final HeaderValidationMode ommerValidationMode);
 }

@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.worldstate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -287,6 +299,149 @@ public class DefaultMutableWorldStateTest {
   }
 
   @Test
+  public void clearStorage() {
+    UInt256 storageKey = UInt256.of(1L);
+    UInt256 storageValue = UInt256.of(2L);
+
+    // Create a world state with one account
+    final MutableWorldState worldState = createEmpty();
+    final WorldUpdater updater = worldState.updater();
+    MutableAccount account = updater.createAccount(ADDRESS);
+    account.setBalance(Wei.of(100000));
+    account.setStorageValue(storageKey, storageValue);
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(storageValue);
+
+    // Clear storage
+    account = updater.getMutable(ADDRESS);
+    assertThat(account).isNotNull();
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(storageValue);
+    account.clearStorage();
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+
+    // Check storage is cleared after committing
+    updater.commit();
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+
+    // And after persisting
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+  }
+
+  @Test
+  public void clearStorage_AfterPersisting() {
+    UInt256 storageKey = UInt256.of(1L);
+    UInt256 storageValue = UInt256.of(2L);
+
+    // Create a world state with one account
+    final MutableWorldState worldState = createEmpty();
+    final WorldUpdater updater = worldState.updater();
+    MutableAccount account = updater.createAccount(ADDRESS);
+    account.setBalance(Wei.of(100000));
+    account.setStorageValue(storageKey, storageValue);
+    updater.commit();
+    worldState.persist();
+    assertNotNull(worldState.get(ADDRESS));
+    assertNotEquals(MerklePatriciaTrie.EMPTY_TRIE_ROOT_HASH, worldState.rootHash());
+
+    // Clear storage
+    account = updater.getMutable(ADDRESS);
+    assertThat(account).isNotNull();
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(storageValue);
+    account.clearStorage();
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(storageValue);
+
+    // Check storage is cleared after committing
+    updater.commit();
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+
+    // And after persisting
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(UInt256.ZERO);
+  }
+
+  @Test
+  public void clearStorageThenEdit() {
+    UInt256 storageKey = UInt256.of(1L);
+    UInt256 originalStorageValue = UInt256.of(2L);
+    UInt256 newStorageValue = UInt256.of(3L);
+
+    // Create a world state with one account
+    final MutableWorldState worldState = createEmpty();
+    final WorldUpdater updater = worldState.updater();
+    MutableAccount account = updater.createAccount(ADDRESS);
+    account.setBalance(Wei.of(100000));
+    account.setStorageValue(storageKey, originalStorageValue);
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(originalStorageValue);
+
+    // Clear storage then edit
+    account = updater.getMutable(ADDRESS);
+    assertThat(account).isNotNull();
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(originalStorageValue);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(originalStorageValue);
+    account.clearStorage();
+    account.setStorageValue(storageKey, newStorageValue);
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(newStorageValue);
+
+    // Check storage is cleared after committing
+    updater.commit();
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+
+    // And after persisting
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+  }
+
+  @Test
+  public void clearStorageThenEditAfterPersisting() {
+    UInt256 storageKey = UInt256.of(1L);
+    UInt256 originalStorageValue = UInt256.of(2L);
+    UInt256 newStorageValue = UInt256.of(3L);
+
+    // Create a world state with one account
+    final MutableWorldState worldState = createEmpty();
+    final WorldUpdater updater = worldState.updater();
+    MutableAccount account = updater.createAccount(ADDRESS);
+    account.setBalance(Wei.of(100000));
+    account.setStorageValue(storageKey, originalStorageValue);
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(originalStorageValue);
+    updater.commit();
+    worldState.persist();
+
+    // Clear storage then edit
+    account = updater.getMutable(ADDRESS);
+    assertThat(account).isNotNull();
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(originalStorageValue);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(originalStorageValue);
+    account.clearStorage();
+    account.setStorageValue(storageKey, newStorageValue);
+    assertThat(account.getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(originalStorageValue);
+
+    // Check storage is cleared after committing
+    updater.commit();
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+
+    // And after persisting
+    assertThat(updater.getMutable(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(updater.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+    assertThat(worldState.get(ADDRESS).getStorageValue(storageKey)).isEqualTo(newStorageValue);
+  }
+
+  @Test
   public void replaceAccountCode() {
     final MutableWorldState worldState = createEmpty();
     final WorldUpdater updater = worldState.updater();
@@ -331,7 +486,8 @@ public class DefaultMutableWorldStateTest {
     final WorldUpdater updater1 = worldState.updater();
     final MutableAccount account1 = updater1.createAccount(ADDRESS);
     updater1.commit();
-    assertThat(updater1.get(ADDRESS)).isEqualTo(account1);
+    assertThat(updater1.get(ADDRESS))
+        .isEqualToComparingOnlyGivenFields(account1, "address", "nonce", "balance", "codeHash");
     updater1.deleteAccount(ADDRESS);
 
     final WorldUpdater updater2 = updater1.updater();
