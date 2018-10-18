@@ -56,7 +56,7 @@ public class ProtocolSpec<C> {
    * @param transactionValidator the transaction validator to use
    * @param transactionProcessor the transaction processor to use
    * @param blockHeaderValidator the block header validator to use
-   * @param ommerValidator voilà
+   * @param ommerValidator the rules used to validate an ommer
    * @param blockBodyValidator the block body validator to use
    * @param blockProcessor the block processor to use
    * @param blockImporter the block importer to use
@@ -88,9 +88,7 @@ public class ProtocolSpec<C> {
     this.transactionValidator = transactionValidator;
     this.transactionProcessor = transactionProcessor;
     this.blockHeaderValidator = blockHeaderValidator;
-
     this.ommerValidator = ommerValidator;
-
     this.blockBodyValidator = blockBodyValidator;
     this.blockProcessor = blockProcessor;
     this.blockImporter = blockImporter;
