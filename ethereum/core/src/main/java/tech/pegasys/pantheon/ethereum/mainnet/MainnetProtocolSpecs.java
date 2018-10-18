@@ -82,7 +82,7 @@ public abstract class MainnetProtocolSpecs {
                     false))
         .difficultyCalculator(MainnetDifficultyCalculators.FRONTIER)
         .blockHeaderValidatorBuilder(MainnetBlockHeaderValidator::create)
-        .ommerValidatorBuilder(MainnetBlockHeaderValidator::createOmmerValidator)
+        .ommerHeaderValidatorBuilder(MainnetBlockHeaderValidator::createOmmerValidator)
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .transactionReceiptFactory(MainnetProtocolSpecs::frontierTransactionReceiptFactory)
         .blockReward(FRONTIER_BLOCK_REWARD)

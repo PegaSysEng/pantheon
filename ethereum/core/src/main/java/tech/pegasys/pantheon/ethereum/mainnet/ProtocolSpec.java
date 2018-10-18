@@ -30,7 +30,7 @@ public class ProtocolSpec<C> {
 
   private final BlockHeaderValidator<C> blockHeaderValidator;
 
-  private final BlockHeaderValidator<C> ommerValidator;
+  private final BlockHeaderValidator<C> ommerHeaderValidator;
 
   private final BlockBodyValidator<C> blockBodyValidator;
 
@@ -56,7 +56,7 @@ public class ProtocolSpec<C> {
    * @param transactionValidator the transaction validator to use
    * @param transactionProcessor the transaction processor to use
    * @param blockHeaderValidator the block header validator to use
-   * @param ommerValidator the rules used to validate an ommer
+   * @param ommerHeaderValidator the rules used to validate an ommer
    * @param blockBodyValidator the block body validator to use
    * @param blockProcessor the block processor to use
    * @param blockImporter the block importer to use
@@ -73,7 +73,7 @@ public class ProtocolSpec<C> {
       final TransactionValidator transactionValidator,
       final TransactionProcessor transactionProcessor,
       final BlockHeaderValidator<C> blockHeaderValidator,
-      final BlockHeaderValidator<C> ommerValidator,
+      final BlockHeaderValidator<C> ommerHeaderValidator,
       final BlockBodyValidator<C> blockBodyValidator,
       final BlockProcessor blockProcessor,
       final BlockImporter<C> blockImporter,
@@ -88,7 +88,7 @@ public class ProtocolSpec<C> {
     this.transactionValidator = transactionValidator;
     this.transactionProcessor = transactionProcessor;
     this.blockHeaderValidator = blockHeaderValidator;
-    this.ommerValidator = ommerValidator;
+    this.ommerHeaderValidator = ommerHeaderValidator;
     this.blockBodyValidator = blockBodyValidator;
     this.blockProcessor = blockProcessor;
     this.blockImporter = blockImporter;
@@ -153,8 +153,13 @@ public class ProtocolSpec<C> {
     return blockHeaderValidator;
   }
 
-  public BlockHeaderValidator<C> getOmmerValidator() {
-    return ommerValidator;
+  /**
+   * Returns the block ommer header validator used in this specification.
+   *
+   * @return the block ommer header validator
+   */
+  public BlockHeaderValidator<C> getOmmerHeaderValidator() {
+    return ommerHeaderValidator;
   }
 
   /**

@@ -218,7 +218,9 @@ public class MainnetBlockBodyValidator<C> implements BlockBodyValidator<C> {
       final BlockHeader ommer,
       final HeaderValidationMode ommerValidationMode) {
     final ProtocolSpec<C> protocolSpec = protocolSchedule.getByBlockNumber(ommer.getNumber());
-    if (!protocolSpec.getOmmerValidator().validateHeader(ommer, context, ommerValidationMode)) {
+    if (!protocolSpec
+        .getOmmerHeaderValidator()
+        .validateHeader(ommer, context, ommerValidationMode)) {
       return false;
     }
 
