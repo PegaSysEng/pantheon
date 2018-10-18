@@ -407,11 +407,14 @@ bintray {
   publish = true
 
   pkg {
-    repo = "pegasys-repo"
-    name = "pantheon"
-    userOrg = "consensys"
-    licenses = ["Apache-2.0"]
-    vcsUrl = "https://github.com/PegaSysEng/pantheon"
+    repo = 'pegasys-repo'
+    name = 'pantheon'
+    userOrg = 'consensys'
+    licenses = ['Apache-2.0']
+    websiteUrl = 'https://github.com/PegaSysEng/pantheon'
+    issueTrackerUrl = 'https://github.com/PegaSysEng/pantheon/issues'
+    vcsUrl = 'https://github.com/PegaSysEng/pantheon.git'
+
     version {
       name = project.version
       released  = new Date()

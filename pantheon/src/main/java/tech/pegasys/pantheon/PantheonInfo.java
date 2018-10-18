@@ -2,7 +2,7 @@ package tech.pegasys.pantheon;
 
 // This file is generated via a gradle task and should not be edited directly.
 public class PantheonInfo {
-  private static final String version = "pantheon/0.0.11-SNAPSHOT";
+  private static final String version = "pantheon/0.0.14-SNAPSHOT";
 
   private PantheonInfo() {}
 
