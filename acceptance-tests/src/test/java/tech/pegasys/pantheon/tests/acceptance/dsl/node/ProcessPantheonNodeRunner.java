@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
 
 import java.io.File;
 import java.io.IOException;

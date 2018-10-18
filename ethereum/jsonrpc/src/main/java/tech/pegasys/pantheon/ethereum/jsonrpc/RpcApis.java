@@ -12,36 +12,29 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.DEBUG;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.ETH;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.MINER;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.NET;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.WEB3;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
 public class RpcApis {
-  public static final RpcApi ETH = new ETH();
-  public static final RpcApi DEBUG = new DEBUG();
-  public static final RpcApi MINER = new MINER();
-  public static final RpcApi NET = new NET();
-  public static final RpcApi WEB3 = new WEB3();
+  public static final RpcApi ETH = new RpcApi("ETH");
+  public static final RpcApi DEBUG = new RpcApi("DEBUG");
+  public static final RpcApi MINER = new RpcApi("MINER");
+  public static final RpcApi NET = new RpcApi("NET");
+  public static final RpcApi WEB3 = new RpcApi("WEB3");
 
   public static final Collection<RpcApi> DEFAULT_JSON_RPC_APIS = Arrays.asList(ETH, NET, WEB3);
 
   public static final Optional<RpcApi> valueOf(final String name) {
-    if (name.equals(ETH.name())) {
+    if (name.equals(ETH.getCliValue())) {
       return Optional.of(ETH);
-    } else if (name.equals(DEBUG.name())) {
+    } else if (name.equals(DEBUG.getCliValue())) {
       return Optional.of(DEBUG);
-    } else if (name.equals(MINER.name())) {
+    } else if (name.equals(MINER.getCliValue())) {
       return Optional.of(MINER);
-    } else if (name.equals(NET.name())) {
+    } else if (name.equals(NET.getCliValue())) {
       return Optional.of(NET);
-    } else if (name.equals(WEB3.name())) {
+    } else if (name.equals(WEB3.getCliValue())) {
       return Optional.of(WEB3);
     } else {
       return Optional.empty();
@@ -49,6 +42,6 @@ public class RpcApis {
   }
 
   public static final String getValue(final RpcApi rpcapi) {
-    return rpcapi.name();
+    return rpcapi.getCliValue();
   }
 }

@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

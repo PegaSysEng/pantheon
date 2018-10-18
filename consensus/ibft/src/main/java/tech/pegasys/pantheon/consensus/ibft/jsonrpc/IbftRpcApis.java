@@ -12,23 +12,22 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.jsonrpc;
 
-import tech.pegasys.pantheon.consensus.ibft.jsonrpc.rpcapi.IBFT;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 
 import java.util.Optional;
 
 public class IbftRpcApis {
-  public static final RpcApi IBFT = new IBFT();
+  public static final RpcApi IBFT = new RpcApi("IBFT");
 
   public static final Optional<RpcApi> valueOf(final String name) {
-    if (name.equals(IBFT.name())) {
+    if (name.equals(IBFT.getCliValue())) {
       return Optional.of(IBFT);
     } else {
       return Optional.empty();
     }
   }
 
-  public static final String getValue(final RpcApi rpcapi) {
-    return rpcapi.name();
+  public static final String getName(final RpcApi rpcapi) {
+    return rpcapi.getCliValue();
   }
 }

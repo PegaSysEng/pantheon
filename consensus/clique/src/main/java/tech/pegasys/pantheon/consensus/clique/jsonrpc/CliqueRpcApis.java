@@ -12,23 +12,22 @@
  */
 package tech.pegasys.pantheon.consensus.clique.jsonrpc;
 
-import tech.pegasys.pantheon.consensus.clique.jsonrpc.rpcapi.CLIQUE;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 
 import java.util.Optional;
 
 public class CliqueRpcApis {
-  public static final RpcApi CLIQUE = new CLIQUE();
+  public static final RpcApi CLIQUE = new RpcApi("CLIQUE");
 
   public static final Optional<RpcApi> valueOf(final String name) {
-    if (name.equals(CLIQUE.name())) {
+    if (name.equals(CLIQUE.getCliValue())) {
       return Optional.of(CLIQUE);
     } else {
       return Optional.empty();
     }
   }
 
-  public static final String getValue(final RpcApi rpcapi) {
-    return rpcapi.name();
+  public static final String getName(final RpcApi rpcapi) {
+    return rpcapi.getCliValue();
   }
 }

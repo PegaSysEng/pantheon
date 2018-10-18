@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.websocket;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.jsonrpc.rpcapi.RpcApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
