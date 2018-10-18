@@ -17,6 +17,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
+import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
+import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -25,9 +27,11 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.BlockchainImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -43,11 +47,14 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.google.common.net.HostAndPort;
 import io.vertx.core.Vertx;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
 import picocli.CommandLine.Command;
@@ -72,7 +79,6 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements Runnable {
-  private static final Logger LOG = LogManager.getLogger();
 
   private static final int DEFAULT_MAX_PEERS = 25;
 
@@ -93,19 +99,23 @@ public class PantheonCommand implements Runnable {
 
   private static final String CONFIG_FILE_OPTION_NAME = "--config";
 
-  public static class RpcApisEnumConverter implements ITypeConverter<RpcApis> {
+  public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
-    public RpcApis convert(final String s) throws RpcApisEnumConvertionException {
-      try {
-        return RpcApis.valueOf(s.trim().toUpperCase());
-      } catch (final IllegalArgumentException e) {
-        throw new RpcApisEnumConvertionException("Invalid value: " + s);
-      }
+    public RpcApi convert(final String name) throws RpcApisConversionException {
+      String uppercaseName = name.trim().toUpperCase();
+
+      return Stream.<Function<String, Optional<RpcApi>>>of(
+              RpcApis::valueOf, CliqueRpcApis::valueOf, IbftRpcApis::valueOf)
+          .map(f -> f.apply(uppercaseName))
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .findFirst()
+          .orElseThrow(() -> new RpcApisConversionException("Invalid value: " + name));
     }
   }
 
-  public static class RpcApisEnumConvertionException extends Exception {
-    RpcApisEnumConvertionException(final String s) {
+  public static class RpcApisConversionException extends Exception {
+    RpcApisConversionException(final String s) {
       super(s);
     }
   }
@@ -265,10 +275,11 @@ public class PantheonCommand implements Runnable {
     paramLabel = "<api name>",
     split = ",",
     arity = "1..*",
-    converter = RpcApisEnumConverter.class,
+    converter = RpcApisConverter.class,
     description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}"
   )
-  private final Collection<RpcApis> rpcApis = Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
+  private final Collection<RpcApi> rpcApis =
+      Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, CliqueRpcApis.CLIQUE, IbftRpcApis.IBFT);
 
   @Option(
     names = {"--ws-enabled"},
@@ -291,10 +302,11 @@ public class PantheonCommand implements Runnable {
     paramLabel = "<api name>",
     split = ",",
     arity = "1..*",
-    converter = RpcApisEnumConverter.class,
+    converter = RpcApisConverter.class,
     description = "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}"
   )
-  private final Collection<RpcApis> wsApis = Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
+  private final Collection<RpcApi> wsApis =
+      Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, CliqueRpcApis.CLIQUE, IbftRpcApis.IBFT);
 
   @Option(
     names = {"--dev-mode"},
@@ -303,6 +315,12 @@ public class PantheonCommand implements Runnable {
             + "and reduced difficulty to enable CPU mining (default: ${DEFAULT-VALUE})."
   )
   private final Boolean isDevMode = false;
+
+  @Option(
+    names = {"--logging", "-l"},
+    description = "Logging verbosity: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
+  )
+  private final Level logLevel = null;
 
   @Option(
     names = {"--miner-enabled"},
@@ -363,10 +381,11 @@ public class PantheonCommand implements Runnable {
     commandLine.addSubcommand("import-blockchain", importBlockchainSubCommand);
     commandLine.addSubcommand("export-pub-key", new ExportPublicKeySubCommand());
 
-    commandLine.registerConverter(HostAndPort.class, HostAndPort::fromString);
-    commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(Address.class, Address::fromHexString);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
+    commandLine.registerConverter(HostAndPort.class, HostAndPort::fromString);
+    commandLine.registerConverter(Level.class, Level::valueOf);
+    commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
 
     // Create a handler that will search for a config file option and use it for default values
@@ -379,6 +398,12 @@ public class PantheonCommand implements Runnable {
 
   @Override
   public void run() {
+    // set log level per CLI flags
+    if (logLevel != null) {
+      System.out.println("Setting logging level to " + logLevel.name());
+      Configurator.setAllLevels("", logLevel);
+    }
+
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
       System.out.println(
@@ -406,6 +431,8 @@ public class PantheonCommand implements Runnable {
           syncWithOttoman,
           new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled),
           isDevMode);
+    } catch (final InvalidConfigurationException e) {
+      throw new ExecutionException(new CommandLine(this), e.getMessage());
     } catch (final IOException e) {
       throw new ExecutionException(new CommandLine(this), "Invalid path", e);
     }
