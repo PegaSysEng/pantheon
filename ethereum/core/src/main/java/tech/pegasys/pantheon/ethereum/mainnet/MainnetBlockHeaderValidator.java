@@ -19,9 +19,9 @@ import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ConstantFiel
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ExtraDataMaxLengthValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasLimitRangeAndDeltaValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasUsageValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.NotTooLate;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.NotTooSoon;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ProofOfWorkValidationRule;
+import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampBoundedByFutureParameter;
+import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampMoreRecentThanParent;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public final class MainnetBlockHeaderValidator {
@@ -54,7 +54,7 @@ public final class MainnetBlockHeaderValidator {
         .addRule(new AncestryValidationRule())
         .addRule(new GasLimitRangeAndDeltaValidationRule(MIN_GAS_LIMIT, MAX_GAS_LIMIT))
         .addRule(new GasUsageValidationRule())
-        .addRule(new NotTooLate(MINIMUM_SECONDS_SINCE_PARENT))
+        .addRule(new TimestampMoreRecentThanParent(MINIMUM_SECONDS_SINCE_PARENT))
         .addRule(new ExtraDataMaxLengthValidationRule(BlockHeader.MAX_EXTRA_DATA_BYTES))
         .addRule(new ProofOfWorkValidationRule())
         .build();
@@ -67,8 +67,8 @@ public final class MainnetBlockHeaderValidator {
         .addRule(new AncestryValidationRule())
         .addRule(new GasLimitRangeAndDeltaValidationRule(MIN_GAS_LIMIT, MAX_GAS_LIMIT))
         .addRule(new GasUsageValidationRule())
-        .addRule(new NotTooLate(MINIMUM_SECONDS_SINCE_PARENT))
-        .addRule(new NotTooSoon(TIMESTAMP_TOLERANCE_S))
+        .addRule(new TimestampMoreRecentThanParent(MINIMUM_SECONDS_SINCE_PARENT))
+        .addRule(new TimestampBoundedByFutureParameter(TIMESTAMP_TOLERANCE_S))
         .addRule(new ExtraDataMaxLengthValidationRule(BlockHeader.MAX_EXTRA_DATA_BYTES))
         .addRule(new ProofOfWorkValidationRule());
   }

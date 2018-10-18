@@ -26,8 +26,8 @@ public class TimestampValidationRuleTest {
 
   @Test
   public void headerTimestampSufficientlyFarIntoFutureVadidatesSuccessfully() {
-    final NotTooSoon uut00 = new NotTooSoon(0);
-    final NotTooLate uut01 = new NotTooLate(10);
+    final TimestampBoundedByFutureParameter uut00 = new TimestampBoundedByFutureParameter(0);
+    final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
@@ -44,14 +44,14 @@ public class TimestampValidationRuleTest {
 
   @Test
   public void headerTimestampDifferenceMustBePositive() {
-    Assertions.assertThatThrownBy(() -> new NotTooLate(-1))
+    Assertions.assertThatThrownBy(() -> new TimestampMoreRecentThanParent(-1))
         .hasMessage("minimumSecondsSinceParent must be positive");
   }
 
   @Test
   public void headerTimestampTooCloseToParentFailsValidation() {
-    final NotTooSoon uut00 = new NotTooSoon(0);
-    final NotTooLate uut01 = new NotTooLate(10);
+    final TimestampBoundedByFutureParameter uut00 = new TimestampBoundedByFutureParameter(0);
+    final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
@@ -68,8 +68,8 @@ public class TimestampValidationRuleTest {
 
   @Test
   public void headerTimestampIsBehindParentFailsValidation() {
-    final NotTooSoon uut00 = new NotTooSoon(0);
-    final NotTooLate uut01 = new NotTooLate(10);
+    final TimestampBoundedByFutureParameter uut00 = new TimestampBoundedByFutureParameter(0);
+    final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
@@ -88,8 +88,9 @@ public class TimestampValidationRuleTest {
   public void headerNewerThanCurrentSystemFailsValidation() {
     final long acceptableClockDrift = 5;
 
-    final NotTooSoon uut00 = new NotTooSoon(acceptableClockDrift);
-    final NotTooLate uut01 = new NotTooLate(10);
+    final TimestampBoundedByFutureParameter uut00 =
+        new TimestampBoundedByFutureParameter(acceptableClockDrift);
+    final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
@@ -110,8 +111,9 @@ public class TimestampValidationRuleTest {
   public void futureHeadersAreValidIfTimestampWithinTolerance() {
     final long acceptableClockDrift = 5;
 
-    final NotTooSoon uut00 = new NotTooSoon(acceptableClockDrift);
-    final NotTooLate uut01 = new NotTooLate(10);
+    final TimestampBoundedByFutureParameter uut00 =
+        new TimestampBoundedByFutureParameter(acceptableClockDrift);
+    final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 

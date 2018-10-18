@@ -20,16 +20,13 @@ import tech.pegasys.pantheon.ethereum.mainnet.DetachedBlockHeaderValidationRule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Responsible for ensuring the timestamp of a block is newer than its parent, but also that it has
- * a timestamp not more than "acceptableClockDriftSeconds' into the future.
- */
-public class NotTooLate implements DetachedBlockHeaderValidationRule {
+/** Responsible for ensuring the timestamp of a block is newer than its parent. */
+public class TimestampMoreRecentThanParent implements DetachedBlockHeaderValidationRule {
 
   private final Logger LOG = LogManager.getLogger();
   private final long minimumSecondsSinceParent;
 
-  public NotTooLate(final long minimumSecondsSinceParent) {
+  public TimestampMoreRecentThanParent(final long minimumSecondsSinceParent) {
     checkArgument(minimumSecondsSinceParent >= 0, "minimumSecondsSinceParent must be positive");
     this.minimumSecondsSinceParent = minimumSecondsSinceParent;
   }

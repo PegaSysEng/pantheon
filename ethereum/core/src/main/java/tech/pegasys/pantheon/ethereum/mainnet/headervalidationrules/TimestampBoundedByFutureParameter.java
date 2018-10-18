@@ -21,15 +21,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Responsible for ensuring the timestamp of a block is newer than its parent, but also that it has
- * a timestamp not more than "acceptableClockDriftSeconds' into the future.
+ * Responsible for ensuring the timestamp of a block is not more than "acceptableClockDriftSeconds'
+ * into the future.
  */
-public class NotTooSoon implements DetachedBlockHeaderValidationRule {
+public class TimestampBoundedByFutureParameter implements DetachedBlockHeaderValidationRule {
 
   private final Logger LOG = LogManager.getLogger();
   private final long acceptableClockDriftSeconds;
 
-  public NotTooSoon(final long acceptableClockDriftSeconds) {
+  public TimestampBoundedByFutureParameter(final long acceptableClockDriftSeconds) {
     this.acceptableClockDriftSeconds = acceptableClockDriftSeconds;
   }
 
