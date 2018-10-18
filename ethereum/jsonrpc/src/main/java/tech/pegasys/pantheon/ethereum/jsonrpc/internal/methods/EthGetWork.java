@@ -55,7 +55,7 @@ public class EthGetWork implements JsonRpcMethod {
       };
       return new JsonRpcSuccessResponse(req.getId(), result);
     } else {
-      LOG.error("Mining is not operational, eth_getWork request cannot be processed");
+      LOG.trace("Mining is not operational, eth_getWork request cannot be processed");
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NO_MINING_WORK_FOUND);
     }
   }
