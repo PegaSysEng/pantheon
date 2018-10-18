@@ -5,17 +5,16 @@ https://github.com/PegaSysEng/pantheon/blob/master/CONTRIBUTING.md#your-first-co
 https://github.com/PegaSysEng/pantheon/blob/master/CONTRIBUTING.md#pull-request-labels
 -->
 
-## PR Description
+## PR description
 
 <!--- Describe your changes in detail, including motivation and context -->
 
 **Which issue(s) this PR fixes** *(optional, in `fixes #<issue number>(, fixes #<issue_number>, ...)` format, will close the issue(s) when PR gets merged)*:
 Fixes #
 
-## Related Issue
+## Related Issue(s)
 
-<!--- This project only accepts pull requests related to open issues -->
-<!--- Please link to the issue here: -->
+<!--- Please link to related issue(s) here: -->
 
 ## Types of changes
 
@@ -39,8 +38,6 @@ Fixes #
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
 <!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
 - [ ] I have read the **CONTRIBUTING.md** document and followed the guidelines there.
-- [ ] This code follows the style guidelines of this project
-- [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have opened an issue for corresponding changes to documentation (OR no doc changes required)
 - [ ] I have added appropriate tests that prove my change is effective
