@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.AncestryVali
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ConstantFieldValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasLimitRangeAndDeltaValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasUsageValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampValidationRule;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 public class IbftBlockHeaderValidationRulesetFactory {

@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class NotTooLate implements DetachedBlockHeaderValidationRule {
 
-  private final Logger LOG = LogManager.getLogger(TimestampValidationRule.class);
+  private final Logger LOG = LogManager.getLogger();
   private final long minimumSecondsSinceParent;
 
   public NotTooLate(final long minimumSecondsSinceParent) {
