@@ -122,14 +122,20 @@ allprojects {
       target '**/*.groovy'
       licenseHeaderFile "${rootDir}/gradle/spotless.java.license", 'import'
     }
-    format 'bash', {
-      target '**/*.sh'
-      licenseHeaderFile "${rootDir}/gradle/spotless.bash.license", '#!/bin'
-    }
-    format 'sol', {
-      target '**/*.sol'
-      licenseHeaderFile "${rootDir}/gradle/spotless.java.license", '^(pragma|contract)'
-    }
+
+    // Currently disabled due to referencetest issues
+
+    //  format 'bash', {
+    //    target fileTree('.') {
+    //      include '**/*.sh'
+    //     exclude '**/ansible/**'
+    //    }
+    //   licenseHeaderFile "${rootDir}/gradle/spotless.bash.license", '#!/bin'
+    //  }
+    //  format 'sol', {
+    //    target fileTree('.') { include '**/*.sol' }
+    //   licenseHeaderFile "${rootDir}/gradle/spotless.java.license", '^(pragma|contract)'
+    //  }
   }
 
   tasks.withType(JavaCompile) {
