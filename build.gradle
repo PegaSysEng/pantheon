@@ -1,4 +1,5 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
+import java.text.SimpleDateFormat
 
 plugins {
   id 'com.diffplug.gradle.spotless' version '3.13.0'
@@ -420,28 +421,56 @@ afterReleaseBuild.dependsOn bintrayUpload
 bintrayUpload.mustRunAfter(distTar)
 bintrayUpload.mustRunAfter(distZip)
 
-task dockerHubUpload{
+// dockerBuild task can be used alone to build a local image
+task dockerBuild{
+  description = 'Build a docker image with Pantheon'
+  group = 'build'
 
-  def user = project.hasProperty('dockerHubUser') ? project.property('dockerHubUser') : System.getenv('DOCKER_HUB_USER')
-  def pass = project.hasProperty('dockerHubPass') ? project.property('dockerHubPass') : System.getenv('DOCKER_HUB_PASS')
-  def imageName = "${user}/pantheon"
-  def tags = [
-    "latest",
-    "${project.version}"
-  ]
+  def org = System.getenv("DOCKER_HUB_ORG") ?: project.property('dockerHubOrg')
+  project.ext.dockerHubImageName = "${org}/pantheon"
 
-  doFirst {
+  def gitHash = null
+  try {
+    gitHash = "${versionDetails().gitHashFull}"
+  } catch (IOException e) {
+    println("No git app installed, skipping git hash retrieval: " + e)
+  }
+
+  doLast {
     exec {
       //build the image
       setExecutable("docker")
       setArgs([
         "build",
         "-t",
-        "${imageName}",
+        "${dockerHubImageName}",
+        "--label",
+        "org.label-schema.version=${project.version}",
+        "--label",
+        "org.label-schema.build-date=${new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date())}",
+        gitHash != null ? "--label" : "",
+        gitHash != null ? "org.label-schema.vcs-ref=${gitHash}" : "",
+        "--label",
+        "org.label-schema.docker.cmd=docker run -d \
+--mount source=pantheon_database,target=/opt/pantheon/database \
+--name CONTAINER-NAME ${dockerHubImageName}",
         "."
       ])
     }
   }
+}
+
+task dockerUpload(dependsOn: dockerBuild){
+  description = 'Push the latest Pantheon docker that was build to Docker Hub'
+  group = 'publishing'
+
+  def user = project.hasProperty('dockerHubUser') ? project.property('dockerHubUser') : System.getenv('DOCKER_HUB_USER')
+  def pass = project.hasProperty('dockerHubPass') ? project.property('dockerHubPass') : System.getenv('DOCKER_HUB_PASS')
+  def tags = [
+    "latest",
+    "${project.version}"
+  ]
+
   doLast {
     // login to Docker Hub
     exec {
@@ -456,21 +485,21 @@ task dockerHubUpload{
     }
 
     for (tag in tags ) {
-      //tag images
+      //tag image
       exec {
         setExecutable("docker")
         setArgs([
           "tag",
-          "${imageName}",
-          "${imageName}:${tag}"
+          "${dockerHubImageName}",
+          "${dockerHubImageName}:${tag}"
         ])
       }
-      // push images
+      // push tagged image
       exec {
         setExecutable("docker")
         setArgs([
           "push",
-          "${imageName}:${tag}"
+          "${dockerHubImageName}:${tag}"
         ])
       }
     }
@@ -483,4 +512,4 @@ task dockerHubUpload{
   }
 }
 
-afterReleaseBuild.dependsOn dockerHubUpload
+afterReleaseBuild.dependsOn dockerUpload

@@ -34,6 +34,18 @@ RUN ./gradlew installDist
 
 # final image with only jre
 FROM openjdk:8-jre-slim
+
+# labels are set using the http://label-schema.org/rc1/ convention
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.vendor="Pegasys"
+LABEL org.label-schema.url="https://pegasys.tech"
+LABEL org.label-schema.name="Pantheon"
+LABEL org.label-schema.vcs-url="https://github.com/PegaSysEng/pantheon"
+LABEL org.label-schema.description="Pantheon is an Apache 2.0 licensed, blockchain platform, \
+written in Java, currently supporting Ethereum mainnet & testnet, \
+permissionless & permissioned networks."
+LABEL org.label-schema.docker.cmd.help="docker exec -it CONTAINER-NAME /opt/pantheon/bin/pantheon --help"
+
 # copy application from builder image
 COPY --from=builder /tmp/pantheon/build/install/pantheon /opt/pantheon/
 # List Exposed Ports
