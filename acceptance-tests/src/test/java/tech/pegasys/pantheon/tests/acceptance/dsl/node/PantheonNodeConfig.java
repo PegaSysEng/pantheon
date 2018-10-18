@@ -12,33 +12,37 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import static tech.pegasys.pantheon.cli.EthNetworkConfig.mainnet;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import java.util.function.Function;
+import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
+import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class PantheonNodeConfig {
-  private static final int NETWORK_ID = 10;
   private final String name;
   private final MiningParameters miningParameters;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
-  private final EthNetworkConfig ethNetworkConfig;
+  private final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig;
   private final boolean devMode;
-  private final Optional<Path> keyPath;
   private ServerSocket serverSocket;
 
   private PantheonNodeConfig(
@@ -46,17 +50,15 @@ public class PantheonNodeConfig {
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
-      final EthNetworkConfig ethNetworkConfig,
-      final boolean devMode,
-      final Path keyPath
+      final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig,
+      final boolean devMode
   ) {
     this.name = name;
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
-    this.ethNetworkConfig = ethNetworkConfig;
+    this.genesisConfig = genesisConfig;
     this.devMode = devMode;
-    this.keyPath = Optional.of(keyPath);
   }
 
   private PantheonNodeConfig(
@@ -68,9 +70,8 @@ public class PantheonNodeConfig {
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
-    this.ethNetworkConfig = createEthNetworkConfig();
+    this.genesisConfig = (ignore) -> Optional.empty();
     this.devMode = true;
-    this.keyPath = Optional.empty();
   }
 
   private PantheonNodeConfig(final String name, final MiningParameters miningParameters) {
@@ -78,9 +79,8 @@ public class PantheonNodeConfig {
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = createJsonRpcConfig();
     this.webSocketConfiguration = createWebSocketConfig();
-    this.ethNetworkConfig = createEthNetworkConfig();
+    this.genesisConfig = (ignore) -> Optional.empty();
     this.devMode = true;
-    this.keyPath = Optional.empty();
   }
 
   private static MiningParameters createMiningParameters(final boolean miner) {
@@ -114,19 +114,14 @@ public class PantheonNodeConfig {
         name, createMiningParameters(false), jsonRpcConfig, webSocketConfig);
   }
 
-  public static PantheonNodeConfig pantheonCliqueNode(final String name, final String cliqueGenesis, final String keyFile) throws URISyntaxException {
-    final URI genesisConfig = Resources.getResource(cliqueGenesis).toURI();
-    final Path keyPath = Paths.get(Resources.getResource(keyFile).toURI());
-    final EthNetworkConfig ethNetworkConfig = new EthNetworkConfig.Builder(EthNetworkConfig.defaultConfig())
-        .setGenesisConfig(genesisConfig).build();
+  public static PantheonNodeConfig pantheonCliqueMinerNode(final String name) {
     return new PantheonNodeConfig(
         name,
         createMiningParameters(true),
         createJsonRpcConfig(),
         createWebSocketConfig(),
-        ethNetworkConfig,
-        false,
-        keyPath
+        PantheonNodeConfig::createGenesisConfig,
+        false
     );
   }
 
@@ -144,8 +139,25 @@ public class PantheonNodeConfig {
     return config;
   }
 
-  private EthNetworkConfig createEthNetworkConfig() {
-    return new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build();
+  private static Optional<String> createGenesisConfig(Iterable<PantheonNode> pantheonNodes) {
+    String genesisTemplate = cliqueGenesisTemplateConfig();
+    String cliqueExtraData = encodeCliqueExtraData(pantheonNodes);
+    String genesis = genesisTemplate.replaceAll("%cliqueExtraData%", cliqueExtraData);
+    return Optional.of(genesis);
+  }
+
+  private static String cliqueGenesisTemplateConfig() {
+    try {
+      URI uri = Resources.getResource("clique/clique.json").toURI();
+      return Resources.toString(uri.toURL(), Charset.defaultCharset());
+    } catch (URISyntaxException | IOException e) {
+      throw new IllegalStateException("Unable to get test clique genesis config");
+    }
+  }
+
+  private static String encodeCliqueExtraData(Iterable<PantheonNode> nodes) {
+    final List<PrivateKey> privateKeys = stream(nodes.spliterator(), false).map(node -> node.keyPair().getPrivateKey()).collect(toList());
+    return CliqueExtraData.createGenesisExtraDataString(privateKeys);
   }
 
   public void initSocket() throws IOException {
@@ -176,15 +188,12 @@ public class PantheonNodeConfig {
     return webSocketConfiguration;
   }
 
-  public EthNetworkConfig getEthNetworkConfig() {
-    return ethNetworkConfig;
+  public Function<Iterable<PantheonNode>, Optional<String>> getGenesisConfig() {
+    return genesisConfig;
   }
 
   public boolean isDevMode() {
     return devMode;
   }
 
-  public Optional<Path> getKeyPath() {
-    return keyPath;
-  }
 }

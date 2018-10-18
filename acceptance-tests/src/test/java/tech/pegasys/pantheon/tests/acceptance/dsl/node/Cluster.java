@@ -16,14 +16,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.web3j.utils.Convert.Unit;
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 
 
 public class Cluster implements AutoCloseable {
+
+  private static final Logger LOG = LogManager.getLogger(Cluster.class);
+  public static final int NETWORK_ID = 10;
 
   private final Map<String, PantheonNode> nodes = new HashMap<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
@@ -38,8 +49,23 @@ public class Cluster implements AutoCloseable {
       bootNodes.add(node.enodeUrl());
     }
 
+    // TODO create clique genesis file
+    // TODO how do we know it's a clique config?
+
+    // TODO provide a config file creator?
+    // (nodes[] -> genesis file)
+    // need to know it's a clique cluster?
+    // only apply to clique nodes?
+    // each node could use same factory? cache result if needed to improve performance?
+    // need to handle null case?
+    // factory to create ethNod
+
     for (final PantheonNode node : nodes) {
       node.bootnodes(bootNodes);
+      Optional<EthNetworkConfig> ethNetworkConfig = node.getGenesisConfig()
+          .apply(Arrays.asList(nodes))
+          .map(config -> new EthNetworkConfig(() -> config, NETWORK_ID, bootNodes));
+      node.ethNetworkConfig(ethNetworkConfig);
       node.start(pantheonNodeRunner);
     }
 
@@ -72,9 +98,8 @@ public class Cluster implements AutoCloseable {
             config.getMiningParameters(),
             config.getJsonRpcConfiguration(),
             config.getWebSocketConfiguration(),
-            config.getEthNetworkConfig(),
             config.isDevMode(),
-            config.getKeyPath());
+            config.getGenesisConfig());
     config.closeSocket();
     return node;
   }

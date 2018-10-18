@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
 
 import java.io.File;
@@ -48,7 +49,9 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     params.add("--datadir");
     params.add(dataDir.toAbsolutePath().toString());
 
-    params.add("--dev-mode");
+    if (node.isDevMode()) {
+      params.add("--dev-mode");
+    }
 
     params.add("--p2p-listen");
     params.add(node.p2pListenAddress());
@@ -76,6 +79,13 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add(node.wsRpcListenAddress().get());
       params.add("--ws-api");
       params.add(apiList(node.webSocketConfiguration().getRpcApis()));
+    }
+
+    EthNetworkConfig ethNetworkConfig = null;
+    if (!ethNetworkConfig.equals(EthNetworkConfig.defaultConfig())) {
+      // TODO this needs to be a file, copy the uri to a temporary file so that resources can be used in acceptance tests
+      params.add("--genesis" + ethNetworkConfig.getGenesisConfig());
+      params.add("--network-id" + ethNetworkConfig.getNetworkId());
     }
 
     final ProcessBuilder processBuilder =

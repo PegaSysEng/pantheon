@@ -49,11 +49,9 @@ public class PantheonControllerBuilder {
           ethNetworkConfig.getNetworkId(),
           nodeKeys);
     } else {
-      final String genesisConfig =
-          Resources.toString(ethNetworkConfig.getGenesisConfig().toURL(), UTF_8);
       return PantheonController.fromConfig(
           synchronizerConfiguration,
-          genesisConfig,
+          ethNetworkConfig.getGenesisConfig(),
           homePath,
           syncWithOttoman,
           ethNetworkConfig.getNetworkId(),

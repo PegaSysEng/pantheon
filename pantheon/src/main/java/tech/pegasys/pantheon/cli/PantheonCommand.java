@@ -13,7 +13,9 @@
 package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.io.Resources;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
@@ -544,7 +546,13 @@ public class PantheonCommand implements Runnable {
   private EthNetworkConfig updateNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
     EthNetworkConfig.Builder builder = new EthNetworkConfig.Builder(ethNetworkConfig);
     if (genesisFile != null) {
-      builder.setGenesisConfig(genesisFile.toPath().toUri());
+      builder.setGenesisConfig(() -> {
+        try {
+          return Resources.toString(genesisFile.toURI().toURL(), UTF_8);
+        } catch (IOException e) {
+          throw new IllegalStateException("");
+        }
+      });
     }
     if (networkId != null) {
       builder.setNetworkId(networkId);

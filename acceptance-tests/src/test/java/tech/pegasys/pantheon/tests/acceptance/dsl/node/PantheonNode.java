@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.Logger;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
@@ -44,6 +45,8 @@ import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
@@ -64,13 +67,14 @@ public class PantheonNode implements Node, AutoCloseable {
   private final boolean jsonRpcEnabled;
   private final boolean wsRpcEnabled;
   private final Properties portsProperties = new Properties();
-  private final EthNetworkConfig ethNetworkConfig;
+  private final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig;
   private final boolean devMode;
 
   private List<String> bootnodes = new ArrayList<>();
   private Eth eth;
   private Web3 web3;
   private Web3j web3j;
+  private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
 
   public PantheonNode(
       final String name,
@@ -78,12 +82,10 @@ public class PantheonNode implements Node, AutoCloseable {
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
-      final EthNetworkConfig ethNetworkConfig,
       final boolean devMode,
-      final Optional<Path> keyPath
+      final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig
   ) throws IOException {
-    Path homeDirectory = Files.createTempDirectory("acctest");
-    copyKey(keyPath, homeDirectory);
+    final Path homeDirectory = Files.createTempDirectory("acctest");
     this.name = name;
     this.homeDirectory = homeDirectory;
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
@@ -93,19 +95,9 @@ public class PantheonNode implements Node, AutoCloseable {
     this.webSocketConfiguration = webSocketConfiguration;
     this.jsonRpcEnabled = jsonRpcConfiguration.isEnabled();
     this.wsRpcEnabled = webSocketConfiguration.isEnabled();
-    this.ethNetworkConfig = ethNetworkConfig;
+    this.genesisConfig = genesisConfig;
     this.devMode = devMode;
     LOG.info("Created PantheonNode {}", this.toString());
-  }
-
-  private void copyKey(Optional<Path> keyPath, Path homeDirectory) {
-    keyPath.ifPresent(key -> {
-      try {
-        Files.copy(key, homeDirectory.resolve("key"));
-      } catch (IOException e) {
-        throw new RuntimeException("Can't copy node0_key file to data directory", e);
-      }
-    });
   }
 
   public String getName() {
@@ -114,6 +106,10 @@ public class PantheonNode implements Node, AutoCloseable {
 
   String enodeUrl() {
     return "enode://" + keyPair.getPublicKey().toString() + "@" + LOCALHOST + ":" + p2pPort;
+  }
+
+  KeyPair keyPair() {
+    return keyPair;
   }
 
   private Optional<String> jsonRpcBaseUrl() {
@@ -307,9 +303,10 @@ public class PantheonNode implements Node, AutoCloseable {
     return miningParameters;
   }
 
-  public EthNetworkConfig getEthNetworkConfig() {
-    return ethNetworkConfig;
+  public Address nodeAddress() {
+    return Address.extract(Hash.hash(keyPair.getPrivateKey().getEncodedBytes()));
   }
+
 
 
   public boolean isDevMode() {
@@ -360,6 +357,18 @@ public class PantheonNode implements Node, AutoCloseable {
     }
 
     return eth;
+  }
+
+  public Function<Iterable<PantheonNode>, Optional<String>> getGenesisConfig() {
+    return genesisConfig;
+  }
+
+  public void ethNetworkConfig(Optional<EthNetworkConfig> ethNetworkConfig) {
+    this.ethNetworkConfig = ethNetworkConfig;
+  }
+
+  public Optional<EthNetworkConfig> ethNetworkConfig() {
+    return ethNetworkConfig;
   }
 
   @Override
