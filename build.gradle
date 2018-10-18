@@ -106,8 +106,8 @@ allprojects {
 
     // Below this line are currently only license header tasks
     format 'groovy', {
-        target '**/*.groovy'
-        licenseHeaderFile "${rootDir}/gradle/spotless.java.license", 'import'
+      target '**/*.groovy'
+      licenseHeaderFile "${rootDir}/gradle/spotless.java.license", 'import'
     }
     format 'bash', {
       target '**/*.sh'
