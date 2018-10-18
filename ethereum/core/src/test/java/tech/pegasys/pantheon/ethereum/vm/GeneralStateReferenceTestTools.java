@@ -101,7 +101,6 @@ public class GeneralStateReferenceTestTools {
     params.blacklist("RevertOpcodeWithBigOutputInInit-EIP150\\[3\\]");
     params.blacklist("RevertOpcodeWithBigOutputInInit-Homestead\\[2\\]");
     params.blacklist("RevertOpcodeWithBigOutputInInit-Homestead\\[3\\]");
-    params.blacklist("RevertInCreateInInit-Byzantium");
     params.blacklist("RevertOpcodeInInit-EIP150\\[2\\]");
     params.blacklist("RevertOpcodeInInit-EIP150\\[3\\]");
     params.blacklist("RevertOpcodeInInit-Homestead\\[2\\]");
@@ -143,13 +142,6 @@ public class GeneralStateReferenceTestTools {
     params.blacklist("UserTransactionGasLimitIsTooLowWhenZeroCost-Frontier");
     params.blacklist("UserTransactionGasLimitIsTooLowWhenZeroCost-Homestead");
     params.blacklist("ecmul_0-3_5616_28000_96-Byzantium\\[3\\]");
-
-    // Constantinople failures to investigate
-    params.blacklist("RevertInCreateInInitCreate2-Constantinople");
-    params.blacklist("create2collisionStorage-Constantinople\\[0\\]");
-    params.blacklist("create2collisionStorage-Constantinople\\[1\\]");
-    params.blacklist("create2collisionStorage-Constantinople\\[2\\]");
-    params.blacklist("RevertInCreateInInit-Constantinople");
     params.blacklist("ecmul_0-3_5616_28000_96-Constantinople\\[3\\]");
   }
 

@@ -72,13 +72,6 @@ public class BlockchainReferenceTestTools {
     // Pantheon is incorrectly rejecting Uncle block timestamps in the future
     params.blacklist("futureUncleTimestampDifficultyDrop2");
     params.blacklist("futureUncleTimestampDifficultyDrop");
-
-    // Needs investigation
-    params.blacklist("RevertInCreateInInit_d0g0v0_Byzantium");
-    params.blacklist("RevertInCreateInInit_d0g0v0_Constantinople");
-
-    // Constantinople failures to investigate
-    params.blacklist("RevertInCreateInInitCreate2_d0g0v0_Constantinople\\[Constantinople\\]");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {
