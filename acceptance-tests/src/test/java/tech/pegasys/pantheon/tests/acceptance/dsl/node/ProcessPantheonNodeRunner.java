@@ -12,11 +12,11 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 
 import java.io.File;
 import java.io.IOException;
