@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
@@ -28,6 +29,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -116,7 +118,7 @@ public class PantheonNodeConfig {
     return new PantheonNodeConfig(
         name,
         createMiningParameters(true),
-        createJsonRpcConfig(),
+        jsonRpcConfigWithClique(),
         createWebSocketConfig(),
         PantheonNodeConfig::createCliqueGenesisConfig,
         false);
@@ -127,7 +129,7 @@ public class PantheonNodeConfig {
     return new PantheonNodeConfig(
         name,
         createMiningParameters(true),
-        createJsonRpcConfig(),
+        jsonRpcConfigWithClique(),
         createWebSocketConfig(),
         clusterNodes ->
             createCliqueGenesisConfig(
@@ -173,6 +175,14 @@ public class PantheonNodeConfig {
     final List<PrivateKey> privateKeys =
         nodes.stream().map(node -> node.keyPair().getPrivateKey()).collect(toList());
     return CliqueExtraData.createGenesisExtraDataString(privateKeys);
+  }
+
+  private static JsonRpcConfiguration jsonRpcConfigWithClique() {
+    final JsonRpcConfiguration jsonRpcConfig = createJsonRpcConfig();
+    final List<RpcApi> rpcApis = new ArrayList<>(jsonRpcConfig.getRpcApis());
+    rpcApis.add(CLIQUE);
+    jsonRpcConfig.setRpcApis(rpcApis);
+    return jsonRpcConfig;
   }
 
   public void initSocket() throws IOException {
