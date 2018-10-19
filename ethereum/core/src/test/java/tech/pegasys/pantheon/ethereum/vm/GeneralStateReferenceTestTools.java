@@ -85,14 +85,6 @@ public class GeneralStateReferenceTestTools {
     params.blacklist("OverflowGasRequire");
     // Consumes a huge amount of memory
     params.blacklist("static_Call1MB1024Calldepth-(Byzantium|Constantinople)");
-
-    // Needs investigation (tests pass in other clients)
-    params.blacklist("suicideCoinbase-Frontier");
-    params.blacklist("suicideCoinbase-Homestead");
-    params.blacklist("SuicidesMixingCoinbase-Frontier\\[0\\]");
-    params.blacklist("SuicidesMixingCoinbase-Frontier\\[1\\]");
-    params.blacklist("SuicidesMixingCoinbase-Homestead\\[0\\]");
-    params.blacklist("SuicidesMixingCoinbase-Homestead\\[1\\]");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {
@@ -124,12 +116,9 @@ public class GeneralStateReferenceTestTools {
             transaction,
             blockHeader.getCoinbase(),
             new BlockHashLookup(blockHeader, blockchain));
-
-    if (result.isInvalid()) {
-      final Account coinbase = worldStateUpdater.getOrCreate(spec.blockHeader().getCoinbase());
-      if (coinbase != null && coinbase.isEmpty() && shouldClearEmptyAccounts(spec.eip())) {
-        worldStateUpdater.deleteAccount(coinbase.getAddress());
-      }
+    final Account coinbase = worldStateUpdater.getOrCreate(spec.blockHeader().getCoinbase());
+    if (coinbase != null && coinbase.isEmpty() && shouldClearEmptyAccounts(spec.eip())) {
+      worldStateUpdater.deleteAccount(coinbase.getAddress());
     }
     worldStateUpdater.commit();
 
