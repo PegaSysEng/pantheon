@@ -90,8 +90,8 @@ public class PeerTable {
   }
 
   /**
-   * Attempts to add the provided peer to the peer table, and returns an {@link AddResult} signalling one of
-   * three outcomes.
+   * Attempts to add the provided peer to the peer table, and returns an {@link AddResult}
+   * signalling one of three outcomes.
    *
    * <h3>Possible outcomes:</h3>
    *
