@@ -546,14 +546,7 @@ public class PantheonCommand implements Runnable {
   private EthNetworkConfig updateNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
     EthNetworkConfig.Builder builder = new EthNetworkConfig.Builder(ethNetworkConfig);
     if (genesisFile != null) {
-      builder.setGenesisConfig(
-          () -> {
-            try {
-              return Resources.toString(genesisFile.toURI().toURL(), UTF_8);
-            } catch (IOException e) {
-              throw new IllegalStateException("");
-            }
-          });
+      builder.setGenesisConfig(genesisConfig());
     }
     if (networkId != null) {
       builder.setNetworkId(networkId);
@@ -562,5 +555,14 @@ public class PantheonCommand implements Runnable {
       builder.setBootNodes(bootstrapNodes);
     }
     return builder.build();
+  }
+
+  private String genesisConfig() {
+    try {
+      return Resources.toString(genesisFile.toURI().toURL(), UTF_8);
+    } catch (IOException e) {
+      throw new ParameterException(
+          new CommandLine(this), String.format("Unable to load genesis file %s.", genesisFile), e);
+    }
   }
 }

@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
@@ -28,7 +28,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -40,7 +40,7 @@ public class PantheonNodeConfig {
   private final MiningParameters miningParameters;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
-  private final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig;
+  private final Function<Collection<PantheonNode>, Optional<String>> genesisConfig;
   private final boolean devMode;
   private ServerSocket serverSocket;
 
@@ -49,7 +49,7 @@ public class PantheonNodeConfig {
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
-      final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig,
+      final Function<Collection<PantheonNode>, Optional<String>> genesisConfig,
       final boolean devMode) {
     this.name = name;
     this.miningParameters = miningParameters;
@@ -104,9 +104,9 @@ public class PantheonNodeConfig {
   public static PantheonNodeConfig patheonNodeWithRpcApis(
       final String name, final RpcApis... enabledRpcApis) {
     final JsonRpcConfiguration jsonRpcConfig = createJsonRpcConfig();
-    jsonRpcConfig.setRpcApis(Arrays.asList(enabledRpcApis));
+    jsonRpcConfig.setRpcApis(asList(enabledRpcApis));
     final WebSocketConfiguration webSocketConfig = createWebSocketConfig();
-    webSocketConfig.setRpcApis(Arrays.asList(enabledRpcApis));
+    webSocketConfig.setRpcApis(asList(enabledRpcApis));
 
     return new PantheonNodeConfig(
         name, createMiningParameters(false), jsonRpcConfig, webSocketConfig);
@@ -118,7 +118,23 @@ public class PantheonNodeConfig {
         createMiningParameters(true),
         createJsonRpcConfig(),
         createWebSocketConfig(),
-        PantheonNodeConfig::createGenesisConfig,
+        PantheonNodeConfig::createCliqueGenesisConfig,
+        false);
+  }
+
+  public static PantheonNodeConfig pantheonCliqueMinerNodeWithValidators(
+      final String name, final String... validators) {
+    return new PantheonNodeConfig(
+        name,
+        createMiningParameters(true),
+        createJsonRpcConfig(),
+        createWebSocketConfig(),
+        clusterNodes ->
+            createCliqueGenesisConfig(
+                clusterNodes
+                    .stream()
+                    .filter(n -> asList(validators).contains(n.getName()))
+                    .collect(toList())),
         false);
   }
 
@@ -136,9 +152,10 @@ public class PantheonNodeConfig {
     return config;
   }
 
-  private static Optional<String> createGenesisConfig(final Iterable<PantheonNode> pantheonNodes) {
+  private static Optional<String> createCliqueGenesisConfig(
+      final Collection<PantheonNode> validators) {
     String genesisTemplate = cliqueGenesisTemplateConfig();
-    String cliqueExtraData = encodeCliqueExtraData(pantheonNodes);
+    String cliqueExtraData = encodeCliqueExtraData(validators);
     String genesis = genesisTemplate.replaceAll("%cliqueExtraData%", cliqueExtraData);
     return Optional.of(genesis);
   }
@@ -152,11 +169,9 @@ public class PantheonNodeConfig {
     }
   }
 
-  private static String encodeCliqueExtraData(final Iterable<PantheonNode> nodes) {
+  private static String encodeCliqueExtraData(final Collection<PantheonNode> nodes) {
     final List<PrivateKey> privateKeys =
-        stream(nodes.spliterator(), false)
-            .map(node -> node.keyPair().getPrivateKey())
-            .collect(toList());
+        nodes.stream().map(node -> node.keyPair().getPrivateKey()).collect(toList());
     return CliqueExtraData.createGenesisExtraDataString(privateKeys);
   }
 
@@ -188,7 +203,7 @@ public class PantheonNodeConfig {
     return webSocketConfiguration;
   }
 
-  public Function<Iterable<PantheonNode>, Optional<String>> getGenesisConfig() {
+  public Function<Collection<PantheonNode>, Optional<String>> getGenesisConfig() {
     return genesisConfig;
   }
 

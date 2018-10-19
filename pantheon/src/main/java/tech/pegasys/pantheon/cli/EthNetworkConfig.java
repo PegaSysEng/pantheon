@@ -23,7 +23,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.Resources;
@@ -31,12 +30,12 @@ import com.google.common.io.Resources;
 public class EthNetworkConfig {
   private static final String MAINNET_GENESIS = "mainnet.json";
   private static final String RINKEBY_GENESIS = "rinkeby.json";
-  private final Supplier<String> genesisConfig;
+  private final String genesisConfig;
   private final int networkId;
   private final Collection<?> bootNodes;
 
   public EthNetworkConfig(
-      final Supplier<String> genesisConfig, final int networkId, final Collection<?> bootNodes) {
+      final String genesisConfig, final int networkId, final Collection<?> bootNodes) {
     Preconditions.checkNotNull(genesisConfig);
     Preconditions.checkNotNull(bootNodes);
     this.genesisConfig = genesisConfig;
@@ -45,7 +44,7 @@ public class EthNetworkConfig {
   }
 
   public String getGenesisConfig() {
-    return genesisConfig.get();
+    return genesisConfig;
   }
 
   public int getNetworkId() {
@@ -89,12 +88,12 @@ public class EthNetworkConfig {
 
   public static EthNetworkConfig mainnet() {
     return new EthNetworkConfig(
-        () -> jsonConfig(MAINNET_GENESIS), MAINNET_NETWORK_ID, MAINNET_BOOTSTRAP_NODES);
+        jsonConfig(MAINNET_GENESIS), MAINNET_NETWORK_ID, MAINNET_BOOTSTRAP_NODES);
   }
 
   public static EthNetworkConfig rinkeby() {
     return new EthNetworkConfig(
-        () -> jsonConfig(RINKEBY_GENESIS), RINKEBY_NETWORK_ID, RINKEBY_BOOTSTRAP_NODES);
+        jsonConfig(RINKEBY_GENESIS), RINKEBY_NETWORK_ID, RINKEBY_BOOTSTRAP_NODES);
   }
 
   private static String jsonConfig(final String resourceName) {
@@ -112,7 +111,7 @@ public class EthNetworkConfig {
 
   public static class Builder {
 
-    private Supplier<String> genesisConfig;
+    private String genesisConfig;
     private int networkId;
     private Collection<?> bootNodes;
 
@@ -124,7 +123,7 @@ public class EthNetworkConfig {
 
     public Builder() {}
 
-    public Builder setGenesisConfig(final Supplier<String> genesisConfig) {
+    public Builder setGenesisConfig(final String genesisConfig) {
       this.genesisConfig = genesisConfig;
       return this;
     }

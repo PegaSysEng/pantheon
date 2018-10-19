@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
@@ -36,6 +36,7 @@ import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -69,11 +70,12 @@ public class PantheonNode implements Node, AutoCloseable {
   private final boolean jsonRpcEnabled;
   private final boolean wsRpcEnabled;
   private final Properties portsProperties = new Properties();
-  private final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig;
+  private final Function<Collection<PantheonNode>, Optional<String>> genesisConfig;
   private final boolean devMode;
 
   private List<String> bootnodes = new ArrayList<>();
   private Eth eth;
+  private Clique clique;
   private Web3 web3;
   private Web3j web3j;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
@@ -85,7 +87,7 @@ public class PantheonNode implements Node, AutoCloseable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final boolean devMode,
-      final Function<Iterable<PantheonNode>, Optional<String>> genesisConfig)
+      final Function<Collection<PantheonNode>, Optional<String>> genesisConfig)
       throws IOException {
     final Path homeDirectory = Files.createTempDirectory("acctest");
     this.name = name;
@@ -250,6 +252,10 @@ public class PantheonNode implements Node, AutoCloseable {
         .isInstanceOf(WebsocketNotConnectedException.class);
   }
 
+  public Address getAddress() {
+    return Util.publicKeyToAddress(keyPair.getPublicKey());
+  }
+
   Path homeDirectory() {
     return homeDirectory;
   }
@@ -305,10 +311,6 @@ public class PantheonNode implements Node, AutoCloseable {
     return miningParameters;
   }
 
-  public Address nodeAddress() {
-    return Address.extract(Hash.hash(keyPair.getPrivateKey().getEncodedBytes()));
-  }
-
   public boolean isDevMode() {
     return devMode;
   }
@@ -359,7 +361,16 @@ public class PantheonNode implements Node, AutoCloseable {
     return eth;
   }
 
-  public Function<Iterable<PantheonNode>, Optional<String>> getGenesisConfig() {
+  @Override
+  public Clique clique() {
+    if (clique == null) {
+      clique = new Clique(new HttpService(jsonRpcBaseUrl().get()));
+    }
+
+    return clique;
+  }
+
+  public Function<Collection<PantheonNode>, Optional<String>> getGenesisConfig() {
     return genesisConfig;
   }
 

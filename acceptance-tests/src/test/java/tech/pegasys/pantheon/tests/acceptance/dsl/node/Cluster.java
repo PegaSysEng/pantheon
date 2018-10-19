@@ -47,11 +47,8 @@ public class Cluster implements AutoCloseable {
       node.bootnodes(bootNodes);
       Optional<EthNetworkConfig> ethNetworkConfig =
           node.getGenesisConfig()
-              .apply(
-                  stream(nodes)
-                      .filter(n -> n.getMiningParameters().isMiningEnabled())
-                      .collect(toList()))
-              .map(config -> new EthNetworkConfig(() -> config, NETWORK_ID, bootNodes));
+              .apply(stream(nodes).collect(toList()))
+              .map(config -> new EthNetworkConfig(config, NETWORK_ID, bootNodes));
       node.ethNetworkConfig(ethNetworkConfig);
       node.start(pantheonNodeRunner);
     }

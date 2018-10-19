@@ -22,4 +22,6 @@ public interface Node {
   <T> T execute(Transaction<T> transaction);
 
   BigInteger getAccountBalance(Account account);
+
+  Clique clique();
 }
