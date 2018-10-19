@@ -79,24 +79,6 @@ public class GeneralStateReferenceTestTools {
     if (EIPS_TO_RUN.isEmpty()) {
       params.blacklistAll();
     }
-    // Known incorrect test.
-    params.blacklist("RevertPrecompiledTouch-(EIP158|Byzantium)");
-    // Gas integer value is too large to construct a valid transaction.
-    params.blacklist("OverflowGasRequire");
-    // Consumes a huge amount of memory
-    params.blacklist("static_Call1MB1024Calldepth-(Byzantium|Constantinople)");
-
-    // Needs investigation (tests pass in other clients)
-    //    params.blacklist("suicideCoinbase-Frontier");
-    //    params.blacklist("suicideCoinbase-Homestead");
-    //    params.blacklist("SuicidesMixingCoinbase-Frontier\\[0\\]");
-    //    params.blacklist("SuicidesMixingCoinbase-Frontier\\[1\\]");
-    //    params.blacklist("SuicidesMixingCoinbase-Homestead\\[0\\]");
-    //    params.blacklist("SuicidesMixingCoinbase-Homestead\\[1\\]");
-
-    // Constantinople failures to investigate
-    params.blacklist("RevertInCreateInInitCreate2-Constantinople");
-    params.blacklist("RevertInCreateInInit-Constantinople");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {
@@ -107,8 +89,6 @@ public class GeneralStateReferenceTestTools {
     final BlockHeader blockHeader = spec.blockHeader();
     final WorldState initialWorldState = spec.initialWorldState();
     final Transaction transaction = spec.transaction();
-
-    System.out.println(transaction.toString());
 
     final MutableWorldState worldState = new DebuggableMutableWorldState(initialWorldState);
     // Several of the GeneralStateTests check if the transaction could potentially
@@ -130,16 +110,10 @@ public class GeneralStateReferenceTestTools {
             transaction,
             blockHeader.getCoinbase(),
             new BlockHashLookup(blockHeader, blockchain));
-
-    System.out.println(result.isInvalid());
-
-    // if (result.isInvalid()) {
     final Account coinbase = worldStateUpdater.getOrCreate(spec.blockHeader().getCoinbase());
     if (coinbase != null && coinbase.isEmpty() && shouldClearEmptyAccounts(spec.eip())) {
       worldStateUpdater.deleteAccount(coinbase.getAddress());
     }
-    // }
-
     worldStateUpdater.commit();
 
     // Check the world state root hash.
