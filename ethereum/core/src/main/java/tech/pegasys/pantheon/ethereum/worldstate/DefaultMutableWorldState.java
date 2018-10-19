@@ -367,7 +367,7 @@ public class DefaultMutableWorldState implements MutableWorldState {
         final SortedMap<UInt256, UInt256> updatedStorage = updated.getUpdatedStorage();
         if (!updatedStorage.isEmpty()) {
           // Apply any storage updates
-          MerklePatriciaTrie<Bytes32, BytesValue> storageTrie =
+          final MerklePatriciaTrie<Bytes32, BytesValue> storageTrie =
               freshState
                   ? wrapped.newAccountStorageTrie(Hash.EMPTY_TRIE_HASH)
                   : origin.storageTrie();

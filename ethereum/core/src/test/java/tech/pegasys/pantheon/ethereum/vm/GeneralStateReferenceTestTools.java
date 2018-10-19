@@ -142,6 +142,8 @@ public class GeneralStateReferenceTestTools {
     params.blacklist("UserTransactionGasLimitIsTooLowWhenZeroCost-Frontier");
     params.blacklist("UserTransactionGasLimitIsTooLowWhenZeroCost-Homestead");
     params.blacklist("ecmul_0-3_5616_28000_96-Byzantium\\[3\\]");
+
+    // Constantinople failures to investigate
     params.blacklist("ecmul_0-3_5616_28000_96-Constantinople\\[3\\]");
   }
 
