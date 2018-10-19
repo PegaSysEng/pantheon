@@ -60,27 +60,17 @@ public class BlockchainReferenceTestTools {
       params.blacklistAll();
     }
 
-    // TODO: Determine and implement cross-chain validation prevention.
-    params.blacklist(
-        "ChainAtoChainB_BlockHash_(Frontier|Homestead|EIP150|EIP158|Byzantium|Constantinople)");
     // Known bad test.
     params.blacklist("RevertPrecompiledTouch_d0g0v0_(EIP158|Byzantium)");
 
     // Consumes a huge amount of memory
     params.blacklist("static_Call1MB1024Calldepth_d1g0v0_(Byzantium|Constantinople)");
 
-    // Pantheon is incorrectly rejecting Uncle block timestamps in the future
-    params.blacklist("futureUncleTimestampDifficultyDrop2");
-    params.blacklist("futureUncleTimestampDifficultyDrop");
-
     // Needs investigation
     params.blacklist("RevertInCreateInInit_d0g0v0_Byzantium");
     params.blacklist("RevertInCreateInInit_d0g0v0_Constantinople");
 
     // Constantinople failures to investigate
-    params.blacklist("create2collisionStorage_d0g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionStorage_d1g0v0_Constantinople\\[Constantinople\\]");
-    params.blacklist("create2collisionStorage_d2g0v0_Constantinople\\[Constantinople\\]");
     params.blacklist("RevertInCreateInInitCreate2_d0g0v0_Constantinople\\[Constantinople\\]");
   }
 

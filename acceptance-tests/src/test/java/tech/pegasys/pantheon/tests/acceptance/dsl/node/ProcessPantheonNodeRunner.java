@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,7 +119,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     }
   }
 
-  private String apiList(final Collection<RpcApis> rpcApis) {
+  private String apiList(final Collection<RpcApi> rpcApis) {
     return String.join(",", rpcApis.stream().map(RpcApis::getValue).collect(Collectors.toList()));
   }
 

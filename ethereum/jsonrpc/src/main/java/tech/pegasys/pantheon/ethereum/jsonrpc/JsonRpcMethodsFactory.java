@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminPeers;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugStorageRangeAt;
@@ -47,6 +46,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleByBloc
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleByBlockNumberAndIndex;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleCountByBlockHash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetUncleCountByBlockNumber;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetWork;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthMining;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewBlockFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewFilter;
@@ -96,7 +96,7 @@ public class JsonRpcMethodsFactory {
       final ProtocolSchedule<?> protocolSchedule,
       final AbstractMiningCoordinator<?, ?> miningCoordinator,
       final Set<Capability> supportedCapabilities,
-      final Collection<RpcApis> rpcApis,
+      final Collection<RpcApi> rpcApis,
       final FilterManager filterManager) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
@@ -125,7 +125,7 @@ public class JsonRpcMethodsFactory {
       final TransactionPool transactionPool,
       final AbstractMiningCoordinator<?, ?> miningCoordinator,
       final Set<Capability> supportedCapabilities,
-      final Collection<RpcApis> rpcApis) {
+      final Collection<RpcApi> rpcApis) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
     // @formatter:off
     if (rpcApis.contains(RpcApis.ETH)) {
@@ -177,7 +177,8 @@ public class JsonRpcMethodsFactory {
           new EthMining<>(miningCoordinator),
           new EthCoinbase(miningCoordinator),
           new EthProtocolVersion(supportedCapabilities),
-          new EthGasPrice<>(miningCoordinator));
+          new EthGasPrice<>(miningCoordinator),
+          new EthGetWork(miningCoordinator));
     }
     if (rpcApis.contains(RpcApis.DEBUG)) {
       final BlockReplay blockReplay =

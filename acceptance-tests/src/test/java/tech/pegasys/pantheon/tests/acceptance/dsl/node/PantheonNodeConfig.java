@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.RpcApis;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 
 import java.io.IOException;
@@ -102,7 +102,7 @@ public class PantheonNodeConfig {
   }
 
   public static PantheonNodeConfig patheonNodeWithRpcApis(
-      final String name, final RpcApis... enabledRpcApis) {
+      final String name, final RpcApi... enabledRpcApis) {
     final JsonRpcConfiguration jsonRpcConfig = createJsonRpcConfig();
     jsonRpcConfig.setRpcApis(asList(enabledRpcApis));
     final WebSocketConfiguration webSocketConfig = createWebSocketConfig();
