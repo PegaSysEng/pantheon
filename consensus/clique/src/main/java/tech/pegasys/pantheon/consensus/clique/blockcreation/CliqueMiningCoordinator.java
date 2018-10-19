@@ -15,14 +15,18 @@ package tech.pegasys.pantheon.consensus.clique.blockcreation;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 
 import java.util.Optional;
 
 public class CliqueMiningCoordinator
     extends AbstractMiningCoordinator<CliqueContext, CliqueBlockMiner> {
 
-  public CliqueMiningCoordinator(final Blockchain blockchain, final CliqueMinerExecutor executor) {
-    super(blockchain, executor);
+  public CliqueMiningCoordinator(
+      final Blockchain blockchain,
+      final CliqueMinerExecutor executor,
+      final Synchronizer synchronizer) {
+    super(blockchain, executor, synchronizer);
   }
 
   @Override

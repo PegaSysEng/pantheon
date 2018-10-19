@@ -161,7 +161,7 @@ public class CliquePantheonController
                 secondsBetweenBlocks),
             epochManger);
     CliqueMiningCoordinator miningCoordinator =
-        new CliqueMiningCoordinator(blockchain, miningExecutor);
+        new CliqueMiningCoordinator(blockchain, miningExecutor, synchronizer);
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
 
     // Clique mining is implicitly enabled.

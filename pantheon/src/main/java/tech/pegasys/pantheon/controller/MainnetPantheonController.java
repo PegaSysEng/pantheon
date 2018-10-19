@@ -153,7 +153,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
                 new SystemClock()));
 
     final EthHashMiningCoordinator miningCoordinator =
-        new EthHashMiningCoordinator(protocolContext.getBlockchain(), executor);
+        new EthHashMiningCoordinator(protocolContext.getBlockchain(), executor, synchronizer);
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
     if (miningParams.isMiningEnabled()) {
       miningCoordinator.enable();

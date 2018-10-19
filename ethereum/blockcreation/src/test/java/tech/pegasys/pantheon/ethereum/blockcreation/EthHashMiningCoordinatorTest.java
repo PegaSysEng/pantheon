@@ -19,6 +19,8 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.SyncStatus;
+import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolution;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
@@ -30,11 +32,23 @@ public class EthHashMiningCoordinatorTest {
 
   private final ExecutionContextTestFixture executionContext = new ExecutionContextTestFixture();
 
+  private static class TestSynchronizer implements Synchronizer {
+
+    @Override
+    public void start() {}
+
+    @Override
+    public Optional<SyncStatus> getSyncStatus() {
+      return Optional.empty();
+    }
+  }
+
   @Test
   public void miningCoordinatorIsCreatedDisabledWithNoReportableMiningStatistics() {
     final EthHashMinerExecutor executor = mock(EthHashMinerExecutor.class);
     final EthHashMiningCoordinator miningCoordinator =
-        new EthHashMiningCoordinator(executionContext.getBlockchain(), executor);
+        new EthHashMiningCoordinator(
+            executionContext.getBlockchain(), executor, new TestSynchronizer());
     final EthHashSolution solution = new EthHashSolution(1L, Hash.EMPTY, new byte[Bytes32.SIZE]);
 
     assertThat(miningCoordinator.isRunning()).isFalse();
@@ -59,7 +73,8 @@ public class EthHashMiningCoordinatorTest {
     when(executor.startAsyncMining(any(), any())).thenReturn(miner);
 
     final EthHashMiningCoordinator miningCoordinator =
-        new EthHashMiningCoordinator(executionContext.getBlockchain(), executor);
+        new EthHashMiningCoordinator(
+            executionContext.getBlockchain(), executor, new TestSynchronizer());
 
     miningCoordinator.enable(); // Must enable prior returning data
     assertThat(miningCoordinator.hashesPerSecond()).isEqualTo(hashRate1);
