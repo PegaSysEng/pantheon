@@ -98,23 +98,6 @@ public class CliqueExtraData {
             .orElse(BytesValue.wrap(new byte[Signature.BYTES_REQUIRED])));
   }
 
-  public static String createGenesisExtraDataString(final List<PrivateKey> privKeys) {
-    List<Address> validators = convertPrivKeysToAddresses(privKeys);
-    CliqueExtraData cliqueExtraData =
-        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validators);
-    BytesValue output = cliqueExtraData.encode();
-    return output.toString();
-  }
-
-  private static List<Address> convertPrivKeysToAddresses(final List<PrivateKey> privKeys) {
-    List<Address> validators = Lists.newArrayList();
-    for (PrivateKey privKey : privKeys) {
-      PublicKey pubKey = PublicKey.create(privKey);
-      validators.add(Util.publicKeyToAddress(pubKey));
-    }
-    return validators;
-  }
-
   public BytesValue getVanityData() {
     return vanityData;
   }
