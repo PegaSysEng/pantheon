@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.BlockchainImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -52,8 +53,8 @@ import java.util.stream.Stream;
 
 import com.google.common.net.HostAndPort;
 import io.vertx.core.Vertx;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
 import picocli.CommandLine.Command;
@@ -78,7 +79,6 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements Runnable {
-  private static final Logger LOG = LogManager.getLogger();
 
   private static final int DEFAULT_MAX_PEERS = 25;
 
@@ -317,6 +317,12 @@ public class PantheonCommand implements Runnable {
   private final Boolean isDevMode = false;
 
   @Option(
+    names = {"--logging", "-l"},
+    description = "Logging verbosity: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
+  )
+  private final Level logLevel = null;
+
+  @Option(
     names = {"--miner-enabled"},
     description = "set if node should perform mining (default: ${DEFAULT-VALUE})"
   )
@@ -375,10 +381,11 @@ public class PantheonCommand implements Runnable {
     commandLine.addSubcommand("import-blockchain", importBlockchainSubCommand);
     commandLine.addSubcommand("export-pub-key", new ExportPublicKeySubCommand());
 
-    commandLine.registerConverter(HostAndPort.class, HostAndPort::fromString);
-    commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(Address.class, Address::fromHexString);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
+    commandLine.registerConverter(HostAndPort.class, HostAndPort::fromString);
+    commandLine.registerConverter(Level.class, Level::valueOf);
+    commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
 
     // Create a handler that will search for a config file option and use it for default values
@@ -391,6 +398,12 @@ public class PantheonCommand implements Runnable {
 
   @Override
   public void run() {
+    // set log level per CLI flags
+    if (logLevel != null) {
+      System.out.println("Setting logging level to " + logLevel.name());
+      Configurator.setAllLevels("", logLevel);
+    }
+
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
       System.out.println(
@@ -418,6 +431,8 @@ public class PantheonCommand implements Runnable {
           syncWithOttoman,
           new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled),
           isDevMode);
+    } catch (final InvalidConfigurationException e) {
+      throw new ExecutionException(new CommandLine(this), e.getMessage());
     } catch (final IOException e) {
       throw new ExecutionException(new CommandLine(this), "Invalid path", e);
     }
