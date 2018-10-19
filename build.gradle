@@ -419,7 +419,7 @@ release {
   ]
 
   git {
-    requireBranch = 'wip-release'
+    requireBranch = 'master'
     pushToRemote = 'origin'
     pushToBranchPrefix = project.version.replace('SNAPSHOT','')
   }
