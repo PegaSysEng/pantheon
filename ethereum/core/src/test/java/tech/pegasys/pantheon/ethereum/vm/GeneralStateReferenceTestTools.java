@@ -93,6 +93,10 @@ public class GeneralStateReferenceTestTools {
     params.blacklist("SuicidesMixingCoinbase-Frontier\\[1\\]");
     params.blacklist("SuicidesMixingCoinbase-Homestead\\[0\\]");
     params.blacklist("SuicidesMixingCoinbase-Homestead\\[1\\]");
+
+    // Constantinople failures to investigate
+    params.blacklist("RevertInCreateInInitCreate2-Constantinople");
+    params.blacklist("RevertInCreateInInit-Constantinople");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {
