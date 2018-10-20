@@ -59,7 +59,9 @@ public class IbftNetworkPeers {
       final Collection<Address> recipients, final MessageData message) {
     for (Address validator : recipients) {
       try {
-        peerConnections.get(validator).sendForProtocol(PROTOCOL_NAME, message);
+        if(peerConnections.containsKey(validator)) {
+          peerConnections.get(validator).sendForProtocol(PROTOCOL_NAME, message);
+        }
       } catch (PeerNotConnected ex) {
         LOG.trace("Lost connection to a validator.");
       }

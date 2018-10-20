@@ -20,6 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Range;
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -78,6 +79,27 @@ public class IbftNetworkPeersTest {
     peers.multicastToValidators(messageToSend);
 
     verify(peerConnections.get(0), times(1)).sendForProtocol("IBF", messageToSend);
+    verify(peerConnections.get(1), never()).sendForProtocol(any(), any());
+    verify(peerConnections.get(2), never()).sendForProtocol(any(), any());
+    verify(peerConnections.get(3), never()).sendForProtocol(any(), any());
+  }
+
+  @Test
+  public void doesntSendToValidatorsWhichAreNotDirectlyConnected() throws PeerNotConnected {
+    validators.add(Util.publicKeyToAddress(publicKeys.get(0)));
+
+    ValidatorProvider validatorProvider = mock(ValidatorProvider.class);
+    when(validatorProvider.getCurrentValidators()).thenReturn(validators);
+
+    IbftNetworkPeers peers = new IbftNetworkPeers(validatorProvider);
+
+    //only add peer connections 1, 2 & 3, none of which should be invoked.
+    Lists.newArrayList(1, 2, 3).stream().forEach(i -> peers.peerAdded(peerConnections.get(i)));
+
+    MessageData messageToSend = new RawMessage(1, EMPTY_BUFFER);
+    peers.multicastToValidators(messageToSend);
+
+    verify(peerConnections.get(0), never()).sendForProtocol(any(), any());
     verify(peerConnections.get(1), never()).sendForProtocol(any(), any());
     verify(peerConnections.get(2), never()).sendForProtocol(any(), any());
     verify(peerConnections.get(3), never()).sendForProtocol(any(), any());
