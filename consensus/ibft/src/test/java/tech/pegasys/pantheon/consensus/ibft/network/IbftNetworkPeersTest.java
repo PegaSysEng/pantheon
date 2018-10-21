@@ -20,7 +20,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Range;
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -93,7 +92,7 @@ public class IbftNetworkPeersTest {
 
     IbftNetworkPeers peers = new IbftNetworkPeers(validatorProvider);
 
-    //only add peer connections 1, 2 & 3, none of which should be invoked.
+    // only add peer connections 1, 2 & 3, none of which should be invoked.
     Lists.newArrayList(1, 2, 3).stream().forEach(i -> peers.peerAdded(peerConnections.get(i)));
 
     MessageData messageToSend = new RawMessage(1, EMPTY_BUFFER);

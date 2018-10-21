@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IbftNetworkPeers {
+
   private static final Logger LOG = LogManager.getLogger();
 
   private static final String PROTOCOL_NAME = "IBF";
@@ -58,9 +59,10 @@ public class IbftNetworkPeers {
   private void sendMessageToSpecificAddresses(
       final Collection<Address> recipients, final MessageData message) {
     for (Address validator : recipients) {
+      PeerConnection connection = peerConnections.get(validator);
       try {
-        if(peerConnections.containsKey(validator)) {
-          peerConnections.get(validator).sendForProtocol(PROTOCOL_NAME, message);
+        if (connection != null) {
+          connection.sendForProtocol(PROTOCOL_NAME, message);
         }
       } catch (PeerNotConnected ex) {
         LOG.trace("Lost connection to a validator.");
