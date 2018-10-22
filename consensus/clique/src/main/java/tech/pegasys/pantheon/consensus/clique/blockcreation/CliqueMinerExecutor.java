@@ -41,7 +41,6 @@ public class CliqueMinerExecutor extends AbstractMinerExecutor<CliqueContext, Cl
   private final Address localAddress;
   private final KeyPair nodeKeys;
   private final EpochManager epochManager;
-  private volatile BytesValue vanityData;
 
   public CliqueMinerExecutor(
       final ProtocolContext<CliqueContext> protocolContext,
@@ -62,7 +61,6 @@ public class CliqueMinerExecutor extends AbstractMinerExecutor<CliqueContext, Cl
     this.nodeKeys = nodeKeys;
     this.localAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
     this.epochManager = epochManager;
-    this.vanityData = miningParams.getExtraData();
   }
 
   @Override
@@ -110,8 +108,8 @@ public class CliqueMinerExecutor extends AbstractMinerExecutor<CliqueContext, Cl
   }
 
   private BytesValue createCorrectlySizedVanityData() {
-    final int vanityPadding = Math.max(0, CliqueExtraData.EXTRA_VANITY_LENGTH - vanityData.size());
-    return BytesValues.concatenate(BytesValue.wrap(new byte[vanityPadding]), vanityData)
+    final int vanityPadding = Math.max(0, CliqueExtraData.EXTRA_VANITY_LENGTH - extraData.size());
+    return BytesValues.concatenate(BytesValue.wrap(new byte[vanityPadding]), extraData)
         .slice(0, CliqueExtraData.EXTRA_VANITY_LENGTH);
   }
 }
