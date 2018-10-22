@@ -12,7 +12,6 @@
  */
 
 import net.ltgt.gradle.errorprone.CheckSeverity
-import java.util.regex.Matcher
 
 plugins {
   id 'com.diffplug.gradle.spotless' version '3.13.0'
