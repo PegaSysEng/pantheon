@@ -133,10 +133,16 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
             genesisConfig.getChainId(),
             fastSyncEnabled,
             syncConfig.downloaderParallelism());
-    final SyncState syncState = new SyncState(protocolContext.getBlockchain(), ethProtocolManager.ethContext(), new PendingBlocks());
+    final SyncState syncState =
+        new SyncState(
+            protocolContext.getBlockchain(), ethProtocolManager.ethContext(), new PendingBlocks());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
-            syncConfig, protocolSchedule, protocolContext, ethProtocolManager.ethContext(), syncState);
+            syncConfig,
+            protocolSchedule,
+            protocolContext,
+            ethProtocolManager.ethContext(),
+            syncState);
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(

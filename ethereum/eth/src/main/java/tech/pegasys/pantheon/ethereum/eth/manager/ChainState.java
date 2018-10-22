@@ -14,16 +14,34 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
+
+import java.util.function.Consumer;
 
 import com.google.common.base.MoreObjects;
 
 public class ChainState {
+
+  public interface EstimatedHeightObserver {
+    void estimatedHeightChanged(long newHeight);
+  }
+
   // The best block by total difficulty that we know about
   private final BestBlock bestBlock = new BestBlock();
   // The highest block that we've seen
   private volatile long estimatedHeight = 0L;
   private volatile boolean estimatedHeightKnown = false;
+
+  private Subscribers<Consumer<Long>> estimatedHeightSubscribers = new Subscribers<>();
+
+  public long addEstimatedHeightObserver(final Consumer<Long> observer) {
+    return estimatedHeightSubscribers.subscribe(observer);
+  }
+
+  public void removeEstimatedHeightObserver(final long observerId) {
+    estimatedHeightSubscribers.unsubscribe(observerId);
+  }
 
   public boolean hasEstimatedHeight() {
     return estimatedHeightKnown;
@@ -77,6 +95,7 @@ public class ChainState {
     estimatedHeightKnown = true;
     if (blockNumber > estimatedHeight) {
       estimatedHeight = blockNumber;
+      estimatedHeightSubscribers.forEach(e -> e.accept(estimatedHeight));
     }
   }
 

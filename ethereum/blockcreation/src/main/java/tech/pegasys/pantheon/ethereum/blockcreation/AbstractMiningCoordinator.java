@@ -43,12 +43,12 @@ public abstract class AbstractMiningCoordinator<
   public AbstractMiningCoordinator(
       final Blockchain blockchain,
       final AbstractMinerExecutor<C, M> executor,
-      final SyncState syncState
-  ) {
+      final SyncState syncState) {
     this.executor = executor;
     this.blockchain = blockchain;
     this.syncState = syncState;
     this.blockchain.observeBlockAdded(this);
+    syncState.addInSyncObserver(this::inSyncChanged);
   }
 
   public void enable() {
@@ -91,8 +91,18 @@ public abstract class AbstractMiningCoordinator<
     synchronized (this) {
       if (isEnabled && shouldStartNewMiner(event)) {
         haltCurrentMiningOperation();
-        startAsyncMiningOperation();
+        if (syncState.getInSync()) {
+          startAsyncMiningOperation();
+        }
       }
+    }
+  }
+
+  public void inSyncChanged(final boolean inSync) {
+    if (isEnabled && inSync) {
+      startAsyncMiningOperation();
+    } else if (!inSync) {
+      haltCurrentMiningOperation();
     }
   }
 

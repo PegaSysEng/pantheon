@@ -19,8 +19,6 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolution;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -36,9 +34,9 @@ public class EthHashMiningCoordinatorTest {
   @Test
   public void miningCoordinatorIsCreatedDisabledWithNoReportableMiningStatistics() {
     final EthHashMinerExecutor executor = mock(EthHashMinerExecutor.class);
+    final SyncState syncState = mock(SyncState.class);
     final EthHashMiningCoordinator miningCoordinator =
-        new EthHashMiningCoordinator(
-            executionContext.getBlockchain(), executor, null);
+        new EthHashMiningCoordinator(executionContext.getBlockchain(), executor, syncState);
     final EthHashSolution solution = new EthHashSolution(1L, Hash.EMPTY, new byte[Bytes32.SIZE]);
 
     assertThat(miningCoordinator.isRunning()).isFalse();
@@ -52,6 +50,7 @@ public class EthHashMiningCoordinatorTest {
   public void reportedHashRateIsCachedIfNoCurrentDataInMiner() throws InterruptedException {
 
     final EthHashBlockMiner miner = mock(EthHashBlockMiner.class);
+    final SyncState syncState = mock(SyncState.class);
 
     final Optional<Long> hashRate1 = Optional.of(10L);
     final Optional<Long> hashRate2 = Optional.empty();
@@ -63,8 +62,7 @@ public class EthHashMiningCoordinatorTest {
     when(executor.startAsyncMining(any(), any())).thenReturn(miner);
 
     final EthHashMiningCoordinator miningCoordinator =
-        new EthHashMiningCoordinator(
-            executionContext.getBlockchain(), executor, null);
+        new EthHashMiningCoordinator(executionContext.getBlockchain(), executor, syncState);
 
     miningCoordinator.enable(); // Must enable prior returning data
     assertThat(miningCoordinator.hashesPerSecond()).isEqualTo(hashRate1);

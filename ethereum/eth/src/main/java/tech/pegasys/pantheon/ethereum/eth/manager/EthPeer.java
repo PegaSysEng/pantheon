@@ -81,6 +81,14 @@ public class EthPeer {
     this.onStatusesExchanged.set(onStatusesExchanged);
   }
 
+  public long addChainEstimatedHeightObserver(final Consumer<Long> observer) {
+    return chainHeadState.addEstimatedHeightObserver(observer);
+  }
+
+  public void removeChainEstimatedHeightObserver(final long observerId) {
+    chainHeadState.removeEstimatedHeightObserver(observerId);
+  }
+
   public void recordRequestTimeout(final int requestCode) {
     LOG.debug("Timed out while waiting for response from peer {}", this);
     reputation.recordRequestTimeout(requestCode).ifPresent(this::disconnect);

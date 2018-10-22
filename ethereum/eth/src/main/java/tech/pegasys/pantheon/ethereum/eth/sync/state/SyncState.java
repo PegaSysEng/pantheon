@@ -12,22 +12,29 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.state;
 
+import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
+import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
-public class SyncState {
+public class SyncState implements BlockAddedObserver {
   private final Blockchain blockchain;
   private final EthContext ethContext;
 
   private final long startingBlock;
   private final PendingBlocks pendingBlocks;
   private Optional<SyncTarget> syncTarget = Optional.empty();
+  private boolean lastInSync = false;
+
+  private Subscribers<Consumer<Boolean>> inSyncSubscribers;
 
   public SyncState(
       final Blockchain blockchain, final EthContext ethContext, final PendingBlocks pendingBlocks) {
@@ -35,6 +42,16 @@ public class SyncState {
     this.ethContext = ethContext;
     this.startingBlock = chainHeadNumber();
     this.pendingBlocks = pendingBlocks;
+    inSyncSubscribers = new Subscribers<>();
+    blockchain.observeBlockAdded(this);
+  }
+
+  public long addInSyncObserver(final Consumer<Boolean> observer) {
+    return inSyncSubscribers.subscribe(observer);
+  }
+
+  public void removeInSyncObserver(final long observerId) {
+    inSyncSubscribers.unsubscribe(observerId);
   }
 
   public SyncStatus syncStatus() {
@@ -64,7 +81,28 @@ public class SyncState {
   public SyncTarget setSyncTarget(final EthPeer peer, final BlockHeader commonAncestor) {
     final SyncTarget target = new SyncTarget(peer, commonAncestor);
     this.syncTarget = Optional.of(target);
+    target.addPeerChainEstimatedHeightObserver(this::targetHeightChanged);
+    checkInSync();
     return target;
+  }
+
+  private void checkInSync() {
+    final boolean newInSync = getInSync();
+
+    if (newInSync != lastInSync) {
+      lastInSync = newInSync;
+      inSyncSubscribers.forEach(c -> c.accept(newInSync));
+    }
+  }
+
+  public boolean getInSync() {
+    return syncTarget
+        .map(t -> t.estimatedTargetHeight() <= blockchain.getChainHeadBlockNumber())
+        .orElse(false);
+  }
+
+  public void setCommonAncestor(final BlockHeader commonAncestor) {
+    syncTarget.ifPresent(target -> target.setCommonAncestor(commonAncestor));
   }
 
   public void clearSyncTarget() {
@@ -84,5 +122,14 @@ public class SyncState {
             .bestPeer()
             .map(p -> p.chainState().getEstimatedHeight())
             .orElse(localChainHeight));
+  }
+
+  public void targetHeightChanged(final long height) {
+    checkInSync();
+  }
+
+  @Override
+  public void onBlockAdded(final BlockAddedEvent event, final Blockchain blockchain) {
+    checkInSync();
   }
 }
