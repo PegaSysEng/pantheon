@@ -228,4 +228,83 @@ public class ChainStateTest {
 
     assertThat(chainState.hasEstimatedHeight()).isTrue();
   }
+
+  private class ValueContainer<V> {
+    private V value;
+    private int timesSet = 0;
+
+    private ValueContainer(final V value) {
+      this.value = value;
+    }
+
+    V get() {
+      return value;
+    }
+
+    void set(final V value) {
+      this.value = value;
+      timesSet++;
+    }
+
+    int getTimesSet() {
+      return timesSet;
+    }
+  }
+
+  @Test
+  public void observersInformedWhenHeightUpdatedViaHashAndNumber() {
+    final long blockNumber = 12;
+    final BlockHeader bestBlockHeader =
+        new BlockHeaderTestFixture().number(blockNumber).buildHeader();
+    chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
+    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
+    chainState.addEstimatedHeightObserver(heightReceived::set);
+    chainState.update(bestBlockHeader.getHash(), blockNumber);
+    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+  }
+
+  @Test
+  public void observersInformedWhenHeightUpdatedViaHeader() {
+    final long blockNumber = 12;
+    final BlockHeader bestBlockHeader =
+        new BlockHeaderTestFixture().number(blockNumber).buildHeader();
+    chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
+    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
+    chainState.addEstimatedHeightObserver(heightReceived::set);
+    chainState.update(bestBlockHeader);
+    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+  }
+
+  @Test
+  public void observersInformedWhenHeightUpdatedViaHeaderAndTD() {
+    final long blockNumber = 12;
+    final BlockHeader bestBlockHeader =
+        new BlockHeaderTestFixture().number(blockNumber).buildHeader();
+    chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
+    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
+    chainState.addEstimatedHeightObserver(heightReceived::set);
+    chainState.update(bestBlockHeader, INITIAL_TOTAL_DIFFICULTY);
+    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+  }
+
+  @Test
+  public void observersNotInformedWhenHeightLowers() {
+    final long blockNumber = 12;
+    final BlockHeader bestBlockHeader =
+        new BlockHeaderTestFixture().number(blockNumber).buildHeader();
+    chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
+    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
+    chainState.addEstimatedHeightObserver(heightReceived::set);
+    chainState.update(bestBlockHeader);
+    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+
+    final long lowerBlockNumber = 12;
+    final BlockHeader lowerBlockHeader =
+        new BlockHeaderTestFixture().number(lowerBlockNumber).buildHeader();
+    chainState.update(lowerBlockHeader);
+
+    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+    assertThat(heightReceived.getTimesSet()).isEqualTo(1);
+  }
+
 }
