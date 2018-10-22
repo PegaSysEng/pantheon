@@ -453,6 +453,6 @@ bintray {
   }
 }
 
-afterReleaseBuild.dependsOn bintrayUpload
-bintrayUpload.mustRunAfter(distTar)
-bintrayUpload.mustRunAfter(distZip)
+//afterReleaseBuild.dependsOn bintrayUpload
+//bintrayUpload.mustRunAfter(distTar)
+//bintrayUpload.mustRunAfter(distZip)
