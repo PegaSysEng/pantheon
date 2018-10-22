@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 
 import java.util.Optional;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 
 public class CliqueMiningCoordinator
     extends AbstractMiningCoordinator<CliqueContext, CliqueBlockMiner> {
@@ -25,8 +26,9 @@ public class CliqueMiningCoordinator
   public CliqueMiningCoordinator(
       final Blockchain blockchain,
       final CliqueMinerExecutor executor,
-      final Synchronizer synchronizer) {
-    super(blockchain, executor, synchronizer);
+      final SyncState syncState
+      ) {
+    super(blockchain, executor, syncState);
   }
 
   @Override

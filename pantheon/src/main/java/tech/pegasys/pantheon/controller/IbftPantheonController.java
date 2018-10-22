@@ -45,6 +45,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
@@ -152,9 +154,10 @@ public class IbftPantheonController implements PantheonController<IbftContext, I
       ethProtocolManager =
           new EthProtocolManager(protocolContext.getBlockchain(), networkId, fastSyncEnabled, 1);
     }
+    final SyncState syncState = new SyncState(protocolContext.getBlockchain(), ethProtocolManager.ethContext(), new PendingBlocks());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
-            syncConfig, protocolSchedule, protocolContext, ethProtocolManager.ethContext());
+            syncConfig, protocolSchedule, protocolContext, ethProtocolManager.ethContext(), syncState);
 
     final IbftEventQueue ibftEventQueue = new IbftEventQueue();
 

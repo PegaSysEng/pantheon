@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolution;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolverInputs;
 
@@ -34,8 +35,9 @@ public class EthHashMiningCoordinator extends AbstractMiningCoordinator<Void, Et
   public EthHashMiningCoordinator(
       final Blockchain blockchain,
       final EthHashMinerExecutor executor,
-      final Synchronizer synchronizer) {
-    super(blockchain, executor, synchronizer);
+      final SyncState syncState
+      ) {
+    super(blockchain, executor, syncState);
     this.executor = executor;
   }
 

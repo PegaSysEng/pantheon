@@ -34,6 +34,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -131,9 +133,10 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
             genesisConfig.getChainId(),
             fastSyncEnabled,
             syncConfig.downloaderParallelism());
+    final SyncState syncState = new SyncState(protocolContext.getBlockchain(), ethProtocolManager.ethContext(), new PendingBlocks());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
-            syncConfig, protocolSchedule, protocolContext, ethProtocolManager.ethContext());
+            syncConfig, protocolSchedule, protocolContext, ethProtocolManager.ethContext(), syncState);
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
@@ -153,7 +156,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
                 new SystemClock()));
 
     final EthHashMiningCoordinator miningCoordinator =
-        new EthHashMiningCoordinator(protocolContext.getBlockchain(), executor, synchronizer);
+        new EthHashMiningCoordinator(protocolContext.getBlockchain(), executor, syncState);
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
     if (miningParams.isMiningEnabled()) {
       miningCoordinator.enable();

@@ -19,9 +19,8 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolution;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolverInputs;
 import tech.pegasys.pantheon.util.Subscribers;
@@ -39,15 +38,16 @@ public abstract class AbstractMiningCoordinator<
   private final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
   private final AbstractMinerExecutor<C, M> executor;
   protected final Blockchain blockchain;
-  private final Synchronizer synchronizer;
+  private final SyncState syncState;
 
   public AbstractMiningCoordinator(
       final Blockchain blockchain,
       final AbstractMinerExecutor<C, M> executor,
-      final Synchronizer synchronizer) {
+      final SyncState syncState
+  ) {
     this.executor = executor;
     this.blockchain = blockchain;
-    this.synchronizer = synchronizer;
+    this.syncState = syncState;
     this.blockchain.observeBlockAdded(this);
   }
 
@@ -89,16 +89,8 @@ public abstract class AbstractMiningCoordinator<
   @Override
   public void onBlockAdded(final BlockAddedEvent event, final Blockchain blockchain) {
     synchronized (this) {
-      // if we need to halt or we are out of sync
-      if (!isEnabled || !syncWithinTolerance()) {
+      if (isEnabled && shouldStartNewMiner(event)) {
         haltCurrentMiningOperation();
-        // if we need to restart
-      } else if (shouldStartNewMiner(event)) {
-        haltCurrentMiningOperation();
-        startAsyncMiningOperation();
-        // if we've been stopped previously (out of sync or disable) and have come back into sync
-        // or been re-enabled
-      } else if (!currentRunningMiner.isPresent()) {
         startAsyncMiningOperation();
       }
     }
@@ -106,14 +98,6 @@ public abstract class AbstractMiningCoordinator<
 
   private boolean shouldStartNewMiner(final BlockAddedEvent event) {
     return event.getEventType() != EventType.FORK;
-  }
-
-  private boolean syncWithinTolerance() {
-    return synchronizer
-        .getSyncStatus()
-        .map(SyncStatus::distanceFromHighestBlock)
-        .map(d -> d < 6)
-        .orElse(false);
   }
 
   public void removeMinedBlockObserver(final long id) {
