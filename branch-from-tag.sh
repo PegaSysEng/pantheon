@@ -39,7 +39,7 @@ bugfix_version=$(echo ${tag_version} | cut -d'.' -f3 | cut -d'-' -f1)
 branch_bugfix_version=$((${bugfix_version}+1))
 
 # Reconstruct the version number for the branch
-branch_version= "${major_version}.${minor_version}.${branch_bugfix_version}-SNAPSHOT"
+branch_version="${major_version}.${minor_version}.${branch_bugfix_version}-SNAPSHOT"
 
 # Change the local gradle.properties version to branch version
 sed -i "" "s/${tag_version}/${branch_version}/g" gradle.properties
