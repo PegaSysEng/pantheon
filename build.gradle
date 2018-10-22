@@ -421,8 +421,8 @@ release {
 
   // A release branch increases the bugfix version, while master increases the minor version
   versionPatterns = project.hasProperty('release.branch') ? [
-    /(\d+\.)+([^\d]*$)/: { Matcher m, Project p ->
-      m.replaceAll("${m[0][1]}.${(m[0][2] as int) + 1}.${m[0][3]}${m[0][4]}") }
+    /(\d+)/: { Matcher m, Project p ->
+      m.replaceAll("${m[0][1]}.${(m[0][2] as int) + 1}.${m[0][3]}") }
   ] : [
     /(\d+)([^\d]*$)/: { Matcher m, Project p ->
       m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
