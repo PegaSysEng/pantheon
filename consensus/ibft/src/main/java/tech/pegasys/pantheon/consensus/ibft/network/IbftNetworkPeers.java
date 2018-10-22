@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
@@ -58,16 +59,18 @@ public class IbftNetworkPeers {
 
   private void sendMessageToSpecificAddresses(
       final Collection<Address> recipients, final MessageData message) {
-    for (Address validator : recipients) {
-      PeerConnection connection = peerConnections.get(validator);
-      try {
-        if (connection != null) {
-          connection.sendForProtocol(PROTOCOL_NAME, message);
-        }
-      } catch (PeerNotConnected ex) {
-        LOG.trace("Lost connection to a validator.");
-      }
-    }
+    recipients
+        .stream()
+        .map(peerConnections::get)
+        .filter(Objects::nonNull)
+        .forEach(
+            connection -> {
+              try {
+                connection.sendForProtocol(PROTOCOL_NAME, message);
+              } catch (PeerNotConnected peerNotConnected) {
+                LOG.trace("Lost connection to a validator.");
+              }
+            });
   }
 
   private Address getAddressFrom(final PeerConnection connection) {
