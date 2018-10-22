@@ -87,7 +87,7 @@ public class SyncState implements BlockAddedObserver {
   }
 
   private void checkInSync() {
-    final boolean newInSync = getInSync();
+    final boolean newInSync = isInSync();
 
     if (newInSync != lastInSync) {
       lastInSync = newInSync;
@@ -95,7 +95,7 @@ public class SyncState implements BlockAddedObserver {
     }
   }
 
-  public boolean getInSync() {
+  public boolean isInSync() {
     return syncTarget
         .map(t -> t.estimatedTargetHeight() <= blockchain.getChainHeadBlockNumber())
         .orElse(false);

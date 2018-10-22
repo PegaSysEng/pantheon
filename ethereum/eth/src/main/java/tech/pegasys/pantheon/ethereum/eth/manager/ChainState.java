@@ -22,11 +22,6 @@ import java.util.function.Consumer;
 import com.google.common.base.MoreObjects;
 
 public class ChainState {
-
-  public interface EstimatedHeightObserver {
-    void estimatedHeightChanged(long newHeight);
-  }
-
   // The best block by total difficulty that we know about
   private final BestBlock bestBlock = new BestBlock();
   // The highest block that we've seen

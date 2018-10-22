@@ -91,7 +91,7 @@ public abstract class AbstractMiningCoordinator<
     synchronized (this) {
       if (isEnabled && shouldStartNewMiner(event)) {
         haltCurrentMiningOperation();
-        if (syncState.getInSync()) {
+        if (syncState.isInSync()) {
           startAsyncMiningOperation();
         }
       }
@@ -99,10 +99,12 @@ public abstract class AbstractMiningCoordinator<
   }
 
   public void inSyncChanged(final boolean inSync) {
-    if (isEnabled && inSync) {
-      startAsyncMiningOperation();
-    } else if (!inSync) {
-      haltCurrentMiningOperation();
+    synchronized (this) {
+      if (isEnabled && inSync) {
+        startAsyncMiningOperation();
+      } else if (!inSync) {
+        haltCurrentMiningOperation();
+      }
     }
   }
 
