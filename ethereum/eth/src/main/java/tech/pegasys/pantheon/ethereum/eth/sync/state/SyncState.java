@@ -28,8 +28,8 @@ public class SyncState {
   private final EthPeers ethPeers;
 
   private final long startingBlock;
-  private final AtomicBoolean lastInSync = new AtomicBoolean(false);
-  private final Subscribers<InSyncListener> inSyncSubscribers = new Subscribers<>();
+  private final AtomicBoolean lastInSync = new AtomicBoolean(true);
+  private final Subscribers<InSyncListener> inSyncListeners = new Subscribers<>();
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private long chainHeightListenerId;
 
@@ -45,8 +45,8 @@ public class SyncState {
         });
   }
 
-  public void addInSyncObserver(final InSyncListener observer) {
-    inSyncSubscribers.subscribe(observer);
+  public void addInSyncListener(final InSyncListener observer) {
+    inSyncListeners.subscribe(observer);
   }
 
   public SyncStatus syncStatus() {
@@ -119,7 +119,7 @@ public class SyncState {
   private void checkInSync() {
     final boolean currentSyncStatus = isInSync();
     if (lastInSync.compareAndSet(!currentSyncStatus, currentSyncStatus)) {
-      inSyncSubscribers.forEach(c -> c.onSyncStatusChanged(currentSyncStatus));
+      inSyncListeners.forEach(c -> c.onSyncStatusChanged(currentSyncStatus));
     }
   }
 }

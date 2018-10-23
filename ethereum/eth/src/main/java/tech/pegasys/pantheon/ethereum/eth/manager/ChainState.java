@@ -66,7 +66,7 @@ public class ChainState {
 
   public void update(final BlockHeader header) {
     synchronized (this) {
-      if (bestBlock.hash.equals(header.getHash())) {
+      if (header.getHash().equals(bestBlock.hash)) {
         bestBlock.number = header.getNumber();
       }
       updateHeightEstimate(header.getNumber());
