@@ -63,7 +63,7 @@ public class EthNetworkConfig {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    EthNetworkConfig that = (EthNetworkConfig) o;
+    final EthNetworkConfig that = (EthNetworkConfig) o;
     return networkId == that.networkId
         && Objects.equals(genesisConfig, that.genesisConfig)
         && Objects.equals(bootNodes, that.bootNodes);
@@ -100,7 +100,7 @@ public class EthNetworkConfig {
     try {
       URI uri = Resources.getResource(resourceName).toURI();
       return Resources.toString(uri.toURL(), UTF_8);
-    } catch (URISyntaxException | IOException e) {
+    } catch (final URISyntaxException | IOException e) {
       throw new IllegalStateException(e);
     }
   }
