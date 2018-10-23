@@ -46,7 +46,7 @@ pipeline {
 
                                   nextVersion = ''
                                   if( params.NEXT_VERSION?.trim() ){
-                                      nextVersion = "-Prelease.releaseVersion=${params.NEXT_VERSION}"
+                                      nextVersion = "-Prelease.newVersion=${params.NEXT_VERSION}"
                                   }
                               }
 
