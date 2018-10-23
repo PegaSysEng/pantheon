@@ -21,14 +21,13 @@ import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SyncState {
   private final Blockchain blockchain;
   private final EthPeers ethPeers;
 
   private final long startingBlock;
-  private final AtomicBoolean lastInSync = new AtomicBoolean(true);
+  private boolean lastInSync = true;
   private final Subscribers<InSyncListener> inSyncListeners = new Subscribers<>();
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private long chainHeightListenerId;
@@ -116,9 +115,10 @@ public class SyncState {
         ethPeers.bestPeer().map(p -> p.chainState().getEstimatedHeight()).orElse(localChainHeight));
   }
 
-  private void checkInSync() {
+  private synchronized void checkInSync() {
     final boolean currentSyncStatus = isInSync();
-    if (lastInSync.compareAndSet(!currentSyncStatus, currentSyncStatus)) {
+    if (lastInSync != currentSyncStatus) {
+      lastInSync = currentSyncStatus;
       inSyncListeners.forEach(c -> c.onSyncStatusChanged(currentSyncStatus));
     }
   }

@@ -327,7 +327,7 @@ public class Downloader<C> {
       return CompletableFuture.completedFuture(Collections.emptyList());
     }
 
-    CompletableFuture<List<Block>> importedBlocks;
+    final CompletableFuture<List<Block>> importedBlocks;
     if (checkpointHeaders.size() < 2) {
       // Download blocks without constraining the end block
       final ImportBlocksTask<C> importTask =
