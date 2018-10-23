@@ -12,8 +12,8 @@ pipeline {
         docker { image 'pegasyseng/pantheon-build:0.0.2' }
     }
     parameters {
-            string(name: 'TAG_NAME', defaultValue: '', description: 'Name of the Tag to branch from')
-            string(name: 'BRANCH_NAME', defaultValue: '', description: 'Desired name of the branch')
+            string(name: 'TAG_NAME', defaultValue: '', description: 'Name of the Tag to create the branch from')
+            string(name: 'BRANCH_NAME', defaultValue: '', description: 'The desired name of the new branch')
     }
     stages {
         stage('Release') {
