@@ -58,7 +58,6 @@ public interface PantheonController<C, M extends BlockMiner<C, ? extends Abstrac
           GenesisConfig.fromConfig(config, MainnetProtocolSchedule.fromConfig(configOptions)),
           syncConfig,
           miningParameters,
-          networkId,
           nodeKeys);
     } else if (configOptions.containsKey("ibft")) {
       return IbftPantheonController.init(

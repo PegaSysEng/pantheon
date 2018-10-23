@@ -139,7 +139,8 @@ public class CliquePantheonController
             fastSyncEnabled,
             networkId);
     final SyncState syncState =
-        new SyncState(protocolContext.getBlockchain(), ethProtocolManager.ethContext());
+        new SyncState(
+            protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
             syncConfig,
@@ -153,7 +154,7 @@ public class CliquePantheonController
             protocolSchedule, protocolContext, ethProtocolManager.ethContext());
 
     final ExecutorService minerThreadPool = Executors.newCachedThreadPool();
-    CliqueMinerExecutor miningExecutor =
+    final CliqueMinerExecutor miningExecutor =
         new CliqueMinerExecutor(
             protocolContext,
             minerThreadPool,
@@ -167,7 +168,7 @@ public class CliquePantheonController
                 Util.publicKeyToAddress(nodeKeys.getPublicKey()),
                 secondsBetweenBlocks),
             epochManger);
-    CliqueMiningCoordinator miningCoordinator =
+    final CliqueMiningCoordinator miningCoordinator =
         new CliqueMiningCoordinator(blockchain, miningExecutor, syncState);
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
 

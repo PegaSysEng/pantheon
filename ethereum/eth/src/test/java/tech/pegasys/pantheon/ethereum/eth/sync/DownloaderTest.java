@@ -80,7 +80,7 @@ public class DownloaderTest {
     protocolContext = localBlockchainSetup.getProtocolContext();
     ethProtocolManager = EthProtocolManagerTestUtil.create(localBlockchain);
     ethContext = ethProtocolManager.ethContext();
-    syncState = new SyncState(protocolContext.getBlockchain(), ethContext);
+    syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
   }
 
   private Downloader<?> downloader(final SynchronizerConfiguration syncConfig) {

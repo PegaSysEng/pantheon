@@ -72,7 +72,6 @@ public final class BlockchainImporterTest {
             genesisConfig,
             SynchronizerConfiguration.builder().build(),
             miningParams,
-            10,
             keyPair);
     final BlockchainImporter.ImportResult result =
         blockImporter.importBlockchain(source, ctrl, true, 1, 1, false, false, null);

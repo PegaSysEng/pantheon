@@ -98,7 +98,6 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
         GenesisConfig.mainnet(),
         SynchronizerConfiguration.builder().build(),
         miningParams,
-        MAINNET_NETWORK_ID,
         nodeKeys);
   }
 
@@ -107,7 +106,6 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
       final GenesisConfig<Void> genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
-      final int networkId,
       final KeyPair nodeKeys)
       throws IOException {
     final RocksDbKeyValueStorage kv =
@@ -133,7 +131,8 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
             fastSyncEnabled,
             syncConfig.downloaderParallelism());
     final SyncState syncState =
-        new SyncState(protocolContext.getBlockchain(), ethProtocolManager.ethContext());
+        new SyncState(
+            protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
             syncConfig,

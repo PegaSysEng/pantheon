@@ -46,7 +46,6 @@ public class PantheonControllerBuilder {
           GenesisConfig.development(),
           synchronizerConfiguration,
           miningParameters,
-          ethNetworkConfig.getNetworkId(),
           nodeKeys);
     } else {
       final String genesisConfig =

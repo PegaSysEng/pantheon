@@ -79,7 +79,7 @@ public class BlockPropagationManagerTest {
             .blockPropagationRange(-3, 5)
             .build()
             .validated(blockchain);
-    syncState = new SyncState(blockchain, ethProtocolManager.ethContext());
+    syncState = new SyncState(blockchain, ethProtocolManager.ethContext().getEthPeers());
     blockPropagationManager =
         new BlockPropagationManager<>(
             syncConfig,

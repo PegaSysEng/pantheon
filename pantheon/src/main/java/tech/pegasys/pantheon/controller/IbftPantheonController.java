@@ -140,8 +140,8 @@ public class IbftPantheonController implements PantheonController<IbftContext, I
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
-    EthProtocolManager ethProtocolManager;
-    SubProtocol ethSubProtocol;
+    final EthProtocolManager ethProtocolManager;
+    final SubProtocol ethSubProtocol;
     if (ottomanTestnetOperation) {
       LOG.info("Operating on Ottoman testnet.");
       ethSubProtocol = Istanbul64Protocol.get();
@@ -154,7 +154,8 @@ public class IbftPantheonController implements PantheonController<IbftContext, I
           new EthProtocolManager(protocolContext.getBlockchain(), networkId, fastSyncEnabled, 1);
     }
     final SyncState syncState =
-        new SyncState(protocolContext.getBlockchain(), ethProtocolManager.ethContext());
+        new SyncState(
+            protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
             syncConfig,

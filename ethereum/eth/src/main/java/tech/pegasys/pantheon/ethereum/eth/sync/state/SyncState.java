@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.ethereum.eth.sync.state;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public class SyncState {
   private final Blockchain blockchain;
-  private final EthContext ethContext;
+  private final EthPeers ethPeers;
 
   private final long startingBlock;
   private final AtomicBoolean lastInSync = new AtomicBoolean(false);
@@ -34,9 +34,9 @@ public class SyncState {
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private long chainHeightListenerId;
 
-  public SyncState(final Blockchain blockchain, final EthContext ethContext) {
+  public SyncState(final Blockchain blockchain, final EthPeers ethPeers) {
     this.blockchain = blockchain;
-    this.ethContext = ethContext;
+    this.ethPeers = ethPeers;
     this.startingBlock = chainHeadNumber();
     blockchain.observeBlockAdded(
         (event, chain) -> {
@@ -114,11 +114,7 @@ public class SyncState {
   public long bestChainHeight(final long localChainHeight) {
     return Math.max(
         localChainHeight,
-        ethContext
-            .getEthPeers()
-            .bestPeer()
-            .map(p -> p.chainState().getEstimatedHeight())
-            .orElse(localChainHeight));
+        ethPeers.bestPeer().map(p -> p.chainState().getEstimatedHeight()).orElse(localChainHeight));
   }
 
   private void checkInSync() {
