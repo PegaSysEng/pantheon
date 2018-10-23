@@ -26,15 +26,15 @@ public class RpcApis {
   public static final Collection<RpcApi> DEFAULT_JSON_RPC_APIS = Arrays.asList(ETH, NET, WEB3);
 
   public static final Optional<RpcApi> valueOf(final String name) {
-    if (name.equals(ETH.getCliValue())) {
+    if (name.equals(ETH.toString())) {
       return Optional.of(ETH);
-    } else if (name.equals(DEBUG.getCliValue())) {
+    } else if (name.equals(DEBUG.toString())) {
       return Optional.of(DEBUG);
-    } else if (name.equals(MINER.getCliValue())) {
+    } else if (name.equals(MINER.toString())) {
       return Optional.of(MINER);
-    } else if (name.equals(NET.getCliValue())) {
+    } else if (name.equals(NET.toString())) {
       return Optional.of(NET);
-    } else if (name.equals(WEB3.getCliValue())) {
+    } else if (name.equals(WEB3.toString())) {
       return Optional.of(WEB3);
     } else {
       return Optional.empty();
@@ -42,6 +42,6 @@ public class RpcApis {
   }
 
   public static final String getValue(final RpcApi rpcapi) {
-    return rpcapi.getCliValue();
+    return rpcapi.toString();
   }
 }

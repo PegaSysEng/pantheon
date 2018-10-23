@@ -20,7 +20,7 @@ public class CliqueRpcApis {
   public static final RpcApi CLIQUE = new RpcApi("CLIQUE");
 
   public static final Optional<RpcApi> valueOf(final String name) {
-    if (name.equals(CLIQUE.getCliValue())) {
+    if (name.equals(CLIQUE.toString())) {
       return Optional.of(CLIQUE);
     } else {
       return Optional.empty();
@@ -28,6 +28,6 @@ public class CliqueRpcApis {
   }
 
   public static final String getName(final RpcApi rpcapi) {
-    return rpcapi.getCliValue();
+    return rpcapi.toString();
   }
 }

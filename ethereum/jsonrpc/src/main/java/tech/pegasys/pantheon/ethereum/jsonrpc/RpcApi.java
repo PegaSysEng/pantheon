@@ -21,10 +21,6 @@ public class RpcApi {
     this.cliValue = cliValue;
   }
 
-  public String getCliValue() {
-    return cliValue;
-  }
-
   @Override
   public boolean equals(final Object o) {
     if (this == o) {
@@ -40,5 +36,10 @@ public class RpcApi {
   @Override
   public int hashCode() {
     return Objects.hashCode(cliValue);
+  }
+
+  @Override
+  public String toString() {
+    return cliValue;
   }
 }

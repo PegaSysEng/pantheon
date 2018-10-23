@@ -20,7 +20,7 @@ public class IbftRpcApis {
   public static final RpcApi IBFT = new RpcApi("IBFT");
 
   public static final Optional<RpcApi> valueOf(final String name) {
-    if (name.equals(IBFT.getCliValue())) {
+    if (name.equals(IBFT.toString())) {
       return Optional.of(IBFT);
     } else {
       return Optional.empty();
@@ -28,6 +28,6 @@ public class IbftRpcApis {
   }
 
   public static final String getName(final RpcApi rpcapi) {
-    return rpcapi.getCliValue();
+    return rpcapi.toString();
   }
 }
