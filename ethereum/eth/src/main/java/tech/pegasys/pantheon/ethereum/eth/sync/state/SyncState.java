@@ -35,6 +35,7 @@ public class SyncState implements BlockAddedObserver {
   private boolean lastInSync = false;
 
   private final Subscribers<Consumer<Boolean>> inSyncSubscribers;
+  private long chainHeightListenerId;
 
   public SyncState(
       final Blockchain blockchain, final EthContext ethContext, final PendingBlocks pendingBlocks) {
@@ -77,7 +78,7 @@ public class SyncState implements BlockAddedObserver {
   public SyncTarget setSyncTarget(final EthPeer peer, final BlockHeader commonAncestor) {
     final SyncTarget target = new SyncTarget(peer, commonAncestor);
     this.syncTarget = Optional.of(target);
-    target.addPeerChainEstimatedHeightListener(this::targetHeightChanged);
+    chainHeightListenerId = target.addPeerChainEstimatedHeightListener(height -> checkInSync());
     checkInSync();
     return target;
   }
@@ -102,7 +103,9 @@ public class SyncState implements BlockAddedObserver {
   }
 
   public void clearSyncTarget() {
-    this.syncTarget = Optional.empty();
+    syncTarget.ifPresent(
+        target -> target.removePeerChainEstimatedHeightListener(chainHeightListenerId));
+    syncTarget = Optional.empty();
   }
 
   public long bestChainHeight() {
@@ -118,10 +121,6 @@ public class SyncState implements BlockAddedObserver {
             .bestPeer()
             .map(p -> p.chainState().getEstimatedHeight())
             .orElse(localChainHeight));
-  }
-
-  public void targetHeightChanged(final long height) {
-    checkInSync();
   }
 
   @Override
