@@ -55,7 +55,9 @@ public abstract class AbstractMiningCoordinator<
       if (isEnabled) {
         return;
       }
-      startAsyncMiningOperation();
+      if (syncState.isInSync()) {
+        startAsyncMiningOperation();
+      }
       isEnabled = true;
     }
   }
