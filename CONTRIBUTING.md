@@ -19,7 +19,7 @@ Before You start
   * [Pull Requests](#pull-requests)
   * [Code Reviews]
 
-[Style Guides](#Style-Guides)
+[Style Guides](#style-guides)
   * [Git Commit Messages & Pull Request Messages](#git-commit-messages--pull-request-messages)
   * [Java Style Guide](#java-code-style-guide)
   * [Documentation Style Guide](#documentation-style-guide)
