@@ -34,7 +34,7 @@ public class SyncState implements BlockAddedObserver {
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private boolean lastInSync = false;
 
-  private Subscribers<Consumer<Boolean>> inSyncSubscribers;
+  private final Subscribers<Consumer<Boolean>> inSyncSubscribers;
 
   public SyncState(
       final Blockchain blockchain, final EthContext ethContext, final PendingBlocks pendingBlocks) {
@@ -46,12 +46,8 @@ public class SyncState implements BlockAddedObserver {
     blockchain.observeBlockAdded(this);
   }
 
-  public long addInSyncObserver(final Consumer<Boolean> observer) {
-    return inSyncSubscribers.subscribe(observer);
-  }
-
-  public void removeInSyncObserver(final long observerId) {
-    inSyncSubscribers.unsubscribe(observerId);
+  public void addInSyncObserver(final Consumer<Boolean> observer) {
+    inSyncSubscribers.subscribe(observer);
   }
 
   public SyncStatus syncStatus() {

@@ -229,28 +229,6 @@ public class ChainStateTest {
     assertThat(chainState.hasEstimatedHeight()).isTrue();
   }
 
-  private class ValueContainer<V> {
-    private V value;
-    private int timesSet = 0;
-
-    private ValueContainer(final V value) {
-      this.value = value;
-    }
-
-    V get() {
-      return value;
-    }
-
-    void set(final V value) {
-      this.value = value;
-      timesSet++;
-    }
-
-    int getTimesSet() {
-      return timesSet;
-    }
-  }
-
   @Test
   public void observersInformedWhenHeightUpdatedViaHashAndNumber() {
     final long blockNumber = 12;
@@ -307,4 +285,25 @@ public class ChainStateTest {
     assertThat(heightReceived.getTimesSet()).isEqualTo(1);
   }
 
+  private static class ValueContainer<V> {
+    private V value;
+    private int timesSet = 0;
+
+    private ValueContainer(final V value) {
+      this.value = value;
+    }
+
+    V get() {
+      return value;
+    }
+
+    void set(final V value) {
+      this.value = value;
+      timesSet++;
+    }
+
+    int getTimesSet() {
+      return timesSet;
+    }
+  }
 }

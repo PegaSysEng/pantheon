@@ -28,7 +28,7 @@ public class ChainState {
   private volatile long estimatedHeight = 0L;
   private volatile boolean estimatedHeightKnown = false;
 
-  private Subscribers<Consumer<Long>> estimatedHeightSubscribers = new Subscribers<>();
+  private final Subscribers<Consumer<Long>> estimatedHeightSubscribers = new Subscribers<>();
 
   public long addEstimatedHeightObserver(final Consumer<Long> observer) {
     return estimatedHeightSubscribers.subscribe(observer);
