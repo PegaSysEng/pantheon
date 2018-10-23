@@ -77,7 +77,7 @@ public class SyncState implements BlockAddedObserver {
   public SyncTarget setSyncTarget(final EthPeer peer, final BlockHeader commonAncestor) {
     final SyncTarget target = new SyncTarget(peer, commonAncestor);
     this.syncTarget = Optional.of(target);
-    target.addPeerChainEstimatedHeightObserver(this::targetHeightChanged);
+    target.addPeerChainEstimatedHeightListener(this::targetHeightChanged);
     checkInSync();
     return target;
   }

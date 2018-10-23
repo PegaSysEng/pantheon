@@ -14,9 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth.sync.state;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.ChainState;
+import tech.pegasys.pantheon.ethereum.eth.manager.ChainState.EstimatedHeightListener;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-
-import java.util.function.Consumer;
 
 import com.google.common.base.MoreObjects;
 
@@ -42,12 +41,12 @@ public class SyncTarget {
     this.commonAncestor = commonAncestor;
   }
 
-  public long addPeerChainEstimatedHeightObserver(final Consumer<Long> observer) {
-    return peer.addChainEstimatedHeightObserver(observer);
+  public long addPeerChainEstimatedHeightListener(final EstimatedHeightListener listener) {
+    return peer.addChainEstimatedHeightListener(listener);
   }
 
-  public void removePeerChainEstimatedHeightObserver(final long observerId) {
-    peer.removeChainEstimatedHeightObserver(observerId);
+  public void removePeerChainEstimatedHeightListener(final long listenerId) {
+    peer.removeChainEstimatedHeightListener(listenerId);
   }
 
   public long estimatedTargetHeight() {

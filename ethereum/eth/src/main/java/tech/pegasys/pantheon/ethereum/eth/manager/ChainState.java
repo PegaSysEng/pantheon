@@ -17,8 +17,6 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.util.function.Consumer;
-
 import com.google.common.base.MoreObjects;
 
 public class ChainState {
@@ -28,14 +26,14 @@ public class ChainState {
   private volatile long estimatedHeight = 0L;
   private volatile boolean estimatedHeightKnown = false;
 
-  private final Subscribers<Consumer<Long>> estimatedHeightSubscribers = new Subscribers<>();
+  private final Subscribers<EstimatedHeightListener> estimatedHeightListeners = new Subscribers<>();
 
-  public long addEstimatedHeightObserver(final Consumer<Long> observer) {
-    return estimatedHeightSubscribers.subscribe(observer);
+  public long addEstimatedHeightListener(final EstimatedHeightListener listener) {
+    return estimatedHeightListeners.subscribe(listener);
   }
 
-  public void removeEstimatedHeightObserver(final long observerId) {
-    estimatedHeightSubscribers.unsubscribe(observerId);
+  public void removeEstimatedHeightListener(final long listenerId) {
+    estimatedHeightListeners.unsubscribe(listenerId);
   }
 
   public boolean hasEstimatedHeight() {
@@ -90,7 +88,7 @@ public class ChainState {
     estimatedHeightKnown = true;
     if (blockNumber > estimatedHeight) {
       estimatedHeight = blockNumber;
-      estimatedHeightSubscribers.forEach(e -> e.accept(estimatedHeight));
+      estimatedHeightListeners.forEach(e -> e.onEstimatedHeightChanged(estimatedHeight));
     }
   }
 
@@ -128,5 +126,10 @@ public class ChainState {
           .add("number", number)
           .toString();
     }
+  }
+
+  @FunctionalInterface
+  public interface EstimatedHeightListener {
+    void onEstimatedHeightChanged(long estimatedHeight);
   }
 }

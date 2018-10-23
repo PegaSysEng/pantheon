@@ -13,10 +13,14 @@
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.eth.manager.ChainState.EstimatedHeightListener;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -235,10 +239,10 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
-    chainState.addEstimatedHeightObserver(heightReceived::set);
+    final EstimatedHeightListener listener = mock(EstimatedHeightListener.class);
+    chainState.addEstimatedHeightListener(listener);
     chainState.update(bestBlockHeader.getHash(), blockNumber);
-    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+    verify(listener).onEstimatedHeightChanged(blockNumber);
   }
 
   @Test
@@ -247,10 +251,10 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
-    chainState.addEstimatedHeightObserver(heightReceived::set);
+    final EstimatedHeightListener listener = mock(EstimatedHeightListener.class);
+    chainState.addEstimatedHeightListener(listener);
     chainState.update(bestBlockHeader);
-    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+    verify(listener).onEstimatedHeightChanged(blockNumber);
   }
 
   @Test
@@ -259,10 +263,10 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
-    chainState.addEstimatedHeightObserver(heightReceived::set);
+    final EstimatedHeightListener listener = mock(EstimatedHeightListener.class);
+    chainState.addEstimatedHeightListener(listener);
     chainState.update(bestBlockHeader, INITIAL_TOTAL_DIFFICULTY);
-    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+    verify(listener).onEstimatedHeightChanged(blockNumber);
   }
 
   @Test
@@ -271,39 +275,16 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ValueContainer<Long> heightReceived = new ValueContainer<>(0L);
-    chainState.addEstimatedHeightObserver(heightReceived::set);
+    final EstimatedHeightListener listener = mock(EstimatedHeightListener.class);
+    chainState.addEstimatedHeightListener(listener);
     chainState.update(bestBlockHeader);
-    assertThat(heightReceived.get()).isEqualTo(blockNumber);
+    verify(listener).onEstimatedHeightChanged(blockNumber);
 
     final long lowerBlockNumber = 12;
     final BlockHeader lowerBlockHeader =
         new BlockHeaderTestFixture().number(lowerBlockNumber).buildHeader();
     chainState.update(lowerBlockHeader);
 
-    assertThat(heightReceived.get()).isEqualTo(blockNumber);
-    assertThat(heightReceived.getTimesSet()).isEqualTo(1);
-  }
-
-  private static class ValueContainer<V> {
-    private V value;
-    private int timesSet = 0;
-
-    private ValueContainer(final V value) {
-      this.value = value;
-    }
-
-    V get() {
-      return value;
-    }
-
-    void set(final V value) {
-      this.value = value;
-      timesSet++;
-    }
-
-    int getTimesSet() {
-      return timesSet;
-    }
+    verifyNoMoreInteractions(listener);
   }
 }
