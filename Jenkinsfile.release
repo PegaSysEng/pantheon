@@ -19,17 +19,6 @@ pipeline {
 
     stages {
         stage('Release') {
-            script{
-                releaseVersion = ''
-                if( params.RELEASE_VERSION?.trim() ){
-                   params.releaseVersion = "-Prelease.releaseVersion=${params.RELEASE_VERSION}"
-                }
-
-                nextVersion = ''
-                if( params.NEXT_VERSION?.trim() ){
-                    nextVersion = "-Prelease.releaseVersion=${params.NEXT_VERSION}"
-                }
-            }
             steps {
                 sshagent(
                     credentials: ['pegasys-admin-github-ssh-private-key']
@@ -48,6 +37,20 @@ pipeline {
                             'GIT_AUTHOR_EMAIL="pegasys.manager@gmail.com"'
                         ]) {
                             tryAddKnownHost('github.com')
+
+                             script{
+                                  releaseVersion = ''
+                                  if( params.RELEASE_VERSION?.trim() ){
+                                      params.releaseVersion = "-Prelease.releaseVersion=${params.RELEASE_VERSION}"
+                                 }
+
+                                  nextVersion = ''
+                                  if( params.NEXT_VERSION?.trim() ){
+                                      nextVersion = "-Prelease.releaseVersion=${params.NEXT_VERSION}"
+                                  }
+                              }
+
+
                             sh "./gradlew release -Prelease.useAutomaticVersion=true -Prelease.branch=${params.BRANCH_NAME} ${releaseVersion} ${nextVersion}"
                         }
                     }
