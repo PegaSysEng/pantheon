@@ -79,5 +79,6 @@ public class EthHashMiningCoordinator extends AbstractMiningCoordinator<Void, Et
           miner.cancel();
           miner.getHashesPerSecond().ifPresent(val -> cachedHashesPerSecond = Optional.of(val));
         });
+    currentRunningMiner = Optional.empty();
   }
 }

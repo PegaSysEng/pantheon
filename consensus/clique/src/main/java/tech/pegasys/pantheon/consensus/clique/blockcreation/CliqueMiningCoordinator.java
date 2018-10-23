@@ -17,19 +17,11 @@ import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 
-import java.util.Optional;
-
 public class CliqueMiningCoordinator
     extends AbstractMiningCoordinator<CliqueContext, CliqueBlockMiner> {
 
   public CliqueMiningCoordinator(
       final Blockchain blockchain, final CliqueMinerExecutor executor, final SyncState syncState) {
     super(blockchain, executor, syncState);
-  }
-
-  @Override
-  protected void haltCurrentMiningOperation() {
-    currentRunningMiner.ifPresent(CliqueBlockMiner::cancel);
-    currentRunningMiner = Optional.empty();
   }
 }

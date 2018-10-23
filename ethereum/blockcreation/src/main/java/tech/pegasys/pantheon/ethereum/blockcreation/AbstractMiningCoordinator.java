@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.blockcreation;
 
+import static org.apache.logging.log4j.LogManager.getLogger;
+
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -27,10 +29,12 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.Logger;
+
 public abstract class AbstractMiningCoordinator<
         C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>>
     implements BlockAddedObserver {
-
+  private static final Logger LOG = getLogger();
   protected boolean isEnabled = false;
   protected volatile Optional<M> currentRunningMiner = Optional.empty();
 
@@ -74,7 +78,7 @@ public abstract class AbstractMiningCoordinator<
 
   public boolean isRunning() {
     synchronized (this) {
-      return isEnabled;
+      return currentRunningMiner.isPresent();
     }
   }
 
@@ -85,6 +89,7 @@ public abstract class AbstractMiningCoordinator<
 
   protected void haltCurrentMiningOperation() {
     currentRunningMiner.ifPresent(M::cancel);
+    currentRunningMiner = Optional.empty();
   }
 
   @Override
@@ -102,8 +107,10 @@ public abstract class AbstractMiningCoordinator<
   public void inSyncChanged(final boolean inSync) {
     synchronized (this) {
       if (isEnabled && inSync) {
+        LOG.info("Resuming mining operations");
         startAsyncMiningOperation();
       } else if (!inSync) {
+        LOG.info("Pausing mining while behind chain head");
         haltCurrentMiningOperation();
       }
     }
