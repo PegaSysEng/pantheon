@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.blockcreation;
 
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
-import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent.EventType;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
@@ -89,7 +88,7 @@ public abstract class AbstractMiningCoordinator<
   @Override
   public void onBlockAdded(final BlockAddedEvent event, final Blockchain blockchain) {
     synchronized (this) {
-      if (isEnabled && shouldStartNewMiner(event)) {
+      if (isEnabled && event.isNewCanonicalHead()) {
         haltCurrentMiningOperation();
         if (syncState.isInSync()) {
           startAsyncMiningOperation();
@@ -108,16 +107,8 @@ public abstract class AbstractMiningCoordinator<
     }
   }
 
-  private boolean shouldStartNewMiner(final BlockAddedEvent event) {
-    return event.getEventType() != EventType.FORK;
-  }
-
-  public void removeMinedBlockObserver(final long id) {
-    minedBlockObservers.unsubscribe(id);
-  }
-
-  public long addMinedBlockObserver(final MinedBlockObserver obs) {
-    return minedBlockObservers.subscribe(obs);
+  public void addMinedBlockObserver(final MinedBlockObserver obs) {
+    minedBlockObservers.subscribe(obs);
   }
 
   // Required for JSON RPC, and are deemed to be valid for all mining mechanisms
@@ -135,26 +126,26 @@ public abstract class AbstractMiningCoordinator<
 
   public void setCoinbase(final Address coinbase) {
     throw new UnsupportedOperationException(
-        "Current consensus mechanism prevents" + " setting coinbase.");
+        "Current consensus mechanism prevents setting coinbase.");
   }
 
   public Optional<Address> getCoinbase() {
     throw new UnsupportedOperationException(
-        "Current consensus mechanism prevents" + " querying of coinbase.");
+        "Current consensus mechanism prevents querying of coinbase.");
   }
 
   public Optional<Long> hashesPerSecond() {
     throw new UnsupportedOperationException(
-        "Current consensus mechanism prevents querying " + "of hashrate.");
+        "Current consensus mechanism prevents querying of hashrate.");
   }
 
   public Optional<EthHashSolverInputs> getWorkDefinition() {
     throw new UnsupportedOperationException(
-        "Current consensus mechanism prevents querying " + "work definition.");
+        "Current consensus mechanism prevents querying work definition.");
   }
 
   public boolean submitWork(final EthHashSolution solution) {
     throw new UnsupportedOperationException(
-        "Current consensus mechanism prevents submission of work" + " solutions.");
+        "Current consensus mechanism prevents submission of work solutions.");
   }
 }

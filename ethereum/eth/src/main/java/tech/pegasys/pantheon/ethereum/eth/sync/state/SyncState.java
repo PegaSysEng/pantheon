@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.state;
 
-import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent.EventType;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
@@ -41,7 +40,7 @@ public class SyncState {
     this.startingBlock = chainHeadNumber();
     blockchain.observeBlockAdded(
         (event, chain) -> {
-          if (event.getEventType() != EventType.FORK) {
+          if (event.isNewCanonicalHead()) {
             checkInSync();
           }
         });
