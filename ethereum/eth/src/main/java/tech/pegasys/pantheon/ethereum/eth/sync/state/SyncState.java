@@ -78,7 +78,7 @@ public class SyncState {
   public boolean isInSync() {
     return syncTarget
         .map(
-            t -> blockchain.getChainHeadBlockNumber() - t.estimatedTargetHeight() <= SYNC_TOLERANCE)
+            t -> t.estimatedTargetHeight() - blockchain.getChainHeadBlockNumber() <= SYNC_TOLERANCE)
         .orElse(true);
   }
 
