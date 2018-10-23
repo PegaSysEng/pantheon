@@ -100,11 +100,6 @@ public class DefaultMutableWorldState implements MutableWorldState {
         .orElse(null);
   }
 
-  @Override
-  public Account getOriginalAccount(final Address address) {
-    return get(address);
-  }
-
   private AccountState deserializeAccount(
       final Address address, final Hash addressHash, final BytesValue encoded) throws RLPException {
     final RLPInput in = RLP.input(encoded);
@@ -280,6 +275,11 @@ public class DefaultMutableWorldState implements MutableWorldState {
     }
 
     @Override
+    public UInt256 getOriginalStorageValue(final UInt256 key) {
+      return getStorageValue(key);
+    }
+
+    @Override
     public NavigableMap<Bytes32, UInt256> storageEntriesFrom(
         final Bytes32 startKeyHash, final int limit) {
       final NavigableMap<Bytes32, UInt256> storageEntries = new TreeMap<>();
@@ -390,10 +390,6 @@ public class DefaultMutableWorldState implements MutableWorldState {
 
         wrapped.accountStateTrie.put(updated.getAddressHash(), account);
       }
-
-      // After committing, clear data
-      deletedAccounts().clear();
-      updatedAccounts().clear();
     }
   }
 }
