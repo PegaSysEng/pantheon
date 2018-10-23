@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import java.util.Optional;
 
 public class SyncState {
+  private static final long SYNC_TOLERANCE = 5;
   private final Blockchain blockchain;
   private final EthPeers ethPeers;
 
@@ -76,7 +77,8 @@ public class SyncState {
 
   public boolean isInSync() {
     return syncTarget
-        .map(t -> t.estimatedTargetHeight() <= blockchain.getChainHeadBlockNumber())
+        .map(
+            t -> blockchain.getChainHeadBlockNumber() - t.estimatedTargetHeight() <= SYNC_TOLERANCE)
         .orElse(true);
   }
 
