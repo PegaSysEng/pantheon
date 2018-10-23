@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 public class SyncState {
   private final Blockchain blockchain;
@@ -30,7 +29,7 @@ public class SyncState {
 
   private final long startingBlock;
   private final AtomicBoolean lastInSync = new AtomicBoolean(false);
-  private final Subscribers<Consumer<Boolean>> inSyncSubscribers = new Subscribers<>();
+  private final Subscribers<InSyncListener> inSyncSubscribers = new Subscribers<>();
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private long chainHeightListenerId;
 
@@ -46,7 +45,7 @@ public class SyncState {
         });
   }
 
-  public void addInSyncObserver(final Consumer<Boolean> observer) {
+  public void addInSyncObserver(final InSyncListener observer) {
     inSyncSubscribers.subscribe(observer);
   }
 
@@ -120,7 +119,7 @@ public class SyncState {
   private void checkInSync() {
     final boolean currentSyncStatus = isInSync();
     if (lastInSync.compareAndSet(!currentSyncStatus, currentSyncStatus)) {
-      inSyncSubscribers.forEach(c -> c.accept(currentSyncStatus));
+      inSyncSubscribers.forEach(c -> c.onSyncStatusChanged(currentSyncStatus));
     }
   }
 }
