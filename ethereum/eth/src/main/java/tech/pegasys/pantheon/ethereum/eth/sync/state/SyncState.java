@@ -79,7 +79,7 @@ public class SyncState {
   public boolean isInSync() {
     return syncTarget
         .map(t -> t.estimatedTargetHeight() <= blockchain.getChainHeadBlockNumber())
-        .orElse(false);
+        .orElse(true);
   }
 
   public void setCommonAncestor(final BlockHeader commonAncestor) {
