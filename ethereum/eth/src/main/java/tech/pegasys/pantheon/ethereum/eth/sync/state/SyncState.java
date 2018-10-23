@@ -34,7 +34,7 @@ public class SyncState implements BlockAddedObserver {
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private boolean lastInSync = false;
 
-  private final Subscribers<Consumer<Boolean>> inSyncSubscribers;
+  private final Subscribers<Consumer<Boolean>> inSyncSubscribers = new Subscribers<>();
   private long chainHeightListenerId;
 
   public SyncState(
@@ -43,7 +43,6 @@ public class SyncState implements BlockAddedObserver {
     this.ethContext = ethContext;
     this.startingBlock = chainHeadNumber();
     this.pendingBlocks = pendingBlocks;
-    inSyncSubscribers = new Subscribers<>();
     blockchain.observeBlockAdded(this);
   }
 
@@ -76,16 +75,13 @@ public class SyncState implements BlockAddedObserver {
   }
 
   public SyncTarget setSyncTarget(final EthPeer peer, final BlockHeader commonAncestor) {
-    final SyncTarget target = new SyncTarget(peer, commonAncestor);
-    this.syncTarget = Optional.of(target);
-    chainHeightListenerId = target.addPeerChainEstimatedHeightListener(height -> checkInSync());
-    checkInSync();
-    return target;
+    final SyncTarget syncTarget = new SyncTarget(peer, commonAncestor);
+    replaceSyncTarget(Optional.of(syncTarget));
+    return syncTarget;
   }
 
-  private void checkInSync() {
+  private synchronized void checkInSync() {
     final boolean newInSync = isInSync();
-
     if (newInSync != lastInSync) {
       lastInSync = newInSync;
       inSyncSubscribers.forEach(c -> c.accept(newInSync));
@@ -103,9 +99,22 @@ public class SyncState implements BlockAddedObserver {
   }
 
   public void clearSyncTarget() {
-    syncTarget.ifPresent(
-        target -> target.removePeerChainEstimatedHeightListener(chainHeightListenerId));
-    syncTarget = Optional.empty();
+    replaceSyncTarget(Optional.empty());
+  }
+
+  private void replaceSyncTarget(final Optional<SyncTarget> newTarget) {
+    syncTarget.ifPresent(this::removeEstimatedHeightListener);
+    syncTarget = newTarget;
+    newTarget.ifPresent(this::addEstimatedHeightListener);
+    checkInSync();
+  }
+
+  private void removeEstimatedHeightListener(final SyncTarget target) {
+    target.removePeerChainEstimatedHeightListener(chainHeightListenerId);
+  }
+
+  private void addEstimatedHeightListener(final SyncTarget target) {
+    chainHeightListenerId = target.addPeerChainEstimatedHeightListener(height -> checkInSync());
   }
 
   public long bestChainHeight() {
