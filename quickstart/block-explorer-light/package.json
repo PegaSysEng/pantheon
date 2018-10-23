@@ -1,0 +1,57 @@
+{
+  "name": "ethstats-light",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "apexcharts": "^2.1.5",
+    "bignumber.js": "^7.2.1",
+    "buefy": "^0.6.7",
+    "ethereum-blockies": "^0.1.1",
+    "identicon.js": "^2.3.3",
+    "uuid": "^3.3.2",
+    "v-tooltip": "^2.0.0-rc.33",
+    "vue": "^2.5.17",
+    "vue-apexcharts": "^1.2.2",
+    "vue-router": "^3.0.1",
+    "vue-timeago": "^5.0.0",
+    "vuex": "^3.0.1",
+    "web3": "0.20.3",
+    "websocket": "^1.0.28"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.0.5",
+    "@vue/cli-plugin-eslint": "^3.0.5",
+    "@vue/cli-service": "^3.0.5",
+    "@vue/eslint-config-airbnb": "^3.0.5",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "@vue/airbnb"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
