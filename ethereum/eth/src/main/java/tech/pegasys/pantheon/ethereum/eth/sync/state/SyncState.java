@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.state;
 
+import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent.EventType;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
@@ -29,19 +30,21 @@ public class SyncState {
   private final EthContext ethContext;
 
   private final long startingBlock;
-  private final PendingBlocks pendingBlocks;
   private final AtomicBoolean lastInSync = new AtomicBoolean(false);
   private final Subscribers<Consumer<Boolean>> inSyncSubscribers = new Subscribers<>();
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private long chainHeightListenerId;
 
-  public SyncState(
-      final Blockchain blockchain, final EthContext ethContext, final PendingBlocks pendingBlocks) {
+  public SyncState(final Blockchain blockchain, final EthContext ethContext) {
     this.blockchain = blockchain;
     this.ethContext = ethContext;
     this.startingBlock = chainHeadNumber();
-    this.pendingBlocks = pendingBlocks;
-    blockchain.observeBlockAdded((event, blockchain1) -> checkInSync());
+    blockchain.observeBlockAdded(
+        (event, chain) -> {
+          if (event.getEventType() != EventType.FORK) {
+            checkInSync();
+          }
+        });
   }
 
   public void addInSyncObserver(final Consumer<Boolean> observer) {
@@ -62,10 +65,6 @@ public class SyncState {
 
   public UInt256 chainHeadTotalDifficulty() {
     return blockchain.getChainHead().getTotalDifficulty();
-  }
-
-  public PendingBlocks pendingBlocks() {
-    return pendingBlocks;
   }
 
   public Optional<SyncTarget> syncTarget() {

@@ -34,7 +34,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderValidator;
@@ -134,8 +133,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
             fastSyncEnabled,
             syncConfig.downloaderParallelism());
     final SyncState syncState =
-        new SyncState(
-            protocolContext.getBlockchain(), ethProtocolManager.ethContext(), new PendingBlocks());
+        new SyncState(protocolContext.getBlockchain(), ethProtocolManager.ethContext());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
             syncConfig,
