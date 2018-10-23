@@ -35,8 +35,4 @@ public final class SyncStatus {
   public long getHighestBlock() {
     return highestBlock;
   }
-
-  public long distanceFromHighestBlock() {
-    return highestBlock - currentBlock;
-  }
 }
