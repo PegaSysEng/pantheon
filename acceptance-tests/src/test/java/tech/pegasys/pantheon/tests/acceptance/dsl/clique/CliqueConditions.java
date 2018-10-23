@@ -12,19 +12,33 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.clique;
 
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlock;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlockHash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
-public class CliqueValidator {
+import java.util.Map;
 
-  public Condition validatorsEqual(final PantheonNode... validators) {
+public class CliqueConditions {
+
+  public Condition validatorsEquals(final PantheonNode... validators) {
     return new ExpectValidators(validators);
   }
 
-  public Condition validatorsAtBlockEqual(
+  public Condition validatorsAtBlockEquals(
       final String blockNumber, final PantheonNode... validators) {
     return new ExpectValidatorsAtBlock(blockNumber, validators);
+  }
+
+  public Condition validatorsAtBlockHashEquals(
+      final String blockHash, final PantheonNode... validators) {
+    return new ExpectValidatorsAtBlockHash(Hash.fromHexString(blockHash), validators);
+  }
+
+  public Condition proposalsEqual(final Map<PantheonNode, Boolean> proposals) {
+    return new ExpectProposals(proposals);
   }
 }

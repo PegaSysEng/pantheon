@@ -24,7 +24,7 @@ import java.util.Optional;
 
 public class ExpectValidators implements Condition {
 
-  private PantheonNode[] validators;
+  private final PantheonNode[] validators;
 
   public ExpectValidators(final PantheonNode... validators) {
     this.validators = validators;
@@ -34,8 +34,8 @@ public class ExpectValidators implements Condition {
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.clique().signersAtBlock(Optional.empty()).getResult())
-                .containsAll(
+            assertThat(node.clique().getSigners(Optional.empty()).getResult())
+                .containsExactlyInAnyOrderElementsOf(
                     Arrays.stream(validators).map(PantheonNode::getAddress).collect(toList())));
   }
 }

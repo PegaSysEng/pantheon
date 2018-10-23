@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class ExpectValidatorsAtBlock implements Condition {
-  private String blockParameter;
+  private final String blockParameter;
   private PantheonNode[] validators;
 
   public ExpectValidatorsAtBlock(final String blockNumber, final PantheonNode... validators) {
@@ -35,8 +35,8 @@ public class ExpectValidatorsAtBlock implements Condition {
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.clique().signersAtBlock(Optional.of(blockParameter)).getResult())
-                .containsAll(
+            assertThat(node.clique().getSigners(Optional.of(blockParameter)).getResult())
+                .containsExactlyInAnyOrderElementsOf(
                     Arrays.stream(validators).map(PantheonNode::getAddress).collect(toList())));
   }
 }

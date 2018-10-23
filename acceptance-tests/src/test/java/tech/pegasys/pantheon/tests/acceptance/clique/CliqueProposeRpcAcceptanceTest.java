@@ -12,19 +12,18 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNode;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueValidator;
+import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
 
 import org.junit.Test;
 
-public class CliqueRpcAcceptanceTest extends AcceptanceTestBase {
-  private final CliqueValidator cliqueValidator = new CliqueValidator();
+public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
+  private final CliqueConditions cliqueConditions = new CliqueConditions();
 
   @Test
   public void shouldAddValidators() throws IOException {
@@ -37,10 +36,10 @@ public class CliqueRpcAcceptanceTest extends AcceptanceTestBase {
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
     cluster.start(minerNode1, minerNode2, minerNode3);
 
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
     minerNode1.clique().propose(minerNode3.getAddress(), true);
     minerNode2.clique().propose(minerNode3.getAddress(), true);
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2, minerNode3));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
   }
 
   @Test
@@ -54,10 +53,10 @@ public class CliqueRpcAcceptanceTest extends AcceptanceTestBase {
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
     cluster.start(minerNode1, minerNode2, minerNode3);
 
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2, minerNode3));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
     minerNode1.clique().propose(minerNode3.getAddress(), false);
     minerNode2.clique().propose(minerNode3.getAddress(), false);
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
   }
 
   @Test
@@ -71,9 +70,9 @@ public class CliqueRpcAcceptanceTest extends AcceptanceTestBase {
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
     cluster.start(minerNode1, minerNode2, minerNode3);
 
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
     minerNode1.clique().propose(minerNode3.getAddress(), true);
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
   }
 
   @Test
@@ -87,38 +86,8 @@ public class CliqueRpcAcceptanceTest extends AcceptanceTestBase {
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
     cluster.start(minerNode1, minerNode2, minerNode3);
 
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2, minerNode3));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
     minerNode1.clique().propose(minerNode3.getAddress(), false);
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2, minerNode3));
-  }
-
-  @Test
-  public void shouldDiscardVotes() throws IOException {
-    String[] initialValidators = {"miner1", "miner2", "miner3"};
-    final PantheonNode minerNode1 =
-        cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
-    final PantheonNode minerNode2 =
-        cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
-    final PantheonNode minerNode3 =
-        cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start(minerNode1, minerNode2, minerNode3);
-
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2, minerNode3));
-    minerNode1.clique().propose(minerNode3.getAddress(), false);
-    minerNode2.clique().propose(minerNode3.getAddress(), false);
-    minerNode1.clique().discard(minerNode3.getAddress());
-    minerNode2.clique().discard(minerNode3.getAddress());
-    cluster.verify(cliqueValidator.validatorsEqual(minerNode1, minerNode2, minerNode3));
-  }
-
-  @Test
-  public void shouldBeAbleQueryValidatorAtSpecificBlock() throws IOException {
-    final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
-    final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
-    final PantheonNode minerNode3 = cluster.create(pantheonCliqueMinerNode("miner3"));
-    cluster.start(minerNode1, minerNode2, minerNode3);
-
-    cluster.verify(
-        cliqueValidator.validatorsAtBlockEqual("0x0", minerNode1, minerNode2, minerNode3));
+    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
   }
 }

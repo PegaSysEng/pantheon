@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -20,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.web3j.protocol.Web3jService;
@@ -28,7 +30,7 @@ import org.web3j.protocol.core.Response;
 
 public class Clique {
 
-  private Web3jService web3jService;
+  private final Web3jService web3jService;
 
   public Clique(final Web3jService web3j) {
     this.web3jService = web3j;
@@ -39,6 +41,8 @@ public class Clique {
   public static class DiscardResponse extends Response<Boolean> {}
 
   public static class SignersBlockResponse extends Response<List<Address>> {}
+
+  public static class ProposalsResponse extends Response<Map<Address, Boolean>> {}
 
   public ProposeResponse propose(final Address address, final Boolean auth) throws IOException {
     Request<?, ProposeResponse> request =
@@ -60,8 +64,13 @@ public class Clique {
     return request.send();
   }
 
-  public SignersBlockResponse signersAtBlock(final Optional<String> blockNumber)
-      throws IOException {
+  public ProposalsResponse proposals() throws IOException {
+    Request<?, ProposalsResponse> request =
+        new Request<>("clique_proposals", emptyList(), web3jService, ProposalsResponse.class);
+    return request.send();
+  }
+
+  public SignersBlockResponse getSigners(final Optional<String> blockNumber) throws IOException {
     Request<?, SignersBlockResponse> request =
         new Request<>(
             "clique_getSigners",
@@ -71,10 +80,10 @@ public class Clique {
     return request.send();
   }
 
-  public SignersBlockResponse signersAtHash(final Hash hash) throws IOException {
+  public SignersBlockResponse getSignersAtHash(final Hash hash) throws IOException {
     Request<?, SignersBlockResponse> request =
         new Request<>(
-            "clique_getSigners",
+            "clique_getSignersAtHash",
             singletonList(hash.toString()),
             web3jService,
             SignersBlockResponse.class);
