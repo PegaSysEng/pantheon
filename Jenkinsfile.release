@@ -18,15 +18,8 @@ pipeline {
     }
 
     stages {
-        stage('Example') {
-            if (env.BRANCH_NAME == 'master') {
-                echo 'I only execute on the master branch'
-            } else {
-                echo 'I execute elsewhere'
-            }
-        }
         stage('Release') {
-
+/*
             releaseVersion = ''
             if( params.RELEASE_VERSION?.trim() ){
                 params.releaseVersion = "-Prelease.releaseVersion=${params.RELEASE_VERSION}"
@@ -36,7 +29,7 @@ pipeline {
             if( params.NEXT_VERSION?.trim() ){
                 nextVersion = "-Prelease.releaseVersion=${params.NEXT_VERSION}"
             }
-
+*/
             steps {
                 sshagent(
                     credentials: ['pegasys-admin-github-ssh-private-key']
