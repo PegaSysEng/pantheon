@@ -42,7 +42,7 @@ branch_bugfix_version=$((${bugfix_version}+1))
 branch_version="${major_version}.${minor_version}.${branch_bugfix_version}-SNAPSHOT"
 
 # Change the local gradle.properties version to branch version
-sed -i "" "s/${tag_version}/${branch_version}/g" gradle.properties
+sed -i "s/${tag_version}/${branch_version}/g" gradle.properties
 
 git commit -am"[Release Script] Updating version to ${branch_version}"
 git push --set-upstream origin ${branch_name}
