@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftStateMachine;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockMiner;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftProtocolSchedule;
@@ -45,6 +46,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
@@ -139,8 +141,8 @@ public class IbftPantheonController implements PantheonController<IbftContext, I
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
-    EthProtocolManager ethProtocolManager;
-    SubProtocol ethSubProtocol;
+    final EthProtocolManager ethProtocolManager;
+    final SubProtocol ethSubProtocol;
     if (ottomanTestnetOperation) {
       LOG.info("Operating on Ottoman testnet.");
       ethSubProtocol = Istanbul64Protocol.get();
@@ -152,9 +154,16 @@ public class IbftPantheonController implements PantheonController<IbftContext, I
       ethProtocolManager =
           new EthProtocolManager(protocolContext.getBlockchain(), networkId, fastSyncEnabled, 1);
     }
+    final SyncState syncState =
+        new SyncState(
+            protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
-            syncConfig, protocolSchedule, protocolContext, ethProtocolManager.ethContext());
+            syncConfig,
+            protocolSchedule,
+            protocolContext,
+            ethProtocolManager.ethContext(),
+            syncState);
 
     final IbftEventQueue ibftEventQueue = new IbftEventQueue();
 
@@ -185,12 +194,15 @@ public class IbftPantheonController implements PantheonController<IbftContext, I
         TransactionPoolFactory.createTransactionPool(
             protocolSchedule, protocolContext, ethProtocolManager.ethContext());
 
+    final IbftNetworkPeers peers =
+        new IbftNetworkPeers(protocolContext.getConsensusState().getVoteTally());
+
     return new IbftPantheonController(
         genesisConfig,
         protocolContext,
         ethSubProtocol,
         ethProtocolManager,
-        new IbftProtocolManager(ibftEventQueue),
+        new IbftProtocolManager(ibftEventQueue, peers),
         synchronizer,
         nodeKeys,
         transactionPool,
