@@ -1,6 +1,15 @@
-# Getting Started
-**Pantheon 0.8.0 RC2 release**
-After you clone the PegaSysEng/pantheon repo, we recommend that you first run the 'pantheon' startup script for Linux/MacOS (or the 'pantheon.bat' startup script for Windows) in the pantheon-<ver>/bin directory. This script appropriately sets system variables and command-line arguments for Java, JVM, and Pantheon.
-After you've run the startup script, we encourage you to read the Pantheon technical documentation, located on the wiki tab of PegaSysEng/pantheon:
-    https://github.com/PegaSysEng/pantheon/wiki
-This wiki provides detailed information on getting started, along with tutorials and comprehensive reference content.
+# Getting Started with Pantheon
+
+After you download and unpackage Pantheon:
+1. At the command line, change into the `pantheon-<release>` directory. 
+
+2. To display the command line help:
+    ```json
+    ./bin/pantheon --help
+   ```
+
+A [basic quickstart](https://github.com/PegaSysEng/pantheon/wiki/Quickstart) and other options for [starting Pantheon](https://github.com/PegaSysEng/pantheon/wiki/Starting-Pantheon) are included in the documentation. 
+
+The documentation is included in this release package and on the [Pantheon Wiki](https://github.com/PegaSysEng/pantheon/wiki). 
+
+>**Note** Starting Pantheon by double-clicking the `pantheon` or `pantheon.bat` executables starts a node synchronizing with the Ethereum mainnet. 
