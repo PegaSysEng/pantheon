@@ -17,6 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
+import javax.annotation.concurrent.Immutable;
+
+@Immutable
 public class JsonRpc {
 
   private final Cluster nodes;

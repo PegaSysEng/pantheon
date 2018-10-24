@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
+import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Blockchain;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 
@@ -24,12 +25,14 @@ public class AcceptanceTestBase {
   protected final Cluster cluster;
   protected final Transactions transactions;
   protected final JsonRpc jsonRpc;
+  protected final Blockchain blockchain;
 
   protected AcceptanceTestBase() {
     accounts = new Accounts();
     cluster = new Cluster();
     transactions = new Transactions(accounts);
     jsonRpc = new JsonRpc(cluster);
+    blockchain = new Blockchain();
   }
 
   @After

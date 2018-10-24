@@ -17,9 +17,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.concurrent.Immutable;
 
 import org.web3j.utils.Convert.Unit;
 
+@Immutable
 public class Transactions {
 
   private final Accounts accounts;

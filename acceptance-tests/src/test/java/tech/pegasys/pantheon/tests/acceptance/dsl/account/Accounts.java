@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.account;
 
+import javax.annotation.concurrent.Immutable;
+
+@Immutable
 public class Accounts {
 
   private final Account richBenefactorOne;
