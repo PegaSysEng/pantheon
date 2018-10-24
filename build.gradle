@@ -329,6 +329,7 @@ distributions {
     contents {
       from("./LICENSE") { into "." }
       from("build/reports/license/license-dependency.html") { into "." }
+      from("./docs/GettingStartedBinaries.md") { into "." }
     }
   }
 }
@@ -419,9 +420,7 @@ release {
   ]
 
   git {
-    requireBranch = 'master'
-    pushToRemote = 'origin'
-    pushToBranchPrefix = project.version.replace('SNAPSHOT','')
+    requireBranch = project.hasProperty('release.branch') ? project.property('release.branch') : 'master'
   }
 }
 
