@@ -16,9 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
+import javax.annotation.concurrent.Immutable;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.Web3Sha3;
 
+@Immutable
 public class Web3 {
 
   private final Web3j web3j;

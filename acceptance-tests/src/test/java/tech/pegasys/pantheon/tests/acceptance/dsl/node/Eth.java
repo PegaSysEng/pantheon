@@ -17,10 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import javax.annotation.concurrent.Immutable;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthGetWork;
 
+@Immutable
 public class Eth {
 
   private final Web3j web3j;
