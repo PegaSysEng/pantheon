@@ -17,8 +17,8 @@ import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
 import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 
 import java.io.IOException;
@@ -43,7 +43,6 @@ public class PantheonControllerBuilder {
           GenesisConfig.development(),
           synchronizerConfiguration,
           miningParameters,
-          ethNetworkConfig.getNetworkId(),
           nodeKeys);
     } else {
       return PantheonController.fromConfig(
