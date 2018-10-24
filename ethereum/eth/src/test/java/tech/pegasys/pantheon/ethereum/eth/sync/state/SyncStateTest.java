@@ -41,7 +41,7 @@ public class SyncStateTest {
   private static final long TARGET_SYNC_NUMBER = OUR_CHAIN_HEAD_NUMBER + 100;
   private final Blockchain blockchain = mock(Blockchain.class);
   private final EthPeers ethPeers = mock(EthPeers.class);
-  private final InSyncListener inSyncListener = mock(InSyncListener.class);
+  private final SyncState.InSyncListener inSyncListener = mock(SyncState.InSyncListener.class);
   private final EthPeer peer = mock(EthPeer.class);
   private final ChainState peerChainHead = new ChainState();
   private SyncState syncState;

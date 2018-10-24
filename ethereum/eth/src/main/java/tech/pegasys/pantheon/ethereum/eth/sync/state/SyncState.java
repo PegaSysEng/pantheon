@@ -124,4 +124,9 @@ public class SyncState {
       inSyncListeners.forEach(c -> c.onSyncStatusChanged(currentSyncStatus));
     }
   }
+
+  @FunctionalInterface
+  public interface InSyncListener {
+    void onSyncStatusChanged(boolean newSyncStatus);
+  }
 }
