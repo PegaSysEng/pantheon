@@ -266,27 +266,6 @@ public class DockerQuickstartTest {
     }
   }
 
-  @Test
-  public void explorerShouldHaveModifiedHttpRpcEndpoint() throws IOException {
-    // we have to check that the sed command well replaced the endpoint placeholder with the
-    // real dynamic endpoint. But as this is a react app, we have to search for the value in the JS
-    // as we can't find it in the HTML page because source code is rendered dynamically.
-    Request request =
-        new Request.Builder()
-            .get()
-            .url(endpoints.get(EndpointsIdentifier.EXPLORER) + "/static/js/bundle.js")
-            .build();
-
-    OkHttpClient httpClient = new OkHttpClient();
-    try (Response resp = httpClient.newCall(request).execute()) {
-      assertThat(resp.code()).isEqualTo(200);
-      assertThat(resp.body()).isNotNull();
-      assertThat(resp.body().string())
-          .containsOnlyOnce(
-              "var fallbackUrl = '" + endpoints.get(EndpointsIdentifier.HTTP_RPC) + "';");
-    }
-  }
-
   private enum ServicesIdentifier {
     BOOTNODE,
     EXPLORER,
