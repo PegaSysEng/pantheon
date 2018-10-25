@@ -5,7 +5,10 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A 'lookup' locates the k closest nodes to a node ID.
@@ -56,30 +59,80 @@ public class RecursivePeerRefreshStateTest {
         peer03.addToPeerTable(peer32);
         peer03.addToPeerTable(peer33);
 
+        /* * */
+        /* * */
+        /* * */
 
-        System.out.println(peer00.toString());
-        System.out.println(peer00.getPeerTable());
-        System.out.println(distance(target, peer01.id));
-        System.out.println(distance(target, peer02.id));
-        System.out.println(distance(target, peer03.id));
-        System.out.println("/n");
-        System.out.println(peer01.toString());
-        System.out.println(peer01.getPeerTable());
-        System.out.println(distance(target, peer11.id));
-        System.out.println(distance(target, peer12.id));
-        System.out.println(distance(target, peer13.id));
-        System.out.println("/n");
-        System.out.println(peer02.toString());
-        System.out.println(peer02.getPeerTable());
-        System.out.println(distance(target, peer21.id));
-        System.out.println(distance(target, peer22.id));
-        System.out.println(distance(target, peer23.id));
-        System.out.println("/n");
-        System.out.println(peer03.toString());
-        System.out.println(peer03.getPeerTable());
-        System.out.println(distance(target, peer31.id));
-        System.out.println(distance(target, peer32.id));
-        System.out.println(distance(target, peer33.id));
+        HashMap<TestPeer, Integer> initialPeerMap = new HashMap<>();
+
+        for(TestPeer peer : peer00.getPeerTable()){
+            initialPeerMap.put(peer, distance(target, peer.id));
+        }
+        for(TestPeer peer : peer01.getPeerTable()){
+            initialPeerMap.put(peer, distance(target, peer.id));
+        }
+        for(TestPeer peer : peer02.getPeerTable()){
+            initialPeerMap.put(peer, distance(target, peer.id));
+        }
+        for(TestPeer peer : peer03.getPeerTable()){
+            initialPeerMap.put(peer, distance(target, peer.id));
+        }
+
+        LinkedHashMap<TestPeer, Integer> distanceSortedPeerMap = sortHashMap(initialPeerMap);
+
+        for(Map.Entry entry : distanceSortedPeerMap.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
+
+    public LinkedHashMap<TestPeer, Integer> sortHashMap(HashMap<TestPeer, Integer> unsortedMap)  {
+        LinkedHashMap<TestPeer, Integer> result = new LinkedHashMap<>();
+
+        // Add TestPeer keys to an array: the array would get sorted, based on those keys' values
+        ArrayList<TestPeer> sortedKeys = new ArrayList<>(unsortedMap.keySet());
+
+        // Sort the ArrayList<TestPeer> of keys
+        for (int i=0; i<unsortedMap.size(); i++)  {
+            for (int j=1; j<sortedKeys.size(); j++)  {
+                if (unsortedMap.get(sortedKeys.get(j)) > unsortedMap.get(sortedKeys.get(j-1))) {
+                    TestPeer temp = sortedKeys.get(j);
+                    sortedKeys.set(j, sortedKeys.get(j-1));
+                    sortedKeys.set(j-1, temp);
+
+                }
+            }
+        }
+
+        // Construct the result Map
+        for (TestPeer key: sortedKeys)  {
+            result.put(key, unsortedMap.get(key));
+        }
+
+        return result;
+    }
+
+
+
+    class TestPeer {
+        BytesValue id;
+        List<TestPeer> peerTable = new ArrayList<>();
+
+        TestPeer(BytesValue id) {
+            this.id = id;
+        }
+
+        void addToPeerTable(TestPeer testPeer) {
+            this.peerTable.add(testPeer);
+        }
+
+        List<TestPeer> getPeerTable() {
+            return this.peerTable;
+        }
+
+        @Override
+        public String toString() {
+            return id.toString();
+        }
     }
 
     static int distance(final BytesValue v1, final BytesValue v2) {
@@ -105,28 +158,5 @@ public class RecursivePeerRefreshStateTest {
             }
         }
         return distance;
-    }
-
-
-    class TestPeer {
-        BytesValue id;
-        List<TestPeer> peerTable = new ArrayList<>();
-
-        TestPeer(BytesValue id) {
-            this.id = id;
-        }
-
-        void addToPeerTable(TestPeer testPeer) {
-            this.peerTable.add(testPeer);
-        }
-
-        List<TestPeer> getPeerTable() {
-            return this.peerTable;
-        }
-
-        @Override
-        public String toString() {
-            return id.toString();
-        }
     }
 }
