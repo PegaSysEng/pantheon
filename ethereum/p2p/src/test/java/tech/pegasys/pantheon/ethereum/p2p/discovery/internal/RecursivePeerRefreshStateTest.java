@@ -1,6 +1,7 @@
 package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
 import org.junit.Test;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,63 +20,76 @@ import java.util.List;
  **/
 public class RecursivePeerRefreshStateTest {
 
-    //System.out.println(Arrays.toString(data));
     @Test
     public void shouldOperateTestPeer() {
+        TestPeer peer00 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"));
+        /* * */
+        TestPeer peer01 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001"));
+        peer00.addToPeerTable(peer01);
+        /* * */
+        TestPeer peer11 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011"));
+        TestPeer peer12 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000012"));
+        TestPeer peer13 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013"));
+        peer01.addToPeerTable(peer11);
+        peer01.addToPeerTable(peer12);
+        peer01.addToPeerTable(peer13);
+        /* * */
+        TestPeer peer02 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002"));
+        peer00.addToPeerTable(peer02);
+        /* * */
+        TestPeer peer21 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000021"));
+        TestPeer peer22 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000022"));
+        TestPeer peer23 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000023"));
+        peer02.addToPeerTable(peer21);
+        peer02.addToPeerTable(peer22);
+        peer02.addToPeerTable(peer23);
+        /* * */
+        TestPeer peer03 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003"));
+        peer00.addToPeerTable(peer03);
+        /* * */
+        TestPeer peer31 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000031"));
+        TestPeer peer32 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000032"));
+        TestPeer peer33 = new TestPeer(BytesValue.fromHexString("0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000033"));
+        peer03.addToPeerTable(peer31);
+        peer03.addToPeerTable(peer32);
+        peer03.addToPeerTable(peer33);
 
-        TestPeer peer00 = new TestPeer(new byte[]{0x00, 0x00, 0x00, 0x00});
-        TestPeer peer01 = new TestPeer(new byte[]{0x01, 0x01, 0x01, 0x01});
-        TestPeer peer02 = new TestPeer(new byte[]{0x02, 0x02, 0x02, 0x02});
-        TestPeer peer03 = new TestPeer(new byte[]{0x03, 0x03, 0x03, 0x03});
-        TestPeer peer04 = new TestPeer(new byte[]{0x04, 0x04, 0x04, 0x04});
-        TestPeer peer05 = new TestPeer(new byte[]{0x05, 0x05, 0x05, 0x05});
-        TestPeer peer06 = new TestPeer(new byte[]{0x06, 0x06, 0x06, 0x06});
-        TestPeer peer07 = new TestPeer(new byte[]{0x07, 0x07, 0x07, 0x07});
-        TestPeer peer08 = new TestPeer(new byte[]{0x08, 0x08, 0x08, 0x08});
 
         System.out.println(peer00.toString());
-
-        peer00.addToPeerTable(peer01);
-        peer00.addToPeerTable(peer02);
-        peer00.addToPeerTable(peer03);
-        peer00.addToPeerTable(peer04);
-        peer00.addToPeerTable(peer05);
-        peer00.addToPeerTable(peer06);
-        peer00.addToPeerTable(peer07);
-        peer00.addToPeerTable(peer08);
-
         System.out.println(peer00.getPeerTable());
+    }
 
-        TestPeer peer10 = new TestPeer(new byte[]{0x10, 0x10, 0x10, 0x10});
-        TestPeer peer11 = new TestPeer(new byte[]{0x11, 0x11, 0x11, 0x11});
-        TestPeer peer12 = new TestPeer(new byte[]{0x12, 0x12, 0x12, 0x12});
-        TestPeer peer13 = new TestPeer(new byte[]{0x13, 0x13, 0x13, 0x13});
-        TestPeer peer14 = new TestPeer(new byte[]{0x14, 0x14, 0x14, 0x14});
-        TestPeer peer15 = new TestPeer(new byte[]{0x15, 0x15, 0x15, 0x15});
-        TestPeer peer16 = new TestPeer(new byte[]{0x16, 0x16, 0x16, 0x16});
-        TestPeer peer17 = new TestPeer(new byte[]{0x17, 0x17, 0x17, 0x17});
-        TestPeer peer18 = new TestPeer(new byte[]{0x18, 0x18, 0x18, 0x18});
+    static int distance(final BytesValue v1, final BytesValue v2) {
+        assert (v1.size() == v2.size());
+        final byte[] v1b = v1.extractArray();
+        final byte[] v2b = v2.extractArray();
 
-        System.out.println(peer10.toString());
+        if (Arrays.equals(v1b, v2b)) {
+            return 0;
+        }
 
-        peer10.addToPeerTable(peer11);
-        peer10.addToPeerTable(peer12);
-        peer10.addToPeerTable(peer13);
-        peer10.addToPeerTable(peer14);
-        peer10.addToPeerTable(peer15);
-        peer10.addToPeerTable(peer16);
-        peer10.addToPeerTable(peer17);
-        peer10.addToPeerTable(peer18);
-
-        System.out.println(peer10.getPeerTable());
+        int distance = v1b.length * 8;
+        for (int i = 0; i < v1b.length; i++) {
+            final byte xor = (byte) (0xff & (v1b[i] ^ v2b[i]));
+            if (xor == 0) {
+                distance -= 8;
+            } else {
+                int p = 7;
+                while (((xor >> p--) & 0x01) == 0) {
+                    distance--;
+                }
+                break;
+            }
+        }
+        return distance;
     }
 
 
     class TestPeer {
-        byte[] id;
+        BytesValue id;
         List<TestPeer> peerTable = new ArrayList<>();
 
-        TestPeer(byte[] id) {
+        TestPeer(BytesValue id) {
             this.id = id;
         }
 
@@ -89,7 +103,7 @@ public class RecursivePeerRefreshStateTest {
 
         @Override
         public String toString() {
-            return Arrays.toString(id);
+            return id.toString();
         }
     }
 }
