@@ -36,42 +36,42 @@ public class Clique {
     this.web3jService = web3j;
   }
 
-  public static class ProposeResponse extends Response<Boolean> {}
+  public ProposeResponse proposeAdd(final PantheonNode node) throws IOException {
+    return propose(node, true);
+  }
 
-  public static class DiscardResponse extends Response<Boolean> {}
+  public ProposeResponse proposeRemove(final PantheonNode node) throws IOException {
+    return propose(node, false);
+  }
 
-  public static class SignersBlockResponse extends Response<List<Address>> {}
-
-  public static class ProposalsResponse extends Response<Map<Address, Boolean>> {}
-
-  public ProposeResponse propose(final Address address, final Boolean auth) throws IOException {
-    Request<?, ProposeResponse> request =
+  private ProposeResponse propose(final PantheonNode node, final Boolean auth) throws IOException {
+    final Request<?, ProposeResponse> request =
         new Request<>(
             "clique_propose",
-            Arrays.asList(address.toString(), auth.toString()),
+            Arrays.asList(node.getAddress().toString(), auth.toString()),
             web3jService,
             ProposeResponse.class);
     return request.send();
   }
 
-  public DiscardResponse discard(final Address address) throws IOException {
-    Request<?, DiscardResponse> request =
+  public DiscardResponse discard(final PantheonNode node) throws IOException {
+    final Request<?, DiscardResponse> request =
         new Request<>(
             "clique_discard",
-            singletonList(address.toString()),
+            singletonList(node.getAddress().toString()),
             web3jService,
             DiscardResponse.class);
     return request.send();
   }
 
   public ProposalsResponse proposals() throws IOException {
-    Request<?, ProposalsResponse> request =
+    final Request<?, ProposalsResponse> request =
         new Request<>("clique_proposals", emptyList(), web3jService, ProposalsResponse.class);
     return request.send();
   }
 
   public SignersBlockResponse getSigners(final Optional<String> blockNumber) throws IOException {
-    Request<?, SignersBlockResponse> request =
+    final Request<?, SignersBlockResponse> request =
         new Request<>(
             "clique_getSigners",
             singletonList(blockNumber.map(Object::toString).orElse("latest")),
@@ -81,7 +81,7 @@ public class Clique {
   }
 
   public SignersBlockResponse getSignersAtHash(final Hash hash) throws IOException {
-    Request<?, SignersBlockResponse> request =
+    final Request<?, SignersBlockResponse> request =
         new Request<>(
             "clique_getSignersAtHash",
             singletonList(hash.toString()),
@@ -89,4 +89,12 @@ public class Clique {
             SignersBlockResponse.class);
     return request.send();
   }
+
+  public static class ProposeResponse extends Response<Boolean> {}
+
+  public static class DiscardResponse extends Response<Boolean> {}
+
+  public static class SignersBlockResponse extends Response<List<Address>> {}
+
+  public static class ProposalsResponse extends Response<Map<Address, Boolean>> {}
 }

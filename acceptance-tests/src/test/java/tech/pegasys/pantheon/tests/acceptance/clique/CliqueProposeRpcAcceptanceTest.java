@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.tests.acceptance.clique;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
@@ -23,71 +22,70 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
-  private final CliqueConditions cliqueConditions = new CliqueConditions();
 
   @Test
   public void shouldAddValidators() throws IOException {
-    String[] initialValidators = {"miner1", "miner2"};
+    final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
     final PantheonNode minerNode2 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
     final PantheonNode minerNode3 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    cluster.start();
 
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
-    minerNode1.clique().propose(minerNode3.getAddress(), true);
-    minerNode2.clique().propose(minerNode3.getAddress(), true);
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
+    minerNode1.clique().proposeAdd(minerNode3);
+    minerNode2.clique().proposeAdd(minerNode3);
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
   }
 
   @Test
   public void shouldRemoveValidators() throws IOException {
-    String[] initialValidators = {"miner1", "miner2", "miner3"};
+    final String[] initialValidators = {"miner1", "miner2", "miner3"};
     final PantheonNode minerNode1 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
     final PantheonNode minerNode2 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
     final PantheonNode minerNode3 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    cluster.start();
 
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
-    minerNode1.clique().propose(minerNode3.getAddress(), false);
-    minerNode2.clique().propose(minerNode3.getAddress(), false);
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
+    minerNode1.clique().proposeRemove(minerNode3);
+    minerNode2.clique().proposeRemove(minerNode3);
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
   }
 
   @Test
   public void shouldNotAddValidatorWhenInsufficientVotes() throws IOException {
-    String[] initialValidators = {"miner1", "miner2"};
+    final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
     final PantheonNode minerNode2 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
     final PantheonNode minerNode3 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    cluster.start();
 
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
-    minerNode1.clique().propose(minerNode3.getAddress(), true);
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2));
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
+    minerNode1.clique().proposeAdd(minerNode3);
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
   }
 
   @Test
   public void shouldNotRemoveValidatorWhenInsufficientVotes() throws IOException {
-    String[] initialValidators = {"miner1", "miner2", "miner3"};
+    final String[] initialValidators = {"miner1", "miner2", "miner3"};
     final PantheonNode minerNode1 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
     final PantheonNode minerNode2 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
     final PantheonNode minerNode3 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    cluster.start();
 
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
-    minerNode1.clique().propose(minerNode3.getAddress(), false);
-    cluster.verify(cliqueConditions.validatorsEquals(minerNode1, minerNode2, minerNode3));
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
+    minerNode1.clique().proposeRemove(minerNode3);
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
   }
 }

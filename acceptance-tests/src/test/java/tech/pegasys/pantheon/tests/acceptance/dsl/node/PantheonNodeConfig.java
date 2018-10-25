@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
-import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
@@ -172,9 +172,8 @@ public class PantheonNodeConfig {
   }
 
   private static String encodeCliqueExtraData(final Collection<PantheonNode> nodes) {
-    final List<PrivateKey> privateKeys =
-        nodes.stream().map(node -> node.keyPair().getPrivateKey()).collect(toList());
-    return CliqueExtraData.createGenesisExtraDataString(privateKeys);
+    final List<Address> addresses = nodes.stream().map(PantheonNode::getAddress).collect(toList());
+    return CliqueExtraData.createGenesisExtraDataString(addresses);
   }
 
   private static JsonRpcConfiguration jsonRpcConfigWithClique() {

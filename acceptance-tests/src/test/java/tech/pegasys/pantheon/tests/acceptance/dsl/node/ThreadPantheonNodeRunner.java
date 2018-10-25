@@ -49,7 +49,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
     final EthNetworkConfig ethNetworkConfig =
-        node.ethNetworkConfig()
+        node.getEthNetworkConfig()
             .orElse(new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build());
     PantheonController<?, ?> pantheonController;
     try {

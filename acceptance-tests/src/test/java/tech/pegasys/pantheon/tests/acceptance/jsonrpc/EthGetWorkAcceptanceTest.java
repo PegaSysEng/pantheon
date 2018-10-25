@@ -33,7 +33,7 @@ public class EthGetWorkAcceptanceTest extends AcceptanceTestBase {
   public void setUp() throws Exception {
     minerNode = cluster.create(pantheonMinerNode("node1"));
     fullNode = cluster.create(pantheonNode("node2"));
-    cluster.start(minerNode, fullNode);
+    cluster.start();
   }
 
   @Test

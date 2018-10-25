@@ -17,35 +17,22 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 public class ExpectProposals implements Condition {
-  private Map<PantheonNode, Boolean> proposers;
+  private final Map<Address, Boolean> proposers;
 
-  public ExpectProposals(final Map<PantheonNode, Boolean> proposers) {
+  public ExpectProposals(final Map<Address, Boolean> proposers) {
     this.proposers = proposers;
   }
 
   @Override
   public void verify(final Node node) {
-    Map<String, Boolean> expectedProposers =
-        proposers
-            .entrySet()
-            .stream()
-            .collect(Collectors.toMap(p -> p.getKey().getAddress().toString(), Entry::getValue));
     waitFor(
         () -> {
-          Map<Address, Boolean> result = node.clique().proposals().getResult();
-          Map<String, Boolean> proposers =
-              result
-                  .entrySet()
-                  .stream()
-                  .collect(Collectors.toMap(p -> p.getKey().toString(), Entry::getValue));
-          assertThat(proposers).isEqualTo(expectedProposers);
+          final Map<Address, Boolean> result = node.clique().proposals().getResult();
+          assertThat(result).isEqualTo(proposers);
         });
   }
 }

@@ -90,9 +90,8 @@ public class PantheonNode implements Node, AutoCloseable {
       final boolean devMode,
       final Function<Collection<PantheonNode>, Optional<String>> genesisConfig)
       throws IOException {
-    final Path homeDirectory = Files.createTempDirectory("acctest");
     this.name = name;
-    this.homeDirectory = homeDirectory;
+    this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.p2pPort = p2pPort;
     this.miningParameters = miningParameters;
@@ -111,10 +110,6 @@ public class PantheonNode implements Node, AutoCloseable {
 
   String enodeUrl() {
     return "enode://" + keyPair.getPublicKey().toString() + "@" + LOCALHOST + ":" + p2pPort;
-  }
-
-  KeyPair keyPair() {
-    return keyPair;
   }
 
   private Optional<String> jsonRpcBaseUrl() {
@@ -375,11 +370,11 @@ public class PantheonNode implements Node, AutoCloseable {
     return genesisConfig;
   }
 
-  public void ethNetworkConfig(final Optional<EthNetworkConfig> ethNetworkConfig) {
+  public void setEthNetworkConfig(final Optional<EthNetworkConfig> ethNetworkConfig) {
     this.ethNetworkConfig = ethNetworkConfig;
   }
 
-  public Optional<EthNetworkConfig> ethNetworkConfig() {
+  public Optional<EthNetworkConfig> getEthNetworkConfig() {
     return ethNetworkConfig;
   }
 

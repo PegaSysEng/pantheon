@@ -62,10 +62,10 @@ import org.mockito.ArgumentMatchers;
 
 @Ignore("temporarily ignored because tests hang if working dir path too long")
 public class PantheonCommandTest extends CommandTestAbstract {
-
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
   private static final JsonRpcConfiguration defaultJsonRpcConfiguration;
   private static final WebSocketConfiguration defaultWebSocketConfiguration;
+  private static final String GENESIS_CONFIG_TESTDATA = "genesis_config";
 
   static {
     final JsonRpcConfiguration rpcConf = JsonRpcConfiguration.createDefault();
@@ -150,7 +150,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   // Testing each option
   @Test
-  public void CallingWithConfigOptionButNoConfigFileShouldDisplayHelp() {
+  public void callingWithConfigOptionButNoConfigFileShouldDisplayHelp() {
 
     parseCommand("--config");
 
@@ -160,7 +160,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void CallingWithConfigOptionButNonExistingFileShouldDisplayHelp() throws IOException {
+  public void callingWithConfigOptionButNonExistingFileShouldDisplayHelp() throws IOException {
     final File tempConfigFile = temp.newFile("an-invalid-file-name-without-extension");
     parseCommand("--config", tempConfigFile.getPath());
 
@@ -170,7 +170,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void CallingWithConfigOptionButTomlFileNotFoundShouldDisplayHelp() {
+  public void callingWithConfigOptionButTomlFileNotFoundShouldDisplayHelp() {
 
     parseCommand("--config", "./an-invalid-file-name-sdsd87sjhqoi34io23.toml");
 
@@ -180,7 +180,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void CallingWithConfigOptionButInvalidContentTomlFileShouldDisplayHelp() throws Exception {
+  public void callingWithConfigOptionButInvalidContentTomlFileShouldDisplayHelp() throws Exception {
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
@@ -201,7 +201,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void CallingWithConfigOptionButInvalidValueTomlFileShouldDisplayHelp() throws Exception {
+  public void callingWithConfigOptionButInvalidValueTomlFileShouldDisplayHelp() throws Exception {
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
@@ -222,11 +222,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void OverrideDefaultValuesIfKeyIsPresentInConfigFile() throws IOException {
+  public void overrideDefaultValuesIfKeyIsPresentInConfigFile() throws IOException {
     final URL configFile = Resources.getResource("complete_config.toml");
     final Path genesisFile = createFakeGenesisFile();
     final String updatedConfig =
-        Resources.toString(configFile, UTF_8).replaceAll("~/genesys.json", genesisFile.toString());
+        Resources.toString(configFile, UTF_8).replaceAll("~/genesis.json", genesisFile.toString());
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, updatedConfig.getBytes(UTF_8));
 
@@ -268,7 +268,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final EthNetworkConfig networkConfig =
         new Builder(EthNetworkConfig.mainnet())
-            .setGenesisConfig("genesis_config")
+            .setGenesisConfig(GENESIS_CONFIG_TESTDATA)
             .setBootNodes(nodes)
             .build();
     verify(mockControllerBuilder)
@@ -290,7 +290,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void NoOverrideDefaultValuesIfKeyIsNotPresentInConfigFile() throws IOException {
+  public void noOverrideDefaultValuesIfKeyIsNotPresentInConfigFile() throws IOException {
     final String configFile = Resources.getResource("partial_config.toml").getFile();
 
     parseCommand("--config", configFile);

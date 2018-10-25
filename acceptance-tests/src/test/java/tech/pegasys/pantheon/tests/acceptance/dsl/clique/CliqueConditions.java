@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.clique;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectProposals;
@@ -20,25 +21,63 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBl
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlockHash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableMap;
 
 public class CliqueConditions {
 
-  public Condition validatorsEquals(final PantheonNode... validators) {
-    return new ExpectValidators(validators);
+  public Condition validatorsEqual(final PantheonNode... validators) {
+    return new ExpectValidators(validatorAddresses(validators));
   }
 
-  public Condition validatorsAtBlockEquals(
+  public Condition validatorsAtBlockEqual(
       final String blockNumber, final PantheonNode... validators) {
-    return new ExpectValidatorsAtBlock(blockNumber, validators);
+    return new ExpectValidatorsAtBlock(blockNumber, validatorAddresses(validators));
   }
 
-  public Condition validatorsAtBlockHashEquals(
+  public Condition validatorsAtBlockHashEqual(
       final String blockHash, final PantheonNode... validators) {
-    return new ExpectValidatorsAtBlockHash(Hash.fromHexString(blockHash), validators);
+    return new ExpectValidatorsAtBlockHash(
+        Hash.fromHexString(blockHash), validatorAddresses(validators));
   }
 
-  public Condition proposalsEqual(final Map<PantheonNode, Boolean> proposals) {
-    return new ExpectProposals(proposals);
+  public ProposalsConfig proposalsEqual() {
+    return new ProposalsConfig();
+  }
+
+  public Condition noProposals() {
+    return new ExpectProposals(ImmutableMap.of());
+  }
+
+  private Address[] validatorAddresses(final PantheonNode[] validators) {
+    return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
+  }
+
+  public static class ProposalsConfig {
+    private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
+
+    public ProposalsConfig addProposal(final PantheonNode node) {
+      proposals.put(node, true);
+      return this;
+    }
+
+    public ProposalsConfig removeProposal(final PantheonNode node) {
+      proposals.put(node, false);
+      return this;
+    }
+
+    public Condition build() {
+      final Map<Address, Boolean> proposalsAsAddress =
+          this.proposals
+              .entrySet()
+              .stream()
+              .collect(Collectors.toMap(p -> p.getKey().getAddress(), Entry::getValue));
+      return new ExpectProposals(proposalsAsAddress);
+    }
   }
 }

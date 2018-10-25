@@ -15,34 +15,32 @@ package tech.pegasys.pantheon.tests.acceptance.clique;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
 public class CliqueProposalRpcAcceptanceTest extends AcceptanceTestBase {
-  private final CliqueConditions clique = new CliqueConditions();
 
   @Test
   public void shouldReturnProposals() throws IOException {
-    String[] initialValidators = {"miner1", "miner2"};
+    final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
     final PantheonNode minerNode2 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
     final PantheonNode minerNode3 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    cluster.start();
 
-    cluster.verify(clique.proposalsEqual(ImmutableMap.of()));
-    minerNode1.clique().propose(minerNode3.getAddress(), true);
-    minerNode1.clique().propose(minerNode2.getAddress(), false);
-    minerNode2.clique().propose(minerNode3.getAddress(), false);
-    minerNode1.verify(clique.proposalsEqual(ImmutableMap.of(minerNode3, true, minerNode2, false)));
-    minerNode2.verify(clique.proposalsEqual(ImmutableMap.of(minerNode3, false)));
-    minerNode3.verify(clique.proposalsEqual(ImmutableMap.of()));
+    cluster.verify(clique.noProposals());
+    minerNode1.clique().proposeAdd(minerNode3);
+    minerNode1.clique().proposeRemove(minerNode2);
+    minerNode2.clique().proposeRemove(minerNode3);
+    minerNode1.verify(
+        clique.proposalsEqual().addProposal(minerNode3).removeProposal(minerNode2).build());
+    minerNode2.verify(clique.proposalsEqual().removeProposal(minerNode3).build());
+    minerNode3.verify(clique.noProposals());
   }
 }

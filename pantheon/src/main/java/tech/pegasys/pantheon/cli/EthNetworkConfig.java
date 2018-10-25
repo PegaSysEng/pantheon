@@ -105,10 +105,6 @@ public class EthNetworkConfig {
     }
   }
 
-  public static EthNetworkConfig defaultConfig() {
-    return mainnet();
-  }
-
   public static class Builder {
 
     private String genesisConfig;
@@ -120,8 +116,6 @@ public class EthNetworkConfig {
       this.networkId = ethNetworkConfig.networkId;
       this.bootNodes = ethNetworkConfig.bootNodes;
     }
-
-    public Builder() {}
 
     public Builder setGenesisConfig(final String genesisConfig) {
       this.genesisConfig = genesisConfig;

@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.tests.acceptance.clique;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNode;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
@@ -25,35 +24,32 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 
 public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
-  private final CliqueConditions cliqueConditions = new CliqueConditions();
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() throws IOException {
     final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
     final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
     final PantheonNode minerNode3 = cluster.create(pantheonCliqueMinerNode("miner3"));
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    final PantheonNode[] allNodes = {minerNode1, minerNode2, minerNode3};
+    cluster.start();
 
     final Block latest =
         minerNode1.web3().ethGetBlockByNumber(DefaultBlockParameter.valueOf("latest"), false);
-    cluster.verify(
-        cliqueConditions.validatorsAtBlockEquals("0x0", minerNode1, minerNode2, minerNode3));
-    cluster.verify(
-        cliqueConditions.validatorsAtBlockEquals("latest", minerNode1, minerNode2, minerNode3));
-    cluster.verify(
-        cliqueConditions.validatorsAtBlockEquals(
-            latest.getNumber().toString(), minerNode1, minerNode2, minerNode3));
+    cluster.verify(clique.validatorsAtBlockEqual("0x0", allNodes));
+    cluster.verify(clique.validatorsAtBlockEqual("latest", allNodes));
+    cluster.verify(clique.validatorsAtBlockEqual(latest.getNumber().toString(), allNodes));
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockHash() throws IOException {
     final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
     final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
-    cluster.start(minerNode1, minerNode2);
+    final PantheonNode[] allNodes = {minerNode1, minerNode2};
+    cluster.start();
 
     final DefaultBlockParameter latest = DefaultBlockParameter.valueOf("latest");
     final Block latestBlock = minerNode1.web3().ethGetBlockByNumber(latest, false);
     final String hash = latestBlock.getHash();
-    cluster.verify(cliqueConditions.validatorsAtBlockHashEquals(hash, minerNode1, minerNode2));
+    cluster.verify(clique.validatorsAtBlockHashEqual(hash, allNodes));
   }
 }

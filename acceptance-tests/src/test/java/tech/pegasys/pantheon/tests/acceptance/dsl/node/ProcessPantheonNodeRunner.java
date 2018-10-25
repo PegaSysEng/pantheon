@@ -85,8 +85,8 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add(apiList(node.webSocketConfiguration().getRpcApis()));
     }
 
-    if (node.ethNetworkConfig().isPresent()) {
-      EthNetworkConfig ethNetworkConfig = node.ethNetworkConfig().get();
+    if (node.getEthNetworkConfig().isPresent()) {
+      EthNetworkConfig ethNetworkConfig = node.getEthNetworkConfig().get();
       Path genesisFile = createGenesisFile(node, ethNetworkConfig);
       params.add("--genesis");
       params.add(genesisFile.toString());

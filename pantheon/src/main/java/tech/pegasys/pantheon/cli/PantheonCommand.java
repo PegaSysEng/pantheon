@@ -566,7 +566,7 @@ public class PantheonCommand implements Runnable {
 
   private EthNetworkConfig ethNetworkConfig() {
     final EthNetworkConfig predefinedNetworkConfig =
-        rinkeby ? EthNetworkConfig.rinkeby() : EthNetworkConfig.defaultConfig();
+        rinkeby ? EthNetworkConfig.rinkeby() : EthNetworkConfig.mainnet();
     return updateNetworkConfig(predefinedNetworkConfig);
   }
 

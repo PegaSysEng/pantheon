@@ -40,7 +40,7 @@ public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
     rpcEnabledNode = cluster.create(pantheonNode("rpc-enabled"));
     rpcDisabledNode = cluster.create(pantheonRpcDisabledNode("rpc-disabled"));
     ethApiDisabledNode = cluster.create(patheonNodeWithRpcApis("eth-api-disabled", RpcApis.NET));
-    cluster.start(rpcEnabledNode, rpcDisabledNode, ethApiDisabledNode);
+    cluster.start();
   }
 
   @Test

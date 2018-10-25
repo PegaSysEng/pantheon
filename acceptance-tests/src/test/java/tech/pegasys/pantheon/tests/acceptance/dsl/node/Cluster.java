@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -22,24 +20,25 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class Cluster implements AutoCloseable {
   public static final int NETWORK_ID = 10;
 
-  private final Map<String, PantheonNode> nodes = new HashMap<>();
+  private final List<PantheonNode> nodes = new ArrayList<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
 
-  public void start(final PantheonNode... nodes) {
-    this.nodes.clear();
+  public void start(final PantheonNode... startNodes) {
+    if (startNodes.length != 0) {
+      this.nodes.clear();
+      this.nodes.addAll(Arrays.asList(startNodes));
+    }
 
     final List<String> bootNodes = new ArrayList<>();
 
     for (final PantheonNode node : nodes) {
-      this.nodes.put(node.getName(), node);
       bootNodes.add(node.enodeUrl());
     }
 
@@ -47,19 +46,19 @@ public class Cluster implements AutoCloseable {
       node.bootnodes(bootNodes);
       Optional<EthNetworkConfig> ethNetworkConfig =
           node.getGenesisConfig()
-              .apply(stream(nodes).collect(toList()))
+              .apply(nodes)
               .map(config -> new EthNetworkConfig(config, NETWORK_ID, bootNodes));
-      node.ethNetworkConfig(ethNetworkConfig);
+      node.setEthNetworkConfig(ethNetworkConfig);
       node.start(pantheonNodeRunner);
     }
 
     for (final PantheonNode node : nodes) {
-      awaitPeerDiscovery(node, nodes.length);
+      awaitPeerDiscovery(node, nodes.size());
     }
   }
 
   public void stop() {
-    for (final PantheonNode node : nodes.values()) {
+    for (final PantheonNode node : this.nodes) {
       node.stop();
     }
     pantheonNodeRunner.shutdown();
@@ -67,7 +66,7 @@ public class Cluster implements AutoCloseable {
 
   @Override
   public void close() {
-    for (final PantheonNode node : nodes.values()) {
+    for (final PantheonNode node : nodes) {
       node.close();
     }
     pantheonNodeRunner.shutdown();
@@ -85,6 +84,7 @@ public class Cluster implements AutoCloseable {
             config.isDevMode(),
             config.getGenesisConfig());
     config.closeSocket();
+    nodes.add(node);
     return node;
   }
 
@@ -95,7 +95,7 @@ public class Cluster implements AutoCloseable {
   }
 
   public void verify(final Condition expected) {
-    for (final Node node : nodes.values()) {
+    for (final Node node : nodes) {
       expected.verify(node);
     }
   }

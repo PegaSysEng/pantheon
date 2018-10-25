@@ -46,7 +46,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     vertx = Vertx.vertx();
     minerNode = cluster.create(pantheonMinerNode("miner-node1"));
     archiveNode = cluster.create(pantheonNode("full-node1"));
-    cluster.start(minerNode, archiveNode);
+    cluster.start();
     accountOne = accounts.createAccount("account-one");
     minerWebSocket = new WebSocket(vertx, minerNode);
     archiveWebSocket = new WebSocket(vertx, archiveNode);

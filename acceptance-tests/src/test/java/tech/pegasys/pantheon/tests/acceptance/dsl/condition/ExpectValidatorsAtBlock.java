@@ -12,21 +12,19 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 public class ExpectValidatorsAtBlock implements Condition {
   private final String blockParameter;
-  private PantheonNode[] validators;
+  private final Address[] validators;
 
-  public ExpectValidatorsAtBlock(final String blockNumber, final PantheonNode... validators) {
+  public ExpectValidatorsAtBlock(final String blockNumber, final Address... validators) {
     this.blockParameter = blockNumber;
     this.validators = validators;
   }
@@ -36,7 +34,6 @@ public class ExpectValidatorsAtBlock implements Condition {
     waitFor(
         () ->
             assertThat(node.clique().getSigners(Optional.of(blockParameter)).getResult())
-                .containsExactlyInAnyOrderElementsOf(
-                    Arrays.stream(validators).map(PantheonNode::getAddress).collect(toList())));
+                .containsExactly(validators));
   }
 }

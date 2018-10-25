@@ -30,7 +30,7 @@ public class MiningAcceptanceTest extends AcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     minerNode = cluster.create(pantheonMinerNode("miner1"));
-    cluster.start(minerNode);
+    cluster.start();
   }
 
   @Test

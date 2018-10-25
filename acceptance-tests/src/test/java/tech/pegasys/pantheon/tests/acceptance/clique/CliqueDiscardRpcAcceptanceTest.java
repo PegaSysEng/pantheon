@@ -15,44 +15,42 @@ package tech.pegasys.pantheon.tests.acceptance.clique;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
 import java.math.BigInteger;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 
 public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
-  private final CliqueConditions clique = new CliqueConditions();
 
   @Test
   public void shouldDiscardVotes() throws IOException {
-    String[] initialValidators = {"miner1", "miner2"};
+    final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
     final PantheonNode minerNode2 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
     final PantheonNode minerNode3 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    cluster.start();
 
-    minerNode1.clique().propose(minerNode2.getAddress(), false);
-    minerNode1.clique().propose(minerNode3.getAddress(), true);
-    minerNode2.clique().propose(minerNode2.getAddress(), false);
-    minerNode2.clique().propose(minerNode3.getAddress(), true);
-    minerNode1.clique().discard(minerNode2.getAddress());
-    minerNode1.clique().discard(minerNode3.getAddress());
+    minerNode1.clique().proposeRemove(minerNode2);
+    minerNode1.clique().proposeAdd(minerNode3);
+    minerNode2.clique().proposeRemove(minerNode2);
+    minerNode2.clique().proposeAdd(minerNode3);
+    minerNode1.clique().discard(minerNode2);
+    minerNode1.clique().discard(minerNode3);
 
     final DefaultBlockParameter latest = DefaultBlockParameter.valueOf("latest");
     final Block latestBlock = minerNode1.web3().ethGetBlockByNumber(latest, false);
     final BigInteger futureBlockNumber = latestBlock.getNumber().add(BigInteger.valueOf(2));
     cluster.verify(
-        clique.validatorsAtBlockEquals(futureBlockNumber.toString(), minerNode1, minerNode2));
-    minerNode1.verify(clique.proposalsEqual(ImmutableMap.of()));
-    minerNode2.verify(clique.proposalsEqual(ImmutableMap.of(minerNode2, false, minerNode3, true)));
+        clique.validatorsAtBlockEqual(futureBlockNumber.toString(), minerNode1, minerNode2));
+    minerNode1.verify(clique.noProposals());
+    minerNode2.verify(
+        clique.proposalsEqual().removeProposal(minerNode2).addProposal(minerNode3).build());
   }
 }
