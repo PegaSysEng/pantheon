@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import io.vertx.core.json.JsonObject;
 import org.junit.Before;
@@ -127,5 +128,40 @@ public class CliqueMinerExecutorTest {
 
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
     assertThat(cliqueExtraData.getValidators()).isEqualTo(Lists.newArrayList());
+  }
+
+  @Test
+  public void vanityDataUpdatesInCliqueExtraDataWhenChangedInExecutor() {
+    final BytesValue initialContent = BytesValue.wrap("InitialValue".getBytes(Charsets.UTF_8));
+    final BytesValue alteredContent = BytesValue.wrap("NewValue".getBytes(Charsets.UTF_8));
+    final int EPOCH_LENGTH = 10;
+
+    final CliqueMinerExecutor executor =
+        new CliqueMinerExecutor(
+            cliqueProtocolContext,
+            Executors.newSingleThreadExecutor(),
+            CliqueProtocolSchedule.create(new JsonObject(), proposerKeyPair),
+            new PendingTransactions(1),
+            proposerKeyPair,
+            new MiningParameters(AddressHelpers.ofValue(1), Wei.ZERO, initialContent, false),
+            mock(CliqueBlockScheduler.class),
+            new EpochManager(EPOCH_LENGTH));
+
+    final BlockHeader header = blockHeaderBuilder.number(EPOCH_LENGTH).buildHeader();
+    BytesValue extraDataBytes = executor.calculateExtraData(header);
+
+    CliqueExtraData cliqueExtraData = CliqueExtraData.decode(extraDataBytes);
+    assertThat(cliqueExtraData.getVanityData().size())
+        .isEqualTo(CliqueExtraData.EXTRA_VANITY_LENGTH);
+    assertThat(cliqueExtraData.getVanityData().extractArray())
+        .endsWith(initialContent.extractArray());
+
+    executor.setExtraData(alteredContent);
+    extraDataBytes = executor.calculateExtraData(header);
+    cliqueExtraData = CliqueExtraData.decode(extraDataBytes);
+    assertThat(cliqueExtraData.getVanityData().size())
+        .isEqualTo(CliqueExtraData.EXTRA_VANITY_LENGTH);
+    assertThat(cliqueExtraData.getVanityData().extractArray())
+        .endsWith(alteredContent.extractArray());
   }
 }
