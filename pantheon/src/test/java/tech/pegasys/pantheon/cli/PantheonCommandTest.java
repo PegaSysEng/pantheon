@@ -106,6 +106,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void callingHelpDisplaysDefaultRpcApisCorrectly() {
+    parseCommand("--help");
+    assertThat(commandOutput.toString()).contains("default: ETH,NET,WEB3,CLIQUE,IBFT");
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void callingVersionDisplayPantheonInfoVersion() {
     parseCommand("--version");
     assertThat(commandOutput.toString()).isEqualToIgnoringWhitespace(PantheonInfo.version());
