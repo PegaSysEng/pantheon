@@ -63,6 +63,7 @@ public class RecursivePeerRefreshStateTest {
         /* * */
         /* * */
 
+        // TODO: Implement a bespoke container for these, or some kind of comparator?
         HashMap<TestPeer, Integer> initialPeerMap = new HashMap<>();
 
         for(TestPeer peer : peer00.getPeerTable()){
