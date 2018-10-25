@@ -20,8 +20,8 @@ import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -44,7 +44,6 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -102,7 +101,7 @@ public class PantheonCommand implements Runnable {
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
     public RpcApi convert(final String name) throws RpcApisConversionException {
-      String uppercaseName = name.trim().toUpperCase();
+      final String uppercaseName = name.trim().toUpperCase();
 
       return Stream.<Function<String, Optional<RpcApi>>>of(
               RpcApis::valueOf, CliqueRpcApis::valueOf, IbftRpcApis::valueOf)
@@ -276,10 +275,10 @@ public class PantheonCommand implements Runnable {
     split = ",",
     arity = "1..*",
     converter = RpcApisConverter.class,
-    description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}"
+    description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}",
+    defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
-  private final Collection<RpcApi> rpcApis =
-      Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, CliqueRpcApis.CLIQUE, IbftRpcApis.IBFT);
+  private final Collection<RpcApi> rpcApis = null;
 
   @Option(
     names = {"--ws-enabled"},
@@ -303,10 +302,10 @@ public class PantheonCommand implements Runnable {
     split = ",",
     arity = "1..*",
     converter = RpcApisConverter.class,
-    description = "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}"
+    description = "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}",
+    defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
-  private final Collection<RpcApi> wsApis =
-      Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, CliqueRpcApis.CLIQUE, IbftRpcApis.IBFT);
+  private final Collection<RpcApi> wsApis = null;
 
   @Option(
     names = {"--dev-mode"},
@@ -453,7 +452,7 @@ public class PantheonCommand implements Runnable {
     webSocketConfiguration.setEnabled(isWsRpcEnabled);
     webSocketConfiguration.setHost(wsHostAndPort.getHost());
     webSocketConfiguration.setPort(wsHostAndPort.getPort());
-    webSocketConfiguration.setRpcApis(rpcApis);
+    webSocketConfiguration.setRpcApis(wsApis);
     return webSocketConfiguration;
   }
 
@@ -514,7 +513,7 @@ public class PantheonCommand implements Runnable {
   private Path getDefaultPantheonDataDir() {
     // this property is retrieved from Gradle tasks or Pantheon running shell script.
     final String pantheonHomeProperty = System.getProperty(PANTHEON_HOME_PROPERTY_NAME);
-    Path pantheonHome;
+    final Path pantheonHome;
 
     // If prop is found, then use it
     if (pantheonHomeProperty != null) {
@@ -569,7 +568,7 @@ public class PantheonCommand implements Runnable {
   }
 
   private EthNetworkConfig updateNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
-    EthNetworkConfig.Builder builder = new EthNetworkConfig.Builder(ethNetworkConfig);
+    final EthNetworkConfig.Builder builder = new EthNetworkConfig.Builder(ethNetworkConfig);
     if (genesisFile != null) {
       builder.setGenesisConfig(genesisFile.toPath().toUri());
     }

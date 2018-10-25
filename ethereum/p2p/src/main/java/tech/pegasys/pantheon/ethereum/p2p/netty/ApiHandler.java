@@ -82,16 +82,16 @@ final class ApiHandler extends SimpleChannelInboundHandler<MessageData> {
                 reason.name(),
                 connection.getPeer().getClientId());
           } catch (final RLPException e) {
-            // It seems pretty common to get disconnect messages with no reason, which results in an
-            // rlp parsing error
-            LOG.warn(
-                "Received Wire DISCONNECT, but unable to parse reason. Peer: {}",
+            LOG.debug(
+                "Received Wire DISCONNECT with invalid RLP. Peer: {}",
                 connection.getPeer().getClientId());
           } catch (final Exception e) {
             LOG.error(
                 "Received Wire DISCONNECT, but unable to parse reason. Peer: {}",
                 connection.getPeer().getClientId(),
                 e);
+          } finally {
+            disconnect.release();
           }
 
           connection.terminateConnection(reason, true);

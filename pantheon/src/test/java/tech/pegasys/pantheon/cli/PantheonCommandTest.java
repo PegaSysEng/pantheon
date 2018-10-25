@@ -30,11 +30,12 @@ import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.cli.EthNetworkConfig.Builder;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -102,6 +103,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--help");
     final String expectedOutputStart = String.format("Usage:%n%npantheon [OPTIONS] [COMMAND]");
     assertThat(commandOutput.toString()).startsWith(expectedOutputStart);
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void callingHelpDisplaysDefaultRpcApisCorrectly() {
+    parseCommand("--help");
+    assertThat(commandOutput.toString()).contains("default: ETH,NET,WEB3,CLIQUE,IBFT");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
@@ -185,7 +193,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
     final File tempConfigFile = temp.newFile("invalid_config.toml");
-    try (Writer fileWriter = Files.newBufferedWriter(tempConfigFile.toPath(), UTF_8)) {
+    try (final Writer fileWriter = Files.newBufferedWriter(tempConfigFile.toPath(), UTF_8)) {
 
       fileWriter.write("."); // an invalid toml content
       fileWriter.flush();
@@ -206,7 +214,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
     final File tempConfigFile = temp.newFile("invalid_config.toml");
-    try (Writer fileWriter = Files.newBufferedWriter(tempConfigFile.toPath(), UTF_8)) {
+    try (final Writer fileWriter = Files.newBufferedWriter(tempConfigFile.toPath(), UTF_8)) {
 
       fileWriter.write("tester===========......."); // an invalid toml content
       fileWriter.flush();
@@ -261,7 +269,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         asList("enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567");
     assertThat(stringListArgumentCaptor.getValue()).isEqualTo(nodes);
 
-    EthNetworkConfig networkConfig =
+    final EthNetworkConfig networkConfig =
         new Builder(EthNetworkConfig.mainnet())
             .setGenesisConfig(new File("~/genesys.json").toPath().toUri())
             .setBootNodes(nodes)
@@ -522,6 +530,30 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void rpcApisPropertyMustBeUsed() {
+    parseCommand("--rpc-api", "ETH,NET");
+
+    verify(mockRunnerBuilder)
+        .build(
+            any(),
+            any(),
+            anyBoolean(),
+            any(),
+            anyString(),
+            anyInt(),
+            anyInt(),
+            jsonRpcConfigArgumentCaptor.capture(),
+            any(),
+            any());
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getRpcApis())
+        .containsExactlyInAnyOrder(RpcApis.ETH, RpcApis.NET);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void jsonRpcHostAndPortOptionMustBeUsed() {
 
     final String host = "1.2.3.4";
@@ -736,6 +768,30 @@ public class PantheonCommandTest extends CommandTestAbstract {
             any());
 
     assertThat(wsRpcConfigArgumentCaptor.getValue().isEnabled()).isTrue();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void wsApiPropertyMustBeUsed() {
+    parseCommand("--ws-api", "ETH, NET");
+
+    verify(mockRunnerBuilder)
+        .build(
+            any(),
+            any(),
+            anyBoolean(),
+            any(),
+            anyString(),
+            anyInt(),
+            anyInt(),
+            any(),
+            wsRpcConfigArgumentCaptor.capture(),
+            any());
+
+    assertThat(wsRpcConfigArgumentCaptor.getValue().getRpcApis())
+        .containsExactlyInAnyOrder(RpcApis.ETH, RpcApis.NET);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();

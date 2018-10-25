@@ -26,8 +26,11 @@ import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader> {
+  private static final Logger LOG = LogManager.getLogger();
   private final EthContext ethContext;
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
@@ -97,7 +100,11 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
     final int skipInterval = initialQuery ? 0 : calculateSkipInterval(range, headerRequestSize);
     final int count =
         initialQuery ? headerRequestSize : calculateCount((double) range, skipInterval);
-
+    LOG.debug(
+        "Searching for common ancestor with {} between {} and {}",
+        peer,
+        minimumPossibleCommonAncestorNumber,
+        maximumPossibleCommonAncestorNumber);
     return executeSubTask(
         () ->
             GetHeadersFromPeerByNumberTask.endingAtNumber(
@@ -128,9 +135,9 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
   private CompletableFuture<Void> processHeaders(
       final AbstractPeerTask.PeerTaskResult<List<BlockHeader>> headersResult) {
     initialQuery = false;
-    List<BlockHeader> headers = headersResult.getResult();
+    final List<BlockHeader> headers = headersResult.getResult();
 
-    OptionalInt maybeAncestorNumber =
+    final OptionalInt maybeAncestorNumber =
         BlockchainUtil.findHighestKnownBlockIndex(protocolContext.getBlockchain(), headers, false);
 
     // Means the insertion point is in the next header request.
@@ -138,7 +145,7 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
       maximumPossibleCommonAncestorNumber = headers.get(headers.size() - 1).getNumber() - 1L;
       return CompletableFuture.completedFuture(null);
     }
-    int ancestorNumber = maybeAncestorNumber.getAsInt();
+    final int ancestorNumber = maybeAncestorNumber.getAsInt();
     commonAncestorCandidate = headers.get(ancestorNumber);
 
     if (ancestorNumber - 1 >= 0) {
