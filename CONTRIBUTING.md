@@ -170,6 +170,70 @@ Exceptions:
 * Provide a summary on the first line with more details on additional lines as needed
 * Reference issues and pull requests liberally
 
+#### Type of Issue and Issue State
+
+| Label name | Search Link :mag_right: | Description |
+| --- | --- | --- |
+| `enhancement` | [search][search-label-enhancement] | Feature requests. |
+| `bug` | [search][search-label-bug] | Confirmed bugs or reports that are very likely to be bugs. |
+| `question` | [search][search-label-question] | Questions more than bug reports or feature requests (e.g. how do I do X). |
+| `feedback` | [search][search-label-feedback] | General feedback more than bug reports or feature requests. |
+| `help-wanted` | [search][search-label-help-wanted] | The core team would appreciate help from the community in resolving these issues. |
+| `beginner` | [search][search-label-beginner] | Less complex issues which would be good first issues to work on for users who want to contribute. |
+| `more-information-needed` | [search][search-label-more-information-needed] | More information needs to be collected about these problems or feature requests (e.g. steps to reproduce). |
+| `needs-reproduction` | [search][search-label-needs-reproduction] | Likely bugs, but haven't been reliably reproduced. |
+| `blocked` | [search][search-label-blocked] | Issues blocked on other issues. |
+| `duplicate` | [search][search-label-duplicate] | Issues which are duplicates of other issues, i.e. they have been reported before. |
+| `wontfix` | [search][search-label-wontfix] | The core team has decided not to fix these issues for now, either because they're working as intended or for some other reason. |
+| `invalid` | [search][search-label-invalid] | Issues which aren't valid (e.g. user errors). |
+
+#### Topic Categories
+
+| Label name | Search Link :mag_right: | Description |
+| --- | --- | --- |
+| `windows` | [search][search-label-windows] | Related to running on Windows. |
+| `linux` | [search][search-label-linux] | Related to running on Linux. |
+| `mac` | [search][search-label-mac] | Related to running on macOS. |
+| `documentation` | [search][search-label-documentation] | Related to any type of documentation |
+| `performance` | [search][search-label-performance] | Related to performance. |
+| `security` | [search][search-label-security] | Related to security. |
+| `api` | [search][search-label-api] | Related to public APIs. |
+
+#### Pull Request Labels
+
+| Label name | Search Link :mag_right: | Description
+| --- | --- | --- |
+| `work-in-progress` | [search][search-label-work-in-progress] | Pull requests which are still being worked on, more changes will follow. |
+| `needs-review` | [search][search-label-needs-review] | Pull requests which need code review, and approval from maintainers or the core team. |
+| `under-review` | [search][search-label-under-review] | Pull requests being reviewed by maintainers or the core team. |
+| `requires-changes` | [search][search-label-requires-changes] | Pull requests which need to be updated based on review comments and then reviewed again. |
+
+
+[search-label-enhancement]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aenhancement
+[search-label-bug]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abug
+[search-label-question]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aquestion
+[search-label-feedback]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Afeedback
+[search-label-help-wanted]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ahelp-wanted
+[search-label-beginner]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abeginner
+[search-label-more-information-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Amore-information-needed
+[search-label-needs-reproduction]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aneeds-reproduction
+[search-label-triage-help-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Atriage-help-needed
+[search-label-windows]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awindows
+[search-label-linux]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Alinux
+[search-label-mac]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Amac
+[search-label-documentation]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Adocumentation
+[search-label-performance]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aperformance
+[search-label-security]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Asecurity
+[search-label-api]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aapi
+
+[search-label-blocked]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ablocked
+[search-label-duplicate]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aduplicate
+[search-label-wontfix]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awontfix
+[search-label-invalid]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ainvalid
+[search-label-work-in-progress]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Awork-in-progress
+[search-label-needs-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Aneeds-review
+[search-label-under-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Aunder-review
+[search-label-requires-changes]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Arequires-changes
 [beginner]:https://github.com/search?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3Abeginner+label%3Ahelp-wanted+repo%3APegasysEng%2FPantheon+sort%3Acomments-desc
 [help-wanted]:https://github.com/search?q=is%3Aopen+is%3Aissue+label%3Ahelp-wanted+repo%3APegasysEng%2FPantheon+sort%3Acomments-desc+-label%3Abeginner
 
