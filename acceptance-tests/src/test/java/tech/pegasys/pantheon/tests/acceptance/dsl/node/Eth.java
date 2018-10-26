@@ -15,15 +15,14 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-
 import java.io.IOException;
 import java.math.BigInteger;
-
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.Response;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthGetWork;
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
 public class Eth {
 
@@ -35,25 +34,28 @@ public class Eth {
 
   public BigInteger blockNumber() throws IOException {
     final EthBlockNumber result = web3j.ethBlockNumber().send();
-    assertThat(result).isNotNull();
-    assertThat(result.hasError()).isFalse();
+    validatePositiveResult(result);
     return result.getBlockNumber();
   }
 
   public String[] getWork() throws IOException {
     final EthGetWork result = web3j.ethGetWork().send();
-    assertThat(result).isNotNull();
-    return new String[] {
-      result.getCurrentBlockHeaderPowHash(),
-      result.getSeedHashForDag(),
-      result.getBoundaryCondition()
+    validatePositiveResult(result);
+    return new String[]{
+        result.getCurrentBlockHeaderPowHash(),
+        result.getSeedHashForDag(),
+        result.getBoundaryCondition()
     };
   }
 
   public BigInteger getBalance(final Account account) throws IOException {
     final EthGetBalance result = web3j.ethGetBalance(account.getAddress(), LATEST).send();
+    validatePositiveResult(result);
+    return result.getBalance();
+  }
+
+  private void validatePositiveResult(final Response<?> result) {
     assertThat(result).isNotNull();
     assertThat(result.hasError()).isFalse();
-    return result.getBalance();
   }
 }
