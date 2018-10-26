@@ -140,9 +140,8 @@ public class PantheonNode implements Node, AutoCloseable {
 
     return web3j;
   }
-
-  @Deprecated
-  public Web3j web3j(final Web3jService web3jService) {
+  
+  private Web3j web3j(final Web3jService web3jService) {
     if (web3j == null) {
       web3j = Web3j.build(web3jService, 2000, Async.defaultExecutorService());
     }
