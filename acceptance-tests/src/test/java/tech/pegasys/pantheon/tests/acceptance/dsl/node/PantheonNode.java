@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
@@ -327,6 +328,7 @@ public class PantheonNode implements Node, AutoCloseable {
     return web3;
   }
 
+  @Override
   public Eth eth() {
     if (eth == null) {
       eth = new Eth(web3j());
@@ -338,5 +340,9 @@ public class PantheonNode implements Node, AutoCloseable {
   @Override
   public <T> T execute(final Transaction<T> transaction) {
     return transaction.execute(web3j());
+  }
+
+  public void verify(final Condition expected) {
+    expected.verify(this);
   }
 }
