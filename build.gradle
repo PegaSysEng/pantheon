@@ -203,6 +203,7 @@ allprojects {
   // Normalise Xdoclint behaviour across JDKs (OpenJDK 8 is more lenient than Oracle JDK by default).
   javadoc {
     options.addStringOption('Xdoclint:all', '-quiet')
+    options.addStringOption('Xwerror', '-quiet')
     options.encoding = 'UTF-8'
   }
 
