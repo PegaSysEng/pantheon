@@ -12,11 +12,16 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
+
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Eth;
 
 import java.io.IOException;
 import java.math.BigInteger;
+
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
 
 public class GetAccountBalance implements Transaction<BigInteger> {
 
@@ -27,9 +32,14 @@ public class GetAccountBalance implements Transaction<BigInteger> {
   }
 
   @Override
-  public BigInteger execute(final Eth node) {
+  public BigInteger execute(final Web3j node) {
     try {
-      return node.getBalance(account);
+      final EthGetBalance result = node.ethGetBalance(account.getAddress(), LATEST).send();
+      assertThat(result).isNotNull();
+      assertThat(result.hasError()).isFalse();
+
+      return result.getBalance();
+
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }

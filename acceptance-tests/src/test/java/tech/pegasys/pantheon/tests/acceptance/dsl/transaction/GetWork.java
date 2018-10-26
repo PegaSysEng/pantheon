@@ -12,16 +12,26 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Eth;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.EthGetWork;
 
 public class GetWork implements Transaction<String[]> {
 
   @Override
-  public String[] execute(final Eth node) {
+  public String[] execute(final Web3j node) {
     try {
-      return node.getWork();
+      final EthGetWork result = node.ethGetWork().send();
+      assertThat(result).isNotNull();
+      return new String[] {
+        result.getCurrentBlockHeaderPowHash(),
+        result.getSeedHashForDag(),
+        result.getBoundaryCondition()
+      };
+
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }

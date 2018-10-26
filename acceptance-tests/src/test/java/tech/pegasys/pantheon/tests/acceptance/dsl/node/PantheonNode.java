@@ -64,7 +64,6 @@ public class PantheonNode implements Node, AutoCloseable {
   private final Properties portsProperties = new Properties();
 
   private List<String> bootnodes = new ArrayList<>();
-  private Eth eth;
   private Web3 web3;
   private Web3j web3j;
 
@@ -291,7 +290,6 @@ public class PantheonNode implements Node, AutoCloseable {
       web3j = null;
     }
 
-    eth = null;
     web3 = null;
   }
 
