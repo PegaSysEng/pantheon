@@ -19,7 +19,6 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.GetWork;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,14 +38,14 @@ public class EthGetWorkAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldReturnSuccessResponseWhenMining() {
-    final String[] response = minerNode.execute(new GetWork());
+    final String[] response = minerNode.execute(eth.getWork());
     assertThat(response).hasSize(3);
     assertThat(response).doesNotContainNull();
   }
 
   @Test
   public void shouldReturnErrorResponseWhenNotMining() {
-    final Throwable thrown = catchThrowable(() -> fullNode.execute(new GetWork()));
+    final Throwable thrown = catchThrowable(() -> fullNode.execute(eth.getWork()));
     assertThat(thrown).isInstanceOf(ClientConnectionException.class);
     assertThat(thrown.getMessage()).contains("No mining work available yet");
   }

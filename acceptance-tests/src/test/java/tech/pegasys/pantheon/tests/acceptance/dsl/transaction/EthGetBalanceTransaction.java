@@ -23,11 +23,11 @@ import java.math.BigInteger;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 
-public class GetAccountBalance implements Transaction<BigInteger> {
+public class EthGetBalanceTransaction implements Transaction<BigInteger> {
 
   private final Account account;
 
-  public GetAccountBalance(final Account account) {
+  EthGetBalanceTransaction(final Account account) {
     this.account = account;
   }
 

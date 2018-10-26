@@ -19,7 +19,9 @@ import java.io.IOException;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetWork;
 
-public class GetWork implements Transaction<String[]> {
+public class EthGetWorkTransaction implements Transaction<String[]> {
+
+  EthGetWorkTransaction() {}
 
   @Override
   public String[] execute(final Web3j node) {

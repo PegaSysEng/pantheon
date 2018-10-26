@@ -18,28 +18,33 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.GetAccountBalance;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthTransactions;
 
 import org.web3j.utils.Convert.Unit;
 
 public class ExpectAccountBalance implements Condition {
 
+  private final EthTransactions eth;
   private final Account account;
   private final String expectedBalance;
   private final Unit balanceUnit;
 
   public ExpectAccountBalance(
-      final Account account, final String expectedBalance, final Unit balanceUnit) {
+      final EthTransactions eth,
+      final Account account,
+      final String expectedBalance,
+      final Unit balanceUnit) {
     this.expectedBalance = expectedBalance;
     this.balanceUnit = balanceUnit;
     this.account = account;
+    this.eth = eth;
   }
 
   @Override
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.execute(new GetAccountBalance(account)))
+            assertThat(node.execute(eth.getBalance((account))))
                 .isEqualTo(toWei(expectedBalance, balanceUnit).toBigIntegerExact()));
   }
 }

@@ -12,25 +12,19 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
-import java.io.IOException;
-import java.math.BigInteger;
+public class EthTransactions {
 
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
+  public EthGetWorkTransaction getWork() {
+    return new EthGetWorkTransaction();
+  }
 
-public class GetLatestBlockNumber implements Transaction<BigInteger> {
+  public EthBlockNumberTransaction blockNumber() {
+    return new EthBlockNumberTransaction();
+  }
 
-  @Override
-  public BigInteger execute(final Web3j node) {
-    try {
-      final EthBlockNumber result = node.ethBlockNumber().send();
-      assertThat(result).isNotNull();
-      assertThat(result.hasError()).isFalse();
-      return result.getBlockNumber();
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
+  public EthGetBalanceTransaction getBalance(final Account account) {
+    return new EthGetBalanceTransaction(account);
   }
 }
