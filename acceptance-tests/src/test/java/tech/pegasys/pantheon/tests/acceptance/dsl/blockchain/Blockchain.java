@@ -17,9 +17,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectMinimumBlockNu
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
 
-@Immutable
 public class Blockchain {
 
   public Condition blockNumberMustBeLatest(final Node node) throws IOException {

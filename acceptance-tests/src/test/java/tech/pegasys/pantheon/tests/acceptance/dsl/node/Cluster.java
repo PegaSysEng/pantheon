@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.concurrent.Immutable;
 
-@Immutable
 public class Cluster implements AutoCloseable {
 
   private final Map<String, PantheonNode> nodes = new HashMap<>();
