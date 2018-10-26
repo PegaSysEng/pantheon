@@ -33,7 +33,6 @@ public class EthGetWorkTransaction implements Transaction<String[]> {
         result.getSeedHashForDag(),
         result.getBoundaryCondition()
       };
-
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
