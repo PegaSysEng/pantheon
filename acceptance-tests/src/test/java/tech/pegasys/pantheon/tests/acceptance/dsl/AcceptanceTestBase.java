@@ -34,7 +34,7 @@ public class AcceptanceTestBase {
   protected AcceptanceTestBase() {
     eth = new EthTransactions();
     accounts = new Accounts(eth);
-    blockchain = new Blockchain();
+    blockchain = new Blockchain(eth);
     cluster = new Cluster();
     jsonRpc = new JsonRpc(cluster);
     transactions = new Transactions(accounts);

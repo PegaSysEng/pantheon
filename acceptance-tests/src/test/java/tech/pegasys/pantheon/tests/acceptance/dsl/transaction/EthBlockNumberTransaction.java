@@ -21,6 +21,8 @@ import org.web3j.protocol.Web3j;
 
 public class EthBlockNumberTransaction implements Transaction<BigInteger> {
 
+  EthBlockNumberTransaction() {}
+
   @Override
   public BigInteger execute(final Web3j node) {
     try {

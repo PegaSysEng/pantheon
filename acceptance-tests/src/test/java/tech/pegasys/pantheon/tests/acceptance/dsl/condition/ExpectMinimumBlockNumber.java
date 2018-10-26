@@ -15,20 +15,22 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthBlockNumberTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthTransactions;
 
 import java.math.BigInteger;
 
 public class ExpectMinimumBlockNumber implements Condition {
 
+  private final EthTransactions eth;
   private final BigInteger blockNumber;
 
-  public ExpectMinimumBlockNumber(final BigInteger blockNumber) {
+  public ExpectMinimumBlockNumber(final EthTransactions eth, final BigInteger blockNumber) {
     this.blockNumber = blockNumber;
+    this.eth = eth;
   }
 
   @Override
   public void verify(final Node node) {
-    assertThat(node.execute(new EthBlockNumberTransaction())).isGreaterThanOrEqualTo(blockNumber);
+    assertThat(node.execute(eth.blockNumber())).isGreaterThanOrEqualTo(blockNumber);
   }
 }
