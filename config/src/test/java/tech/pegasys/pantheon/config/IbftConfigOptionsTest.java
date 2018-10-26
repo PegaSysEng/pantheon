@@ -64,7 +64,7 @@ public class IbftConfigOptionsTest {
 
   @Test
   public void shouldGetRequestTimeoutFromConfig() {
-    final IbftConfigOptions config = fromConfigOptions(singletonMap("RequestTimeout", 5));
+    final IbftConfigOptions config = fromConfigOptions(singletonMap("RequestTimeoutSeconds", 5));
     assertThat(config.getRequestTimeoutMillis()).isEqualTo(5);
   }
 

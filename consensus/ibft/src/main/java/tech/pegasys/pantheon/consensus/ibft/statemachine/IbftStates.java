@@ -10,11 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft;
+package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import tech.pegasys.pantheon.consensus.ibft.IbftEvents.Type;
-
-/** Category of events that will effect and are interpretable by the Ibft processing mechanism */
-public interface IbftEvent {
-  Type getType();
+public enum IbftStates {
+  AWAITING_PROPOSAL, // waiting for block
+  PREPARING, // waiting for prepare
+  READY, // waiting for commit
+  COMPLETED // done done.
 }

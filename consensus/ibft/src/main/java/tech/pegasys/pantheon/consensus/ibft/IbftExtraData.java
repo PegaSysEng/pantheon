@@ -15,15 +15,22 @@ package tech.pegasys.pantheon.consensus.ibft;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
+import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
 
 /**
  * Represents the data structure stored in the extraData field of the BlockHeader used when
@@ -34,14 +41,14 @@ public class IbftExtraData {
   public static final int EXTRA_VANITY_LENGTH = 32;
 
   private final BytesValue vanityData;
-  private final List<Signature> seals;
+  private final Collection<Signature> seals;
   private final Optional<Vote> vote;
   private final int round;
   private final List<Address> validators;
 
   public IbftExtraData(
       final BytesValue vanityData,
-      final List<Signature> seals,
+      final Collection<Signature> seals,
       final Optional<Vote> vote,
       final int round,
       final List<Address> validators) {
@@ -127,7 +134,7 @@ public class IbftExtraData {
     return vanityData;
   }
 
-  public List<Signature> getSeals() {
+  public Collection<Signature> getSeals() {
     return seals;
   }
 
@@ -141,5 +148,26 @@ public class IbftExtraData {
 
   public int getRound() {
     return round;
+  }
+
+  public static String createBasicExtraData(final List<PrivateKey> privKeys) {
+    Collectors.toList();
+    IbftExtraData extraData =
+        new IbftExtraData(
+            BytesValue.wrap(new byte[32]),
+            Lists.newArrayList(),
+            Optional.empty(),
+            0,
+            convertPrivKeysToAddresses(privKeys));
+    return extraData.encode().toString();
+  }
+
+  private static List<Address> convertPrivKeysToAddresses(final List<PrivateKey> privKeys) {
+    final List<Address> validators = Lists.newArrayList();
+    for (final PrivateKey privKey : privKeys) {
+      final PublicKey pubKey = PublicKey.create(privKey);
+      validators.add(Util.publicKeyToAddress(pubKey));
+    }
+    return validators;
   }
 }
