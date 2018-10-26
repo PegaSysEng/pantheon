@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
  * MessageFrame.State#CODE_SUSPENDED}.
  *
  * <table>
+ * <caption>Method Overview</caption>
  * <tr>
  * <td><b>{@code MessageFrame.State}</b></td>
  * <td><b>Method</b></td>
