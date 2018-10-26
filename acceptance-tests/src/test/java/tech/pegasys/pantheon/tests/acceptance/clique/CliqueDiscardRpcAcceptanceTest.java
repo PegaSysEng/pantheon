@@ -18,11 +18,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import org.junit.Test;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthBlock.Block;
 
 public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
 
@@ -48,6 +45,7 @@ public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
     minerNode1.verify(clique.noProposals());
-    minerNode2.verify(clique.proposalsEqual().removeProposal(minerNode2).addProposal(minerNode3).build());
+    minerNode2.verify(
+        clique.proposalsEqual().removeProposal(minerNode2).addProposal(minerNode3).build());
   }
 }

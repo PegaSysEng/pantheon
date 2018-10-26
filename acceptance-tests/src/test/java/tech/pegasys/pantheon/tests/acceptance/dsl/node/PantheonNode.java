@@ -16,10 +16,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Java6Assertions;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;

@@ -17,10 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.Response;
-import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.EthBlock.Block;
 import org.web3j.protocol.core.methods.response.Web3Sha3;
 
 public class Web3 {
@@ -33,20 +30,8 @@ public class Web3 {
 
   public String web3Sha3(final String input) throws IOException {
     final Web3Sha3 result = web3j.web3Sha3(input).send();
-    assertResponseHasResult(result);
-    return result.getResult();
-  }
-
-  public Block ethGetBlockByNumber(
-      final DefaultBlockParameter blockParameter, final boolean fullTransactionData)
-      throws IOException {
-    EthBlock result = web3j.ethGetBlockByNumber(blockParameter, fullTransactionData).send();
-    assertResponseHasResult(result);
-    return result.getBlock();
-  }
-
-  private void assertResponseHasResult(final Response<?> result) {
-    assertThat(result).isNotNull();
+    assertThat((Response<?>) result).isNotNull();
     assertThat(result.hasError()).isFalse();
+    return result.getResult();
   }
 }

@@ -12,44 +12,50 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNode;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthBlock.Block;
 
 public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
 
+  private PantheonNode minerNode1;
+  private PantheonNode minerNode2;
+  private PantheonNode minerNode3;
+  private PantheonNode[] allNodes;
+
+  @Before
+  public void setUp() throws Exception {
+    final String[] validators = {"miner1", "miner2"};
+    minerNode1 = cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", validators));
+    minerNode2 = cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", validators));
+    minerNode3 = cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", validators));
+    allNodes = new PantheonNode[] {minerNode1, minerNode2, minerNode3};
+    cluster.start();
+  }
+
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() throws IOException {
-    final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
-    final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
-    final PantheonNode minerNode3 = cluster.create(pantheonCliqueMinerNode("miner3"));
-    final PantheonNode[] allNodes = {minerNode1, minerNode2, minerNode3};
-    cluster.start();
+    minerNode1.clique().proposeAdd(minerNode3);
+    minerNode2.clique().proposeAdd(minerNode3);
+    minerNode1.waitForChainHeadToProgress(2);
 
-    final Block latest =
-        minerNode1.web3().ethGetBlockByNumber(DefaultBlockParameter.valueOf("latest"), false);
-    cluster.verify(clique.validatorsAtBlockEqual("0x0", allNodes));
+    cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));
     cluster.verify(clique.validatorsAtBlockEqual("latest", allNodes));
-    cluster.verify(clique.validatorsAtBlockEqual(latest.getNumber().toString(), allNodes));
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockHash() throws IOException {
-    final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
-    final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
-    final PantheonNode[] allNodes = {minerNode1, minerNode2};
-    cluster.start();
+    minerNode1.clique().proposeAdd(minerNode3);
+    minerNode2.clique().proposeAdd(minerNode3);
+    minerNode1.waitForChainHeadToProgress(2);
 
-    final DefaultBlockParameter latest = DefaultBlockParameter.valueOf("latest");
-    final Block latestBlock = minerNode1.web3().ethGetBlockByNumber(latest, false);
-    final String hash = latestBlock.getHash();
-    cluster.verify(clique.validatorsAtBlockHashEqual(hash, allNodes));
+    final String latestBlockHash = minerNode1.eth().blockHash();
+    cluster.verify(clique.validatorsAtBlockHashEqual(latestBlockHash, allNodes));
   }
 }
