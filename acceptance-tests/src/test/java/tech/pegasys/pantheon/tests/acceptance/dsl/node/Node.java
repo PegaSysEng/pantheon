@@ -24,4 +24,6 @@ public interface Node {
   BigInteger getAccountBalance(Account account);
 
   Clique clique();
+
+  Eth eth();
 }

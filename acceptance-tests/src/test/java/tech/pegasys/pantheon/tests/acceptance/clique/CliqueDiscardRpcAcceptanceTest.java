@@ -44,13 +44,10 @@ public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
     minerNode1.clique().discard(minerNode2);
     minerNode1.clique().discard(minerNode3);
 
-    final DefaultBlockParameter latest = DefaultBlockParameter.valueOf("latest");
-    final Block latestBlock = minerNode1.web3().ethGetBlockByNumber(latest, false);
-    final BigInteger futureBlockNumber = latestBlock.getNumber().add(BigInteger.valueOf(2));
-    cluster.verify(
-        clique.validatorsAtBlockEqual(futureBlockNumber.toString(), minerNode1, minerNode2));
+    minerNode1.waitForChainHeadToProgress(2);
+
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
     minerNode1.verify(clique.noProposals());
-    minerNode2.verify(
-        clique.proposalsEqual().removeProposal(minerNode2).addProposal(minerNode3).build());
+    minerNode2.verify(clique.proposalsEqual().removeProposal(minerNode2).addProposal(minerNode3).build());
   }
 }

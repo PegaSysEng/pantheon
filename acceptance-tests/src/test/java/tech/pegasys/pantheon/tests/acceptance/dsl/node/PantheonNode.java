@@ -16,7 +16,10 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Java6Assertions;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -27,6 +30,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
@@ -385,5 +389,10 @@ public class PantheonNode implements Node, AutoCloseable {
 
   public void verify(final Condition expected) {
     expected.verify(this);
+  }
+
+  public void waitForChainHeadToProgress(final int blocksAheadOfLatest) throws IOException {
+    final BigInteger futureBlock = eth().blockNumber().add(BigInteger.valueOf(blocksAheadOfLatest));
+    new ExpectBlockNumber(futureBlock).verify(this);
   }
 }
