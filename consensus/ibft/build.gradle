@@ -29,6 +29,7 @@ dependencies {
   implementation project(':config')
   implementation project(':consensus:common')
   implementation project(':crypto')
+  implementation project(':config')
   implementation project(':ethereum:blockcreation')
   implementation project(':ethereum:core')
   implementation project(':ethereum:eth')
@@ -39,6 +40,7 @@ dependencies {
 
   implementation 'io.vertx:vertx-core'
   implementation 'com.google.guava:guava'
+  implementation 'io.vertx:vertx-core'
 
   testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
 

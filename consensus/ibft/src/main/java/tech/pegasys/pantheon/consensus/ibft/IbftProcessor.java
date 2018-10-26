@@ -12,6 +12,13 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvent;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
+
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,26 +35,26 @@ public class IbftProcessor implements Runnable {
   private final IbftEventQueue incomingQueue;
   private final ScheduledExecutorService roundTimerExecutor;
   private final RoundTimer roundTimer;
-  private final IbftStateMachine stateMachine;
   private volatile boolean shutdown = false;
+  private final IbftController ibftController;
 
   /**
    * Construct a new IbftProcessor
    *
    * @param incomingQueue The event queue from which to drain new events
    * @param baseRoundExpiryMillis The expiry time in milliseconds of round 0
-   * @param stateMachine an IbftStateMachine ready to process events and maintain state
+   * @param ibftController an object capable of handling any/all IBFT events
    */
   public IbftProcessor(
       final IbftEventQueue incomingQueue,
       final int baseRoundExpiryMillis,
-      final IbftStateMachine stateMachine) {
+      final IbftController ibftController) {
     // Spawning the round timer with a single thread as we should never have more than 1 timer in
     // flight at a time
     this(
         incomingQueue,
         baseRoundExpiryMillis,
-        stateMachine,
+        ibftController,
         Executors.newSingleThreadScheduledExecutor());
   }
 
@@ -55,13 +62,17 @@ public class IbftProcessor implements Runnable {
   IbftProcessor(
       final IbftEventQueue incomingQueue,
       final int baseRoundExpiryMillis,
-      final IbftStateMachine stateMachine,
+      final IbftController ibftController,
       final ScheduledExecutorService roundTimerExecutor) {
     this.incomingQueue = incomingQueue;
     this.roundTimerExecutor = roundTimerExecutor;
 
     this.roundTimer = new RoundTimer(incomingQueue, baseRoundExpiryMillis, roundTimerExecutor);
-    this.stateMachine = stateMachine;
+    this.ibftController = ibftController;
+  }
+
+  public void start() {
+    ibftController.start();
   }
 
   /** Indicate to the processor that it should gracefully stop at its next opportunity */
@@ -71,10 +82,18 @@ public class IbftProcessor implements Runnable {
 
   @Override
   public void run() {
+    /*
+    try {
+      // added to ensure blocks created during developer testing wait for the other node(s) to come up.
+      Thread.sleep(3_000);
+    } catch (InterruptedException ex) {
+    }
+    */
+
     while (!shutdown) {
       Optional<IbftEvent> newEvent = Optional.empty();
       try {
-        newEvent = Optional.ofNullable(incomingQueue.poll(2, TimeUnit.SECONDS));
+        newEvent = Optional.ofNullable(incomingQueue.poll(500, TimeUnit.MILLISECONDS));
       } catch (final InterruptedException interrupt) {
         // If the queue was interrupted propagate it and spin to check our shutdown status
         Thread.currentThread().interrupt();
@@ -83,7 +102,26 @@ public class IbftProcessor implements Runnable {
       newEvent.ifPresent(
           ibftEvent -> {
             try {
-              stateMachine.processEvent(ibftEvent, roundTimer);
+              switch (ibftEvent.getType()) {
+                case MESSAGE:
+                  final IbftReceivedMessageEvent rxEvent = (IbftReceivedMessageEvent) ibftEvent;
+                  ibftController.handleMessageEvent(rxEvent);
+                  break;
+                case ROUND_EXPIRY:
+                  final RoundExpiry roundExpiryEvent = (RoundExpiry) ibftEvent;
+                  ibftController.handleRoundExpiry(roundExpiryEvent);
+                  break;
+                case NEW_CHAIN_HEAD:
+                  final NewChainHead newChainHead = (NewChainHead) ibftEvent;
+                  ibftController.handleNewBlockEvent(newChainHead);
+                  break;
+                case BLOCK_TIMER_EXPIRY:
+                  final BlockTimerExpiry blockTimerExpiry = (BlockTimerExpiry) ibftEvent;
+                  ibftController.handleBlockTimerExpiry(blockTimerExpiry);
+                  break;
+                default:
+                  throw new RuntimeException("Illegal event in queue.");
+              }
             } catch (final Exception e) {
               LOG.error(
                   "State machine threw exception while processing event {" + ibftEvent + "}", e);

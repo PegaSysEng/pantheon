@@ -1,0 +1,157 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package tech.pegasys.pantheon.consensus.ibft.statemachine;
+
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.InRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
+public class IbftController {
+
+  private final Blockchain blockchain;
+  private final IbftImmutableState immutableState;
+  private IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory;
+  private final List<MessageData> futureMessages = Lists.newArrayList();
+  private IbftBlockHeightManager currentHeightManager;
+
+  public IbftController(
+      final Blockchain blockchain,
+      final IbftImmutableState immutableState,
+      final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory) {
+    this.blockchain = blockchain;
+    this.immutableState = immutableState;
+    this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
+  }
+
+  public void start() {
+    final BlockHeader parentHeader = blockchain.getChainHeadHeader();
+    startNewHeightManager(parentHeader);
+  }
+
+  public void handleMessageEvent(final IbftReceivedMessageEvent msg) {
+    MessageData messageData = msg.getMessageData();
+    handleMessage(messageData);
+  }
+
+  private void handleMessage(final MessageData messageData) {
+    switch (messageData.getCode()) {
+      case IbftV2.PROPOSAL:
+        final SignedData<ProposalPayload> prePrepareMsg =
+            ProposalMessage.fromMessage(messageData).decode();
+        if (processMessage(prePrepareMsg, messageData)) {
+          currentHeightManager.handlePreprepareMessage(prePrepareMsg);
+        }
+        break;
+
+      case IbftV2.PREPARE:
+        final SignedData<PreparePayload> prepareMsg =
+            PrepareMessage.fromMessage(messageData).decode();
+        if (processMessage(prepareMsg, messageData)) {
+          currentHeightManager.handlePrepareMessage(prepareMsg);
+        }
+        break;
+
+      case IbftV2.COMMIT:
+        final SignedData<CommitPayload> commitMsg = CommitMessage.fromMessage(messageData).decode();
+        if (processMessage(commitMsg, messageData)) {
+          currentHeightManager.handleCommitMessage(commitMsg);
+        }
+        break;
+
+      case IbftV2.ROUND_CHANGE:
+        final SignedData<RoundChangePayload> roundChangeMsg =
+            RoundChangeMessage.fromMessage(messageData).decode();
+        // if(processMessage(roundChangeMsg, messageData)) {
+        currentHeightManager.handleRoundChangeMessage(roundChangeMsg);
+        // }
+        break;
+
+      case IbftV2.NEW_ROUND:
+        final SignedData<NewRoundPayload> newRoundMsg =
+            NewRoundMessage.fromMessage(messageData).decode();
+        // if(processMessage(newRoundMsg, messageData)) {
+        currentHeightManager.handleNewRoundMessage(newRoundMsg);
+        // }
+        break;
+
+      default:
+        throw new IllegalArgumentException(
+            "Received message does not conform to any recognised IBFT message structure.");
+    }
+  }
+
+  public void handleNewBlockEvent(final NewChainHead newChainHead) {
+    final BlockHeader newHead = newChainHead.getNewChainHeadHeader();
+    startNewHeightManager(newHead);
+  }
+
+  public void handleBlockTimerExpiry(final BlockTimerExpiry blockTimerExpiry) {
+    currentHeightManager.handleBlockTimerExpiry();
+  }
+
+  public void startNewHeightManager(final BlockHeader parentHeader) {
+    currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
+
+    // for(futuremessage) {
+    //  handle(message);
+    // }
+  }
+
+  public void handleRoundExpiry(final RoundExpiry expired) {
+    currentHeightManager.roundExpired(expired);
+  }
+
+  private boolean processMessage(
+      final SignedData<? extends InRoundPayload> msg, final MessageData rawMsg) {
+    final ConsensusRoundIdentifier msgRoundIdentifier = msg.getPayload().getRoundIdentifier();
+
+    if (msgIsForCurrentHeight(msgRoundIdentifier)) {
+      if (immutableState.getValidators().contains(msg.getSender())) {
+        return true;
+      }
+    } else if (msgIsForFutureRound(msgRoundIdentifier)) {
+      futureMessages.add(rawMsg);
+    }
+    return false;
+  }
+
+  private boolean msgIsForCurrentHeight(final ConsensusRoundIdentifier roundIdentifier) {
+    return roundIdentifier.getSequenceNumber() == currentHeightManager.getChainHeight();
+  }
+
+  private boolean msgIsForFutureRound(final ConsensusRoundIdentifier roundIdentifier) {
+    return roundIdentifier.getSequenceNumber() > currentHeightManager.getChainHeight();
+  }
+}

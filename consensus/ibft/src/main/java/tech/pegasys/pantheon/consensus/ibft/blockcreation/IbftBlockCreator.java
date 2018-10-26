@@ -61,7 +61,9 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
     final BlockHeaderBuilder builder =
         BlockHeaderBuilder.create()
             .populateFrom(sealableBlockHeader)
-            .mixHash(Hash.ZERO)
+            .mixHash(
+                Hash.fromHexString(
+                    "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365"))
             .nonce(0L)
             .blockHashFunction(blockHashFunction);
 
