@@ -13,11 +13,10 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.GetLatestBlockNumber;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 public class ExpectMinimumBlockNumber implements Condition {
@@ -30,11 +29,6 @@ public class ExpectMinimumBlockNumber implements Condition {
 
   @Override
   public void verify(final Node node) {
-
-    try {
-      assertThat(node.eth().blockNumber()).isGreaterThanOrEqualTo(blockNumber);
-    } catch (final IOException e) {
-      fail("Failed to assert block number was greater then or equal to %s", blockNumber, e);
-    }
+    assertThat(node.execute(new GetLatestBlockNumber())).isGreaterThanOrEqualTo(blockNumber);
   }
 }

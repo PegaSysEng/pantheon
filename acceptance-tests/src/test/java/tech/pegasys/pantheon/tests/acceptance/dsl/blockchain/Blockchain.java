@@ -15,12 +15,11 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.blockchain;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectMinimumBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-
-import java.io.IOException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.GetLatestBlockNumber;
 
 public class Blockchain {
 
-  public Condition blockNumberMustBeLatest(final Node node) throws IOException {
-    return new ExpectMinimumBlockNumber(node.eth().blockNumber());
+  public Condition blockNumberMustBeLatest(final Node node) {
+    return new ExpectMinimumBlockNumber(node.execute(new GetLatestBlockNumber()));
   }
 }

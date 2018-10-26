@@ -15,21 +15,18 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +43,6 @@ import org.apache.logging.log4j.Logger;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
@@ -153,17 +149,6 @@ public class PantheonNode implements Node, AutoCloseable {
     }
 
     return web3j;
-  }
-
-  @Override
-  public BigInteger getAccountBalance(final Account account) {
-    try {
-      final EthGetBalance balanceResponse =
-          web3j().ethGetBalance(account.getAddress(), LATEST).send();
-      return balanceResponse.getBalance();
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public int getPeerCount() {
@@ -326,15 +311,6 @@ public class PantheonNode implements Node, AutoCloseable {
     }
 
     return web3;
-  }
-
-  @Override
-  public Eth eth() {
-    if (eth == null) {
-      eth = new Eth(web3j());
-    }
-
-    return eth;
   }
 
   @Override

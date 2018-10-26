@@ -18,6 +18,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.GetAccountBalance;
 
 import org.web3j.utils.Convert.Unit;
 
@@ -38,7 +39,7 @@ public class ExpectAccountBalance implements Condition {
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.getAccountBalance(account))
+            assertThat(node.execute(new GetAccountBalance(account)))
                 .isEqualTo(toWei(expectedBalance, balanceUnit).toBigIntegerExact()));
   }
 }

@@ -12,9 +12,17 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Eth;
+
 import org.web3j.protocol.Web3j;
 
 public interface Transaction<T> {
 
-  T execute(final Web3j node);
+  default T execute(final Web3j node) {
+    throw new UnsupportedOperationException();
+  }
+
+  default T execute(final Eth node) {
+    throw new UnsupportedOperationException();
+  }
 }

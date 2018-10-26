@@ -13,12 +13,16 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
+
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
 import java.io.IOException;
 import java.math.BigInteger;
 
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthGetWork;
 
 public class Eth {
@@ -44,5 +48,12 @@ public class Eth {
       result.getSeedHashForDag(),
       result.getBoundaryCondition()
     };
+  }
+
+  public BigInteger getBalance(final Account account) throws IOException {
+    final EthGetBalance result = web3j.ethGetBalance(account.getAddress(), LATEST).send();
+    assertThat(result).isNotNull();
+    assertThat(result.hasError()).isFalse();
+    return result.getBalance();
   }
 }
