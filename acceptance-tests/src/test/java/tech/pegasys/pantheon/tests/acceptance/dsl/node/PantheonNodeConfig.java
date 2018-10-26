@@ -66,21 +66,23 @@ public class PantheonNodeConfig {
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration) {
-    this.name = name;
-    this.miningParameters = miningParameters;
-    this.jsonRpcConfiguration = jsonRpcConfiguration;
-    this.webSocketConfiguration = webSocketConfiguration;
-    this.genesisConfig = (ignore) -> Optional.empty();
-    this.devMode = true;
+    this(
+        name,
+        miningParameters,
+        jsonRpcConfiguration,
+        webSocketConfiguration,
+        (ignore) -> Optional.empty(),
+        true);
   }
 
   private PantheonNodeConfig(final String name, final MiningParameters miningParameters) {
-    this.name = name;
-    this.miningParameters = miningParameters;
-    this.jsonRpcConfiguration = createJsonRpcConfig();
-    this.webSocketConfiguration = createWebSocketConfig();
-    this.genesisConfig = (ignore) -> Optional.empty();
-    this.devMode = true;
+    this(
+        name,
+        miningParameters,
+        createJsonRpcConfig(),
+        createWebSocketConfig(),
+        (ignore) -> Optional.empty(),
+        true);
   }
 
   private static MiningParameters createMiningParameters(final boolean miner) {
