@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.cli;
 
-import static tech.pegasys.pantheon.controller.CliquePantheonController.RINKEBY_NETWORK_ID;
-import static tech.pegasys.pantheon.controller.MainnetPantheonController.MAINNET_NETWORK_ID;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.RINKEBY_BOOTSTRAP_NODES;
 
@@ -26,6 +24,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Resources;
 
 public class EthNetworkConfig {
+  private static final int MAINNET_NETWORK_ID = 1;
+  private static final int RINKEBY_NETWORK_ID = 4;
   private static final String MAINNET_GENESIS = "mainnet.json";
   private static final String RINKEBY_GENESIS = "rinkeby.json";
   private final URI genesisConfig;
