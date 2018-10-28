@@ -18,7 +18,6 @@ Welcome to the Pantheon repository!  The following is a set of guidelines for co
 [Style Guides](#style-guides)
   * [Git Commit Messages & Pull Request Messages](#git-commit-messages--pull-request-messages)
   * [Java Style Guide](#java-code-style-guide)
-  * [Documentation Style Guide](#documentation-style-guide)
 
 [Issue and Pull Request Labels](#issue-and-pull-request-labels)
 
@@ -102,9 +101,9 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 * **Specify the name and version of the OS you're using.**
 
 ## Your First Code Contribution
-Start by looking through the 'beginner' and 'help wanted' issues:
-* [Beginner issues][search-label-beginner] - issues which should only require a few lines of code, and a test or two.
-* [Help wanted issues][search-label-help-wanted] - issues which are a bit more involved than `beginner` issues.
+Start by looking through the 'good first issue' and 'help wanted' issues:
+* [Good First Issue][search-label-good-first-issue] - issues which should only require a few lines of code, and a test or two.
+* [Help wanted issues][search-label-help-wanted] - issues which are a bit more involved than `good first issue` issues.
 
 ### Local Development
 The codebase is maintained using the "*contributor workflow*" where everyone without exception contributes patch proposals using "*pull-requests*". This facilitates social contribution, easy testing and peer review.
@@ -170,6 +169,7 @@ Exceptions:
 * Provide a summary on the first line with more details on additional lines as needed
 * Reference issues and pull requests liberally
 
+#Issue and Pull Request Labels
 #### Type of Issue and Issue State
 
 | Label name | Search Link :mag_right: | Description |
@@ -177,8 +177,8 @@ Exceptions:
 | `enhancement` | [search][search-label-enhancement] | Feature requests. |
 | `bug` | [search][search-label-bug] | Confirmed bugs or reports that are very likely to be bugs. |
 | `help wanted` | [search][search-label-help-wanted] | The core team would appreciate help from the community in resolving these issues. |
-| `beginner` | [search][search-label-beginner] | Less complex issues which would be good first issues to work on for users who want to contribute. |
-| `info needed` | [search][search-label-more-information-needed] | More information needs to be collected about these problems or feature requests (e.g. steps to reproduce). |
+| `good first issue` | [search][search-label-good-first-issue] | Less complex issues which would be good first issues to work on for users who want to contribute. |
+| `info needed` | [search][search-label-info-needed] | More information needs to be collected about these problems or feature requests (e.g. steps to reproduce). |
 | `needs reproduction` | [search][search-label-needs-reproduction] | Likely bugs, but haven't been reliably reproduced. |
 | `blocked` | [search][search-label-blocked] | Issues blocked on other issues. |
 | `duplicate` | [search][search-label-duplicate] | Issues which are duplicates of other issues, i.e. they have been reported before. |
@@ -216,7 +216,7 @@ Exceptions:
 [search-label-enhancement]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aenhancement
 [search-label-bug]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abug
 [search-label-help-wanted]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ahelp%20wanted
-[search-label-beginner]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abeginner
+[search-label-good-first-issue]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Agood%20first%20issue
 [search-label-info-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ainfo%20needed
 [search-label-needs-reproduction]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aneeds%20reproduction
 [search-label-blocked]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ablocked
@@ -228,7 +228,7 @@ Exceptions:
 
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
-[Gitter]: https://gitter.im/Pantheon
+[Gitter]: https://gitter.im/PegaSysEng/pantheon
 [Wiki]: https://github.com/PegaSysEng/pantheon/wiki
 [Debugging Wiki]: https://github.com/PegaSysEng/pantheon/wiki/Debugging
 [CLA.md]: /CLA.md
