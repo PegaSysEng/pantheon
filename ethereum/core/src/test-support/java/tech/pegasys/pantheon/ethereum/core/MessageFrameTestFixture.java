@@ -187,7 +187,7 @@ public class MessageFrameTestFixture {
   private ExecutionContextTestFixture getOrCreateExecutionContextTestFixture() {
     // Avoid creating a test fixture if the test supplies the blockchain and worldstate.
     if (executionContextTestFixture == null) {
-      executionContextTestFixture = new ExecutionContextTestFixture();
+      executionContextTestFixture = ExecutionContextTestFixture.create();
     }
     return executionContextTestFixture;
   }

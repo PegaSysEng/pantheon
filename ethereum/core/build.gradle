@@ -57,6 +57,7 @@ dependencies {
   jmhImplementation project(':ethereum:rlp')
   jmhImplementation project(':ethereum:trie')
   jmhImplementation project(':services:kvstore')
+  jmhImplementation 'com.google.guava:guava'
   jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
 }
 
