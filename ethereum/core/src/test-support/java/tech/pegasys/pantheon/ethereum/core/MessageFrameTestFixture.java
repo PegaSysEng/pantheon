@@ -59,6 +59,12 @@ public class MessageFrameTestFixture {
     return this;
   }
 
+  public MessageFrameTestFixture executionContextTestFixture(
+      final ExecutionContextTestFixture executionContextTestFixture) {
+    this.executionContextTestFixture = executionContextTestFixture;
+    return this;
+  }
+
   public MessageFrameTestFixture blockchain(final Blockchain blockchain) {
     this.blockchain = Optional.of(blockchain);
     return this;
