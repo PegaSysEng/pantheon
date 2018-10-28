@@ -231,6 +231,12 @@ public class PantheonCommand implements Runnable {
   private final Boolean rinkeby = false;
 
   @Option(
+    names = {"--ropsten"},
+    description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean ropsten = false;
+
+  @Option(
     names = {"--p2p-listen"},
     paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
     description = "Host and port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
@@ -562,8 +568,13 @@ public class PantheonCommand implements Runnable {
   }
 
   private EthNetworkConfig ethNetworkConfig() {
-    final EthNetworkConfig predefinedNetworkConfig =
-        rinkeby ? EthNetworkConfig.rinkeby() : EthNetworkConfig.mainnet();
+    EthNetworkConfig predefinedNetworkConfig = EthNetworkConfig.mainnet();
+    if (rinkeby) {
+      predefinedNetworkConfig = EthNetworkConfig.rinkeby();
+    }
+    if (ropsten) {
+      predefinedNetworkConfig = EthNetworkConfig.ropsten();
+    }
     return updateNetworkConfig(predefinedNetworkConfig);
   }
 
