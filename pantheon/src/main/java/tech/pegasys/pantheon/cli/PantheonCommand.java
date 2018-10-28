@@ -416,6 +416,11 @@ public class PantheonCommand implements Runnable {
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
       return;
     }
+    if (ropsten && rinkeby) {
+      System.out.println(
+          "Unable to connect to multiple networks simultaneously. Remove one of --ropsten or --rinkeby");
+      return;
+    }
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
     synchronize(
         buildController(),
@@ -568,12 +573,13 @@ public class PantheonCommand implements Runnable {
   }
 
   private EthNetworkConfig ethNetworkConfig() {
-    EthNetworkConfig predefinedNetworkConfig = EthNetworkConfig.mainnet();
+    final EthNetworkConfig predefinedNetworkConfig;
     if (rinkeby) {
       predefinedNetworkConfig = EthNetworkConfig.rinkeby();
-    }
-    if (ropsten) {
+    } else if (ropsten) {
       predefinedNetworkConfig = EthNetworkConfig.ropsten();
+    } else {
+      predefinedNetworkConfig = EthNetworkConfig.mainnet();
     }
     return updateNetworkConfig(predefinedNetworkConfig);
   }
