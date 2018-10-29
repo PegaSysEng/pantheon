@@ -16,19 +16,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 import java.math.BigInteger;
 
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class EthGetBalanceTransaction implements Transaction<BigInteger> {
 
   private final Account account;
 
-  EthGetBalanceTransaction(final Account account) {
+  public EthGetBalanceTransaction(final Account account) {
     this.account = account;
   }
 

@@ -14,17 +14,18 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+
 import java.io.IOException;
 
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.Web3Sha3;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class Web3Sha3Transaction implements Transaction<String> {
 
   private final String input;
 
-  Web3Sha3Transaction(final String input) {
+  public Web3Sha3Transaction(final String input) {
     this.input = input;
   }
 

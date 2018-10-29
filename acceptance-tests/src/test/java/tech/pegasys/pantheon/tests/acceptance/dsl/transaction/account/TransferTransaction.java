@@ -16,6 +16,7 @@ import static org.web3j.utils.Numeric.toHexString;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -25,7 +26,6 @@ import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class TransferTransaction implements Transaction<Hash> {
 

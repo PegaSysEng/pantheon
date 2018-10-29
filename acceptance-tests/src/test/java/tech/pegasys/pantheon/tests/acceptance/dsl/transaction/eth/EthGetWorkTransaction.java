@@ -14,15 +14,16 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+
 import java.io.IOException;
 
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetWork;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class EthGetWorkTransaction implements Transaction<String[]> {
 
-  EthGetWorkTransaction() {}
+  public EthGetWorkTransaction() {}
 
   @Override
   public String[] execute(final Web3j node) {
