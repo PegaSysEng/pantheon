@@ -23,6 +23,8 @@ import org.web3j.protocol.core.methods.response.NetVersion;
 
 public class NetVersionTransaction implements Transaction<String> {
 
+  NetVersionTransaction() {}
+
   @Override
   public String execute(final Web3j node) {
     try {

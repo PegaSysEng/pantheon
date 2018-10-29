@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersionConnectionException;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersionConnectionExceptionWithCause;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersionIsNotBlank;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NetTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
 
 public class Net {
 

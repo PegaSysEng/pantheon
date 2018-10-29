@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.web3.ExpectWeb3Sha3Equals;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Web3Transactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Transactions;
 
 public class Web3 {
 

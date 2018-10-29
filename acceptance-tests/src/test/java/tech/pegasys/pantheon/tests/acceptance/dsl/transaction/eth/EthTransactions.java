@@ -10,13 +10,25 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Sha3Transaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
-public class Web3Transactions {
+public class EthTransactions {
 
-  public Web3Sha3Transaction sha3(final String input) {
-    return new Web3Sha3Transaction(input);
+  public EthGetWorkTransaction getWork() {
+    return new EthGetWorkTransaction();
+  }
+
+  public EthBlockNumberTransaction blockNumber() {
+    return new EthBlockNumberTransaction();
+  }
+
+  public EthGetBalanceTransaction getBalance(final Account account) {
+    return new EthGetBalanceTransaction(account);
+  }
+
+  public EthAccountsTransaction accounts() {
+    return new EthAccountsTransaction();
   }
 }

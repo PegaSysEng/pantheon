@@ -25,7 +25,7 @@ public class Web3Sha3Transaction implements Transaction<String> {
 
   private final String input;
 
-  public Web3Sha3Transaction(final String input) {
+  Web3Sha3Transaction(final String input) {
     this.input = input;
   }
 

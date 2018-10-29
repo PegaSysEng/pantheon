@@ -23,7 +23,7 @@ import org.web3j.protocol.core.methods.response.EthGetWork;
 
 public class EthGetWorkTransaction implements Transaction<String[]> {
 
-  public EthGetWorkTransaction() {}
+  EthGetWorkTransaction() {}
 
   @Override
   public String[] execute(final Web3j node) {

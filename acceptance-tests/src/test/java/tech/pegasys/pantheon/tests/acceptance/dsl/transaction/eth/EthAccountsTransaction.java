@@ -24,6 +24,8 @@ import org.web3j.protocol.core.methods.response.EthAccounts;
 
 public class EthAccountsTransaction implements Transaction<List<String>> {
 
+  EthAccountsTransaction() {}
+
   @Override
   public List<String> execute(final Web3j node) {
     try {

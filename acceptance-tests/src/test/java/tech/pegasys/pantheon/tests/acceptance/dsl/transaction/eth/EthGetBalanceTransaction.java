@@ -28,7 +28,7 @@ public class EthGetBalanceTransaction implements Transaction<BigInteger> {
 
   private final Account account;
 
-  public EthGetBalanceTransaction(final Account account) {
+  EthGetBalanceTransaction(final Account account) {
     this.account = account;
   }
 
