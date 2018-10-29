@@ -33,17 +33,17 @@ import com.google.common.io.RecursiveDeleteOption;
 
 public class OperationBenchmarkHelper {
 
-  private final ExecutionContextTestFixture executionContext;
   private final Path storageDirectory;
   private final RocksDbKeyValueStorage keyValueStorage;
+  private final MessageFrame messageFrame;
 
   private OperationBenchmarkHelper(
-      final ExecutionContextTestFixture executionContext,
       final Path storageDirectory,
-      final RocksDbKeyValueStorage keyValueStorage) {
-    this.executionContext = executionContext;
+      final RocksDbKeyValueStorage keyValueStorage,
+      final MessageFrame messageFrame) {
     this.storageDirectory = storageDirectory;
     this.keyValueStorage = keyValueStorage;
+    this.messageFrame = messageFrame;
   }
 
   public static OperationBenchmarkHelper create() throws IOException {
@@ -65,20 +65,45 @@ public class OperationBenchmarkHelper {
               new BlockBody(emptyList(), emptyList())),
           emptyList());
     }
-    return new OperationBenchmarkHelper(executionContext, storageDirectory, keyValueStorage);
+    final MessageFrame messageFrame =
+        new MessageFrameTestFixture()
+            .executionContextTestFixture(executionContext)
+            .blockHeader(
+                new BlockHeaderTestFixture()
+                    .parentHash(blockchain.getChainHeadHash())
+                    .number(blockchain.getChainHeadBlockNumber() + 1)
+                    .difficulty(UInt256.ONE)
+                    .buildHeader())
+            .build();
+    return new OperationBenchmarkHelper(storageDirectory, keyValueStorage, messageFrame);
   }
 
   public MessageFrame createMessageFrame() {
-    final MutableBlockchain blockchain = executionContext.getBlockchain();
-    return new MessageFrameTestFixture()
-        .executionContextTestFixture(executionContext)
-        .blockHeader(
-            new BlockHeaderTestFixture()
-                .parentHash(blockchain.getChainHeadHash())
-                .number(blockchain.getChainHeadBlockNumber() + 1)
-                .difficulty(UInt256.ONE)
-                .buildHeader())
-        .build();
+    return createMessageFrameBuilder().build();
+  }
+
+  public MessageFrame.Builder createMessageFrameBuilder() {
+    return MessageFrame.builder()
+        .type(MessageFrame.Type.MESSAGE_CALL)
+        .messageFrameStack(messageFrame.getMessageFrameStack())
+        .blockchain(messageFrame.getBlockchain())
+        .worldState(messageFrame.getWorldState())
+        .initialGas(messageFrame.getRemainingGas())
+        .address(messageFrame.getContractAddress())
+        .originator(messageFrame.getOriginatorAddress())
+        .contract(messageFrame.getRecipientAddress())
+        .gasPrice(messageFrame.getGasPrice())
+        .inputData(messageFrame.getInputData())
+        .sender(messageFrame.getSenderAddress())
+        .value(messageFrame.getValue())
+        .apparentValue(messageFrame.getApparentValue())
+        .code(messageFrame.getCode())
+        .blockHeader(messageFrame.getBlockHeader())
+        .depth(messageFrame.getMessageStackDepth())
+        .isStatic(messageFrame.isStatic())
+        .completer(messageFrame -> {})
+        .miningBeneficiary(messageFrame.getMiningBeneficiary())
+        .blockHashLookup(messageFrame.getBlockHashLookup());
   }
 
   public void cleanUp() throws IOException {

@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.vm.operations;
 
 import tech.pegasys.pantheon.ethereum.mainnet.ConstantinopleGasCalculator;
+import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -27,7 +28,11 @@ import org.openjdk.jmh.annotations.TearDown;
 @State(Scope.Thread)
 public class BlockHashOperationBenchmark {
 
-  @Param({"1", "125", "255"})
+  @Param({
+    "1", // Worst-case scenario
+    "125", // Must iterate up the chain
+    "255" // Hash available directly via current header's parentHash
+  })
   public long blockNumber;
 
   private OperationBenchmarkHelper operationBenchmarkHelper;
@@ -51,5 +56,17 @@ public class BlockHashOperationBenchmark {
     frame.pushStackItem(UInt256.of(blockNumber).getBytes());
     operation.execute(frame);
     return frame.popStackItem();
+  }
+
+  @Benchmark
+  public Bytes32 executeOperationWithEmptyHashCache() {
+    final MessageFrame cleanFrame =
+        operationBenchmarkHelper
+            .createMessageFrameBuilder()
+            .blockHashLookup(new BlockHashLookup(frame.getBlockHeader(), frame.getBlockchain()))
+            .build();
+    cleanFrame.pushStackItem(UInt256.of(blockNumber).getBytes());
+    operation.execute(cleanFrame);
+    return cleanFrame.popStackItem();
   }
 }
