@@ -62,14 +62,6 @@ public class Account {
     return BigInteger.valueOf(nonce++);
   }
 
-  public void setNextNonce(final long nonce) {
-    this.nonce = nonce;
-  }
-
-  public String getName() {
-    return name;
-  }
-
   public Condition balanceEquals(final String expectedBalance, final Unit balanceUnit) {
     return new ExpectAccountBalance(eth, this, expectedBalance, balanceUnit);
   }

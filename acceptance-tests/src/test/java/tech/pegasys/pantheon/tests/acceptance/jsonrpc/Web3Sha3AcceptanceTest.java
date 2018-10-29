@@ -15,13 +15,10 @@ package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-
-import java.io.IOException;
-
 import org.junit.Before;
 import org.junit.Test;
+import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 public class Web3Sha3AcceptanceTest extends AcceptanceTestBase {
 
@@ -34,7 +31,7 @@ public class Web3Sha3AcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldReturnCorrectSha3() throws IOException {
+  public void shouldReturnCorrectSha3() {
     final String input = "0x68656c6c6f20776f726c64";
     final String sha3 = "0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad";
 
