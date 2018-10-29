@@ -29,16 +29,14 @@ public class AcceptanceTestBase {
   protected final EthTransactions eth;
   protected final JsonRpc jsonRpc;
   protected final Transactions transactions;
-  protected final Web3Transactions web3;
 
   protected AcceptanceTestBase() {
     eth = new EthTransactions();
     accounts = new Accounts(eth);
     blockchain = new Blockchain(eth);
     cluster = new Cluster();
-    jsonRpc = new JsonRpc(cluster);
+    jsonRpc = new JsonRpc(cluster, new Web3Transactions());
     transactions = new Transactions(accounts);
-    web3 = new Web3Transactions();
   }
 
   @After
