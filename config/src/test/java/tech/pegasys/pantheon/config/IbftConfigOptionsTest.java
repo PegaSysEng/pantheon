@@ -46,7 +46,7 @@ public class IbftConfigOptionsTest {
 
   @Test
   public void shouldGetBlockPeriodFromConfig() {
-    final IbftConfigOptions config = fromConfigOptions(singletonMap("blockPeriodSeconds", 5));
+    final IbftConfigOptions config = fromConfigOptions(singletonMap("blockPeriodSeConds", 5));
     assertThat(config.getBlockPeriodSeconds()).isEqualTo(5);
   }
 
@@ -81,8 +81,9 @@ public class IbftConfigOptionsTest {
   }
 
   private IbftConfigOptions fromConfigOptions(final Map<String, Object> ibftConfigOptions) {
-    return GenesisConfigOptions.fromGenesisConfig(
+    return GenesisConfigFile.fromConfig(
             new JsonObject(singletonMap("config", singletonMap("ibft", ibftConfigOptions))))
+        .getConfigOptions()
         .getIbftConfigOptions()
         .orElseThrow(() -> new AssertionError("Did not find IBFT config"));
   }

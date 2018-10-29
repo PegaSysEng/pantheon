@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.controller;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftProtocolSchedule;
@@ -48,7 +49,8 @@ public interface PantheonController<C> extends Closeable {
       throws IOException {
 
     final JsonObject config = new JsonObject(configContents);
-    final GenesisConfigOptions configOptions = GenesisConfigOptions.fromGenesisConfig(config);
+    final GenesisConfigOptions configOptions =
+        GenesisConfigFile.fromConfig(config).getConfigOptions();
 
     if (configOptions.isEthHash()) {
       return MainnetPantheonController.init(

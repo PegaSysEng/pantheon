@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -39,7 +39,8 @@ public class BlockchainImporter {
 
   public BlockchainImporter(final URL blocksUrl, final String genesisJson) throws Exception {
     protocolSchedule =
-        MainnetProtocolSchedule.fromConfig(GenesisConfigOptions.fromGenesisConfig(genesisJson));
+        MainnetProtocolSchedule.fromConfig(
+            GenesisConfigFile.fromConfig(genesisJson).getConfigOptions());
 
     blocks = new ArrayList<>();
     try (final RawBlockIterator iterator =

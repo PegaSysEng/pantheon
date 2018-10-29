@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.chain;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -76,7 +77,8 @@ public final class GenesisConfig<C> {
       final JsonObject config =
           new JsonObject(
               Resources.toString(Resources.getResource(MAINNET_FILE), StandardCharsets.UTF_8));
-      final GenesisConfigOptions configOptions = GenesisConfigOptions.fromGenesisConfig(config);
+      final GenesisConfigOptions configOptions =
+          GenesisConfigFile.fromConfig(config).getConfigOptions();
       return GenesisConfig.fromConfig(config, MainnetProtocolSchedule.fromConfig(configOptions));
     } catch (final IOException ex) {
       throw new IllegalStateException(ex);
@@ -127,7 +129,8 @@ public final class GenesisConfig<C> {
             buildHeader(definition, calculateGenesisStateHash(genesisAccounts), protocolSchedule),
             BODY);
     final int chainId =
-        GenesisConfigOptions.fromGenesisConfig(jsonConfig)
+        GenesisConfigFile.fromConfig(jsonConfig)
+            .getConfigOptions()
             .getChainId()
             .orElse(MainnetProtocolSchedule.DEFAULT_CHAIN_ID);
     return new GenesisConfig<>(block, chainId, protocolSchedule, genesisAccounts);
