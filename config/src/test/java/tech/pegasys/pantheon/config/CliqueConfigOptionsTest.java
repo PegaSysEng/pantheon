@@ -65,7 +65,6 @@ public class CliqueConfigOptionsTest {
   private CliqueConfigOptions fromConfigOptions(final Map<String, Object> cliqueConfigOptions) {
     return GenesisConfigOptions.fromGenesisConfig(
             new JsonObject(singletonMap("config", singletonMap("clique", cliqueConfigOptions))))
-        .getCliqueConfigOptions()
-        .orElseThrow(() -> new AssertionError("Did not find clique config"));
+        .getCliqueConfigOptions();
   }
 }

@@ -83,7 +83,6 @@ public class IbftConfigOptionsTest {
   private IbftConfigOptions fromConfigOptions(final Map<String, Object> ibftConfigOptions) {
     return GenesisConfigOptions.fromGenesisConfig(
             new JsonObject(singletonMap("config", singletonMap("ibft", ibftConfigOptions))))
-        .getIbftConfigOptions()
-        .orElseThrow(() -> new AssertionError("Did not find IBFT config"));
+        .getIbftConfigOptions();
   }
 }

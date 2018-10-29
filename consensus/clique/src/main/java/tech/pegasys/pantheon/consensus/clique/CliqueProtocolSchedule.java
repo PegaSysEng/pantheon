@@ -28,8 +28,7 @@ public class CliqueProtocolSchedule extends MutableProtocolSchedule<CliqueContex
       final GenesisConfigOptions config, final KeyPair nodeKeys) {
 
     // Get Config Data
-    final CliqueConfigOptions cliqueConfig =
-        config.getCliqueConfigOptions().orElse(CliqueConfigOptions.DEFAULT);
+    final CliqueConfigOptions cliqueConfig = config.getCliqueConfigOptions();
     final long epochLength = cliqueConfig.getEpochLength();
     final long blockPeriod = cliqueConfig.getBlockPeriodSeconds();
     final int chainId = config.getChainId().orElse(DEFAULT_CHAIN_ID);

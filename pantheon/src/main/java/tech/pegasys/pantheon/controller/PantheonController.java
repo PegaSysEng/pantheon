@@ -63,7 +63,7 @@ public interface PantheonController<C> extends Closeable {
           GenesisConfig.fromConfig(config, IbftProtocolSchedule.create(configOptions)),
           syncConfig,
           ottomanTestnetOperation,
-          configOptions.getIbftConfigOptions().get(),
+          configOptions.getIbftConfigOptions(),
           networkId,
           nodeKeys);
     } else if (configOptions.isClique()) {
@@ -72,7 +72,7 @@ public interface PantheonController<C> extends Closeable {
           GenesisConfig.fromConfig(config, CliqueProtocolSchedule.create(configOptions, nodeKeys)),
           syncConfig,
           miningParameters,
-          configOptions.getCliqueConfigOptions().get(),
+          configOptions.getCliqueConfigOptions(),
           networkId,
           nodeKeys);
     } else {

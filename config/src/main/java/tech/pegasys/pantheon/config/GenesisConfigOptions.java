@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.config;
 
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
@@ -48,16 +47,16 @@ public class GenesisConfigOptions {
     return configRoot.containsKey(CLIQUE_CONFIG_KEY);
   }
 
-  public Optional<IbftConfigOptions> getIbftConfigOptions() {
+  public IbftConfigOptions getIbftConfigOptions() {
     return isIbft()
-        ? Optional.of(new IbftConfigOptions(configRoot.getJsonObject(IBFT_CONFIG_KEY)))
-        : Optional.empty();
+        ? new IbftConfigOptions(configRoot.getJsonObject(IBFT_CONFIG_KEY))
+        : IbftConfigOptions.DEFAULT;
   }
 
-  public Optional<CliqueConfigOptions> getCliqueConfigOptions() {
+  public CliqueConfigOptions getCliqueConfigOptions() {
     return isClique()
-        ? Optional.of(new CliqueConfigOptions(configRoot.getJsonObject(CLIQUE_CONFIG_KEY)))
-        : Optional.empty();
+        ? new CliqueConfigOptions(configRoot.getJsonObject(CLIQUE_CONFIG_KEY))
+        : CliqueConfigOptions.DEFAULT;
   }
 
   public OptionalLong getHomesteadBlockNumber() {

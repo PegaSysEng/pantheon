@@ -25,8 +25,7 @@ public class IbftProtocolSchedule {
 
   public static ProtocolSchedule<IbftContext> create(final GenesisConfigOptions config) {
     final long spuriousDragonBlock = config.getSpuriousDragonBlockNumber().orElse(0);
-    final IbftConfigOptions ibftConfig =
-        config.getIbftConfigOptions().orElse(IbftConfigOptions.DEFAULT);
+    final IbftConfigOptions ibftConfig = config.getIbftConfigOptions();
     final int chainId = config.getChainId().orElse(DEFAULT_CHAIN_ID);
     final long epochLength = ibftConfig.getEpochLength();
     final long blockPeriod = ibftConfig.getBlockPeriodSeconds();
