@@ -226,9 +226,15 @@ public class PantheonCommand implements Runnable {
     names = {"--rinkeby"},
     description =
         "Use the Rinkeby test network"
-            + "- see https://github.com/ethereum/EIPs/issues/225 (default: ${DEFAULT-VALUE})"
+            + " - see https://github.com/ethereum/EIPs/issues/225 (default: ${DEFAULT-VALUE})"
   )
   private final Boolean rinkeby = false;
+
+  @Option(
+    names = {"--ropsten"},
+    description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean ropsten = false;
 
   @Option(
     names = {"--p2p-listen"},
@@ -410,6 +416,11 @@ public class PantheonCommand implements Runnable {
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
       return;
     }
+    if (ropsten && rinkeby) {
+      System.out.println(
+          "Unable to connect to multiple networks simultaneously. Remove one of --ropsten or --rinkeby");
+      return;
+    }
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
     synchronize(
         buildController(),
@@ -562,8 +573,14 @@ public class PantheonCommand implements Runnable {
   }
 
   private EthNetworkConfig ethNetworkConfig() {
-    final EthNetworkConfig predefinedNetworkConfig =
-        rinkeby ? EthNetworkConfig.rinkeby() : EthNetworkConfig.mainnet();
+    final EthNetworkConfig predefinedNetworkConfig;
+    if (rinkeby) {
+      predefinedNetworkConfig = EthNetworkConfig.rinkeby();
+    } else if (ropsten) {
+      predefinedNetworkConfig = EthNetworkConfig.ropsten();
+    } else {
+      predefinedNetworkConfig = EthNetworkConfig.mainnet();
+    }
     return updateNetworkConfig(predefinedNetworkConfig);
   }
 

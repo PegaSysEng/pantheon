@@ -47,6 +47,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
 import tech.pegasys.pantheon.util.time.SystemClock;
 
@@ -61,7 +62,6 @@ import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.Logger;
 
 public class CliquePantheonController implements PantheonController<CliqueContext> {
-  public static int RINKEBY_NETWORK_ID = 4;
   private static final Logger LOG = getLogger();
   private final GenesisConfig<CliqueContext> genesisConfig;
   private final ProtocolContext<CliqueContext> context;
@@ -109,7 +109,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
         cliqueConfig.getLong("period", SECONDS_BETWEEN_BLOCKS_DEFAULT);
 
     final EpochManager epochManger = new EpochManager(blocksPerEpoch);
-    final RocksDbKeyValueStorage kv =
+    final KeyValueStorage kv =
         RocksDbKeyValueStorage.create(Files.createDirectories(home.resolve(DATABASE_PATH)));
     final ProtocolSchedule<CliqueContext> protocolSchedule = genesisConfig.getProtocolSchedule();
     final BlockHashFunction blockHashFunction =
@@ -192,7 +192,11 @@ public class CliquePantheonController implements PantheonController<CliqueContex
           } catch (final InterruptedException e) {
             LOG.error("Failed to shutdown miner executor");
           }
-          kv.close();
+          try {
+            kv.close();
+          } catch (final IOException e) {
+            LOG.error("Failed to close key value storage", e);
+          }
         });
   }
 
