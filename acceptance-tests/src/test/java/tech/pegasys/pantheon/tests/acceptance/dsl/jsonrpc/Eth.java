@@ -13,7 +13,8 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetWorkExceptional;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthAccountsException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetWorkException;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetWorkHasThreeNotNullValues;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthTransactions;
 
@@ -29,7 +30,11 @@ public class Eth {
     return new ExpectEthGetWorkHasThreeNotNullValues(transactions.getWork());
   }
 
-  public Condition getWorkExceptional(final String message) {
-    return new ExpectEthGetWorkExceptional(transactions.getWork(), message);
+  public Condition getWorkExceptional(final String expectedMessage) {
+    return new ExpectEthGetWorkException(transactions.getWork(), expectedMessage);
+  }
+
+  public Condition accountsExceptional(final String expectedMessage) {
+    return new ExpectEthAccountsException(transactions.accounts(), expectedMessage);
   }
 }
