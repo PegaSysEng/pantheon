@@ -55,7 +55,7 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     minerNode2.clique().proposeAdd(minerNode3);
     minerNode1.waitForChainHeadToProgress(2);
 
-    final String latestBlockHash = minerNode1.eth().blockHash();
+    final String latestBlockHash = minerNode1.eth().latestBlockHash();
     cluster.verify(clique.validatorsAtBlockHashEqual(latestBlockHash, allNodes));
   }
 }

@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
+import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.BlockChainConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
@@ -26,6 +27,7 @@ public class AcceptanceTestBase {
   protected final Transactions transactions;
   protected final JsonRpc jsonRpc;
   protected final CliqueConditions clique;
+  protected final BlockChainConditions blockChain;
 
   protected AcceptanceTestBase() {
     accounts = new Accounts();
@@ -33,6 +35,7 @@ public class AcceptanceTestBase {
     transactions = new Transactions(accounts);
     jsonRpc = new JsonRpc(cluster);
     clique = new CliqueConditions();
+    blockChain = new BlockChainConditions();
   }
 
   @After

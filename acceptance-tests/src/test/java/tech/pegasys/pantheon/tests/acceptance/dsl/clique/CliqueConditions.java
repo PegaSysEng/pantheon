@@ -15,6 +15,8 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.clique;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote.CLIQUE_NONCE_VOTE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlock;
@@ -52,6 +54,10 @@ public class CliqueConditions {
 
   public Condition noProposals() {
     return new ExpectProposals(ImmutableMap.of());
+  }
+
+  public Condition nonceVoteEquals(final CLIQUE_NONCE_VOTE clique_nonce_vote) {
+    return new ExpectNonceVote(clique_nonce_vote);
   }
 
   private Address[] validatorAddresses(final PantheonNode[] validators) {

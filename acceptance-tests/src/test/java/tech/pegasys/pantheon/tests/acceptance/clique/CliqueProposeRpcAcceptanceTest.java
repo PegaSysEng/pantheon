@@ -12,9 +12,11 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
+import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNode;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote.CLIQUE_NONCE_VOTE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
@@ -75,7 +77,19 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldNotRemoveValidatorWhenInsufficientVotes() throws IOException {
-    final String[] initialValidators = {"miner1", "miner2", "miner3"};
+    final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
+    final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
+    final PantheonNode minerNode3 = cluster.create(pantheonCliqueMinerNode("miner3"));
+    cluster.start();
+
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
+    minerNode1.clique().proposeRemove(minerNode3);
+    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
+  }
+
+  @Test
+  public void shouldIncludeVoteInBlockHeader() throws IOException {
+    final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
     final PantheonNode minerNode2 =
@@ -84,8 +98,15 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
     cluster.start();
 
-    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
-    minerNode1.clique().proposeRemove(minerNode3);
-    cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
+    minerNode1.clique().proposeAdd(minerNode3);
+    minerNode1.clique().proposeRemove(minerNode2);
+
+    minerNode1.waitForChainHeadToProgress(1);
+    minerNode1.verify(blockChain.beneficiaryEquals(minerNode3));
+    minerNode1.verify(clique.nonceVoteEquals(CLIQUE_NONCE_VOTE.AUTH));
+
+    minerNode1.waitForChainHeadToProgress(1);
+    minerNode1.verify(blockChain.beneficiaryEquals(minerNode2));
+    minerNode1.verify(clique.nonceVoteEquals(CLIQUE_NONCE_VOTE.DROP));
   }
 }

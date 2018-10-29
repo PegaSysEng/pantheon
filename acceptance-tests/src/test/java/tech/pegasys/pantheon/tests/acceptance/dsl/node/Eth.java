@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.EthBlock.Block;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.EthGetWork;
 
@@ -39,12 +40,20 @@ public class Eth {
     return result.getBlockNumber();
   }
 
-  public String blockHash() throws IOException {
+  public String latestBlockHash() throws IOException {
     final DefaultBlockParameter latest = DefaultBlockParameter.valueOf(LATEST);
     EthBlock result = web3j.ethGetBlockByNumber(latest, false).send();
     assertThat(result).isNotNull();
     assertThat(result.hasError()).isFalse();
     return result.getBlock().getHash();
+  }
+
+  public Block latestBlock() throws IOException {
+    final DefaultBlockParameter latest = DefaultBlockParameter.valueOf(LATEST);
+    EthBlock result = web3j.ethGetBlockByNumber(latest, false).send();
+    assertThat(result).isNotNull();
+    assertThat(result.hasError()).isFalse();
+    return result.getBlock();
   }
 
   public String[] getWork() throws IOException {
