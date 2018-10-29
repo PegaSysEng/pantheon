@@ -64,7 +64,6 @@ public class PantheonNode implements Node, AutoCloseable {
   private final Properties portsProperties = new Properties();
 
   private List<String> bootnodes = new ArrayList<>();
-  private Web3 web3;
   private Web3j web3j;
 
   public PantheonNode(
@@ -288,8 +287,6 @@ public class PantheonNode implements Node, AutoCloseable {
       web3j.shutdown();
       web3j = null;
     }
-
-    web3 = null;
   }
 
   @Override
@@ -300,14 +297,6 @@ public class PantheonNode implements Node, AutoCloseable {
     } catch (final IOException e) {
       LOG.info("Failed to clean up temporary file: {}", homeDirectory, e);
     }
-  }
-
-  public Web3 web3() {
-    if (web3 == null) {
-      web3 = new Web3(web3j());
-    }
-
-    return web3;
   }
 
   @Override
