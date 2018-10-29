@@ -40,28 +40,28 @@ public class GenesisConfigOptionsTest {
   public void shouldUseIbftWhenIbftInConfig() {
     final GenesisConfigOptions config = fromConfigOptions(singletonMap("ibft", emptyMap()));
     assertThat(config.isIbft()).isTrue();
-    assertThat(config.getIbftConfigOptions()).isPresent();
+    assertThat(config.getIbftConfigOptions()).isNotSameAs(IbftConfigOptions.DEFAULT);
   }
 
   @Test
   public void shouldNotUseIbftIfIbftNotPresent() {
     final GenesisConfigOptions config = fromConfigOptions(emptyMap());
     assertThat(config.isIbft()).isFalse();
-    assertThat(config.getIbftConfigOptions()).isEmpty();
+    assertThat(config.getIbftConfigOptions()).isSameAs(IbftConfigOptions.DEFAULT);
   }
 
   @Test
   public void shouldUseCliqueWhenCliqueInConfig() {
     final GenesisConfigOptions config = fromConfigOptions(singletonMap("clique", emptyMap()));
     assertThat(config.isClique()).isTrue();
-    assertThat(config.getCliqueConfigOptions()).isPresent();
+    assertThat(config.getCliqueConfigOptions()).isNotSameAs(CliqueConfigOptions.DEFAULT);
   }
 
   @Test
   public void shouldNotUseCliqueIfCliqueNotPresent() {
     final GenesisConfigOptions config = fromConfigOptions(emptyMap());
     assertThat(config.isClique()).isFalse();
-    assertThat(config.getCliqueConfigOptions()).isEmpty();
+    assertThat(config.getCliqueConfigOptions()).isSameAs(CliqueConfigOptions.DEFAULT);
   }
 
   @Test

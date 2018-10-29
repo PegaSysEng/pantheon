@@ -66,7 +66,6 @@ public class CliqueConfigOptionsTest {
     return GenesisConfigFile.fromConfig(
             new JsonObject(singletonMap("config", singletonMap("clique", cliqueConfigOptions))))
         .getConfigOptions()
-        .getCliqueConfigOptions()
-        .orElseThrow(() -> new AssertionError("Did not find clique config"));
+        .getCliqueConfigOptions();
   }
 }
