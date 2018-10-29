@@ -18,13 +18,13 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Web3Transactions;
 
 public class Web3 {
 
-  private final Web3Transactions web3;
+  private final Web3Transactions transactions;
 
-  public Web3(final Web3Transactions web3) {
-    this.web3 = web3;
+  public Web3(final Web3Transactions transactions) {
+    this.transactions = transactions;
   }
 
   public Condition sha3(final String input, final String expectedHash) {
-    return new ExpectSha3(web3.sha3(input), expectedHash);
+    return new ExpectSha3(transactions.sha3(input), expectedHash);
   }
 }
