@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 import org.junit.Test;
 
@@ -60,5 +61,23 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
     minerNode3.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
     cluster.verify(receiver.balanceEquals(3));
+  }
+
+  @Test
+  public void shouldStallMiningWhenInsufficientValidators()
+      throws IOException, InterruptedException {
+    final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
+    final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
+    final PantheonNode minerNode3 = cluster.create(pantheonCliqueMinerNode("miner3"));
+    cluster.start();
+
+    cluster.stopNode(minerNode2);
+    cluster.stopNode(minerNode3);
+
+    BigInteger lastBlockNumber = minerNode1.eth().blockNumber();
+    Thread.sleep(20_000);
+    minerNode1.verify(blockChain.blockNumberEquals(lastBlockNumber));
+    Thread.sleep(20_000);
+    minerNode1.verify(blockChain.blockNumberEquals(lastBlockNumber));
   }
 }

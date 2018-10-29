@@ -64,6 +64,10 @@ public class Cluster implements AutoCloseable {
     pantheonNodeRunner.shutdown();
   }
 
+  public void stopNode(final PantheonNode node) {
+    pantheonNodeRunner.stopNode(node);
+  }
+
   @Override
   public void close() {
     for (final PantheonNode node : nodes) {

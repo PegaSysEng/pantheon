@@ -14,11 +14,18 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.blockchain;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectBeneficiary;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+
+import java.math.BigInteger;
 
 public class BlockChainConditions {
 
   public Condition beneficiaryEquals(final PantheonNode node) {
     return new ExpectBeneficiary(node);
+  }
+
+  public Condition blockNumberEquals(final BigInteger blockNumber) {
+    return new ExpectBlockNumber(blockNumber);
   }
 }
