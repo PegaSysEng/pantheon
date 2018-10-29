@@ -12,25 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.vm.operations;
 
-import static java.util.Collections.emptyList;
-
-import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
-import tech.pegasys.pantheon.ethereum.core.MessageFrameTestFixture;
 import tech.pegasys.pantheon.ethereum.mainnet.ConstantinopleGasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import com.google.common.io.MoreFiles;
-import com.google.common.io.RecursiveDeleteOption;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -38,57 +24,26 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
-@State(Scope.Benchmark)
+@State(Scope.Thread)
 public class BlockHashOperationBenchmark {
-
-  private BlockHashOperation operation;
-  private MessageFrame frame;
-  private Path storageDirectory;
 
   @Param({"1", "125", "255"})
   public long blockNumber;
 
-  private RocksDbKeyValueStorage keyValueStorage;
+  private OperationBenchmarkHelper operationBenchmarkHelper;
+  private BlockHashOperation operation;
+  private MessageFrame frame;
 
   @Setup
   public void prepare() throws Exception {
-    storageDirectory = Files.createTempDirectory("benchmark");
+    operationBenchmarkHelper = OperationBenchmarkHelper.create();
     operation = new BlockHashOperation(new ConstantinopleGasCalculator());
-
-    keyValueStorage = RocksDbKeyValueStorage.create(storageDirectory);
-
-    final ExecutionContextTestFixture executionContext =
-        ExecutionContextTestFixture.builder().keyValueStorage(keyValueStorage).build();
-    final MutableBlockchain blockchain = executionContext.getBlockchain();
-
-    for (int i = 1; i < 256; i++) {
-      blockchain.appendBlock(
-          new Block(
-              new BlockHeaderTestFixture()
-                  .parentHash(blockchain.getChainHeadHash())
-                  .number(i)
-                  .difficulty(UInt256.ONE)
-                  .buildHeader(),
-              new BlockBody(emptyList(), emptyList())),
-          emptyList());
-    }
-
-    frame =
-        new MessageFrameTestFixture()
-            .executionContextTestFixture(executionContext)
-            .blockHeader(
-                new BlockHeaderTestFixture()
-                    .parentHash(blockchain.getChainHeadHash())
-                    .number(blockchain.getChainHeadBlockNumber() + 1)
-                    .difficulty(UInt256.ONE)
-                    .buildHeader())
-            .build();
+    frame = operationBenchmarkHelper.createMessageFrame();
   }
 
   @TearDown
-  public void deleteStorage() throws Exception {
-    keyValueStorage.close();
-    MoreFiles.deleteRecursively(storageDirectory, RecursiveDeleteOption.ALLOW_INSECURE);
+  public void cleanUp() throws Exception {
+    operationBenchmarkHelper.cleanUp();
   }
 
   @Benchmark
