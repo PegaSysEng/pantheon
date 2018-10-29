@@ -36,6 +36,6 @@ public class Web3Sha3AcceptanceTest extends AcceptanceTestBase {
     final String expectedHash =
         "0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad";
 
-    node.verify(jsonRpc.web3sha3(input, expectedHash));
+    node.verify(web3.sha3(input, expectedHash));
   }
 }

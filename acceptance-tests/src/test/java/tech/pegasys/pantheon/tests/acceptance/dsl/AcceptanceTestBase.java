@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.tests.acceptance.dsl;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Blockchain;
+import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.JsonRpc;
+import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Web3;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
@@ -29,14 +31,16 @@ public class AcceptanceTestBase {
   protected final EthTransactions eth;
   protected final JsonRpc jsonRpc;
   protected final Transactions transactions;
+  protected final Web3 web3;
 
   protected AcceptanceTestBase() {
     eth = new EthTransactions();
     accounts = new Accounts(eth);
     blockchain = new Blockchain(eth);
     cluster = new Cluster();
-    jsonRpc = new JsonRpc(cluster, new Web3Transactions());
+    jsonRpc = new JsonRpc(cluster);
     transactions = new Transactions(accounts);
+    web3 = new Web3(new Web3Transactions());
   }
 
   @After
