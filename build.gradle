@@ -79,9 +79,7 @@ allprojects {
   targetCompatibility = '1.8'
 
   repositories {
-    println "jenkinsurl: $System.env.JENKINS_URL";
     if ("$System.env.JENKINS_URL" == 'https://jenkins.pegasys.tech/') {
-      println "using our repo"
       maven { url "https://nexus.int.pegasys.tech/repository/jcenter/" }
     } else {
       jcenter()
