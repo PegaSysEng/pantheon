@@ -350,6 +350,7 @@ public class PantheonNode implements Node, AutoCloseable {
     return web3;
   }
 
+  @Override
   public Eth eth() {
     if (eth == null) {
       eth = new Eth(web3j());

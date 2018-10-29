@@ -14,11 +14,14 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote.CLIQUE_NONCE_VOTE.AUTH;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 public class ExpectNonceVote implements Condition {
-  private String expectedNonce;
+  private static final String NONCE_AUTH = "0xffffffffffffffff";
+  private static final String NONCE_DROP = "0x0000000000000000";
+  private final String expectedNonce;
 
   public enum CLIQUE_NONCE_VOTE {
     AUTH,
@@ -26,8 +29,7 @@ public class ExpectNonceVote implements Condition {
   }
 
   public ExpectNonceVote(final CLIQUE_NONCE_VOTE vote) {
-    this.expectedNonce =
-        vote == CLIQUE_NONCE_VOTE.AUTH ? "0xffffffffffffffff" : "0x0000000000000000";
+    this.expectedNonce = vote == AUTH ? NONCE_AUTH : NONCE_DROP;
   }
 
   @Override
