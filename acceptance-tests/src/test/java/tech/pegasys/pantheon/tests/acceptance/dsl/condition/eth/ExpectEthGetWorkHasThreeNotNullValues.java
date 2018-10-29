@@ -10,31 +10,26 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
+package tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthGetWorkTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetWorkTransaction;
 
-import org.web3j.protocol.exceptions.ClientConnectionException;
-
-public class ExpectEthGetWorkExceptional implements Condition {
+public class ExpectEthGetWorkHasThreeNotNullValues implements Condition {
 
   private final EthGetWorkTransaction transaction;
-  private final String message;
 
-  public ExpectEthGetWorkExceptional(
-      final EthGetWorkTransaction transaction, final String expectedMessage) {
+  public ExpectEthGetWorkHasThreeNotNullValues(final EthGetWorkTransaction transaction) {
     this.transaction = transaction;
-    this.message = expectedMessage;
   }
 
   @Override
   public void verify(final Node node) {
-    final Throwable thrown = catchThrowable(() -> node.execute(transaction));
-    assertThat(thrown).isInstanceOf(ClientConnectionException.class);
-    assertThat(thrown.getMessage()).contains(message);
+    final String[] response = node.execute(transaction);
+    assertThat(response).hasSize(3);
+    assertThat(response).doesNotContainNull();
   }
 }

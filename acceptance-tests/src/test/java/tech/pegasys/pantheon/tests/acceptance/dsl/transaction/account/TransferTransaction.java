@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account;
 
 import static org.web3j.utils.Numeric.toHexString;
 
@@ -25,6 +25,7 @@ import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class TransferTransaction implements Transaction<Hash> {
 

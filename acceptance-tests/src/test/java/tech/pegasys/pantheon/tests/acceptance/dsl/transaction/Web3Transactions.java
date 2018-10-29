@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Sha3Transaction;
+
 public class Web3Transactions {
 
   public Web3Sha3Transaction sha3(final String input) {

@@ -10,25 +10,26 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
+package tech.pegasys.pantheon.tests.acceptance.dsl.condition.web3;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthGetWorkTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Sha3Transaction;
 
-public class ExpectEthGetWorkThreeNotNullValues implements Condition {
+public class ExpectWeb3Sha3Equals implements Condition {
 
-  private final EthGetWorkTransaction transaction;
+  private final Web3Sha3Transaction input;
+  private final String hash;
 
-  public ExpectEthGetWorkThreeNotNullValues(final EthGetWorkTransaction transaction) {
-    this.transaction = transaction;
+  public ExpectWeb3Sha3Equals(final Web3Sha3Transaction input, final String expectedHash) {
+    this.hash = expectedHash;
+    this.input = input;
   }
 
   @Override
   public void verify(final Node node) {
-    final String[] response = node.execute(transaction);
-    assertThat(response).hasSize(3);
-    assertThat(response).doesNotContainNull();
+    assertThat(node.execute(input)).isEqualTo(hash);
   }
 }

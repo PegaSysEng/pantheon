@@ -10,29 +10,37 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
+
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.EthGetWork;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
-public class EthGetWorkTransaction implements Transaction<String[]> {
+public class EthGetBalanceTransaction implements Transaction<BigInteger> {
 
-  EthGetWorkTransaction() {}
+  private final Account account;
+
+  EthGetBalanceTransaction(final Account account) {
+    this.account = account;
+  }
 
   @Override
-  public String[] execute(final Web3j node) {
+  public BigInteger execute(final Web3j node) {
     try {
-      final EthGetWork result = node.ethGetWork().send();
+      final EthGetBalance result = node.ethGetBalance(account.getAddress(), LATEST).send();
       assertThat(result).isNotNull();
-      return new String[] {
-        result.getCurrentBlockHeaderPowHash(),
-        result.getSeedHashForDag(),
-        result.getBoundaryCondition()
-      };
+      assertThat(result.hasError()).isFalse();
+
+      return result.getBalance();
+
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }

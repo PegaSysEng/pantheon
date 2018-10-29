@@ -13,6 +13,9 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthBlockNumberTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetBalanceTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetWorkTransaction;
 
 public class EthTransactions {
 

@@ -10,36 +10,31 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
-
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.Web3Sha3;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
-public class EthGetBalanceTransaction implements Transaction<BigInteger> {
+public class Web3Sha3Transaction implements Transaction<String> {
 
-  private final Account account;
+  private final String input;
 
-  EthGetBalanceTransaction(final Account account) {
-    this.account = account;
+  Web3Sha3Transaction(final String input) {
+    this.input = input;
   }
 
   @Override
-  public BigInteger execute(final Web3j node) {
+  public String execute(final Web3j node) {
     try {
-      final EthGetBalance result = node.ethGetBalance(account.getAddress(), LATEST).send();
+      final Web3Sha3 result = node.web3Sha3(input).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
-
-      return result.getBalance();
-
+      return result.getResult();
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }

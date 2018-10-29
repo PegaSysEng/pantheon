@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.web3j.utils.Convert.Unit;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransactionSet;
 
 public class Transactions {
 

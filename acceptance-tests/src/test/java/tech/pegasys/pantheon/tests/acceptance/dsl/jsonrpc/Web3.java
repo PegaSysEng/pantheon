@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectSha3;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.web3.ExpectWeb3Sha3Equals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Web3Transactions;
 
 public class Web3 {
@@ -25,6 +25,6 @@ public class Web3 {
   }
 
   public Condition sha3(final String input, final String expectedHash) {
-    return new ExpectSha3(transactions.sha3(input), expectedHash);
+    return new ExpectWeb3Sha3Equals(transactions.sha3(input), expectedHash);
   }
 }

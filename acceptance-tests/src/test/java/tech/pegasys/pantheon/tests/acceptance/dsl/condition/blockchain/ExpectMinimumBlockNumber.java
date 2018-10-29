@@ -10,25 +10,28 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
+package tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Web3Sha3Transaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EthTransactions;
 
-public class ExpectSha3 implements Condition {
+import java.math.BigInteger;
 
-  private final Web3Sha3Transaction input;
-  private final String hash;
+public class ExpectMinimumBlockNumber implements Condition {
 
-  public ExpectSha3(final Web3Sha3Transaction input, final String expectedHash) {
-    this.hash = expectedHash;
-    this.input = input;
+  private final EthTransactions eth;
+  private final BigInteger blockNumber;
+
+  public ExpectMinimumBlockNumber(final EthTransactions eth, final BigInteger blockNumber) {
+    this.blockNumber = blockNumber;
+    this.eth = eth;
   }
 
   @Override
   public void verify(final Node node) {
-    assertThat(node.execute(input)).isEqualTo(hash);
+    assertThat(node.execute(eth.blockNumber())).isGreaterThanOrEqualTo(blockNumber);
   }
 }
