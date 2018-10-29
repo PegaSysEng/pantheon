@@ -56,7 +56,7 @@ public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
   public void shouldSucceedConnectingToNodeWithWsRpcEnabled() {
     rpcEnabledNode.jsonRpcByWebSockets();
 
-    // TODO previously this test was calling netVersion using the HTTP not WebSockets
+    // TODO previously this test was calling netVersion using the HTTP not WebSockets, now failing
     rpcEnabledNode.verify(net.netVersion());
   }
 
