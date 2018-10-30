@@ -142,12 +142,9 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
-            genesisConfig
-                .getConfigOptions()
-                .getChainId()
-                .orElse(CliqueProtocolSchedule.DEFAULT_CHAIN_ID),
+            networkId,
             fastSyncEnabled,
-            networkId);
+            syncConfig.downloaderParallelism());
     final SyncState syncState =
         new SyncState(
             protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());

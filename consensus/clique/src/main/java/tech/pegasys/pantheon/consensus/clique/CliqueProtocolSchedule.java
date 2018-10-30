@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 /** Defines the protocol behaviours for a blockchain using Clique. */
 public class CliqueProtocolSchedule extends MutableProtocolSchedule<CliqueContext> {
 
-  public static final int DEFAULT_CHAIN_ID = 4;
+  private static final int DEFAULT_CHAIN_ID = 4;
 
   public static ProtocolSchedule<CliqueContext> create(
       final GenesisConfigOptions config, final KeyPair nodeKeys) {

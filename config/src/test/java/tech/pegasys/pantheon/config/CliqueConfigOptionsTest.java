@@ -28,7 +28,7 @@ public class CliqueConfigOptionsTest {
 
   @Test
   public void shouldGetEpochLengthFromConfig() {
-    final CliqueConfigOptions config = fromConfigOptions(singletonMap("epochLengTh", 10_000));
+    final CliqueConfigOptions config = fromConfigOptions(singletonMap("EpochLength", 10_000));
     assertThat(config.getEpochLength()).isEqualTo(10_000);
   }
 
@@ -46,7 +46,7 @@ public class CliqueConfigOptionsTest {
 
   @Test
   public void shouldGetBlockPeriodFromConfig() {
-    final CliqueConfigOptions config = fromConfigOptions(singletonMap("blockPeriodSeConds", 5));
+    final CliqueConfigOptions config = fromConfigOptions(singletonMap("BlockPeriodSeconds", 5));
     assertThat(config.getBlockPeriodSeconds()).isEqualTo(5);
   }
 

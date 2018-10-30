@@ -24,7 +24,7 @@ public class IbftConfigOptions {
 
   private final JsonObject ibftConfigRoot;
 
-  public IbftConfigOptions(final JsonObject ibftConfigRoot) {
+  IbftConfigOptions(final JsonObject ibftConfigRoot) {
     this.ibftConfigRoot = ibftConfigRoot;
   }
 

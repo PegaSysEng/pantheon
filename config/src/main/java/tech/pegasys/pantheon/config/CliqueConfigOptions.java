@@ -23,7 +23,7 @@ public class CliqueConfigOptions {
 
   private final JsonObject cliqueConfigRoot;
 
-  public CliqueConfigOptions(final JsonObject cliqueConfigRoot) {
+  CliqueConfigOptions(final JsonObject cliqueConfigRoot) {
     this.cliqueConfigRoot = cliqueConfigRoot;
   }
 
