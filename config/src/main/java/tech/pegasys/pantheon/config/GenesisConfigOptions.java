@@ -19,6 +19,7 @@ import io.vertx.core.json.JsonObject;
 
 public class GenesisConfigOptions {
 
+  private static final String ETHASH_CONFIG_KEY = "ethash";
   private static final String IBFT_CONFIG_KEY = "ibft";
   private static final String CLIQUE_CONFIG_KEY = "clique";
   private final JsonObject configRoot;
@@ -36,7 +37,7 @@ public class GenesisConfigOptions {
   }
 
   public boolean isEthHash() {
-    return configRoot.containsKey("ethash");
+    return configRoot.containsKey(ETHASH_CONFIG_KEY);
   }
 
   public boolean isIbft() {
