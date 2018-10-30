@@ -104,10 +104,11 @@ public class CliquePantheonController implements PantheonController<CliqueContex
       final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
-      final CliqueConfigOptions cliqueConfig,
       final int networkId,
       final KeyPair nodeKeys)
       throws IOException {
+    final CliqueConfigOptions cliqueConfig =
+        genesisConfig.getConfigOptions().getCliqueConfigOptions();
     final long blocksPerEpoch = cliqueConfig.getEpochLength();
     final long secondsBetweenBlocks = cliqueConfig.getBlockPeriodSeconds();
 

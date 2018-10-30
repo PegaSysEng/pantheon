@@ -114,7 +114,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final boolean ottomanTestnetOperation,
-      final IbftConfigOptions ibftConfig,
       final int networkId,
       final KeyPair nodeKeys)
       throws IOException {
@@ -132,6 +131,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
     genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
+    final IbftConfigOptions ibftConfig = genesisConfig.getConfigOptions().getIbftConfigOptions();
     final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
 
     final VoteTally voteTally =

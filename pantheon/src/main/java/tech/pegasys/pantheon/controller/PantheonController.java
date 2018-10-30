@@ -56,22 +56,10 @@ public interface PantheonController<C> extends Closeable {
           nodeKeys);
     } else if (configOptions.isIbft()) {
       return IbftPantheonController.init(
-          pantheonHome,
-          config,
-          syncConfig,
-          ottomanTestnetOperation,
-          configOptions.getIbftConfigOptions(),
-          networkId,
-          nodeKeys);
+          pantheonHome, config, syncConfig, ottomanTestnetOperation, networkId, nodeKeys);
     } else if (configOptions.isClique()) {
       return CliquePantheonController.init(
-          pantheonHome,
-          config,
-          syncConfig,
-          miningParameters,
-          configOptions.getCliqueConfigOptions(),
-          networkId,
-          nodeKeys);
+          pantheonHome, config, syncConfig, miningParameters, networkId, nodeKeys);
     } else {
       throw new IllegalArgumentException("Unknown consensus mechanism defined");
     }
