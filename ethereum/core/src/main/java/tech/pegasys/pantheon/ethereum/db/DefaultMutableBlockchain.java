@@ -51,8 +51,7 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   private final Subscribers<BlockAddedObserver> blockAddedObservers = new Subscribers<>();
 
   public DefaultMutableBlockchain(
-      final Block genesisBlock,
-      final BlockchainStorage blockchainStorage) {
+      final Block genesisBlock, final BlockchainStorage blockchainStorage) {
     checkNotNull(genesisBlock);
     this.blockchainStorage = blockchainStorage;
     this.setGenesis(genesisBlock);
