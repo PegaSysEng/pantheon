@@ -17,7 +17,6 @@ import static java.lang.String.format;
 
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -170,11 +169,9 @@ public class BlockchainImporter extends BlockImporter {
       final Boolean isSkipBlocks,
       final int metricsIntervalSec,
       final Long worldStateOffset) {
+    checkNotNull(isSkipBlocks);
     final ProtocolSchedule<C> protocolSchedule = pantheonController.getProtocolSchedule();
     final ProtocolContext<C> context = pantheonController.getProtocolContext();
-    final GenesisConfig<C> genesis = pantheonController.getGenesisConfig();
-    checkNotNull(isSkipBlocks);
-    final BlockHeader genesisHeader = genesis.getBlock().getHeader();
 
     final long startTime = System.currentTimeMillis();
     long lapStartTime = startTime;
@@ -201,7 +198,8 @@ public class BlockchainImporter extends BlockImporter {
     final Function<RLPInput, BlockHeader> headerReader =
         rlp2 -> BlockHeader.readFrom(rlp2, ScheduleBasedBlockHashFunction.create(protocolSchedule));
 
-    BlockHeader previousHeader = genesis.getBlock().getHeader();
+    BlockHeader previousHeader =
+        context.getBlockchain().getBlockHeader(BlockHeader.GENESIS_BLOCK_NUMBER).get();
     int blockCount = 0;
     int lapCount = 0;
     BlockHeader header = null;
@@ -228,7 +226,7 @@ public class BlockchainImporter extends BlockImporter {
           body = new BlockBody(rlp.readList(Transaction::readFrom), rlp.readList(headerReader));
           rlp.leaveList();
           receipts = rlp.readList(TransactionReceipt::readFrom);
-          if (header.getNumber() == genesisHeader.getNumber()) {
+          if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
             // Don't import genesis block
             previousHeader = header;
             continue;

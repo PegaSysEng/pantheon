@@ -16,28 +16,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Gas;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
-import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.debug.TraceFrame;
 import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor.Result;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
-import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
-import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -66,16 +60,11 @@ public class TraceTransactionIntegrationTest {
 
   @Before
   public void setUp() {
-    final GenesisConfig<Void> genesisConfig = GenesisConfig.development();
-    genesisBlock = genesisConfig.getBlock();
-    final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
-    blockchain =
-        new DefaultMutableBlockchain(
-            genesisBlock, keyValueStorage, MainnetBlockHashFunction::createHash);
-    worldStateArchive =
-        new WorldStateArchive(new KeyValueStorageWorldStateStorage(keyValueStorage));
-    final ProtocolSchedule<Void> protocolSchedule = genesisConfig.getProtocolSchedule();
-    genesisConfig.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
+    final ExecutionContextTestFixture contextTestFixture = ExecutionContextTestFixture.create();
+    genesisBlock = contextTestFixture.getGenesis();
+    blockchain = contextTestFixture.getBlockchain();
+    worldStateArchive = contextTestFixture.getStateArchive();
+    final ProtocolSchedule<Void> protocolSchedule = contextTestFixture.getProtocolSchedule();
     transactionProcessor = protocolSchedule.getByBlockNumber(0).getTransactionProcessor();
     blockHashLookup = new BlockHashLookup(genesisBlock.getHeader(), blockchain);
   }

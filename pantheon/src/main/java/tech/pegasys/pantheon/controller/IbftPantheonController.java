@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.controller;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.config.IbftConfigOptions;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
@@ -26,13 +28,14 @@ import tech.pegasys.pantheon.consensus.ibft.IbftStateMachine;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
+import tech.pegasys.pantheon.consensus.ibftlegacy.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftVoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64Protocol;
 import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64ProtocolManager;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -68,7 +71,8 @@ import org.apache.logging.log4j.Logger;
 public class IbftPantheonController implements PantheonController<IbftContext> {
 
   private static final Logger LOG = getLogger();
-  private final GenesisConfig<IbftContext> genesisConfig;
+  private final GenesisConfigOptions genesisConfig;
+  private final ProtocolSchedule<IbftContext> protocolSchedule;
   private final ProtocolContext<IbftContext> context;
   private final Synchronizer synchronizer;
   private final SubProtocol ethSubProtocol;
@@ -80,7 +84,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   private final Runnable closer;
 
   IbftPantheonController(
-      final GenesisConfig<IbftContext> genesisConfig,
+      final GenesisConfigOptions genesisConfig,
+      final ProtocolSchedule<IbftContext> protocolSchedule,
       final ProtocolContext<IbftContext> context,
       final SubProtocol ethSubProtocol,
       final ProtocolManager ethProtocolManager,
@@ -92,6 +97,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final Runnable closer) {
 
     this.genesisConfig = genesisConfig;
+    this.protocolSchedule = protocolSchedule;
     this.context = context;
     this.ethSubProtocol = ethSubProtocol;
     this.ethProtocolManager = ethProtocolManager;
@@ -105,7 +111,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
   public static PantheonController<IbftContext> init(
       final Path home,
-      final GenesisConfig<IbftContext> genesisConfig,
+      final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final boolean ottomanTestnetOperation,
       final IbftConfigOptions ibftConfig,
@@ -114,15 +120,17 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       throws IOException {
     final KeyValueStorage kv =
         RocksDbKeyValueStorage.create(Files.createDirectories(home.resolve(DATABASE_PATH)));
-    final ProtocolSchedule<IbftContext> protocolSchedule = genesisConfig.getProtocolSchedule();
+    final ProtocolSchedule<IbftContext> protocolSchedule =
+        IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
+    final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final MutableBlockchain blockchain =
-        new DefaultMutableBlockchain(genesisConfig.getBlock(), kv, blockHashFunction);
+        new DefaultMutableBlockchain(genesisState.getBlock(), kv, blockHashFunction);
     final KeyValueStorageWorldStateStorage worldStateStorage =
         new KeyValueStorageWorldStateStorage(kv);
     final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
-    genesisConfig.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
+    genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
     final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
 
@@ -195,7 +203,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         new IbftNetworkPeers(protocolContext.getConsensusState().getVoteTally());
 
     return new IbftPantheonController(
-        genesisConfig,
+        genesisConfig.getConfigOptions(),
+        protocolSchedule,
         protocolContext,
         ethSubProtocol,
         ethProtocolManager,
@@ -213,7 +222,12 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   }
 
   @Override
-  public GenesisConfig<IbftContext> getGenesisConfig() {
+  public ProtocolSchedule<IbftContext> getProtocolSchedule() {
+    return protocolSchedule;
+  }
+
+  @Override
+  public GenesisConfigOptions getGenesisConfigOptions() {
     return genesisConfig;
   }
 

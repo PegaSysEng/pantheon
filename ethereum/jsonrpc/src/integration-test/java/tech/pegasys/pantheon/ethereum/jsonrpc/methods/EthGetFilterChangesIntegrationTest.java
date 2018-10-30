@@ -19,21 +19,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool.TransactionBatchAddedListener;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
@@ -45,10 +43,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
-import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
-import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -79,21 +73,17 @@ public class EthGetFilterChangesIntegrationTest {
 
   @Before
   public void setUp() {
-    final GenesisConfig<Void> genesisConfig = GenesisConfig.mainnet();
-    final Block genesisBlock = genesisConfig.getBlock();
-    final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
-    blockchain =
-        new DefaultMutableBlockchain(
-            genesisBlock, keyValueStorage, MainnetBlockHashFunction::createHash);
-    final WorldStateArchive worldStateArchive =
-        new WorldStateArchive(new KeyValueStorageWorldStateStorage(keyValueStorage));
-    final ProtocolContext<Void> protocolContext =
-        new ProtocolContext<>(blockchain, worldStateArchive, null);
+    final ExecutionContextTestFixture executionContext = ExecutionContextTestFixture.create();
+    blockchain = executionContext.getBlockchain();
+    final ProtocolContext<Void> protocolContext = executionContext.getProtocolContext();
     transactionPool =
         new TransactionPool(
-            transactions, genesisConfig.getProtocolSchedule(), protocolContext, batchAddedListener);
+            transactions,
+            executionContext.getProtocolSchedule(),
+            protocolContext,
+            batchAddedListener);
     final BlockchainQueries blockchainQueries =
-        new BlockchainQueries(blockchain, worldStateArchive);
+        new BlockchainQueries(blockchain, protocolContext.getWorldStateArchive());
     filterManager =
         new FilterManager(
             blockchainQueries, transactionPool, new FilterIdGenerator(), new FilterRepository());

@@ -28,25 +28,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryWorldState.createInMemoryWorldStateArchive;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.EXCEEDS_BLOCK_GAS_LIMIT;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
 import static tech.pegasys.pantheon.ethereum.mainnet.ValidationResult.valid;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool.TransactionBatchAddedListener;
-import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
-import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.List;
@@ -80,19 +73,12 @@ public class TransactionPoolTest {
 
   @Before
   public void setUp() {
-    final GenesisConfig<Void> genesisConfig = GenesisConfig.development();
-    final Block genesisBlock = genesisConfig.getBlock();
-    final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
-    blockchain =
-        new DefaultMutableBlockchain(
-            genesisBlock, keyValueStorage, MainnetBlockHashFunction::createHash);
-    final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
-    final ProtocolContext<Void> protocolContext =
-        new ProtocolContext<>(blockchain, worldStateArchive, null);
-    genesisConfig.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
+    final ExecutionContextTestFixture executionContext = ExecutionContextTestFixture.create();
+    blockchain = executionContext.getBlockchain();
+    final ProtocolContext<Void> protocolContext = executionContext.getProtocolContext();
     when(protocolSchedule.getByBlockNumber(anyLong())).thenReturn(protocolSpec);
     when(protocolSpec.getTransactionValidator()).thenReturn(transactionValidator);
-    genesisBlockGasLimit = genesisBlock.getHeader().getGasLimit();
+    genesisBlockGasLimit = executionContext.getGenesis().getHeader().getGasLimit();
 
     transactionPool =
         new TransactionPool(transactions, protocolSchedule, protocolContext, batchAddedListener);

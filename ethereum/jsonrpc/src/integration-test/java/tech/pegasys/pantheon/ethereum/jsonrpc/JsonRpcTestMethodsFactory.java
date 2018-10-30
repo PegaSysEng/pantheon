@@ -58,7 +58,7 @@ public class JsonRpcTestMethodsFactory {
     final WorldStateArchive stateArchive =
         new WorldStateArchive(new KeyValueStorageWorldStateStorage(keyValueStorage));
 
-    importer.getGenesisConfig().writeStateTo(stateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
+    importer.getGenesisState().writeStateTo(stateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
     final MutableBlockchain blockchain =
         new DefaultMutableBlockchain(

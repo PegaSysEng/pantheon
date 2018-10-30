@@ -20,7 +20,7 @@ import static tech.pegasys.pantheon.ethereum.core.InMemoryWorldState.createInMem
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -80,7 +80,7 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
 
   protected static Block GENESIS_BLOCK;
 
-  protected static GenesisConfig<?> GENESIS_CONFIG;
+  protected static GenesisState GENESIS_CONFIG;
 
   protected final Vertx vertx = Vertx.vertx();
 
@@ -137,7 +137,7 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
     final String gensisjson = Resources.toString(genesisJsonUrl, Charsets.UTF_8);
 
     GENESIS_BLOCK = BLOCKS.get(0);
-    GENESIS_CONFIG = GenesisConfig.fromJson(gensisjson, PROTOCOL_SCHEDULE);
+    GENESIS_CONFIG = GenesisState.fromJson(gensisjson, PROTOCOL_SCHEDULE);
   }
 
   @Before

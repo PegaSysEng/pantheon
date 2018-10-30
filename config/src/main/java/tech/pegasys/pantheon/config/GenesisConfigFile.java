@@ -12,18 +12,42 @@
  */
 package tech.pegasys.pantheon.config;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import com.google.common.io.Resources;
 import io.vertx.core.json.JsonObject;
 
 public class GenesisConfigFile {
+
+  public static final GenesisConfigFile DEFAULT = new GenesisConfigFile(new JsonObject());
 
   private final JsonObject configRoot;
 
   private GenesisConfigFile(final JsonObject config) {
     this.configRoot = config;
+  }
+
+  public static GenesisConfigFile mainnet() {
+    try {
+      return fromConfig(Resources.toString(Resources.getResource("mainnet.json"), UTF_8));
+    } catch (final IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  public static GenesisConfigFile development() {
+    try {
+      return fromConfig(Resources.toString(Resources.getResource("dev.json"), UTF_8));
+    } catch (final IOException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   public static GenesisConfigFile fromConfig(final String config) {
@@ -36,6 +60,54 @@ public class GenesisConfigFile {
 
   public GenesisConfigOptions getConfigOptions() {
     return new GenesisConfigOptions(configRoot.getJsonObject("config"));
+  }
+
+  public Stream<GenesisAllocation> getAllocations() {
+    final JsonObject allocations = configRoot.getJsonObject("alloc");
+    return allocations
+        .fieldNames()
+        .stream()
+        .map(key -> new GenesisAllocation(key, allocations.getJsonObject(key)));
+  }
+
+  public String getParentHash() {
+    return configRoot.getString("parenthash", "");
+  }
+
+  public String getDifficulty() {
+    return getRequiredString("difficulty");
+  }
+
+  public String getExtraData() {
+    return configRoot.getString("extradata", "");
+  }
+
+  public Long getGasLimit() {
+    return Long.decode(getRequiredString("gaslimit"));
+  }
+
+  public String getMixHash() {
+    return configRoot.getString("mixhash", "");
+  }
+
+  public String getNonce() {
+    return configRoot.getString("nonce", "");
+  }
+
+  public Optional<String> getCoinbase() {
+    return Optional.ofNullable(configRoot.getString("coinbase"));
+  }
+
+  public long getTimestamp() {
+    return Long.parseLong(configRoot.getString("timestamp", "0x0").substring(2), 16);
+  }
+
+  private String getRequiredString(final String key) {
+    if (!configRoot.containsKey(key)) {
+      throw new IllegalArgumentException(
+          String.format("Invalid Genesis block configuration, missing value for '%s'", key));
+    }
+    return configRoot.getString(key);
   }
 
   /* Converts the {@link JsonObject} describing the Genesis Block to a {@link Map}. This method

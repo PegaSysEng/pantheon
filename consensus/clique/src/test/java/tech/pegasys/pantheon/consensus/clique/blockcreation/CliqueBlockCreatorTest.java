@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.clique.CliqueHelpers;
@@ -29,7 +30,7 @@ import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
@@ -61,16 +62,15 @@ public class CliqueBlockCreatorTest {
   private final KeyPair otherKeyPair = KeyPair.generate();
   private final List<Address> validatorList = Lists.newArrayList();
 
-  private final Block genesis = GenesisConfig.mainnet().getBlock();
+  private final MutableProtocolSchedule<CliqueContext> protocolSchedule =
+      new CliqueProtocolSchedule();
   private final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
-  private final MutableBlockchain blockchain =
-      new DefaultMutableBlockchain(genesis, keyValueStorage, MainnetBlockHashFunction::createHash);
   private final WorldStateArchive stateArchive =
       new WorldStateArchive(new KeyValueStorageWorldStateStorage(keyValueStorage));
 
+  private Block genesis;
+  private MutableBlockchain blockchain;
   private ProtocolContext<CliqueContext> protocolContext;
-  private final MutableProtocolSchedule<CliqueContext> protocolSchedule =
-      new CliqueProtocolSchedule();
   private VoteProposer voteProposer;
 
   @Before
@@ -93,6 +93,10 @@ public class CliqueBlockCreatorTest {
     voteProposer = new VoteProposer();
     final CliqueContext cliqueContext = new CliqueContext(voteTallyCache, voteProposer, null);
 
+    genesis = GenesisState.fromConfig(GenesisConfigFile.mainnet(), protocolSchedule).getBlock();
+    blockchain =
+        new DefaultMutableBlockchain(
+            genesis, keyValueStorage, MainnetBlockHashFunction::createHash);
     protocolContext = new ProtocolContext<>(blockchain, stateArchive, cliqueContext);
 
     // Add a block above the genesis

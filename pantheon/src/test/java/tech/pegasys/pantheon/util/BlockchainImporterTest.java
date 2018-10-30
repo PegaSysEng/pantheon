@@ -15,10 +15,10 @@ package tech.pegasys.pantheon.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -71,11 +71,11 @@ public final class BlockchainImporterTest {
 
     final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
     final MiningParameters miningParams = new MiningParametersTestBuilder().enabled(false).build();
-    final GenesisConfig<Void> genesisConfig = GenesisConfig.fromJson(genesisJson, protocolSchedule);
     final PantheonController<Void> ctrl =
         MainnetPantheonController.init(
             target,
-            genesisConfig,
+            GenesisConfigFile.fromConfig(genesisJson),
+            protocolSchedule,
             SynchronizerConfiguration.builder().build(),
             miningParams,
             keyPair);

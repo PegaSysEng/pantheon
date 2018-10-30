@@ -15,7 +15,10 @@ package tech.pegasys.pantheon.controller;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.config.CliqueConfigOptions;
+import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
+import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import tech.pegasys.pantheon.consensus.clique.CliqueVoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.clique.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueBlockScheduler;
@@ -26,7 +29,7 @@ import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -63,7 +66,8 @@ import org.apache.logging.log4j.Logger;
 
 public class CliquePantheonController implements PantheonController<CliqueContext> {
   private static final Logger LOG = getLogger();
-  private final GenesisConfig<CliqueContext> genesisConfig;
+  private final GenesisConfigOptions genesisConfigOptions;
+  private final ProtocolSchedule<CliqueContext> protocolSchedule;
   private final ProtocolContext<CliqueContext> context;
   private final Synchronizer synchronizer;
   private final ProtocolManager ethProtocolManager;
@@ -74,7 +78,8 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   private final MiningCoordinator miningCoordinator;
 
   CliquePantheonController(
-      final GenesisConfig<CliqueContext> genesisConfig,
+      final GenesisConfigOptions genesisConfigOptions,
+      final ProtocolSchedule<CliqueContext> protocolSchedule,
       final ProtocolContext<CliqueContext> context,
       final ProtocolManager ethProtocolManager,
       final Synchronizer synchronizer,
@@ -83,7 +88,8 @@ public class CliquePantheonController implements PantheonController<CliqueContex
       final MiningCoordinator miningCoordinator,
       final Runnable closer) {
 
-    this.genesisConfig = genesisConfig;
+    this.genesisConfigOptions = genesisConfigOptions;
+    this.protocolSchedule = protocolSchedule;
     this.context = context;
     this.ethProtocolManager = ethProtocolManager;
     this.synchronizer = synchronizer;
@@ -95,7 +101,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
 
   public static PantheonController<CliqueContext> init(
       final Path home,
-      final GenesisConfig<CliqueContext> genesisConfig,
+      final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
       final CliqueConfigOptions cliqueConfig,
@@ -108,15 +114,17 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     final EpochManager epochManger = new EpochManager(blocksPerEpoch);
     final KeyValueStorage kv =
         RocksDbKeyValueStorage.create(Files.createDirectories(home.resolve(DATABASE_PATH)));
-    final ProtocolSchedule<CliqueContext> protocolSchedule = genesisConfig.getProtocolSchedule();
+    final ProtocolSchedule<CliqueContext> protocolSchedule =
+        CliqueProtocolSchedule.create(genesisConfig.getConfigOptions(), nodeKeys);
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
+    final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final MutableBlockchain blockchain =
-        new DefaultMutableBlockchain(genesisConfig.getBlock(), kv, blockHashFunction);
+        new DefaultMutableBlockchain(genesisState.getBlock(), kv, blockHashFunction);
     final KeyValueStorageWorldStateStorage worldStateStorage =
         new KeyValueStorageWorldStateStorage(kv);
     final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
-    genesisConfig.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
+    genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
     final ProtocolContext<CliqueContext> protocolContext =
         new ProtocolContext<>(
@@ -133,7 +141,10 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
-            genesisConfig.getChainId(),
+            genesisConfig
+                .getConfigOptions()
+                .getChainId()
+                .orElse(CliqueProtocolSchedule.DEFAULT_CHAIN_ID),
             fastSyncEnabled,
             networkId);
     final SyncState syncState =
@@ -174,7 +185,8 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     miningCoordinator.enable();
 
     return new CliquePantheonController(
-        genesisConfig,
+        genesisConfig.getConfigOptions(),
+        protocolSchedule,
         protocolContext,
         ethProtocolManager,
         synchronizer,
@@ -203,8 +215,13 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   }
 
   @Override
-  public GenesisConfig<CliqueContext> getGenesisConfig() {
-    return genesisConfig;
+  public ProtocolSchedule<CliqueContext> getProtocolSchedule() {
+    return protocolSchedule;
+  }
+
+  @Override
+  public GenesisConfigOptions getGenesisConfigOptions() {
+    return genesisConfigOptions;
   }
 
   @Override

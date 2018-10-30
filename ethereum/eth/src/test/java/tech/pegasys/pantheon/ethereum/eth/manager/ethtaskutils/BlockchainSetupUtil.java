@@ -17,7 +17,7 @@ import static tech.pegasys.pantheon.ethereum.core.InMemoryWorldState.createInMem
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
@@ -49,7 +49,7 @@ import com.google.common.io.Resources;
 import org.junit.rules.TemporaryFolder;
 
 public class BlockchainSetupUtil<C> {
-  private final GenesisConfig<C> genesisConfig;
+  private final GenesisState genesisState;
   private final KeyValueStorage kvStore;
   private final MutableBlockchain blockchain;
   private final ProtocolContext<C> protocolContext;
@@ -59,14 +59,14 @@ public class BlockchainSetupUtil<C> {
   private long maxBlockNumber;
 
   public BlockchainSetupUtil(
-      final GenesisConfig<C> genesisConfig,
+      final GenesisState genesisState,
       final KeyValueStorage kvStore,
       final MutableBlockchain blockchain,
       final ProtocolContext<C> protocolContext,
       final ProtocolSchedule<C> protocolSchedule,
       final WorldStateArchive worldArchive,
       final List<Block> blocks) {
-    this.genesisConfig = genesisConfig;
+    this.genesisState = genesisState;
     this.kvStore = kvStore;
     this.blockchain = blockchain;
     this.protocolContext = protocolContext;
@@ -103,16 +103,16 @@ public class BlockchainSetupUtil<C> {
     try {
       temp.create();
       final URL genesisFileUrl = getResourceUrl(temp, "testGenesis.json");
-      final GenesisConfig<Void> genesisConfig =
-          GenesisConfig.fromJson(
+      final GenesisState genesisState =
+          GenesisState.fromJson(
               Resources.toString(genesisFileUrl, Charsets.UTF_8), protocolSchedule);
       final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
       final MutableBlockchain blockchain =
           new DefaultMutableBlockchain(
-              genesisConfig.getBlock(), kvStore, MainnetBlockHashFunction::createHash);
+              genesisState.getBlock(), kvStore, MainnetBlockHashFunction::createHash);
       final WorldStateArchive worldArchive = createInMemoryWorldStateArchive();
 
-      genesisConfig.writeStateTo(worldArchive.getMutable());
+      genesisState.writeStateTo(worldArchive.getMutable());
       final ProtocolContext<Void> protocolContext =
           new ProtocolContext<>(blockchain, worldArchive, null);
 
@@ -127,7 +127,7 @@ public class BlockchainSetupUtil<C> {
         }
       }
       return new BlockchainSetupUtil<>(
-          genesisConfig,
+          genesisState,
           kvStore,
           blockchain,
           protocolContext,
@@ -163,8 +163,8 @@ public class BlockchainSetupUtil<C> {
     return maxBlockNumber;
   }
 
-  public GenesisConfig<C> getGenesisConfig() {
-    return genesisConfig;
+  public GenesisState getGenesisState() {
+    return genesisState;
   }
 
   public KeyValueStorage getKvStore() {
