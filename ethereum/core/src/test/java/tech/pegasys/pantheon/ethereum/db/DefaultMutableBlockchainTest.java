@@ -710,6 +710,8 @@ public class DefaultMutableBlockchainTest {
   private DefaultMutableBlockchain createBlockchain(
       final KeyValueStorage kvStore, final Block genesisBlock) {
     return new DefaultMutableBlockchain(
-        genesisBlock, kvStore, MainnetBlockHashFunction::createHash);
+        genesisBlock,
+        new KeyValueStoragePrefixedKeyBlockchainStorage(
+            kvStore, MainnetBlockHashFunction::createHash));
   }
 }

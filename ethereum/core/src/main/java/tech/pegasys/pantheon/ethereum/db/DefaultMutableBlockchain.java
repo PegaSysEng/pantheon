@@ -24,13 +24,11 @@ import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.TransactionLocation;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -54,11 +52,9 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
 
   public DefaultMutableBlockchain(
       final Block genesisBlock,
-      final KeyValueStorage keyValueStorage,
-      final BlockHashFunction blockHashFunction) {
-    checkArgument(genesisBlock != null, "Missing required KeyValueStorage");
-    this.blockchainStorage =
-        new KeyValueStoragePrefixedKeyBlockchainStorage(keyValueStorage, blockHashFunction);
+      final BlockchainStorage blockchainStorage) {
+    checkNotNull(genesisBlock);
+    this.blockchainStorage = blockchainStorage;
     this.setGenesis(genesisBlock);
   }
 

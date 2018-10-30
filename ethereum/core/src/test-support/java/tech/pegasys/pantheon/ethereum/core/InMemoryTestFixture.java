@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
+import tech.pegasys.pantheon.ethereum.db.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
@@ -27,8 +28,10 @@ public class InMemoryTestFixture {
 
   public static MutableBlockchain createInMemoryBlockchain(
       final Block genesisBlock, final BlockHashFunction blockHashFunction) {
+    final InMemoryKeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
     return new DefaultMutableBlockchain(
-        genesisBlock, new InMemoryKeyValueStorage(), blockHashFunction);
+        genesisBlock,
+        new KeyValueStoragePrefixedKeyBlockchainStorage(keyValueStorage, blockHashFunction));
   }
 
   public static WorldStateArchive createInMemoryWorldStateArchive() {
