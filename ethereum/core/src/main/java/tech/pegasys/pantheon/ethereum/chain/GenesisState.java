@@ -60,7 +60,7 @@ public final class GenesisState {
    * @param json A JSON string describing the genesis block
    * @param protocolSchedule A protocol Schedule associated with
    * @param <C> The consensus context type
-   * @return A new genesis state builder.
+   * @return A new {@link GenesisState}.
    */
   public static <C> GenesisState fromJson(
       final String json, final ProtocolSchedule<C> protocolSchedule) {
@@ -73,7 +73,7 @@ public final class GenesisState {
    * @param config A {@link GenesisConfigFile} describing the genesis block.
    * @param protocolSchedule A protocol Schedule associated with
    * @param <C> The consensus context type
-   * @return A new genesis state builder.
+   * @return A new {@link GenesisState}.
    */
   @SuppressWarnings("unchecked")
   public static <C> GenesisState fromConfig(
