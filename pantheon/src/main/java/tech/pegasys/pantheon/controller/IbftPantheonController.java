@@ -152,11 +152,18 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       ethSubProtocol = Istanbul64Protocol.get();
       ethProtocolManager =
           new Istanbul64ProtocolManager(
-              protocolContext.getBlockchain(), networkId, fastSyncEnabled, 1);
+              protocolContext.getBlockchain(),
+              networkId,
+              fastSyncEnabled,
+              syncConfig.downloaderParallelism());
     } else {
       ethSubProtocol = EthProtocol.get();
       ethProtocolManager =
-          new EthProtocolManager(protocolContext.getBlockchain(), networkId, fastSyncEnabled, 1);
+          new EthProtocolManager(
+              protocolContext.getBlockchain(),
+              networkId,
+              fastSyncEnabled,
+              syncConfig.downloaderParallelism());
     }
     final SyncState syncState =
         new SyncState(
