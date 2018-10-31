@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
@@ -71,6 +72,7 @@ public class PantheonNode implements Node, AutoCloseable {
   private Eth eth;
   private Clique clique;
   private Web3j web3j;
+  private PantheonWeb3j pantheonWeb3j;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
 
   public PantheonNode(
@@ -144,7 +146,7 @@ public class PantheonNode implements Node, AutoCloseable {
     }
 
     if (web3j == null) {
-      return web3j(new HttpService(jsonRpcBaseUrl().get()));
+      return web3j(web3jService());
     }
 
     return web3j;
@@ -178,6 +180,31 @@ public class PantheonNode implements Node, AutoCloseable {
     }
 
     web3j = Web3j.build(webSocketService, 2000, Async.defaultExecutorService());
+  }
+
+  private PantheonWeb3j pantheonWeb3j() {
+    if (pantheonWeb3j == null) {
+      return pantheonWeb3j(web3jService());
+    }
+
+    return pantheonWeb3j;
+  }
+
+  private PantheonWeb3j pantheonWeb3j(final Web3jService web3jService) {
+    if (pantheonWeb3j == null) {
+      pantheonWeb3j = new PantheonWeb3j(web3jService, 2000, Async.defaultExecutorService());
+    }
+
+    return pantheonWeb3j;
+  }
+
+  private Web3jService web3jService() {
+    if (!jsonRpcBaseUrl().isPresent()) {
+      throw new IllegalStateException(
+          "Can't create a web3j instance for a node with RPC disabled.");
+    }
+
+    return new HttpService(jsonRpcBaseUrl().get());
   }
 
   public int getPeerCount() {
@@ -315,7 +342,7 @@ public class PantheonNode implements Node, AutoCloseable {
 
   @Override
   public <T> T execute(final Transaction<T> transaction) {
-    return transaction.execute(web3j());
+    return transaction.execute(pantheonWeb3j());
   }
 
   public void verify(final Condition expected) {

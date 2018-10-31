@@ -14,11 +14,11 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
@@ -34,7 +34,7 @@ public class EthGetBlockTransaction implements Transaction<Block> {
   }
 
   @Override
-  public Block execute(final Web3j node) {
+  public Block execute(final PantheonWeb3j node) {
     try {
       final EthBlock result =
           node.ethGetBlockByNumber(blockParameter, fullTransactionObjects).send();
