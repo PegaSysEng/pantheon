@@ -26,7 +26,7 @@ public class DevelopmentProtocolSchedule {
 
   public static ProtocolSchedule<Void> create(final GenesisConfigOptions config) {
     final Integer chainId = config.getChainId().orElse(NO_CHAIN_ID);
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>();
+    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(chainId);
     protocolSchedule.putMilestone(0, DevelopmentProtocolSpecs.first(chainId, protocolSchedule));
     return protocolSchedule;
   }

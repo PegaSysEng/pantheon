@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
+import tech.pegasys.pantheon.ethereum.db.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
@@ -121,8 +122,11 @@ public class MainnetPantheonController implements PantheonController<Void> {
         RocksDbKeyValueStorage.create(Files.createDirectories(home.resolve(DATABASE_PATH)));
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
+    final KeyValueStoragePrefixedKeyBlockchainStorage blockchainStorage =
+        new KeyValueStoragePrefixedKeyBlockchainStorage(kv, blockHashFunction);
     final MutableBlockchain blockchain =
-        new DefaultMutableBlockchain(genesisState.getBlock(), kv, blockHashFunction);
+        new DefaultMutableBlockchain(genesisState.getBlock(), blockchainStorage);
+
     final WorldStateArchive worldStateArchive =
         new WorldStateArchive(new KeyValueStorageWorldStateStorage(kv));
     genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));

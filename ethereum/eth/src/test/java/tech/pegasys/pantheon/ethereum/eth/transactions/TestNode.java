@@ -14,7 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth.transactions;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.util.Preconditions.checkNotNull;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryWorldState.createInMemoryWorldStateArchive;
+import static tech.pegasys.pantheon.ethereum.core.InMemoryTestFixture.createInMemoryBlockchain;
+import static tech.pegasys.pantheon.ethereum.core.InMemoryTestFixture.createInMemoryWorldStateArchive;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -24,7 +25,6 @@ import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
-import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.development.DevelopmentProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
@@ -44,8 +44,6 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.Closeable;
@@ -94,9 +92,8 @@ public class TestNode implements Closeable {
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfigFile, protocolSchedule);
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
-    final KeyValueStorage kv = new InMemoryKeyValueStorage();
     final MutableBlockchain blockchain =
-        new DefaultMutableBlockchain(genesisState.getBlock(), kv, blockHashFunction);
+        createInMemoryBlockchain(genesisState.getBlock(), blockHashFunction);
     final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
     genesisState.writeStateTo(worldStateArchive.getMutable());
     final ProtocolContext<Void> protocolContext =

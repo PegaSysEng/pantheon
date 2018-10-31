@@ -47,7 +47,7 @@ public class MainnetProtocolSchedule {
       final long constantinopleBlockNumber,
       final int chainId) {
 
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>();
+    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(chainId);
     protocolSchedule.putMilestone(0, MainnetProtocolSpecs.frontier(protocolSchedule));
     final ProtocolSpec<Void> homestead = MainnetProtocolSpecs.homestead(protocolSchedule);
     protocolSchedule.putMilestone(homesteadBlockNumber, homestead);

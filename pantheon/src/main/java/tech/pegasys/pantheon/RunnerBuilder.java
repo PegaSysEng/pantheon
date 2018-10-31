@@ -224,7 +224,6 @@ public class RunnerBuilder {
         new JsonRpcMethodsFactory()
             .methods(
                 PantheonInfo.version(),
-                String.valueOf(pantheonController.getGenesisConfigOptions().getChainId()),
                 networkRunner.getNetwork(),
                 context.getBlockchain(),
                 context.getWorldStateArchive(),
