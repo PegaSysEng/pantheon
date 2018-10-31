@@ -15,7 +15,6 @@ import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
   id 'com.diffplug.gradle.spotless' version '3.13.0'
-  id 'com.palantir.git-version' version '0.10.0'
   id 'io.spring.dependency-management' version '1.0.4.RELEASE'
   id 'com.github.hierynomus.license' version '0.14.0'
   id 'net.ltgt.errorprone' version '0.6'
@@ -80,9 +79,13 @@ allprojects {
   targetCompatibility = '1.8'
 
   repositories {
-    jcenter()
-    mavenCentral()
-    maven { url  "https://consensys.bintray.com/pegasys-repo" }
+    if ("$System.env.JENKINS_URL" == 'https://jenkins.pegasys.tech/') {
+      maven { url "https://nexus.int.pegasys.tech/repository/jcenter/" }
+    } else {
+      jcenter()
+      mavenCentral()
+      maven { url  "https://consensys.bintray.com/pegasys-repo" }
+    }
   }
 
   dependencies {
@@ -204,6 +207,11 @@ allprojects {
   // Normalise Xdoclint behaviour across JDKs (OpenJDK 8 is more lenient than Oracle JDK by default).
   javadoc {
     options.addStringOption('Xdoclint:all', '-quiet')
+    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+      options.addStringOption('Xwerror', '-quiet')
+    } else {
+      options.addStringOption('Xwerror', '-html5')
+    }
     options.encoding = 'UTF-8'
   }
 
@@ -329,6 +337,8 @@ distributions {
     contents {
       from("./LICENSE") { into "." }
       from("build/reports/license/license-dependency.html") { into "." }
+      from("./docs/GettingStartedBinaries.md") { into "." }
+      from("./docs/DocsArchive0.8.0.html") { into "." }
     }
   }
 }
@@ -382,12 +392,6 @@ configure(subprojects.findAll {it.name != 'errorprone-checks'}) {
   }
 }
 
-
-if (!file("ethereum/referencetests/src/test/resources/README.md").exists()) {
-  throw new GradleException("ethereum/referencetests/src/test/resources/README.md missing: please clone submodules (git submodule update --init --recursive)")
-}
-
-
 apply plugin: 'net.researchgate.release'
 
 task releaseIntegrationTest(type: Test){
@@ -400,7 +404,11 @@ task releaseIntegrationTest(type: Test){
   }
 }
 
-task releaseReferenceTest(type: Test, dependsOn : ':ethereum:core:referenceTests'){
+task releaseReferenceTest(type: Test, dependsOn : [
+  ':ethereum:core:referenceTests',
+  ':ethereum:rlp:referenceTests',
+  ':ethereum:trie:referenceTests'
+]){
 }
 
 task releaseAcceptanceTest(type: Test, dependsOn : ':acceptance-tests:acceptanceTest') {}

@@ -17,9 +17,9 @@ import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.DefaultBlockScheduler;
-import tech.pegasys.pantheon.ethereum.blockcreation.EthHashBlockMiner;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMinerExecutor;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
+import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
+import tech.pegasys.pantheon.ethereum.db.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
@@ -42,6 +43,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
 import tech.pegasys.pantheon.util.time.SystemClock;
 
@@ -55,10 +57,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class MainnetPantheonController implements PantheonController<Void, EthHashBlockMiner> {
+public class MainnetPantheonController implements PantheonController<Void> {
 
   private static final Logger LOG = LogManager.getLogger();
-  public static final int MAINNET_NETWORK_ID = 1;
 
   private final GenesisConfig<Void> genesisConfig;
   private final ProtocolContext<Void> protocolContext;
@@ -67,7 +68,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
   private final Synchronizer synchronizer;
 
   private final TransactionPool transactionPool;
-  private final EthHashMiningCoordinator miningCoordinator;
+  private final MiningCoordinator miningCoordinator;
   private final Runnable close;
 
   public MainnetPantheonController(
@@ -77,7 +78,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
       final Synchronizer synchronizer,
       final KeyPair keyPair,
       final TransactionPool transactionPool,
-      final EthHashMiningCoordinator miningCoordinator,
+      final MiningCoordinator miningCoordinator,
       final Runnable close) {
     this.genesisConfig = genesisConfig;
     this.protocolContext = protocolContext;
@@ -89,8 +90,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
     this.close = close;
   }
 
-  public static PantheonController<Void, EthHashBlockMiner> mainnet(final Path home)
-      throws IOException {
+  public static PantheonController<Void> mainnet(final Path home) throws IOException {
     final MiningParameters miningParams = new MiningParameters(null, null, null, false);
     final KeyPair nodeKeys = loadKeyPair(home);
     return init(
@@ -101,20 +101,24 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
         nodeKeys);
   }
 
-  public static PantheonController<Void, EthHashBlockMiner> init(
+  public static PantheonController<Void> init(
       final Path home,
       final GenesisConfig<Void> genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
       final KeyPair nodeKeys)
       throws IOException {
-    final RocksDbKeyValueStorage kv =
+    final KeyValueStorage kv =
         RocksDbKeyValueStorage.create(Files.createDirectories(home.resolve(DATABASE_PATH)));
     final ProtocolSchedule<Void> protocolSchedule = genesisConfig.getProtocolSchedule();
+
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
+    final KeyValueStoragePrefixedKeyBlockchainStorage blockchainStorage =
+        new KeyValueStoragePrefixedKeyBlockchainStorage(kv, blockHashFunction);
     final MutableBlockchain blockchain =
-        new DefaultMutableBlockchain(genesisConfig.getBlock(), kv, blockHashFunction);
+        new DefaultMutableBlockchain(genesisConfig.getBlock(), blockchainStorage);
+
     final WorldStateArchive worldStateArchive =
         new WorldStateArchive(new KeyValueStorageWorldStateStorage(kv));
     genesisConfig.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
@@ -181,7 +185,11 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
           } catch (final InterruptedException e) {
             LOG.error("Failed to shutdown miner executor");
           }
-          kv.close();
+          try {
+            kv.close();
+          } catch (final IOException e) {
+            LOG.error("Failed to close key value storage", e);
+          }
         });
   }
 
@@ -216,7 +224,7 @@ public class MainnetPantheonController implements PantheonController<Void, EthHa
   }
 
   @Override
-  public EthHashMiningCoordinator getMiningCoordinator() {
+  public MiningCoordinator getMiningCoordinator() {
     return miningCoordinator;
   }
 

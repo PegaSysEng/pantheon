@@ -8,10 +8,6 @@ Welcome to the Pantheon repository!  The following is a set of guidelines for co
 
 [I just have a quick question](#i-just-have-a-quick-question)
 
-Before You start
-  * [Pantheon Architecture](docs/architecture/architecture.md)
-  * [Java Modules](docs/architecture/java-modules.md)
-
 [How To Contribute](#how-to-contribute)
   * [Reporting Bugs](#reporting-bugs)
   * [Suggesting Enhancements](#suggesting-enhancements)
@@ -22,7 +18,6 @@ Before You start
 [Style Guides](#style-guides)
   * [Git Commit Messages & Pull Request Messages](#git-commit-messages--pull-request-messages)
   * [Java Style Guide](#java-code-style-guide)
-  * [Documentation Style Guide](#documentation-style-guide)
 
 [Issue and Pull Request Labels](#issue-and-pull-request-labels)
 
@@ -41,7 +36,7 @@ This project and everyone participating in it is governed by the [Pantheon Code 
 ## How To Contribute
 ### Reporting Bugs
 
-This section guides you through submitting a bug report. Following these guidelines helps maintainers and the community understand your report :pencil:, reproduce the behavior :computer: :computer:, and find related reports :mag_right:.
+This section guides you through submitting a bug report. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
 
 Before creating bug reports, please check the [before-submitting-a-bug-report](#before-submitting-a-bug-report) checklist as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill in the [issue_template.md](.github/issue_template.md), the information it asks for helps us resolve issues faster.
 
@@ -53,7 +48,7 @@ Before creating bug reports, please check the [before-submitting-a-bug-report](#
 * **Perform a [cursory search of project issues](https://github.com/search?q=+is%3Aissue+repo%3APegasysEng/Pantheon)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Bug Report?
-Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).  Issues should and provide the following information by filling in the [issue_template.md](.github/issue_template.md).
+Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/).  Issues should provide the following information by filling in the [issue_template.md](.github/issue_template.md).
 
 Explain the problem and include additional details to help maintainers reproduce the problem:
 
@@ -82,7 +77,7 @@ Include details about your configuration and environment:
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion :pencil: and find related suggestions :mag_right:.
+This section guides you through submitting an enhancement suggestion, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion and find related suggestions.
 
 Before creating enhancement suggestions, please check the [before-submitting-an-enhancement-suggestion](#before-submitting-an-enhancement-suggestion) list as you might find out that you don't need to create one. When you are creating an enhancement suggestion, please [include as many details as possible](#how-do-i-submit-a-good-enhancement-suggestion). Fill in the [issue_template.md](.github/issue_template.md), including the steps that you imagine you would take if the feature you're requesting existed.
 
@@ -106,9 +101,9 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 * **Specify the name and version of the OS you're using.**
 
 ## Your First Code Contribution
-Start by looking through the 'beginner' and 'help wanted' issues:
-* [Beginner issues][beginner] - issues which should only require a few lines of code, and a test or two.
-* [Help wanted issues][help-wanted] - issues which should be a bit more involved than `beginner` issues.
+Start by looking through the 'good first issue' and 'help wanted' issues:
+* [Good First Issue][search-label-good-first-issue] - issues which should only require a few lines of code, and a test or two.
+* [Help wanted issues][search-label-help-wanted] - issues which are a bit more involved than `good first issue` issues.
 
 ### Local Development
 The codebase is maintained using the "*contributor workflow*" where everyone without exception contributes patch proposals using "*pull-requests*". This facilitates social contribution, easy testing and peer review.
@@ -127,7 +122,7 @@ In general a commit serves a single purpose and diffs should be easily comprehen
 Questions on architectural best practices will be guided by the principles set forth in [Effective Java](http://index-of.es/Java/Effective%20Java.pdf) by Joshua Bloch
 
 ### Automated Test coverage
-Testing is 100% automated for this product.  There is no such thing as a manual test.  All code submissions must be accompanied by appropriate tests.  The goal is to provide confidence in the code’s robustness, while avoiding redundant tests.
+All code submissions must be accompanied by appropriate automated tests.  The goal is to provide confidence in the code’s robustness, while avoiding redundant tests.
 
 ### Pull Requests
 
@@ -171,55 +166,25 @@ Exceptions:
 ## Git Commit Messages & Pull Request Messages
 * Use the present tense ("Add feature" not "Added feature")
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
-* Limit the first line to 72 characters or less
-* Reference issues and pull requests liberally after the first line
-* Consider starting the commit message with an applicable emoji:
-    * :art: `:art:` when improving the format/structure of the code
-    * :racehorse: `:racehorse:` when improving performance
-    * :non-potable_water: `:non-potable_water:` when plugging memory leaks
-    * :memo: `:memo:` when writing docs
-    * :penguin: `:penguin:` when fixing something on Linux
-    * :apple: `:apple:` when fixing something on macOS
-    * :checkered_flag: `:checkered_flag:` when fixing something on Windows
-    * :bug: `:bug:` when fixing a bug
-    * :fire: `:fire:` when removing code or files
-    * :green_heart: `:green_heart:` when fixing the CI build
-    * :white_check_mark: `:white_check_mark:` when adding tests
-    * :lock: `:lock:` when dealing with security
-    * :arrow_up: `:arrow_up:` when upgrading dependencies
-    * :arrow_down: `:arrow_down:` when downgrading dependencies
-    * :shirt: `:shirt:` when removing lint warnings
+* Provide a summary on the first line with more details on additional lines as needed
+* Reference issues and pull requests liberally
 
-## Documentation Style Guide
-**TODO: Create Documentation Style Guide**
-
-
-# Issue and Pull Request Labels
-
-This section lists the labels we use to help us track and manage issues and pull requests. 
-
-[GitHub search](https://help.github.com/articles/searching-issues-and-pull-requests/) makes it easy to use labels for finding groups of issues or pull requests you're interested in. 
-
-The labels are loosely grouped by their purpose, but it's not required that every issue have a label from every group or that an issue can't have more than one label from the same group.
-
-Please open an issue on `PegasysEng/Pantheon` if you have suggestions for new labels.
-
+#Issue and Pull Request Labels
 #### Type of Issue and Issue State
 
 | Label name | Search Link :mag_right: | Description |
 | --- | --- | --- |
 | `enhancement` | [search][search-label-enhancement] | Feature requests. |
 | `bug` | [search][search-label-bug] | Confirmed bugs or reports that are very likely to be bugs. |
-| `question` | [search][search-label-question] | Questions more than bug reports or feature requests (e.g. how do I do X). |
-| `feedback` | [search][search-label-feedback] | General feedback more than bug reports or feature requests. |
-| `help-wanted` | [search][search-label-help-wanted] | The core team would appreciate help from the community in resolving these issues. |
-| `beginner` | [search][search-label-beginner] | Less complex issues which would be good first issues to work on for users who want to contribute. |
-| `more-information-needed` | [search][search-label-more-information-needed] | More information needs to be collected about these problems or feature requests (e.g. steps to reproduce). |
-| `needs-reproduction` | [search][search-label-needs-reproduction] | Likely bugs, but haven't been reliably reproduced. |
+| `help wanted` | [search][search-label-help-wanted] | The core team would appreciate help from the community in resolving these issues. |
+| `good first issue` | [search][search-label-good-first-issue] | Less complex issues which would be good first issues to work on for users who want to contribute. |
+| `info needed` | [search][search-label-info-needed] | More information needs to be collected about these problems or feature requests (e.g. steps to reproduce). |
+| `needs reproduction` | [search][search-label-needs-reproduction] | Likely bugs, but haven't been reliably reproduced. |
 | `blocked` | [search][search-label-blocked] | Issues blocked on other issues. |
 | `duplicate` | [search][search-label-duplicate] | Issues which are duplicates of other issues, i.e. they have been reported before. |
 | `wontfix` | [search][search-label-wontfix] | The core team has decided not to fix these issues for now, either because they're working as intended or for some other reason. |
 | `invalid` | [search][search-label-invalid] | Issues which aren't valid (e.g. user errors). |
+| `do we want this?` | [search][search-label-do-we-want-this] | Seeking stakeholder consensus on proposed feature. |
 
 #### Topic Categories
 
@@ -238,20 +203,8 @@ Please open an issue on `PegasysEng/Pantheon` if you have suggestions for new la
 | Label name | Search Link :mag_right: | Description
 | --- | --- | --- |
 | `work-in-progress` | [search][search-label-work-in-progress] | Pull requests which are still being worked on, more changes will follow. |
-| `needs-review` | [search][search-label-needs-review] | Pull requests which need code review, and approval from maintainers or the core team. |
-| `under-review` | [search][search-label-under-review] | Pull requests being reviewed by maintainers or the core team. |
 | `requires-changes` | [search][search-label-requires-changes] | Pull requests which need to be updated based on review comments and then reviewed again. |
 
-
-[search-label-enhancement]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aenhancement
-[search-label-bug]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abug
-[search-label-question]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aquestion
-[search-label-feedback]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Afeedback
-[search-label-help-wanted]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ahelp-wanted
-[search-label-beginner]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abeginner
-[search-label-more-information-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Amore-information-needed
-[search-label-needs-reproduction]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aneeds-reproduction
-[search-label-triage-help-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Atriage-help-needed
 [search-label-windows]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awindows
 [search-label-linux]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Alinux
 [search-label-mac]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Amac
@@ -260,19 +213,22 @@ Please open an issue on `PegasysEng/Pantheon` if you have suggestions for new la
 [search-label-security]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Asecurity
 [search-label-api]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aapi
 
+[search-label-enhancement]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aenhancement
+[search-label-bug]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abug
+[search-label-help-wanted]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ahelp%20wanted
+[search-label-good-first-issue]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Agood%20first%20issue
+[search-label-info-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ainfo%20needed
+[search-label-needs-reproduction]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aneeds%20reproduction
 [search-label-blocked]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ablocked
 [search-label-duplicate]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aduplicate
 [search-label-wontfix]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awontfix
 [search-label-invalid]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ainvalid
-[search-label-work-in-progress]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Awork-in-progress
-[search-label-needs-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Aneeds-review
-[search-label-under-review]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Aunder-review
-[search-label-requires-changes]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Arequires-changes
-[beginner]:https://github.com/search?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3Abeginner+label%3Ahelp-wanted+repo%3APegasysEng%2FPantheon+sort%3Acomments-desc
-[help-wanted]:https://github.com/search?q=is%3Aopen+is%3Aissue+label%3Ahelp-wanted+repo%3APegasysEng%2FPantheon+sort%3Acomments-desc+-label%3Abeginner
+[search-label-work-in-progress]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Awork%20in%20progress
+[search-label-requires-changes]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Arequires%20changes
+
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
-[Gitter]: https://gitter.im/Pantheon
+[Gitter]: https://gitter.im/PegaSysEng/pantheon
 [Wiki]: https://github.com/PegaSysEng/pantheon/wiki
 [Debugging Wiki]: https://github.com/PegaSysEng/pantheon/wiki/Debugging
 [CLA.md]: /CLA.md

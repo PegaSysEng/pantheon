@@ -26,7 +26,7 @@ import java.nio.file.Path;
 
 public class PantheonControllerBuilder {
 
-  public PantheonController<?, ?> build(
+  public PantheonController<?> build(
       final SynchronizerConfiguration synchronizerConfiguration,
       final Path homePath,
       final EthNetworkConfig ethNetworkConfig,

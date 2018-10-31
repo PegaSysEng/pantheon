@@ -13,10 +13,8 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
+import java.math.BigInteger;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -28,13 +26,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectBlockNumber;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -49,10 +46,8 @@ import com.google.common.base.MoreObjects;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.Logger;
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
@@ -78,7 +73,6 @@ public class PantheonNode implements Node, AutoCloseable {
   private List<String> bootnodes = new ArrayList<>();
   private Eth eth;
   private Clique clique;
-  private Web3 web3;
   private Web3j web3j;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
 
@@ -105,7 +99,7 @@ public class PantheonNode implements Node, AutoCloseable {
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
-  public String getName() {
+  String getName() {
     return name;
   }
 
@@ -149,8 +143,7 @@ public class PantheonNode implements Node, AutoCloseable {
   @Deprecated
   public Web3j web3j() {
     if (!jsonRpcBaseUrl().isPresent()) {
-      throw new IllegalStateException(
-          "Can't create a web3j instance for a node with RPC disabled.");
+      return web3j(new HttpService("http://" + LOCALHOST + ":8545"));
     }
 
     if (web3j == null) {
@@ -158,6 +151,14 @@ public class PantheonNode implements Node, AutoCloseable {
     }
 
     return web3j;
+  }
+
+  public void setWeb3j(final Web3jService web3jService) {
+    if (web3j != null) {
+      web3j.shutdown();
+    }
+
+    web3j = Web3j.build(web3jService, 2000, Async.defaultExecutorService());
   }
 
   @Deprecated
@@ -169,15 +170,17 @@ public class PantheonNode implements Node, AutoCloseable {
     return web3j;
   }
 
-  @Override
-  public BigInteger getAccountBalance(final Account account) {
-    try {
-      final EthGetBalance balanceResponse =
-          web3j().ethGetBalance(account.getAddress(), LATEST).send();
-      return balanceResponse.getBalance();
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
+  /** All future JSON-RPC calls are made via a web sockets connection. */
+  public void useWebSocketsForJsonRpc() {
+    final String url = wsRpcBaseUrl().isPresent() ? wsRpcBaseUrl().get() : "ws://127.0.0.1:8546";
+
+    final WebSocketService webSocketService = new WebSocketService(url, true);
+
+    if (web3j != null) {
+      web3j.shutdown();
     }
+
+    web3j = Web3j.build(webSocketService, 2000, Async.defaultExecutorService());
   }
 
   public int getPeerCount() {
@@ -200,57 +203,6 @@ public class PantheonNode implements Node, AutoCloseable {
     } catch (final IOException e) {
       throw new RuntimeException("Error reading Pantheon ports file", e);
     }
-  }
-
-  public void verifyJsonRpcEnabled() {
-    if (!jsonRpcBaseUrl().isPresent()) {
-      throw new RuntimeException("JSON-RPC is not enabled in node configuration");
-    }
-
-    try {
-      assertThat(web3j().netVersion().send().getError()).isNull();
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void verifyJsonRpcDisabled() {
-    if (jsonRpcBaseUrl().isPresent()) {
-      throw new RuntimeException("JSON-RPC is enabled in node configuration");
-    }
-
-    final HttpService web3jService = new HttpService("http://" + LOCALHOST + ":8545");
-    assertThat(catchThrowable(() -> web3j(web3jService).netVersion().send()))
-        .isInstanceOf(ConnectException.class)
-        .hasMessage("Failed to connect to /127.0.0.1:8545");
-  }
-
-  public void verifyWsRpcEnabled() {
-    if (!wsRpcBaseUrl().isPresent()) {
-      throw new RuntimeException("WS-RPC is not enabled in node configuration");
-    }
-
-    try {
-      final WebSocketService webSocketService = new WebSocketService(wsRpcBaseUrl().get(), true);
-      assertThat(web3j(webSocketService).netVersion().send().getError()).isNull();
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void verifyWsRpcDisabled() {
-    if (wsRpcBaseUrl().isPresent()) {
-      throw new RuntimeException("WS-RPC is enabled in node configuration");
-    }
-
-    final WebSocketService webSocketService =
-        new WebSocketService("ws://" + LOCALHOST + ":8546", true);
-    assertThat(catchThrowable(() -> web3j(webSocketService).netVersion().send()))
-        .isInstanceOf(WebsocketNotConnectedException.class);
-  }
-
-  public Address getAddress() {
-    return Util.publicKeyToAddress(keyPair.getPublicKey());
   }
 
   Path homeDirectory() {
@@ -327,9 +279,6 @@ public class PantheonNode implements Node, AutoCloseable {
       web3j.shutdown();
       web3j = null;
     }
-
-    eth = null;
-    web3 = null;
   }
 
   @Override
@@ -340,14 +289,6 @@ public class PantheonNode implements Node, AutoCloseable {
     } catch (final IOException e) {
       LOG.info("Failed to clean up temporary file: {}", homeDirectory, e);
     }
-  }
-
-  public Web3 web3() {
-    if (web3 == null) {
-      web3 = new Web3(web3j());
-    }
-
-    return web3;
   }
 
   @Override

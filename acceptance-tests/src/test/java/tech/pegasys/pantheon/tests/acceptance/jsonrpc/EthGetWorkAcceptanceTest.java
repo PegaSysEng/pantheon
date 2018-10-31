@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
 
@@ -22,7 +20,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.web3j.protocol.exceptions.ClientConnectionException;
 
 public class EthGetWorkAcceptanceTest extends AcceptanceTestBase {
 
@@ -37,16 +34,12 @@ public class EthGetWorkAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldReturnSuccessResponseWhenMining() throws Exception {
-    final String[] response = minerNode.eth().getWork();
-    assertThat(response).hasSize(3);
-    assertThat(response).doesNotContainNull();
+  public void shouldReturnSuccessResponseWhenMining() {
+    minerNode.verify(eth.getWork());
   }
 
   @Test
   public void shouldReturnErrorResponseWhenNotMining() {
-    final Throwable thrown = catchThrowable(() -> fullNode.eth().getWork());
-    assertThat(thrown).isInstanceOf(ClientConnectionException.class);
-    assertThat(thrown.getMessage()).contains("No mining work available yet");
+    fullNode.verify(eth.getWorkExceptional("No mining work available yet"));
   }
 }
