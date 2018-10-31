@@ -82,7 +82,7 @@ def generateTestFiles(FileTree jsonPath, File resourcesPath, File templateFile, 
 
   fileSets.eachWithIndex { fileSet, idx ->
     def resPath = resourcesPath.getPath().replaceAll("\\\\", "/")
-    
+
     def paths = []
     fileSet.each { testJsonFile ->
       if (!testJsonFile.getName().toString().startsWith(".")) {
