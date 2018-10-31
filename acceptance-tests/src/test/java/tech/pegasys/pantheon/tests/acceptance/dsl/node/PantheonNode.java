@@ -153,7 +153,7 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
-  public void jsonRpcByWebSockets() {
+  public void useWebSocketsForJsonRpc() {
     final String url = wsRpcBaseUrl().isPresent() ? wsRpcBaseUrl().get() : "ws://127.0.0.1:8546";
 
     final WebSocketService webSocketService = new WebSocketService(url, true);

@@ -18,11 +18,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetWorkTransaction;
 
-public class ExpectEthGetWorkHasThreeNotNullValues implements Condition {
+public class SanityCheckEthGetWorkValues implements Condition {
 
   private final EthGetWorkTransaction transaction;
 
-  public ExpectEthGetWorkHasThreeNotNullValues(final EthGetWorkTransaction transaction) {
+  public SanityCheckEthGetWorkValues(final EthGetWorkTransaction transaction) {
     this.transaction = transaction;
   }
 
