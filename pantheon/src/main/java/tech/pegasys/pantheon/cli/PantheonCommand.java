@@ -380,9 +380,7 @@ public class PantheonCommand implements Runnable {
     final CommandLine commandLine = new CommandLine(this);
 
     final ImportSubCommand importSubCommand = new ImportSubCommand(blockImporter);
-    final ImportBlockchainSubCommand importBlockchainSubCommand = new ImportBlockchainSubCommand();
     commandLine.addSubcommand("import", importSubCommand);
-    commandLine.addSubcommand("import-blockchain", importBlockchainSubCommand);
     commandLine.addSubcommand("export-pub-key", new ExportPublicKeySubCommand());
 
     commandLine.registerConverter(Address.class, Address::fromHexString);
