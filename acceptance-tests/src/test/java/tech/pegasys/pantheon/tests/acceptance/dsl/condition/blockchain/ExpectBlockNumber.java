@@ -10,27 +10,29 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
+package tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
-public class ExpectBeneficiary implements Condition {
+import java.math.BigInteger;
+
+public class ExpectBlockNumber implements Condition {
 
   private EthTransactions eth;
-  private String beneficiary;
+  private BigInteger blockNumber;
 
-  public ExpectBeneficiary(final EthTransactions eth, final PantheonNode node) {
+  public ExpectBlockNumber(final EthTransactions eth, final BigInteger blockNumber) {
     this.eth = eth;
-    this.beneficiary = node.getAddress().toString();
+    this.blockNumber = blockNumber;
   }
 
   @Override
   public void verify(final Node node) {
-    waitFor(() -> assertThat(node.execute(eth.block()).getMiner()).isEqualTo(beneficiary));
+    waitFor(() -> assertThat(node.execute(eth.blockNumber())).isEqualTo(blockNumber));
   }
 }

@@ -13,8 +13,8 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.blockchain;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectBeneficiary;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectBlockNumber;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBeneficiary;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectMinimumBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
