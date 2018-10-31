@@ -16,7 +16,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote.CLIQUE_NONCE_VOTE;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;

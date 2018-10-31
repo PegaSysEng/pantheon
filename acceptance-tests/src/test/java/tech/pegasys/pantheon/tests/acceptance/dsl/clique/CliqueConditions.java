@@ -15,12 +15,12 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.clique;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote.CLIQUE_NONCE_VOTE;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectProposals;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidators;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlock;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlockHash;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectProposals;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidators;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidatorsAtBlock;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidatorsAtBlockHash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 

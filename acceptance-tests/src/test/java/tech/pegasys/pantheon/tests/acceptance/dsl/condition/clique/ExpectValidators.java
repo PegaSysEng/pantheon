@@ -10,12 +10,13 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.condition;
+package tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 import java.util.Optional;
