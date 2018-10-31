@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
+import org.web3j.protocol.core.DefaultBlockParameterName;
+
 public class EthTransactions {
 
   public EthGetWorkTransaction getWork() {
@@ -22,6 +24,10 @@ public class EthTransactions {
 
   public EthBlockNumberTransaction blockNumber() {
     return new EthBlockNumberTransaction();
+  }
+
+  public EthGetBlockTransaction block() {
+    return new EthGetBlockTransaction(DefaultBlockParameterName.LATEST, false);
   }
 
   public EthGetBalanceTransaction getBalance(final Account account) {

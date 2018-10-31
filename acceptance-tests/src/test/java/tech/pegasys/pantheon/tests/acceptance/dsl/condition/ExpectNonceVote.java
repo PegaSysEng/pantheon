@@ -17,10 +17,12 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectNonceVote.CLIQUE_NONCE_VOTE.AUTH;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class ExpectNonceVote implements Condition {
   private static final String NONCE_AUTH = "0xffffffffffffffff";
   private static final String NONCE_DROP = "0x0000000000000000";
+  private final EthTransactions eth;
   private final String expectedNonce;
 
   public enum CLIQUE_NONCE_VOTE {
@@ -28,15 +30,13 @@ public class ExpectNonceVote implements Condition {
     DROP
   }
 
-  public ExpectNonceVote(final CLIQUE_NONCE_VOTE vote) {
+  public ExpectNonceVote(final EthTransactions eth, final CLIQUE_NONCE_VOTE vote) {
+    this.eth = eth;
     this.expectedNonce = vote == AUTH ? NONCE_AUTH : NONCE_DROP;
   }
 
   @Override
   public void verify(final Node node) {
-    waitFor(
-        () -> {
-          assertThat(node.eth().latestBlock().getNonceRaw()).isEqualTo(expectedNonce);
-        });
+    waitFor(() -> assertThat(node.execute(eth.block()).getNonceRaw()).isEqualTo(expectedNonce));
   }
 }

@@ -13,23 +13,22 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
+
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
-import java.math.BigInteger;
+
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class EthGetBlockTransaction implements Transaction<Block> {
   private final DefaultBlockParameter blockParameter;
   private final boolean fullTransactionObjects;
 
-  EthGetBlockTransaction(final DefaultBlockParameter blockParameter, final boolean fullTransactionObjects) {
+  EthGetBlockTransaction(
+      final DefaultBlockParameter blockParameter, final boolean fullTransactionObjects) {
     this.blockParameter = blockParameter;
     this.fullTransactionObjects = fullTransactionObjects;
   }
@@ -37,7 +36,8 @@ public class EthGetBlockTransaction implements Transaction<Block> {
   @Override
   public Block execute(final Web3j node) {
     try {
-      final EthBlock result = node.ethGetBlockByNumber(blockParameter, fullTransactionObjects).send();
+      final EthBlock result =
+          node.ethGetBlockByNumber(blockParameter, fullTransactionObjects).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getBlock();

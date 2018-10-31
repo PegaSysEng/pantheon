@@ -16,18 +16,22 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 import java.math.BigInteger;
 
 public class ExpectBlockNumber implements Condition {
+
+  private EthTransactions eth;
   private BigInteger blockNumber;
 
-  public ExpectBlockNumber(final BigInteger blockNumber) {
+  public ExpectBlockNumber(final EthTransactions eth, final BigInteger blockNumber) {
+    this.eth = eth;
     this.blockNumber = blockNumber;
   }
 
   @Override
   public void verify(final Node node) {
-    waitFor(() -> assertThat(node.eth().blockNumber()).isEqualTo(blockNumber));
+    waitFor(() -> assertThat(node.execute(eth.blockNumber())).isEqualTo(blockNumber));
   }
 }

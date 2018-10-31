@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlock;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectValidatorsAtBlockHash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,6 +33,11 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 
 public class CliqueConditions {
+  private final EthTransactions eth;
+
+  public CliqueConditions(final EthTransactions eth) {
+    this.eth = eth;
+  }
 
   public Condition validatorsEqual(final PantheonNode... validators) {
     return new ExpectValidators(validatorAddresses(validators));
@@ -57,7 +63,7 @@ public class CliqueConditions {
   }
 
   public Condition nonceVoteEquals(final CLIQUE_NONCE_VOTE clique_nonce_vote) {
-    return new ExpectNonceVote(clique_nonce_vote);
+    return new ExpectNonceVote(eth, clique_nonce_vote);
   }
 
   private Address[] validatorAddresses(final PantheonNode[] validators) {

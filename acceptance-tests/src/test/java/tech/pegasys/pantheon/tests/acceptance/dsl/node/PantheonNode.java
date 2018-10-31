@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import java.math.BigInteger;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -23,10 +22,8 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ExpectBlockNumber;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.File;
@@ -205,6 +202,10 @@ public class PantheonNode implements Node, AutoCloseable {
     }
   }
 
+  public Address getAddress() {
+    return Util.publicKeyToAddress(keyPair.getPublicKey());
+  }
+
   Path homeDirectory() {
     return homeDirectory;
   }
@@ -292,15 +293,6 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   @Override
-  public Eth eth() {
-    if (eth == null) {
-      eth = new Eth(web3j());
-    }
-
-    return eth;
-  }
-
-  @Override
   public Clique clique() {
     if (clique == null) {
       clique = new Clique(new HttpService(jsonRpcBaseUrl().get()));
@@ -330,8 +322,7 @@ public class PantheonNode implements Node, AutoCloseable {
     expected.verify(this);
   }
 
-  public void waitForChainHeadToProgress(final int blocksAheadOfLatest) throws IOException {
-    final BigInteger futureBlock = eth().blockNumber().add(BigInteger.valueOf(blocksAheadOfLatest));
-    new ExpectBlockNumber(futureBlock).verify(this);
+  public void waitForChainHeadToProgress(final int blocksAheadOfLatest) {
+    // TODO requires DSL changes for this to work
   }
 }

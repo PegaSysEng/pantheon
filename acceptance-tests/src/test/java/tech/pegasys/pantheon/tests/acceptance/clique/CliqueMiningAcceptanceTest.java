@@ -16,10 +16,10 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import org.junit.Test;
 
@@ -74,10 +74,10 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
     cluster.stopNode(minerNode2);
     cluster.stopNode(minerNode3);
 
-    BigInteger lastBlockNumber = minerNode1.eth().blockNumber();
-    Thread.sleep(20_000);
-    minerNode1.verify(blockChain.blockNumberEquals(lastBlockNumber));
-    Thread.sleep(20_000);
-    minerNode1.verify(blockChain.blockNumberEquals(lastBlockNumber));
+    final Condition lastBlockNumber = blockchain.blockNumberMustBeLatest(minerNode1);
+    Thread.sleep(15_000);
+    minerNode1.verify(lastBlockNumber);
+    Thread.sleep(15_000);
+    minerNode1.verify(lastBlockNumber);
   }
 }

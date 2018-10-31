@@ -14,10 +14,9 @@ package tech.pegasys.pantheon.tests.acceptance.dsl;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Blockchain;
+import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.JsonRpc;
-import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.BlockChainConditions;
-import tech.pegasys.pantheon.tests.acceptance.dsl.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Web3;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
@@ -35,7 +34,6 @@ public class AcceptanceTestBase {
   protected final Cluster cluster;
   protected final JsonRpc jsonRpc;
   protected final CliqueConditions clique;
-  protected final BlockChainConditions blockChain;
   protected final Transactions transactions;
   protected final Web3 web3;
   protected final Eth eth;
@@ -48,8 +46,7 @@ public class AcceptanceTestBase {
     cluster = new Cluster();
     eth = new Eth(ethTransactions);
     jsonRpc = new JsonRpc(cluster);
-    clique = new CliqueConditions();
-    blockChain = new BlockChainConditions();
+    clique = new CliqueConditions(ethTransactions);
     net = new Net(new NetTransactions());
     transactions = new Transactions(accounts);
     web3 = new Web3(new Web3Transactions());

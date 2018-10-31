@@ -17,20 +17,20 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class ExpectBeneficiary implements Condition {
+
+  private EthTransactions eth;
   private String beneficiary;
 
-  public ExpectBeneficiary(final PantheonNode node) {
+  public ExpectBeneficiary(final EthTransactions eth, final PantheonNode node) {
+    this.eth = eth;
     this.beneficiary = node.getAddress().toString();
   }
 
   @Override
   public void verify(final Node node) {
-    waitFor(
-        () -> {
-          String miner = node.eth().latestBlock().getMiner();
-          assertThat(miner).isEqualTo(beneficiary);
-        });
+    waitFor(() -> assertThat(node.execute(eth.block()).getMiner()).isEqualTo(beneficiary));
   }
 }
