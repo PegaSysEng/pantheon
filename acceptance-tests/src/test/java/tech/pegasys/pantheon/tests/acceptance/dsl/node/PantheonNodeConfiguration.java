@@ -16,18 +16,14 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
-public class PantheonNodeConfig {
+public class PantheonNodeConfiguration {
 
   private final String name;
   private final MiningParameters miningParameters;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
-  private ServerSocket serverSocket;
 
-  public PantheonNodeConfig(
+  public PantheonNodeConfiguration(
       final String name,
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
@@ -36,20 +32,6 @@ public class PantheonNodeConfig {
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
-  }
-
-  public void initSocket() throws IOException {
-    serverSocket = new ServerSocket(0);
-  }
-
-  public void closeSocket() throws IOException {
-    if (serverSocket != null) {
-      serverSocket.close();
-    }
-  }
-
-  public int getSocketPort() {
-    return serverSocket.getLocalPort();
   }
 
   public String getName() {

@@ -19,38 +19,34 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.Arrays;
 
 public class PantheonNodeFactory {
 
-  private PantheonNode create(final PantheonNodeConfig config) throws IOException {
-    config.initSocket();
-    final PantheonNode node =
-        new PantheonNode(
-            config.getName(),
-            config.getSocketPort(),
-            config.getMiningParameters(),
-            config.getJsonRpcConfiguration(),
-            config.getWebSocketConfiguration());
-    config.closeSocket();
+  private PantheonNode create(final PantheonNodeConfiguration config) throws IOException {
+    ServerSocket serverSocket = new ServerSocket(0);
+    final PantheonNode node = new PantheonNode(config, serverSocket.getLocalPort());
+    serverSocket.close();
+
     return node;
   }
 
   public PantheonNode createMinerNode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfig(
+        new PantheonNodeConfiguration(
             name, createMiningParameters(true), createJsonRpcConfig(), createWebSocketConfig()));
   }
 
   public PantheonNode createArchiveNode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfig(
+        new PantheonNodeConfiguration(
             name, createMiningParameters(false), createJsonRpcConfig(), createWebSocketConfig()));
   }
 
   public PantheonNode createArchiveNodeWithRpcDisabled(final String name) throws IOException {
     return create(
-        new PantheonNodeConfig(
+        new PantheonNodeConfiguration(
             name,
             createMiningParameters(false),
             JsonRpcConfiguration.createDefault(),
@@ -65,7 +61,7 @@ public class PantheonNodeFactory {
     webSocketConfig.setRpcApis(Arrays.asList(enabledRpcApis));
 
     return create(
-        new PantheonNodeConfig(
+        new PantheonNodeConfiguration(
             name, createMiningParameters(false), jsonRpcConfig, webSocketConfig));
   }
 

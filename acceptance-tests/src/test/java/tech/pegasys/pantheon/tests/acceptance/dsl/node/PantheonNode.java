@@ -48,42 +48,36 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();
 
-  private final String name;
   private final Path homeDirectory;
   private final KeyPair keyPair;
   private final int p2pPort;
-  private final MiningParameters miningParameters;
-  private final JsonRpcConfiguration jsonRpcConfiguration;
-  private final WebSocketConfiguration webSocketConfiguration;
-  private final boolean jsonRpcEnabled;
-  private final boolean wsRpcEnabled;
   private final Properties portsProperties = new Properties();
+
+  private final PantheonNodeConfiguration configuration;
 
   private List<String> bootnodes = new ArrayList<>();
   private Web3j web3j;
 
-  public PantheonNode(
-      final String name,
-      final int p2pPort,
-      final MiningParameters miningParameters,
-      final JsonRpcConfiguration jsonRpcConfiguration,
-      final WebSocketConfiguration webSocketConfiguration)
+  public PantheonNode(final PantheonNodeConfiguration configuration, final int p2pPort)
       throws IOException {
-    this.name = name;
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.p2pPort = p2pPort;
-    this.miningParameters = miningParameters;
-    this.jsonRpcConfiguration = jsonRpcConfiguration;
-    this.webSocketConfiguration = webSocketConfiguration;
-    this.jsonRpcEnabled = jsonRpcConfiguration.isEnabled();
-    this.wsRpcEnabled = webSocketConfiguration.isEnabled();
+    this.configuration = configuration;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
+  private boolean isJsonRpcEnabled() {
+    return jsonRpcConfiguration().isEnabled();
+  }
+
+  private boolean isWebSocketsRpcEnabled() {
+    return webSocketConfiguration().isEnabled();
+  }
+
   @Override
-  public String id() {
-    return name;
+  public String getName() {
+    return configuration.getName();
   }
 
   @Override
@@ -92,10 +86,10 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   private Optional<String> jsonRpcBaseUrl() {
-    if (jsonRpcEnabled) {
+    if (isJsonRpcEnabled()) {
       return Optional.of(
           "http://"
-              + jsonRpcConfiguration.getHost()
+              + configuration.getJsonRpcConfiguration().getHost()
               + ":"
               + portsProperties.getProperty("json-rpc"));
     } else {
@@ -104,9 +98,12 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   private Optional<String> wsRpcBaseUrl() {
-    if (wsRpcEnabled) {
+    if (isWebSocketsRpcEnabled()) {
       return Optional.of(
-          "ws://" + webSocketConfiguration.getHost() + ":" + portsProperties.getProperty("ws-rpc"));
+          "ws://"
+              + configuration.getWebSocketConfiguration().getHost()
+              + ":"
+              + portsProperties.getProperty("ws-rpc"));
     } else {
       return Optional.empty();
     }
@@ -114,7 +111,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public Optional<Integer> jsonRpcWebSocketPort() {
-    if (wsRpcEnabled) {
+    if (isWebSocketsRpcEnabled()) {
       return Optional.of(Integer.valueOf(portsProperties.getProperty("ws-rpc")));
     } else {
       return Optional.empty();
@@ -203,31 +200,32 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public boolean jsonRpcEnabled() {
-    return jsonRpcEnabled;
+    return isJsonRpcEnabled();
   }
 
   JsonRpcConfiguration jsonRpcConfiguration() {
-    return jsonRpcConfiguration;
+    return configuration.getJsonRpcConfiguration();
   }
 
   Optional<String> jsonRpcListenAddress() {
-    if (jsonRpcEnabled) {
-      return Optional.of(jsonRpcConfiguration.getHost() + ":" + jsonRpcConfiguration.getPort());
+    if (isJsonRpcEnabled()) {
+      return Optional.of(jsonRpcConfiguration().getHost() + ":" + jsonRpcConfiguration().getPort());
     } else {
       return Optional.empty();
     }
   }
 
   boolean wsRpcEnabled() {
-    return wsRpcEnabled;
+    return isWebSocketsRpcEnabled();
   }
 
   WebSocketConfiguration webSocketConfiguration() {
-    return webSocketConfiguration;
+    return configuration.getWebSocketConfiguration();
   }
 
   Optional<String> wsRpcListenAddress() {
-    return Optional.of(webSocketConfiguration.getHost() + ":" + webSocketConfiguration.getPort());
+    return Optional.of(
+        webSocketConfiguration().getHost() + ":" + webSocketConfiguration().getPort());
   }
 
   int p2pPort() {
@@ -251,13 +249,13 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   MiningParameters getMiningParameters() {
-    return miningParameters;
+    return configuration.getMiningParameters();
   }
 
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-        .add("name", name)
+        .add("name", configuration.getName())
         .add("p2pPort", p2pPort)
         .add("homeDirectory", homeDirectory)
         .add("keyPair", keyPair)

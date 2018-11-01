@@ -26,5 +26,5 @@ public interface RunnableNode extends Node {
 
   void awaitPeerDiscovery(final Condition condition);
 
-  String id();
+  String getName();
 }
