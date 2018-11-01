@@ -37,8 +37,8 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.start();
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
-    minerNode1.clique().proposeAdd(minerNode3);
-    minerNode2.clique().proposeAdd(minerNode3);
+    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
+    minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
   }
 
@@ -54,8 +54,8 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.start();
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
-    minerNode1.clique().proposeRemove(minerNode3);
-    minerNode2.clique().proposeRemove(minerNode3);
+    minerNode1.execute(cliqueTransactions.proposeRemove(minerNode3));
+    minerNode2.execute(cliqueTransactions.proposeRemove(minerNode3));
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
   }
 
@@ -71,7 +71,7 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.start();
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
-    minerNode1.clique().proposeAdd(minerNode3);
+    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
   }
 
@@ -83,7 +83,7 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.start();
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
-    minerNode1.clique().proposeRemove(minerNode3);
+    minerNode1.execute(cliqueTransactions.proposeRemove(minerNode3));
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
   }
 
@@ -98,8 +98,8 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
         cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
     cluster.start();
 
-    minerNode1.clique().proposeAdd(minerNode3);
-    minerNode1.clique().proposeRemove(minerNode2);
+    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
+    minerNode1.execute(cliqueTransactions.proposeRemove(minerNode2));
 
     minerNode1.waitForChainHeadToProgress(1);
     minerNode1.verify(blockchain.beneficiaryEquals(minerNode3));

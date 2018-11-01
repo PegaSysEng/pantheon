@@ -35,9 +35,9 @@ public class CliqueProposalRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.start();
 
     cluster.verify(clique.noProposals());
-    minerNode1.clique().proposeAdd(minerNode3);
-    minerNode1.clique().proposeRemove(minerNode2);
-    minerNode2.clique().proposeRemove(minerNode3);
+    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
+    minerNode1.execute(cliqueTransactions.proposeRemove(minerNode2));
+    minerNode2.execute(cliqueTransactions.proposeRemove(minerNode3));
     minerNode1.verify(
         clique.proposalsEqual().addProposal(minerNode3).removeProposal(minerNode2).build());
     minerNode2.verify(clique.proposalsEqual().removeProposal(minerNode3).build());

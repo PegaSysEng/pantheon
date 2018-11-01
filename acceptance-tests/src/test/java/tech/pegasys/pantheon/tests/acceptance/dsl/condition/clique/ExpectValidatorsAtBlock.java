@@ -20,17 +20,13 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 
-import org.web3j.protocol.core.DefaultBlockParameter;
-
 public class ExpectValidatorsAtBlock implements Condition {
   private final CliqueTransactions clique;
-  private final DefaultBlockParameter blockParameter;
+  private final String blockParameter;
   private final Address[] validators;
 
   public ExpectValidatorsAtBlock(
-      final CliqueTransactions clique,
-      final DefaultBlockParameter blockNumber,
-      final Address... validators) {
+      final CliqueTransactions clique, final String blockNumber, final Address... validators) {
     this.clique = clique;
     this.blockParameter = blockNumber;
     this.validators = validators;

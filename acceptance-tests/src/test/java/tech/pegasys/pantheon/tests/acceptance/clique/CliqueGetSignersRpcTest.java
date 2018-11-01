@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions.LATEST;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -23,7 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
-
   private PantheonNode minerNode1;
   private PantheonNode minerNode2;
   private PantheonNode minerNode3;
@@ -41,18 +41,18 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() throws IOException {
-    minerNode1.clique().proposeAdd(minerNode3);
-    minerNode2.clique().proposeAdd(minerNode3);
+    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
+    minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode1.waitForChainHeadToProgress(2);
 
     cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));
-    cluster.verify(clique.validatorsAtBlockEqual("latest", allNodes));
+    cluster.verify(clique.validatorsAtBlockEqual(LATEST, allNodes));
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockHash() throws IOException {
-    minerNode1.clique().proposeAdd(minerNode3);
-    minerNode2.clique().proposeAdd(minerNode3);
+    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
+    minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode1.waitForChainHeadToProgress(2);
 
     // TODO requires DSL changes for this test to work

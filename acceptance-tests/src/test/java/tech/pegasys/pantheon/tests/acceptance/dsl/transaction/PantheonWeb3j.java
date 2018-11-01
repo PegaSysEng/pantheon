@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.JsonRpc2_0Web3j;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.Response;
@@ -59,13 +58,9 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
     return new Request<>("clique_proposals", emptyList(), web3jService, ProposalsResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> cliqueGetSigners(
-      final DefaultBlockParameter blockNumber) {
+  public Request<?, SignersBlockResponse> cliqueGetSigners(final String blockNumber) {
     return new Request<>(
-        "clique_getSigners",
-        singletonList(blockNumber.getValue()),
-        web3jService,
-        SignersBlockResponse.class);
+        "clique_getSigners", singletonList(blockNumber), web3jService, SignersBlockResponse.class);
   }
 
   public Request<?, SignersBlockResponse> cliqueGetSignersAtHash(final Hash hash) {

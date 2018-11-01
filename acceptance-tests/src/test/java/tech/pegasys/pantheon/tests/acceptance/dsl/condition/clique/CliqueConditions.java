@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
-import org.web3j.protocol.core.DefaultBlockParameterName;
 
 public class CliqueConditions {
   private final EthTransactions eth;
@@ -44,8 +43,7 @@ public class CliqueConditions {
 
   public Condition validatorsAtBlockEqual(
       final String blockNumber, final PantheonNode... validators) {
-    return new ExpectValidatorsAtBlock(
-        clique, DefaultBlockParameterName.fromString(blockNumber), validatorAddresses(validators));
+    return new ExpectValidatorsAtBlock(clique, blockNumber, validatorAddresses(validators));
   }
 
   public Condition validatorsAtBlockHashEqual(

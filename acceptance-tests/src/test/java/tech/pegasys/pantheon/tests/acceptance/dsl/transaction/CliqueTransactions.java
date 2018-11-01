@@ -20,9 +20,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueGetSi
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliquePropose;
 
-import org.web3j.protocol.core.DefaultBlockParameter;
-
 public class CliqueTransactions {
+  public static final String LATEST = "latest";
 
   public CliquePropose proposeRemove(final PantheonNode node) {
     return propose(node.getAddress().toString(), false);
@@ -40,7 +39,7 @@ public class CliqueTransactions {
     return new CliqueProposals();
   }
 
-  public CliqueGetSigners getSigners(final DefaultBlockParameter blockNumber) {
+  public CliqueGetSigners getSigners(final String blockNumber) {
     return new CliqueGetSigners(blockNumber);
   }
 

@@ -14,13 +14,12 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions.LATEST;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
-
-import org.web3j.protocol.core.DefaultBlockParameterName;
 
 public class ExpectValidators implements Condition {
   private final CliqueTransactions clique;
@@ -33,9 +32,6 @@ public class ExpectValidators implements Condition {
 
   @Override
   public void verify(final Node node) {
-    waitFor(
-        () ->
-            assertThat(node.execute(clique.getSigners(DefaultBlockParameterName.LATEST)))
-                .containsExactly(validators));
+    waitFor(() -> assertThat(node.execute(clique.getSigners(LATEST))).containsExactly(validators));
   }
 }
