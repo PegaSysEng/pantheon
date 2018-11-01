@@ -24,9 +24,15 @@ import java.util.Arrays;
 
 public class PantheonNodeFactory {
 
-  private PantheonNode create(final PantheonNodeConfiguration config) throws IOException {
+  private PantheonNode create(final PantheonFactoryConfiguration config) throws IOException {
     ServerSocket serverSocket = new ServerSocket(0);
-    final PantheonNode node = new PantheonNode(config, serverSocket.getLocalPort());
+    final PantheonNode node =
+        new PantheonNode(
+            config.getName(),
+            config.getMiningParameters(),
+            config.getJsonRpcConfiguration(),
+            config.getWebSocketConfiguration(),
+            serverSocket.getLocalPort());
     serverSocket.close();
 
     return node;
@@ -34,19 +40,19 @@ public class PantheonNodeFactory {
 
   public PantheonNode createMinerNode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfiguration(
+        new PantheonFactoryConfiguration(
             name, createMiningParameters(true), createJsonRpcConfig(), createWebSocketConfig()));
   }
 
   public PantheonNode createArchiveNode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfiguration(
+        new PantheonFactoryConfiguration(
             name, createMiningParameters(false), createJsonRpcConfig(), createWebSocketConfig()));
   }
 
   public PantheonNode createArchiveNodeWithRpcDisabled(final String name) throws IOException {
     return create(
-        new PantheonNodeConfiguration(
+        new PantheonFactoryConfiguration(
             name,
             createMiningParameters(false),
             JsonRpcConfiguration.createDefault(),
@@ -61,7 +67,7 @@ public class PantheonNodeFactory {
     webSocketConfig.setRpcApis(Arrays.asList(enabledRpcApis));
 
     return create(
-        new PantheonNodeConfiguration(
+        new PantheonFactoryConfiguration(
             name, createMiningParameters(false), jsonRpcConfig, webSocketConfig));
   }
 
@@ -81,5 +87,40 @@ public class PantheonNodeFactory {
     config.setEnabled(true);
     config.setPort(0);
     return config;
+  }
+
+  static class PantheonFactoryConfiguration {
+
+    private final String name;
+    private final MiningParameters miningParameters;
+    private final JsonRpcConfiguration jsonRpcConfiguration;
+    private final WebSocketConfiguration webSocketConfiguration;
+
+    public PantheonFactoryConfiguration(
+        final String name,
+        final MiningParameters miningParameters,
+        final JsonRpcConfiguration jsonRpcConfiguration,
+        final WebSocketConfiguration webSocketConfiguration) {
+      this.name = name;
+      this.miningParameters = miningParameters;
+      this.jsonRpcConfiguration = jsonRpcConfiguration;
+      this.webSocketConfiguration = webSocketConfiguration;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public MiningParameters getMiningParameters() {
+      return miningParameters;
+    }
+
+    public JsonRpcConfiguration getJsonRpcConfiguration() {
+      return jsonRpcConfiguration;
+    }
+
+    public WebSocketConfiguration getWebSocketConfiguration() {
+      return webSocketConfiguration;
+    }
   }
 }

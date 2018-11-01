@@ -53,17 +53,28 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final int p2pPort;
   private final Properties portsProperties = new Properties();
 
-  private final PantheonNodeConfiguration configuration;
+  private final String name;
+  private final MiningParameters miningParameters;
+  private final JsonRpcConfiguration jsonRpcConfiguration;
+  private final WebSocketConfiguration webSocketConfiguration;
 
   private List<String> bootnodes = new ArrayList<>();
   private Web3j web3j;
 
-  public PantheonNode(final PantheonNodeConfiguration configuration, final int p2pPort)
+  public PantheonNode(
+      final String name,
+      final MiningParameters miningParameters,
+      final JsonRpcConfiguration jsonRpcConfiguration,
+      final WebSocketConfiguration webSocketConfiguration,
+      final int p2pPort)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.p2pPort = p2pPort;
-    this.configuration = configuration;
+    this.name = name;
+    this.miningParameters = miningParameters;
+    this.jsonRpcConfiguration = jsonRpcConfiguration;
+    this.webSocketConfiguration = webSocketConfiguration;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -77,7 +88,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public String getName() {
-    return configuration.getName();
+    return name;
   }
 
   @Override
@@ -89,7 +100,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     if (isJsonRpcEnabled()) {
       return Optional.of(
           "http://"
-              + configuration.getJsonRpcConfiguration().getHost()
+              + jsonRpcConfiguration.getHost()
               + ":"
               + portsProperties.getProperty("json-rpc"));
     } else {
@@ -100,10 +111,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private Optional<String> wsRpcBaseUrl() {
     if (isWebSocketsRpcEnabled()) {
       return Optional.of(
-          "ws://"
-              + configuration.getWebSocketConfiguration().getHost()
-              + ":"
-              + portsProperties.getProperty("ws-rpc"));
+          "ws://" + webSocketConfiguration.getHost() + ":" + portsProperties.getProperty("ws-rpc"));
     } else {
       return Optional.empty();
     }
@@ -204,7 +212,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   JsonRpcConfiguration jsonRpcConfiguration() {
-    return configuration.getJsonRpcConfiguration();
+    return jsonRpcConfiguration;
   }
 
   Optional<String> jsonRpcListenAddress() {
@@ -220,7 +228,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   WebSocketConfiguration webSocketConfiguration() {
-    return configuration.getWebSocketConfiguration();
+    return webSocketConfiguration;
   }
 
   Optional<String> wsRpcListenAddress() {
@@ -249,13 +257,13 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   MiningParameters getMiningParameters() {
-    return configuration.getMiningParameters();
+    return miningParameters;
   }
 
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-        .add("name", configuration.getName())
+        .add("name", name)
         .add("p2pPort", p2pPort)
         .add("homeDirectory", homeDirectory)
         .add("keyPair", keyPair)
