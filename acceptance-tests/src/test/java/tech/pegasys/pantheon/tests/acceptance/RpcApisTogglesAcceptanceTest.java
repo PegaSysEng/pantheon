@@ -54,7 +54,7 @@ public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldSucceedConnectingToNodeWithWsRpcEnabled() {
-    rpcEnabledNode.useWebSocketsForJsonRpc();
+    rpcEnabledNode.getConfiguration().useWebSocketsForJsonRpc();
 
     // TODO previously this test was calling netVersion using the HTTP not WebSockets, now failing
     rpcEnabledNode.verify(net.netVersion());
@@ -62,7 +62,7 @@ public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldFailConnectingToNodeWithWsRpcDisabled() {
-    rpcDisabledNode.useWebSocketsForJsonRpc();
+    rpcDisabledNode.getConfiguration().useWebSocketsForJsonRpc();
 
     rpcDisabledNode.verify(net.netVersionExceptional(WebsocketNotConnectedException.class));
   }

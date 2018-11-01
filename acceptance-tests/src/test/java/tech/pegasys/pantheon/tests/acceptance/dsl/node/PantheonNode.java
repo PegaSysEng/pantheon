@@ -43,7 +43,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
 
-public class PantheonNode implements Node, AutoCloseable {
+public class PantheonNode implements Node, NodeConfiguration, AutoCloseable {
 
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();
@@ -173,6 +173,11 @@ public class PantheonNode implements Node, AutoCloseable {
   public void start(final PantheonNodeRunner runner) {
     runner.startNode(this);
     loadPortsFile();
+  }
+
+  @Override
+  public NodeConfiguration getConfiguration() {
+    return this;
   }
 
   private void loadPortsFile() {

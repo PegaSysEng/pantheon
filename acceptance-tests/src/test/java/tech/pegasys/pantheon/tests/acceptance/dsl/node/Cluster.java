@@ -35,11 +35,11 @@ public class Cluster implements AutoCloseable {
     final List<String> bootNodes = new ArrayList<>();
     for (final Node node : nodes) {
       this.nodes.add(node);
-      bootNodes.add(node.enodeUrl());
+      bootNodes.add(node.getConfiguration().enodeUrl());
     }
 
     for (final Node node : nodes) {
-      node.bootnodes(bootNodes);
+      node.getConfiguration().bootnodes(bootNodes);
       node.start(pantheonNodeRunner);
     }
 
@@ -77,7 +77,7 @@ public class Cluster implements AutoCloseable {
   }
 
   private void awaitPeerDiscovery(final Node node, final int nodeCount) {
-    if (node.jsonRpcEnabled()) {
+    if (node.getConfiguration().jsonRpcEnabled()) {
       node.verify(net.awaitPeerCount(nodeCount - 1));
     }
   }

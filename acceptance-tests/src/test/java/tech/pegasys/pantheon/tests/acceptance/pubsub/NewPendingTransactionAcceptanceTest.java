@@ -47,8 +47,8 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     archiveNode = cluster.create(pantheonNode("full-node1"));
     cluster.start(minerNode, archiveNode);
     accountOne = accounts.createAccount("account-one");
-    minerWebSocket = new WebSocket(vertx, minerNode);
-    archiveWebSocket = new WebSocket(vertx, archiveNode);
+    minerWebSocket = new WebSocket(vertx, minerNode.getConfiguration());
+    archiveWebSocket = new WebSocket(vertx, archiveNode.getConfiguration());
   }
 
   @After
@@ -107,9 +107,10 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     // Restart the two nodes on the light fork with the additional node from the heavy fork
     cluster.start(minerNode, archiveNode, minerNodeTwo);
 
-    final WebSocket minerMergedForksWebSocket = new WebSocket(vertx, minerNode);
+    final WebSocket minerMergedForksWebSocket = new WebSocket(vertx, minerNode.getConfiguration());
     final WebSocket minerTwoMergedForksWebSocket = new WebSocket(vertx, minerNodeTwo);
-    final WebSocket archiveMergedForksWebSocket = new WebSocket(vertx, archiveNode);
+    final WebSocket archiveMergedForksWebSocket =
+        new WebSocket(vertx, archiveNode.getConfiguration());
     final Subscription minerMergedForksSubscription = minerMergedForksWebSocket.subscribe();
     final Subscription minerTwoMergedForksSubscription = minerTwoMergedForksWebSocket.subscribe();
     final Subscription archiveMergedForksSubscription = archiveMergedForksWebSocket.subscribe();
