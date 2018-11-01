@@ -70,7 +70,6 @@ public class PantheonNode implements Node, AutoCloseable {
 
   private List<String> bootnodes = new ArrayList<>();
   private Eth eth;
-  private Clique clique;
   private Web3j web3j;
   private PantheonWeb3j pantheonWeb3j;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
@@ -317,15 +316,6 @@ public class PantheonNode implements Node, AutoCloseable {
     } catch (final IOException e) {
       LOG.info("Failed to clean up temporary file: {}", homeDirectory, e);
     }
-  }
-
-  @Override
-  public Clique clique() {
-    if (clique == null) {
-      clique = new Clique(new HttpService(jsonRpcBaseUrl().get()));
-    }
-
-    return clique;
   }
 
   public Function<Collection<PantheonNode>, Optional<String>> getGenesisConfig() {
