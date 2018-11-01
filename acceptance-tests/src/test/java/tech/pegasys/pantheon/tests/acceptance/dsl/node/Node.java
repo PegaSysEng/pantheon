@@ -12,9 +12,38 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface Node {
 
+  // used by Conditional -> new interface
   <T> T execute(Transaction<T> transaction);
+
+  void verify(final Condition expected);
+
+  // Node runner -> new interface
+  void stop();
+
+  void close();
+
+  void start(PantheonNodeRunner runner);
+
+  // Node config -> new interface
+  String enodeUrl();
+
+  void bootnodes(List<String> bootnodes);
+
+  void useWebSocketsForJsonRpc();
+
+  Optional<Integer> jsonRpcWebSocketPort();
+
+  String hostName();
+
+  boolean jsonRpcEnabled();
+
+  int getPeerCount();
 }

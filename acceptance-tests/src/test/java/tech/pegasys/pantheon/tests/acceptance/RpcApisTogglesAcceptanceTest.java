@@ -18,7 +18,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.junit.Before;
@@ -28,9 +28,9 @@ import org.junit.Test;
 @Ignore
 public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode rpcEnabledNode;
-  private PantheonNode rpcDisabledNode;
-  private PantheonNode ethApiDisabledNode;
+  private Node rpcEnabledNode;
+  private Node rpcDisabledNode;
+  private Node ethApiDisabledNode;
 
   @Before
   public void before() throws Exception {

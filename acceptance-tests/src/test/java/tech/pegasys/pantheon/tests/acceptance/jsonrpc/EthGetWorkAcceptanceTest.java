@@ -16,15 +16,15 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class EthGetWorkAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode minerNode;
-  private PantheonNode fullNode;
+  private Node minerNode;
+  private Node fullNode;
 
   @Before
   public void setUp() throws Exception {

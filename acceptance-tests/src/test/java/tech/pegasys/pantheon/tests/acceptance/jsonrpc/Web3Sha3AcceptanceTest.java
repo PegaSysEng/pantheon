@@ -15,14 +15,14 @@ package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class Web3Sha3AcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode node;
+  private Node node;
 
   @Before
   public void setUp() throws Exception {

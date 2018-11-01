@@ -19,37 +19,39 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Cluster implements AutoCloseable {
 
-  private final Map<String, PantheonNode> nodes = new HashMap<>();
+  private final List<Node> nodes = new ArrayList<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
 
-  public void start(final PantheonNode... nodes) {
+  public void start(final Node... nodes) {
     this.nodes.clear();
 
-    final List<String> bootNodes = new ArrayList<>();
+    final List<String> bootNodes = bootNodes();
 
-    for (final PantheonNode node : nodes) {
-      this.nodes.put(node.getName(), node);
-      bootNodes.add(node.enodeUrl());
-    }
-
-    for (final PantheonNode node : nodes) {
+    for (final Node node : nodes) {
       node.bootnodes(bootNodes);
       node.start(pantheonNodeRunner);
     }
 
-    for (final PantheonNode node : nodes) {
+    for (final Node node : nodes) {
       awaitPeerDiscovery(node, nodes.length);
     }
   }
 
+  private List<String> bootNodes() {
+    final List<String> bootNodes = new ArrayList<>();
+    for (final Node node : nodes) {
+      bootNodes.add(node.enodeUrl());
+    }
+
+    return bootNodes;
+  }
+
   public void stop() {
-    for (final PantheonNode node : nodes.values()) {
+    for (final Node node : nodes) {
       node.stop();
     }
     pantheonNodeRunner.shutdown();
@@ -57,7 +59,7 @@ public class Cluster implements AutoCloseable {
 
   @Override
   public void close() {
-    for (final PantheonNode node : nodes.values()) {
+    for (final Node node : nodes) {
       node.close();
     }
     pantheonNodeRunner.shutdown();
@@ -76,14 +78,15 @@ public class Cluster implements AutoCloseable {
     return node;
   }
 
-  private void awaitPeerDiscovery(final PantheonNode node, final int nodeCount) {
+  private void awaitPeerDiscovery(final Node node, final int nodeCount) {
+    // Todo use conditional?
     if (node.jsonRpcEnabled()) {
       WaitUtils.waitFor(() -> assertThat(node.getPeerCount()).isEqualTo(nodeCount - 1));
     }
   }
 
   public void verify(final Condition expected) {
-    for (final Node node : nodes.values()) {
+    for (final Node node : nodes) {
       expected.verify(node);
     }
   }

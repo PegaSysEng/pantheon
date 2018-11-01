@@ -16,7 +16,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,7 +25,7 @@ import org.junit.Test;
 @Ignore
 public class MiningAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode minerNode;
+  private Node minerNode;
 
   @Before
   public void setUp() throws Exception {

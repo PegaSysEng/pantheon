@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.pubsub.Subscription;
 import tech.pegasys.pantheon.tests.acceptance.dsl.pubsub.WebSocket;
@@ -36,8 +37,8 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
   private Account accountOne;
   private WebSocket minerWebSocket;
   private WebSocket archiveWebSocket;
-  private PantheonNode minerNode;
-  private PantheonNode archiveNode;
+  private Node minerNode;
+  private Node archiveNode;
 
   @Before
   public void setUp() throws Exception {

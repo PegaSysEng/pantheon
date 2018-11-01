@@ -85,7 +85,8 @@ public class PantheonNode implements Node, AutoCloseable {
     return name;
   }
 
-  String enodeUrl() {
+  @Override
+  public String enodeUrl() {
     return "enode://" + keyPair.getPublicKey().toString() + "@" + LOCALHOST + ":" + p2pPort;
   }
 
@@ -110,6 +111,7 @@ public class PantheonNode implements Node, AutoCloseable {
     }
   }
 
+  @Override
   public Optional<Integer> jsonRpcWebSocketPort() {
     if (wsRpcEnabled) {
       return Optional.of(Integer.valueOf(portsProperties.getProperty("ws-rpc")));
@@ -118,7 +120,8 @@ public class PantheonNode implements Node, AutoCloseable {
     }
   }
 
-  public String getHost() {
+  @Override
+  public String hostName() {
     return LOCALHOST;
   }
 
@@ -153,6 +156,7 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
+  @Override
   public void useWebSocketsForJsonRpc() {
     final String url = wsRpcBaseUrl().isPresent() ? wsRpcBaseUrl().get() : "ws://127.0.0.1:8546";
 
@@ -165,6 +169,7 @@ public class PantheonNode implements Node, AutoCloseable {
     web3j = Web3j.build(webSocketService, 2000, Async.defaultExecutorService());
   }
 
+  @Override
   public int getPeerCount() {
     try {
       return web3j().netPeerCount().send().getQuantity().intValueExact();
@@ -173,6 +178,7 @@ public class PantheonNode implements Node, AutoCloseable {
     }
   }
 
+  @Override
   public void start(final PantheonNodeRunner runner) {
     runner.startNode(this);
     loadPortsFile();
@@ -191,7 +197,8 @@ public class PantheonNode implements Node, AutoCloseable {
     return homeDirectory;
   }
 
-  boolean jsonRpcEnabled() {
+  @Override
+  public boolean jsonRpcEnabled() {
     return jsonRpcEnabled;
   }
 
@@ -234,7 +241,8 @@ public class PantheonNode implements Node, AutoCloseable {
         .collect(Collectors.toList());
   }
 
-  void bootnodes(final List<String> bootnodes) {
+  @Override
+  public void bootnodes(final List<String> bootnodes) {
     this.bootnodes = bootnodes;
   }
 
@@ -252,7 +260,8 @@ public class PantheonNode implements Node, AutoCloseable {
         .toString();
   }
 
-  void stop() {
+  @Override
+  public void stop() {
     if (web3j != null) {
       web3j.shutdown();
       web3j = null;
@@ -274,6 +283,7 @@ public class PantheonNode implements Node, AutoCloseable {
     return transaction.execute(web3j());
   }
 
+  @Override
   public void verify(final Condition expected) {
     expected.verify(this);
   }
