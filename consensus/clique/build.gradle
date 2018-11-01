@@ -24,6 +24,7 @@ jar {
 repositories { mavenCentral() }
 
 dependencies {
+  implementation project(':config')
   implementation project(':crypto')
   implementation project(':ethereum:core')
   implementation project(':ethereum:blockcreation')
