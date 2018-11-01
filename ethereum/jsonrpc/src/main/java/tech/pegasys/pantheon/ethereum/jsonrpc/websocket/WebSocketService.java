@@ -106,7 +106,6 @@ public class WebSocketService {
   }
 
   private Handler<HttpServerRequest> httpHandler() {
-    System.out.println("HTTP Handler");
     return http ->
         http.response().setStatusCode(400).end("Websocket endpoint can't handle HTTP requests");
   }
