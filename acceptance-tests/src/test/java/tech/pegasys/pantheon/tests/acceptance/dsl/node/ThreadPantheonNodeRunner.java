@@ -82,13 +82,13 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     waitForPortsFile(node.homeDirectory().toAbsolutePath());
 
-    pantheonRunners.put(node.getName(), runner);
+    pantheonRunners.put(node.id(), runner);
   }
 
   @Override
   public void stopNode(final PantheonNode node) {
     node.stop();
-    killRunner(node.getName());
+    killRunner(node.id());
   }
 
   @Override

@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.pubsub.Subscription;
 import tech.pegasys.pantheon.tests.acceptance.dsl.pubsub.WebSocket;
@@ -37,14 +36,14 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
   private Account accountOne;
   private WebSocket minerWebSocket;
   private WebSocket archiveWebSocket;
-  private Node minerNode;
-  private Node archiveNode;
+  private PantheonNode minerNode;
+  private PantheonNode archiveNode;
 
   @Before
   public void setUp() throws Exception {
     vertx = Vertx.vertx();
-    minerNode = cluster.create(pantheonMinerNode("miner-node1"));
-    archiveNode = cluster.create(pantheonNode("full-node1"));
+    minerNode = pantheon.create(pantheonMinerNode("miner-node1"));
+    archiveNode = pantheon.create(pantheonNode("full-node1"));
     cluster.start(minerNode, archiveNode);
     accountOne = accounts.createAccount("account-one");
     minerWebSocket = new WebSocket(vertx, minerNode.getConfiguration());
@@ -73,7 +72,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     cluster.stop();
 
     // Create the heavy fork
-    final PantheonNode minerNodeTwo = cluster.create(pantheonMinerNode("miner-node2"));
+    final PantheonNode minerNodeTwo = pantheon.create(pantheonMinerNode("miner-node2"));
     cluster.start(minerNodeTwo);
 
     final WebSocket heavyForkWebSocket = new WebSocket(vertx, minerNodeTwo);

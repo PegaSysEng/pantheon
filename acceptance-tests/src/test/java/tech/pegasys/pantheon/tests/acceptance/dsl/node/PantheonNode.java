@@ -43,7 +43,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
 
-public class PantheonNode implements Node, NodeConfiguration, AutoCloseable {
+public class PantheonNode implements Node, NodeConfiguration, RunnableNode, AutoCloseable {
 
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();
@@ -81,7 +81,8 @@ public class PantheonNode implements Node, NodeConfiguration, AutoCloseable {
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
-  String getName() {
+  @Override
+  public String id() {
     return name;
   }
 
@@ -178,6 +179,13 @@ public class PantheonNode implements Node, NodeConfiguration, AutoCloseable {
   @Override
   public NodeConfiguration getConfiguration() {
     return this;
+  }
+
+  @Override
+  public void awaitPeerDiscovery(final Condition condition) {
+    if (jsonRpcEnabled()) {
+      verify(condition);
+    }
   }
 
   private void loadPortsFile() {

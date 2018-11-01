@@ -18,7 +18,7 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.junit.Before;
@@ -28,15 +28,15 @@ import org.junit.Test;
 @Ignore
 public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
-  private Node rpcEnabledNode;
-  private Node rpcDisabledNode;
-  private Node ethApiDisabledNode;
+  private PantheonNode rpcEnabledNode;
+  private PantheonNode rpcDisabledNode;
+  private PantheonNode ethApiDisabledNode;
 
   @Before
   public void before() throws Exception {
-    rpcEnabledNode = cluster.create(pantheonNode("rpc-enabled"));
-    rpcDisabledNode = cluster.create(pantheonRpcDisabledNode("rpc-disabled"));
-    ethApiDisabledNode = cluster.create(patheonNodeWithRpcApis("eth-api-disabled", RpcApis.NET));
+    rpcEnabledNode = pantheon.create(pantheonNode("rpc-enabled"));
+    rpcDisabledNode = pantheon.create(pantheonRpcDisabledNode("rpc-disabled"));
+    ethApiDisabledNode = pantheon.create(patheonNodeWithRpcApis("eth-api-disabled", RpcApis.NET));
     cluster.start(rpcEnabledNode, rpcDisabledNode, ethApiDisabledNode);
   }
 
@@ -54,7 +54,7 @@ public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldSucceedConnectingToNodeWithWsRpcEnabled() {
-    rpcEnabledNode.getConfiguration().useWebSocketsForJsonRpc();
+    rpcEnabledNode.useWebSocketsForJsonRpc();
 
     // TODO previously this test was calling netVersion using the HTTP not WebSockets, now failing
     rpcEnabledNode.verify(net.netVersion());
@@ -62,7 +62,7 @@ public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldFailConnectingToNodeWithWsRpcDisabled() {
-    rpcDisabledNode.getConfiguration().useWebSocketsForJsonRpc();
+    rpcDisabledNode.useWebSocketsForJsonRpc();
 
     rpcDisabledNode.verify(net.netVersionExceptional(WebsocketNotConnectedException.class));
   }

@@ -86,7 +86,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
     try {
       final Process process = processBuilder.start();
-      pantheonProcesses.put(node.getName(), process);
+      pantheonProcesses.put(node.id(), process);
     } catch (final IOException e) {
       LOG.error("Error starting PantheonNode process", e);
     }
@@ -101,9 +101,9 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   @Override
   public void stopNode(final PantheonNode node) {
     node.stop();
-    if (pantheonProcesses.containsKey(node.getName())) {
-      final Process process = pantheonProcesses.get(node.getName());
-      killPantheonProcess(node.getName(), process);
+    if (pantheonProcesses.containsKey(node.id())) {
+      final Process process = pantheonProcesses.get(node.id());
+      killPantheonProcess(node.id(), process);
     }
   }
 

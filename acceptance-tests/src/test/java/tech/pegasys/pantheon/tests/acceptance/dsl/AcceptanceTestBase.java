@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Web3;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
@@ -34,6 +35,7 @@ public class AcceptanceTestBase {
   protected final Web3 web3;
   protected final Eth eth;
   protected final Net net;
+  protected final PantheonNodeFactory pantheon;
 
   protected AcceptanceTestBase() {
     final EthTransactions ethTransactions = new EthTransactions();
@@ -44,6 +46,7 @@ public class AcceptanceTestBase {
     cluster = new Cluster(net);
     transactions = new Transactions(accounts);
     web3 = new Web3(new Web3Transactions());
+    pantheon = new PantheonNodeFactory();
   }
 
   @After

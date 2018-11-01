@@ -12,16 +12,21 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Cluster implements AutoCloseable {
 
-  private final List<Node> nodes = new ArrayList<>();
+  private final Map<String, RunnableNode> nodes = new HashMap<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
   private final Net net;
 
@@ -30,26 +35,37 @@ public class Cluster implements AutoCloseable {
   }
 
   public void start(final Node... nodes) {
+    start(
+        Arrays.stream(nodes)
+            .map(
+                n -> {
+                  assertThat(n instanceof RunnableNode).isTrue();
+                  return (RunnableNode) n;
+                })
+            .collect(Collectors.toList()));
+  }
+
+  public void start(final List<RunnableNode> nodes) {
     this.nodes.clear();
 
     final List<String> bootNodes = new ArrayList<>();
-    for (final Node node : nodes) {
-      this.nodes.add(node);
+    for (final RunnableNode node : nodes) {
+      this.nodes.put(node.id(), node);
       bootNodes.add(node.getConfiguration().enodeUrl());
     }
 
-    for (final Node node : nodes) {
+    for (final RunnableNode node : nodes) {
       node.getConfiguration().bootnodes(bootNodes);
       node.start(pantheonNodeRunner);
     }
 
-    for (final Node node : nodes) {
-      awaitPeerDiscovery(node, nodes.length);
+    for (final RunnableNode node : nodes) {
+      node.awaitPeerDiscovery(net.awaitPeerCount(nodes.size() - 1));
     }
   }
 
   public void stop() {
-    for (final Node node : nodes) {
+    for (final RunnableNode node : nodes.values()) {
       node.stop();
     }
     pantheonNodeRunner.shutdown();
@@ -57,33 +73,14 @@ public class Cluster implements AutoCloseable {
 
   @Override
   public void close() {
-    for (final Node node : nodes) {
+    for (final RunnableNode node : nodes.values()) {
       node.close();
     }
     pantheonNodeRunner.shutdown();
   }
 
-  public PantheonNode create(final PantheonNodeConfig config) throws IOException {
-    config.initSocket();
-    final PantheonNode node =
-        new PantheonNode(
-            config.getName(),
-            config.getSocketPort(),
-            config.getMiningParameters(),
-            config.getJsonRpcConfiguration(),
-            config.getWebSocketConfiguration());
-    config.closeSocket();
-    return node;
-  }
-
-  private void awaitPeerDiscovery(final Node node, final int nodeCount) {
-    if (node.getConfiguration().jsonRpcEnabled()) {
-      node.verify(net.awaitPeerCount(nodeCount - 1));
-    }
-  }
-
   public void verify(final Condition expected) {
-    for (final Node node : nodes) {
+    for (final Node node : nodes.values()) {
       expected.verify(node);
     }
   }

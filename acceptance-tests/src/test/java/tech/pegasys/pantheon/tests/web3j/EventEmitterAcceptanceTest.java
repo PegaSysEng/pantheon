@@ -48,7 +48,7 @@ public class EventEmitterAcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    node = cluster.create(pantheonMinerNode("node1"));
+    node = pantheon.create(pantheonMinerNode("node1"));
     cluster.start(node);
   }
 

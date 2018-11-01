@@ -20,13 +20,4 @@ public interface Node {
   <T> T execute(Transaction<T> transaction);
 
   void verify(final Condition expected);
-
-  NodeConfiguration getConfiguration();
-
-  // Node runner -> new interface
-  void stop();
-
-  void close();
-
-  void start(PantheonNodeRunner runner);
 }
