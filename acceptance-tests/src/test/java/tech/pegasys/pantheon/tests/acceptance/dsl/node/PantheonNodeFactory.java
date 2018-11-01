@@ -12,11 +12,18 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
+import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+
 import java.io.IOException;
+import java.util.Arrays;
 
 public class PantheonNodeFactory {
 
-  public PantheonNode create(final PantheonNodeConfig config) throws IOException {
+  private PantheonNode create(final PantheonNodeConfig config) throws IOException {
     config.initSocket();
     final PantheonNode node =
         new PantheonNode(
@@ -27,5 +34,56 @@ public class PantheonNodeFactory {
             config.getWebSocketConfiguration());
     config.closeSocket();
     return node;
+  }
+
+  public PantheonNode createMinerNode(final String name) throws IOException {
+    return create(
+        new PantheonNodeConfig(
+            name, createMiningParameters(true), createJsonRpcConfig(), createWebSocketConfig()));
+  }
+
+  public PantheonNode createArchiveNode(final String name) throws IOException {
+    return create(
+        new PantheonNodeConfig(
+            name, createMiningParameters(false), createJsonRpcConfig(), createWebSocketConfig()));
+  }
+
+  public PantheonNode createArchiveNodeWithRpcDisabled(final String name) throws IOException {
+    return create(
+        new PantheonNodeConfig(
+            name,
+            createMiningParameters(false),
+            JsonRpcConfiguration.createDefault(),
+            WebSocketConfiguration.createDefault()));
+  }
+
+  public PantheonNode createArchiveNodeWithRpcApis(
+      final String name, final RpcApi... enabledRpcApis) throws IOException {
+    final JsonRpcConfiguration jsonRpcConfig = createJsonRpcConfig();
+    jsonRpcConfig.setRpcApis(Arrays.asList(enabledRpcApis));
+    final WebSocketConfiguration webSocketConfig = createWebSocketConfig();
+    webSocketConfig.setRpcApis(Arrays.asList(enabledRpcApis));
+
+    return create(
+        new PantheonNodeConfig(
+            name, createMiningParameters(false), jsonRpcConfig, webSocketConfig));
+  }
+
+  private MiningParameters createMiningParameters(final boolean miner) {
+    return new MiningParametersTestBuilder().enabled(miner).build();
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfig() {
+    final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
+    config.setEnabled(true);
+    config.setPort(0);
+    return config;
+  }
+
+  private WebSocketConfiguration createWebSocketConfig() {
+    final WebSocketConfiguration config = WebSocketConfiguration.createDefault();
+    config.setEnabled(true);
+    config.setPort(0);
+    return config;
   }
 }

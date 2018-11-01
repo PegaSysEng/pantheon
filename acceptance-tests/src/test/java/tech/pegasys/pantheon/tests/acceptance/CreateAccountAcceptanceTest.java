@@ -13,8 +13,6 @@
 package tech.pegasys.pantheon.tests.acceptance;
 
 import static org.web3j.utils.Convert.Unit.ETHER;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
@@ -31,8 +29,8 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    minerNode = pantheon.create(pantheonMinerNode("node1"));
-    cluster.start(minerNode, pantheon.create(pantheonNode("node2")));
+    minerNode = pantheon.createMinerNode("node1");
+    cluster.start(minerNode, pantheon.createArchiveNode("node2"));
   }
 
   @Test

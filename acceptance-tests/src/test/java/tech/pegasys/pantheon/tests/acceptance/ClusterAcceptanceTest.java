@@ -12,9 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
@@ -28,8 +25,8 @@ public class ClusterAcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    minerNode = pantheon.create(pantheonMinerNode("node1"));
-    fullNode = pantheon.create(pantheonNode("node2"));
+    minerNode = pantheon.createMinerNode("node1");
+    fullNode = pantheon.createArchiveNode("node2");
     cluster.start(minerNode, fullNode);
   }
 

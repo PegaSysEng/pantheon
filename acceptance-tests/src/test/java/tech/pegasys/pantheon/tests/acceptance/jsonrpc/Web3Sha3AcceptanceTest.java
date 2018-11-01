@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonNode;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
@@ -26,7 +24,7 @@ public class Web3Sha3AcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    node = pantheon.create(pantheonNode("node1"));
+    node = pantheon.createArchiveNode("node1");
     cluster.start(node);
   }
 
