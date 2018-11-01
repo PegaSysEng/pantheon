@@ -12,10 +12,8 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,11 +23,20 @@ public class Cluster implements AutoCloseable {
 
   private final List<Node> nodes = new ArrayList<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
+  private final Net net;
+
+  public Cluster(final Net net) {
+    this.net = net;
+  }
 
   public void start(final Node... nodes) {
     this.nodes.clear();
 
-    final List<String> bootNodes = bootNodes();
+    final List<String> bootNodes = new ArrayList<>();
+    for (final Node node : nodes) {
+      this.nodes.add(node);
+      bootNodes.add(node.enodeUrl());
+    }
 
     for (final Node node : nodes) {
       node.bootnodes(bootNodes);
@@ -39,15 +46,6 @@ public class Cluster implements AutoCloseable {
     for (final Node node : nodes) {
       awaitPeerDiscovery(node, nodes.length);
     }
-  }
-
-  private List<String> bootNodes() {
-    final List<String> bootNodes = new ArrayList<>();
-    for (final Node node : nodes) {
-      bootNodes.add(node.enodeUrl());
-    }
-
-    return bootNodes;
   }
 
   public void stop() {
@@ -79,9 +77,8 @@ public class Cluster implements AutoCloseable {
   }
 
   private void awaitPeerDiscovery(final Node node, final int nodeCount) {
-    // Todo use conditional?
     if (node.jsonRpcEnabled()) {
-      WaitUtils.waitFor(() -> assertThat(node.getPeerCount()).isEqualTo(nodeCount - 1));
+      node.verify(net.awaitPeerCount(nodeCount - 1));
     }
   }
 

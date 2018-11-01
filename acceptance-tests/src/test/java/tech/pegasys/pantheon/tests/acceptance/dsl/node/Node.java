@@ -44,6 +44,4 @@ public interface Node {
   String hostName();
 
   boolean jsonRpcEnabled();
-
-  int getPeerCount();
 }

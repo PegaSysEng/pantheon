@@ -170,15 +170,6 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   @Override
-  public int getPeerCount() {
-    try {
-      return web3j().netPeerCount().send().getQuantity().intValueExact();
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Override
   public void start(final PantheonNodeRunner runner) {
     runner.startNode(this);
     loadPortsFile();
