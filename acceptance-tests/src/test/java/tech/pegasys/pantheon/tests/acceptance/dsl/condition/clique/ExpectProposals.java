@@ -18,22 +18,21 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 
 import java.util.Map;
 
 public class ExpectProposals implements Condition {
+  private final CliqueTransactions clique;
   private final Map<Address, Boolean> proposers;
 
-  public ExpectProposals(final Map<Address, Boolean> proposers) {
+  public ExpectProposals(final CliqueTransactions clique, final Map<Address, Boolean> proposers) {
+    this.clique = clique;
     this.proposers = proposers;
   }
 
   @Override
   public void verify(final Node node) {
-    waitFor(
-        () -> {
-          final Map<Address, Boolean> result = node.clique().proposals().getResult();
-          assertThat(result).isEqualTo(proposers);
-        });
+    waitFor(() -> assertThat(node.execute(clique.proposals())).isEqualTo(proposers));
   }
 }

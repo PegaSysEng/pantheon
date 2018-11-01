@@ -22,10 +22,12 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import java.io.IOException;
 import java.util.List;
 
-public class CliqueGetSigners implements Transaction<List<Address>> {
-  private final String blockNumber;
+import org.web3j.protocol.core.DefaultBlockParameter;
 
-  public CliqueGetSigners(final String blockNumber) {
+public class CliqueGetSigners implements Transaction<List<Address>> {
+  private final DefaultBlockParameter blockNumber;
+
+  public CliqueGetSigners(final DefaultBlockParameter blockNumber) {
     this.blockNumber = blockNumber;
   }
 

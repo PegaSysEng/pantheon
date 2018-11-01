@@ -20,6 +20,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueGetSi
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliquePropose;
 
+import org.web3j.protocol.core.DefaultBlockParameter;
+
 public class CliqueTransactions {
 
   public CliquePropose proposeRemove(final PantheonNode node) {
@@ -38,7 +40,7 @@ public class CliqueTransactions {
     return new CliqueProposals();
   }
 
-  public CliqueGetSigners getSigners(final String blockNumber) {
+  public CliqueGetSigners getSigners(final DefaultBlockParameter blockNumber) {
     return new CliqueGetSigners(blockNumber);
   }
 

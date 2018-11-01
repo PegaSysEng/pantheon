@@ -10,18 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.clique;
+package tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectProposals;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidators;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidatorsAtBlock;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidatorsAtBlockHash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 import java.util.Arrays;
@@ -31,35 +27,39 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 
 public class CliqueConditions {
   private final EthTransactions eth;
+  private final CliqueTransactions clique;
 
-  public CliqueConditions(final EthTransactions eth) {
+  public CliqueConditions(final EthTransactions eth, final CliqueTransactions clique) {
     this.eth = eth;
+    this.clique = clique;
   }
 
-  public Condition validatorsEqual(final PantheonNode... validators) {
-    return new ExpectValidators(validatorAddresses(validators));
+  public ExpectValidators validatorsEqual(final PantheonNode... validators) {
+    return new ExpectValidators(clique, validatorAddresses(validators));
   }
 
   public Condition validatorsAtBlockEqual(
       final String blockNumber, final PantheonNode... validators) {
-    return new ExpectValidatorsAtBlock(blockNumber, validatorAddresses(validators));
+    return new ExpectValidatorsAtBlock(
+        clique, DefaultBlockParameterName.fromString(blockNumber), validatorAddresses(validators));
   }
 
   public Condition validatorsAtBlockHashEqual(
       final String blockHash, final PantheonNode... validators) {
     return new ExpectValidatorsAtBlockHash(
-        Hash.fromHexString(blockHash), validatorAddresses(validators));
+        clique, Hash.fromHexString(blockHash), validatorAddresses(validators));
   }
 
   public ProposalsConfig proposalsEqual() {
-    return new ProposalsConfig();
+    return new ProposalsConfig(clique);
   }
 
   public Condition noProposals() {
-    return new ExpectProposals(ImmutableMap.of());
+    return new ExpectProposals(clique, ImmutableMap.of());
   }
 
   public Condition nonceVoteEquals(final CLIQUE_NONCE_VOTE clique_nonce_vote) {
@@ -72,6 +72,11 @@ public class CliqueConditions {
 
   public static class ProposalsConfig {
     private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
+    private final CliqueTransactions clique;
+
+    public ProposalsConfig(final CliqueTransactions clique) {
+      this.clique = clique;
+    }
 
     public ProposalsConfig addProposal(final PantheonNode node) {
       proposals.put(node, true);
@@ -89,7 +94,7 @@ public class CliqueConditions {
               .entrySet()
               .stream()
               .collect(Collectors.toMap(p -> p.getKey().getAddress(), Entry::getValue));
-      return new ExpectProposals(proposalsAsAddress);
+      return new ExpectProposals(clique, proposalsAsAddress);
     }
   }
 }

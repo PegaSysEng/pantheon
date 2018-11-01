@@ -19,12 +19,16 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 
 public class ExpectValidatorsAtBlockHash implements Condition {
+  private final CliqueTransactions clique;
   private final Hash blockHash;
   private final Address[] validators;
 
-  public ExpectValidatorsAtBlockHash(final Hash blockHash, final Address... validators) {
+  public ExpectValidatorsAtBlockHash(
+      final CliqueTransactions clique, final Hash blockHash, final Address... validators) {
+    this.clique = clique;
     this.blockHash = blockHash;
     this.validators = validators;
   }
@@ -33,7 +37,7 @@ public class ExpectValidatorsAtBlockHash implements Condition {
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.clique().getSignersAtHash(blockHash).getResult())
+            assertThat(node.execute(clique.getSignersAtHash(blockHash)))
                 .containsExactly(validators));
   }
 }

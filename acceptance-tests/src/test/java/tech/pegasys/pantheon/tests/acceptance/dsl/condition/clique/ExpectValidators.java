@@ -18,14 +18,16 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 
-import java.util.Optional;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 
 public class ExpectValidators implements Condition {
-
+  private final CliqueTransactions clique;
   private final Address[] validators;
 
-  public ExpectValidators(final Address... validators) {
+  public ExpectValidators(final CliqueTransactions clique, final Address... validators) {
+    this.clique = clique;
     this.validators = validators;
   }
 
@@ -33,7 +35,7 @@ public class ExpectValidators implements Condition {
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.clique().getSigners(Optional.empty()).getResult())
+            assertThat(node.execute(clique.getSigners(DefaultBlockParameterName.LATEST)))
                 .containsExactly(validators));
   }
 }
