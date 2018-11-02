@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.db;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
+import tech.pegasys.pantheon.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
@@ -35,7 +36,7 @@ import java.util.Collections;
 import org.junit.Test;
 
 public class GenesisBlockMismatchTest {
-  private static final SecureRandom srand = new SecureRandom();
+  private static final SecureRandom srand = SecureRandomProvider.publicSecureRandom();
 
   static private byte[] bytes(final int len) {
     final byte[] bytes = new byte[len];
