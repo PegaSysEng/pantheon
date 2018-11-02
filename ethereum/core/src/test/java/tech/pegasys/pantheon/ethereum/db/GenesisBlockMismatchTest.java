@@ -38,7 +38,7 @@ import org.junit.Test;
 public class GenesisBlockMismatchTest {
   private static final SecureRandom srand = SecureRandomProvider.publicSecureRandom();
 
-  static private byte[] bytes(final int len) {
+  private static byte[] bytes(final int len) {
     final byte[] bytes = new byte[len];
     srand.nextBytes(bytes);
     return bytes;
