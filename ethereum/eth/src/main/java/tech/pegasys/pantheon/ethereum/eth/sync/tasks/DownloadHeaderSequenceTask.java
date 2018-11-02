@@ -163,6 +163,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
           BlockHeader child = null;
           boolean firstSkipped = false;
           for (final BlockHeader header : headersResult.getResult()) {
+            resetRetryCounter();
             final int headerIndex =
                 Ints.checkedCast(
                     segmentLength - (referenceHeader.getNumber() - header.getNumber()));
