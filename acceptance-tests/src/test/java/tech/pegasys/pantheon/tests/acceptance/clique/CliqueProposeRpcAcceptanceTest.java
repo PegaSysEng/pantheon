@@ -101,11 +101,11 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
     minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode1.execute(cliqueTransactions.proposeRemove(minerNode2));
 
-    minerNode1.waitForChainHeadToProgress(1);
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
     minerNode1.verify(blockchain.beneficiaryEquals(minerNode3));
     minerNode1.verify(clique.nonceVoteEquals(CLIQUE_NONCE_VOTE.AUTH));
 
-    minerNode1.waitForChainHeadToProgress(1);
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
     minerNode1.verify(blockchain.beneficiaryEquals(minerNode2));
     minerNode1.verify(clique.nonceVoteEquals(CLIQUE_NONCE_VOTE.DROP));
   }

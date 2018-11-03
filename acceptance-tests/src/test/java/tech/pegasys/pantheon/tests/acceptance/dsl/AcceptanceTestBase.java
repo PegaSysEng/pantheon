@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransaction
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Transactions;
 
 import org.junit.After;
+import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitConditions;
 
 public class AcceptanceTestBase {
 
@@ -40,6 +41,7 @@ public class AcceptanceTestBase {
   protected final Web3 web3;
   protected final Eth eth;
   protected final Net net;
+  protected final WaitConditions wait;
 
   protected AcceptanceTestBase() {
     final EthTransactions ethTransactions = new EthTransactions();
@@ -53,6 +55,7 @@ public class AcceptanceTestBase {
     net = new Net(new NetTransactions());
     transactions = new Transactions(accounts);
     web3 = new Web3(new Web3Transactions());
+    wait = new WaitConditions(ethTransactions);
   }
 
   @After

@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
@@ -49,6 +50,7 @@ import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
+import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
 public class PantheonNode implements Node, AutoCloseable {
 
@@ -339,7 +341,7 @@ public class PantheonNode implements Node, AutoCloseable {
     expected.verify(this);
   }
 
-  public void waitForChainHeadToProgress(final int blocksAheadOfLatest) {
-    // TODO requires DSL changes for this to work
+  public void waitUntil(final WaitCondition expected) {
+    waitFor(() -> expected.verify(this));
   }
 }

@@ -43,7 +43,7 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   public void shouldBeAbleToGetValidatorsForBlockNumber() throws IOException {
     minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
-    minerNode1.waitForChainHeadToProgress(2);
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1,2));
 
     cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));
     cluster.verify(clique.validatorsAtBlockEqual(LATEST, allNodes));
@@ -53,9 +53,9 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   public void shouldBeAbleToGetValidatorsForBlockHash() throws IOException {
     minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
-    minerNode1.waitForChainHeadToProgress(2);
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
-    // TODO requires DSL changes for this test to work
-    // cluster.verify(clique.validatorsAtBlockHashEqual(latestBlockHash, allNodes));
+    // TODO add support for latest block hash
+//     cluster.verify(clique.validatorsAtBlockHashEqual(latestBlockHash, allNodes));
   }
 }
