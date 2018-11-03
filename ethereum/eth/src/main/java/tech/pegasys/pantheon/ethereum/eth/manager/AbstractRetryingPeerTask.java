@@ -107,5 +107,13 @@ public abstract class AbstractRetryingPeerTask<T extends List<?>> extends Abstra
             ethContext.getScheduler().scheduleFutureTask(this::executeTask, Duration.ofSeconds(1)));
   }
 
+  /**
+   * Reset the retryCounter. Once called executeTask will get a fresh set of retries to complete the
+   * task.
+   */
+  protected void resetRetryCounter() {
+    retryCount = 0;
+  }
+
   protected abstract boolean isRetryableError(Throwable error);
 }

@@ -128,6 +128,9 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
           .get()
           .complete(
               headers.stream().map(h -> blocks.get(h.getNumber())).collect(Collectors.toList()));
+    } else if (endingIncompleteHeaders < startingIncompleteHeaders) {
+      // If we made any progress reset the retry counter
+      resetRetryCounter();
     }
 
     return CompletableFuture.completedFuture(blocksResult.getResult());
