@@ -59,7 +59,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               ethNetworkConfig,
               false,
               node.getMiningParameters(),
-              true);
+              true,
+              node.homeDirectory());
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
     }

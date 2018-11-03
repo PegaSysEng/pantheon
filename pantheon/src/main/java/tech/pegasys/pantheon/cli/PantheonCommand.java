@@ -144,6 +144,13 @@ public class PantheonCommand implements Runnable {
   )
   private final Path dataDir = getDefaultPantheonDataDir();
 
+  @Option(
+    names = {"--nodekey"},
+    paramLabel = MANDATORY_PATH_FORMAT_HELP,
+    description = "the path to node private key folder."
+  )
+  private final Path nodePrivateKeyFile = getDefaultPrivateKeyFile();
+
   // Genesis file path with null default option if the option
   // is not defined on command line as this default is handled by Runner
   // to use mainnet json file from resources
@@ -433,7 +440,8 @@ public class PantheonCommand implements Runnable {
           ethNetworkConfig(),
           syncWithOttoman,
           new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled),
-          isDevMode);
+          isDevMode,
+          nodePrivateKeyFile);
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(new CommandLine(this), e.getMessage());
     } catch (final IOException e) {
@@ -512,6 +520,10 @@ public class PantheonCommand implements Runnable {
 
   private HostAndPort getDefaultHostAndPort(final int port) {
     return HostAndPort.fromParts(autoDiscoverDefaultIP().getHostAddress(), port);
+  }
+
+  private Path getDefaultPrivateKeyFile() {
+    return dataDir.resolve("key");
   }
 
   private Path getDefaultPantheonDataDir() {

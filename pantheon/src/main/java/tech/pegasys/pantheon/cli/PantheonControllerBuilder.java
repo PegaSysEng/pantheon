@@ -35,11 +35,12 @@ public class PantheonControllerBuilder {
       final EthNetworkConfig ethNetworkConfig,
       final boolean syncWithOttoman,
       final MiningParameters miningParameters,
-      final boolean isDevMode)
+      final boolean isDevMode,
+      final Path nodePrivateKeyFile)
       throws IOException {
     // instantiate a controller with mainnet config if no genesis file is defined
     // otherwise use the indicated genesis file
-    final KeyPair nodeKeys = loadKeyPair(homePath);
+    final KeyPair nodeKeys = loadKeyPair(nodePrivateKeyFile);
     if (isDevMode) {
       return MainnetPantheonController.init(
           homePath,
