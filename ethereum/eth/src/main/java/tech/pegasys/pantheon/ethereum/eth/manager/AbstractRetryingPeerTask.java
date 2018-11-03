@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeerTask;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @param <T> The type as a typed list that the peer task can get partial or full results in.
  */
-public abstract class AbstractRetryingPeerTask<T extends List<?>> extends AbstractEthTask<T> {
+public abstract class AbstractRetryingPeerTask<T extends Collection<?>> extends AbstractEthTask<T> {
 
   private static final Logger LOG = LogManager.getLogger();
   private final EthContext ethContext;
@@ -105,14 +105,6 @@ public abstract class AbstractRetryingPeerTask<T extends List<?>> extends Abstra
     executeSubTask(
         () ->
             ethContext.getScheduler().scheduleFutureTask(this::executeTask, Duration.ofSeconds(1)));
-  }
-
-  /**
-   * Reset the retryCounter. Once called executeTask will get a fresh set of retries to complete the
-   * task.
-   */
-  protected void resetRetryCounter() {
-    retryCount = 0;
   }
 
   protected abstract boolean isRetryableError(Throwable error);
