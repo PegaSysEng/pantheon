@@ -14,7 +14,9 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthAccountsException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetTransactionRecieptNull;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetWorkException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.SanityCheckEthGetTransactionReceiptValues;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.SanityCheckEthGetWorkValues;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
@@ -36,5 +38,13 @@ public class Eth {
 
   public Condition accountsExceptional(final String expectedMessage) {
     return new ExpectEthAccountsException(transactions.accounts(), expectedMessage);
+  }
+
+  public Condition getTransactionReceipt(final String param) {
+    return new SanityCheckEthGetTransactionReceiptValues(transactions.getTransactionReceipt(param));
+  }
+
+  public Condition getTransactionReceiptNull(final String param) {
+    return new ExpectEthGetTransactionRecieptNull(transactions.getTransactionReceipt(param));
   }
 }

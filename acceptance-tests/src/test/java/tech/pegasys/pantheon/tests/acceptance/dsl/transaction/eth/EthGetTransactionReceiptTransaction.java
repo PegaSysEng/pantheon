@@ -1,4 +1,4 @@
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,8 +7,10 @@ import java.util.Optional;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
-public class EthGetTransactionReceiptTransaction implements Transaction<Optional<TransactionReceipt>> {
+public class EthGetTransactionReceiptTransaction implements
+    Transaction<Optional<TransactionReceipt>> {
 
   private final String input;
 

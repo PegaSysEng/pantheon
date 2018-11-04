@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetTransactionReceipt;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 
 public class EthTransactions {
@@ -30,5 +31,9 @@ public class EthTransactions {
 
   public EthAccountsTransaction accounts() {
     return new EthAccountsTransaction();
+  }
+
+  public EthGetTransactionReceiptTransaction getTransactionReceipt(final String param) {
+    return new EthGetTransactionReceiptTransaction(param);
   }
 }
