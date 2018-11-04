@@ -60,7 +60,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               false,
               node.getMiningParameters(),
               true,
-              node.homeDirectory().resolve("key"));
+              node.homeDirectory().resolve("key").toFile());
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
     }

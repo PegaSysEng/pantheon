@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -36,7 +37,7 @@ public class PantheonControllerBuilder {
       final boolean syncWithOttoman,
       final MiningParameters miningParameters,
       final boolean isDevMode,
-      final Path nodePrivateKeyFile)
+      final File nodePrivateKeyFile)
       throws IOException {
     // instantiate a controller with mainnet config if no genesis file is defined
     // otherwise use the indicated genesis file

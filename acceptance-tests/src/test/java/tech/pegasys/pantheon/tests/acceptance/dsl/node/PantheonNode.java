@@ -71,7 +71,7 @@ public class PantheonNode implements Node, AutoCloseable {
       throws IOException {
     this.name = name;
     this.homeDirectory = Files.createTempDirectory("acctest");
-    this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory.resolve("key"));
+    this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory.resolve("key").toFile());
     this.p2pPort = p2pPort;
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;

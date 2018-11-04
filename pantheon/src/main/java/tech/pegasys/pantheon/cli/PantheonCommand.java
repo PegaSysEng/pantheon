@@ -149,7 +149,7 @@ public class PantheonCommand implements Runnable {
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
     description = "the path to node private key folder."
   )
-  private final Path nodePrivateKeyFile = getDefaultPrivateKeyFile();
+  private final File nodePrivateKeyFile = getDefaultPrivateKeyFile();
 
   // Genesis file path with null default option if the option
   // is not defined on command line as this default is handled by Runner
@@ -522,8 +522,8 @@ public class PantheonCommand implements Runnable {
     return HostAndPort.fromParts(autoDiscoverDefaultIP().getHostAddress(), port);
   }
 
-  private Path getDefaultPrivateKeyFile() {
-    return dataDir.resolve("key");
+  private File getDefaultPrivateKeyFile() {
+    return dataDir.resolve("key").toFile();
   }
 
   private Path getDefaultPantheonDataDir() {

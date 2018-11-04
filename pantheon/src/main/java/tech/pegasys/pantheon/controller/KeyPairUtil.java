@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,8 +23,7 @@ import org.apache.logging.log4j.Logger;
 public class KeyPairUtil {
   private static final Logger LOG = LogManager.getLogger();
 
-  public static SECP256K1.KeyPair loadKeyPair(final Path keyPath) throws IOException {
-    final File keyFile = keyPath.toFile();
+  public static SECP256K1.KeyPair loadKeyPair(final File keyFile) throws IOException {
     final SECP256K1.KeyPair key;
     if (keyFile.exists()) {
       key = SECP256K1.KeyPair.load(keyFile);

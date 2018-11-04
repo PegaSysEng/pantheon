@@ -79,7 +79,7 @@ public final class RunnerTest {
   private void syncFromGenesis(final SyncMode mode) throws Exception {
     final Path dbAhead = temp.newFolder().toPath();
     final int blockCount = 500;
-    final KeyPair aheadDbNodeKeys = loadKeyPair(dbAhead.resolve("key"));
+    final KeyPair aheadDbNodeKeys = loadKeyPair(dbAhead.resolve("key").toFile());
     final SynchronizerConfiguration fastSyncConfig =
         SynchronizerConfiguration.builder()
             .syncMode(mode)
@@ -133,7 +133,7 @@ public final class RunnerTest {
 
       // Setup runner with no block data
       final Path dbBehind = temp.newFolder().toPath();
-      final KeyPair behindDbNodeKeys = loadKeyPair(dbBehind.resolve("key"));
+      final KeyPair behindDbNodeKeys = loadKeyPair(dbBehind.resolve("key").toFile());
       final PantheonController<Void> controllerBehind =
           MainnetPantheonController.init(
               temp.newFolder().toPath(),

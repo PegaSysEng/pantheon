@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -65,6 +66,7 @@ public abstract class CommandTestAbstract {
 
   @Captor ArgumentCaptor<Collection<String>> stringListArgumentCaptor;
   @Captor ArgumentCaptor<Path> pathArgumentCaptor;
+  @Captor ArgumentCaptor<File> fileArgumentCaptor;
   @Captor ArgumentCaptor<String> stringArgumentCaptor;
   @Captor ArgumentCaptor<Integer> intArgumentCaptor;
   @Captor ArgumentCaptor<JsonRpcConfiguration> jsonRpcConfigArgumentCaptor;

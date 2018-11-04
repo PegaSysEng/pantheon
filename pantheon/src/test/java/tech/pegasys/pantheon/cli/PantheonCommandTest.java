@@ -338,9 +338,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void nodekeyOptionMustBeUsed() throws Exception {
-    final Path path = Paths.get("./specific/key");
+    final File file = new File("./specific/key");
 
-    parseCommand("--nodekey", path.toString());
+    parseCommand("--nodekey", file.getPath());
 
     verify(mockControllerBuilder)
         .build(
@@ -350,9 +350,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(false),
             any(),
             anyBoolean(),
-            pathArgumentCaptor.capture());
+            fileArgumentCaptor.capture());
 
-    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(path);
+    assertThat(fileArgumentCaptor.getValue().compareTo(file)).isZero();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
