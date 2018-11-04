@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
+import tech.pegasys.pantheon.ethereum.db.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
@@ -42,12 +43,13 @@ import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
-import tech.pegasys.pantheon.util.time.SystemClock;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -106,13 +108,17 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final MiningParameters miningParams,
       final KeyPair nodeKeys)
       throws IOException {
-    final RocksDbKeyValueStorage kv =
+    final KeyValueStorage kv =
         RocksDbKeyValueStorage.create(Files.createDirectories(home.resolve(DATABASE_PATH)));
     final ProtocolSchedule<Void> protocolSchedule = genesisConfig.getProtocolSchedule();
+
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
+    final KeyValueStoragePrefixedKeyBlockchainStorage blockchainStorage =
+        new KeyValueStoragePrefixedKeyBlockchainStorage(kv, blockHashFunction);
     final MutableBlockchain blockchain =
-        new DefaultMutableBlockchain(genesisConfig.getBlock(), kv, blockHashFunction);
+        new DefaultMutableBlockchain(genesisConfig.getBlock(), blockchainStorage);
+
     final WorldStateArchive worldStateArchive =
         new WorldStateArchive(new KeyValueStorageWorldStateStorage(kv));
     genesisConfig.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
@@ -154,7 +160,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
             new DefaultBlockScheduler(
                 MainnetBlockHeaderValidator.MINIMUM_SECONDS_SINCE_PARENT,
                 MainnetBlockHeaderValidator.TIMESTAMP_TOLERANCE_S,
-                new SystemClock()));
+                Clock.systemUTC()));
 
     final EthHashMiningCoordinator miningCoordinator =
         new EthHashMiningCoordinator(protocolContext.getBlockchain(), executor, syncState);
@@ -179,7 +185,11 @@ public class MainnetPantheonController implements PantheonController<Void> {
           } catch (final InterruptedException e) {
             LOG.error("Failed to shutdown miner executor");
           }
-          kv.close();
+          try {
+            kv.close();
+          } catch (final IOException e) {
+            LOG.error("Failed to close key value storage", e);
+          }
         });
   }
 

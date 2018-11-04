@@ -24,13 +24,11 @@ import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.TransactionLocation;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -53,12 +51,9 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   private final Subscribers<BlockAddedObserver> blockAddedObservers = new Subscribers<>();
 
   public DefaultMutableBlockchain(
-      final Block genesisBlock,
-      final KeyValueStorage keyValueStorage,
-      final BlockHashFunction blockHashFunction) {
-    checkArgument(genesisBlock != null, "Missing required KeyValueStorage");
-    this.blockchainStorage =
-        new KeyValueStoragePrefixedKeyBlockchainStorage(keyValueStorage, blockHashFunction);
+      final Block genesisBlock, final BlockchainStorage blockchainStorage) {
+    checkNotNull(genesisBlock);
+    this.blockchainStorage = blockchainStorage;
     this.setGenesis(genesisBlock);
   }
 
@@ -355,8 +350,7 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
       if (!genesisHash.get().equals(genesisBlock.getHash())) {
         throw new InvalidConfigurationException(
             "Supplied genesis block does not match stored chain data.\n"
-                + "Please ensure the integrity of the file: \'pantheon/ethereum/core/src/main/resources/mainnet.json\'.\n"
-                + "To set a custom genesis file employ the runtime option \'--genesis=PATH_TO_FILE\'.");
+                + "Please specify a different data directory with --datadir or specify the original genesis file with --genesis.");
       }
     }
   }
