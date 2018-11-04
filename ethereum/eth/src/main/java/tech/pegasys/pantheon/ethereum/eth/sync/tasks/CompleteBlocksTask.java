@@ -121,9 +121,7 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
       final PeerTaskResult<List<Block>> blocksResult) {
     blocksResult.getResult().forEach((block) -> blocks.put(block.getHeader().getNumber(), block));
 
-    final int endingIncompleteHeaders = incompleteHeaders().size();
-    final boolean done = endingIncompleteHeaders == 0;
-    if (done) {
+    if (incompleteHeaders().size() == 0) {
       result
           .get()
           .complete(
