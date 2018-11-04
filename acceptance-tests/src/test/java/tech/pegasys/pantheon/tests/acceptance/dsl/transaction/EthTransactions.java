@@ -27,4 +27,8 @@ public class EthTransactions {
   public EthGetBalanceTransaction getBalance(final Account account) {
     return new EthGetBalanceTransaction(account);
   }
+
+  public EthGetTransactionReceiptTransaction getTransactionReceipt(final String param) {
+    return new EthGetTransactionReceiptTransaction(param);
+  }
 }
