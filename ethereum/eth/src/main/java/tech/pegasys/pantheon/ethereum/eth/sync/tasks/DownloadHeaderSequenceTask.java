@@ -47,7 +47,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List<BlockHeader>> {
   private static final Logger LOG = LogManager.getLogger();
-  private static final int DEFAULT_RETRIES = 20;
+  private static final int DEFAULT_RETRIES = 3;
 
   private final EthContext ethContext;
   private final ProtocolContext<C> protocolContext;
@@ -106,7 +106,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
   }
 
   @Override
-  protected CompletableFuture<?> executePeerTask() {
+  protected CompletableFuture<List<BlockHeader>> executePeerTask() {
     LOG.debug(
         "Downloading headers from {} to {}.", startingBlockNumber, referenceHeader.getNumber() - 1);
     final CompletableFuture<List<BlockHeader>> task =

@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>> {
   private static final Logger LOG = LogManager.getLogger();
-  private static final int DEFAULT_RETRIES = 20;
+  private static final int DEFAULT_RETRIES = 3;
 
   private final EthContext ethContext;
   private final ProtocolSchedule<C> protocolSchedule;
@@ -83,7 +83,7 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
   }
 
   @Override
-  protected CompletableFuture<?> executePeerTask() {
+  protected CompletableFuture<List<Block>> executePeerTask() {
     return requestBodies().thenCompose(this::processBodiesResult);
   }
 
@@ -117,26 +117,18 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
         });
   }
 
-  private CompletableFuture<Void> processBodiesResult(
+  private CompletableFuture<List<Block>> processBodiesResult(
       final PeerTaskResult<List<Block>> blocksResult) {
-    blocksResult
-        .getResult()
-        .forEach(
-            (block) -> {
-              blocks.put(block.getHeader().getNumber(), block);
-            });
+    blocksResult.getResult().forEach((block) -> blocks.put(block.getHeader().getNumber(), block));
 
-    final boolean done = incompleteHeaders().size() == 0;
-    if (done) {
+    if (incompleteHeaders().size() == 0) {
       result
           .get()
           .complete(
               headers.stream().map(h -> blocks.get(h.getNumber())).collect(Collectors.toList()));
     }
 
-    final CompletableFuture<Void> future = new CompletableFuture<>();
-    future.complete(null);
-    return future;
+    return CompletableFuture.completedFuture(blocksResult.getResult());
   }
 
   private List<BlockHeader> incompleteHeaders() {
