@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
+import java.util.Optional;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequestId;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
@@ -100,6 +101,20 @@ public class JsonRpcHttpService {
 
     // Handle json rpc requests
     final Router router = Router.router(vertx);
+
+    // Verify hostname header is set to avoid rebind attack.
+    router
+        .route()
+        .handler(
+            event -> {
+              Optional<String> header = Optional.ofNullable(event.request().getHeader("Host"));
+              if (!header.isPresent() || !header.get().equals("localhost")) {
+                event.response().setStatusCode(403).end();
+              } else {
+                event.next();
+              }
+            });
+
     router
         .route()
         .handler(
