@@ -66,7 +66,6 @@ public class Runner implements AutoCloseable {
   public void execute() {
     try {
       LOG.info("Starting Ethereum main loop ... ");
-      Runtime.getRuntime().addShutdownHook(shutdownTask());
       networkRunner.start();
       pantheonController.getSynchronizer().start();
       jsonRpc.ifPresent(service -> service.start().join());
@@ -81,18 +80,6 @@ public class Runner implements AutoCloseable {
       LOG.error("Exception in main loop:", ex);
       throw new IllegalStateException(ex);
     }
-  }
-
-  private Thread shutdownTask() {
-    return new Thread(
-        () -> {
-          try {
-            close();
-          } catch (Exception e) {
-            LOG.error("Error shutting down Pantheon");
-            throw new RuntimeException(e);
-          }
-        });
   }
 
   @Override
