@@ -23,15 +23,15 @@ public class CliqueConfigOptions {
 
   private final JsonObject cliqueConfigRoot;
 
-  public CliqueConfigOptions(final JsonObject cliqueConfigRoot) {
+  CliqueConfigOptions(final JsonObject cliqueConfigRoot) {
     this.cliqueConfigRoot = cliqueConfigRoot;
   }
 
   public long getEpochLength() {
-    return cliqueConfigRoot.getLong("epochLength", DEFAULT_EPOCH_LENGTH);
+    return cliqueConfigRoot.getLong("epochlength", DEFAULT_EPOCH_LENGTH);
   }
 
   public int getBlockPeriodSeconds() {
-    return cliqueConfigRoot.getInteger("blockPeriodSeconds", DEFAULT_BLOCK_PERIOD_SECONDS);
+    return cliqueConfigRoot.getInteger("blockperiodseconds", DEFAULT_BLOCK_PERIOD_SECONDS);
   }
 }
