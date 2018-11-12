@@ -37,7 +37,6 @@ public class CliqueProtocolSchedule {
 
     final CliqueConfigOptions cliqueConfig = config.getCliqueConfigOptions();
 
-    // TODO(tmm) replace address with passed in node data (coming later)
     final Address localNodeAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
 
     final EpochManager epochManager = new EpochManager(cliqueConfig.getEpochLength());
