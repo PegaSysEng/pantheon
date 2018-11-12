@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
-import java.util.Optional;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequestId;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
@@ -34,6 +33,7 @@ import java.net.SocketException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
@@ -108,7 +108,7 @@ public class JsonRpcHttpService {
         .handler(
             event -> {
               Optional<String> header = Optional.ofNullable(event.request().getHeader("Host"));
-              if (!header.isPresent() || !header.get().equals("localhost")) {
+              if (!header.isPresent() || !config.hostWhitelist().contains(header.get())) {
                 event.response().setStatusCode(403).end();
               } else {
                 event.next();

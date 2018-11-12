@@ -1984,10 +1984,6 @@ public class JsonRpcHttpServiceTest {
   }
 
   private Request requestWithHeader(String path) {
-    return new Request.Builder()
-        .get()
-        .url(baseUrl + path)
-        .addHeader("Host", "localhost")
-        .build();
+    return new Request.Builder().get().url(baseUrl + path).addHeader("Host", "localhost").build();
   }
 }

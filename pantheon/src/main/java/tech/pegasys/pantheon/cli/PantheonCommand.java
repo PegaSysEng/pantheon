@@ -329,6 +329,17 @@ public class PantheonCommand implements Runnable {
   private final Collection<RpcApi> wsApis = null;
 
   @Option(
+    names = {"--host-whitelist"},
+    paramLabel = "<hostname>",
+    split = ",",
+    arity = "1..*",
+    description =
+        "Comma separated list of hostnames to whitelist for RPC access.  default: ${DEFAULT-VALUE}",
+    defaultValue = "localhost"
+  )
+  private final Collection<String> hostWhitelist = null;
+
+  @Option(
     names = {"--dev-mode"},
     description =
         "set during development to have a custom genesis with specific chain id "
@@ -471,6 +482,7 @@ public class PantheonCommand implements Runnable {
     jsonRpcConfiguration.setPort(rpcHostAndPort.getPort());
     jsonRpcConfiguration.setCorsAllowedDomains(rpcCorsAllowedOrigins.getDomains());
     jsonRpcConfiguration.setRpcApis(rpcApis);
+    jsonRpcConfiguration.hostWhitelist(hostWhitelist);
     return jsonRpcConfiguration;
   }
 
