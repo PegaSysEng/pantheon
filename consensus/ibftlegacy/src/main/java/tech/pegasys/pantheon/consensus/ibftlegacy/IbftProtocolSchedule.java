@@ -40,8 +40,10 @@ public class IbftProtocolSchedule {
     final EpochManager epochManager = new EpochManager(epochLength);
 
     return new ProtocolScheduleBuilder<>(
-            config, builder -> applyIbftChanges(blockPeriod, epochManager, builder))
-        .createProtocolSchedule(DEFAULT_CHAIN_ID);
+            config,
+            DEFAULT_CHAIN_ID,
+            builder -> applyIbftChanges(blockPeriod, epochManager, builder))
+        .createProtocolSchedule();
   }
 
   private static ProtocolSpecBuilder<IbftContext> applyIbftChanges(

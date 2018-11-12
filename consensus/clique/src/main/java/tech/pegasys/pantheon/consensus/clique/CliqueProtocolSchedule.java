@@ -42,10 +42,11 @@ public class CliqueProtocolSchedule {
     final EpochManager epochManager = new EpochManager(cliqueConfig.getEpochLength());
     return new ProtocolScheduleBuilder<>(
             config,
+            DEFAULT_CHAIN_ID,
             builder ->
                 applyCliqueSpecificModifications(
                     epochManager, cliqueConfig.getBlockPeriodSeconds(), localNodeAddress, builder))
-        .createProtocolSchedule(DEFAULT_CHAIN_ID);
+        .createProtocolSchedule();
   }
 
   private static ProtocolSpecBuilder<CliqueContext> applyCliqueSpecificModifications(

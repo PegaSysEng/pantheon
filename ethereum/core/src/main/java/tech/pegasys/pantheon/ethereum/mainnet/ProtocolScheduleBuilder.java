@@ -21,15 +21,18 @@ public class ProtocolScheduleBuilder<C> {
 
   private final GenesisConfigOptions config;
   private final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter;
+  private final int defaultChainId;
 
   public ProtocolScheduleBuilder(
       final GenesisConfigOptions config,
+      final int defaultChainId,
       final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter) {
     this.config = config;
     this.protocolSpecAdapter = protocolSpecAdapter;
+    this.defaultChainId = defaultChainId;
   }
 
-  public ProtocolSchedule<C> createProtocolSchedule(final int defaultChainId) {
+  public ProtocolSchedule<C> createProtocolSchedule() {
     final int chainId = config.getChainId().orElse(defaultChainId);
     final MutableProtocolSchedule<C> protocolSchedule = new MutableProtocolSchedule<>(chainId);
 

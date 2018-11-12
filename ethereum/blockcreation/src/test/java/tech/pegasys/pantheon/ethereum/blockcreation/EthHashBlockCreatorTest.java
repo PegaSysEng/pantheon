@@ -47,8 +47,8 @@ public class EthHashBlockCreatorTest {
       ExecutionContextTestFixture.builder()
           .protocolSchedule(
               new ProtocolScheduleBuilder<>(
-                      GenesisConfigFile.DEFAULT.getConfigOptions(), Function.identity())
-                  .createProtocolSchedule(42))
+                      GenesisConfigFile.DEFAULT.getConfigOptions(), 42, Function.identity())
+                  .createProtocolSchedule())
           .build();
 
   @Test

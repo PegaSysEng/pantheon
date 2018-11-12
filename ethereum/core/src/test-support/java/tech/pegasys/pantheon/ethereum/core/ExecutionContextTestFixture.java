@@ -112,8 +112,9 @@ public class ExecutionContextTestFixture {
         protocolSchedule =
             new ProtocolScheduleBuilder<>(
                     new GenesisConfigOptions.Builder().constantinopleBlock(0).build(),
+                    42,
                     Function.identity())
-                .createProtocolSchedule(42);
+                .createProtocolSchedule();
       }
       if (keyValueStorage == null) {
         keyValueStorage = new InMemoryKeyValueStorage();

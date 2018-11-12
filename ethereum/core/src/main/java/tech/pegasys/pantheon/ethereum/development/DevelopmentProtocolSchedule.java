@@ -24,7 +24,8 @@ public class DevelopmentProtocolSchedule {
   public static ProtocolSchedule<Void> create(final GenesisConfigOptions config) {
     return new ProtocolScheduleBuilder<>(
             config,
+            NO_CHAIN_ID,
             builder -> builder.difficultyCalculator(DevelopmentDifficultyCalculators.DEVELOPER))
-        .createProtocolSchedule(NO_CHAIN_ID);
+        .createProtocolSchedule();
   }
 }

@@ -55,7 +55,7 @@ public class ReferenceTestProtocolSchedules {
   }
 
   private static ProtocolSchedule<Void> createSchedule(final GenesisConfigOptions.Builder builder) {
-    return new ProtocolScheduleBuilder<>(builder.build(), Function.identity())
-        .createProtocolSchedule(CHAIN_ID);
+    return new ProtocolScheduleBuilder<>(builder.build(), CHAIN_ID, Function.identity())
+        .createProtocolSchedule();
   }
 }

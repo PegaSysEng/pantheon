@@ -34,7 +34,7 @@ public class MainnetProtocolSchedule {
    * @return A configured mainnet protocol schedule
    */
   public static ProtocolSchedule<Void> fromConfig(final GenesisConfigOptions config) {
-    return new ProtocolScheduleBuilder<>(config, Function.identity())
-        .createProtocolSchedule(DEFAULT_CHAIN_ID);
+    return new ProtocolScheduleBuilder<>(config, DEFAULT_CHAIN_ID, Function.identity())
+        .createProtocolSchedule();
   }
 }
