@@ -13,15 +13,14 @@
 package tech.pegasys.pantheon.ethereum.vm;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.config.GenesisConfigOptions.Builder;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableMap;
-import io.vertx.core.json.JsonObject;
 
 public class ReferenceTestProtocolSchedules {
 
@@ -29,22 +28,19 @@ public class ReferenceTestProtocolSchedules {
 
   public static ReferenceTestProtocolSchedules create() {
     final ImmutableMap.Builder<String, ProtocolSchedule<Void>> builder = ImmutableMap.builder();
-    builder.put("Frontier", createSchedule(Collections.emptyMap()));
-    builder.put("FrontierToHomesteadAt5", createSchedule(ImmutableMap.of("homesteadblock", 5)));
-    builder.put("Homestead", createSchedule(ImmutableMap.of("homesteadblock", 0)));
+    builder.put("Frontier", createSchedule(new Builder()));
+    builder.put("FrontierToHomesteadAt5", createSchedule(new Builder().homesteadBlock(5)));
+    builder.put("Homestead", createSchedule(new Builder().homesteadBlock(0)));
     builder.put(
-        "HomesteadToEIP150At5",
-        createSchedule(ImmutableMap.of("homesteadblock", 0, "eip150block", 5)));
+        "HomesteadToEIP150At5", createSchedule(new Builder().homesteadBlock(0).eip150Block(5)));
     builder.put(
-        "HomesteadToDaoAt5",
-        createSchedule(ImmutableMap.of("homesteadblock", 0, "daoforkblock", 5)));
-    builder.put("EIP150", createSchedule(ImmutableMap.of("eip150block", 0)));
-    builder.put("EIP158", createSchedule(ImmutableMap.of("eip158block", 0)));
+        "HomesteadToDaoAt5", createSchedule(new Builder().homesteadBlock(0).daoForkBlock(5)));
+    builder.put("EIP150", createSchedule(new Builder().eip150Block(0)));
+    builder.put("EIP158", createSchedule(new Builder().eip158Block(0)));
     builder.put(
-        "EIP158ToByzantiumAt5",
-        createSchedule(ImmutableMap.of("eip158block", 0, "byzantiumblock", 5)));
-    builder.put("Byzantium", createSchedule(ImmutableMap.of("byzantiumblock", 0)));
-    builder.put("Constantinople", createSchedule(ImmutableMap.of("constantinopleblock", 0)));
+        "EIP158ToByzantiumAt5", createSchedule(new Builder().eip158Block(0).byzantiumBlock(5)));
+    builder.put("Byzantium", createSchedule(new Builder().byzantiumBlock(0)));
+    builder.put("Constantinople", createSchedule(new Builder().constantinopleBlock(0)));
     return new ReferenceTestProtocolSchedules(builder.build());
   }
 
@@ -58,9 +54,8 @@ public class ReferenceTestProtocolSchedules {
     return schedules.get(name);
   }
 
-  private static ProtocolSchedule<Void> createSchedule(final Map<String, Object> config) {
-    return new ProtocolScheduleBuilder<>(
-            new GenesisConfigOptions(new JsonObject(config)), Function.identity())
+  private static ProtocolSchedule<Void> createSchedule(final GenesisConfigOptions.Builder builder) {
+    return new ProtocolScheduleBuilder<>(builder.build(), Function.identity())
         .createProtocolSchedule(CHAIN_ID);
   }
 }

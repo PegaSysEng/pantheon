@@ -26,7 +26,7 @@ public class GenesisConfigOptions {
   private static final String CLIQUE_CONFIG_KEY = "clique";
   private final JsonObject configRoot;
 
-  public GenesisConfigOptions(final JsonObject configRoot) {
+  GenesisConfigOptions(final JsonObject configRoot) {
     this.configRoot = configRoot != null ? configRoot : new JsonObject();
   }
 
@@ -92,6 +92,31 @@ public class GenesisConfigOptions {
 
   public static class Builder {
     private final Map<String, Object> config = new HashMap<>();
+
+    public Builder homesteadBlock(final long blockNumber) {
+      config.put("homesteadblock", blockNumber);
+      return this;
+    }
+
+    public Builder daoForkBlock(final long blockNumber) {
+      config.put("daoforkblock", blockNumber);
+      return this;
+    }
+
+    public Builder eip150Block(final long blockNumber) {
+      config.put("eip150block", blockNumber);
+      return this;
+    }
+
+    public Builder eip158Block(final long blockNumber) {
+      config.put("eip158block", blockNumber);
+      return this;
+    }
+
+    public Builder byzantiumBlock(final long blockNumber) {
+      config.put("byzantiumblock", blockNumber);
+      return this;
+    }
 
     public Builder constantinopleBlock(final long constantinopleBlock) {
       config.put("constantinopleblock", constantinopleBlock);
