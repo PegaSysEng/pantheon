@@ -138,7 +138,7 @@ public abstract class MainnetProtocolSpecs {
     return daoRecoveryInitDefinition().build(protocolSchedule);
   }
 
-  private static ProtocolSpecBuilder<Void> daoRecoveryInitDefinition() {
+  public static ProtocolSpecBuilder<Void> daoRecoveryInitDefinition() {
     return homesteadDefinition()
         .blockHeaderValidatorBuilder(MainnetBlockHeaderValidator::createDaoValidator)
         .blockProcessorBuilder(
@@ -163,10 +163,14 @@ public abstract class MainnetProtocolSpecs {
    */
   public static ProtocolSpec<Void> daoRecoveryTransition(
       final ProtocolSchedule<Void> protocolSchedule) {
+    return daoRecoveryTransitionDefinition()
+        .build(protocolSchedule);
+  }
+
+  public static ProtocolSpecBuilder<Void> daoRecoveryTransitionDefinition() {
     return daoRecoveryInitDefinition()
         .blockProcessorBuilder(MainnetBlockProcessor::new)
-        .name("DaoRecoveryTransition")
-        .build(protocolSchedule);
+        .name("DaoRecoveryTransition");
   }
 
   /**
