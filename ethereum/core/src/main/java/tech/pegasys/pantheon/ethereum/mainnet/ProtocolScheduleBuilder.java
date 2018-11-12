@@ -40,13 +40,17 @@ public class ProtocolScheduleBuilder<C> {
         config.getHomesteadBlockNumber().orElse(defaultMilestoneBlocks.getHomesteadBlockNumber()),
         MainnetProtocolSpecs.homesteadDefinition());
 
-    final long daoBlockNumber = config.getDaoForkBlock().orElse(defaultMilestoneBlocks.getDaoBlockNumber());
+    final long daoBlockNumber =
+        config.getDaoForkBlock().orElse(defaultMilestoneBlocks.getDaoBlockNumber());
     if (daoBlockNumber > 0) {
-      final ProtocolSpec<C> originalProtocolSpec = protocolSchedule.getByBlockNumber(daoBlockNumber);
+      final ProtocolSpec<C> originalProtocolSpec =
+          protocolSchedule.getByBlockNumber(daoBlockNumber);
       addProtocolSpec(
           protocolSchedule, daoBlockNumber, MainnetProtocolSpecs.daoRecoveryInitDefinition());
       addProtocolSpec(
-          protocolSchedule, daoBlockNumber + 1, MainnetProtocolSpecs.daoRecoveryTransitionDefinition());
+          protocolSchedule,
+          daoBlockNumber + 1,
+          MainnetProtocolSpecs.daoRecoveryTransitionDefinition());
 
       // Return to the previous protocol spec after the dao fork has completed.
       protocolSchedule.putMilestone(daoBlockNumber + 10, originalProtocolSpec);

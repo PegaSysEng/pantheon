@@ -12,7 +12,15 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder.DefaultMilestoneBlocks;
+
+import java.util.Collections;
+import java.util.function.Function;
+
+import com.google.common.collect.ImmutableMap;
+import io.vertx.core.json.JsonObject;
 
 /** Provides {@link ProtocolSpec} lookups for mainnet hard forks. */
 public class MainnetProtocolSchedule {
@@ -25,6 +33,14 @@ public class MainnetProtocolSchedule {
   // Start of Constantinople has not yet been set.
   private static final long DEFAULT_CONSTANTINOPLE_BLOCK_NUMBER = -1L;
   public static final int DEFAULT_CHAIN_ID = 1;
+  private static final DefaultMilestoneBlocks DEFAULT_MILESTONE_BLOCKS =
+      new DefaultMilestoneBlocks(
+          DEFAULT_HOMESTEAD_BLOCK_NUMBER,
+          DEFAULT_DAO_BLOCK_NUMBER,
+          DEFAULT_TANGERINE_WHISTLE_BLOCK_NUMBER,
+          DEFAULT_SPURIOUS_DRAGON_BLOCK_NUMBER,
+          DEFAULT_BYZANTIUM_BLOCK_NUMBER,
+          DEFAULT_CONSTANTINOPLE_BLOCK_NUMBER);
 
   /**
    * Creates a mainnet protocol schedule with milestones starting at the specified block numbers
@@ -47,42 +63,23 @@ public class MainnetProtocolSchedule {
       final long constantinopleBlockNumber,
       final int chainId) {
 
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(chainId);
-    protocolSchedule.putMilestone(0, MainnetProtocolSpecs.frontier(protocolSchedule));
-    final ProtocolSpec<Void> homestead = MainnetProtocolSpecs.homestead(protocolSchedule);
-    protocolSchedule.putMilestone(homesteadBlockNumber, homestead);
-    if (daoBlockNumber != 0) {
-      protocolSchedule.putMilestone(
-          daoBlockNumber, MainnetProtocolSpecs.daoRecoveryInit(protocolSchedule));
-      protocolSchedule.putMilestone(
-          daoBlockNumber + 1, MainnetProtocolSpecs.daoRecoveryTransition(protocolSchedule));
-      protocolSchedule.putMilestone(daoBlockNumber + 10, homestead);
-    }
-    protocolSchedule.putMilestone(
-        tangerineWhistleBlockNumber, MainnetProtocolSpecs.tangerineWhistle(protocolSchedule));
-    protocolSchedule.putMilestone(
-        spuriousDragonBlockNumber, MainnetProtocolSpecs.spuriousDragon(chainId, protocolSchedule));
-    protocolSchedule.putMilestone(
-        byzantiumBlockNumber, MainnetProtocolSpecs.byzantium(chainId, protocolSchedule));
-
-    if (constantinopleBlockNumber >= 0) {
-      protocolSchedule.putMilestone(
-          constantinopleBlockNumber,
-          MainnetProtocolSpecs.constantinople(chainId, protocolSchedule));
-    }
-
-    return protocolSchedule;
+    return fromConfig(
+        new GenesisConfigOptions(
+            new JsonObject(
+                ImmutableMap.<String, Object>builder()
+                    .put("ethash", Collections.emptyMap())
+                    .put("homesteadblock", homesteadBlockNumber)
+                    .put("daoforkblock", daoBlockNumber)
+                    .put("eip150block", tangerineWhistleBlockNumber)
+                    .put("eip158block", spuriousDragonBlockNumber)
+                    .put("byzantiumblock", byzantiumBlockNumber)
+                    .put("constantinopleblock", constantinopleBlockNumber)
+                    .put("chainid", chainId)
+                    .build())));
   }
 
   public static ProtocolSchedule<Void> create() {
-    return create(
-        DEFAULT_HOMESTEAD_BLOCK_NUMBER,
-        DEFAULT_DAO_BLOCK_NUMBER,
-        DEFAULT_TANGERINE_WHISTLE_BLOCK_NUMBER,
-        DEFAULT_SPURIOUS_DRAGON_BLOCK_NUMBER,
-        DEFAULT_BYZANTIUM_BLOCK_NUMBER,
-        DEFAULT_CONSTANTINOPLE_BLOCK_NUMBER,
-        DEFAULT_CHAIN_ID);
+    return fromConfig(GenesisConfigFile.DEFAULT.getConfigOptions());
   }
 
   /**
@@ -93,25 +90,7 @@ public class MainnetProtocolSchedule {
    * @return A configured mainnet protocol schedule
    */
   public static ProtocolSchedule<Void> fromConfig(final GenesisConfigOptions config) {
-    final long homesteadBlockNumber =
-        config.getHomesteadBlockNumber().orElse(DEFAULT_HOMESTEAD_BLOCK_NUMBER);
-    final long daoBlockNumber = config.getDaoForkBlock().orElse(DEFAULT_DAO_BLOCK_NUMBER);
-    final long tangerineWhistleBlockNumber =
-        config.getTangerineWhistleBlockNumber().orElse(DEFAULT_TANGERINE_WHISTLE_BLOCK_NUMBER);
-    final long spuriousDragonBlockNumber =
-        config.getSpuriousDragonBlockNumber().orElse(DEFAULT_SPURIOUS_DRAGON_BLOCK_NUMBER);
-    final long byzantiumBlockNumber =
-        config.getByzantiumBlockNumber().orElse(DEFAULT_BYZANTIUM_BLOCK_NUMBER);
-    final long constantinopleBlockNumber =
-        config.getConstantinopleBlockNumber().orElse(DEFAULT_CONSTANTINOPLE_BLOCK_NUMBER);
-    final int chainId = config.getChainId().orElse(DEFAULT_CHAIN_ID);
-    return create(
-        homesteadBlockNumber,
-        daoBlockNumber,
-        tangerineWhistleBlockNumber,
-        spuriousDragonBlockNumber,
-        byzantiumBlockNumber,
-        constantinopleBlockNumber,
-        chainId);
+    return new ProtocolScheduleBuilder<>(config, DEFAULT_MILESTONE_BLOCKS, Function.identity())
+        .createProtocolSchedule(DEFAULT_CHAIN_ID);
   }
 }

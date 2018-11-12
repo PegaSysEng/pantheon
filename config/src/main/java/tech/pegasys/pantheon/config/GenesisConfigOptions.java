@@ -24,7 +24,7 @@ public class GenesisConfigOptions {
   private static final String CLIQUE_CONFIG_KEY = "clique";
   private final JsonObject configRoot;
 
-  GenesisConfigOptions(final JsonObject configRoot) {
+  public GenesisConfigOptions(final JsonObject configRoot) {
     this.configRoot = configRoot != null ? configRoot : new JsonObject();
   }
 

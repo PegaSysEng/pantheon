@@ -163,8 +163,7 @@ public abstract class MainnetProtocolSpecs {
    */
   public static ProtocolSpec<Void> daoRecoveryTransition(
       final ProtocolSchedule<Void> protocolSchedule) {
-    return daoRecoveryTransitionDefinition()
-        .build(protocolSchedule);
+    return daoRecoveryTransitionDefinition().build(protocolSchedule);
   }
 
   public static ProtocolSpecBuilder<Void> daoRecoveryTransitionDefinition() {
