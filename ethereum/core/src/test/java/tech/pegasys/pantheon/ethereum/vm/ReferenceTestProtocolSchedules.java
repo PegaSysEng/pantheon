@@ -12,15 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.vm;
 
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSpecs;
-import tech.pegasys.pantheon.ethereum.mainnet.MutableProtocolSchedule;
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableMap;
+import io.vertx.core.json.JsonObject;
 
 public class ReferenceTestProtocolSchedules {
 
@@ -28,26 +29,22 @@ public class ReferenceTestProtocolSchedules {
 
   public static ReferenceTestProtocolSchedules create() {
     final ImmutableMap.Builder<String, ProtocolSchedule<Void>> builder = ImmutableMap.builder();
-    builder.put("Frontier", createSchedule(MainnetProtocolSpecs::frontier));
-    builder.put("FrontierToHomesteadAt5", frontierToHomesteadAt5());
-    builder.put("Homestead", createSchedule(MainnetProtocolSpecs::homestead));
-    builder.put("HomesteadToEIP150At5", homesteadToEip150At5());
-    builder.put("HomesteadToDaoAt5", homesteadToDaoAt5());
-    builder.put("EIP150", createSchedule(MainnetProtocolSpecs::tangerineWhistle));
+    builder.put("Frontier", createSchedule(Collections.emptyMap()));
+    builder.put("FrontierToHomesteadAt5", createSchedule(ImmutableMap.of("homesteadblock", 5)));
+    builder.put("Homestead", createSchedule(ImmutableMap.of("homesteadblock", 0)));
     builder.put(
-        "EIP158",
-        createSchedule(
-            protocolSpecLookup ->
-                MainnetProtocolSpecs.spuriousDragon(CHAIN_ID, protocolSpecLookup)));
-    builder.put("EIP158ToByzantiumAt5", eip158ToByzantiumAt5());
+        "HomesteadToEIP150At5",
+        createSchedule(ImmutableMap.of("homesteadblock", 0, "eip150block", 5)));
     builder.put(
-        "Byzantium",
-        createSchedule(
-            protocolSchedule -> MainnetProtocolSpecs.byzantium(CHAIN_ID, protocolSchedule)));
+        "HomesteadToDaoAt5",
+        createSchedule(ImmutableMap.of("homesteadblock", 0, "daoforkblock", 5)));
+    builder.put("EIP150", createSchedule(ImmutableMap.of("eip150block", 0)));
+    builder.put("EIP158", createSchedule(ImmutableMap.of("eip158block", 0)));
     builder.put(
-        "Constantinople",
-        createSchedule(
-            protocolSchedule -> MainnetProtocolSpecs.constantinople(CHAIN_ID, protocolSchedule)));
+        "EIP158ToByzantiumAt5",
+        createSchedule(ImmutableMap.of("eip158block", 0, "byzantiumblock", 5)));
+    builder.put("Byzantium", createSchedule(ImmutableMap.of("byzantiumblock", 0)));
+    builder.put("Constantinople", createSchedule(ImmutableMap.of("constantinopleblock", 0)));
     return new ReferenceTestProtocolSchedules(builder.build());
   }
 
@@ -61,42 +58,9 @@ public class ReferenceTestProtocolSchedules {
     return schedules.get(name);
   }
 
-  private static ProtocolSchedule<Void> createSchedule(
-      final Function<ProtocolSchedule<Void>, ProtocolSpec<Void>> specCreator) {
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(CHAIN_ID);
-    protocolSchedule.putMilestone(0, specCreator.apply(protocolSchedule));
-    return protocolSchedule;
-  }
-
-  private static ProtocolSchedule<Void> frontierToHomesteadAt5() {
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(CHAIN_ID);
-    protocolSchedule.putMilestone(0, MainnetProtocolSpecs.frontier(protocolSchedule));
-    protocolSchedule.putMilestone(5, MainnetProtocolSpecs.homestead(protocolSchedule));
-    return protocolSchedule;
-  }
-
-  private static ProtocolSchedule<Void> homesteadToEip150At5() {
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(CHAIN_ID);
-    protocolSchedule.putMilestone(0, MainnetProtocolSpecs.homestead(protocolSchedule));
-    protocolSchedule.putMilestone(5, MainnetProtocolSpecs.tangerineWhistle(protocolSchedule));
-    return protocolSchedule;
-  }
-
-  private static ProtocolSchedule<Void> homesteadToDaoAt5() {
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(CHAIN_ID);
-    final ProtocolSpec<Void> homestead = MainnetProtocolSpecs.homestead(protocolSchedule);
-    protocolSchedule.putMilestone(0, homestead);
-    protocolSchedule.putMilestone(5, MainnetProtocolSpecs.daoRecoveryInit(protocolSchedule));
-    protocolSchedule.putMilestone(6, MainnetProtocolSpecs.daoRecoveryTransition(protocolSchedule));
-    protocolSchedule.putMilestone(15, homestead);
-    return protocolSchedule;
-  }
-
-  private static ProtocolSchedule<Void> eip158ToByzantiumAt5() {
-    final MutableProtocolSchedule<Void> protocolSchedule = new MutableProtocolSchedule<>(CHAIN_ID);
-    protocolSchedule.putMilestone(
-        0, MainnetProtocolSpecs.spuriousDragon(CHAIN_ID, protocolSchedule));
-    protocolSchedule.putMilestone(5, MainnetProtocolSpecs.byzantium(CHAIN_ID, protocolSchedule));
-    return protocolSchedule;
+  private static ProtocolSchedule<Void> createSchedule(final Map<String, Object> config) {
+    return new ProtocolScheduleBuilder<>(
+            new GenesisConfigOptions(new JsonObject(config)), Function.identity())
+        .createProtocolSchedule(CHAIN_ID);
   }
 }

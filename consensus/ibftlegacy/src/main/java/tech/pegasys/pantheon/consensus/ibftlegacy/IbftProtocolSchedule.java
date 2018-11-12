@@ -24,7 +24,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder.DefaultMilestoneBlocks;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpecBuilder;
 
 import java.math.BigInteger;
@@ -41,9 +40,7 @@ public class IbftProtocolSchedule {
     final EpochManager epochManager = new EpochManager(epochLength);
 
     return new ProtocolScheduleBuilder<>(
-            config,
-            DefaultMilestoneBlocks.NO_DEFAULTS,
-            builder -> applyIbftChanges(blockPeriod, epochManager, builder))
+            config, builder -> applyIbftChanges(blockPeriod, epochManager, builder))
         .createProtocolSchedule(DEFAULT_CHAIN_ID);
   }
 

@@ -17,7 +17,6 @@ import static tech.pegasys.pantheon.ethereum.mainnet.MainnetTransactionValidator
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder.DefaultMilestoneBlocks;
 
 /** A ProtocolSchedule which behaves similarly to MainNet, but with a much reduced difficulty. */
 public class DevelopmentProtocolSchedule {
@@ -25,7 +24,6 @@ public class DevelopmentProtocolSchedule {
   public static ProtocolSchedule<Void> create(final GenesisConfigOptions config) {
     return new ProtocolScheduleBuilder<>(
             config,
-            DefaultMilestoneBlocks.NO_DEFAULTS,
             builder -> builder.difficultyCalculator(DevelopmentDifficultyCalculators.DEVELOPER))
         .createProtocolSchedule(NO_CHAIN_ID);
   }

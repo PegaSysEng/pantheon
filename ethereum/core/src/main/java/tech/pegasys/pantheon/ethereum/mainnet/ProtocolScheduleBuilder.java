@@ -14,19 +14,18 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 
+import java.util.OptionalLong;
 import java.util.function.Function;
 
 public class ProtocolScheduleBuilder<C> {
+
   private final GenesisConfigOptions config;
-  private final DefaultMilestoneBlocks defaultMilestoneBlocks;
   private final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter;
 
   public ProtocolScheduleBuilder(
       final GenesisConfigOptions config,
-      final DefaultMilestoneBlocks defaultMilestoneBlocks,
       final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter) {
     this.config = config;
-    this.defaultMilestoneBlocks = defaultMilestoneBlocks;
     this.protocolSpecAdapter = protocolSpecAdapter;
   }
 
@@ -34,49 +33,49 @@ public class ProtocolScheduleBuilder<C> {
     final int chainId = config.getChainId().orElse(defaultChainId);
     final MutableProtocolSchedule<C> protocolSchedule = new MutableProtocolSchedule<>(chainId);
 
-    addProtocolSpec(protocolSchedule, 0, MainnetProtocolSpecs.frontierDefinition());
+    addProtocolSpec(
+        protocolSchedule, OptionalLong.of(0), MainnetProtocolSpecs.frontierDefinition());
     addProtocolSpec(
         protocolSchedule,
-        config.getHomesteadBlockNumber().orElse(defaultMilestoneBlocks.getHomesteadBlockNumber()),
+        config.getHomesteadBlockNumber(),
         MainnetProtocolSpecs.homesteadDefinition());
 
-    final long daoBlockNumber =
-        config.getDaoForkBlock().orElse(defaultMilestoneBlocks.getDaoBlockNumber());
-    if (daoBlockNumber > 0) {
-      final ProtocolSpec<C> originalProtocolSpec =
-          protocolSchedule.getByBlockNumber(daoBlockNumber);
-      addProtocolSpec(
-          protocolSchedule, daoBlockNumber, MainnetProtocolSpecs.daoRecoveryInitDefinition());
-      addProtocolSpec(
-          protocolSchedule,
-          daoBlockNumber + 1,
-          MainnetProtocolSpecs.daoRecoveryTransitionDefinition());
+    config
+        .getDaoForkBlock()
+        .ifPresent(
+            daoBlockNumber -> {
+              if (daoBlockNumber > 0) {
+                final ProtocolSpec<C> originalProtocolSpec =
+                    protocolSchedule.getByBlockNumber(daoBlockNumber);
+                addProtocolSpec(
+                    protocolSchedule,
+                    OptionalLong.of(daoBlockNumber),
+                    MainnetProtocolSpecs.daoRecoveryInitDefinition());
+                addProtocolSpec(
+                    protocolSchedule,
+                    OptionalLong.of(daoBlockNumber + 1),
+                    MainnetProtocolSpecs.daoRecoveryTransitionDefinition());
 
-      // Return to the previous protocol spec after the dao fork has completed.
-      protocolSchedule.putMilestone(daoBlockNumber + 10, originalProtocolSpec);
-    }
+                // Return to the previous protocol spec after the dao fork has completed.
+                protocolSchedule.putMilestone(daoBlockNumber + 10, originalProtocolSpec);
+              }
+            });
 
     addProtocolSpec(
         protocolSchedule,
-        config
-            .getTangerineWhistleBlockNumber()
-            .orElse(defaultMilestoneBlocks.getTangerineWhistleBlockNumber()),
+        config.getTangerineWhistleBlockNumber(),
         MainnetProtocolSpecs.tangerineWhistleDefinition());
     addProtocolSpec(
         protocolSchedule,
-        config
-            .getSpuriousDragonBlockNumber()
-            .orElse(defaultMilestoneBlocks.getSpuriousDragonBlockNumber()),
+        config.getSpuriousDragonBlockNumber(),
         MainnetProtocolSpecs.spuriousDragonDefinition(chainId));
     addProtocolSpec(
         protocolSchedule,
-        config.getByzantiumBlockNumber().orElse(defaultMilestoneBlocks.getByzantiumBlockNumber()),
+        config.getByzantiumBlockNumber(),
         MainnetProtocolSpecs.byzantiumDefinition(chainId));
     addProtocolSpec(
         protocolSchedule,
-        config
-            .getConstantinopleBlockNumber()
-            .orElse(defaultMilestoneBlocks.getConstantinopleBlockNumber()),
+        config.getConstantinopleBlockNumber(),
         MainnetProtocolSpecs.constantinopleDefinition(chainId));
 
     return protocolSchedule;
@@ -84,63 +83,11 @@ public class ProtocolScheduleBuilder<C> {
 
   private void addProtocolSpec(
       final MutableProtocolSchedule<C> protocolSchedule,
-      final long blockNumber,
+      final OptionalLong blockNumber,
       final ProtocolSpecBuilder<Void> definition) {
-    if (blockNumber >= 0) {
-      protocolSchedule.putMilestone(
-          blockNumber, protocolSpecAdapter.apply(definition).build(protocolSchedule));
-    }
-  }
-
-  public static class DefaultMilestoneBlocks {
-
-    public static final DefaultMilestoneBlocks NO_DEFAULTS =
-        new DefaultMilestoneBlocks(-1, -1, -1, -1, -1, -1);
-
-    private final long homesteadBlockNumber;
-    private final long daoBlockNumber;
-    private final long tangerineWhistleBlockNumber;
-    private final long spuriousDragonBlockNumber;
-    private final long byzantiumBlockNumber;
-    private final long constantinopleBlockNumber;
-
-    public DefaultMilestoneBlocks(
-        final long homesteadBlockNumber,
-        final long daoBlockNumber,
-        final long tangerineWhistleBlockNumber,
-        final long spuriousDragonBlockNumber,
-        final long byzantiumBlockNumber,
-        final long constantinopleBlockNumber) {
-      this.homesteadBlockNumber = homesteadBlockNumber;
-      this.daoBlockNumber = daoBlockNumber;
-      this.tangerineWhistleBlockNumber = tangerineWhistleBlockNumber;
-      this.spuriousDragonBlockNumber = spuriousDragonBlockNumber;
-      this.byzantiumBlockNumber = byzantiumBlockNumber;
-      this.constantinopleBlockNumber = constantinopleBlockNumber;
-    }
-
-    public long getHomesteadBlockNumber() {
-      return homesteadBlockNumber;
-    }
-
-    public long getDaoBlockNumber() {
-      return daoBlockNumber;
-    }
-
-    public long getTangerineWhistleBlockNumber() {
-      return tangerineWhistleBlockNumber;
-    }
-
-    public long getSpuriousDragonBlockNumber() {
-      return spuriousDragonBlockNumber;
-    }
-
-    public long getByzantiumBlockNumber() {
-      return byzantiumBlockNumber;
-    }
-
-    public long getConstantinopleBlockNumber() {
-      return constantinopleBlockNumber;
-    }
+    blockNumber.ifPresent(
+        number ->
+            protocolSchedule.putMilestone(
+                number, protocolSpecAdapter.apply(definition).build(protocolSchedule)));
   }
 }

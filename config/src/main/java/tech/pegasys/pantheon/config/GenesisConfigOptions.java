@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
@@ -86,5 +88,23 @@ public class GenesisConfigOptions {
     return configRoot.containsKey(key)
         ? OptionalLong.of(configRoot.getLong(key))
         : OptionalLong.empty();
+  }
+
+  public static class Builder {
+    private final Map<String, Object> config = new HashMap<>();
+
+    public Builder constantinopleBlock(final long constantinopleBlock) {
+      config.put("constantinopleblock", constantinopleBlock);
+      return this;
+    }
+
+    public Builder chainId(final int chainId) {
+      config.put("chainid", chainId);
+      return this;
+    }
+
+    public GenesisConfigOptions build() {
+      return new GenesisConfigOptions(new JsonObject(config));
+    }
   }
 }

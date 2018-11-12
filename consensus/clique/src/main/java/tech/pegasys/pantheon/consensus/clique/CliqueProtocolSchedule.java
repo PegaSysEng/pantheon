@@ -25,7 +25,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder.DefaultMilestoneBlocks;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpecBuilder;
 
 /** Defines the protocol behaviours for a blockchain using Clique. */
@@ -44,7 +43,6 @@ public class CliqueProtocolSchedule {
     final EpochManager epochManager = new EpochManager(cliqueConfig.getEpochLength());
     return new ProtocolScheduleBuilder<>(
             config,
-            DefaultMilestoneBlocks.NO_DEFAULTS,
             builder ->
                 applyCliqueSpecificModifications(
                     epochManager, cliqueConfig.getBlockPeriodSeconds(), localNodeAddress, builder))
