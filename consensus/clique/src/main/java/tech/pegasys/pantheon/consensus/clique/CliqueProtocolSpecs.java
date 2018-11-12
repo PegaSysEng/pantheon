@@ -66,7 +66,8 @@ public class CliqueProtocolSpecs {
   }
 
   public ProtocolSpec<CliqueContext> constantinople() {
-    return applyCliqueSpecificModifications(MainnetProtocolSpecs.constantinopleDefinition(chainId));
+    return applyCliqueSpecificModifications(
+        MainnetProtocolSpecs.constantinopleDefinition(protocolSchedule.getChainId()));
   }
 
   private ProtocolSpec<CliqueContext> applyCliqueSpecificModifications(
