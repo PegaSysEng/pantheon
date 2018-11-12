@@ -340,7 +340,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void nodekeyOptionMustBeUsed() throws Exception {
     final File file = new File("./specific/key");
 
-    parseCommand("--nodekey", file.getPath());
+    parseCommand("--node-private-key", file.getPath());
 
     verify(mockControllerBuilder)
         .build(

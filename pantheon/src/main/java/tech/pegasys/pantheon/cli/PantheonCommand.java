@@ -145,7 +145,7 @@ public class PantheonCommand implements Runnable {
   private final Path dataDir = getDefaultPantheonDataDir();
 
   @Option(
-    names = {"--nodekey"},
+    names = {"--node-private-key"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
     description =
         "the path to the node's private key file. (default: a file named \"key\" in the Pantheon data folder.)"
