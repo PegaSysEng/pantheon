@@ -35,8 +35,8 @@ import com.google.common.collect.ImmutableSet;
  *
  * <p>The storage list is not infinite. A default cap of 500 is applied and nodes are removed on a
  * first added first removed basis. Adding a new copy of the same node will not affect the priority
- * for removal.  The exception to this is a list of banned nodes passed in by reference to the
- * constructor.  This list neither adds nor removes from that list passed in.
+ * for removal. The exception to this is a list of banned nodes passed in by reference to the
+ * constructor. This list neither adds nor removes from that list passed in.
  */
 public class PeerBlacklist implements DisconnectCallback {
   private static final int DEFAULT_BLACKLIST_CAP = 500;
