@@ -43,6 +43,7 @@ dependencies {
   testImplementation 'org.mockito:mockito-core'
   testImplementation 'junit:junit'
 
+  integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   integrationTestImplementation 'org.assertj:assertj-core'
   integrationTestImplementation 'org.mockito:mockito-core'
   integrationTestImplementation 'junit:junit'
@@ -56,6 +57,7 @@ dependencies {
 
   jmhImplementation project(':util')
   jmhImplementation project( path: ':ethereum:core', configuration: 'testSupportArtifacts')
+  jmhImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   jmhImplementation project(':crypto')
   jmhImplementation project(':ethereum:rlp')
   jmhImplementation project(':ethereum:trie')
