@@ -58,7 +58,7 @@ dependencies {
 
 task writeInfoFile(type: ProjectPropertiesFile) {
   destPackage = "tech.pegasys.pantheon"
-  addString("version", "$rootProject.name/$rootProject.version")
+  addVersion("version", "$rootProject.name/$rootProject.version")
 }
 
 compileJava.dependsOn(writeInfoFile)
