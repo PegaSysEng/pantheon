@@ -27,6 +27,30 @@ public class PeerBlacklistTest {
   private int nodeIdValue = 1;
 
   @Test
+  public void directlyAddingPeerWorks() {
+    final PeerBlacklist blacklist = new PeerBlacklist();
+    final Peer peer = generatePeer();
+
+    assertThat(blacklist.contains(peer)).isFalse();
+
+    blacklist.add(peer);
+
+    assertThat(blacklist.contains(peer)).isTrue();
+  }
+
+  @Test
+  public void directlyAddingPeerByPeerIdWorks() {
+    final PeerBlacklist blacklist = new PeerBlacklist();
+    final Peer peer = generatePeer();
+
+    assertThat(blacklist.contains(peer)).isFalse();
+
+    blacklist.add(peer.getId());
+
+    assertThat(blacklist.contains(peer)).isTrue();
+  }
+
+  @Test
   public void doesNotBlacklistPeerForNormalDisconnect() throws Exception {
     final PeerBlacklist blacklist = new PeerBlacklist();
     final PeerConnection peer = generatePeerConnection();
@@ -135,5 +159,11 @@ public class PeerBlacklistTest {
     when(peer.getPeer()).thenReturn(peerInfo);
 
     return peer;
+  }
+
+  private Peer generatePeer() {
+    final byte[] id = new byte[64];
+    id[0] = (byte) nodeIdValue++;
+    return new DefaultPeer(BytesValue.wrap(id), "10.9.8.7", 65535, 65534);
   }
 }

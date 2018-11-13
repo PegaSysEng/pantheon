@@ -199,6 +199,14 @@ public class PantheonCommand implements Runnable {
   )
   private final Integer maxTrailingPeers = Integer.MAX_VALUE;
 
+  @Option(
+    names = {"--banned-nodeids"},
+    description = "A list of node IDs to ban from the p2p network.",
+    split = ",",
+    arity = "1..*"
+  )
+  private final Collection<String> bannedNodeIds = null;
+
   // TODO: Re-enable as per NC-1057/NC-1681
   //  @Option(
   //    names = {"--sync-mode"},
@@ -491,7 +499,8 @@ public class PantheonCommand implements Runnable {
             maxPeers,
             jsonRpcConfiguration,
             webSocketConfiguration,
-            dataDir);
+            dataDir,
+            bannedNodeIds);
 
     addShutdownHook(runner);
     runner.execute();

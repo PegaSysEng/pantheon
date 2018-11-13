@@ -25,6 +25,18 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * A list of nodes that the running client will not communicate with. This can be because of network
+ * issues, protocol issues, or by being explicitly set on the command line.
+ *
+ * <p>Peers are stored and identified strictly by their nodeId, the convenience methods taking
+ * {@link Peer}s and {@link PeerConnection}s redirect to the methods that take {@link BytesValue}
+ * object that represent the node ID of the banned nodes.
+ *
+ * <p>The storage list is not infinite. A default cap of 500 is applied and nodes are removed on a
+ * first added first removed basis. Adding a new copy of the same node will not affect the priority
+ * for removal.
+ */
 public class PeerBlacklist implements DisconnectCallback {
   private static final int DEFAULT_BLACKLIST_CAP = 500;
 
@@ -70,7 +82,7 @@ public class PeerBlacklist implements DisconnectCallback {
     add(peer.getId());
   }
 
-  private void add(final BytesValue peerId) {
+  public void add(final BytesValue peerId) {
     blacklistedNodeIds.add(peerId);
   }
 
