@@ -44,6 +44,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -500,7 +501,7 @@ public class PantheonCommand implements Runnable {
             jsonRpcConfiguration,
             webSocketConfiguration,
             dataDir,
-            bannedNodeIds);
+            bannedNodeIds == null ? Collections.emptySet() : bannedNodeIds);
 
     addShutdownHook(runner);
     runner.execute();
