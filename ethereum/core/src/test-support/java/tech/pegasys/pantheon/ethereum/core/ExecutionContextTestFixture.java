@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.core;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -111,9 +111,7 @@ public class ExecutionContextTestFixture {
       if (protocolSchedule == null) {
         protocolSchedule =
             new ProtocolScheduleBuilder<>(
-                    new GenesisConfigOptions.Builder().constantinopleBlock(0).build(),
-                    42,
-                    Function.identity())
+                    new StubGenesisConfigOptions().constantinopleBlock(0), 42, Function.identity())
                 .createProtocolSchedule();
       }
       if (keyValueStorage == null) {
