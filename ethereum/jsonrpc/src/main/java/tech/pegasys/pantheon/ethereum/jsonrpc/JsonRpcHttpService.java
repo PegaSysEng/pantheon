@@ -102,16 +102,21 @@ public class JsonRpcHttpService {
     // Handle json rpc requests
     final Router router = Router.router(vertx);
 
-    // Verify hostname header is set to avoid rebind attack.
+    // Verify Host header to avoid rebind attack.
     router
         .route()
         .handler(
             event -> {
               Optional<String> header = Optional.ofNullable(event.request().getHeader("Host"));
-              if (!header.isPresent() || !config.hostWhitelist().contains(header.get())) {
-                event.response().setStatusCode(403).end();
-              } else {
+              if (header.isPresent()
+                  && ("*".equals(header.get())
+                      || (config
+                          .hostWhitelist()
+                          .stream()
+                          .anyMatch(s -> s.toLowerCase().equals(header.get().toLowerCase()))))) {
                 event.next();
+              } else {
+                event.response().setStatusCode(403).end();
               }
             });
 
