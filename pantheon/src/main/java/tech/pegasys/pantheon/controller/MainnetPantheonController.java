@@ -98,7 +98,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
 
   public static PantheonController<Void> mainnet(final Path home) throws IOException {
     final MiningParameters miningParams = new MiningParameters(null, null, null, false);
-    final KeyPair nodeKeys = loadKeyPair(home.resolve("key").toFile());
+    final KeyPair nodeKeys = loadKeyPair(home);
     return init(
         home,
         GenesisConfigFile.mainnet(),

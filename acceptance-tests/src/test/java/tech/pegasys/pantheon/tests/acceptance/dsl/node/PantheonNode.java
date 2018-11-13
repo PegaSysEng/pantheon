@@ -69,7 +69,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final int p2pPort)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
-    this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory.resolve("key").toFile());
+    this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.p2pPort = p2pPort;
     this.name = name;
     this.miningParameters = miningParameters;

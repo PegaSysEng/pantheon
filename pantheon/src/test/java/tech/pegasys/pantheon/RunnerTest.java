@@ -80,7 +80,7 @@ public final class RunnerTest {
   private void syncFromGenesis(final SyncMode mode) throws Exception {
     final Path dbAhead = temp.newFolder().toPath();
     final int blockCount = 500;
-    final KeyPair aheadDbNodeKeys = loadKeyPair(dbAhead.resolve("key").toFile());
+    final KeyPair aheadDbNodeKeys = loadKeyPair(dbAhead);
     final SynchronizerConfiguration fastSyncConfig =
         SynchronizerConfiguration.builder()
             .syncMode(mode)

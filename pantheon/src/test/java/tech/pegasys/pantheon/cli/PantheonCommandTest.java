@@ -352,7 +352,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyBoolean(),
             fileArgumentCaptor.capture());
 
-    assertThat(fileArgumentCaptor.getValue().compareTo(file)).isZero();
+    assertThat(fileArgumentCaptor.getValue()).isEqualTo(file);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();

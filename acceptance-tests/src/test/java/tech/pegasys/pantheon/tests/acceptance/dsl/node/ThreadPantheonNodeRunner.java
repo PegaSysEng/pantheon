@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
+import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 
@@ -60,7 +61,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               false,
               node.getMiningParameters(),
               true,
-              node.homeDirectory().resolve("key").toFile());
+              KeyPairUtil.getDefaultKeyFile(node.homeDirectory()));
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
     }

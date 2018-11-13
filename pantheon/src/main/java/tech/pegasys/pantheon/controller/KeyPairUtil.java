@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,5 +38,13 @@ public class KeyPairUtil {
           keyFile.getAbsolutePath());
     }
     return key;
+  }
+
+  public static SECP256K1.KeyPair loadKeyPair(final Path homeDirectory) throws IOException {
+    return loadKeyPair(getDefaultKeyFile(homeDirectory));
+  }
+
+  public static File getDefaultKeyFile(final Path homeDirectory) {
+    return homeDirectory.resolve("key").toFile();
   }
 }

@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
+import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
@@ -150,7 +151,7 @@ public class PantheonCommand implements Runnable {
     description =
         "the path to the node's private key file. (default: a file named \"key\" in the Pantheon data folder.)"
   )
-  private final File nodePrivateKeyFile = getDefaultPrivateKeyFile();
+  private final File nodePrivateKeyFile = KeyPairUtil.getDefaultKeyFile(dataDir);
 
   // Genesis file path with null default option if the option
   // is not defined on command line as this default is handled by Runner
@@ -535,10 +536,6 @@ public class PantheonCommand implements Runnable {
 
   private HostAndPort getDefaultHostAndPort(final int port) {
     return HostAndPort.fromParts(autoDiscoverDefaultIP().getHostAddress(), port);
-  }
-
-  private File getDefaultPrivateKeyFile() {
-    return dataDir.resolve("key").toFile();
   }
 
   private Path getDefaultPantheonDataDir() {
