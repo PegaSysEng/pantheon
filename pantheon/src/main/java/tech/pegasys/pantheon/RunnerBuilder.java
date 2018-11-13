@@ -124,8 +124,9 @@ public class RunnerBuilder {
             .setClientId(PantheonInfo.version())
             .setSupportedProtocols(subProtocols);
 
-    final PeerBlacklist peerBlacklist = new PeerBlacklist();
-    bannedNodeIds.forEach(s -> peerBlacklist.add(BytesValue.fromHexString(s)));
+    final PeerBlacklist peerBlacklist =
+        new PeerBlacklist(
+            bannedNodeIds.stream().map(BytesValue::fromHexString).collect(Collectors.toSet()));
 
     final NetworkRunner networkRunner =
         NetworkRunner.builder()
