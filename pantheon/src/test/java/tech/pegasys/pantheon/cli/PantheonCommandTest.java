@@ -823,6 +823,59 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void jsonRpcHostWhitelistAcceptsSingleArgument() {
+    parseCommand("--host-whitelist", "*");
+
+    verify(mockRunnerBuilder)
+        .build(
+            any(),
+            any(),
+            anyBoolean(),
+            any(),
+            anyString(),
+            anyInt(),
+            anyInt(),
+            jsonRpcConfigArgumentCaptor.capture(),
+            any(),
+            any(),
+            any());
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostWhitelist().size()).isEqualTo(1);
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostWhitelist()).contains("*");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostWhitelist()).doesNotContain("localhost");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistAcceptsMultipleArguments() {
+    parseCommand("--host-whitelist", "a,b");
+
+    verify(mockRunnerBuilder)
+        .build(
+            any(),
+            any(),
+            anyBoolean(),
+            any(),
+            anyString(),
+            anyInt(),
+            anyInt(),
+            jsonRpcConfigArgumentCaptor.capture(),
+            any(),
+            any(),
+            any());
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostWhitelist().size()).isEqualTo(2);
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostWhitelist()).contains("a", "b");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostWhitelist())
+        .doesNotContain("*", "localhost");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void wsRpcEnabledPropertyDefaultIsFalse() {
     parseCommand();
 
