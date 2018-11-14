@@ -7,7 +7,7 @@ public final class PantheonInfo {
   private static final String clientIdentity = "pantheon";
   private static final String version =
       clientIdentity
-          + "/"
+          + "/v"
           + PantheonInfo.class.getPackage().getImplementationVersion()
           + "/"
           + PlatformDetector.getOS()
