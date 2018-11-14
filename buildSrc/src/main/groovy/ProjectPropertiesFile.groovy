@@ -130,12 +130,14 @@ ${String.join("\n", methodDeclarations)}
         }
 
         String variableDeclaration() {
+            def constantName = name.replaceAll("([a-z])([A-Z]+)", '$1_$2').toUpperCase()
+            def constantValue = value.replaceAll("([a-z])([A-Z]+)", '$1_$2').toUpperCase()
             switch (type) {
                 case PropertyType.STRING:
-                    return "  private static final ${type} ${name} = \"${value}\";"
+                    return "  private static final ${type} ${constantName} = \"${value}\";"
                 case PropertyType.VERSION:
-                    return "  private static final ${type} ${name} =\n" +
-                           "      ${value}\n" +
+                    return "  private static final ${type} ${constantName} =\n" +
+                           "      ${constantValue}\n" +
                            "          + \"/v\"\n" +
                            "          + ${filename}.class.getPackage().getImplementationVersion()\n" +
                            "          + \"/\"\n" +
@@ -148,7 +150,7 @@ ${String.join("\n", methodDeclarations)}
         String methodDeclaration() {
             return """
   public static ${type} ${name}() {
-    return ${name};
+    return ${name.replaceAll("([a-z])([A-Z]+)", '$1_$2').toUpperCase()};
   }"""
         }
     }

@@ -4,9 +4,9 @@ import tech.pegasys.pantheon.util.PlatformDetector;
 
 // This file is generated via a gradle task and should not be edited directly.
 public final class PantheonInfo {
-  private static final String clientIdentity = "pantheon";
-  private static final String version =
-      clientIdentity
+  private static final String CLIENT_IDENTITY = "pantheon";
+  private static final String VERSION =
+      CLIENT_IDENTITY
           + "/v"
           + PantheonInfo.class.getPackage().getImplementationVersion()
           + "/"
@@ -17,10 +17,10 @@ public final class PantheonInfo {
   private PantheonInfo() {}
 
   public static String clientIdentity() {
-    return clientIdentity;
+    return CLIENT_IDENTITY;
   }
 
   public static String version() {
-    return version;
+    return VERSION;
   }
 }
