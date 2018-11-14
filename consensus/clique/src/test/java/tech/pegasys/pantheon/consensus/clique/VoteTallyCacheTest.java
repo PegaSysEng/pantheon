@@ -20,6 +20,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -30,7 +31,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.InMemoryTestFixture;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
@@ -68,7 +68,7 @@ public class VoteTallyCacheTest {
 
     genesisBlock = createEmptyBlock(0, Hash.ZERO);
 
-    blockChain = InMemoryTestFixture.createInMemoryBlockchain(genesisBlock);
+    blockChain = createInMemoryBlockchain(genesisBlock);
 
     block_1 = createEmptyBlock(1, genesisBlock.getHeader().getHash());
     block_2 = createEmptyBlock(1, block_1.getHeader().getHash());
