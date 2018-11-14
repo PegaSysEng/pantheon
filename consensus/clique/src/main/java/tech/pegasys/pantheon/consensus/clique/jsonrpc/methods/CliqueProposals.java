@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
@@ -45,7 +45,7 @@ public class CliqueProposals implements JsonRpcMethod {
             .collect(
                 Collectors.toMap(
                     proposal -> proposal.getKey().toString(),
-                    proposal -> proposal.getValue() == VoteType.ADD));
+                    proposal -> proposal.getValue() == ValidatorVote.ADD));
 
     return new JsonRpcSuccessResponse(request.getId(), proposals);
   }

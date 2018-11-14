@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.consensus.ibftlegacy;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.ADD;
-import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.DROP;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVote.ADD;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVote.DROP;
 
 import tech.pegasys.pantheon.consensus.common.CastVote;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;

@@ -16,8 +16,8 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
@@ -53,9 +53,9 @@ public class CliqueProposalsTest {
         .thenReturn(
             ImmutableMap.of(
                 Address.fromHexString("1"),
-                VoteType.ADD,
+                ValidatorVote.ADD,
                 Address.fromHexString("2"),
-                VoteType.DROP));
+                ValidatorVote.DROP));
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcSuccessResponse(

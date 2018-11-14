@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.common;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.List;
 import java.util.Optional;

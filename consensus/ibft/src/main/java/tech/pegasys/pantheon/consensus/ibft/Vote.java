@@ -12,27 +12,38 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableBiMap;
 
+/** This class is only used to serialise/deserialise BlockHeaders and should not appear
+  * in business logic.
+  */
 public class Vote {
   private final Address recipient;
-  private final IbftVoteType voteType;
+  private final ValidatorVote voteType;
 
-  private Vote(final Address recipient, final IbftVoteType voteType) {
+  public static final ImmutableBiMap<ValidatorVote, Byte> voteToValue =
+      ImmutableBiMap.of(
+          ValidatorVote.ADD, (byte) 0xFF,
+          ValidatorVote.DROP, (byte) 0x0);
+
+  public Vote(final Address recipient, final ValidatorVote voteType) {
     this.recipient = recipient;
     this.voteType = voteType;
   }
 
   public static Vote authVote(final Address address) {
-    return new Vote(address, IbftVoteType.ADD);
+    return new Vote(address, ValidatorVote.ADD);
   }
 
   public static Vote dropVote(final Address address) {
-    return new Vote(address, IbftVoteType.DROP);
+    return new Vote(address, ValidatorVote.DROP);
   }
 
   public Address getRecipient() {
@@ -40,11 +51,11 @@ public class Vote {
   }
 
   public boolean isAuth() {
-    return voteType.equals(IbftVoteType.ADD);
+    return voteType.equals(ValidatorVote.ADD);
   }
 
   public boolean isDrop() {
-    return voteType.equals(IbftVoteType.DROP);
+    return voteType.equals(ValidatorVote.DROP);
   }
 
   @Override
@@ -64,14 +75,14 @@ public class Vote {
     return Objects.hashCode(recipient, voteType);
   }
 
-  public IbftVoteType getVoteType() {
+  public ValidatorVote getVoteType() {
     return voteType;
   }
 
   public void writeTo(final RLPOutput rlpOutput) {
     rlpOutput.startList();
     rlpOutput.writeBytesValue(recipient);
-    voteType.writeTo(rlpOutput);
+    rlpOutput.writeByte(voteToValue.get(voteType));
     rlpOutput.endList();
   }
 
@@ -79,7 +90,10 @@ public class Vote {
 
     rlpInput.enterList();
     final Address recipient = Address.readFrom(rlpInput);
-    final IbftVoteType vote = IbftVoteType.readFrom(rlpInput);
+    final ValidatorVote vote = voteToValue.inverse().get(rlpInput.readByte());
+    if (vote == null) {
+      throw new RLPException("Vote field was of an incorrect binary value.");
+    }
     rlpInput.leaveList();
 
     return new Vote(recipient, vote);

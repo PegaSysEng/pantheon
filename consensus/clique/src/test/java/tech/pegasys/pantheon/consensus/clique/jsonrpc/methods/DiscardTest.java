@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
@@ -92,7 +92,7 @@ public class DiscardTest {
     final JsonRpcResponse response = discard.response(requestWithParams(a0));
 
     assertThat(proposer.get(a0)).isEqualTo(Optional.empty());
-    assertThat(proposer.get(a1)).isEqualTo(Optional.of(VoteType.ADD));
+    assertThat(proposer.get(a1)).isEqualTo(Optional.of(ValidatorVote.ADD));
     assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
     final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
     assertThat(successResponse.getResult()).isEqualTo(true);

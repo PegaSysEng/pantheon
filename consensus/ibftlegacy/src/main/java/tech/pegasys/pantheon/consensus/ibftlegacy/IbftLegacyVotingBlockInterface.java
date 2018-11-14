@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibftlegacy;
 
 import tech.pegasys.pantheon.consensus.common.CastVote;
-import tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity;
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteBlockInterface;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -27,13 +27,13 @@ import com.google.common.collect.ImmutableBiMap;
 
 public class IbftLegacyVotingBlockInterface implements VoteBlockInterface {
 
-  private static final Address NO_VOTE_SUBJECT =
+  public static final Address NO_VOTE_SUBJECT =
       Address.wrap(BytesValue.wrap(new byte[Address.SIZE]));
 
-  private static final ImmutableBiMap<ValidatorVotePolarity, Long> voteToValue =
+  public static final ImmutableBiMap<ValidatorVote, Long> voteToValue =
       ImmutableBiMap.of(
-          ValidatorVotePolarity.ADD, 0xFFFFFFFFFFFFFFFFL,
-          ValidatorVotePolarity.DROP, 0x0L);
+          ValidatorVote.ADD, 0xFFFFFFFFFFFFFFFFL,
+          ValidatorVote.DROP, 0x0L);
 
   @Override
   public Optional<CastVote> extractVoteFromHeader(final BlockHeader header) {
@@ -41,7 +41,7 @@ public class IbftLegacyVotingBlockInterface implements VoteBlockInterface {
     if (!candidate.equals(NO_VOTE_SUBJECT)) {
       final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
       final Address proposer = IbftBlockHashing.recoverProposerAddress(header, ibftExtraData);
-      final ValidatorVotePolarity votePolarity = voteToValue.inverse().get(header.getNonce());
+      final ValidatorVote votePolarity = voteToValue.inverse().get(header.getNonce());
       final Address recipient = header.getCoinbase();
 
       return Optional.of(new CastVote(votePolarity, proposer, recipient));
@@ -57,7 +57,7 @@ public class IbftLegacyVotingBlockInterface implements VoteBlockInterface {
       builder.nonce(voteToValue.get(voteToCast.getVotePolarity()));
       builder.coinbase(voteToCast.getRecipient());
     } else {
-      builder.nonce(voteToValue.get(ValidatorVotePolarity.DROP));
+      builder.nonce(voteToValue.get(ValidatorVote.DROP));
       builder.coinbase(NO_VOTE_SUBJECT);
     }
     return builder;

@@ -20,12 +20,12 @@ import com.google.common.base.Preconditions;
 
 public class CastVote {
 
-  private final ValidatorVotePolarity votePolarity;
+  private final ValidatorVote votePolarity;
   private final Address proposer;
   private final Address recipient;
 
   public CastVote(
-      final ValidatorVotePolarity votePolarity, final Address proposer, final Address recipient) {
+      final ValidatorVote votePolarity, final Address proposer, final Address recipient) {
     Preconditions.checkNotNull(votePolarity);
     Preconditions.checkNotNull(proposer);
     Preconditions.checkNotNull(recipient);
@@ -34,7 +34,7 @@ public class CastVote {
     this.recipient = recipient;
   }
 
-  public ValidatorVotePolarity getVotePolarity() {
+  public ValidatorVote getVotePolarity() {
     return votePolarity;
   }
 

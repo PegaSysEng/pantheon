@@ -79,7 +79,7 @@ public class IbftExtraDataTest {
     // encoded vote
     encoder.startList();
     encoder.writeBytesValue(vote.get().getRecipient());
-    vote.get().getVoteType().writeTo(encoder);
+    encoder.writeByte(Vote.voteToValue.get(vote.get().getVoteType()));
     encoder.endList();
 
     // This is to verify that the decoding works correctly when the round is encoded as 4 bytes
@@ -122,7 +122,7 @@ public class IbftExtraDataTest {
     // encoded vote
     encoder.startList();
     encoder.writeBytesValue(vote.get().getRecipient());
-    vote.get().getVoteType().writeTo(encoder);
+    encoder.writeByte(Vote.voteToValue.get(vote.get().getVoteType()));
     encoder.endList();
 
     // This is to verify that the decoding throws an exception when the round number is not encoded
@@ -209,7 +209,7 @@ public class IbftExtraDataTest {
     // encoded vote
     encoder.startList();
     encoder.writeBytesValue(vote.get().getRecipient());
-    vote.get().getVoteType().writeTo(encoder);
+    encoder.writeByte(Vote.voteToValue.get(vote.get().getVoteType()));
     encoder.endList();
 
     encoder.writeInt(round);
@@ -271,7 +271,7 @@ public class IbftExtraDataTest {
     // encoded vote
     encoder.startList();
     encoder.writeBytesValue(vote.get().getRecipient());
-    vote.get().getVoteType().writeTo(encoder);
+    encoder.writeByte(Vote.voteToValue.get(vote.get().getVoteType()));
     encoder.endList();
 
     encoder.writeInt(round);
@@ -354,7 +354,7 @@ public class IbftExtraDataTest {
     // encoded vote
     encoder.startList();
     encoder.writeBytesValue(vote.get().getRecipient());
-    vote.get().getVoteType().writeTo(encoder);
+    encoder.writeByte(Vote.voteToValue.get(vote.get().getVoteType()));
     encoder.endList();
     encoder.writeInt(round);
     encoder.endList();
@@ -391,7 +391,7 @@ public class IbftExtraDataTest {
     // encoded vote
     encoder.startList();
     encoder.writeBytesValue(vote.get().getRecipient());
-    vote.get().getVoteType().writeTo(encoder);
+    encoder.writeByte(Vote.voteToValue.get(vote.get().getVoteType()));
     encoder.endList();
     encoder.endList();
 
@@ -423,7 +423,7 @@ public class IbftExtraDataTest {
     // encoded vote
     encoder.startList();
     encoder.writeBytesValue(vote.get().getRecipient());
-    vote.get().getVoteType().writeTo(encoder);
+    encoder.writeByte(Vote.voteToValue.get(vote.get().getVoteType()));
     encoder.endList();
 
     encoder.writeInt(round);

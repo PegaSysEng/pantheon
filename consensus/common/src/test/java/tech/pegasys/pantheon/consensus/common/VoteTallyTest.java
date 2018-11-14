@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.consensus.common;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.ADD;
-import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.DROP;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVote.ADD;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVote.DROP;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 

@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /** Container for pending votes and selecting a vote for new blocks */
 public class VoteProposer {
 
-  private final Map<Address, VoteType> proposals = new ConcurrentHashMap<>();
+  private final Map<Address, ValidatorVote> proposals = new ConcurrentHashMap<>();
   private final AtomicInteger votePosition = new AtomicInteger(0);
 
   /**
@@ -34,7 +34,7 @@ public class VoteProposer {
    * @param address The address to be voted in
    */
   public void auth(final Address address) {
-    proposals.put(address, VoteType.ADD);
+    proposals.put(address, ValidatorVote.ADD);
   }
 
   /**
@@ -43,7 +43,7 @@ public class VoteProposer {
    * @param address The address to be voted out
    */
   public void drop(final Address address) {
-    proposals.put(address, VoteType.DROP);
+    proposals.put(address, ValidatorVote.DROP);
   }
 
   /**
@@ -60,18 +60,18 @@ public class VoteProposer {
     proposals.clear();
   }
 
-  public Map<Address, VoteType> getProposals() {
+  public Map<Address, ValidatorVote> getProposals() {
     return proposals;
   }
 
-  public Optional<VoteType> get(final Address address) {
+  public Optional<ValidatorVote> get(final Address address) {
     return Optional.ofNullable(proposals.get(address));
   }
 
   private boolean voteNotYetCast(
       final Address localAddress,
       final Address voteAddress,
-      final VoteType vote,
+      final ValidatorVote vote,
       final Collection<Address> validators,
       final VoteTally tally) {
 
@@ -81,17 +81,17 @@ public class VoteProposer {
         tally.getOutstandingRemoveVotesFor(voteAddress).contains(localAddress);
 
     // if they're a validator, we want to see them dropped, and we haven't voted to drop them yet
-    if (validators.contains(voteAddress) && !votedDrop && vote == VoteType.DROP) {
+    if (validators.contains(voteAddress) && !votedDrop && vote == ValidatorVote.DROP) {
       return true;
       // or if we've previously voted to auth them and we want to drop them
-    } else if (votedAuth && vote == VoteType.DROP) {
+    } else if (votedAuth && vote == ValidatorVote.DROP) {
       return true;
       // if they're not currently a validator and we want to see them authed and we haven't voted to
       // auth them yet
-    } else if (!validators.contains(voteAddress) && !votedAuth && vote == VoteType.ADD) {
+    } else if (!validators.contains(voteAddress) && !votedAuth && vote == ValidatorVote.ADD) {
       return true;
       // or if we've previously voted to drop them and we want to see them authed
-    } else if (votedDrop && vote == VoteType.ADD) {
+    } else if (votedDrop && vote == ValidatorVote.ADD) {
       return true;
     }
 
@@ -106,10 +106,9 @@ public class VoteProposer {
    * @return Either an address with the vote (auth or drop) or no vote if we have no valid pending
    *     votes
    */
-  public Optional<Map.Entry<Address, VoteType>> getVote(
-      final Address localAddress, final VoteTally tally) {
+  public Optional<CastVote> getVote(final Address localAddress, final VoteTally tally) {
     final Collection<Address> validators = tally.getCurrentValidators();
-    final List<Map.Entry<Address, VoteType>> validVotes = new ArrayList<>();
+    final List<Map.Entry<Address, ValidatorVote>> validVotes = new ArrayList<>();
 
     proposals
         .entrySet()
@@ -128,7 +127,9 @@ public class VoteProposer {
     // Get the next position in the voting queue we should propose
     final int currentVotePosition = votePosition.updateAndGet(i -> ++i % validVotes.size());
 
+    final Map.Entry<Address, ValidatorVote> voteToCast = validVotes.get(currentVotePosition);
+
     // Get a vote from the valid votes and return it
-    return Optional.of(validVotes.get(currentVotePosition));
+    return Optional.of(new CastVote(voteToCast.getValue(), localAddress, voteToCast.getKey()));
   }
 }

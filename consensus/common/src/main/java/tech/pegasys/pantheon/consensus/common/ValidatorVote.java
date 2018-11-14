@@ -12,8 +12,19 @@
  */
 package tech.pegasys.pantheon.consensus.common;
 
-public interface ValidatorVote {
-  boolean isAddVote();
+/**
+  * Determines if a validator vote is indicating that they should be added, or removed.
+  * This does not attempt to determine how said vote should be serialised/deserialised.
+  */
+public enum ValidatorVote {
+  ADD,
+  DROP;
 
-  boolean isDropVote();
+  public boolean isAddVote() {
+    return this.equals(ADD);
+  }
+
+  public boolean isDropVote() {
+    return this.equals(DROP);
+  }
 }
