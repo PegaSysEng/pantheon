@@ -24,12 +24,9 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.development.DevelopmentProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.google.common.io.Resources;
@@ -48,9 +45,8 @@ public class PantheonControllerBuilder {
     // otherwise use the indicated genesis file
     final KeyPair nodeKeys = loadKeyPair(homePath);
 
-    final KeyValueStorage kv =
-        RocksDbKeyValueStorage.create(Files.createDirectories(homePath.resolve(DATABASE_PATH)));
-    final StorageProvider storageProvider = new KeyValueStorageProvider(kv);
+    final StorageProvider storageProvider =
+        RocksDbStorageProvider.create(homePath.resolve(DATABASE_PATH));
     if (isDevMode) {
       final GenesisConfigFile genesisConfig = GenesisConfigFile.development();
       return MainnetPantheonController.init(

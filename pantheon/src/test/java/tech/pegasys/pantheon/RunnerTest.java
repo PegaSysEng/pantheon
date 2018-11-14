@@ -34,11 +34,11 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
+import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -234,9 +234,8 @@ public final class RunnerTest {
     }
   }
 
-  private KeyValueStorageProvider createKeyValueStorageProvider(final Path dbAhead) {
-    final KeyValueStorage kv = RocksDbKeyValueStorage.create(dbAhead);
-    return new KeyValueStorageProvider(kv);
+  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) throws IOException {
+    return RocksDbStorageProvider.create(dbAhead);
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
