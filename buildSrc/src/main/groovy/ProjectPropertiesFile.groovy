@@ -136,7 +136,7 @@ ${String.join("\n", methodDeclarations)}
                 case PropertyType.VERSION:
                     return "  private static final ${type} ${name} =\n" +
                            "      ${value}\n" +
-                           "          + \"/\"\n" +
+                           "          + \"/v\"\n" +
                            "          + ${filename}.class.getPackage().getImplementationVersion()\n" +
                            "          + \"/\"\n" +
                            "          + PlatformDetector.getOS()\n" +
