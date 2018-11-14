@@ -80,8 +80,8 @@ class ProjectPropertiesFile extends DefaultTask {
 import tech.pegasys.pantheon.util.PlatformDetector;
 
 // This file is generated via a gradle task and should not be edited directly.
-public class ${filename} {
-${String.join("\n  ", varDeclarations)}
+public final class ${filename} {
+${String.join("\n", varDeclarations)}
 
   private ${filename}() {}
 ${String.join("\n", methodDeclarations)}
@@ -103,7 +103,7 @@ ${String.join("\n", methodDeclarations)}
         }
     }
 
-    private static class Property {
+    private class Property {
         private final String name
         private final String value
         private final PropertyType type
@@ -135,9 +135,12 @@ ${String.join("\n", methodDeclarations)}
                     return "  private static final ${type} ${name} = \"${value}\";"
                 case PropertyType.VERSION:
                     return "  private static final ${type} ${name} =\n" +
-                           "      \"${value}/\"\n" +
+                           "      ${value}\n" +
+                           "          + \"/\"\n" +
+                           "          + ${filename}.class.getPackage().getImplementationVersion()\n" +
+                           "          + \"/\"\n" +
                            "          + PlatformDetector.getOS()\n" +
-                           "          + \"/\" \n" +
+                           "          + \"/\"\n" +
                            "          + PlatformDetector.getVM();"
             }
         }
