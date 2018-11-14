@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -39,11 +40,12 @@ public class PantheonControllerBuilder {
       final EthNetworkConfig ethNetworkConfig,
       final boolean syncWithOttoman,
       final MiningParameters miningParameters,
-      final boolean isDevMode)
+      final boolean isDevMode,
+      final File nodePrivateKeyFile)
       throws IOException {
     // instantiate a controller with mainnet config if no genesis file is defined
     // otherwise use the indicated genesis file
-    final KeyPair nodeKeys = loadKeyPair(homePath);
+    final KeyPair nodeKeys = loadKeyPair(nodePrivateKeyFile);
 
     final StorageProvider storageProvider =
         RocksDbStorageProvider.create(homePath.resolve(DATABASE_PATH));
