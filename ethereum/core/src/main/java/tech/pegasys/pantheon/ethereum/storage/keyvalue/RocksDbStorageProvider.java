@@ -24,7 +24,6 @@ public class RocksDbStorageProvider {
 
   public static StorageProvider create(final Path databaseDir) throws IOException {
     final KeyValueStorage kv = RocksDbKeyValueStorage.create(Files.createDirectories(databaseDir));
-    final StorageProvider storageProvider = new KeyValueStorageProvider(kv);
-    return storageProvider;
+    return new KeyValueStorageProvider(kv);
   }
 }
