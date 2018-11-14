@@ -163,14 +163,14 @@ public class JsonRpcHttpServiceTest {
 
   @Test
   public void http404() throws Exception {
-    try (final Response resp = client.newCall(requestWithDefaultHeader("/foo")).execute()) {
+    try (final Response resp = client.newCall(requestWithDefaultHost("/foo")).execute()) {
       assertThat(resp.code()).isEqualTo(404);
     }
   }
 
   @Test
   public void handleEmptyRequest() throws Exception {
-    try (final Response resp = client.newCall(requestWithDefaultHeader("")).execute()) {
+    try (final Response resp = client.newCall(requestWithDefaultHost("")).execute()) {
       assertThat(resp.code()).isEqualTo(201);
     }
   }
@@ -219,7 +219,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.header("Content-Type")).isEqualTo("application/json");
     }
   }
@@ -234,7 +234,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -253,7 +253,7 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -272,7 +272,7 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"eth_accounts\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -293,7 +293,7 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_peerCount\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -321,7 +321,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockHash\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String jsonStr = resp.body().string();
@@ -349,7 +349,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockHash\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String jsonStr = resp.body().string();
@@ -378,7 +378,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockNumber\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -406,7 +406,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockNumber\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -433,7 +433,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockNumber\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -461,7 +461,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockNumber\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -485,7 +485,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockNumber\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -508,7 +508,7 @@ public class JsonRpcHttpServiceTest {
                 + params
                 + ",\"method\":\"eth_getUncleCountByBlockNumber\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -528,7 +528,7 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_peerCount\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -559,7 +559,7 @@ public class JsonRpcHttpServiceTest {
                 + address
                 + "\",\"latest\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -591,7 +591,7 @@ public class JsonRpcHttpServiceTest {
                 + address
                 + "\",\"latest\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -622,7 +622,7 @@ public class JsonRpcHttpServiceTest {
                 + address
                 + "\",\"earliest\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -656,7 +656,7 @@ public class JsonRpcHttpServiceTest {
                 + Long.toString(blockNumber, 16)
                 + "\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -686,7 +686,7 @@ public class JsonRpcHttpServiceTest {
     // Setup mocks
     when(blockchainQueries.blockByHash(eq(blockHash))).thenReturn(Optional.empty());
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -718,7 +718,7 @@ public class JsonRpcHttpServiceTest {
                 + blockHash
                 + "\",true]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -750,7 +750,7 @@ public class JsonRpcHttpServiceTest {
                 + blockHash
                 + "\",false]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -776,7 +776,7 @@ public class JsonRpcHttpServiceTest {
     when(blockchainQueries.blockByHash(ArgumentMatchers.isA(Hash.class)))
         .thenReturn(Optional.empty());
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -800,7 +800,7 @@ public class JsonRpcHttpServiceTest {
                 + blockHashString
                 + "\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -823,7 +823,7 @@ public class JsonRpcHttpServiceTest {
                 + blockHashString
                 + "\",true]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -846,7 +846,7 @@ public class JsonRpcHttpServiceTest {
                 + blockHashString
                 + "\",true]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -870,7 +870,7 @@ public class JsonRpcHttpServiceTest {
                 + blockHashString
                 + "\",{}]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -890,7 +890,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"eth_getBlockByHash\", \"params\": []}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -910,7 +910,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"eth_getBlockByHash\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -940,7 +940,7 @@ public class JsonRpcHttpServiceTest {
                 + Long.toString(number, 16)
                 + "\",true]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -972,7 +972,7 @@ public class JsonRpcHttpServiceTest {
                 + Long.toString(number, 16)
                 + "\",false]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -995,7 +995,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"eth_getBlockByNumber\", \"params\": [\"bla\",false]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1024,7 +1024,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"eth_getBlockByNumber\", \"params\": [\"earliest\",true]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1053,7 +1053,7 @@ public class JsonRpcHttpServiceTest {
         blockWithMetadata(block);
     when(blockchainQueries.blockByNumber(eq(0L))).thenReturn(Optional.of(blockWithMetadata));
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1083,7 +1083,7 @@ public class JsonRpcHttpServiceTest {
     when(blockchainQueries.headBlockNumber()).thenReturn(0L);
     when(blockchainQueries.blockByNumber(eq(0L))).thenReturn(Optional.of(blockWithMetadata));
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1105,7 +1105,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"eth_getBlockByNumber\", \"params\": [\"pending\",true]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1127,7 +1127,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\", \"params\": [1,2,3]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1145,7 +1145,7 @@ public class JsonRpcHttpServiceTest {
         RequestBody.create(
             JSON, "{\"id\":" + Json.encode(id) + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       final JsonObject json = new JsonObject(resp.body().string());
       testHelper.assertValidJsonRpcResult(json, id);
@@ -1160,7 +1160,7 @@ public class JsonRpcHttpServiceTest {
     final RequestBody body =
         RequestBody.create(JSON, "{\"jsonrpc\":\"2.0\",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       // Notifications return an empty response
       assertThat(resp.code()).isEqualTo(200);
       final String resBody = resp.body().string();
@@ -1175,7 +1175,7 @@ public class JsonRpcHttpServiceTest {
         RequestBody.create(
             JSON, "{\"jsonrpc\":\"2.0\",\"id\":null,\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1196,7 +1196,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       // An empty string is still a string, so should be a valid id
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
@@ -1218,7 +1218,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1242,7 +1242,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1268,7 +1268,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1289,7 +1289,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1306,7 +1306,7 @@ public class JsonRpcHttpServiceTest {
         RequestBody.create(
             JSON, "{\"jsonrpc\":\"2.0\",\"id\":{},\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.INVALID_REQUEST;
@@ -1321,7 +1321,7 @@ public class JsonRpcHttpServiceTest {
         RequestBody.create(
             JSON, "{\"jsonrpc\":\"2.0\",\"id\":[],\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.INVALID_REQUEST;
@@ -1336,7 +1336,7 @@ public class JsonRpcHttpServiceTest {
     final RequestBody body =
         RequestBody.create(JSON, "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + "}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.INVALID_REQUEST;
@@ -1349,7 +1349,7 @@ public class JsonRpcHttpServiceTest {
   public void invalidJson() throws Exception {
     final RequestBody body = RequestBody.create(JSON, "{bla");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.PARSE_ERROR;
@@ -1362,7 +1362,7 @@ public class JsonRpcHttpServiceTest {
   public void wrongJsonType() throws Exception {
     final RequestBody body = RequestBody.create(JSON, "\"a string\"");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.PARSE_ERROR;
@@ -1381,7 +1381,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(id)
                 + ",\"method\":\"web3_clientVersion\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       final JsonObject json = new JsonObject(resp.body().string());
       testHelper.assertValidJsonRpcResult(json, id);
@@ -1397,7 +1397,7 @@ public class JsonRpcHttpServiceTest {
         RequestBody.create(
             JSON, "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"bla\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.METHOD_NOT_FOUND;
@@ -1418,7 +1418,7 @@ public class JsonRpcHttpServiceTest {
     final RequestBody body =
         RequestBody.create(JSON, "{\"jsonrpc\":\"2.0\",\"id\":\"666\",\"method\":\"foo\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(500);
     }
   }
@@ -1438,7 +1438,7 @@ public class JsonRpcHttpServiceTest {
                 + "{\"jsonrpc\":\"2.0\",\"id\":\"111\",\"method\":\"foo\"},"
                 + "{\"jsonrpc\":\"2.0\",\"id\":\"222\",\"method\":\"net_version\"}]");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(500);
     }
   }
@@ -1461,7 +1461,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(netVersionRequestId)
                 + ",\"method\":\"net_version\"}]");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonArray json = new JsonArray(resp.body().string());
@@ -1509,7 +1509,7 @@ public class JsonRpcHttpServiceTest {
     final String batchRequest = "[" + String.join(", ", reqs) + "]";
     final RequestBody body = RequestBody.create(JSON, batchRequest);
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String jsonStr = resp.body().string();
@@ -1556,7 +1556,7 @@ public class JsonRpcHttpServiceTest {
 
     final RequestBody body = RequestBody.create(JSON, req);
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.PARSE_ERROR;
@@ -1580,7 +1580,7 @@ public class JsonRpcHttpServiceTest {
                 + Json.encode(netVersionRequestId)
                 + ",\"method\":\"net_version\"}]");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final JsonArray json = new JsonArray(resp.body().string());
@@ -1613,7 +1613,7 @@ public class JsonRpcHttpServiceTest {
   public void emptyBatchRequest() throws Exception {
     final RequestBody body = RequestBody.create(JSON, "[]");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonRpcError expectedError = JsonRpcError.INVALID_REQUEST;
@@ -1745,7 +1745,7 @@ public class JsonRpcHttpServiceTest {
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"eth_syncing\"}");
     when(synchronizer.getSyncStatus()).thenReturn(Optional.empty());
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Verify general result format.
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1765,7 +1765,7 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"eth_syncing\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       final String respBody = resp.body().string();
       final JsonObject json = new JsonObject(respBody);
       final JsonObject result = json.getJsonObject("result");
@@ -1832,7 +1832,7 @@ public class JsonRpcHttpServiceTest {
                 + UInt256.ZERO
                 + "\",\"latest\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1867,7 +1867,7 @@ public class JsonRpcHttpServiceTest {
                 + UInt256.ONE
                 + "\",\"latest\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1901,7 +1901,7 @@ public class JsonRpcHttpServiceTest {
                 + UInt256.ONE
                 + "\",\"earliest\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1937,7 +1937,7 @@ public class JsonRpcHttpServiceTest {
                 + 0L
                 + "\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       // Check general format of result
       final String respBody = resp.body().string();
@@ -1969,7 +1969,7 @@ public class JsonRpcHttpServiceTest {
                 + "blah"
                 + "\",\"latest\"]}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -1987,7 +1987,7 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndDefaultHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
     }
   }
@@ -2000,7 +2000,7 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndWildcardHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndWildcardHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
     }
   }
@@ -2013,24 +2013,24 @@ public class JsonRpcHttpServiceTest {
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
 
-    try (final Response resp = client.newCall(requestWithBodyAndUnknownHeader(body)).execute()) {
+    try (final Response resp = client.newCall(requestWithBodyAndUnknownHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(403);
     }
   }
 
-  private Request requestWithBodyAndDefaultHeader(RequestBody body) {
+  private Request requestWithBodyAndDefaultHost(final RequestBody body) {
     return new Request.Builder().post(body).url(baseUrl).addHeader("Host", "localhost").build();
   }
 
-  private Request requestWithDefaultHeader(String path) {
+  private Request requestWithDefaultHost(final String path) {
     return new Request.Builder().get().url(baseUrl + path).addHeader("Host", "localhost").build();
   }
 
-  private Request requestWithBodyAndWildcardHeader(RequestBody body) {
+  private Request requestWithBodyAndWildcardHost(final RequestBody body) {
     return new Request.Builder().post(body).url(baseUrl).addHeader("Host", "*").build();
   }
 
-  private Request requestWithBodyAndUnknownHeader(RequestBody body) {
+  private Request requestWithBodyAndUnknownHost(final RequestBody body) {
     return new Request.Builder().post(body).url(baseUrl).addHeader("Host", "haxor").build();
   }
 }

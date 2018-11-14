@@ -252,10 +252,9 @@ public class EthJsonRpcHttpBySpecTest extends AbstractEthJsonRpcHttpServiceTest 
 
     final String rawRequestBody = spec.getJsonObject("request").toString();
     final RequestBody requestBody = RequestBody.create(JSON, rawRequestBody);
-    final Request request = new Request.Builder().post(requestBody).url(baseUrl).build();
 
     importBlocks(1, BLOCKS.size());
-    try (final Response resp = client.newCall(request).execute()) {
+    try (final Response resp = client.newCall(requestWithDefaultHost(requestBody)).execute()) {
       final int expectedStatusCode = spec.getInteger("statusCode");
       assertThat(resp.code()).isEqualTo(expectedStatusCode);
 
@@ -268,5 +267,9 @@ public class EthJsonRpcHttpBySpecTest extends AbstractEthJsonRpcHttpServiceTest 
     for (int i = from; i < to; ++i) {
       importBlock(i);
     }
+  }
+
+  private Request requestWithDefaultHost(final RequestBody body) {
+    return new Request.Builder().post(body).url(baseUrl).header("Host", "localhost").build();
   }
 }

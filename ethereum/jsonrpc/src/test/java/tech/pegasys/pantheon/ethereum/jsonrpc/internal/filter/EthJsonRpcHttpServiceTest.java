@@ -123,8 +123,7 @@ public class EthJsonRpcHttpServiceTest extends AbstractEthJsonRpcHttpServiceTest
                 + ",\"method\":\""
                 + method
                 + "\"}");
-    final Request request = new Request.Builder().post(body).url(baseUrl).build();
-    return client.newCall(request).execute();
+    return client.newCall(requestWithDefaultHost(body)).execute();
   }
 
   private Response ethNewBlockFilter(final int id) throws Exception {
@@ -141,5 +140,9 @@ public class EthJsonRpcHttpServiceTest extends AbstractEthJsonRpcHttpServiceTest
 
   private Response ethUninstallFilter(final int id, final String filterId) throws Exception {
     return jsonRpcRequest(id, "eth_uninstallFilter", "[\"" + filterId + "\"]");
+  }
+
+  private Request requestWithDefaultHost(final RequestBody body) {
+    return new Request.Builder().post(body).url(baseUrl).addHeader("Host", "localhost").build();
   }
 }

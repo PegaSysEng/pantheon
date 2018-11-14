@@ -62,10 +62,8 @@ public class JsonRpcHttpServiceCorsTest {
   public void requestWithAcceptedOriginShouldSucceed() throws Exception {
     jsonRpcHttpService = createJsonRpcHttpServiceWithAllowedDomains("http://foo.io");
 
-    final Request request =
-        new Builder().url(jsonRpcHttpService.url()).header("Origin", "http://foo.io").build();
-
-    try (final Response response = client.newCall(request).execute()) {
+    try (final Response response =
+        client.newCall(requestWithDefaultHostAndCors("http://foo.io")).execute()) {
       assertThat(response.isSuccessful()).isTrue();
     }
   }
@@ -75,10 +73,8 @@ public class JsonRpcHttpServiceCorsTest {
     jsonRpcHttpService =
         createJsonRpcHttpServiceWithAllowedDomains("http://foo.io", "http://bar.me");
 
-    final Request request =
-        new Builder().url(jsonRpcHttpService.url()).header("Origin", "http://bar.me").build();
-
-    try (final Response response = client.newCall(request).execute()) {
+    try (final Response response =
+        client.newCall(requestWithDefaultHostAndCors("http://bar.me")).execute()) {
       assertThat(response.isSuccessful()).isTrue();
     }
   }
@@ -88,10 +84,8 @@ public class JsonRpcHttpServiceCorsTest {
     jsonRpcHttpService =
         createJsonRpcHttpServiceWithAllowedDomains("http://foo.io", "http://bar.me");
 
-    final Request request =
-        new Builder().url(jsonRpcHttpService.url()).header("Origin", "http://hel.lo").build();
-
-    try (final Response response = client.newCall(request).execute()) {
+    try (final Response response =
+        client.newCall(requestWithDefaultHostAndCors("http://hel.lo")).execute()) {
       assertThat(response.isSuccessful()).isFalse();
     }
   }
@@ -100,9 +94,7 @@ public class JsonRpcHttpServiceCorsTest {
   public void requestWithNoOriginShouldSucceedWhenNoCorsConfigSet() throws Exception {
     jsonRpcHttpService = createJsonRpcHttpServiceWithAllowedDomains();
 
-    final Request request = new Builder().url(jsonRpcHttpService.url()).build();
-
-    try (final Response response = client.newCall(request).execute()) {
+    try (final Response response = client.newCall(requestWithDefaultHost()).execute()) {
       assertThat(response.isSuccessful()).isTrue();
     }
   }
@@ -111,9 +103,7 @@ public class JsonRpcHttpServiceCorsTest {
   public void requestWithNoOriginShouldSucceedWhenCorsIsSet() throws Exception {
     jsonRpcHttpService = createJsonRpcHttpServiceWithAllowedDomains("http://foo.io");
 
-    final Request request = new Builder().url(jsonRpcHttpService.url()).build();
-
-    try (final Response response = client.newCall(request).execute()) {
+    try (final Response response = client.newCall(requestWithDefaultHost()).execute()) {
       assertThat(response.isSuccessful()).isTrue();
     }
   }
@@ -134,10 +124,8 @@ public class JsonRpcHttpServiceCorsTest {
   public void requestWithAnyOriginShouldSucceedWhenCorsIsStart() throws Exception {
     jsonRpcHttpService = createJsonRpcHttpServiceWithAllowedDomains("*");
 
-    final Request request =
-        new Builder().url(jsonRpcHttpService.url()).header("Origin", "http://bar.me").build();
-
-    try (final Response response = client.newCall(request).execute()) {
+    try (final Response response =
+        client.newCall(requestWithDefaultHostAndCors("http://bar.me")).execute()) {
       assertThat(response.isSuccessful()).isTrue();
     }
   }
@@ -152,6 +140,7 @@ public class JsonRpcHttpServiceCorsTest {
             .method("OPTIONS", null)
             .header("Access-Control-Request-Method", "OPTIONS")
             .header("Origin", "http://foo.io")
+            .header("Host", "localhost")
             .build();
 
     try (final Response response = client.newCall(request).execute()) {
@@ -172,5 +161,17 @@ public class JsonRpcHttpServiceCorsTest {
     jsonRpcHttpService.start().join();
 
     return jsonRpcHttpService;
+  }
+
+  private Request requestWithDefaultHostAndCors(final String corsURL) {
+    return new Builder()
+        .url(jsonRpcHttpService.url())
+        .addHeader("Origin", corsURL)
+        .addHeader("Host", "localhost")
+        .build();
+  }
+
+  private Request requestWithDefaultHost() {
+    return new Builder().url(jsonRpcHttpService.url()).addHeader("Host", "localhost").build();
   }
 }

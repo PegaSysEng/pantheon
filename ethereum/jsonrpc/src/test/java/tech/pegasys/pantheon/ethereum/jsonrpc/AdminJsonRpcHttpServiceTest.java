@@ -69,7 +69,8 @@ public class AdminJsonRpcHttpServiceTest extends JsonRpcHttpServiceTest {
         RequestBody.create(
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"admin_peers\"}");
-    final Request request = new Request.Builder().post(body).url(baseUrl).build();
+    final Request request =
+        new Request.Builder().post(body).url(baseUrl).addHeader("Host", "localhost").build();
     LOG.info("Request: " + request);
     try (final Response resp = client.newCall(request).execute()) {
       LOG.info("Response: " + resp);

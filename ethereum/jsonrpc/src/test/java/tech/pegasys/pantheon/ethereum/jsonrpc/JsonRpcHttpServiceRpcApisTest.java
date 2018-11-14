@@ -86,9 +86,8 @@ public class JsonRpcHttpServiceRpcApisTest {
         RequestBody.create(
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
-    final Request request = new Request.Builder().post(body).url(baseUrl).build();
 
-    try (final Response resp = client.newCall(request).execute()) {
+    try (final Response resp = client.newCall(requestWithDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
     }
   }
@@ -101,9 +100,8 @@ public class JsonRpcHttpServiceRpcApisTest {
         RequestBody.create(
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
-    final Request request = new Request.Builder().post(body).url(baseUrl).build();
 
-    try (final Response resp = client.newCall(request).execute()) {
+    try (final Response resp = client.newCall(requestWithDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
     }
   }
@@ -116,9 +114,8 @@ public class JsonRpcHttpServiceRpcApisTest {
         RequestBody.create(
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
-    final Request request = new Request.Builder().post(body).url(baseUrl).build();
 
-    try (final Response resp = client.newCall(request).execute()) {
+    try (final Response resp = client.newCall(requestWithDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
@@ -136,9 +133,8 @@ public class JsonRpcHttpServiceRpcApisTest {
         RequestBody.create(
             JSON,
             "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
-    final Request request = new Request.Builder().post(body).url(baseUrl).build();
 
-    try (final Response resp = client.newCall(request).execute()) {
+    try (final Response resp = client.newCall(requestWithDefaultHost(body)).execute()) {
       assertThat(resp.code()).isEqualTo(200);
     }
   }
@@ -184,5 +180,9 @@ public class JsonRpcHttpServiceRpcApisTest {
 
     baseUrl = jsonRpcHttpService.url();
     return jsonRpcHttpService;
+  }
+
+  private Request requestWithDefaultHost(final RequestBody body) {
+    return new Request.Builder().post(body).url(baseUrl).header("Host", "localhost").build();
   }
 }
