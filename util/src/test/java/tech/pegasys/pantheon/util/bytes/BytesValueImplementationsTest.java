@@ -30,8 +30,6 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import com.google.common.io.BaseEncoding;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.vertx.core.buffer.Buffer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,12 +71,6 @@ public class BytesValueImplementationsTest {
             (BytesValueSliceCreator) (b, start, len) -> BytesValue.wrapBuffer(buffer(b), start, len)
           },
           {
-            "BytesValue.wrapBuffer() (Netty ByteBuf)",
-            (BytesValueCreator) (b) -> BytesValue.wrapBuffer(byteBuf(b)),
-            (BytesValueSliceCreator)
-                (b, start, len) -> BytesValue.wrapBuffer(byteBuf(b), start, len)
-          },
-          {
             "BytesValue.wrapBuffer() (nio ByteBuffer)",
             (BytesValueCreator) (b) -> BytesValue.wrapBuffer(byteBuffer(b)),
             (BytesValueSliceCreator)
@@ -94,12 +86,6 @@ public class BytesValueImplementationsTest {
             (BytesValueCreator) (b) -> MutableBytesValue.wrapBuffer(buffer(b)),
             (BytesValueSliceCreator)
                 (b, start, len) -> MutableBytesValue.wrapBuffer(buffer(b), start, len)
-          },
-          {
-            "MutableBytesValue.wrapBuffer() (Netty ByteBuf)",
-            (BytesValueCreator) (b) -> MutableBytesValue.wrapBuffer(byteBuf(b)),
-            (BytesValueSliceCreator)
-                (b, start, len) -> MutableBytesValue.wrapBuffer(byteBuf(b), start, len)
           },
           {
             "MutableBytesValue.wrapBuffer() (nio ByteBuffer)",
@@ -124,12 +110,6 @@ public class BytesValueImplementationsTest {
                 (b, start, len) -> new MutableBufferWrappingBytesValue(buffer(b), start, len)
           },
           {
-            MutableByteBufWrappingBytesValue.class.getSimpleName(),
-            (BytesValueCreator) (b) -> new MutableByteBufWrappingBytesValue(byteBuf(b)),
-            (BytesValueSliceCreator)
-                (b, start, len) -> new MutableByteBufWrappingBytesValue(byteBuf(b), start, len),
-          },
-          {
             MutableByteBufferWrappingBytesValue.class.getSimpleName(),
             (BytesValueCreator) (b) -> new MutableByteBufferWrappingBytesValue(byteBuffer(b)),
             (BytesValueSliceCreator)
@@ -143,10 +123,6 @@ public class BytesValueImplementationsTest {
     return ByteBuffer.wrap(bytes);
   }
 
-  private static ByteBuf byteBuf(final byte[] bytes) {
-    return Unpooled.copiedBuffer(bytes);
-  }
-
   private static Buffer buffer(final byte[] bytes) {
     return Buffer.buffer(bytes);
   }
@@ -155,18 +131,12 @@ public class BytesValueImplementationsTest {
     return Buffer.buffer(fromHexString(hex).getArrayUnsafe());
   }
 
-  private static ByteBuf hexToByteBuf(final String hex) {
-    final byte[] bytes = fromHexString(hex).getArrayUnsafe();
-    return Unpooled.unreleasableBuffer(Unpooled.buffer(bytes.length, Integer.MAX_VALUE))
-        .writeBytes(bytes);
-  }
-
   private BytesValue fromHex(final String hex) {
     String hexVal = hex;
     if (hex.substring(0, 2).equals("0x")) {
       hexVal = hex.substring((2));
     }
-    byte[] bytes = BaseEncoding.base16().decode(hexVal);
+    final byte[] bytes = BaseEncoding.base16().decode(hexVal);
     return creator.create(bytes);
   }
 
@@ -365,32 +335,6 @@ public class BytesValueImplementationsTest {
       final BytesValue toAppend, final Buffer buffer, final BytesValue expected) {
     toAppend.appendTo(buffer);
     assertEquals(expected, BytesValue.wrap(buffer.getBytes()));
-  }
-
-  @Test
-  public void appendingToByteBuf() {
-    final byte[] bytes0 = new byte[0];
-    final byte[] bytes1 = new byte[0];
-    assertAppendToByteBuf(
-        BytesValue.EMPTY,
-        Unpooled.unreleasableBuffer(Unpooled.buffer(bytes0.length, Integer.MAX_VALUE))
-            .writeBytes(bytes0),
-        BytesValue.EMPTY);
-    assertAppendToByteBuf(BytesValue.EMPTY, hexToByteBuf("0x1234"), fromHex("0x1234"));
-    assertAppendToByteBuf(
-        fromHex("0x1234"),
-        Unpooled.unreleasableBuffer(Unpooled.buffer(bytes1.length, Integer.MAX_VALUE))
-            .writeBytes(bytes1),
-        fromHex("0x1234"));
-    assertAppendToByteBuf(fromHex("0x5678"), hexToByteBuf("0x1234"), fromHex("0x12345678"));
-  }
-
-  private void assertAppendToByteBuf(
-      final BytesValue toAppend, final ByteBuf buffer, final BytesValue expected) {
-    toAppend.appendTo(buffer);
-    final byte[] arr = new byte[buffer.writerIndex()];
-    buffer.getBytes(0, arr);
-    assertEquals(expected, BytesValue.wrap(arr));
   }
 
   @SuppressWarnings("DoNotInvokeMessageDigestDirectly")
@@ -646,11 +590,11 @@ public class BytesValueImplementationsTest {
 
   @FunctionalInterface
   private interface BytesValueCreator {
-    public BytesValue create(byte[] bytes);
+    BytesValue create(byte[] bytes);
   }
 
   @FunctionalInterface
   private interface BytesValueSliceCreator {
-    public BytesValue create(byte[] bytes, int start, int length);
+    BytesValue create(byte[] bytes, int start, int length);
   }
 }
