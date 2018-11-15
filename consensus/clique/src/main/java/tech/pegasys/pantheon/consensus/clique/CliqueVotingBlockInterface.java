@@ -27,7 +27,8 @@ import com.google.common.collect.ImmutableBiMap;
 
 public class CliqueVotingBlockInterface implements VoteBlockInterface {
 
-  public static final Address NO_VOTE_SUBJECT = Address.wrap(BytesValue.wrap(new byte[20]));
+  public static final Address NO_VOTE_SUBJECT =
+      Address.wrap(BytesValue.wrap(new byte[Address.SIZE]));
 
   private static final ImmutableBiMap<ValidatorVotePolarity, Long> voteToValue =
       ImmutableBiMap.of(
@@ -38,8 +39,8 @@ public class CliqueVotingBlockInterface implements VoteBlockInterface {
   public Optional<CastVote> extractVoteFromHeader(final BlockHeader header) {
     final Address candidate = header.getCoinbase();
     if (!candidate.equals(NO_VOTE_SUBJECT)) {
-      final CliqueExtraData ibftExtraData = CliqueExtraData.decode(header.getExtraData());
-      final Address proposer = CliqueBlockHashing.recoverProposerAddress(header, ibftExtraData);
+      final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(header.getExtraData());
+      final Address proposer = CliqueBlockHashing.recoverProposerAddress(header, cliqueExtraData);
       final ValidatorVotePolarity votePolarity = voteToValue.inverse().get(header.getNonce());
       final Address recipient = header.getCoinbase();
 
@@ -52,7 +53,7 @@ public class CliqueVotingBlockInterface implements VoteBlockInterface {
   public BlockHeaderBuilder insertVoteToHeaderBuilder(
       final BlockHeaderBuilder builder, final Optional<CastVote> vote) {
     if (vote.isPresent()) {
-      CastVote voteToCast = vote.get();
+      final CastVote voteToCast = vote.get();
       builder.nonce(voteToValue.get(voteToCast.getVotePolarity()));
       builder.coinbase(voteToCast.getRecipient());
     } else {

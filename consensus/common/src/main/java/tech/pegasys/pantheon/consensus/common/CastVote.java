@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.common;
 
+import com.google.common.base.Preconditions;
+import java.util.Objects;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
 public class CastVote {
@@ -22,6 +24,9 @@ public class CastVote {
 
   public CastVote(
       final ValidatorVotePolarity votePolarity, final Address proposer, final Address recipient) {
+    Preconditions.checkNotNull(votePolarity);
+    Preconditions.checkNotNull(proposer);
+    Preconditions.checkNotNull(recipient);
     this.votePolarity = votePolarity;
     this.proposer = proposer;
     this.recipient = recipient;
@@ -37,5 +42,24 @@ public class CastVote {
 
   public Address getRecipient() {
     return recipient;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    CastVote castVote = (CastVote) o;
+    return votePolarity == castVote.votePolarity &&
+        Objects.equals(proposer, castVote.proposer) &&
+        Objects.equals(recipient, castVote.recipient);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(votePolarity, proposer, recipient);
   }
 }

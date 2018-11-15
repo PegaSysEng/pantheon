@@ -13,10 +13,12 @@
 package tech.pegasys.pantheon.consensus.clique;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.ADD;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.DROP;
 
+import org.junit.Before;
 import tech.pegasys.pantheon.consensus.common.CastVote;
-import tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
@@ -33,67 +35,56 @@ import org.junit.Test;
 
 public class CliqueVotingBlockInterfaceTest {
 
-  private final KeyPair proposerKeys = KeyPair.generate();
-  private final Address proposerAddress = Util.publicKeyToAddress(proposerKeys.getPublicKey());
-  private final List<Address> validatorList = singletonList(proposerAddress);
+  private final static KeyPair proposerKeys = KeyPair.generate();
+  private final static Address proposerAddress =
+      Util.publicKeyToAddress(proposerKeys.getPublicKey());
+  private final static List<Address> validatorList = singletonList(proposerAddress);
+
+  private final CliqueVotingBlockInterface blockInterface = new CliqueVotingBlockInterface();
+
+  private final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
+
+  private final BlockHeader header =
+      TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
+
+  private final BlockHeaderBuilder builder =
+      BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
+          .blockHashFunction(MainnetBlockHashFunction::createHash);
 
   @Test
   public void headerWithZeroCoinbaseReturnsAnEmptyVote() {
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     headerBuilder.coinbase(AddressHelpers.ofValue(0));
-    final CliqueVotingBlockInterface serDeser = new CliqueVotingBlockInterface();
 
-    assertThat(serDeser.extractVoteFromHeader(headerBuilder.buildHeader()))
-        .isEqualTo(Optional.empty());
+    assertThat(blockInterface.extractVoteFromHeader(headerBuilder.buildHeader())).isEmpty();
   }
 
   @Test
   public void headerWithNonceOfZeroReportsDropVote() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     headerBuilder.coinbase(AddressHelpers.ofValue(1)).nonce(0L);
-    final CliqueVotingBlockInterface serDeser = new CliqueVotingBlockInterface();
 
-    final BlockHeader header =
-        TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
-    final Optional<CastVote> extractedVote = serDeser.extractVoteFromHeader(header);
+    final Optional<CastVote> extractedVote = blockInterface.extractVoteFromHeader(header);
 
-    assertThat(extractedVote).isNotEqualTo(Optional.empty());
-    assertThat(extractedVote.get().getRecipient()).isEqualTo(header.getCoinbase());
-    assertThat(extractedVote.get().getVotePolarity()).isEqualTo(ValidatorVotePolarity.DROP);
-    assertThat(extractedVote.get().getProposer()).isEqualTo(proposerAddress);
+    assertThat(extractedVote).contains(new CastVote(DROP, proposerAddress, header.getCoinbase()));
   }
 
   @Test
   public void headerWithNonceOfMaxLongReportsAddVote() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     headerBuilder.coinbase(AddressHelpers.ofValue(2)).nonce(0xFFFFFFFFFFFFFFFFL);
-    final CliqueVotingBlockInterface serDeser = new CliqueVotingBlockInterface();
 
     final BlockHeader header =
         TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
-    final Optional<CastVote> extractedVote = serDeser.extractVoteFromHeader(header);
+    final Optional<CastVote> extractedVote = blockInterface.extractVoteFromHeader(header);
 
-    assertThat(extractedVote).isNotEqualTo(Optional.empty());
-    assertThat(extractedVote.get().getRecipient()).isEqualTo(header.getCoinbase());
-    assertThat(extractedVote.get().getVotePolarity()).isEqualTo(ValidatorVotePolarity.ADD);
-    assertThat(extractedVote.get().getProposer()).isEqualTo(proposerAddress);
+    assertThat(extractedVote).contains(new CastVote(ADD, proposerAddress, header.getCoinbase()));
   }
 
   @Test
   public void blendingAddVoteToHeaderResultsInHeaderWithNonceOfMaxLong() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
-    final BlockHeaderBuilder builder =
-        BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-            .blockHashFunction(MainnetBlockHashFunction::createHash);
-
-    final CliqueVotingBlockInterface serDeser = new CliqueVotingBlockInterface();
-
-    CastVote vote =
-        new CastVote(
-            ValidatorVotePolarity.ADD, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final CastVote vote = new CastVote(ADD, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
-        serDeser.insertVoteToHeaderBuilder(builder, Optional.of(vote));
+        blockInterface.insertVoteToHeaderBuilder(builder, Optional.of(vote));
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -103,19 +94,10 @@ public class CliqueVotingBlockInterfaceTest {
 
   @Test
   public void blendingDropVoteToHeaderResultsInHeaderWithNonceOfZero() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
-    final BlockHeaderBuilder builder =
-        BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-            .blockHashFunction(MainnetBlockHashFunction::createHash);
-
-    final CliqueVotingBlockInterface serDeser = new CliqueVotingBlockInterface();
-
-    CastVote vote =
-        new CastVote(
-            ValidatorVotePolarity.DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final CastVote vote = new CastVote(DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
-        serDeser.insertVoteToHeaderBuilder(builder, Optional.of(vote));
+        blockInterface.insertVoteToHeaderBuilder(builder, Optional.of(vote));
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -125,15 +107,8 @@ public class CliqueVotingBlockInterfaceTest {
 
   @Test
   public void nonVoteBlendedIntoHeaderResultsInACoinbaseOfZero() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-
-    final BlockHeaderBuilder builder =
-        BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-            .blockHashFunction(MainnetBlockHashFunction::createHash);
-
-    final CliqueVotingBlockInterface serDeser = new CliqueVotingBlockInterface();
     final BlockHeaderBuilder builderWithVote =
-        serDeser.insertVoteToHeaderBuilder(builder, Optional.empty());
+        blockInterface.insertVoteToHeaderBuilder(builder, Optional.empty());
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -143,12 +118,9 @@ public class CliqueVotingBlockInterfaceTest {
 
   @Test
   public void extractsValidatorsFromHeader() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     final BlockHeader header =
         TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
-
-    final CliqueVotingBlockInterface serDeser = new CliqueVotingBlockInterface();
-    final List<Address> extractedValidators = serDeser.validatorsInBlock(header);
+    final List<Address> extractedValidators = blockInterface.validatorsInBlock(header);
 
     assertThat(extractedValidators).isEqualTo(validatorList);
   }

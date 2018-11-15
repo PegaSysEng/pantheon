@@ -13,10 +13,15 @@
 package tech.pegasys.pantheon.consensus.ibftlegacy;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.ADD;
+import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.DROP;
 
+import java.util.List;
+import java.util.Optional;
+import org.junit.Before;
+import org.junit.Test;
 import tech.pegasys.pantheon.consensus.common.CastVote;
-import tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
@@ -26,77 +31,56 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.Test;
-
 public class IbftLegacyVoteBlockInterfaceTest {
 
-  private final KeyPair proposerKeys = KeyPair.generate();
-  private final Address proposerAddress = Util.publicKeyToAddress(proposerKeys.getPublicKey());
-  private final List<Address> validatorList = singletonList(proposerAddress);
+  private static final KeyPair proposerKeys = KeyPair.generate();
+  private static final Address proposerAddress =
+      Util.publicKeyToAddress(proposerKeys.getPublicKey());
+  private static final List<Address> validatorList = singletonList(proposerAddress);
+
+  private final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
+  private final IbftLegacyVoteBlockInterface blockInterface = new IbftLegacyVoteBlockInterface();
+  private final BlockHeaderBuilder builder =
+      BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
+          .blockHashFunction(MainnetBlockHashFunction::createHash);
+
+  @Before
+  public void setup() {
+    // must set "number" to ensure extradata is correctly deserialised during hashing.
+    headerBuilder.coinbase(AddressHelpers.ofValue(0)).number(1);
+  }
 
   @Test
   public void headerWithZeroCoinbaseReturnsAnEmptyVote() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-    // must set "number" to ensure extradata is correctly deserialised during hashing.
-    headerBuilder.coinbase(AddressHelpers.ofValue(0)).number(1);
-    final IbftLegacyVoteBlockInterface serDeser = new IbftLegacyVoteBlockInterface();
-
-    assertThat(serDeser.extractVoteFromHeader(headerBuilder.buildHeader()))
+    assertThat(blockInterface.extractVoteFromHeader(headerBuilder.buildHeader()))
         .isEqualTo(Optional.empty());
   }
 
   @Test
   public void headerWithNonceOfZeroReportsDropVote() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-    // must set "number" to ensure extradata is correctly deserialised during hashing.
-    headerBuilder.coinbase(AddressHelpers.ofValue(1)).nonce(0L).number(1);
-    final IbftLegacyVoteBlockInterface serDeser = new IbftLegacyVoteBlockInterface();
-
     final BlockHeader header =
         TestHelpers.createIbftSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
-    final Optional<CastVote> extractedVote = serDeser.extractVoteFromHeader(header);
+    final Optional<CastVote> extractedVote = blockInterface.extractVoteFromHeader(header);
 
-    assertThat(extractedVote).isNotEqualTo(Optional.empty());
-    assertThat(extractedVote.get().getRecipient()).isEqualTo(header.getCoinbase());
-    assertThat(extractedVote.get().getVotePolarity()).isEqualTo(ValidatorVotePolarity.DROP);
-    assertThat(extractedVote.get().getProposer()).isEqualTo(proposerAddress);
+    assertThat(extractedVote).contains(new CastVote(DROP, proposerAddress, header.getCoinbase()));
   }
 
   @Test
   public void headerWithNonceOfMaxLongReportsAddVote() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-    // must set "number" to ensure extradata is correctly deserialised during hashing.
-    headerBuilder.coinbase(AddressHelpers.ofValue(2)).nonce(0xFFFFFFFFFFFFFFFFL).number(1);
-    final IbftLegacyVoteBlockInterface serDeser = new IbftLegacyVoteBlockInterface();
+    headerBuilder.nonce(0xFFFFFFFFFFFFFFFFL);
 
     final BlockHeader header =
         TestHelpers.createIbftSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
-    final Optional<CastVote> extractedVote = serDeser.extractVoteFromHeader(header);
+    final Optional<CastVote> extractedVote = blockInterface.extractVoteFromHeader(header);
 
-    assertThat(extractedVote).isNotEqualTo(Optional.empty());
-    assertThat(extractedVote.get().getRecipient()).isEqualTo(header.getCoinbase());
-    assertThat(extractedVote.get().getVotePolarity()).isEqualTo(ValidatorVotePolarity.ADD);
-    assertThat(extractedVote.get().getProposer()).isEqualTo(proposerAddress);
+    assertThat(extractedVote).contains(new CastVote(ADD, proposerAddress, header.getCoinbase()));
   }
 
   @Test
   public void blendingAddVoteToHeaderResultsInHeaderWithNonceOfMaxLong() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-
-    final BlockHeaderBuilder builder =
-        BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-            .blockHashFunction(MainnetBlockHashFunction::createHash);
-
-    final IbftLegacyVoteBlockInterface serDeser = new IbftLegacyVoteBlockInterface();
-
-    CastVote vote =
-        new CastVote(
-            ValidatorVotePolarity.ADD, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final CastVote vote = new CastVote(ADD, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
-        serDeser.insertVoteToHeaderBuilder(builder, Optional.of(vote));
+        blockInterface.insertVoteToHeaderBuilder(builder, Optional.of(vote));
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -106,19 +90,10 @@ public class IbftLegacyVoteBlockInterfaceTest {
 
   @Test
   public void blendingDropVoteToHeaderResultsInHeaderWithNonceOfZero() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-
-    final BlockHeaderBuilder builder =
-        BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-            .blockHashFunction(MainnetBlockHashFunction::createHash);
-
-    final IbftLegacyVoteBlockInterface serDeser = new IbftLegacyVoteBlockInterface();
-
-    CastVote vote =
-        new CastVote(
-            ValidatorVotePolarity.DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final CastVote vote =
+        new CastVote(DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
-        serDeser.insertVoteToHeaderBuilder(builder, Optional.of(vote));
+        blockInterface.insertVoteToHeaderBuilder(builder, Optional.of(vote));
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -128,15 +103,8 @@ public class IbftLegacyVoteBlockInterfaceTest {
 
   @Test
   public void nonVoteBlendedIntoHeaderResultsInACoinbaseOfZero() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-
-    final BlockHeaderBuilder builder =
-        BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-            .blockHashFunction(MainnetBlockHashFunction::createHash);
-
-    final IbftLegacyVoteBlockInterface serDeser = new IbftLegacyVoteBlockInterface();
     final BlockHeaderBuilder builderWithVote =
-        serDeser.insertVoteToHeaderBuilder(builder, Optional.empty());
+        blockInterface.insertVoteToHeaderBuilder(builder, Optional.empty());
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -146,7 +114,6 @@ public class IbftLegacyVoteBlockInterfaceTest {
 
   @Test
   public void extractsValidatorsFromHeader() {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     final BlockHeader header =
         TestHelpers.createIbftSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
 

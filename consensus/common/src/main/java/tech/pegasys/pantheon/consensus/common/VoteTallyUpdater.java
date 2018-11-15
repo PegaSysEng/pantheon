@@ -31,12 +31,12 @@ public class VoteTallyUpdater {
   private static final Logger LOG = LogManager.getLogger();
 
   private final EpochManager epochManager;
-  private final VoteBlockInterface serialiserDeserialiser;
+  private final VoteBlockInterface blockInterface;
 
   public VoteTallyUpdater(
-      final EpochManager epochManager, final VoteBlockInterface serialiserDeserialiser) {
+      final EpochManager epochManager, final VoteBlockInterface blockInterface) {
     this.epochManager = epochManager;
-    this.serialiserDeserialiser = serialiserDeserialiser;
+    this.blockInterface = blockInterface;
   }
 
   /**
@@ -50,7 +50,7 @@ public class VoteTallyUpdater {
     final long epochBlockNumber = epochManager.getLastEpochBlock(chainHeadBlockNumber);
     LOG.info("Loading validator voting state starting from block {}", epochBlockNumber);
     final BlockHeader epochBlock = blockchain.getBlockHeader(epochBlockNumber).get();
-    final List<Address> initialValidators = serialiserDeserialiser.validatorsInBlock(epochBlock);
+    final List<Address> initialValidators = blockInterface.validatorsInBlock(epochBlock);
     final VoteTally voteTally = new VoteTally(initialValidators);
     for (long blockNumber = epochBlockNumber + 1;
         blockNumber <= chainHeadBlockNumber;
@@ -71,7 +71,7 @@ public class VoteTallyUpdater {
       voteTally.discardOutstandingVotes();
       return;
     }
-    final Optional<CastVote> vote = serialiserDeserialiser.extractVoteFromHeader(header);
-    vote.ifPresent(v -> voteTally.addVote(v.getProposer(), v.getRecipient(), v.getVotePolarity()));
+    final Optional<CastVote> vote = blockInterface.extractVoteFromHeader(header);
+    vote.ifPresent(voteTally::addVote);
   }
 }
