@@ -398,7 +398,7 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
       // may kill some of "their" updates, and our updates may review some of the account "they"
       // deleted.
       deletedAccounts().forEach(wrapped.updatedAccounts::remove);
-      updatedAccounts().forEach(a -> wrapped.deletedAccounts.remove(a.getAddressHash()));
+      updatedAccounts().forEach(a -> wrapped.deletedAccounts.remove(a.getAddress()));
 
       // Then push our deletes and updates to the stacked ones.
       wrapped.deletedAccounts.addAll(deletedAccounts());
