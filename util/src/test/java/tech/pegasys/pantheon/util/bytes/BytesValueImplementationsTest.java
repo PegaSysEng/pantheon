@@ -131,6 +131,10 @@ public class BytesValueImplementationsTest {
     return Buffer.buffer(fromHexString(hex).getArrayUnsafe());
   }
 
+  private static byte[] hexToByteArray(final String hex) {
+    return fromHexString(hex).getArrayUnsafe();
+  }
+
   private BytesValue fromHex(final String hex) {
     String hexVal = hex;
     if (hex.substring(0, 2).equals("0x")) {
@@ -324,17 +328,38 @@ public class BytesValueImplementationsTest {
   }
 
   @Test
-  public void appending() {
-    assertAppendTo(BytesValue.EMPTY, Buffer.buffer(), BytesValue.EMPTY);
-    assertAppendTo(BytesValue.EMPTY, hexToBuffer("0x1234"), fromHex("0x1234"));
-    assertAppendTo(fromHex("0x1234"), Buffer.buffer(), fromHex("0x1234"));
-    assertAppendTo(fromHex("0x5678"), hexToBuffer("0x1234"), fromHex("0x12345678"));
+  public void appendingToBuffer() {
+    assertAppendToBuffer(BytesValue.EMPTY, Buffer.buffer(), BytesValue.EMPTY);
+    assertAppendToBuffer(BytesValue.EMPTY, hexToBuffer("0x1234"), fromHex("0x1234"));
+    assertAppendToBuffer(fromHex("0x1234"), Buffer.buffer(), fromHex("0x1234"));
+    assertAppendToBuffer(fromHex("0x5678"), hexToBuffer("0x1234"), fromHex("0x12345678"));
   }
 
-  private void assertAppendTo(
+  private void assertAppendToBuffer(
       final BytesValue toAppend, final Buffer buffer, final BytesValue expected) {
     toAppend.appendTo(buffer);
     assertEquals(expected, BytesValue.wrap(buffer.getBytes()));
+  }
+
+  @Test
+  public void copyingToByteArray() {
+    assertCopyToByteArray(BytesValue.EMPTY, 0, new byte[0], 0, BytesValue.EMPTY);
+    assertCopyToByteArray(BytesValue.EMPTY, 0, hexToByteArray("0x1234"), 2, fromHex("0x1234"));
+    assertCopyToByteArray(fromHex("0x1234"), 0, new byte[2], 0, fromHex("0x1234"));
+    assertCopyToByteArray(fromHex("0x1234"), 1, new byte[2], 0, fromHex("0x3400"));
+    assertCopyToByteArray(fromHex("0x1234"), 1, new byte[2], 1, fromHex("0x0034"));
+    assertCopyToByteArray(
+        fromHex("0x5678"), 0, Arrays.copyOf(hexToByteArray("0x1234"), 4), 2, fromHex("0x12345678"));
+  }
+
+  private void assertCopyToByteArray(
+      final BytesValue toAppend,
+      final int srcPos,
+      final byte[] dest,
+      final int destPos,
+      final BytesValue expected) {
+    toAppend.copyTo(dest, srcPos, destPos);
+    assertEquals(expected, BytesValue.wrap(dest));
   }
 
   @SuppressWarnings("DoNotInvokeMessageDigestDirectly")

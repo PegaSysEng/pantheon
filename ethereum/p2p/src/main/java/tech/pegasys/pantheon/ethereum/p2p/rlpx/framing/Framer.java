@@ -332,7 +332,7 @@ public class Framer {
     f[0] = bv.get(0);
 
     // Zero-padded to 16-byte boundary.
-    System.arraycopy(message.getData().getArrayUnsafe(), 0, f, 1, message.getSize());
+    message.getData().copyTo(f, 0, 1);
     encryptor.processBytes(f, 0, f.length, f, 0);
 
     // Calculate the frame MAC.

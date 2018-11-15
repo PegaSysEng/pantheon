@@ -442,6 +442,10 @@ public interface BytesValue extends Comparable<BytesValue> {
     }
   }
 
+  default void copyTo(final byte[] dest, final int srcPos, final int destPos) {
+    System.arraycopy(getArrayUnsafe(), srcPos, dest, destPos, size() - srcPos);
+  }
+
   /**
    * Return the number of bytes in common between this set of bytes and another.
    *
