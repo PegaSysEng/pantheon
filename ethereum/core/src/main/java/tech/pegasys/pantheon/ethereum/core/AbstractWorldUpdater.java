@@ -411,7 +411,7 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
           existing = update.getWrappedAccount();
           if (existing == null) {
             // Brand new account, create our own version
-            existing = new UpdateTrackingAccount<A>(update.address);
+            existing = new UpdateTrackingAccount<>(update.address);
           }
           wrapped.updatedAccounts.put(existing.address, existing);
         }
