@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.consensus.clique.CliqueBlockHashing;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.clique.CliqueVotingBlockInterface;
-import tech.pegasys.pantheon.consensus.common.CastVote;
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -40,7 +40,8 @@ import java.util.function.Function;
 public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
 
   private final KeyPair nodeKeys;
-  private static final CliqueVotingBlockInterface votingInterface = new CliqueVotingBlockInterface();
+  private static final CliqueVotingBlockInterface votingInterface =
+      new CliqueVotingBlockInterface();
 
   public CliqueBlockCreator(
       final Address coinbase,
@@ -88,7 +89,9 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
     final CliqueContext cliqueContext = protocolContext.getConsensusState();
     final VoteTally voteTally = cliqueContext.getVoteTallyCache().getVoteTallyAtBlock(parentHeader);
 
-    final Optional<CastVote> vote = cliqueContext.getVoteProposer()
+    final Optional<ValidatorVote> vote =
+        cliqueContext
+            .getVoteProposer()
             .getVote(Util.publicKeyToAddress(nodeKeys.getPublicKey()), voteTally);
     votingInterface.insertVoteToHeaderBuilder(builder, vote);
 

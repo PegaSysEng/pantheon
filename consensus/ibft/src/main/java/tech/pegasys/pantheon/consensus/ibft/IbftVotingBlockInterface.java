@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import tech.pegasys.pantheon.consensus.common.CastVote;
 import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteBlockInterface;
+import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
@@ -25,14 +25,14 @@ import java.util.Optional;
 public class IbftVotingBlockInterface implements VoteBlockInterface {
 
   @Override
-  public Optional<CastVote> extractVoteFromHeader(final BlockHeader header) {
+  public Optional<ValidatorVote> extractVoteFromHeader(final BlockHeader header) {
     final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
 
     if (ibftExtraData.getVote().isPresent()) {
       final Vote headerVote = ibftExtraData.getVote().get();
-      final CastVote vote =
-          new CastVote(
-              headerVote.isAuth() ? ValidatorVote.ADD : ValidatorVote.DROP,
+      final ValidatorVote vote =
+          new ValidatorVote(
+              headerVote.isAuth() ? VoteType.ADD : VoteType.DROP,
               header.getCoinbase(),
               headerVote.getRecipient());
       return Optional.of(vote);
@@ -42,14 +42,14 @@ public class IbftVotingBlockInterface implements VoteBlockInterface {
 
   @Override
   public BlockHeaderBuilder insertVoteToHeaderBuilder(
-      final BlockHeaderBuilder builder, final Optional<CastVote> vote) {
+      final BlockHeaderBuilder builder, final Optional<ValidatorVote> vote) {
     final BlockHeader header = builder.buildBlockHeader();
     final IbftExtraData extraData = IbftExtraData.decode(header.getExtraData());
 
     Optional<Vote> headerVote = Optional.empty();
 
     if (vote.isPresent()) {
-      final CastVote voteToCast = vote.get();
+      final ValidatorVote voteToCast = vote.get();
       headerVote = Optional.of(new Vote(voteToCast.getRecipient(), voteToCast.getVotePolarity()));
     }
 

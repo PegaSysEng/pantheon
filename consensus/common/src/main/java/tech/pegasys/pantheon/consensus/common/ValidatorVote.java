@@ -12,19 +12,62 @@
  */
 package tech.pegasys.pantheon.consensus.common;
 
-/**
-  * Determines if a validator vote is indicating that they should be added, or removed.
-  * This does not attempt to determine how said vote should be serialised/deserialised.
-  */
-public enum ValidatorVote {
-  ADD,
-  DROP;
+import static tech.pegasys.pantheon.consensus.common.VoteType.ADD;
 
-  public boolean isAddVote() {
-    return this.equals(ADD);
+import tech.pegasys.pantheon.ethereum.core.Address;
+
+import java.util.Objects;
+
+import com.google.common.base.Preconditions;
+
+public class ValidatorVote {
+
+  private final VoteType votePolarity;
+  private final Address proposer;
+  private final Address recipient;
+
+  public ValidatorVote(
+      final VoteType votePolarity, final Address proposer, final Address recipient) {
+    Preconditions.checkNotNull(votePolarity);
+    Preconditions.checkNotNull(proposer);
+    Preconditions.checkNotNull(recipient);
+    this.votePolarity = votePolarity;
+    this.proposer = proposer;
+    this.recipient = recipient;
   }
 
-  public boolean isDropVote() {
-    return this.equals(DROP);
+  public VoteType getVotePolarity() {
+    return votePolarity;
+  }
+
+  public Address getProposer() {
+    return proposer;
+  }
+
+  public Address getRecipient() {
+    return recipient;
+  }
+
+  public boolean isAuthVote() {
+    return votePolarity.equals(ADD);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ValidatorVote validatorVote = (ValidatorVote) o;
+    return votePolarity == validatorVote.votePolarity
+        && Objects.equals(proposer, validatorVote.proposer)
+        && Objects.equals(recipient, validatorVote.recipient);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(votePolarity, proposer, recipient);
   }
 }

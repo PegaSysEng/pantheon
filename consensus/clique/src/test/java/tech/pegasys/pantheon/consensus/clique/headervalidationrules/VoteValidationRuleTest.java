@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.consensus.clique.headervalidationrules;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueVotingBlockInterface;
-import tech.pegasys.pantheon.consensus.common.ValidatorVote;
+import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 
@@ -35,8 +35,8 @@ public class VoteValidationRuleTest {
   public static Collection<Object[]> data() {
     return Arrays.asList(
         new Object[][] {
-          {CliqueVotingBlockInterface.voteToValue.get(ValidatorVote.DROP), true},
-          {CliqueVotingBlockInterface.voteToValue.get(ValidatorVote.ADD), true},
+          {CliqueVotingBlockInterface.voteToValue.get(VoteType.DROP), true},
+          {CliqueVotingBlockInterface.voteToValue.get(VoteType.ADD), true},
           {0x01L, false},
           {0xFFFFFFFFFFFFFFFEL, false}
         });

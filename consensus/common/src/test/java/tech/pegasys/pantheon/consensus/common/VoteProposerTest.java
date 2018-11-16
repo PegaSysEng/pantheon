@@ -13,8 +13,8 @@
 package tech.pegasys.pantheon.consensus.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.common.ValidatorVote.ADD;
-import static tech.pegasys.pantheon.consensus.common.ValidatorVote.DROP;
+import static tech.pegasys.pantheon.consensus.common.VoteType.ADD;
+import static tech.pegasys.pantheon.consensus.common.VoteType.DROP;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 
@@ -55,9 +55,9 @@ public class VoteProposerTest {
 
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList()))).isEmpty();
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.singletonList(a1))))
-        .contains(new CastVote(DROP, localAddress, a1));
+        .contains(new ValidatorVote(DROP, localAddress, a1));
     assertThat(proposer.getVote(localAddress, new VoteTally(Arrays.asList(a1, a2, a3))))
-        .contains(new CastVote(DROP, localAddress, a1));
+        .contains(new ValidatorVote(DROP, localAddress, a1));
     assertThat(proposer.getVote(localAddress, new VoteTally(Arrays.asList(a2, a3)))).isEmpty();
   }
 
@@ -71,12 +71,12 @@ public class VoteProposerTest {
     proposer.auth(a1);
 
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a1));
+        .contains(new ValidatorVote(ADD, localAddress, a1));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.singletonList(a1))))
         .isEmpty();
     assertThat(proposer.getVote(localAddress, new VoteTally(Arrays.asList(a1, a2, a3)))).isEmpty();
     assertThat(proposer.getVote(localAddress, new VoteTally(Arrays.asList(a2, a3))))
-        .contains(new CastVote(ADD, localAddress, a1));
+        .contains(new ValidatorVote(ADD, localAddress, a1));
   }
 
   @Test
@@ -91,12 +91,12 @@ public class VoteProposerTest {
     proposer.discard(a2);
 
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a1));
+        .contains(new ValidatorVote(ADD, localAddress, a1));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.singletonList(a1))))
         .isEmpty();
     assertThat(proposer.getVote(localAddress, new VoteTally(Arrays.asList(a1, a2, a3)))).isEmpty();
     assertThat(proposer.getVote(localAddress, new VoteTally(Arrays.asList(a2, a3))))
-        .contains(new CastVote(ADD, localAddress, a1));
+        .contains(new ValidatorVote(ADD, localAddress, a1));
   }
 
   @Test
@@ -111,13 +111,13 @@ public class VoteProposerTest {
     proposer.auth(a3);
 
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a2));
+        .contains(new ValidatorVote(ADD, localAddress, a2));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a3));
+        .contains(new ValidatorVote(ADD, localAddress, a3));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a1));
+        .contains(new ValidatorVote(ADD, localAddress, a1));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a2));
+        .contains(new ValidatorVote(ADD, localAddress, a2));
   }
 
   @Test
@@ -134,13 +134,13 @@ public class VoteProposerTest {
     proposer.drop(a4);
 
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a2));
+        .contains(new ValidatorVote(ADD, localAddress, a2));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a3));
+        .contains(new ValidatorVote(ADD, localAddress, a3));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a1));
+        .contains(new ValidatorVote(ADD, localAddress, a1));
     assertThat(proposer.getVote(localAddress, new VoteTally(Collections.emptyList())))
-        .contains(new CastVote(ADD, localAddress, a2));
+        .contains(new ValidatorVote(ADD, localAddress, a2));
   }
 
   @Test
@@ -153,10 +153,10 @@ public class VoteProposerTest {
     proposer.drop(a1);
 
     final VoteTally tally = new VoteTally(Arrays.asList(a2, a3));
-    tally.addVote(new CastVote(ADD, localAddress, a1));
+    tally.addVote(new ValidatorVote(ADD, localAddress, a1));
 
     assertThat(proposer.getVote(localAddress, tally))
-        .contains(new CastVote(DROP, localAddress, a1));
+        .contains(new ValidatorVote(DROP, localAddress, a1));
   }
 
   @Test
@@ -169,9 +169,10 @@ public class VoteProposerTest {
     proposer.auth(a1);
 
     final VoteTally tally = new VoteTally(Arrays.asList(a2, a3));
-    tally.addVote(new CastVote(DROP, localAddress, a1));
+    tally.addVote(new ValidatorVote(DROP, localAddress, a1));
 
-    assertThat(proposer.getVote(localAddress, tally)).contains(new CastVote(ADD, localAddress, a1));
+    assertThat(proposer.getVote(localAddress, tally))
+        .contains(new ValidatorVote(ADD, localAddress, a1));
   }
 
   @Test
@@ -182,12 +183,12 @@ public class VoteProposerTest {
     final Address a3 = Address.fromHexString("3");
 
     final VoteTally tally = new VoteTally(Arrays.asList(a1, a2, a3));
-    tally.addVote(new CastVote(ADD, localAddress, a1));
+    tally.addVote(new ValidatorVote(ADD, localAddress, a1));
 
     proposer.drop(a1);
 
     assertThat(proposer.getVote(localAddress, tally))
-        .contains(new CastVote(DROP, localAddress, a1));
+        .contains(new ValidatorVote(DROP, localAddress, a1));
   }
 
   @Test
@@ -198,10 +199,11 @@ public class VoteProposerTest {
     final Address a3 = Address.fromHexString("3");
 
     final VoteTally tally = new VoteTally(Arrays.asList(a1, a2, a3));
-    tally.addVote(new CastVote(DROP, localAddress, a1));
+    tally.addVote(new ValidatorVote(DROP, localAddress, a1));
 
     proposer.auth(a1);
 
-    assertThat(proposer.getVote(localAddress, tally)).contains(new CastVote(ADD, localAddress, a1));
+    assertThat(proposer.getVote(localAddress, tally))
+        .contains(new ValidatorVote(ADD, localAddress, a1));
   }
 }
