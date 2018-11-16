@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import com.google.common.collect.ImmutableBiMap;
 
-public class IbftLegacyVoteBlockInterface implements VoteBlockInterface {
+public class IbftLegacyVotingBlockInterface implements VoteBlockInterface {
 
   private static final Address NO_VOTE_SUBJECT =
       Address.wrap(BytesValue.wrap(new byte[Address.SIZE]));

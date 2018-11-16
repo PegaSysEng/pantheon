@@ -13,8 +13,8 @@
 package tech.pegasys.pantheon.consensus.common;
 
 /**
- * Determines if a validator vote is indicating that they should be added, or removed.
- * This does not attempt to determine how said vote should be serialised/deserialised.
+ * Determines if a validator vote is indicating that they should be added, or removed. This does not
+ * attempt to determine how said vote should be serialised/deserialised.
  */
 public enum ValidatorVotePolarity implements ValidatorVote {
   ADD,

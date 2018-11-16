@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.ADD;
 import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.DROP;
 
-import org.junit.Before;
 import tech.pegasys.pantheon.consensus.common.CastVote;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -35,10 +34,10 @@ import org.junit.Test;
 
 public class CliqueVotingBlockInterfaceTest {
 
-  private final static KeyPair proposerKeys = KeyPair.generate();
-  private final static Address proposerAddress =
+  private static final KeyPair proposerKeys = KeyPair.generate();
+  private static final Address proposerAddress =
       Util.publicKeyToAddress(proposerKeys.getPublicKey());
-  private final static List<Address> validatorList = singletonList(proposerAddress);
+  private static final List<Address> validatorList = singletonList(proposerAddress);
 
   private final CliqueVotingBlockInterface blockInterface = new CliqueVotingBlockInterface();
 

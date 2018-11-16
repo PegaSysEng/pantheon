@@ -29,7 +29,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftStateMachine;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
-import tech.pegasys.pantheon.consensus.ibftlegacy.IbftLegacyVoteBlockInterface;
+import tech.pegasys.pantheon.consensus.ibftlegacy.IbftLegacyVotingBlockInterface;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64Protocol;
 import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64ProtocolManager;
@@ -140,7 +140,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
 
     final VoteTally voteTally =
-        new VoteTallyUpdater(epochManager, new IbftLegacyVoteBlockInterface())
+        new VoteTallyUpdater(epochManager, new IbftLegacyVotingBlockInterface())
             .buildVoteTallyFromBlockchain(blockchain);
 
     final VoteProposer voteProposer = new VoteProposer();

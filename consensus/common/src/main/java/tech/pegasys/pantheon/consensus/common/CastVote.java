@@ -12,9 +12,11 @@
  */
 package tech.pegasys.pantheon.consensus.common;
 
-import com.google.common.base.Preconditions;
-import java.util.Objects;
 import tech.pegasys.pantheon.ethereum.core.Address;
+
+import java.util.Objects;
+
+import com.google.common.base.Preconditions;
 
 public class CastVote {
 
@@ -45,7 +47,7 @@ public class CastVote {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) {
       return true;
     }
@@ -53,9 +55,9 @@ public class CastVote {
       return false;
     }
     CastVote castVote = (CastVote) o;
-    return votePolarity == castVote.votePolarity &&
-        Objects.equals(proposer, castVote.proposer) &&
-        Objects.equals(recipient, castVote.recipient);
+    return votePolarity == castVote.votePolarity
+        && Objects.equals(proposer, castVote.proposer)
+        && Objects.equals(recipient, castVote.recipient);
   }
 
   @Override

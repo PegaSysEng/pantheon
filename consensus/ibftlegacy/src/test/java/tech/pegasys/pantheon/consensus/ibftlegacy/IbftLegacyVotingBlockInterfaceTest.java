@@ -17,10 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.ADD;
 import static tech.pegasys.pantheon.consensus.common.ValidatorVotePolarity.DROP;
 
-import java.util.List;
-import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.common.CastVote;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -31,7 +27,13 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 
-public class IbftLegacyVoteBlockInterfaceTest {
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class IbftLegacyVotingBlockInterfaceTest {
 
   private static final KeyPair proposerKeys = KeyPair.generate();
   private static final Address proposerAddress =
@@ -39,7 +41,8 @@ public class IbftLegacyVoteBlockInterfaceTest {
   private static final List<Address> validatorList = singletonList(proposerAddress);
 
   private final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-  private final IbftLegacyVoteBlockInterface blockInterface = new IbftLegacyVoteBlockInterface();
+  private final IbftLegacyVotingBlockInterface blockInterface =
+      new IbftLegacyVotingBlockInterface();
   private final BlockHeaderBuilder builder =
       BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
           .blockHashFunction(MainnetBlockHashFunction::createHash);
@@ -52,12 +55,12 @@ public class IbftLegacyVoteBlockInterfaceTest {
 
   @Test
   public void headerWithZeroCoinbaseReturnsAnEmptyVote() {
-    assertThat(blockInterface.extractVoteFromHeader(headerBuilder.buildHeader()))
-        .isEqualTo(Optional.empty());
+    assertThat(blockInterface.extractVoteFromHeader(headerBuilder.buildHeader())).isEmpty();
   }
 
   @Test
   public void headerWithNonceOfZeroReportsDropVote() {
+    headerBuilder.nonce(0x0L).coinbase(AddressHelpers.ofValue(2));
     final BlockHeader header =
         TestHelpers.createIbftSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
     final Optional<CastVote> extractedVote = blockInterface.extractVoteFromHeader(header);
@@ -67,7 +70,7 @@ public class IbftLegacyVoteBlockInterfaceTest {
 
   @Test
   public void headerWithNonceOfMaxLongReportsAddVote() {
-    headerBuilder.nonce(0xFFFFFFFFFFFFFFFFL);
+    headerBuilder.nonce(0xFFFFFFFFFFFFFFFFL).coinbase(AddressHelpers.ofValue(2));
 
     final BlockHeader header =
         TestHelpers.createIbftSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
@@ -90,8 +93,7 @@ public class IbftLegacyVoteBlockInterfaceTest {
 
   @Test
   public void blendingDropVoteToHeaderResultsInHeaderWithNonceOfZero() {
-    final CastVote vote =
-        new CastVote(DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final CastVote vote = new CastVote(DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
         blockInterface.insertVoteToHeaderBuilder(builder, Optional.of(vote));
 
@@ -117,7 +119,7 @@ public class IbftLegacyVoteBlockInterfaceTest {
     final BlockHeader header =
         TestHelpers.createIbftSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
 
-    final IbftLegacyVoteBlockInterface serDeser = new IbftLegacyVoteBlockInterface();
+    final IbftLegacyVotingBlockInterface serDeser = new IbftLegacyVotingBlockInterface();
     final List<Address> extractedValidators = serDeser.validatorsInBlock(header);
 
     assertThat(extractedValidators).isEqualTo(validatorList);
