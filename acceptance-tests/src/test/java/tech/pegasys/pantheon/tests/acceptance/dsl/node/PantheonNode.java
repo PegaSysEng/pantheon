@@ -134,15 +134,18 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     if (web3j == null) {
       if (!jsonRpcBaseUrl().isPresent()) {
-        return Web3j.build(
-            new HttpService("http://" + LOCALHOST + ":8545"), 2000, Async.defaultExecutorService());
+        return buildWeb3jService("http://" + LOCALHOST + ":8545");
       }
 
-      return Web3j.build(
-          new HttpService(jsonRpcBaseUrl().get()), 2000, Async.defaultExecutorService());
+      return buildWeb3jService(jsonRpcBaseUrl().get());
     }
-
     return web3j;
+  }
+
+  private Web3j buildWeb3jService(final String url) {
+    HttpService web3jService = new HttpService(url);
+    web3jService.addHeader("Host", "localhost");
+    return Web3j.build(web3jService, 2000, Async.defaultExecutorService());
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
