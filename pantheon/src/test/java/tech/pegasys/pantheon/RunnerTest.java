@@ -186,6 +186,7 @@ public final class RunnerTest {
                                             + Json.encode(7)
                                             + ",\"method\":\"eth_syncing\"}"))
                                 .url(baseUrl)
+                                .addHeader("Host", "localhost")
                                 .build())
                         .execute()) {
 
