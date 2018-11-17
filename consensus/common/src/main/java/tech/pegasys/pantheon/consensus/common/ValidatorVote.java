@@ -12,13 +12,12 @@
  */
 package tech.pegasys.pantheon.consensus.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.pegasys.pantheon.consensus.common.VoteType.ADD;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 
 import java.util.Objects;
-
-import com.google.common.base.Preconditions;
 
 public class ValidatorVote {
 
@@ -28,9 +27,9 @@ public class ValidatorVote {
 
   public ValidatorVote(
       final VoteType votePolarity, final Address proposer, final Address recipient) {
-    Preconditions.checkNotNull(votePolarity);
-    Preconditions.checkNotNull(proposer);
-    Preconditions.checkNotNull(recipient);
+    checkNotNull(votePolarity);
+    checkNotNull(proposer);
+    checkNotNull(recipient);
     this.votePolarity = votePolarity;
     this.proposer = proposer;
     this.recipient = recipient;

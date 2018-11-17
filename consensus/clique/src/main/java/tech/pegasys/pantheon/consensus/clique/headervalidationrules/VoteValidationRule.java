@@ -33,7 +33,7 @@ public class VoteValidationRule implements DetachedBlockHeaderValidationRule {
   @Override
   public boolean validate(final BlockHeader header, final BlockHeader parent) {
     final long nonce = header.getNonce();
-    if (!CliqueVotingBlockInterface.voteToValue.values().contains(nonce)) {
+    if (!CliqueVotingBlockInterface.isValidVoteValue(nonce)) {
       LOG.trace("Nonce value ({}) is neither auth or drop.", nonce);
       return false;
     }

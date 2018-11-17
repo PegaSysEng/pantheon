@@ -29,10 +29,13 @@ public class Vote {
   private final Address recipient;
   private final VoteType voteType;
 
+  public static final byte ADD_NONCE = (byte) 0xFF;
+  public static final byte DROP_NONCE = (byte) 0x0L;
+
   public static final ImmutableBiMap<VoteType, Byte> voteToValue =
       ImmutableBiMap.of(
-          VoteType.ADD, (byte) 0xFF,
-          VoteType.DROP, (byte) 0x0);
+          VoteType.ADD, ADD_NONCE,
+          VoteType.DROP, DROP_NONCE);
 
   public Vote(final Address recipient, final VoteType voteType) {
     this.recipient = recipient;

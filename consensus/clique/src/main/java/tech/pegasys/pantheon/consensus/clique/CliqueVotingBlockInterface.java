@@ -30,10 +30,13 @@ public class CliqueVotingBlockInterface implements VoteBlockInterface {
   public static final Address NO_VOTE_SUBJECT =
       Address.wrap(BytesValue.wrap(new byte[Address.SIZE]));
 
-  public static final ImmutableBiMap<VoteType, Long> voteToValue =
+  public static final long ADD_NONCE = 0xFFFFFFFFFFFFFFFFL;
+  public static final long DROP_NONCE = 0x0L;
+
+  private static final ImmutableBiMap<VoteType, Long> voteToValue =
       ImmutableBiMap.of(
-          VoteType.ADD, 0xFFFFFFFFFFFFFFFFL,
-          VoteType.DROP, 0x0L);
+          VoteType.ADD, ADD_NONCE,
+          VoteType.DROP, DROP_NONCE);
 
   @Override
   public Optional<ValidatorVote> extractVoteFromHeader(final BlockHeader header) {
@@ -66,5 +69,9 @@ public class CliqueVotingBlockInterface implements VoteBlockInterface {
   @Override
   public List<Address> validatorsInBlock(final BlockHeader header) {
     return CliqueExtraData.decode(header.getExtraData()).getValidators();
+  }
+
+  public static boolean isValidVoteValue(final long value) {
+    return voteToValue.values().contains(value);
   }
 }
