@@ -127,7 +127,7 @@ final class DeFramer extends ByteToMessageDecoder {
   public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable throwable)
       throws Exception {
     if (throwable instanceof FramingException) {
-      LOG.error("Invalid incoming message", throwable);
+      LOG.debug("Invalid incoming message", throwable);
       if (connectFuture.isDone()) {
         connectFuture.get().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
         return;
