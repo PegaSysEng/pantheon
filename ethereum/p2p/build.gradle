@@ -16,8 +16,12 @@ apply plugin: 'java-library'
 jar {
   baseName 'pantheon-p2p'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
@@ -29,7 +33,7 @@ dependencies {
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
   implementation 'org.apache.logging.log4j:log4j-api'
-  implementation 'org.xerial.snappy:snappy-java'
+  implementation 'org.iq80.snappy:snappy'
 
   runtime 'org.apache.logging.log4j:log4j-core'
 

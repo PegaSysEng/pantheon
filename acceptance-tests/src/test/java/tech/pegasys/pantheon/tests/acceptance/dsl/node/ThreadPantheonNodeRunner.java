@@ -18,10 +18,12 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
+import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -59,7 +61,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               ethNetworkConfig,
               false,
               node.getMiningParameters(),
-              true);
+              true,
+              KeyPairUtil.getDefaultKeyFile(node.homeDirectory()));
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
     }
@@ -71,12 +74,13 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
                 pantheonController,
                 true,
                 node.bootnodes(),
-                node.getHost(),
+                node.hostName(),
                 node.p2pPort(),
                 25,
                 node.jsonRpcConfiguration(),
                 node.webSocketConfiguration(),
-                node.homeDirectory());
+                node.homeDirectory(),
+                Collections.emptySet());
 
     nodeExecutor.submit(runner::execute);
 

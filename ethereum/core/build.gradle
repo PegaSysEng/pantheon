@@ -16,8 +16,12 @@ apply plugin: 'java-library'
 jar {
   baseName 'pantheon-core'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
@@ -36,17 +40,20 @@ dependencies {
   runtime 'org.apache.logging.log4j:log4j-core'
 
   testImplementation project(path:':ethereum:referencetests', configuration: 'testOutput')
+  testImplementation project( path: ':config', configuration: 'testSupportArtifacts')
   testImplementation project(':testutil')
 
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.mockito:mockito-core'
   testImplementation 'junit:junit'
 
+  integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   integrationTestImplementation 'org.assertj:assertj-core'
   integrationTestImplementation 'org.mockito:mockito-core'
   integrationTestImplementation 'junit:junit'
 
   testSupportImplementation project(':testutil')
+  testSupportImplementation project( path: ':config', configuration: 'testSupportArtifacts')
 
   testSupportImplementation 'org.assertj:assertj-core'
   testSupportImplementation 'org.mockito:mockito-core'
@@ -54,6 +61,7 @@ dependencies {
 
   jmhImplementation project(':util')
   jmhImplementation project( path: ':ethereum:core', configuration: 'testSupportArtifacts')
+  jmhImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   jmhImplementation project(':crypto')
   jmhImplementation project(':ethereum:rlp')
   jmhImplementation project(':ethereum:trie')
