@@ -34,7 +34,7 @@ public interface MessageData {
   /**
    * Get the actual byte data for this message
    *
-   * @return the actual data
+   * @return the serialized representation of this message
    */
   BytesValue getData();
 }

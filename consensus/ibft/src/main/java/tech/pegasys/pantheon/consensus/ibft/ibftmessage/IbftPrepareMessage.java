@@ -47,7 +47,7 @@ public class IbftPrepareMessage extends AbstractIbftMessage {
   public static IbftPrepareMessage create(
       final IbftSignedMessageData<IbftUnsignedPrepareMessageData> ibftPrepareMessageDecoded) {
 
-    return new IbftPrepareMessage(ibftPrepareMessageDecoded.toRlp());
+    return new IbftPrepareMessage(ibftPrepareMessageDecoded.encode());
   }
 
   @Override

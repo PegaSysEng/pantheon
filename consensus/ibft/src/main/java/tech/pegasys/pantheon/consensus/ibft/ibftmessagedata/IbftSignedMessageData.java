@@ -53,7 +53,7 @@ public class IbftSignedMessageData<M extends AbstractIbftUnsignedMessageData> {
     output.endList();
   }
 
-  public BytesValue toRlp() {
+  public BytesValue encode() {
     final BytesValueRLPOutput rlpEncode = new BytesValueRLPOutput();
     writeTo(rlpEncode);
     return rlpEncode.encoded();

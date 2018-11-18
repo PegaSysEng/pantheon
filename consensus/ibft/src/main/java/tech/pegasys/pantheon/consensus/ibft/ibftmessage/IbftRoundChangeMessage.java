@@ -47,7 +47,7 @@ public class IbftRoundChangeMessage extends AbstractIbftMessage {
   public static IbftRoundChangeMessage create(
       final IbftSignedMessageData<IbftUnsignedRoundChangeMessageData> ibftPrepareMessageDecoded) {
 
-    return new IbftRoundChangeMessage(ibftPrepareMessageDecoded.toRlp());
+    return new IbftRoundChangeMessage(ibftPrepareMessageDecoded.encode());
   }
 
   @Override
