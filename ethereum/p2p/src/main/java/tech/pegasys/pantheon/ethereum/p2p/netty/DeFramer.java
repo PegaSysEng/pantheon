@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.netty.exceptions.IncompatiblePeerException;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.framing.Framer;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.framing.FramingException;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
@@ -125,7 +126,13 @@ final class DeFramer extends ByteToMessageDecoder {
   @Override
   public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable throwable)
       throws Exception {
-    if (throwable instanceof IOException) {
+    if (throwable instanceof FramingException) {
+      LOG.error("Invalid incoming message", throwable);
+      if (connectFuture.isDone()) {
+        connectFuture.get().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
+        return;
+      }
+    } else if (throwable instanceof IOException) {
       // IO failures are routine when communicating with random peers across the network.
       LOG.debug("IO error while processing incoming message", throwable);
     } else {
