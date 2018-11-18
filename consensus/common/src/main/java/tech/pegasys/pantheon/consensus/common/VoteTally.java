@@ -52,35 +52,33 @@ public class VoteTally implements ValidatorProvider {
    * Add a vote to the current tally. The current validator list will be updated if this vote takes
    * the tally past the required votes to approve the change.
    *
-   * @param proposer the address of the validator casting the vote via block proposal
-   * @param subject the validator the vote is about
-   * @param validatorVote the type of vote, either add or drop
+   * @param validatorVote The vote which was cast in a block header.
    */
-  public void addVote(
-      final Address proposer, final Address subject, final ValidatorVote validatorVote) {
+  public void addVote(final ValidatorVote validatorVote) {
     final Set<Address> addVotesForSubject =
-        addVotesBySubject.computeIfAbsent(subject, target -> new HashSet<>());
+        addVotesBySubject.computeIfAbsent(validatorVote.getRecipient(), target -> new HashSet<>());
     final Set<Address> removeVotesForSubject =
-        removeVotesBySubject.computeIfAbsent(subject, target -> new HashSet<>());
+        removeVotesBySubject.computeIfAbsent(
+            validatorVote.getRecipient(), target -> new HashSet<>());
 
-    if (validatorVote.isAddVote()) {
-      addVotesForSubject.add(proposer);
-      removeVotesForSubject.remove(proposer);
+    if (validatorVote.isAuthVote()) {
+      addVotesForSubject.add(validatorVote.getProposer());
+      removeVotesForSubject.remove(validatorVote.getProposer());
     } else {
-      removeVotesForSubject.add(proposer);
-      addVotesForSubject.remove(proposer);
+      removeVotesForSubject.add(validatorVote.getProposer());
+      addVotesForSubject.remove(validatorVote.getProposer());
     }
 
     final int validatorLimit = validatorLimit();
     if (addVotesForSubject.size() >= validatorLimit) {
-      currentValidators.add(subject);
-      discardOutstandingVotesFor(subject);
+      currentValidators.add(validatorVote.getRecipient());
+      discardOutstandingVotesFor(validatorVote.getRecipient());
     }
     if (removeVotesForSubject.size() >= validatorLimit) {
-      currentValidators.remove(subject);
-      discardOutstandingVotesFor(subject);
-      addVotesBySubject.values().forEach(votes -> votes.remove(subject));
-      removeVotesBySubject.values().forEach(votes -> votes.remove(subject));
+      currentValidators.remove(validatorVote.getRecipient());
+      discardOutstandingVotesFor(validatorVote.getRecipient());
+      addVotesBySubject.values().forEach(votes -> votes.remove(validatorVote.getRecipient()));
+      removeVotesBySubject.values().forEach(votes -> votes.remove(validatorVote.getRecipient()));
     }
   }
 

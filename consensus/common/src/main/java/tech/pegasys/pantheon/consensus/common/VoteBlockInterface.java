@@ -10,20 +10,21 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft;
+package tech.pegasys.pantheon.consensus.common;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 
-import org.junit.Test;
+import java.util.List;
+import java.util.Optional;
 
-public class IbftVoteTypeTest {
+public interface VoteBlockInterface {
 
-  @Test
-  public void testValidatorVoteMethodImplementation() {
-    assertThat(IbftVoteType.ADD.isAddVote()).isTrue();
-    assertThat(IbftVoteType.ADD.isDropVote()).isFalse();
+  Optional<ValidatorVote> extractVoteFromHeader(final BlockHeader header);
 
-    assertThat(IbftVoteType.DROP.isAddVote()).isFalse();
-    assertThat(IbftVoteType.DROP.isDropVote()).isTrue();
-  }
+  BlockHeaderBuilder insertVoteToHeaderBuilder(
+      final BlockHeaderBuilder builder, final Optional<ValidatorVote> vote);
+
+  List<Address> validatorsInBlock(final BlockHeader header);
 }
