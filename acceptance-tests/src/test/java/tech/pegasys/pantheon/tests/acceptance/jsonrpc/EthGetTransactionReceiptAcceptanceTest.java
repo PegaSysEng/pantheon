@@ -1,7 +1,5 @@
 package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonMinerNode;
-
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import org.junit.Before;
@@ -20,7 +18,7 @@ public class EthGetTransactionReceiptAcceptanceTest extends AcceptanceTestBase {
   public void setUp() throws Exception {
     sender = accounts.createAccount("sender");
     recipient = accounts.createAccount("recipient");
-    minerNode = cluster.create(pantheonMinerNode("node"));
+    minerNode = pantheon.createMinerNode("node");
     cluster.start(minerNode);
     minerNode.execute(transactions.createTransfer(sender, 10));
     cluster.verify(sender.balanceEquals(10));
@@ -38,7 +36,7 @@ public class EthGetTransactionReceiptAcceptanceTest extends AcceptanceTestBase {
   public void mustCorrectlyQueryTransactionReceiptFromNormalTransaction() {
     final Hash transactionHash
         = minerNode.execute(transactions.createTransfer(sender, recipient, 5));
-    cluster.verify(recipient.balanceEquals(10));
+    cluster.verify(recipient.balanceEquals(5)); //should this be 10 due to prev test?
     cluster.verify(sender.balanceEquals(5));
     minerNode.verify(eth.getTransactionReceipt(transactionHash.toString()));
   }
