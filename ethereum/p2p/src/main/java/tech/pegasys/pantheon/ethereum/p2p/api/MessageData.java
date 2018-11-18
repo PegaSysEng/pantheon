@@ -32,7 +32,7 @@ public interface MessageData {
   int getCode();
 
   /**
-   * Get the actual byte data for this message
+   * Get the serialized representation for this message
    *
    * @return the serialized representation of this message
    */
