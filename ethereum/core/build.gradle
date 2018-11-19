@@ -16,12 +16,17 @@ apply plugin: 'java-library'
 jar {
   baseName 'pantheon-core'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
 dependencies {
+  implementation project(':config')
   implementation project(':crypto')
   implementation project(':ethereum:rlp')
   implementation project(':ethereum:trie')
@@ -35,17 +40,20 @@ dependencies {
   runtime 'org.apache.logging.log4j:log4j-core'
 
   testImplementation project(path:':ethereum:referencetests', configuration: 'testOutput')
+  testImplementation project( path: ':config', configuration: 'testSupportArtifacts')
   testImplementation project(':testutil')
 
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.mockito:mockito-core'
   testImplementation 'junit:junit'
 
+  integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   integrationTestImplementation 'org.assertj:assertj-core'
   integrationTestImplementation 'org.mockito:mockito-core'
   integrationTestImplementation 'junit:junit'
 
   testSupportImplementation project(':testutil')
+  testSupportImplementation project( path: ':config', configuration: 'testSupportArtifacts')
 
   testSupportImplementation 'org.assertj:assertj-core'
   testSupportImplementation 'org.mockito:mockito-core'
@@ -53,6 +61,7 @@ dependencies {
 
   jmhImplementation project(':util')
   jmhImplementation project( path: ':ethereum:core', configuration: 'testSupportArtifacts')
+  jmhImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   jmhImplementation project(':crypto')
   jmhImplementation project(':ethereum:rlp')
   jmhImplementation project(':ethereum:trie')
@@ -80,20 +89,8 @@ def generateTestFiles(FileTree jsonPath, File resourcesPath, File templateFile, 
   // This is how many json files to include in each test file
   def fileSets = jsonPath.getFiles().collate(5)
 
-  fileSets.each { fileSet ->
+  fileSets.eachWithIndex { fileSet, idx ->
     def resPath = resourcesPath.getPath().replaceAll("\\\\", "/")
-    def name = fileSet
-      .find({ !it.getName().toString().startsWith(".")})
-      .getPath()
-      .toString()
-      .replaceAll("\\\\", "/")
-      .replaceAll(resPath + "/", "")
-      .replaceAll(pathstrip, "")
-      .replaceAll(".json", "")
-      .replaceAll("/", "_")
-      .replaceAll("\\^", "")
-      .replaceAll("\\-", "")
-      .replaceAll("\\+", "")
 
     def paths = []
     fileSet.each { testJsonFile ->
@@ -103,13 +100,13 @@ def generateTestFiles(FileTree jsonPath, File resourcesPath, File templateFile, 
       }
     }
 
-    def testFile = file(destination + "/" + namePrefix + "_" + name + ".java")
+    def testFile = file(destination + "/" + namePrefix + "_" + idx + ".java")
 
     def allPaths = '"' + paths.join('", "') + '"';
 
     def testFileContents = referenceTestTemplate
       .replaceAll("%%TESTS_FILE%%", allPaths)
-      .replaceAll("%%TESTS_NAME%%", namePrefix + "_" + name)
+      .replaceAll("%%TESTS_NAME%%", namePrefix + "_" + idx)
     testFile.newWriter().withWriter { w -> w << testFileContents }
   }
 }

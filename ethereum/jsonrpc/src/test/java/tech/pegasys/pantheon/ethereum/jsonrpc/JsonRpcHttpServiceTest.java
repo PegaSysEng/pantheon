@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -87,7 +88,7 @@ public class JsonRpcHttpServiceTest {
   protected static String baseUrl;
   protected static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
   protected static final String CLIENT_VERSION = "TestClientVersion/0.1.0";
-  protected static final String NET_VERSION = "6986785976597";
+  protected static final int CHAIN_ID = 123;
   protected static P2PNetwork peerDiscoveryMock;
   protected static BlockchainQueries blockchainQueries;
   protected static Synchronizer synchronizer;
@@ -110,11 +111,11 @@ public class JsonRpcHttpServiceTest {
             new JsonRpcMethodsFactory()
                 .methods(
                     CLIENT_VERSION,
-                    NET_VERSION,
                     peerDiscoveryMock,
                     blockchainQueries,
                     synchronizer,
-                    MainnetProtocolSchedule.create(),
+                    MainnetProtocolSchedule.fromConfig(
+                        new StubGenesisConfigOptions().constantinopleBlock(0).chainId(CHAIN_ID)),
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),
@@ -266,7 +267,7 @@ public class JsonRpcHttpServiceTest {
       testHelper.assertValidJsonRpcResult(json, id);
       // Check result
       final String result = json.getString("result");
-      assertThat(result).isEqualTo(NET_VERSION);
+      assertThat(result).isEqualTo(String.valueOf(CHAIN_ID));
     }
   }
 
@@ -1544,7 +1545,7 @@ public class JsonRpcHttpServiceTest {
       // Check result net_version
       final JsonObject jsonNetVersion = responses.get(netVersionRequestId);
       testHelper.assertValidJsonRpcResult(jsonNetVersion, netVersionRequestId);
-      assertThat(jsonNetVersion.getString("result")).isEqualTo(NET_VERSION);
+      assertThat(jsonNetVersion.getString("result")).isEqualTo(String.valueOf(CHAIN_ID));
     }
   }
 
@@ -1600,7 +1601,7 @@ public class JsonRpcHttpServiceTest {
       // Check result net_version
       final JsonObject jsonNetVersion = responses.get(netVersionRequestId);
       testHelper.assertValidJsonRpcResult(jsonNetVersion, netVersionRequestId);
-      assertThat(jsonNetVersion.getString("result")).isEqualTo(NET_VERSION);
+      assertThat(jsonNetVersion.getString("result")).isEqualTo(String.valueOf(CHAIN_ID));
     }
   }
 
@@ -1661,7 +1662,7 @@ public class JsonRpcHttpServiceTest {
       // Check result net_version
       final JsonObject jsonNetVersion = responses.get(netVersionRequestId);
       testHelper.assertValidJsonRpcResult(jsonNetVersion, netVersionRequestId);
-      assertThat(jsonNetVersion.getString("result")).isEqualTo(NET_VERSION);
+      assertThat(jsonNetVersion.getString("result")).isEqualTo(String.valueOf(CHAIN_ID));
     }
   }
 

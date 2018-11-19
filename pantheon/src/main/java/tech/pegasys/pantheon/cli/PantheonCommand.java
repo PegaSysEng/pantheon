@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
+import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
@@ -34,7 +35,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.BlockImporter;
-import tech.pegasys.pantheon.util.BlockchainImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
@@ -46,6 +46,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -122,7 +123,6 @@ public class PantheonCommand implements Runnable {
   }
 
   private final BlockImporter blockImporter;
-  final BlockchainImporter blockchainImporter;
 
   private final PantheonControllerBuilder controllerBuilder;
   private final Builder synchronizerConfigurationBuilder;
@@ -147,6 +147,14 @@ public class PantheonCommand implements Runnable {
     description = "the path to Pantheon data directory"
   )
   private final Path dataDir = getDefaultPantheonDataDir();
+
+  @Option(
+    names = {"--node-private-key"},
+    paramLabel = MANDATORY_PATH_FORMAT_HELP,
+    description =
+        "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)"
+  )
+  private final File nodePrivateKeyFile = null;
 
   // Genesis file path with null default option if the option
   // is not defined on command line as this default is handled by Runner
@@ -191,8 +199,7 @@ public class PantheonCommand implements Runnable {
   @Option(
     names = {"--max-peers"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-    description =
-        "Maximium p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
+    description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
   )
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
@@ -203,6 +210,14 @@ public class PantheonCommand implements Runnable {
         "Maximum p2p peer connections for peers that are trailing behind our chain head (default: unlimited)"
   )
   private final Integer maxTrailingPeers = Integer.MAX_VALUE;
+
+  @Option(
+    names = {"--banned-nodeids"},
+    description = "A list of node IDs to ban from the p2p network.",
+    split = ",",
+    arity = "1..*"
+  )
+  private final Collection<String> bannedNodeIds = null;
 
   // TODO: Re-enable as per NC-1057/NC-1681
   //  @Option(
@@ -364,12 +379,10 @@ public class PantheonCommand implements Runnable {
 
   public PantheonCommand(
       final BlockImporter blockImporter,
-      final BlockchainImporter blockchainImporter,
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
       final Builder synchronizerConfigurationBuilder) {
     this.blockImporter = blockImporter;
-    this.blockchainImporter = blockchainImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
     this.synchronizerConfigurationBuilder = synchronizerConfigurationBuilder;
@@ -383,9 +396,7 @@ public class PantheonCommand implements Runnable {
     final CommandLine commandLine = new CommandLine(this);
 
     final ImportSubCommand importSubCommand = new ImportSubCommand(blockImporter);
-    final ImportBlockchainSubCommand importBlockchainSubCommand = new ImportBlockchainSubCommand();
     commandLine.addSubcommand("import", importSubCommand);
-    commandLine.addSubcommand("import-blockchain", importBlockchainSubCommand);
     commandLine.addSubcommand("export-pub-key", new ExportPublicKeySubCommand());
 
     commandLine.registerConverter(Address.class, Address::fromHexString);
@@ -442,12 +453,17 @@ public class PantheonCommand implements Runnable {
           ethNetworkConfig(),
           syncWithOttoman,
           new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled),
-          isDevMode);
+          isDevMode,
+          getNodePrivateKeyFile());
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(new CommandLine(this), e.getMessage());
     } catch (final IOException e) {
       throw new ExecutionException(new CommandLine(this), "Invalid path", e);
     }
+  }
+
+  private File getNodePrivateKeyFile() {
+    return nodePrivateKeyFile != null ? nodePrivateKeyFile : KeyPairUtil.getDefaultKeyFile(dataDir);
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
@@ -500,9 +516,24 @@ public class PantheonCommand implements Runnable {
             maxPeers,
             jsonRpcConfiguration,
             webSocketConfiguration,
-            dataDir);
+            dataDir,
+            bannedNodeIds == null ? Collections.emptySet() : bannedNodeIds);
 
+    addShutdownHook(runner);
     runner.execute();
+  }
+
+  private void addShutdownHook(final Runner runner) {
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  try {
+                    runner.close();
+                  } catch (Exception e) {
+                    throw new RuntimeException(e);
+                  }
+                }));
   }
 
   // Used to discover the default IP of the client.

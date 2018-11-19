@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugTraceTransac
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthAccounts;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthBlockNumber;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthCall;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthChainId;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthCoinbase;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthEstimateGas;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGasPrice;
@@ -87,7 +88,6 @@ public class JsonRpcMethodsFactory {
 
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
-      final String chainId,
       final P2PNetwork peerNetworkingService,
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
@@ -102,7 +102,6 @@ public class JsonRpcMethodsFactory {
         new BlockchainQueries(blockchain, worldStateArchive);
     return methods(
         clientVersion,
-        chainId,
         peerNetworkingService,
         blockchainQueries,
         synchronizer,
@@ -116,7 +115,6 @@ public class JsonRpcMethodsFactory {
 
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
-      final String chainId,
       final P2PNetwork p2pNetwork,
       final BlockchainQueries blockchainQueries,
       final Synchronizer synchronizer,
@@ -178,7 +176,8 @@ public class JsonRpcMethodsFactory {
           new EthCoinbase(miningCoordinator),
           new EthProtocolVersion(supportedCapabilities),
           new EthGasPrice(miningCoordinator),
-          new EthGetWork(miningCoordinator));
+          new EthGetWork(miningCoordinator),
+          new EthChainId(protocolSchedule.getChainId()));
     }
     if (rpcApis.contains(RpcApis.DEBUG)) {
       final BlockReplay blockReplay =
@@ -195,7 +194,7 @@ public class JsonRpcMethodsFactory {
     if (rpcApis.contains(RpcApis.NET)) {
       addMethods(
           enabledMethods,
-          new NetVersion(chainId),
+          new NetVersion(protocolSchedule.getChainId()),
           new NetListening(p2pNetwork),
           new NetPeerCount(p2pNetwork),
           new AdminPeers(p2pNetwork));

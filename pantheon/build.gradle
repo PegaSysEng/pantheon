@@ -16,12 +16,17 @@ apply plugin: 'java-library'
 jar {
   baseName 'pantheon'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
 dependencies {
+  implementation project(':config')
   implementation project(':crypto')
   implementation project(':consensus:common')
   implementation project(':consensus:clique')
@@ -57,7 +62,8 @@ dependencies {
 
 task writeInfoFile(type: ProjectPropertiesFile) {
   destPackage = "tech.pegasys.pantheon"
-  addString("version", "$rootProject.name/$rootProject.version")
+  addString("clientIdentity", rootProject.name)
+  addVersion("version", "clientIdentity")
 }
 
 compileJava.dependsOn(writeInfoFile)

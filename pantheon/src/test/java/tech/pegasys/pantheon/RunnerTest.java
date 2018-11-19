@@ -15,11 +15,11 @@ package tech.pegasys.pantheon;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.BlockSyncTestUtils;
@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
@@ -93,7 +94,8 @@ public final class RunnerTest {
     try (final PantheonController<Void> controller =
         MainnetPantheonController.init(
             dbAhead,
-            GenesisConfig.mainnet(),
+            GenesisConfigFile.mainnet(),
+            MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
             aheadDbNodeKeys)) {
@@ -104,7 +106,8 @@ public final class RunnerTest {
     final PantheonController<Void> controllerAhead =
         MainnetPantheonController.init(
             dbAhead,
-            GenesisConfig.mainnet(),
+            GenesisConfigFile.mainnet(),
+            MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
             aheadDbNodeKeys);
@@ -124,7 +127,8 @@ public final class RunnerTest {
             3,
             aheadJsonRpcConfiguration,
             aheadWebSocketConfiguration,
-            dbAhead);
+            dbAhead,
+            Collections.emptySet());
     try {
 
       executorService.submit(runnerAhead::execute);
@@ -133,11 +137,12 @@ public final class RunnerTest {
 
       // Setup runner with no block data
       final Path dbBehind = temp.newFolder().toPath();
-      final KeyPair behindDbNodeKeys = loadKeyPair(dbBehind);
+      final KeyPair behindDbNodeKeys = loadKeyPair(dbBehind.resolve("key").toFile());
       final PantheonController<Void> controllerBehind =
           MainnetPantheonController.init(
               temp.newFolder().toPath(),
-              GenesisConfig.mainnet(),
+              GenesisConfigFile.mainnet(),
+              MainnetProtocolSchedule.create(),
               fastSyncConfig,
               new MiningParametersTestBuilder().enabled(false).build(),
               behindDbNodeKeys);
@@ -157,7 +162,8 @@ public final class RunnerTest {
               3,
               behindJsonRpcConfiguration,
               behindWebSocketConfiguration,
-              dbBehind);
+              dbBehind,
+              Collections.emptySet());
 
       executorService.submit(runnerBehind::execute);
       final Call.Factory client = new OkHttpClient();

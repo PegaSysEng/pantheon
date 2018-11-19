@@ -18,18 +18,30 @@ import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeerTask;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
+/**
+ * A task that will retry a fixed number of times before completing the associated CompletableFuture
+ * exceptionally with a new {@link MaxRetriesReachedException}. If the future returned from {@link
+ * #executePeerTask()} is complete with a non-empty list the retry counter is reset.
+ *
+ * @param <T> The type as a typed list that the peer task can get partial or full results in.
+ */
+public abstract class AbstractRetryingPeerTask<T extends Collection<?>> extends AbstractEthTask<T> {
 
   private static final Logger LOG = LogManager.getLogger();
   private final EthContext ethContext;
   private final int maxRetries;
-  private int requestCount = 0;
+  private int retryCount = 0;
 
+  /**
+   * @param ethContext The context of the current Eth network we are attached to.
+   * @param maxRetries Maximum number of retries to accept before completing exceptionally.
+   */
   public AbstractRetryingPeerTask(final EthContext ethContext, final int maxRetries) {
     this.ethContext = ethContext;
     this.maxRetries = maxRetries;
@@ -41,24 +53,28 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
       // Return if task is done
       return;
     }
-    if (requestCount > maxRetries) {
+    if (retryCount > maxRetries) {
       result.get().completeExceptionally(new MaxRetriesReachedException());
       return;
     }
 
-    requestCount += 1;
+    retryCount += 1;
     executePeerTask()
         .whenComplete(
             (peerResult, error) -> {
               if (error != null) {
                 handleTaskError(error);
               } else {
+                // If we get a partial success reset the retry counter.
+                if (peerResult.size() > 0) {
+                  retryCount = 0;
+                }
                 executeTask();
               }
             });
   }
 
-  protected abstract CompletableFuture<?> executePeerTask();
+  protected abstract CompletableFuture<T> executePeerTask();
 
   private void handleTaskError(final Throwable error) {
     final Throwable cause = ExceptionUtils.rootCause(error);
@@ -77,10 +93,7 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
               ethContext
                   .getScheduler()
                   .timeout(waitTask, Duration.ofSeconds(5))
-                  .whenComplete(
-                      (r, t) -> {
-                        executeTask();
-                      }));
+                  .whenComplete((r, t) -> executeTask()));
       return;
     }
 

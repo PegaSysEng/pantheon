@@ -11,6 +11,8 @@
  * specific language governing permissions and limitations under the License.
  */
 
+enableFeaturePreview('STABLE_PUBLISHING')
+
 rootProject.name='pantheon'
 include 'acceptance-tests'
 include 'consensus'
@@ -18,6 +20,7 @@ include 'consensus:clique'
 include 'consensus:common'
 include 'consensus:ibft'
 include 'consensus:ibftlegacy'
+include 'config'
 include 'crypto'
 include 'ethereum:p2p'
 include 'ethereum:mock-p2p'

@@ -32,7 +32,7 @@ public class ECRECPrecompiledContract extends AbstractPrecompiledContract {
   private static final int V_BASE = 27;
 
   public ECRECPrecompiledContract(final GasCalculator gasCalculator) {
-    super("ECREC_PRECOMPILED_GAS_COST", gasCalculator);
+    super("ECREC", gasCalculator);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class ECRECPrecompiledContract extends AbstractPrecompiledContract {
     try {
       final Optional<PublicKey> recovered = PublicKey.recoverFromSignature(h, signature);
       if (!recovered.isPresent()) {
-        return Bytes32.ZERO;
+        return BytesValue.EMPTY;
       }
 
       final Bytes32 hashed = Hash.hash(recovered.get().getEncodedBytes());
@@ -80,7 +80,7 @@ public class ECRECPrecompiledContract extends AbstractPrecompiledContract {
       hashed.slice(12).copyTo(result, 12);
       return result;
     } catch (final IllegalArgumentException e) {
-      return Bytes32.ZERO;
+      return BytesValue.EMPTY;
     }
   }
 }

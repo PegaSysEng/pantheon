@@ -52,15 +52,17 @@ import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
-public class PantheonNode implements Node, AutoCloseable {
+public class PantheonNode implements Node, NodeConfiguration, RunnableNode, AutoCloseable {
 
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();
 
-  private final String name;
   private final Path homeDirectory;
   private final KeyPair keyPair;
   private final int p2pPort;
+  private final Properties portsProperties = new Properties();
+
+  private final String name;
   private final MiningParameters miningParameters;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
@@ -78,17 +80,18 @@ public class PantheonNode implements Node, AutoCloseable {
 
   public PantheonNode(
       final String name,
-      final int p2pPort,
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final boolean devMode,
       final Function<Collection<PantheonNode>, Optional<String>> genesisConfig)
+      final WebSocketConfiguration webSocketConfiguration,
+      final int p2pPort)
       throws IOException {
-    this.name = name;
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.p2pPort = p2pPort;
+    this.name = name;
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
@@ -99,16 +102,26 @@ public class PantheonNode implements Node, AutoCloseable {
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
-  String getName() {
+  private boolean isJsonRpcEnabled() {
+    return jsonRpcConfiguration().isEnabled();
+  }
+
+  private boolean isWebSocketsRpcEnabled() {
+    return webSocketConfiguration().isEnabled();
+  }
+
+  @Override
+  public String getName() {
     return name;
   }
 
-  String enodeUrl() {
+  @Override
+  public String enodeUrl() {
     return "enode://" + keyPair.getPublicKey().toString() + "@" + LOCALHOST + ":" + p2pPort;
   }
 
   private Optional<String> jsonRpcBaseUrl() {
-    if (jsonRpcEnabled) {
+    if (isJsonRpcEnabled()) {
       return Optional.of(
           "http://"
               + jsonRpcConfiguration.getHost()
@@ -120,7 +133,7 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   private Optional<String> wsRpcBaseUrl() {
-    if (wsRpcEnabled) {
+    if (isWebSocketsRpcEnabled()) {
       return Optional.of(
           "ws://" + webSocketConfiguration.getHost() + ":" + portsProperties.getProperty("ws-rpc"));
     } else {
@@ -128,15 +141,17 @@ public class PantheonNode implements Node, AutoCloseable {
     }
   }
 
+  @Override
   public Optional<Integer> jsonRpcWebSocketPort() {
-    if (wsRpcEnabled) {
+    if (isWebSocketsRpcEnabled()) {
       return Optional.of(Integer.valueOf(portsProperties.getProperty("ws-rpc")));
     } else {
       return Optional.empty();
     }
   }
 
-  public String getHost() {
+  @Override
+  public String hostName() {
     return LOCALHOST;
   }
 
@@ -171,6 +186,7 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
+  @Override
   public void useWebSocketsForJsonRpc() {
     final String url = wsRpcBaseUrl().isPresent() ? wsRpcBaseUrl().get() : "ws://127.0.0.1:8546";
 
@@ -216,9 +232,22 @@ public class PantheonNode implements Node, AutoCloseable {
     }
   }
 
+  @Override
   public void start(final PantheonNodeRunner runner) {
     runner.startNode(this);
     loadPortsFile();
+  }
+
+  @Override
+  public NodeConfiguration getConfiguration() {
+    return this;
+  }
+
+  @Override
+  public void awaitPeerDiscovery(final Condition condition) {
+    if (jsonRpcEnabled()) {
+      verify(condition);
+    }
   }
 
   private void loadPortsFile() {
@@ -238,8 +267,9 @@ public class PantheonNode implements Node, AutoCloseable {
     return homeDirectory;
   }
 
-  boolean jsonRpcEnabled() {
-    return jsonRpcEnabled;
+  @Override
+  public boolean jsonRpcEnabled() {
+    return isJsonRpcEnabled();
   }
 
   JsonRpcConfiguration jsonRpcConfiguration() {
@@ -247,15 +277,15 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   Optional<String> jsonRpcListenAddress() {
-    if (jsonRpcEnabled) {
-      return Optional.of(jsonRpcConfiguration.getHost() + ":" + jsonRpcConfiguration.getPort());
+    if (isJsonRpcEnabled()) {
+      return Optional.of(jsonRpcConfiguration().getHost() + ":" + jsonRpcConfiguration().getPort());
     } else {
       return Optional.empty();
     }
   }
 
   boolean wsRpcEnabled() {
-    return wsRpcEnabled;
+    return isWebSocketsRpcEnabled();
   }
 
   WebSocketConfiguration webSocketConfiguration() {
@@ -263,7 +293,8 @@ public class PantheonNode implements Node, AutoCloseable {
   }
 
   Optional<String> wsRpcListenAddress() {
-    return Optional.of(webSocketConfiguration.getHost() + ":" + webSocketConfiguration.getPort());
+    return Optional.of(
+        webSocketConfiguration().getHost() + ":" + webSocketConfiguration().getPort());
   }
 
   int p2pPort() {
@@ -281,7 +312,8 @@ public class PantheonNode implements Node, AutoCloseable {
         .collect(Collectors.toList());
   }
 
-  void bootnodes(final List<String> bootnodes) {
+  @Override
+  public void bootnodes(final List<String> bootnodes) {
     this.bootnodes = bootnodes;
   }
 
@@ -303,7 +335,8 @@ public class PantheonNode implements Node, AutoCloseable {
         .toString();
   }
 
-  void stop() {
+  @Override
+  public void stop() {
     if (web3j != null) {
       web3j.shutdown();
       web3j = null;
@@ -337,6 +370,7 @@ public class PantheonNode implements Node, AutoCloseable {
     return transaction.execute(pantheonWeb3j());
   }
 
+  @Override
   public void verify(final Condition expected) {
     expected.verify(this);
   }

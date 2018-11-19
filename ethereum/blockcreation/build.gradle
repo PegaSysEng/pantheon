@@ -3,8 +3,12 @@ apply plugin: 'java-library'
 jar {
   baseName 'pantheon-blockcreation'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
@@ -12,6 +16,7 @@ dependencies {
   implementation project(':ethereum:core')
   implementation project(':ethereum:eth')
   implementation project(':util')
+  implementation project(':config')
   implementation project(':crypto')
   implementation project(':services:kvstore')
 
@@ -22,6 +27,7 @@ dependencies {
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.awaitility:awaitility'
   testImplementation 'org.mockito:mockito-core'
+  testImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
   testImplementation project(path: ':ethereum:core', configuration: 'testArtifacts')
 }

@@ -16,11 +16,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Blockchain;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.CliqueConditions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
-import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.JsonRpc;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Web3;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
@@ -34,27 +34,27 @@ public class AcceptanceTestBase {
   protected final Accounts accounts;
   protected final Blockchain blockchain;
   protected final Cluster cluster;
-  protected final JsonRpc jsonRpc;
   protected final CliqueConditions clique;
   protected final CliqueTransactions cliqueTransactions;
   protected final Transactions transactions;
   protected final Web3 web3;
   protected final Eth eth;
   protected final Net net;
+  protected final PantheonNodeFactory pantheon;
   protected final WaitConditions wait;
 
   protected AcceptanceTestBase() {
     final EthTransactions ethTransactions = new EthTransactions();
     accounts = new Accounts(ethTransactions);
     blockchain = new Blockchain(ethTransactions);
-    cluster = new Cluster();
     eth = new Eth(ethTransactions);
-    jsonRpc = new JsonRpc(cluster);
     cliqueTransactions = new CliqueTransactions();
     clique = new CliqueConditions(ethTransactions, cliqueTransactions);
     net = new Net(new NetTransactions());
+    cluster = new Cluster(net);
     transactions = new Transactions(accounts);
     web3 = new Web3(new Web3Transactions());
+    pantheon = new PantheonNodeFactory();
     wait = new WaitConditions(ethTransactions);
   }
 

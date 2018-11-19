@@ -17,4 +17,8 @@ public class NetTransactions {
   public NetVersionTransaction netVersion() {
     return new NetVersionTransaction();
   }
+
+  public NetPeerCountTransaction peerCount() {
+    return new NetPeerCountTransaction();
+  }
 }

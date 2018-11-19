@@ -16,8 +16,12 @@ apply plugin: 'java-library'
 jar {
   baseName 'pantheon-json-rpc'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
@@ -35,6 +39,8 @@ dependencies {
 
   testImplementation project(path: ':ethereum:core', configuration: 'testArtifacts')
   testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
+  testImplementation project(':config')
+  testImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   testImplementation project(':services:kvstore')
   testImplementation project(':testutil')
 
@@ -45,6 +51,8 @@ dependencies {
   testImplementation 'io.vertx:vertx-codegen'
   testImplementation 'io.vertx:vertx-unit'
 
+  integrationTestImplementation project(':config')
+  integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   integrationTestImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
   integrationTestImplementation project(':services:kvstore')
 

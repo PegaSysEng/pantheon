@@ -16,12 +16,17 @@ apply plugin: 'java-library'
 jar {
   baseName 'pantheon-ibft'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
 dependencies {
+  implementation project(':config')
   implementation project(':consensus:common')
   implementation project(':crypto')
   implementation project(':ethereum:core')

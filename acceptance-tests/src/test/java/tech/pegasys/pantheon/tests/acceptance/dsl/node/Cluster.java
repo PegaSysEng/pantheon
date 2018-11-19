@@ -17,48 +17,65 @@ import static org.assertj.core.api.Assertions.assertThat;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Cluster implements AutoCloseable {
   public static final int NETWORK_ID = 10;
 
-  private final List<PantheonNode> nodes = new ArrayList<>();
+  private final Map<String, RunnableNode> nodes = new HashMap<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
+  private final Net net;
 
-  public void start(final PantheonNode... startNodes) {
-    if (startNodes.length != 0) {
-      this.nodes.clear();
-      this.nodes.addAll(Arrays.asList(startNodes));
-    }
+  public Cluster(final Net net) {
+    this.net = net;
+  }
+
+  public void start(final Node... nodes) {
+    start(
+        Arrays.stream(nodes)
+            .map(
+                n -> {
+                  assertThat(n instanceof RunnableNode).isTrue();
+                  return (RunnableNode) n;
+                })
+            .collect(Collectors.toList()));
+  }
+
+  public void start(final List<RunnableNode> nodes) {
+    this.nodes.clear();
 
     final List<String> bootNodes = new ArrayList<>();
 
-    for (final PantheonNode node : nodes) {
-      bootNodes.add(node.enodeUrl());
+    for (final RunnableNode node : nodes) {
+      this.nodes.put(node.getName(), node);
+      bootNodes.add(node.getConfiguration().enodeUrl());
     }
 
-    for (final PantheonNode node : nodes) {
-      node.bootnodes(bootNodes);
+    for (final RunnableNode node : nodes) {
+      node.getConfiguration().bootnodes(bootNodes);
       Optional<EthNetworkConfig> ethNetworkConfig =
-          node.getGenesisConfig()
+          node.getConfiguration().genesisConfig()
               .apply(nodes)
               .map(config -> new EthNetworkConfig(config, NETWORK_ID, bootNodes));
-      node.setEthNetworkConfig(ethNetworkConfig);
+      node.getConfiguration().ethNetworkConfig(ethNetworkConfig);
       node.start(pantheonNodeRunner);
     }
 
-    for (final PantheonNode node : nodes) {
-      awaitPeerDiscovery(node, nodes.size());
+    for (final RunnableNode node : nodes) {
+      node.awaitPeerDiscovery(net.awaitPeerCount(nodes.size() - 1));
     }
   }
 
   public void stop() {
-    for (final PantheonNode node : this.nodes) {
+    for (final RunnableNode node : nodes.values()) {
       node.stop();
     }
     pantheonNodeRunner.shutdown();
@@ -70,36 +87,14 @@ public class Cluster implements AutoCloseable {
 
   @Override
   public void close() {
-    for (final PantheonNode node : nodes) {
+    for (final RunnableNode node : nodes.values()) {
       node.close();
     }
     pantheonNodeRunner.shutdown();
   }
 
-  public PantheonNode create(final PantheonNodeConfig config) throws IOException {
-    config.initSocket();
-    final PantheonNode node =
-        new PantheonNode(
-            config.getName(),
-            config.getSocketPort(),
-            config.getMiningParameters(),
-            config.getJsonRpcConfiguration(),
-            config.getWebSocketConfiguration(),
-            config.isDevMode(),
-            config.getGenesisConfig());
-    config.closeSocket();
-    nodes.add(node);
-    return node;
-  }
-
-  private void awaitPeerDiscovery(final PantheonNode node, final int nodeCount) {
-    if (node.jsonRpcEnabled()) {
-      WaitUtils.waitFor(() -> assertThat(node.getPeerCount()).isEqualTo(nodeCount - 1));
-    }
-  }
-
   public void verify(final Condition expected) {
-    for (final Node node : nodes) {
+    for (final Node node : nodes.values()) {
       expected.verify(node);
     }
   }

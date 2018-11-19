@@ -16,14 +16,19 @@ plugins { id 'java' }
 jar {
   baseName 'pantheon-clique'
   manifest {
-    attributes('Implementation-Title': baseName,
-    'Implementation-Version': project.version)
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
   }
 }
 
 repositories { mavenCentral() }
 
 dependencies {
+  implementation project(':config')
   implementation project(':crypto')
   implementation project(':ethereum:core')
   implementation project(':ethereum:blockcreation')

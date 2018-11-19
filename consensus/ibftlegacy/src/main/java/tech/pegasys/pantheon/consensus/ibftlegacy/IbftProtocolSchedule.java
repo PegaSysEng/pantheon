@@ -12,38 +12,57 @@
  */
 package tech.pegasys.pantheon.consensus.ibftlegacy;
 
+import static tech.pegasys.pantheon.consensus.ibftlegacy.IbftBlockHeaderValidationRulesetFactory.ibftBlockHeaderValidator;
+
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.config.IbftConfigOptions;
+import tech.pegasys.pantheon.consensus.common.EpochManager;
+import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockImporter;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.ethereum.mainnet.MutableProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpecBuilder;
 
-import java.util.Optional;
-
-import io.vertx.core.json.JsonObject;
+import java.math.BigInteger;
 
 /** Defines the protocol behaviours for a blockchain using IBFT. */
 public class IbftProtocolSchedule {
 
-  private static final long DEFAULT_EPOCH_LENGTH = 30_000;
-  private static final int DEFAULT_BLOCK_PERIOD_SECONDS = 1;
+  private static final int DEFAULT_CHAIN_ID = 1;
 
-  public static ProtocolSchedule<IbftContext> create(final JsonObject config) {
-    final long spuriousDragonBlock = config.getLong("spuriousDragonBlock", 0L);
-    final Optional<JsonObject> ibftConfig = Optional.ofNullable(config.getJsonObject("ibft"));
-    final int chainId = config.getInteger("chainId", 1);
-    final long epochLength = getEpochLength(ibftConfig);
-    final long blockPeriod =
-        ibftConfig
-            .map(iC -> iC.getInteger("blockPeriodSeconds"))
-            .orElse(DEFAULT_BLOCK_PERIOD_SECONDS);
+  public static ProtocolSchedule<IbftContext> create(final GenesisConfigOptions config) {
+    final IbftConfigOptions ibftConfig = config.getIbftConfigOptions();
+    final long epochLength = ibftConfig.getEpochLength();
+    final long blockPeriod = ibftConfig.getBlockPeriodSeconds();
+    final EpochManager epochManager = new EpochManager(epochLength);
 
-    final MutableProtocolSchedule<IbftContext> protocolSchedule = new MutableProtocolSchedule<>();
-    protocolSchedule.putMilestone(
-        spuriousDragonBlock,
-        IbftProtocolSpecs.spuriousDragon(blockPeriod, epochLength, chainId, protocolSchedule));
-    return protocolSchedule;
+    return new ProtocolScheduleBuilder<>(
+            config,
+            DEFAULT_CHAIN_ID,
+            builder -> applyIbftChanges(blockPeriod, epochManager, builder))
+        .createProtocolSchedule();
   }
 
-  public static long getEpochLength(final Optional<JsonObject> ibftConfig) {
-    return ibftConfig.map(conf -> conf.getLong("epochLength")).orElse(DEFAULT_EPOCH_LENGTH);
+  private static ProtocolSpecBuilder<IbftContext> applyIbftChanges(
+      final long secondsBetweenBlocks,
+      final EpochManager epochManager,
+      final ProtocolSpecBuilder<Void> builder) {
+    return builder
+        .<IbftContext>changeConsensusContextType(
+            difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
+            difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
+            MainnetBlockBodyValidator::new,
+            (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
+                new IbftBlockImporter(
+                    new MainnetBlockImporter<>(
+                        blockHeaderValidator, blockBodyValidator, blockProcessor),
+                    new VoteTallyUpdater(epochManager, new IbftLegacyVotingBlockInterface())),
+            (time, parent, protocolContext) -> BigInteger.ONE)
+        .blockReward(Wei.ZERO)
+        .blockHashFunction(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
   }
 }

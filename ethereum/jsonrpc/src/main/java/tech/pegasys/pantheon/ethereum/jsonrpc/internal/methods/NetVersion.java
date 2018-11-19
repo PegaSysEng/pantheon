@@ -25,8 +25,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 public class NetVersion implements JsonRpcMethod {
   private final String chainId;
 
-  public NetVersion(final String chainId) {
-    this.chainId = chainId;
+  public NetVersion(final int chainId) {
+    this.chainId = String.valueOf(chainId);
   }
 
   @Override

@@ -12,68 +12,56 @@
  */
 package tech.pegasys.pantheon.consensus.clique;
 
+import static tech.pegasys.pantheon.consensus.clique.BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator;
+
+import tech.pegasys.pantheon.config.CliqueConfigOptions;
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.mainnet.MutableProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-
-import java.util.Optional;
-
-import io.vertx.core.json.JsonObject;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpecBuilder;
 
 /** Defines the protocol behaviours for a blockchain using Clique. */
-public class CliqueProtocolSchedule extends MutableProtocolSchedule<CliqueContext> {
+public class CliqueProtocolSchedule {
 
-  private static final long DEFAULT_EPOCH_LENGTH = 30_000;
-  private static final int DEFAULT_BLOCK_PERIOD_SECONDS = 1;
   private static final int DEFAULT_CHAIN_ID = 4;
 
   public static ProtocolSchedule<CliqueContext> create(
-      final JsonObject config, final KeyPair nodeKeys) {
+      final GenesisConfigOptions config, final KeyPair nodeKeys) {
 
-    // Get Config Data
-    final Optional<JsonObject> cliqueConfig = Optional.ofNullable(config.getJsonObject("clique"));
-    final long epochLength =
-        cliqueConfig.map(cc -> cc.getLong("epochLength")).orElse(DEFAULT_EPOCH_LENGTH);
-    final long blockPeriod =
-        cliqueConfig
-            .map(cc -> cc.getInteger("blockPeriodSeconds"))
-            .orElse(DEFAULT_BLOCK_PERIOD_SECONDS);
-    final int chainId = config.getInteger("chainId", DEFAULT_CHAIN_ID);
+    final CliqueConfigOptions cliqueConfig = config.getCliqueConfigOptions();
 
-    final MutableProtocolSchedule<CliqueContext> protocolSchedule = new CliqueProtocolSchedule();
+    final Address localNodeAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
 
-    // TODO(tmm) replace address with passed in node data (coming later)
-    final CliqueProtocolSpecs specs =
-        new CliqueProtocolSpecs(
-            blockPeriod,
-            epochLength,
-            chainId,
-            Util.publicKeyToAddress(nodeKeys.getPublicKey()),
-            protocolSchedule);
+    final EpochManager epochManager = new EpochManager(cliqueConfig.getEpochLength());
+    return new ProtocolScheduleBuilder<>(
+            config,
+            DEFAULT_CHAIN_ID,
+            builder ->
+                applyCliqueSpecificModifications(
+                    epochManager, cliqueConfig.getBlockPeriodSeconds(), localNodeAddress, builder))
+        .createProtocolSchedule();
+  }
 
-    protocolSchedule.putMilestone(0, specs.frontier());
-
-    final Long homesteadBlockNumber = config.getLong("homesteadBlock");
-    if (homesteadBlockNumber != null) {
-      protocolSchedule.putMilestone(homesteadBlockNumber, specs.homestead());
-    }
-
-    final Long tangerineWhistleBlockNumber = config.getLong("eip150Block");
-    if (tangerineWhistleBlockNumber != null) {
-      protocolSchedule.putMilestone(tangerineWhistleBlockNumber, specs.tangerineWhistle());
-    }
-
-    final Long spuriousDragonBlockNumber = config.getLong("eip158Block");
-    if (spuriousDragonBlockNumber != null) {
-      protocolSchedule.putMilestone(spuriousDragonBlockNumber, specs.spuriousDragon());
-    }
-
-    final Long byzantiumBlockNumber = config.getLong("byzantiumBlock");
-    if (byzantiumBlockNumber != null) {
-      protocolSchedule.putMilestone(byzantiumBlockNumber, specs.byzantium());
-    }
-
-    return protocolSchedule;
+  private static ProtocolSpecBuilder<CliqueContext> applyCliqueSpecificModifications(
+      final EpochManager epochManager,
+      final long secondsBetweenBlocks,
+      final Address localNodeAddress,
+      final ProtocolSpecBuilder<Void> specBuilder) {
+    return specBuilder
+        .changeConsensusContextType(
+            difficultyCalculator -> cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
+            difficultyCalculator -> cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
+            MainnetBlockBodyValidator::new,
+            MainnetBlockImporter::new,
+            new CliqueDifficultyCalculator(localNodeAddress))
+        .blockReward(Wei.ZERO)
+        .miningBeneficiaryCalculator(CliqueHelpers::getProposerOfBlock);
   }
 }

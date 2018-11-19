@@ -12,19 +12,23 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
+import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.GenesisConfig;
+import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.db.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutableWorldState;
 import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
+
+import java.util.function.Function;
 
 public class ExecutionContextTestFixture {
 
@@ -38,8 +42,9 @@ public class ExecutionContextTestFixture {
 
   private ExecutionContextTestFixture(
       final ProtocolSchedule<Void> protocolSchedule, final KeyValueStorage keyValueStorage) {
-    final GenesisConfig<Void> genesisConfig = GenesisConfig.mainnet();
-    this.genesis = genesisConfig.getBlock();
+    final GenesisState genesisState =
+        GenesisState.fromConfig(GenesisConfigFile.mainnet(), protocolSchedule);
+    this.genesis = genesisState.getBlock();
     this.keyValueStorage = keyValueStorage;
     this.blockchain =
         new DefaultMutableBlockchain(
@@ -51,7 +56,7 @@ public class ExecutionContextTestFixture {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = new ProtocolContext<>(blockchain, stateArchive, null);
 
-    genesisConfig.writeStateTo(
+    genesisState.writeStateTo(
         new DefaultMutableWorldState(new KeyValueStorageWorldStateStorage(keyValueStorage)));
   }
 
@@ -104,7 +109,10 @@ public class ExecutionContextTestFixture {
 
     public ExecutionContextTestFixture build() {
       if (protocolSchedule == null) {
-        protocolSchedule = MainnetProtocolSchedule.create(0, 0, 0, 0, 0, 0, 42);
+        protocolSchedule =
+            new ProtocolScheduleBuilder<>(
+                    new StubGenesisConfigOptions().constantinopleBlock(0), 42, Function.identity())
+                .createProtocolSchedule();
       }
       if (keyValueStorage == null) {
         keyValueStorage = new InMemoryKeyValueStorage();
