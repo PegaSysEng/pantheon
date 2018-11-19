@@ -38,7 +38,6 @@ import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.Logger;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
@@ -132,20 +131,15 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   private Web3j web3j() {
-    if (!jsonRpcBaseUrl().isPresent()) {
-      return web3j(new HttpService("http://" + LOCALHOST + ":8545"));
-    }
 
     if (web3j == null) {
-      return web3j(new HttpService(jsonRpcBaseUrl().get()));
-    }
+      if (!jsonRpcBaseUrl().isPresent()) {
+        return Web3j.build(
+            new HttpService("http://" + LOCALHOST + ":8545"), 2000, Async.defaultExecutorService());
+      }
 
-    return web3j;
-  }
-
-  private Web3j web3j(final Web3jService web3jService) {
-    if (web3j == null) {
-      web3j = Web3j.build(web3jService, 2000, Async.defaultExecutorService());
+      return Web3j.build(
+          new HttpService(jsonRpcBaseUrl().get()), 2000, Async.defaultExecutorService());
     }
 
     return web3j;
