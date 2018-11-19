@@ -36,8 +36,7 @@ public class EthGetTransactionReceiptAcceptanceTest extends AcceptanceTestBase {
   public void mustCorrectlyQueryTransactionReceiptFromNormalTransaction() {
     final Hash transactionHash
         = minerNode.execute(transactions.createTransfer(sender, recipient, 5));
-    cluster.verify(recipient.balanceEquals(5)); //should this be 10 due to prev test?
-    cluster.verify(sender.balanceEquals(5));
+    cluster.verify(recipient.balanceEquals(5));
     minerNode.verify(eth.getTransactionReceipt(transactionHash.toString()));
   }
 
