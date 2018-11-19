@@ -20,7 +20,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.RemoteCall;
 import org.web3j.tx.Contract;
 
-public class DeploySmartContract<T extends Contract> implements Transaction<T> {
+public class DeploySmartContractTransaction<T extends Contract> implements Transaction<T> {
 
   private static final BigInteger DEFAULT_GAS_PRICE = BigInteger.valueOf(1000);
   private static final BigInteger DEFAULT_GAS_LIMIT = BigInteger.valueOf(3000000);
@@ -30,7 +30,7 @@ public class DeploySmartContract<T extends Contract> implements Transaction<T> {
 
   private final Class<T> clazz;
 
-  public DeploySmartContract(final Class<T> clazz) {
+  public DeploySmartContractTransaction(final Class<T> clazz) {
     this.clazz = clazz;
   }
 
