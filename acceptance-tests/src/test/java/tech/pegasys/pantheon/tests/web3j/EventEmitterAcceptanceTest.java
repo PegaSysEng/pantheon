@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.DeploySmartContractTransaction;
 import tech.pegasys.pantheon.tests.web3j.generated.EventEmitter;
 import tech.pegasys.pantheon.tests.web3j.generated.EventEmitter.StoredEventResponse;
 
@@ -47,10 +46,8 @@ public class EventEmitterAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldDeployContractAndAllowLookupOfValuesAndEmittingEvents() throws Exception {
-    System.out.println("Sending Create Contract Transaction");
-
     final EventEmitter eventEmitter =
-        new DeploySmartContractTransaction<>(EventEmitter.class).execute(node.web3j());
+        node.execute(transactions.createSmartContract(EventEmitter.class));
 
     final Observable<StoredEventResponse> storedEventResponseObservable =
         eventEmitter.storedEventObservable(new EthFilter());

@@ -131,8 +131,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return LOCALHOST;
   }
 
-  @Deprecated
-  public Web3j web3j() {
+  private Web3j web3j() {
     if (!jsonRpcBaseUrl().isPresent()) {
       return web3j(new HttpService("http://" + LOCALHOST + ":8545"));
     }
@@ -144,16 +143,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return web3j;
   }
 
-  public void setWeb3j(final Web3jService web3jService) {
-    if (web3j != null) {
-      web3j.shutdown();
-    }
-
-    web3j = Web3j.build(web3jService, 2000, Async.defaultExecutorService());
-  }
-
-  @Deprecated
-  public Web3j web3j(final Web3jService web3jService) {
+  private Web3j web3j(final Web3jService web3jService) {
     if (web3j == null) {
       web3j = Web3j.build(web3jService, 2000, Async.defaultExecutorService());
     }
