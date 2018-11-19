@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.SmartContract;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.DeploySmartContract;
 import tech.pegasys.pantheon.tests.web3j.generated.EventEmitter;
 import tech.pegasys.pantheon.tests.web3j.generated.EventEmitter.StoredEventResponse;
 
@@ -33,7 +33,6 @@ import rx.Observable;
 
 /*
  * This class is based around the EventEmitter solidity contract
- *
  */
 @Ignore
 public class EventEmitterAcceptanceTest extends AcceptanceTestBase {
@@ -50,7 +49,11 @@ public class EventEmitterAcceptanceTest extends AcceptanceTestBase {
   public void shouldDeployContractAndAllowLookupOfValuesAndEmittingEvents() throws Exception {
     System.out.println("Sending Create Contract Transaction");
 
-    final EventEmitter eventEmitter =new SmartContract(node.web3j()).deploy(EventEmitter.class);
+    //    final EventEmitter eventEmitter =new
+    // SmartContract(node.web3j()).deploy(EventEmitter.class);
+
+    final EventEmitter eventEmitter =
+        new DeploySmartContract<>(EventEmitter.class).execute(node.web3j());
 
     final Observable<StoredEventResponse> storedEventResponseObservable =
         eventEmitter.storedEventObservable(new EthFilter());
