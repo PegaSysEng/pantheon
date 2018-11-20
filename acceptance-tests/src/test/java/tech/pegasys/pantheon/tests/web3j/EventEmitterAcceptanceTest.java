@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.web3j;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
@@ -53,14 +54,16 @@ public class EventEmitterAcceptanceTest extends AcceptanceTestBase {
         eventEmitter.storedEventObservable(new EthFilter());
 
     final AtomicBoolean subscriptionReceived = new AtomicBoolean(false);
+
     storedEventResponseObservable.subscribe(
         storedEventResponse -> {
           subscriptionReceived.set(true);
           assertEquals(BigInteger.valueOf(12), storedEventResponse._amount);
         });
 
-    final TransactionReceipt send = eventEmitter.store(BigInteger.valueOf(12)).send();
+    final TransactionReceipt receipt = eventEmitter.store(BigInteger.valueOf(12)).send();
 
+    assertNotNull(receipt);
     assertEquals(BigInteger.valueOf(12), eventEmitter.value().send());
     assertTrue(subscriptionReceived.get());
   }
