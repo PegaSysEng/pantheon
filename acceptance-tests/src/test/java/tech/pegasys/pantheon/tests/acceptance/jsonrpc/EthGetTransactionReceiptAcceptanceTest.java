@@ -23,23 +23,19 @@ import org.junit.Test;
 public class EthGetTransactionReceiptAcceptanceTest extends AcceptanceTestBase {
 
   private PantheonNode minerNode;
-  private Account sender;
   private Account recipient;
 
   @Before
   public void setUp() throws Exception {
-    sender = accounts.createAccount("sender");
     recipient = accounts.createAccount("recipient");
     minerNode = pantheon.createMinerNode("node");
     cluster.start(minerNode);
-    minerNode.execute(transactions.createTransfer(sender, 10));
-    cluster.verify(sender.balanceEquals(10));
   }
 
   @Test
   public void transactionMustHaveReceipt() {
     final Hash transactionHash =
-        minerNode.execute(transactions.createTransfer(sender, recipient, 5));
+        minerNode.execute(transactions.createTransfer(recipient, 5));
     cluster.verify(recipient.balanceEquals(5));
     minerNode.verify(eth.expectSuccessfulTransactionReceipt(transactionHash));
   }
