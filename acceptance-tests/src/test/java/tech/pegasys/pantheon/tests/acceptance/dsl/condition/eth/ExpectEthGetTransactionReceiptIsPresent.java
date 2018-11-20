@@ -35,5 +35,6 @@ public class ExpectEthGetTransactionReceiptIsPresent implements Condition {
   public void verify(final Node node) {
     final Optional<TransactionReceipt> response = node.execute(transaction);
     assertThat(response.isPresent()).isTrue();
+    assertThat(response.get().getStatus()).isEqualToIgnoringCase("0x1");
   }
 }

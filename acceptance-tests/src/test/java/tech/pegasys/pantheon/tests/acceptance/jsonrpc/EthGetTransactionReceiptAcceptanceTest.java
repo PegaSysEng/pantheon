@@ -37,24 +37,17 @@ public class EthGetTransactionReceiptAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void mustCorrectlyQueryTransactionReceiptFromContractCreationTransaction() {
-    final Hash transactionHash = minerNode.execute(transactions.createTransfer(recipient, 5));
-    cluster.verify(recipient.balanceEquals(5));
-    minerNode.verify(eth.getTransactionReceipt(transactionHash));
-  }
-
-  @Test
-  public void mustCorrectlyQueryTransactionReceiptFromNormalTransaction() {
+  public void transactionMustHaveReceipt() {
     final Hash transactionHash =
         minerNode.execute(transactions.createTransfer(sender, recipient, 5));
     cluster.verify(recipient.balanceEquals(5));
-    minerNode.verify(eth.getTransactionReceipt(transactionHash));
+    minerNode.verify(eth.expectTransactionReceipt(transactionHash));
   }
 
   @Test
-  public void mustReturnNullWhenTransactionDoesNotExist() {
+  public void imaginaryTransactionMustHaveNoReceipt() {
     minerNode.verify(
-        eth.getTransactionReceiptNotAvailable(
+        eth.expectNoTransactionReceipt(
             "0x0000000000000000000000000000000000000000000000000000000000000000"));
   }
 }
