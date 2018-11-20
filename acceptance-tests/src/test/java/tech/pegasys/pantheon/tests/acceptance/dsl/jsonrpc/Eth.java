@@ -41,12 +41,12 @@ public class Eth {
     return new ExpectEthAccountsException(transactions.accounts(), expectedMessage);
   }
 
-  public Condition getTransactionReceipt(final Hash transactionHash) {
+  public Condition expectTransactionReceipt(final Hash transactionHash) {
     return new ExpectEthGetTransactionReceiptIsPresent(
         transactions.getTransactionReceipt(transactionHash.toString()));
   }
 
-  public Condition getTransactionReceiptNotAvailable(final String transactionHash) {
+  public Condition expectNoTransactionReceipt(final String transactionHash) {
     return new ExpectEthGetTransactionReceiptIsAbsent(
         transactions.getTransactionReceipt(transactionHash));
   }
