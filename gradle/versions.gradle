@@ -41,11 +41,11 @@ dependencyManagement {
 
     dependency('io.pkts:pkts-core:3.0.2')
 
-    dependency("org.iq80.snappy:snappy:0.4")
+    dependency('org.xerial.snappy:snappy-java:1.1.7.2')
 
     dependency('com.github.docker-java:docker-java:3.0.14')
 
-    dependency('info.picocli:picocli:3.6.1')
+    dependency('info.picocli:picocli:3.8.0')
     dependency('net.consensys.cava:cava-toml:0.3.1')
 
     dependency('org.openjdk.jmh:jmh-core:1.21')
