@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
@@ -27,12 +25,12 @@ public class CliqueProposalRpcAcceptanceTest extends AcceptanceTestBase {
   public void shouldReturnProposals() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
-        cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", initialValidators));
+        pantheon.createCliqueMinerNodeWithValidators("miner1", initialValidators);
     final PantheonNode minerNode2 =
-        cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", initialValidators));
+        pantheon.createCliqueMinerNodeWithValidators("miner2", initialValidators);
     final PantheonNode minerNode3 =
-        cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", initialValidators));
-    cluster.start();
+        pantheon.createCliqueMinerNodeWithValidators("miner3", initialValidators);
+    cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.noProposals());
     minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));

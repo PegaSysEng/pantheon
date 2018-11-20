@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNodeWithValidators;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions.LATEST;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
@@ -32,18 +31,18 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     final String[] validators = {"miner1", "miner2"};
-    minerNode1 = cluster.create(pantheonCliqueMinerNodeWithValidators("miner1", validators));
-    minerNode2 = cluster.create(pantheonCliqueMinerNodeWithValidators("miner2", validators));
-    minerNode3 = cluster.create(pantheonCliqueMinerNodeWithValidators("miner3", validators));
+    minerNode1 = pantheon.createCliqueMinerNodeWithValidators("miner1", validators);
+    minerNode2 = pantheon.createCliqueMinerNodeWithValidators("miner2", validators);
+    minerNode3 = pantheon.createCliqueMinerNodeWithValidators("miner3", validators);
     allNodes = new PantheonNode[] {minerNode1, minerNode2, minerNode3};
-    cluster.start();
+    cluster.start(allNodes);
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() throws IOException {
     minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
-    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1,2));
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
     cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));
     cluster.verify(clique.validatorsAtBlockEqual(LATEST, allNodes));
@@ -56,6 +55,6 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
     // TODO add support for latest block hash
-//     cluster.verify(clique.validatorsAtBlockHashEqual(latestBlockHash, allNodes));
+    //     cluster.verify(clique.validatorsAtBlockHashEqual(latestBlockHash, allNodes));
   }
 }

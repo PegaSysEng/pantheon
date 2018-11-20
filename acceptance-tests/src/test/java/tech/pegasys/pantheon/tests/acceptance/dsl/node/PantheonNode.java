@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,11 +35,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.base.MoreObjects;
@@ -50,7 +49,6 @@ import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
-import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
 public class PantheonNode implements Node, NodeConfiguration, RunnableNode, AutoCloseable {
 
@@ -66,10 +64,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final MiningParameters miningParameters;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
-  private final boolean jsonRpcEnabled;
-  private final boolean wsRpcEnabled;
-  private final Properties portsProperties = new Properties();
-  private final Function<Collection<PantheonNode>, Optional<String>> genesisConfig;
+  private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
 
   private List<String> bootnodes = new ArrayList<>();
@@ -84,8 +79,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final boolean devMode,
-      final Function<Collection<PantheonNode>, Optional<String>> genesisConfig)
-      final WebSocketConfiguration webSocketConfiguration,
+      final GenesisConfigProvider genesisConfigProvider,
       final int p2pPort)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
@@ -95,9 +89,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
-    this.jsonRpcEnabled = jsonRpcConfiguration.isEnabled();
-    this.wsRpcEnabled = webSocketConfiguration.isEnabled();
-    this.genesisConfig = genesisConfig;
+    this.genesisConfigProvider = genesisConfigProvider;
     this.devMode = devMode;
     LOG.info("Created PantheonNode {}", this.toString());
   }
@@ -162,7 +154,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     }
 
     if (web3j == null) {
-      return web3j(web3jService());
+      return web3j(new HttpService(jsonRpcBaseUrl().get()));
     }
 
     return web3j;
@@ -224,14 +216,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return new HttpService(jsonRpcBaseUrl().get());
   }
 
-  public int getPeerCount() {
-    try {
-      return web3j().netPeerCount().send().getQuantity().intValueExact();
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   @Override
   public void start(final PantheonNodeRunner runner) {
     runner.startNode(this);
@@ -259,6 +243,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     }
   }
 
+  @Override
   public Address getAddress() {
     return Util.publicKeyToAddress(keyPair.getPublicKey());
   }
@@ -353,16 +338,19 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     }
   }
 
-  public Function<Collection<PantheonNode>, Optional<String>> getGenesisConfig() {
-    return genesisConfig;
+  @Override
+  public GenesisConfigProvider genesisConfigProvider() {
+    return genesisConfigProvider;
   }
 
-  public void setEthNetworkConfig(final Optional<EthNetworkConfig> ethNetworkConfig) {
-    this.ethNetworkConfig = ethNetworkConfig;
-  }
-
-  public Optional<EthNetworkConfig> getEthNetworkConfig() {
+  @Override
+  public Optional<EthNetworkConfig> ethNetworkConfig() {
     return ethNetworkConfig;
+  }
+
+  @Override
+  public void ethNetworkConfig(final Optional<EthNetworkConfig> ethNetworkConfig) {
+    this.ethNetworkConfig = ethNetworkConfig;
   }
 
   @Override

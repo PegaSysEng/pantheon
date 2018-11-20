@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
-import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 
@@ -23,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Cluster implements AutoCloseable {
@@ -62,8 +61,9 @@ public class Cluster implements AutoCloseable {
     for (final RunnableNode node : nodes) {
       node.getConfiguration().bootnodes(bootNodes);
       Optional<EthNetworkConfig> ethNetworkConfig =
-          node.getConfiguration().genesisConfig()
-              .apply(nodes)
+          node.getConfiguration()
+              .genesisConfigProvider()
+              .createGenesisConfig(nodes)
               .map(config -> new EthNetworkConfig(config, NETWORK_ID, bootNodes));
       node.getConfiguration().ethNetworkConfig(ethNetworkConfig);
       node.start(pantheonNodeRunner);

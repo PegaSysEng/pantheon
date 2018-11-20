@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeConfig.pantheonCliqueMinerNode;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
@@ -27,8 +25,8 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactionsOnSingleNode() throws IOException {
-    final PantheonNode minerNode = cluster.create(pantheonCliqueMinerNode("miner1"));
-    cluster.start();
+    final PantheonNode minerNode = pantheon.createMinerNode("miner1");
+    cluster.start(minerNode);
 
     final Account sender = accounts.createAccount("account1");
     final Account receiver = accounts.createAccount("account2");
@@ -45,10 +43,10 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactionsOnMultipleNodes() throws IOException {
-    final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
-    final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
-    final PantheonNode minerNode3 = cluster.create(pantheonCliqueMinerNode("miner3"));
-    cluster.start();
+    final PantheonNode minerNode1 = pantheon.createCliqueMinerNode("miner1");
+    final PantheonNode minerNode2 = pantheon.createCliqueMinerNode("miner2");
+    final PantheonNode minerNode3 = pantheon.createCliqueMinerNode("miner3");
+    cluster.start(minerNode1, minerNode2, minerNode3);
 
     final Account sender = accounts.createAccount("account1");
     final Account receiver = accounts.createAccount("account2");
@@ -66,10 +64,10 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldStallMiningWhenInsufficientValidators()
       throws IOException, InterruptedException {
-    final PantheonNode minerNode1 = cluster.create(pantheonCliqueMinerNode("miner1"));
-    final PantheonNode minerNode2 = cluster.create(pantheonCliqueMinerNode("miner2"));
-    final PantheonNode minerNode3 = cluster.create(pantheonCliqueMinerNode("miner3"));
-    cluster.start();
+    final PantheonNode minerNode1 = pantheon.createCliqueMinerNode("miner1");
+    final PantheonNode minerNode2 = pantheon.createCliqueMinerNode("miner2");
+    final PantheonNode minerNode3 = pantheon.createCliqueMinerNode("miner3");
+    cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.stopNode(minerNode2);
     cluster.stopNode(minerNode3);

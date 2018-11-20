@@ -19,15 +19,15 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Web3;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Transactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitConditions;
 
 import org.junit.After;
-import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitConditions;
 
 public class AcceptanceTestBase {
 

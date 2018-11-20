@@ -51,7 +51,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
     final EthNetworkConfig ethNetworkConfig =
-        node.getEthNetworkConfig()
+        node.ethNetworkConfig()
             .orElse(new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build());
     PantheonController<?> pantheonController;
     try {
@@ -62,7 +62,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               ethNetworkConfig,
               false,
               node.getMiningParameters(),
-              true,
+              node.isDevMode(),
               KeyPairUtil.getDefaultKeyFile(node.homeDirectory()));
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
