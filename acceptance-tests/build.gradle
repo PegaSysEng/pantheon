@@ -42,5 +42,6 @@ task acceptanceTest(type: Test) {
   mustRunAfter rootProject.subprojects*.test
   description = 'Runs Pantheon acceptance tests.'
   group = 'verification'
+  testLogging { showStandardStreams = true }
 }
 acceptanceTest.dependsOn(rootProject.installDist)
