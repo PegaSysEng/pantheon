@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.pubsub;
 
-import org.junit.Ignore;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
@@ -24,6 +23,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.pubsub.WebSocket;
 import io.vertx.core.Vertx;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
