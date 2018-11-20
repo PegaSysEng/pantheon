@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.pubsub;
 
+import org.junit.Ignore;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
@@ -51,6 +52,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
+  @Ignore
   public void transactionRemovedByChainReorganisationMustPublishEvent() throws Exception {
 
     // Create the light fork
