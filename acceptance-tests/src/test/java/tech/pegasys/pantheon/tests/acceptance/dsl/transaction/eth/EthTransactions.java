@@ -32,7 +32,7 @@ public class EthTransactions {
     return new EthAccountsTransaction();
   }
 
-  public EthGetTransactionReceiptTransaction getTransactionReceipt(final String param) {
-    return new EthGetTransactionReceiptTransaction(param);
+  public EthGetTransactionReceiptTransaction getTransactionReceipt(final String transactionHash) {
+    return new EthGetTransactionReceiptTransaction(transactionHash);
   }
 }

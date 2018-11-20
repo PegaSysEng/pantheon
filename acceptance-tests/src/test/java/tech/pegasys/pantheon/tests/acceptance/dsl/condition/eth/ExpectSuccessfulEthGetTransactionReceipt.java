@@ -22,11 +22,11 @@ import java.util.Optional;
 
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-public class ExpectEthGetTransactionReceiptIsPresent implements Condition {
+public class ExpectSuccessfulEthGetTransactionReceipt implements Condition {
 
   private final EthGetTransactionReceiptTransaction transaction;
 
-  public ExpectEthGetTransactionReceiptIsPresent(
+  public ExpectSuccessfulEthGetTransactionReceipt(
       final EthGetTransactionReceiptTransaction transaction) {
     this.transaction = transaction;
   }

@@ -41,7 +41,7 @@ public class EthGetTransactionReceiptAcceptanceTest extends AcceptanceTestBase {
     final Hash transactionHash =
         minerNode.execute(transactions.createTransfer(sender, recipient, 5));
     cluster.verify(recipient.balanceEquals(5));
-    minerNode.verify(eth.expectTransactionReceipt(transactionHash));
+    minerNode.verify(eth.expectSuccessfulTransactionReceipt(transactionHash));
   }
 
   @Test
