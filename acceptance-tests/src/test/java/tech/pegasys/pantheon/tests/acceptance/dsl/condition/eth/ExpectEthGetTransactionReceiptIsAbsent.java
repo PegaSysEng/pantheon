@@ -22,11 +22,11 @@ import java.util.Optional;
 
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-public class SanityCheckEthGetTransactionReceiptValues implements Condition {
+public class ExpectEthGetTransactionReceiptIsAbsent implements Condition {
 
   private final EthGetTransactionReceiptTransaction transaction;
 
-  public SanityCheckEthGetTransactionReceiptValues(
+  public ExpectEthGetTransactionReceiptIsAbsent(
       final EthGetTransactionReceiptTransaction transaction) {
     this.transaction = transaction;
   }
@@ -34,6 +34,6 @@ public class SanityCheckEthGetTransactionReceiptValues implements Condition {
   @Override
   public void verify(final Node node) {
     final Optional<TransactionReceipt> response = node.execute(transaction);
-    assertThat(response.isPresent()).isTrue();
+    assertThat(response.isPresent()).isFalse();
   }
 }

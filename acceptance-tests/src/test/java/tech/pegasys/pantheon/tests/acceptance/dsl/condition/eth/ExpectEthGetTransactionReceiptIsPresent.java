@@ -22,17 +22,18 @@ import java.util.Optional;
 
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-public class ExpectEthGetTransactionRecieptNull implements Condition {
+public class ExpectEthGetTransactionReceiptIsPresent implements Condition {
 
   private final EthGetTransactionReceiptTransaction transaction;
 
-  public ExpectEthGetTransactionRecieptNull(final EthGetTransactionReceiptTransaction transaction) {
+  public ExpectEthGetTransactionReceiptIsPresent(
+      final EthGetTransactionReceiptTransaction transaction) {
     this.transaction = transaction;
   }
 
   @Override
   public void verify(final Node node) {
     final Optional<TransactionReceipt> response = node.execute(transaction);
-    assertThat(response.isPresent()).isFalse();
+    assertThat(response.isPresent()).isTrue();
   }
 }

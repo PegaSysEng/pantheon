@@ -12,11 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthAccountsException;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetTransactionRecieptNull;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetTransactionReceiptIsAbsent;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetTransactionReceiptIsPresent;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetWorkException;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.SanityCheckEthGetTransactionReceiptValues;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.SanityCheckEthGetWorkValues;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
@@ -40,11 +41,13 @@ public class Eth {
     return new ExpectEthAccountsException(transactions.accounts(), expectedMessage);
   }
 
-  public Condition getTransactionReceipt(final String param) {
-    return new SanityCheckEthGetTransactionReceiptValues(transactions.getTransactionReceipt(param));
+  public Condition getTransactionReceipt(final Hash transactionHash) {
+    return new ExpectEthGetTransactionReceiptIsPresent(
+        transactions.getTransactionReceipt(transactionHash.toString()));
   }
 
-  public Condition getTransactionReceiptNull(final String param) {
-    return new ExpectEthGetTransactionRecieptNull(transactions.getTransactionReceipt(param));
+  public Condition getTransactionReceiptNotAvailable(final String transactionHash) {
+    return new ExpectEthGetTransactionReceiptIsAbsent(
+        transactions.getTransactionReceipt(transactionHash));
   }
 }
