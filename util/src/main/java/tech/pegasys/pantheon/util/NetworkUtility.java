@@ -28,7 +28,11 @@ public class NetworkUtility {
   private static final Supplier<Boolean> ipv6Available =
       Suppliers.memoize(NetworkUtility::checkIpv6Availability);
 
-  /** Is IPv6 available? */
+  /**
+   * Is IPv6 available?
+   *
+   * @return Returns true if the machine reports having any IPv6 addresses.
+   */
   public static boolean isIPv6Available() {
     return ipv6Available.get();
   }
