@@ -16,8 +16,8 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthAccountsException;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetTransactionReceiptIsAbsent;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectSuccessfulEthGetTransactionReceipt;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectEthGetWorkException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.ExpectSuccessfulEthGetTransactionReceipt;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth.SanityCheckEthGetWorkValues;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
