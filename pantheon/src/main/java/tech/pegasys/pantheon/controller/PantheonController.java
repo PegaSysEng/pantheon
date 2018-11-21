@@ -62,6 +62,7 @@ public interface PantheonController<C> extends Closeable {
           storageProvider,
           genesisConfigFile,
           syncConfig,
+          miningParameters,
           ottomanTestnetOperation,
           networkId,
           nodeKeys);
