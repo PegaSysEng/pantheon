@@ -16,7 +16,6 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.config.CliqueConfigOptions;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import tech.pegasys.pantheon.consensus.clique.CliqueVotingBlockInterface;
@@ -24,6 +23,7 @@ import tech.pegasys.pantheon.consensus.clique.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueBlockScheduler;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueMinerExecutor;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueMiningCoordinator;
+import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueJsonRpcMethodsFactory;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
@@ -32,14 +32,13 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.core.Util;
+import tech.pegasys.pantheon.ethereum.db.BlockchainStorage;
 import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
-import tech.pegasys.pantheon.ethereum.db.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
@@ -48,18 +47,18 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.worldstate.KeyValueStorageWorldStateStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
+import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Clock;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -69,7 +68,6 @@ import org.apache.logging.log4j.Logger;
 public class CliquePantheonController implements PantheonController<CliqueContext> {
 
   private static final Logger LOG = getLogger();
-  private final GenesisConfigOptions genesisConfigOptions;
   private final ProtocolSchedule<CliqueContext> protocolSchedule;
   private final ProtocolContext<CliqueContext> context;
   private final Synchronizer synchronizer;
@@ -81,7 +79,6 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   private final MiningCoordinator miningCoordinator;
 
   CliquePantheonController(
-      final GenesisConfigOptions genesisConfigOptions,
       final ProtocolSchedule<CliqueContext> protocolSchedule,
       final ProtocolContext<CliqueContext> context,
       final ProtocolManager ethProtocolManager,
@@ -91,7 +88,6 @@ public class CliquePantheonController implements PantheonController<CliqueContex
       final MiningCoordinator miningCoordinator,
       final Runnable closer) {
 
-    this.genesisConfigOptions = genesisConfigOptions;
     this.protocolSchedule = protocolSchedule;
     this.context = context;
     this.ethProtocolManager = ethProtocolManager;
@@ -103,33 +99,27 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   }
 
   public static PantheonController<CliqueContext> init(
-      final Path home,
+      final StorageProvider storageProvider,
       final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
       final int networkId,
-      final KeyPair nodeKeys)
-      throws IOException {
+      final KeyPair nodeKeys) {
     final CliqueConfigOptions cliqueConfig =
         genesisConfig.getConfigOptions().getCliqueConfigOptions();
     final long blocksPerEpoch = cliqueConfig.getEpochLength();
     final long secondsBetweenBlocks = cliqueConfig.getBlockPeriodSeconds();
 
     final EpochManager epochManger = new EpochManager(blocksPerEpoch);
-    final KeyValueStorage kv =
-        RocksDbKeyValueStorage.create(Files.createDirectories(home.resolve(DATABASE_PATH)));
     final ProtocolSchedule<CliqueContext> protocolSchedule =
         CliqueProtocolSchedule.create(genesisConfig.getConfigOptions(), nodeKeys);
-    final BlockHashFunction blockHashFunction =
-        ScheduleBasedBlockHashFunction.create(protocolSchedule);
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
-    final KeyValueStoragePrefixedKeyBlockchainStorage blockchainStorage =
-        new KeyValueStoragePrefixedKeyBlockchainStorage(kv, blockHashFunction);
+    final BlockchainStorage blockchainStorage =
+        storageProvider.createBlockchainStorage(protocolSchedule);
     final MutableBlockchain blockchain =
         new DefaultMutableBlockchain(genesisState.getBlock(), blockchainStorage);
 
-    final KeyValueStorageWorldStateStorage worldStateStorage =
-        new KeyValueStorageWorldStateStorage(kv);
+    final WorldStateStorage worldStateStorage = storageProvider.createWorldStateStorage();
     final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
     genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
@@ -191,7 +181,6 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     miningCoordinator.enable();
 
     return new CliquePantheonController(
-        genesisConfig.getConfigOptions(),
         protocolSchedule,
         protocolContext,
         ethProtocolManager,
@@ -208,9 +197,9 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             LOG.error("Failed to shutdown miner executor");
           }
           try {
-            kv.close();
+            storageProvider.close();
           } catch (final IOException e) {
-            LOG.error("Failed to close key value storage", e);
+            LOG.error("Failed to close storage provider", e);
           }
         });
   }
@@ -223,11 +212,6 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   @Override
   public ProtocolSchedule<CliqueContext> getProtocolSchedule() {
     return protocolSchedule;
-  }
-
-  @Override
-  public GenesisConfigOptions getGenesisConfigOptions() {
-    return genesisConfigOptions;
   }
 
   @Override
@@ -253,6 +237,12 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   @Override
   public MiningCoordinator getMiningCoordinator() {
     return miningCoordinator;
+  }
+
+  @Override
+  public Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
+      final Collection<RpcApi> enabledRpcApis) {
+    return new CliqueJsonRpcMethodsFactory().methods(context, enabledRpcApis);
   }
 
   @Override
