@@ -14,13 +14,10 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.blockchain;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBeneficiary;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectMinimumBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
-import java.math.BigInteger;
 
 public class Blockchain {
 
@@ -36,9 +33,5 @@ public class Blockchain {
 
   public Condition beneficiaryEquals(final PantheonNode node) {
     return new ExpectBeneficiary(eth, node);
-  }
-
-  public Condition blockNumberEquals(final BigInteger blockNumber) {
-    return new ExpectBlockNumber(eth, blockNumber);
   }
 }

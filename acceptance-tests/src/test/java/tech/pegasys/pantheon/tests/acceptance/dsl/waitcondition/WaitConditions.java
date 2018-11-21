@@ -12,17 +12,23 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition;
 
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions.LATEST;
+
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumber;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 import java.math.BigInteger;
 
 public class WaitConditions {
   private final EthTransactions eth;
+  private CliqueTransactions clique;
 
-  public WaitConditions(final EthTransactions eth) {
+  public WaitConditions(final EthTransactions eth, final CliqueTransactions clique) {
     this.eth = eth;
+    this.clique = clique;
   }
 
   public WaitCondition chainHeadHasProgressed(
@@ -30,5 +36,9 @@ public class WaitConditions {
     final BigInteger futureBlock =
         node.execute(eth.blockNumber()).add(BigInteger.valueOf(blocksAheadOfLatest));
     return new ExpectBlockNumber(eth, futureBlock)::verify;
+  }
+
+  public WaitCondition cliqueValidatorsChanged(final Node node) {
+    return new WaitUntilSignersChanged(node.execute(clique.getSigners(LATEST)), clique);
   }
 }

@@ -25,7 +25,7 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactionsOnSingleNode() throws IOException {
-    final PantheonNode minerNode = pantheon.createMinerNode("miner1");
+    final PantheonNode minerNode = pantheon.createCliqueMinerNode("miner1");
     cluster.start(minerNode);
 
     final Account sender = accounts.createAccount("account1");

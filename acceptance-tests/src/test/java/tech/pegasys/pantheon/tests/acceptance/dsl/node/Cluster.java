@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
+import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,6 +97,12 @@ public class Cluster implements AutoCloseable {
   public void verify(final Condition expected) {
     for (final Node node : nodes.values()) {
       expected.verify(node);
+    }
+  }
+
+  public void waitUntil(final WaitCondition condition) {
+    for (final Node node : nodes.values()) {
+      node.waitUntil(condition);
     }
   }
 }

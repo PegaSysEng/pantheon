@@ -12,14 +12,17 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique;
 
+import static tech.pegasys.pantheon.ethereum.core.Hash.fromHexString;
+
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import org.web3j.protocol.core.DefaultBlockParameter;
 
 public class CliqueConditions {
   private final EthTransactions eth;
@@ -46,10 +50,13 @@ public class CliqueConditions {
     return new ExpectValidatorsAtBlock(clique, blockNumber, validatorAddresses(validators));
   }
 
-  public Condition validatorsAtBlockHashEqual(
-      final String blockHash, final PantheonNode... validators) {
+  public Condition validatorsAtBlockHashFromBlockNumberEqual(
+      final Node node, final long blockNumber, final PantheonNode... validators) {
+    final DefaultBlockParameter blockParameter =
+        DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
+    final String blockHash = node.execute(eth.block(blockParameter)).getHash();
     return new ExpectValidatorsAtBlockHash(
-        clique, Hash.fromHexString(blockHash), validatorAddresses(validators));
+        clique, fromHexString(blockHash), validatorAddresses(validators));
   }
 
   public ProposalsConfig proposalsEqual() {

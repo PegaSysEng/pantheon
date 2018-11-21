@@ -17,8 +17,6 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTrans
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
-import java.io.IOException;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,7 +37,7 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldBeAbleToGetValidatorsForBlockNumber() throws IOException {
+  public void shouldBeAbleToGetValidatorsForBlockNumber() {
     minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
@@ -49,12 +47,11 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldBeAbleToGetValidatorsForBlockHash() throws IOException {
+  public void shouldBeAbleToGetValidatorsForBlockHash() {
     minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
     minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
-    // TODO add support for latest block hash
-    //     cluster.verify(clique.validatorsAtBlockHashEqual(latestBlockHash, allNodes));
+    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 3, allNodes));
   }
 }

@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
@@ -364,6 +363,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   public void waitUntil(final WaitCondition expected) {
-    waitFor(() -> expected.verify(this));
+    expected.waitUntil(this);
   }
 }

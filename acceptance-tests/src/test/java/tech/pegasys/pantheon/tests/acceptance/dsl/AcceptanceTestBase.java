@@ -55,7 +55,7 @@ public class AcceptanceTestBase {
     transactions = new Transactions(accounts);
     web3 = new Web3(new Web3Transactions());
     pantheon = new PantheonNodeFactory();
-    wait = new WaitConditions(ethTransactions);
+    wait = new WaitConditions(ethTransactions, cliqueTransactions);
   }
 
   @After
