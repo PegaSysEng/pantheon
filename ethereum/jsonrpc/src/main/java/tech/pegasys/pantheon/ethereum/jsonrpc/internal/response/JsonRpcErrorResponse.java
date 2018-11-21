@@ -14,8 +14,6 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.response;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.base.Objects;
 
@@ -31,7 +29,6 @@ public class JsonRpcErrorResponse implements JsonRpcResponse {
   }
 
   @JsonGetter("id")
-  @JsonInclude(Include.NON_NULL)
   public Object getId() {
     return id;
   }
