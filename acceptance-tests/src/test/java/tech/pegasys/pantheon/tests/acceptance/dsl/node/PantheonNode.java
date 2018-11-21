@@ -347,6 +347,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     expected.verify(this);
   }
 
+  @Override
   public void waitUntil(final WaitCondition expected) {
     expected.waitUntil(this);
   }

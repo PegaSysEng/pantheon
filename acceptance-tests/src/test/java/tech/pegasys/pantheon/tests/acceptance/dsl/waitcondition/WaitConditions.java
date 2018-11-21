@@ -24,7 +24,7 @@ import java.math.BigInteger;
 
 public class WaitConditions {
   private final EthTransactions eth;
-  private CliqueTransactions clique;
+  private final CliqueTransactions clique;
 
   public WaitConditions(final EthTransactions eth, final CliqueTransactions clique) {
     this.eth = eth;
