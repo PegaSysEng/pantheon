@@ -52,8 +52,8 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
   }
 
   /*
-    This test will be fixed on NC-1952
-   */
+   This test will be fixed on NC-1952
+  */
   @Test
   @Ignore
   public void transactionRemovedByChainReorganisationMustPublishEvent() throws Exception {
