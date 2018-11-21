@@ -156,13 +156,15 @@ public class JsonRpcHttpService {
 
   private Handler<RoutingContext> checkWhitelistHostHeader() {
     return event -> {
-      Optional<String> header = Optional.ofNullable(event.request().getHeader("Host"));
-      if (header.isPresent()
-          && ("*".equals(header.get())
-              || (config
+      Optional<String> hostHeader = Optional.ofNullable(event.request().host().split(":")[0]);
+      if ((config.hostWhitelist().size() == 1 && config.hostWhitelist().contains("*"))
+          || (hostHeader.isPresent()
+              && config
                   .hostWhitelist()
                   .stream()
-                  .anyMatch(host -> host.toLowerCase().equals(header.get().toLowerCase()))))) {
+                  .anyMatch(
+                      whitelistEntry ->
+                          whitelistEntry.toLowerCase().equals(hostHeader.get().toLowerCase())))) {
         event.next();
       } else {
         event
