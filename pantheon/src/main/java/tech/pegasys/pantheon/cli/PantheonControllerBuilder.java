@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.cli;
 
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
+import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
@@ -21,6 +22,8 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.development.DevelopmentProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,20 +43,25 @@ public class PantheonControllerBuilder {
     // instantiate a controller with mainnet config if no genesis file is defined
     // otherwise use the indicated genesis file
     final KeyPair nodeKeys = loadKeyPair(nodePrivateKeyFile);
+
+    final StorageProvider storageProvider =
+        RocksDbStorageProvider.create(homePath.resolve(DATABASE_PATH));
     if (isDevMode) {
       final GenesisConfigFile genesisConfig = GenesisConfigFile.development();
       return MainnetPantheonController.init(
-          homePath,
+          storageProvider,
           genesisConfig,
           DevelopmentProtocolSchedule.create(genesisConfig.getConfigOptions()),
           synchronizerConfiguration,
           miningParameters,
           nodeKeys);
     } else {
+      final String genesisConfig = ethNetworkConfig.getGenesisConfig();
+      final GenesisConfigFile genesisConfigFile = GenesisConfigFile.fromConfig(genesisConfig);
       return PantheonController.fromConfig(
+          genesisConfigFile,
           synchronizerConfiguration,
-          ethNetworkConfig.getGenesisConfig(),
-          homePath,
+          storageProvider,
           syncWithOttoman,
           ethNetworkConfig.getNetworkId(),
           miningParameters,

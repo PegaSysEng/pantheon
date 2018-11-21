@@ -16,13 +16,10 @@ import static io.netty.buffer.ByteBufUtil.hexDump;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.bouncycastle.pqc.math.linearalgebra.ByteUtils.xor;
 
-import tech.pegasys.pantheon.ethereum.p2p.NetworkMemoryPool;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
-import tech.pegasys.pantheon.ethereum.p2p.utils.ByteBufUtils;
 import tech.pegasys.pantheon.ethereum.p2p.wire.RawMessage;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.rlp.RlpUtils;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Arrays;
@@ -70,7 +67,7 @@ public class Framer {
           .extractArray();
 
   private final HandshakeSecrets secrets;
-  private static final Compressor compressor = new SnappyCompressor();
+  private static final SnappyCompressor compressor = new SnappyCompressor();
   private final StreamCipher encryptor;
   private final StreamCipher decryptor;
   private final BlockCipher macEncryptor;
@@ -201,7 +198,7 @@ public class Framer {
 
     // Discard the header data (RLP): being set to fixed value 0xc28080 (list of two null
     // elements) by other clients.
-    final int headerDataLength = RlpUtils.decodeLength(h.nioBuffer(), 0);
+    final int headerDataLength = RLP.calculateSize(BytesValue.wrapBuffer(h.nioBuffer()));
     h.skipBytes(headerDataLength);
 
     // Discard padding in header (= zero-fill to 16-byte boundary).
@@ -254,22 +251,19 @@ public class Framer {
     final int id = idbv.isZero() || idbv.size() == 0 ? 0 : idbv.get(0);
 
     // Write message data to ByteBuf, decompressing as necessary
-    final ByteBuf data;
+    final BytesValue data;
     if (compressionEnabled) {
-      // Decompress data before writing to ByteBuf
       final byte[] compressedMessageData = Arrays.copyOfRange(frameData, 1, frameData.length - pad);
-      // Check message length
-      Preconditions.checkState(
-          compressor.uncompressedLength(compressedMessageData) < LENGTH_MAX_MESSAGE_FRAME,
-          "Message size in excess of maximum length.");
+      final int uncompressedLength = compressor.uncompressedLength(compressedMessageData);
+      if (uncompressedLength >= LENGTH_MAX_MESSAGE_FRAME) {
+        throw error("Message size %s in excess of maximum length.", uncompressedLength);
+      }
       final byte[] decompressedMessageData = compressor.decompress(compressedMessageData);
-      data = NetworkMemoryPool.allocate(decompressedMessageData.length);
-      data.writeBytes(decompressedMessageData);
+      data = BytesValue.wrap(decompressedMessageData);
     } else {
       // Move data to a ByteBuf
       final int messageLength = frameSize - LENGTH_MESSAGE_ID;
-      data = NetworkMemoryPool.allocate(messageLength);
-      data.writeBytes(frameData, 1, messageLength);
+      data = BytesValue.wrap(frameData, 1, messageLength);
     }
 
     return new RawMessage(id, data);
@@ -295,76 +289,57 @@ public class Framer {
         message.getSize() < LENGTH_MAX_MESSAGE_FRAME, "Message size in excess of maximum length.");
     // Compress message
     if (compressionEnabled) {
-      try {
-        // Extract data from message
-        final ByteBuf tmp = NetworkMemoryPool.allocate(message.getSize());
-        message.writeTo(tmp);
-        // Compress data
-        final byte[] uncompressed = ByteBufUtils.toByteArray(tmp);
-        final byte[] compressed = compressor.compress(uncompressed);
-        tmp.release();
-        // Construct new, compressed message
-        final ByteBuf compressedBuf = NetworkMemoryPool.allocate(compressed.length);
-        compressedBuf.writeBytes(compressed);
-        frameAndReleaseMessage(new RawMessage(message.getCode(), compressedBuf), output);
-      } finally {
-        // We have to release the original message because frameAndRelease only released the
-        // compressed copy.
-        message.release();
-      }
+      // Extract data from message
+      // Compress data
+      final byte[] compressed = compressor.compress(message.getData().getArrayUnsafe());
+      // Construct new, compressed message
+      frameMessage(new RawMessage(message.getCode(), BytesValue.wrap(compressed)), output);
     } else {
-      frameAndReleaseMessage(message, output);
+      frameMessage(message, output);
     }
   }
 
   @VisibleForTesting
-  void frameAndReleaseMessage(final MessageData message, final ByteBuf buf) {
-    try {
-      final int frameSize = message.getSize() + LENGTH_MESSAGE_ID;
-      final int pad = padding16(frameSize);
+  void frameMessage(final MessageData message, final ByteBuf buf) {
+    final int frameSize = message.getSize() + LENGTH_MESSAGE_ID;
+    final int pad = padding16(frameSize);
 
-      final byte id = (byte) message.getCode();
+    final byte id = (byte) message.getCode();
 
-      // Generate the header data.
-      final byte[] h = new byte[LENGTH_HEADER_DATA];
-      h[0] = (byte) ((frameSize >> 16) & 0xff);
-      h[1] = (byte) ((frameSize >> 8) & 0xff);
-      h[2] = (byte) (frameSize & 0xff);
-      System.arraycopy(PROTOCOL_HEADER, 0, h, LENGTH_FRAME_SIZE, PROTOCOL_HEADER.length);
-      Arrays.fill(h, LENGTH_FRAME_SIZE + PROTOCOL_HEADER.length, h.length - 1, (byte) 0x00);
-      encryptor.processBytes(h, 0, LENGTH_HEADER_DATA, h, 0);
+    // Generate the header data.
+    final byte[] h = new byte[LENGTH_HEADER_DATA];
+    h[0] = (byte) ((frameSize >> 16) & 0xff);
+    h[1] = (byte) ((frameSize >> 8) & 0xff);
+    h[2] = (byte) (frameSize & 0xff);
+    System.arraycopy(PROTOCOL_HEADER, 0, h, LENGTH_FRAME_SIZE, PROTOCOL_HEADER.length);
+    Arrays.fill(h, LENGTH_FRAME_SIZE + PROTOCOL_HEADER.length, h.length - 1, (byte) 0x00);
+    encryptor.processBytes(h, 0, LENGTH_HEADER_DATA, h, 0);
 
-      // Generate the header MAC.
-      byte[] hMac = Arrays.copyOf(secrets.getEgressMac(), LENGTH_MAC);
-      macEncryptor.processBlock(hMac, 0, hMac, 0);
-      hMac = secrets.updateEgress(xor(h, hMac)).getEgressMac();
-      hMac = Arrays.copyOf(hMac, LENGTH_MAC);
-      buf.writeBytes(h).writeBytes(hMac);
+    // Generate the header MAC.
+    byte[] hMac = Arrays.copyOf(secrets.getEgressMac(), LENGTH_MAC);
+    macEncryptor.processBlock(hMac, 0, hMac, 0);
+    hMac = secrets.updateEgress(xor(h, hMac)).getEgressMac();
+    hMac = Arrays.copyOf(hMac, LENGTH_MAC);
+    buf.writeBytes(h).writeBytes(hMac);
 
-      // Encrypt payload.
-      final byte[] f = new byte[frameSize + pad];
+    // Encrypt payload.
+    final byte[] f = new byte[frameSize + pad];
 
-      final BytesValue bv = id == 0 ? RLP.NULL : RLP.encodeOne(BytesValue.of(id));
-      assert bv.size() == 1;
-      f[0] = bv.get(0);
+    final BytesValue bv = id == 0 ? RLP.NULL : RLP.encodeOne(BytesValue.of(id));
+    assert bv.size() == 1;
+    f[0] = bv.get(0);
 
-      // Zero-padded to 16-byte boundary.
-      final ByteBuf tmp = NetworkMemoryPool.allocate(message.getSize());
-      message.writeTo(tmp);
-      tmp.getBytes(tmp.readerIndex(), f, 1, tmp.readableBytes());
-      encryptor.processBytes(f, 0, f.length, f, 0);
-      tmp.release();
+    // Zero-padded to 16-byte boundary.
+    message.getData().copyTo(f, 0, 1);
+    encryptor.processBytes(f, 0, f.length, f, 0);
 
-      // Calculate the frame MAC.
-      final byte[] fMacSeed = Arrays.copyOf(secrets.updateEgress(f).getEgressMac(), LENGTH_MAC);
-      byte[] fMac = new byte[16];
-      macEncryptor.processBlock(fMacSeed, 0, fMac, 0);
-      fMac = Arrays.copyOf(secrets.updateEgress(xor(fMac, fMacSeed)).getEgressMac(), LENGTH_MAC);
+    // Calculate the frame MAC.
+    final byte[] fMacSeed = Arrays.copyOf(secrets.updateEgress(f).getEgressMac(), LENGTH_MAC);
+    byte[] fMac = new byte[16];
+    macEncryptor.processBlock(fMacSeed, 0, fMac, 0);
+    fMac = Arrays.copyOf(secrets.updateEgress(xor(fMac, fMacSeed)).getEgressMac(), LENGTH_MAC);
 
-      buf.writeBytes(f).writeBytes(fMac);
-    } finally {
-      message.release();
-    }
+    buf.writeBytes(f).writeBytes(fMac);
   }
 
   private static int padding16(final int size) {

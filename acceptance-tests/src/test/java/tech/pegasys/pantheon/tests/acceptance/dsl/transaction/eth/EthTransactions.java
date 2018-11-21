@@ -42,4 +42,8 @@ public class EthTransactions {
   public EthAccountsTransaction accounts() {
     return new EthAccountsTransaction();
   }
+
+  public EthGetTransactionReceiptTransaction getTransactionReceipt(final String transactionHash) {
+    return new EthGetTransactionReceiptTransaction(transactionHash);
+  }
 }

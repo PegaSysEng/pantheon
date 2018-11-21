@@ -10,16 +10,17 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.p2p.rlpx.framing;
+package tech.pegasys.pantheon.ethereum.storage;
 
-/** Thrown when an error occurs during compression and decompression of payloads. */
-public class CompressionException extends RuntimeException {
+import tech.pegasys.pantheon.ethereum.db.BlockchainStorage;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 
-  public CompressionException(final String message) {
-    super(message);
-  }
+import java.io.Closeable;
 
-  public CompressionException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+public interface StorageProvider extends Closeable {
+
+  BlockchainStorage createBlockchainStorage(ProtocolSchedule<?> protocolSchedule);
+
+  WorldStateStorage createWorldStateStorage();
 }
