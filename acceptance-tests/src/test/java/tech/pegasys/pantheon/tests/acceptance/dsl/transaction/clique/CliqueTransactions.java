@@ -14,20 +14,15 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueDiscard;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueGetSigners;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueGetSignersAtHash;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueProposals;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliquePropose;
 
 public class CliqueTransactions {
   public static final String LATEST = "latest";
 
-  public CliquePropose proposeRemove(final PantheonNode node) {
+  public CliquePropose createProposeRemove(final PantheonNode node) {
     return propose(node.getAddress().toString(), false);
   }
 
-  public CliquePropose proposeAdd(final PantheonNode node) {
+  public CliquePropose createProposeAdd(final PantheonNode node) {
     return propose(node.getAddress().toString(), true);
   }
 
@@ -35,19 +30,19 @@ public class CliqueTransactions {
     return new CliquePropose(address, auth);
   }
 
-  public CliqueProposals proposals() {
+  public CliqueProposals createProposals() {
     return new CliqueProposals();
   }
 
-  public CliqueGetSigners getSigners(final String blockNumber) {
+  public CliqueGetSigners createGetSigners(final String blockNumber) {
     return new CliqueGetSigners(blockNumber);
   }
 
-  public CliqueGetSignersAtHash getSignersAtHash(final Hash blockHash) {
+  public CliqueGetSignersAtHash createGetSignersAtHash(final Hash blockHash) {
     return new CliqueGetSignersAtHash(blockHash);
   }
 
-  public CliqueDiscard discard(final PantheonNode node) {
+  public CliqueDiscard createDiscard(final PantheonNode node) {
     return new CliqueDiscard(node.getAddress().toString());
   }
 }

@@ -32,6 +32,8 @@ public class ExpectValidators implements Condition {
 
   @Override
   public void verify(final Node node) {
-    waitFor(() -> assertThat(node.execute(clique.getSigners(LATEST))).containsExactly(validators));
+    waitFor(
+        () ->
+            assertThat(node.execute(clique.createGetSigners(LATEST))).containsExactly(validators));
   }
 }

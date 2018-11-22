@@ -37,7 +37,7 @@ public class ExpectValidatorsAtBlockHash implements Condition {
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.execute(clique.getSignersAtHash(blockHash)))
+            assertThat(node.execute(clique.createGetSignersAtHash(blockHash)))
                 .containsExactly(validators));
   }
 }

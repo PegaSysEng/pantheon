@@ -33,6 +33,6 @@ public class ExpectProposals implements Condition {
 
   @Override
   public void verify(final Node node) {
-    waitFor(() -> assertThat(node.execute(clique.proposals())).isEqualTo(proposers));
+    waitFor(() -> assertThat(node.execute(clique.createProposals())).isEqualTo(proposers));
   }
 }

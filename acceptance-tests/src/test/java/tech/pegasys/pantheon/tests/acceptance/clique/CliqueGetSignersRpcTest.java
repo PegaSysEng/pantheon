@@ -38,8 +38,8 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() {
-    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
-    minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
+    minerNode1.execute(cliqueTransactions.createProposeAdd(minerNode3));
+    minerNode2.execute(cliqueTransactions.createProposeAdd(minerNode3));
     minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
     cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));
@@ -48,8 +48,8 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockHash() {
-    minerNode1.execute(cliqueTransactions.proposeAdd(minerNode3));
-    minerNode2.execute(cliqueTransactions.proposeAdd(minerNode3));
+    minerNode1.execute(cliqueTransactions.createProposeAdd(minerNode3));
+    minerNode2.execute(cliqueTransactions.createProposeAdd(minerNode3));
     minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
     cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 3, allNodes));

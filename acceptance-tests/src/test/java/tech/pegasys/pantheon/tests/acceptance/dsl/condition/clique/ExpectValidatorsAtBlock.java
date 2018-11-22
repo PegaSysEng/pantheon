@@ -36,7 +36,7 @@ public class ExpectValidatorsAtBlock implements Condition {
   public void verify(final Node node) {
     waitFor(
         () ->
-            assertThat(node.execute(clique.getSigners(blockParameter)))
+            assertThat(node.execute(clique.createGetSigners(blockParameter)))
                 .containsExactly(validators));
   }
 }

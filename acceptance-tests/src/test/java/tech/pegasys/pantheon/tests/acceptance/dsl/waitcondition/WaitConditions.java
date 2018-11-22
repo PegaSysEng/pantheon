@@ -39,6 +39,6 @@ public class WaitConditions {
   }
 
   public WaitCondition cliqueValidatorsChanged(final Node node) {
-    return new WaitUntilSignersChanged(node.execute(clique.getSigners(LATEST)), clique);
+    return new WaitUntilSignersChanged(node.execute(clique.createGetSigners(LATEST)), clique);
   }
 }

@@ -35,6 +35,8 @@ public class WaitUntilSignersChanged implements WaitCondition {
   @Override
   public void waitUntil(final Node node) {
     waitFor(
-        60, () -> assertThat(node.execute(clique.getSigners(LATEST))).isNotEqualTo(initialSigners));
+        60,
+        () ->
+            assertThat(node.execute(clique.createGetSigners(LATEST))).isNotEqualTo(initialSigners));
   }
 }
