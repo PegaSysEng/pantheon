@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.clique;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions.LATEST;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;

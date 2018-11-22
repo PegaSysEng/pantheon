@@ -14,11 +14,11 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions.LATEST;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 
 import java.util.List;
 

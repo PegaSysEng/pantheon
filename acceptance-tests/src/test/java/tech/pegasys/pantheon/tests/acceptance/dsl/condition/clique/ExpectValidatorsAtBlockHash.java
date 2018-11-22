@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 
 public class ExpectValidatorsAtBlockHash implements Condition {
   private final CliqueTransactions clique;

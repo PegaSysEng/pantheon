@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -31,7 +31,7 @@ public class CliqueTransactions {
     return propose(node.getAddress().toString(), true);
   }
 
-  public CliquePropose propose(final String address, final boolean auth) {
+  private CliquePropose propose(final String address, final boolean auth) {
     return new CliquePropose(address, auth);
   }
 

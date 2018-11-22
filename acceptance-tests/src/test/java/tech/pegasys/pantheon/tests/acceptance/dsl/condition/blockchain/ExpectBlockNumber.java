@@ -22,9 +22,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransaction
 import java.math.BigInteger;
 
 public class ExpectBlockNumber implements Condition {
-
-  private EthTransactions eth;
-  private BigInteger blockNumber;
+  private final EthTransactions eth;
+  private final BigInteger blockNumber;
 
   public ExpectBlockNumber(final EthTransactions eth, final BigInteger blockNumber) {
     this.eth = eth;

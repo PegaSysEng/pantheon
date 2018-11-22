@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Web3;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;

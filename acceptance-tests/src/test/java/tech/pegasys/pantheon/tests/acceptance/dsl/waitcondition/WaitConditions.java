@@ -12,12 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions.LATEST;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 import java.math.BigInteger;

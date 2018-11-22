@@ -21,9 +21,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class ExpectBeneficiary implements Condition {
-
-  private EthTransactions eth;
-  private String beneficiary;
+  private final EthTransactions eth;
+  private final String beneficiary;
 
   public ExpectBeneficiary(final EthTransactions eth, final PantheonNode node) {
     this.eth = eth;
