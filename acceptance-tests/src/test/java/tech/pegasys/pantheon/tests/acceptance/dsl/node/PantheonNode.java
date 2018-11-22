@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
@@ -49,8 +48,6 @@ import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketClient;
 import org.web3j.protocol.websocket.WebSocketListener;
@@ -75,8 +72,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final boolean devMode;
 
   private List<String> bootnodes = new ArrayList<>();
-  private Eth eth;
-  private Web3j web3j;
   private PantheonWeb3j pantheonWeb3j;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
 
@@ -154,19 +149,19 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return LOCALHOST;
   }
 
-  private Web3j web3j() {
+  private PantheonWeb3j pantheonWeb3j() {
 
-    if (web3j == null) {
+    if (pantheonWeb3j == null) {
       if (!jsonRpcBaseUrl().isPresent()) {
-        return Web3j.build(
+        return new PantheonWeb3j(
             new HttpService("http://" + LOCALHOST + ":8545"), 2000, Async.defaultExecutorService());
       }
 
-      return Web3j.build(
+      return new PantheonWeb3j(
           new HttpService(jsonRpcBaseUrl().get()), 2000, Async.defaultExecutorService());
     }
 
-    return web3j;
+    return pantheonWeb3j;
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
@@ -183,11 +178,11 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       throw new RuntimeException("Error connection to WebSocket endpoint", e);
     }
 
-    if (web3j != null) {
-      web3j.shutdown();
+    if (pantheonWeb3j != null) {
+      pantheonWeb3j.shutdown();
     }
 
-    web3j = Web3j.build(webSocketService, 2000, Async.defaultExecutorService());
+    pantheonWeb3j = new PantheonWeb3j(webSocketService, 2000, Async.defaultExecutorService());
   }
 
   private void checkIfWebSocketEndpointIsAvailable(final String url) {
@@ -222,31 +217,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     } finally {
       webSocketClient.close();
     }
-  }
-
-  private PantheonWeb3j pantheonWeb3j() {
-    if (pantheonWeb3j == null) {
-      return pantheonWeb3j(web3jService());
-    }
-
-    return pantheonWeb3j;
-  }
-
-  private PantheonWeb3j pantheonWeb3j(final Web3jService web3jService) {
-    if (pantheonWeb3j == null) {
-      pantheonWeb3j = new PantheonWeb3j(web3jService, 2000, Async.defaultExecutorService());
-    }
-
-    return pantheonWeb3j;
-  }
-
-  private Web3jService web3jService() {
-    if (!jsonRpcBaseUrl().isPresent()) {
-      throw new IllegalStateException(
-          "Can't create a web3j instance for a node with RPC disabled.");
-    }
-
-    return new HttpService(jsonRpcBaseUrl().get());
   }
 
   @Override
@@ -355,9 +325,9 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public void stop() {
-    if (web3j != null) {
-      web3j.shutdown();
-      web3j = null;
+    if (pantheonWeb3j != null) {
+      pantheonWeb3j.shutdown();
+      pantheonWeb3j = null;
     }
   }
 

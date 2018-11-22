@@ -183,7 +183,7 @@ public class PantheonNodeFactory {
           miningParameters,
           jsonRpcConfiguration,
           webSocketConfiguration,
-          false,
+          true,
           ignore -> Optional.empty());
     }
 
