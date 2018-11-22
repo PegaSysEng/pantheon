@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE;
 
@@ -29,10 +30,7 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.google.common.io.Resources;
 
@@ -154,6 +152,7 @@ public class PantheonNodeFactory {
     final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
     config.setEnabled(true);
     config.setPort(0);
+    config.hostWhitelist(singletonList("*"));
     return config;
   }
 

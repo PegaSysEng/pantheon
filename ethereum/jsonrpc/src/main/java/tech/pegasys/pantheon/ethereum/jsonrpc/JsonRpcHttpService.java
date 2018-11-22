@@ -38,13 +38,17 @@ import java.net.SocketException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
@@ -113,6 +117,10 @@ public class JsonRpcHttpService {
 
     // Handle json rpc requests
     final Router router = Router.router(vertx);
+
+    // Verify Host header to avoid rebind attack.
+    router.route().handler(checkWhitelistHostHeader());
+
     router
         .route()
         .handler(
@@ -159,6 +167,29 @@ public class JsonRpcHttpService {
             });
 
     return resultFuture;
+  }
+
+  private Handler<RoutingContext> checkWhitelistHostHeader() {
+    return event -> {
+      Optional<String> hostHeader =
+          Optional.ofNullable(Iterables.get(Splitter.on(':').split(event.request().host()), 0));
+      if ((config.hostWhitelist().size() == 1 && config.hostWhitelist().contains("*"))
+          || (hostHeader.isPresent()
+              && config
+                  .hostWhitelist()
+                  .stream()
+                  .anyMatch(
+                      whitelistEntry ->
+                          whitelistEntry.toLowerCase().equals(hostHeader.get().toLowerCase())))) {
+        event.next();
+      } else {
+        event
+            .response()
+            .setStatusCode(403)
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end("{\"message\":\"Host not authorized.\"}");
+      }
+    };
   }
 
   public CompletableFuture<?> stop() {
