@@ -20,7 +20,6 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
 import tech.pegasys.pantheon.ethereum.p2p.wire.RawMessage;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.rlp.RlpUtils;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Arrays;
@@ -34,7 +33,6 @@ import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-import org.iq80.snappy.CorruptionException;
 
 /**
  * This component is responsible for reading and composing RLPx protocol frames, conformant to the
@@ -200,7 +198,7 @@ public class Framer {
 
     // Discard the header data (RLP): being set to fixed value 0xc28080 (list of two null
     // elements) by other clients.
-    final int headerDataLength = RlpUtils.decodeLength(h.nioBuffer(), 0);
+    final int headerDataLength = RLP.calculateSize(BytesValue.wrapBuffer(h.nioBuffer()));
     h.skipBytes(headerDataLength);
 
     // Discard padding in header (= zero-fill to 16-byte boundary).
@@ -260,12 +258,8 @@ public class Framer {
       if (uncompressedLength >= LENGTH_MAX_MESSAGE_FRAME) {
         throw error("Message size %s in excess of maximum length.", uncompressedLength);
       }
-      try {
-        final byte[] decompressedMessageData = compressor.decompress(compressedMessageData);
-        data = BytesValue.wrap(decompressedMessageData);
-      } catch (final CorruptionException e) {
-        throw new FramingException("Decompression failed", e);
-      }
+      final byte[] decompressedMessageData = compressor.decompress(compressedMessageData);
+      data = BytesValue.wrap(decompressedMessageData);
     } else {
       // Move data to a ByteBuf
       final int messageLength = frameSize - LENGTH_MESSAGE_ID;
