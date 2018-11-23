@@ -1,0 +1,36 @@
+#!/usr/bin/env groovy
+
+def images = [
+    'openjdk:8-alpine',
+    'openjdk:10-alpine',
+    'openjdk:11-alpine',
+    'airdock/oracle-jdk:1.8'
+]
+
+def builds = [:]
+
+for (x in images) {
+    def image = x
+
+    builds[image] = {
+        node {
+            checkout scm
+            docker.image(image) {
+                try {
+                    stage('Build') {
+                        sh './gradlew --no-daemon --parallel build'
+                    }
+                } finally {
+                    archiveArtifacts '**/build/reports/**'
+                    archiveArtifacts '**/build/test-results/**'
+                    archiveArtifacts 'build/reports/**'
+                    archiveArtifacts 'build/distributions/**'
+
+                    junit '**/build/test-results/**/*.xml'
+                }
+            }
+        }
+    }
+}
+
+parallel builds
