@@ -17,7 +17,7 @@ for (x in images) {
             checkout scm
             docker.image(image).inside {
                 try {
-                    stage('Build') {
+                    stage('Build ' + image) {
                         sh './gradlew --no-daemon --parallel build'
                     }
                 } finally {
