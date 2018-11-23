@@ -8,7 +8,7 @@ def images = [
     'adoptopenjdk/openjdk8-openj9:jdk8u181-b13_openj9-0.9.0'
 ]
 
-def builds = [:]
+// def builds = [:]
 
 for (x in images) {
     def image = x
