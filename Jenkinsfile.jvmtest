@@ -1,9 +1,9 @@
 #!/usr/bin/env groovy
 
 def images = [
-    'openjdk:8-alpine',
-    'openjdk:10-alpine',
-    'openjdk:11-alpine',
+    'openjdk:8',
+    'openjdk:10',
+    'openjdk:11',
     'airdock/oracle-jdk:1.8'
 ]
 
