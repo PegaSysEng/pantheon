@@ -54,8 +54,9 @@ public class Eth {
         transactions.getTransactionReceipt(transactionHash));
   }
 
-  public Condition expectTransactionReceipt(final TransactionReceipt receipt) {
+  public Condition expectTransactionReceipt(
+      final String transactionHash, final TransactionReceipt receipt) {
     return new EthGetTransactionReceiptEquals(
-        transactions.getTransactionReceipt(receipt.getTransactionHash()), receipt);
+        transactions.getTransactionReceipt(transactionHash), receipt);
   }
 }
