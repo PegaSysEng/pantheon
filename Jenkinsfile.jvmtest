@@ -19,6 +19,7 @@ for (x in images) {
                 try {
                     stage('debugging ' + image) {
                         sh 'pwd'
+                        sh 'ls'
                     }
                     stage('Build ' + image) {
                         sh './gradlew --no-daemon --parallel build'
