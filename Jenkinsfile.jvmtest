@@ -13,7 +13,7 @@ def builds = [:]
 for (x in images) {
     def image = x
 
-    builds[image] = {
+    // builds[image] = {
         node {
             checkout scm
             docker.image(image).inside {
@@ -31,7 +31,7 @@ for (x in images) {
                 }
             }
         }
-    }
+    // }
 }
 
-parallel builds
+// parallel builds
