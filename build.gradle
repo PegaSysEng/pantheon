@@ -23,8 +23,6 @@ plugins {
   id 'net.researchgate.release' version '2.6.0'
 }
 
-apply from: './versions.gradle'
-
 group = 'tech.pegasys.pantheon'
 
 defaultTasks 'build', 'checkLicenses', 'javadoc'
@@ -89,9 +87,9 @@ allprojects {
   }
 
   dependencies {
-    errorprone("com.google.errorprone:error_prone_core:$errorproneCore")
+    errorprone("com.google.errorprone:error_prone_core")
     if (JavaVersion.current().isJava8()) {
-      errorproneJavac("com.google.errorprone:javac:$errorproneJavac")
+      errorproneJavac("com.google.errorprone:javac")
     }
   }
 
@@ -331,7 +329,7 @@ startScripts {
 
 dependencies {
   compile project(':pantheon')
-  errorprone 'com.google.errorprone:error_prone_core:2.3.1'
+  errorprone 'com.google.errorprone:error_prone_core'
 }
 
 distributions {

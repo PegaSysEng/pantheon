@@ -44,7 +44,7 @@ dependencies {
 
   implementation project(':util')
   testImplementation project( path: ':ethereum:core', configuration: 'testSupportArtifacts')
-  testImplementation group: 'junit', name: 'junit', version: '4.12'
-  testImplementation "org.assertj:assertj-core:3.10.0"
+  testImplementation 'junit:junit'
+  testImplementation "org.assertj:assertj-core"
   testImplementation 'org.mockito:mockito-core'
 }
