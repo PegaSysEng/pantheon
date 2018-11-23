@@ -13,6 +13,8 @@
 package tech.pegasys.pantheon.consensus.ibft.ibftmessagedata;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
@@ -21,24 +23,40 @@ import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 // how a PreparedCertificate is encoded and decoded inside a RoundChange message
 public class IbftUnsignedPrePrepareMessageData extends AbstractIbftUnsignedInRoundMessageData {
 
+  private static final int TYPE = IbftV2.PRE_PREPARE;
+  private final Block block;
+
   public IbftUnsignedPrePrepareMessageData(
       final ConsensusRoundIdentifier roundIdentifier, final Block block) {
     super(roundIdentifier);
-  }
-
-  public Block getBlock() {
-    return null;
-  }
-
-  @Override
-  public void writeTo(final RLPOutput rlpOutput) {}
-
-  @Override
-  public int getMessageType() {
-    return 0;
+    this.block = block;
   }
 
   public static IbftUnsignedPrePrepareMessageData readFrom(final RLPInput rlpInput) {
-    return null;
+
+    rlpInput.enterList();
+    final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
+    final Block block = Block.readFrom(rlpInput, IbftBlockHashing::calculateHashOfIbftBlockOnChain);
+    rlpInput.leaveList();
+
+    return new IbftUnsignedPrePrepareMessageData(roundIdentifier, block);
+  }
+
+  @Override
+  public void writeTo(final RLPOutput rlpOutput) {
+
+    rlpOutput.startList();
+    roundIdentifier.writeTo(rlpOutput);
+    block.writeTo(rlpOutput);
+    rlpOutput.endList();
+  }
+
+  public Block getBlock() {
+    return block;
+  }
+
+  @Override
+  public int getMessageType() {
+    return TYPE;
   }
 }

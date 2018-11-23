@@ -27,16 +27,7 @@ public class IbftPrepareMessage extends AbstractIbftMessage {
   }
 
   public static IbftPrepareMessage fromMessage(final MessageData message) {
-    if (message instanceof IbftPrepareMessage) {
-      return (IbftPrepareMessage) message;
-    }
-    final int code = message.getCode();
-    if (code != MESSAGE_CODE) {
-      throw new IllegalArgumentException(
-          String.format("Message has code %d and thus is not a PrepareMessage", code));
-    }
-
-    return new IbftPrepareMessage(message.getData());
+    return fromMessage(message, MESSAGE_CODE, IbftPrepareMessage.class, IbftPrepareMessage::new);
   }
 
   @Override
