@@ -25,6 +25,7 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   private PantheonNode minerNode2;
   private PantheonNode minerNode3;
   private PantheonNode[] allNodes;
+  private PantheonNode[] initialNodes;
 
   @Before
   public void setUp() throws Exception {
@@ -32,26 +33,35 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     minerNode1 = pantheon.createCliqueMinerNodeWithValidators("miner1", validators);
     minerNode2 = pantheon.createCliqueMinerNodeWithValidators("miner2", validators);
     minerNode3 = pantheon.createCliqueMinerNodeWithValidators("miner3", validators);
+    initialNodes = new PantheonNode[] {minerNode1, minerNode2};
     allNodes = new PantheonNode[] {minerNode1, minerNode2, minerNode3};
     cluster.start(allNodes);
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() {
+    cluster.verify(clique.validatorsAtBlockEqual("0x0", initialNodes));
     minerNode1.execute(cliqueTransactions.createProposeAdd(minerNode3));
     minerNode2.execute(cliqueTransactions.createProposeAdd(minerNode3));
-    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
+    cluster.verify(clique.validatorsAtBlockEqual("0x1", initialNodes));
+
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
     cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));
     cluster.verify(clique.validatorsAtBlockEqual(LATEST, allNodes));
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockHash() {
+    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 0, initialNodes));
     minerNode1.execute(cliqueTransactions.createProposeAdd(minerNode3));
     minerNode2.execute(cliqueTransactions.createProposeAdd(minerNode3));
-    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
 
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
+    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 1, initialNodes));
+
+    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
     cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 3, allNodes));
   }
 }
