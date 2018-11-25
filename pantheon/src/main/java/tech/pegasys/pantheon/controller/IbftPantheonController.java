@@ -33,8 +33,6 @@ import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftLegacyBlockInterface;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftProtocolSchedule;
-import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64Protocol;
-import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64ProtocolManager;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
@@ -116,7 +114,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
-      final boolean ottomanTestnetOperation,
       final int networkId,
       final KeyPair nodeKeys) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
@@ -146,26 +143,14 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
-    final EthProtocolManager ethProtocolManager;
-    final SubProtocol ethSubProtocol;
-    if (ottomanTestnetOperation) {
-      LOG.info("Operating on Ottoman testnet.");
-      ethSubProtocol = Istanbul64Protocol.get();
-      ethProtocolManager =
-          new Istanbul64ProtocolManager(
-              protocolContext.getBlockchain(),
-              networkId,
-              fastSyncEnabled,
-              syncConfig.downloaderParallelism());
-    } else {
-      ethSubProtocol = EthProtocol.get();
-      ethProtocolManager =
-          new EthProtocolManager(
-              protocolContext.getBlockchain(),
-              networkId,
-              fastSyncEnabled,
-              syncConfig.downloaderParallelism());
-    }
+    final EthProtocolManager ethProtocolManager =
+        new EthProtocolManager(
+            protocolContext.getBlockchain(),
+            networkId,
+            fastSyncEnabled,
+            syncConfig.downloaderParallelism());
+    final SubProtocol ethSubProtocol = EthProtocol.get();
+
     final SyncState syncState =
         new SyncState(
             protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
