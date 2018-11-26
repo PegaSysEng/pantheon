@@ -18,11 +18,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 public class CliqueTransactions {
   public static final String LATEST = "latest";
 
-  public CliquePropose createProposeRemove(final PantheonNode node) {
+  public CliquePropose createRemoveProposal(final PantheonNode node) {
     return propose(node.getAddress().toString(), false);
   }
 
-  public CliquePropose createProposeAdd(final PantheonNode node) {
+  public CliquePropose createAddProposal(final PantheonNode node) {
     return propose(node.getAddress().toString(), true);
   }
 
@@ -42,7 +42,7 @@ public class CliqueTransactions {
     return new CliqueGetSignersAtHash(blockHash);
   }
 
-  public CliqueDiscard createDiscard(final PantheonNode node) {
+  public CliqueDiscard createDiscardProposal(final PantheonNode node) {
     return new CliqueDiscard(node.getAddress().toString());
   }
 }
