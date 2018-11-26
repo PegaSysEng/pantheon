@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
@@ -20,13 +19,10 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 import java.math.BigInteger;
-import java.util.concurrent.TimeUnit;
-
-import org.awaitility.Awaitility;
-import org.awaitility.Duration;
 
 public class ExpectBlockNotCreated implements Condition {
-  private static final Duration WAIT_TIME = new Duration(20, SECONDS);
+  private static final int INITIAL_WAIT = 5_000;
+  private static final int WAIT = 15_000;
   private final EthTransactions eth;
 
   public ExpectBlockNotCreated(final EthTransactions eth) {
@@ -35,11 +31,13 @@ public class ExpectBlockNotCreated implements Condition {
 
   @Override
   public void verify(final Node node) {
-    final BigInteger lastBlock = node.execute(eth.blockNumber());
-    Awaitility.await()
-        .ignoreExceptions()
-        .pollInterval(WAIT_TIME)
-        .atMost(30, TimeUnit.SECONDS)
-        .untilAsserted(() -> assertThat(node.execute(eth.blockNumber())).isEqualTo(lastBlock));
+    try {
+      Thread.sleep(INITIAL_WAIT);
+      final BigInteger lastBlock = node.execute(eth.blockNumber());
+      Thread.sleep(WAIT);
+      assertThat(node.execute(eth.blockNumber())).isEqualTo(lastBlock);
+    } catch (InterruptedException e) {
+      throw new IllegalStateException(e);
+    }
   }
 }
