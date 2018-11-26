@@ -231,4 +231,44 @@ public class MessageValidatorTest {
     assertThat(validator.validateCommmitMessage(proposerCommitMsg)).isTrue();
     assertThat(validator.validateCommmitMessage(validatorCommitMsg)).isTrue();
   }
+
+  @Test
+  public void subsequentPreprepareHasDifferentSenderFails() {
+    when(headerValidator.validateHeader(any(), any(), any(), any())).thenReturn(true);
+
+    final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> preprepareMsg =
+        proposerMessageFactory.createIbftSignedPrePrepareMessageData(roundIdentifier, block);
+    assertThat(validator.addPreprepareMessage(preprepareMsg)).isTrue();
+
+    final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> secondPreprepareMsg =
+        validatorMessageFactory.createIbftSignedPrePrepareMessageData(roundIdentifier, block);
+    assertThat(validator.addPreprepareMessage(secondPreprepareMsg)).isFalse();
+  }
+
+  @Test
+  public void subsequentPreprepareHasDifferentContentFails() {
+    when(headerValidator.validateHeader(any(), any(), any(), any())).thenReturn(true);
+
+    final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> preprepareMsg =
+        proposerMessageFactory.createIbftSignedPrePrepareMessageData(roundIdentifier, block);
+    assertThat(validator.addPreprepareMessage(preprepareMsg)).isTrue();
+
+    final ConsensusRoundIdentifier newRoundIdentifier = new ConsensusRoundIdentifier(3, 0);
+    final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> secondPreprepareMsg =
+        proposerMessageFactory.createIbftSignedPrePrepareMessageData(newRoundIdentifier, block);
+    assertThat(validator.addPreprepareMessage(secondPreprepareMsg)).isFalse();
+  }
+
+  @Test
+  public void subsequentPreprepareHasIdenticalSenderAndContentIsSuccessful() {
+    when(headerValidator.validateHeader(any(), any(), any(), any())).thenReturn(true);
+
+    final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> preprepareMsg =
+        proposerMessageFactory.createIbftSignedPrePrepareMessageData(roundIdentifier, block);
+    assertThat(validator.addPreprepareMessage(preprepareMsg)).isTrue();
+
+    final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> secondPreprepareMsg =
+        proposerMessageFactory.createIbftSignedPrePrepareMessageData(roundIdentifier, block);
+    assertThat(validator.addPreprepareMessage(secondPreprepareMsg)).isTrue();
+  }
 }

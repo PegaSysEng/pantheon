@@ -67,6 +67,10 @@ public class MessageValidator {
   public boolean addPreprepareMessage(
       final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> msg) {
 
+    if (preprepareMessage.isPresent()) {
+      return handleSubsequentPreprepareMessage(msg);
+    }
+
     if (!msg.getUnsignedMessageData().getRoundIdentifier().equals(roundIdentifier)) {
       LOG.info("Invalid Preprepare message, does not match current round.");
       return false;
@@ -92,6 +96,26 @@ public class MessageValidator {
     }
 
     preprepareMessage = Optional.of(msg);
+    return true;
+  }
+
+  private boolean handleSubsequentPreprepareMessage(
+      final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> msg) {
+    IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> existingMsg = preprepareMessage.get();
+
+    if (!existingMsg.getSender().equals(msg.getSender())) {
+      LOG.debug("Received subsequent invalid Preprepare message; sender differs from original.");
+      return false;
+    }
+
+    final IbftUnsignedPrePrepareMessageData existingData = existingMsg.getUnsignedMessageData();
+    final IbftUnsignedPrePrepareMessageData newData = msg.getUnsignedMessageData();
+
+    if (!existingData.equals(newData)) {
+      LOG.debug("Received subsequent invalid Preprepare message; content differs from original.");
+      return false;
+    }
+
     return true;
   }
 
