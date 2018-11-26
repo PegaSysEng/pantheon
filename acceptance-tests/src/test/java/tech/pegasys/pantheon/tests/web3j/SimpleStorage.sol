@@ -10,17 +10,20 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.common;
+pragma solidity >=0.4.0 <0.6.0;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+// compile with:
+// solc SimpleStorage.sol --bin --abi --optimize --overwrite -o .
+// then create web3j wrappers with:
+// web3j solidity generate -b ./generated/SimpleStorage.bin -a ./generated/SimpleStorage.abi -o ../../../../../ -p tech.pegasys.pantheon.tests.web3j.generated
+contract SimpleStorage {
+    uint data;
 
-import java.util.List;
-import java.util.Optional;
+    function set(uint value) public {
+        data = value;
+    }
 
-public interface VoteBlockInterface {
-
-  Optional<ValidatorVote> extractVoteFromHeader(final BlockHeader header);
-
-  List<Address> validatorsInBlock(final BlockHeader header);
+    function get() public view returns (uint) {
+        return data;
+    }
 }
