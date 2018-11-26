@@ -27,6 +27,7 @@ public class EthBlockNumberTransaction implements Transaction<BigInteger> {
   @Override
   public BigInteger execute(final PantheonWeb3j node) {
     try {
+      System.out.println("getting block number");
       final org.web3j.protocol.core.methods.response.EthBlockNumber result =
           node.ethBlockNumber().send();
       assertThat(result).isNotNull();

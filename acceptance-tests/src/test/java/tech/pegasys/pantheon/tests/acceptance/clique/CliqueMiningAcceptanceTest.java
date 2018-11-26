@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.clique;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
@@ -62,8 +61,7 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldStallMiningWhenInsufficientValidators()
-      throws IOException, InterruptedException {
+  public void shouldStallMiningWhenInsufficientValidators() throws IOException {
     final PantheonNode minerNode1 = pantheon.createCliqueMinerNode("miner1");
     final PantheonNode minerNode2 = pantheon.createCliqueMinerNode("miner2");
     final PantheonNode minerNode3 = pantheon.createCliqueMinerNode("miner3");
@@ -71,11 +69,6 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
     cluster.stopNode(minerNode2);
     cluster.stopNode(minerNode3);
-
-    final Condition lastBlockNumber = blockchain.blockNumberMustBeLatest(minerNode1);
-    Thread.sleep(15_000);
-    minerNode1.verify(lastBlockNumber);
-    Thread.sleep(15_000);
-    minerNode1.verify(lastBlockNumber);
+    minerNode1.verify(blockchain.blockNotCreated());
   }
 }
