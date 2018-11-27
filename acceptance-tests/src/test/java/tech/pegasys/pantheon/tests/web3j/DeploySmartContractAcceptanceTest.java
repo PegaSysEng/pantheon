@@ -41,38 +41,44 @@ public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
     final SimpleStorage contract =
         minerNode.execute(transactions.createSmartContract(SimpleStorage.class));
 
-    final TransactionReceipt transactionReceipt = expectingPresentReceipt(contract);
-
-    verifyReceipt(transactionReceipt);
+    verifyContractReceipt(contract);
   }
 
-  // TODO move this into the DSL?
-  private void verifyReceipt(final TransactionReceipt transactionReceipt) {
+  // TODO code reuse - does need a node, new entrypoint in DSL?
+  private void verifyContractReceipt(final Contract contract) {
+
+    final String contractAddress = "0x42699a7612a82f1d9c36148af9c77354759b210b";
+    final String senderAddress = accounts.getPrimaryBenefactor().getAddress();
+
+    assertThat(contract).isNotNull();
+    final Optional<TransactionReceipt> receipt = contract.getTransactionReceipt();
+
+    // We're expecting a receipt
+    assertThat(receipt).isNotNull();
+    assertThat(receipt.isPresent()).isTrue();
+    final TransactionReceipt transactionReceipt = receipt.get();
 
     // Contract transaction has no 'to' address or contract address
     assertThat(transactionReceipt.getTo()).isNull();
-
     assertThat(transactionReceipt.getRoot()).isNull();
 
-    // Changeable - just check existence
+    // Variables outside the control of the test :. just check existence
     assertThat(transactionReceipt.getBlockHash()).isNotBlank();
     assertThat(transactionReceipt.getTransactionHash()).isNotBlank();
     assertThat(transactionReceipt.getTransactionIndex()).isNotNull();
     assertThat(transactionReceipt.getTransactionHash()).isNotNull();
 
-    // Block zero is the genesis, must be after that
+    // Block zero is the genesis, expecting anytime after then
     assertThat(transactionReceipt.getBlockNumber()).isGreaterThanOrEqualTo(BigInteger.ONE);
 
     // Address generation is deterministic, based on the sender address, nonce and data
-    assertThat(transactionReceipt.getContractAddress())
-        .isEqualTo("0x42699a7612a82f1d9c36148af9c77354759b210b");
+    assertThat(transactionReceipt.getContractAddress()).isEqualTo(contractAddress);
 
-    // Success code is '0x1'
+    // Expecting successful transaction (status '0x1')
     assertThat(transactionReceipt.getStatus()).isEqualTo("0x1");
 
-    // TODO where is the from address obtained? shouldn't it be the sender address?
-    assertThat(transactionReceipt.getFrom())
-        .isEqualTo("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
+    // Address for the account that signed (and paid) for the contract deployment transaction
+    assertThat(transactionReceipt.getFrom()).isEqualTo(senderAddress);
 
     // No logs from expected from the contract deployment
     assertThat(transactionReceipt.getLogs()).isNotNull();
@@ -80,13 +86,5 @@ public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
     assertThat(transactionReceipt.getLogsBloom())
         .isEqualTo(
             "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-  }
-
-  // TODO wrap this up? (or rename)
-  private TransactionReceipt expectingPresentReceipt(final Contract contract) {
-    assertThat(contract).isNotNull();
-    final Optional<TransactionReceipt> receipt = contract.getTransactionReceipt();
-    assertThat(receipt).isNotNull();
-    return receipt.get();
   }
 }
