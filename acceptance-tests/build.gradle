@@ -22,6 +22,7 @@ dependencies {
   testImplementation project(':ethereum:blockcreation')
   testImplementation project(':ethereum:jsonrpc')
   testImplementation project(':pantheon')
+  testImplementation project(':config')
   testImplementation project(':util')
   testImplementation project(':consensus:clique')
 

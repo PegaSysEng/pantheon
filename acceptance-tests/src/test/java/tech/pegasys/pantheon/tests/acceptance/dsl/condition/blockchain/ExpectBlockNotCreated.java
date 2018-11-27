@@ -12,30 +12,63 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static junit.framework.TestCase.fail;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 import java.math.BigInteger;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.awaitility.Awaitility;
 
 public class ExpectBlockNotCreated implements Condition {
-  private static final int INITIAL_WAIT = 5_000;
-  private static final int WAIT = 15_000;
   private final EthTransactions eth;
+  private final int initialWait;
+  private final int blockPeriodWait;
 
-  public ExpectBlockNotCreated(final EthTransactions eth) {
+  public ExpectBlockNotCreated(
+      final EthTransactions eth, final int initialWait, final int blockPeriodWait) {
     this.eth = eth;
+    this.initialWait = initialWait;
+    this.blockPeriodWait = blockPeriodWait;
   }
 
   @Override
   public void verify(final Node node) {
+    final AtomicInteger tries = new AtomicInteger();
+    final int triesRequired = blockPeriodWait / 1000;
+    final BigInteger initialBlock = initialBlock(node);
+    Awaitility.await()
+        .pollInterval(1, TimeUnit.SECONDS)
+        .atMost(30, TimeUnit.SECONDS)
+        .until(() -> isNewBlock(node, tries, triesRequired, initialBlock));
+  }
+
+  private Boolean isNewBlock(
+      final Node node,
+      final AtomicInteger tries,
+      final int triesRequired,
+      final BigInteger lastBlock) {
+    final BigInteger currentBlock = node.execute(eth.blockNumber());
+    final int currentTries = tries.getAndIncrement();
+    if (!currentBlock.equals(lastBlock)) {
+      final String failMsg =
+          String.format(
+              "New block created. Expected block=%s got block=%s", lastBlock, currentBlock);
+      fail(failMsg);
+    }
+    // Only consider that the block is really the same after a period of time or number tries as a
+    // block could be currently be in the process of being mined
+    return currentTries > triesRequired;
+  }
+
+  private BigInteger initialBlock(final Node node) {
     try {
-      Thread.sleep(INITIAL_WAIT);
-      final BigInteger lastBlock = node.execute(eth.blockNumber());
-      Thread.sleep(WAIT);
-      assertThat(node.execute(eth.blockNumber())).isEqualTo(lastBlock);
+      Thread.sleep(initialWait);
+      return node.execute(eth.blockNumber());
     } catch (InterruptedException e) {
       throw new IllegalStateException(e);
     }

@@ -36,7 +36,4 @@ public class Blockchain {
     return new ExpectBeneficiary(eth, node);
   }
 
-  public Condition blockNotCreated() {
-    return new ExpectBlockNotCreated(eth);
-  }
 }

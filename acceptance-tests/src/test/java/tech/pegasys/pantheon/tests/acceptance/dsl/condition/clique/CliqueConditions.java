@@ -12,10 +12,14 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique;
 
+import static java.util.Collections.emptyList;
 import static tech.pegasys.pantheon.ethereum.core.Hash.fromHexString;
 
+import tech.pegasys.pantheon.config.CliqueConfigOptions;
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -69,6 +73,20 @@ public class CliqueConditions {
 
   public Condition nonceVoteEquals(final CLIQUE_NONCE_VOTE clique_nonce_vote) {
     return new ExpectNonceVote(eth, clique_nonce_vote);
+  }
+
+  public Condition noNewBlockCreated(final PantheonNode node) {
+    final int blockPeriodSeconds = cliqueBlockPeriod(node);
+    final int blockPeriodWait = blockPeriodSeconds * 1000;
+    return new ExpectBlockNotCreated(eth, blockPeriodWait, blockPeriodWait);
+  }
+
+  private int cliqueBlockPeriod(final PantheonNode node) {
+    final String config = node.genesisConfigProvider().createGenesisConfig(emptyList()).get();
+    final GenesisConfigFile genesisConfigFile = GenesisConfigFile.fromConfig(config);
+    final CliqueConfigOptions cliqueConfigOptions = genesisConfigFile.getConfigOptions()
+        .getCliqueConfigOptions();
+    return cliqueConfigOptions.getBlockPeriodSeconds();
   }
 
   private Address[] validatorAddresses(final PantheonNode[] validators) {
