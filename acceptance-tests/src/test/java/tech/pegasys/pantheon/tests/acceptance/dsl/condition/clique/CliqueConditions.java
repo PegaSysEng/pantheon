@@ -84,8 +84,8 @@ public class CliqueConditions {
   private int cliqueBlockPeriod(final PantheonNode node) {
     final String config = node.genesisConfigProvider().createGenesisConfig(emptyList()).get();
     final GenesisConfigFile genesisConfigFile = GenesisConfigFile.fromConfig(config);
-    final CliqueConfigOptions cliqueConfigOptions = genesisConfigFile.getConfigOptions()
-        .getCliqueConfigOptions();
+    final CliqueConfigOptions cliqueConfigOptions =
+        genesisConfigFile.getConfigOptions().getCliqueConfigOptions();
     return cliqueConfigOptions.getBlockPeriodSeconds();
   }
 

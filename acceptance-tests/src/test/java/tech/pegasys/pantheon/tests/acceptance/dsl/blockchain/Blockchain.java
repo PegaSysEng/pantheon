@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.blockchain;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBeneficiary;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectMinimumBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -35,5 +34,4 @@ public class Blockchain {
   public Condition beneficiaryEquals(final PantheonNode node) {
     return new ExpectBeneficiary(eth, node);
   }
-
 }
