@@ -19,8 +19,6 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
-import java.util.Objects;
-
 // NOTE: Implementation of all methods of this class is still pending. This class was added to show
 // how a PreparedCertificate is encoded and decoded inside a RoundChange message
 public class IbftUnsignedPrePrepareMessageData extends AbstractIbftUnsignedInRoundMessageData {
@@ -61,23 +59,5 @@ public class IbftUnsignedPrePrepareMessageData extends AbstractIbftUnsignedInRou
   @Override
   public int getMessageType() {
     return TYPE;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    IbftUnsignedPrePrepareMessageData that = (IbftUnsignedPrePrepareMessageData) o;
-    return Objects.equals(block, that.block)
-        && Objects.equals(roundIdentifier, that.roundIdentifier);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(block);
   }
 }
