@@ -156,18 +156,7 @@ public class RoundChangeMessageValidatorTest {
   }
 
   @Test
-  public void roundChangeTargettingRoundSameAsCurrentFails() {
-
-    final IbftSignedMessageData<IbftUnsignedRoundChangeMessageData> msg =
-        proposerMessageFactory.createIbftSignedRoundChangeMessageData(
-            currentRound, Optional.empty());
-
-    assertThat(validator.validateMessage(msg)).isFalse();
-    verify(basicValidator, never()).validatePrepareMessage(any());
-  }
-
-  @Test
-  public void roundChangeWithPreprepareFromAFutureRoundFails() {
+  public void roundChangeWithPreprepareFromARoundAheadOfRoundChangeTargetails() {
     final ConsensusRoundIdentifier futureRound =
         new ConsensusRoundIdentifier(
             currentRound.getSequenceNumber(), currentRound.getRoundNumber() + 2);

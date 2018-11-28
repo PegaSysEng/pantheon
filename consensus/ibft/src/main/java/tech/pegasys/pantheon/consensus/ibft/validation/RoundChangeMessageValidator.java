@@ -55,7 +55,11 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    if (!validateRoundChangeIsForCurrentHeightAndTargetsFutureRound(msg)) {
+    final ConsensusRoundIdentifier roundChangeTarget =
+        msg.getUnsignedMessageData().getRoundChangeIdentifier();
+
+    if (roundChangeTarget.getSequenceNumber() != currentRound.getSequenceNumber()) {
+      LOG.info("Invalid RoundChange message, not valid for local chain height.");
       return false;
     }
 
@@ -63,39 +67,21 @@ public class RoundChangeMessageValidator {
       final IbftPreparedCertificate certificate =
           msg.getUnsignedMessageData().getPreparedCertificate().get();
 
-      return validatePrepareCertificate(certificate);
+      return validatePrepareCertificate(certificate, roundChangeTarget);
     }
 
     return true;
   }
 
-  private boolean validateRoundChangeIsForCurrentHeightAndTargetsFutureRound(
-      final IbftSignedMessageData<IbftUnsignedRoundChangeMessageData> msg) {
-
-    final ConsensusRoundIdentifier msgRoundIdentifier =
-        msg.getUnsignedMessageData().getRoundChangeIdentifier();
-
-    if (msgRoundIdentifier.getSequenceNumber() != currentRound.getSequenceNumber()) {
-      LOG.info("Invalid RoundChange message, not valid for local chain height.");
-      return false;
-    }
-
-    if (msgRoundIdentifier.getRoundNumber() <= currentRound.getRoundNumber()) {
-      LOG.info("Invalid RoundChange message, targets a round which is not in the future");
-      return false;
-    }
-
-    return true;
-  }
-
-  private boolean validatePrepareCertificate(final IbftPreparedCertificate certificate) {
+  private boolean validatePrepareCertificate(
+      final IbftPreparedCertificate certificate, final ConsensusRoundIdentifier roundChangeTarget) {
     final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> preprepareMessage =
         certificate.getIbftPrePrepareMessage();
 
     final ConsensusRoundIdentifier prepareCertRound =
         preprepareMessage.getUnsignedMessageData().getRoundIdentifier();
 
-    if (!validatePreprepareCertificateRound(prepareCertRound)) {
+    if (!validatePreprepareCertificateRound(prepareCertRound, roundChangeTarget)) {
       return false;
     }
 
@@ -130,14 +116,15 @@ public class RoundChangeMessageValidator {
   }
 
   private boolean validatePreprepareCertificateRound(
-      final ConsensusRoundIdentifier prepareCertRound) {
+      final ConsensusRoundIdentifier prepareCertRound,
+      final ConsensusRoundIdentifier roundChangeTarget) {
 
-    if (prepareCertRound.getSequenceNumber() != currentRound.getSequenceNumber()) {
+    if (prepareCertRound.getSequenceNumber() != roundChangeTarget.getSequenceNumber()) {
       LOG.info("Invalid RoundChange message, PreprepareCertificate is not for local chain height.");
       return false;
     }
 
-    if (prepareCertRound.getRoundNumber() > currentRound.getRoundNumber()) {
+    if (prepareCertRound.getRoundNumber() >= roundChangeTarget.getRoundNumber()) {
       LOG.info("Invalid RoundChange message, PreprepareCertificate is not for a past round.");
       return false;
     }
