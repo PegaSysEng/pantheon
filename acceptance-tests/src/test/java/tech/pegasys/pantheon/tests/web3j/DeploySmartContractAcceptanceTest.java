@@ -12,19 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.web3j;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.web3j.generated.SimpleStorage;
 
-import java.math.BigInteger;
-import java.util.Optional;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Contract;
 
 public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
 
@@ -41,50 +34,8 @@ public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
     final SimpleStorage contract =
         minerNode.execute(transactions.createSmartContract(SimpleStorage.class));
 
-    verifyContractReceipt(contract);
-  }
+    final String expectedContractAddress = "0x42699a7612a82f1d9c36148af9c77354759b210b";
 
-  // TODO code reuse - does need a node, new entrypoint in DSL?
-  private void verifyContractReceipt(final Contract contract) {
-
-    final String contractAddress = "0x42699a7612a82f1d9c36148af9c77354759b210b";
-    final String senderAddress = accounts.getPrimaryBenefactor().getAddress();
-
-    assertThat(contract).isNotNull();
-    final Optional<TransactionReceipt> receipt = contract.getTransactionReceipt();
-
-    // We're expecting a receipt
-    assertThat(receipt).isNotNull();
-    assertThat(receipt.isPresent()).isTrue();
-    final TransactionReceipt transactionReceipt = receipt.get();
-
-    // Contract transaction has no 'to' address or contract address
-    assertThat(transactionReceipt.getTo()).isNull();
-    assertThat(transactionReceipt.getRoot()).isNull();
-
-    // Variables outside the control of the test :. just check existence
-    assertThat(transactionReceipt.getBlockHash()).isNotBlank();
-    assertThat(transactionReceipt.getTransactionHash()).isNotBlank();
-    assertThat(transactionReceipt.getTransactionIndex()).isNotNull();
-    assertThat(transactionReceipt.getTransactionHash()).isNotNull();
-
-    // Block zero is the genesis, expecting anytime after then
-    assertThat(transactionReceipt.getBlockNumber()).isGreaterThanOrEqualTo(BigInteger.ONE);
-
-    // Address generation is deterministic, based on the sender address, nonce and data
-    assertThat(transactionReceipt.getContractAddress()).isEqualTo(contractAddress);
-
-    // Expecting successful transaction (status '0x1')
-    assertThat(transactionReceipt.getStatus()).isEqualTo("0x1");
-
-    // Address for the account that signed (and paid) for the contract deployment transaction
-    assertThat(transactionReceipt.getFrom()).isEqualTo(senderAddress);
-
-    // No logs from expected from the contract deployment
-    assertThat(transactionReceipt.getLogs()).isNotNull();
-    assertThat(transactionReceipt.getLogs().size()).isEqualTo(0);
-    assertThat(transactionReceipt.getLogsBloom())
-        .isEqualTo(
-            "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+    contractVerifier.verifyValidTransactionReceipt(contract, expectedContractAddress);
   }
 }
