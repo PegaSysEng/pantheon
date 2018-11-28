@@ -98,8 +98,8 @@ public class PantheonNodeFactory {
             this::createCliqueGenesisConfig));
   }
 
-  public PantheonNode createCliqueNodeWithValidators(
-      final String name, final String... validators) throws IOException {
+  public PantheonNode createCliqueNodeWithValidators(final String name, final String... validators)
+      throws IOException {
     return create(
         new PantheonFactoryConfiguration(
             name,

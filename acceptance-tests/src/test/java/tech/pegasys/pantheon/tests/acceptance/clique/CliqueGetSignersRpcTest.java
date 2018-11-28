@@ -41,11 +41,12 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() {
     cluster.verify(clique.validatorsAtBlockEqual("0x0", initialNodes));
+    cluster.waitUntil(wait.chainHeadIsAt(1));
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
     minerNode2.execute(cliqueTransactions.createAddProposal(minerNode3));
 
-    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
-    cluster.verify(clique.validatorsAtBlockEqual("0x1", initialNodes));
+    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
+    cluster.verify(clique.validatorsAtBlockEqual("0x2", initialNodes));
 
     minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
     cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));

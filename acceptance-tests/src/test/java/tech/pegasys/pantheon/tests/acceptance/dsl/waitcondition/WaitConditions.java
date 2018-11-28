@@ -41,4 +41,8 @@ public class WaitConditions {
   public WaitCondition cliqueValidatorsChanged(final Node node) {
     return new WaitUntilSignersChanged(node.execute(clique.createGetSigners(LATEST)), clique);
   }
+
+  public WaitCondition chainHeadIsAt(final long blockNumber) {
+    return new ExpectBlockNumber(eth, BigInteger.valueOf(blockNumber))::verify;
+  }
 }
