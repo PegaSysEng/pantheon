@@ -37,7 +37,7 @@ public class AcceptanceTestBase {
   protected final Eth eth;
   protected final Net net;
   protected final PantheonNodeFactory pantheon;
-  protected final ContractVerifier contract;
+  protected final ContractVerifier contractVerifier;
 
   protected AcceptanceTestBase() {
     final EthTransactions ethTransactions = new EthTransactions();
@@ -49,7 +49,7 @@ public class AcceptanceTestBase {
     transactions = new Transactions(accounts);
     web3 = new Web3(new Web3Transactions());
     pantheon = new PantheonNodeFactory();
-    contract = new ContractVerifier(accounts.getPrimaryBenefactor());
+    contractVerifier = new ContractVerifier(accounts.getPrimaryBenefactor());
   }
 
   @After

@@ -37,6 +37,6 @@ public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
     final SimpleStorage simpleStorageContract =
         minerNode.execute(transactions.createSmartContract(SimpleStorage.class));
 
-    contract.validTransactionReceipt(contractAddress).verify(simpleStorageContract);
+    contractVerifier.validTransactionReceipt(contractAddress).verify(simpleStorageContract);
   }
 }
