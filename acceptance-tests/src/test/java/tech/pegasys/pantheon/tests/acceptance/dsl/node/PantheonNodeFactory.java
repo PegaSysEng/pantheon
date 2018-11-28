@@ -87,7 +87,7 @@ public class PantheonNodeFactory {
             name, createMiningParameters(false), jsonRpcConfig, webSocketConfig));
   }
 
-  public PantheonNode createCliqueMinerNode(final String name) throws IOException {
+  public PantheonNode createCliqueNode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfiguration(
             name,
@@ -98,7 +98,7 @@ public class PantheonNodeFactory {
             this::createCliqueGenesisConfig));
   }
 
-  public PantheonNode createCliqueMinerNodeWithValidators(
+  public PantheonNode createCliqueNodeWithValidators(
       final String name, final String... validators) throws IOException {
     return create(
         new PantheonFactoryConfiguration(

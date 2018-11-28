@@ -30,9 +30,9 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     final String[] validators = {"miner1", "miner2"};
-    minerNode1 = pantheon.createCliqueMinerNodeWithValidators("miner1", validators);
-    minerNode2 = pantheon.createCliqueMinerNodeWithValidators("miner2", validators);
-    minerNode3 = pantheon.createCliqueMinerNodeWithValidators("miner3", validators);
+    minerNode1 = pantheon.createCliqueNodeWithValidators("miner1", validators);
+    minerNode2 = pantheon.createCliqueNodeWithValidators("miner2", validators);
+    minerNode3 = pantheon.createCliqueNodeWithValidators("miner3", validators);
     initialNodes = new PantheonNode[] {minerNode1, minerNode2};
     allNodes = new PantheonNode[] {minerNode1, minerNode2, minerNode3};
     cluster.start(allNodes);

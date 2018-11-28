@@ -27,11 +27,11 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   public void shouldAddValidators() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
-        pantheon.createCliqueMinerNodeWithValidators("miner1", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner1", initialValidators);
     final PantheonNode minerNode2 =
-        pantheon.createCliqueMinerNodeWithValidators("miner2", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner2", initialValidators);
     final PantheonNode minerNode3 =
-        pantheon.createCliqueMinerNodeWithValidators("miner3", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
@@ -46,11 +46,11 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   public void shouldRemoveValidators() throws IOException {
     final String[] initialValidators = {"miner1", "miner2", "miner3"};
     final PantheonNode minerNode1 =
-        pantheon.createCliqueMinerNodeWithValidators("miner1", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner1", initialValidators);
     final PantheonNode minerNode2 =
-        pantheon.createCliqueMinerNodeWithValidators("miner2", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner2", initialValidators);
     final PantheonNode minerNode3 =
-        pantheon.createCliqueMinerNodeWithValidators("miner3", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
@@ -65,11 +65,11 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   public void shouldNotAddValidatorWhenInsufficientVotes() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
-        pantheon.createCliqueMinerNodeWithValidators("miner1", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner1", initialValidators);
     final PantheonNode minerNode2 =
-        pantheon.createCliqueMinerNodeWithValidators("miner2", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner2", initialValidators);
     final PantheonNode minerNode3 =
-        pantheon.createCliqueMinerNodeWithValidators("miner3", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
@@ -80,9 +80,9 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldNotRemoveValidatorWhenInsufficientVotes() throws IOException {
-    final PantheonNode minerNode1 = pantheon.createCliqueMinerNode("miner1");
-    final PantheonNode minerNode2 = pantheon.createCliqueMinerNode("miner2");
-    final PantheonNode minerNode3 = pantheon.createCliqueMinerNode("miner3");
+    final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
+    final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
+    final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
@@ -95,11 +95,11 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   public void shouldIncludeVoteInBlockHeader() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
-        pantheon.createCliqueMinerNodeWithValidators("miner1", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner1", initialValidators);
     final PantheonNode minerNode2 =
-        pantheon.createCliqueMinerNodeWithValidators("miner2", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner2", initialValidators);
     final PantheonNode minerNode3 =
-        pantheon.createCliqueMinerNodeWithValidators("miner3", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));

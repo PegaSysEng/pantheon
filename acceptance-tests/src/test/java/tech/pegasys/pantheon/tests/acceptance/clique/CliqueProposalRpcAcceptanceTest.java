@@ -25,11 +25,11 @@ public class CliqueProposalRpcAcceptanceTest extends AcceptanceTestBase {
   public void shouldReturnProposals() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
     final PantheonNode minerNode1 =
-        pantheon.createCliqueMinerNodeWithValidators("miner1", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner1", initialValidators);
     final PantheonNode minerNode2 =
-        pantheon.createCliqueMinerNodeWithValidators("miner2", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner2", initialValidators);
     final PantheonNode minerNode3 =
-        pantheon.createCliqueMinerNodeWithValidators("miner3", initialValidators);
+        pantheon.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.noProposals());

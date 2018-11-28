@@ -24,7 +24,7 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactionsOnSingleNode() throws IOException {
-    final PantheonNode minerNode = pantheon.createCliqueMinerNode("miner1");
+    final PantheonNode minerNode = pantheon.createCliqueNode("miner1");
     cluster.start(minerNode);
 
     final Account sender = accounts.createAccount("account1");
@@ -42,9 +42,9 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactionsOnMultipleNodes() throws IOException {
-    final PantheonNode minerNode1 = pantheon.createCliqueMinerNode("miner1");
-    final PantheonNode minerNode2 = pantheon.createCliqueMinerNode("miner2");
-    final PantheonNode minerNode3 = pantheon.createCliqueMinerNode("miner3");
+    final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
+    final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
+    final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     final Account sender = accounts.createAccount("account1");
@@ -62,9 +62,9 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldStallMiningWhenInsufficientValidators() throws IOException {
-    final PantheonNode minerNode1 = pantheon.createCliqueMinerNode("miner1");
-    final PantheonNode minerNode2 = pantheon.createCliqueMinerNode("miner2");
-    final PantheonNode minerNode3 = pantheon.createCliqueMinerNode("miner3");
+    final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
+    final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
+    final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.stopNode(minerNode2);
