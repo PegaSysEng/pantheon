@@ -313,7 +313,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         "Comma separated list of hostnames to whitelist for RPC access.  default: ${DEFAULT-VALUE}",
     defaultValue = "localhost"
   )
-  private final Collection<String> hostWhitelist = null;
+  private final Collection<String> hostsWhitelist = null;
 
   @Option(
     names = {"--dev-mode"},
@@ -483,7 +483,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setPort(rpcHostAndPort.getPort());
     jsonRpcConfiguration.setCorsAllowedDomains(rpcCorsAllowedOrigins.getDomains());
     jsonRpcConfiguration.setRpcApis(rpcApis);
-    jsonRpcConfiguration.hostWhitelist(hostWhitelist);
+    jsonRpcConfiguration.hostsWhitelist(hostsWhitelist);
     return jsonRpcConfiguration;
   }
 

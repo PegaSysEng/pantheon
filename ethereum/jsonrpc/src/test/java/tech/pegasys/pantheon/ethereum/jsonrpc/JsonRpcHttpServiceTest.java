@@ -149,7 +149,7 @@ public class JsonRpcHttpServiceTest {
   protected static JsonRpcConfiguration createJsonRpcConfig() {
     final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
     config.setPort(0);
-    config.hostWhitelist(Collections.singletonList("*"));
+    config.hostsWhitelist(Collections.singletonList("*"));
     return config;
   }
 

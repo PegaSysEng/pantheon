@@ -62,16 +62,15 @@ public class JsonRpcHttpServiceHostWhitelistTest {
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
   private static final String CLIENT_VERSION = "TestClientVersion/0.1.0";
   private static final int CHAIN_ID = 123;
-  protected static BlockchainQueries blockchainQueries;
   private static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
   private final JsonRpcConfiguration jsonRpcConfig = createJsonRpcConfig();
-  private final List<String> hostWhitelist = Arrays.asList("ally", "friend");
+  private final List<String> hostsWhitelist = Arrays.asList("ally", "friend");
 
   @Before
   public void initServerAndClient() throws Exception {
     P2PNetwork peerDiscoveryMock = mock(P2PNetwork.class);
-    blockchainQueries = mock(BlockchainQueries.class);
+    BlockchainQueries blockchainQueries = mock(BlockchainQueries.class);
     Synchronizer synchronizer = mock(Synchronizer.class);
 
     final Set<Capability> supportedCapabilities = new HashSet<>();
@@ -96,7 +95,6 @@ public class JsonRpcHttpServiceHostWhitelistTest {
     service = createJsonRpcHttpService();
     service.start().join();
 
-    // Build an OkHttp client.
     client = new OkHttpClient();
     baseUrl = service.url();
   }
@@ -111,7 +109,6 @@ public class JsonRpcHttpServiceHostWhitelistTest {
     return config;
   }
 
-  /** Tears down the HTTP server. */
   @After
   public void shutdownServer() {
     service.stop().join();
@@ -129,21 +126,21 @@ public class JsonRpcHttpServiceHostWhitelistTest {
 
   @Test
   public void requestWithAnyHostnameAndWildcardConfigIsAccepted() throws IOException {
-    jsonRpcConfig.hostWhitelist(Collections.singletonList("*"));
+    jsonRpcConfig.hostsWhitelist(Collections.singletonList("*"));
     assertThat(doRequest("ally")).isEqualTo(200);
     assertThat(doRequest("foe")).isEqualTo(200);
   }
 
   @Test
   public void requestWithWhitelistedHostIsAccepted() throws IOException {
-    jsonRpcConfig.hostWhitelist(hostWhitelist);
+    jsonRpcConfig.hostsWhitelist(hostsWhitelist);
     assertThat(doRequest("ally")).isEqualTo(200);
     assertThat(doRequest("friend")).isEqualTo(200);
   }
 
   @Test
   public void requestWithUnknownHostIsRejected() throws IOException {
-    jsonRpcConfig.hostWhitelist(hostWhitelist);
+    jsonRpcConfig.hostsWhitelist(hostsWhitelist);
     assertThat(doRequest("foe")).isEqualTo(403);
   }
 

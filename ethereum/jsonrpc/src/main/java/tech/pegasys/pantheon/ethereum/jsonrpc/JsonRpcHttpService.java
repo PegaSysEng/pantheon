@@ -173,10 +173,10 @@ public class JsonRpcHttpService {
     return event -> {
       Optional<String> hostHeader =
           Optional.ofNullable(Iterables.get(Splitter.on(':').split(event.request().host()), 0));
-      if ((config.hostWhitelist().size() == 1 && config.hostWhitelist().contains("*"))
+      if ((config.hostsWhitelist().size() == 1 && config.hostsWhitelist().contains("*"))
           || (hostHeader.isPresent()
               && config
-                  .hostWhitelist()
+                  .hostsWhitelist()
                   .stream()
                   .anyMatch(
                       whitelistEntry ->

@@ -28,7 +28,7 @@ public class JsonRpcConfiguration {
   private String host;
   private Collection<String> corsAllowedDomains = Collections.emptyList();
   private Collection<RpcApi> rpcApis;
-  private Collection<String> hostWhitelist = Collections.singletonList("localhost");
+  private Collection<String> hostsWhitelist = Collections.singletonList("localhost");
 
   public static JsonRpcConfiguration createDefault() {
     final JsonRpcConfiguration config = new JsonRpcConfiguration();
@@ -88,12 +88,12 @@ public class JsonRpcConfiguration {
     rpcApis.add(rpcApi);
   }
 
-  public Collection<String> hostWhitelist() {
-    return this.hostWhitelist;
+  public Collection<String> hostsWhitelist() {
+    return this.hostsWhitelist;
   }
 
-  public void hostWhitelist(final Collection<String> hostWhitelist) {
-    this.hostWhitelist = hostWhitelist;
+  public void hostsWhitelist(final Collection<String> hostsWhitelist) {
+    this.hostsWhitelist = hostsWhitelist;
   }
 
   @Override
@@ -103,7 +103,7 @@ public class JsonRpcConfiguration {
         .add("port", port)
         .add("host", host)
         .add("corsAllowedDomains", corsAllowedDomains)
-        .add("hostWhitelist", hostWhitelist)
+        .add("hostsWhitelist", hostsWhitelist)
         .add("rpcApis", rpcApis)
         .toString();
   }
@@ -121,12 +121,12 @@ public class JsonRpcConfiguration {
         && port == that.port
         && Objects.equal(host, that.host)
         && Objects.equal(corsAllowedDomains, that.corsAllowedDomains)
-        && Objects.equal(hostWhitelist, that.hostWhitelist)
+        && Objects.equal(hostsWhitelist, that.hostsWhitelist)
         && Objects.equal(rpcApis, that.rpcApis);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(enabled, port, host, corsAllowedDomains, hostWhitelist, rpcApis);
+    return Objects.hashCode(enabled, port, host, corsAllowedDomains, hostsWhitelist, rpcApis);
   }
 }

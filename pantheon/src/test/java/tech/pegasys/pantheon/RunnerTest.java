@@ -252,7 +252,7 @@ public final class RunnerTest {
     final JsonRpcConfiguration configuration = JsonRpcConfiguration.createDefault();
     configuration.setPort(0);
     configuration.setEnabled(true);
-    configuration.hostWhitelist(Collections.singletonList("*"));
+    configuration.hostsWhitelist(Collections.singletonList("*"));
     return configuration;
   }
 
