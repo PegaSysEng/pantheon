@@ -31,11 +31,12 @@ public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void deployingMustGiveValidReceipt() {
-    final SimpleStorage contract =
+    // Contract address is generated from sender address and transaction nonce
+    final String contractAddress = "0x42699a7612a82f1d9c36148af9c77354759b210b";
+
+    final SimpleStorage simpleStorageContract =
         minerNode.execute(transactions.createSmartContract(SimpleStorage.class));
 
-    final String expectedContractAddress = "0x42699a7612a82f1d9c36148af9c77354759b210b";
-
-    contractVerifier.verifyValidTransactionReceipt(contract, expectedContractAddress);
+    contract.validTransactionReceipt(contractAddress).verify(simpleStorageContract);
   }
 }

@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Blockchain;
+import tech.pegasys.pantheon.tests.acceptance.dsl.contract.ContractVerifier;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eth;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Web3;
@@ -23,7 +24,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Transactions;
-import tech.pegasys.pantheon.tests.acceptance.dsl.verify.ContractVerifier;
 
 import org.junit.After;
 
@@ -37,7 +37,7 @@ public class AcceptanceTestBase {
   protected final Eth eth;
   protected final Net net;
   protected final PantheonNodeFactory pantheon;
-  protected final ContractVerifier contractVerifier;
+  protected final ContractVerifier contract;
 
   protected AcceptanceTestBase() {
     final EthTransactions ethTransactions = new EthTransactions();
@@ -49,7 +49,7 @@ public class AcceptanceTestBase {
     transactions = new Transactions(accounts);
     web3 = new Web3(new Web3Transactions());
     pantheon = new PantheonNodeFactory();
-    contractVerifier = new ContractVerifier(accounts.getPrimaryBenefactor());
+    contract = new ContractVerifier(accounts.getPrimaryBenefactor());
   }
 
   @After

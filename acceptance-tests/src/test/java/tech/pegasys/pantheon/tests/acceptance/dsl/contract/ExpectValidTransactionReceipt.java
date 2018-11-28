@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.verify;
+package tech.pegasys.pantheon.tests.acceptance.dsl.contract;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,15 +22,17 @@ import java.util.Optional;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.Contract;
 
-public class ContractVerifier {
+public class ExpectValidTransactionReceipt {
 
   private final String senderAddress;
+  private final String contractAddress;
 
-  public ContractVerifier(final Account sender) {
+  public ExpectValidTransactionReceipt(final Account sender, final String contractAddress) {
+    this.contractAddress = contractAddress;
     this.senderAddress = sender.getAddress();
   }
 
-  public void verifyValidTransactionReceipt(final Contract contract, final String contractAddress) {
+  public void verify(final Contract contract) {
 
     assertThat(contract).isNotNull();
     final Optional<TransactionReceipt> receipt = contract.getTransactionReceipt();
