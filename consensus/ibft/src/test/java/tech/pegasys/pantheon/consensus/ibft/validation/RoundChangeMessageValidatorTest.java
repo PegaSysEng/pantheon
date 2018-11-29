@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftPreparedCertific
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftSignedMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedPrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedRoundChangeMessageData;
+import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -58,9 +59,9 @@ public class RoundChangeMessageValidatorTest {
   private final MessageValidator basicValidator = mock(MessageValidator.class);
   private final List<Address> validators = Lists.newArrayList();
 
+  private final MessageValidatorFactory validatorFactory = mock(MessageValidatorFactory.class);
   private final RoundChangeMessageValidator validator =
-      new RoundChangeMessageValidator(
-          roundIdentifier -> basicValidator, validators, 1, currentRound);
+      new RoundChangeMessageValidator(validatorFactory, validators, 1, currentRound);
 
   @Before
   public void setup() {
@@ -68,6 +69,7 @@ public class RoundChangeMessageValidatorTest {
     validators.add(Util.publicKeyToAddress(validatorKey.getPublicKey()));
 
     when(block.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
+    when(validatorFactory.createAt(any())).thenReturn(basicValidator);
   }
 
   @Test
@@ -101,6 +103,16 @@ public class RoundChangeMessageValidatorTest {
     when(basicValidator.addPreprepareMessage(any())).thenReturn(false);
 
     assertThat(validator.validateMessage(msg)).isFalse();
+    verify(validatorFactory, times(1))
+        .createAt(
+            prepareCertificate
+                .getIbftPrePrepareMessage()
+                .getUnsignedMessageData()
+                .getRoundIdentifier());
+    verify(basicValidator, times(1))
+        .addPreprepareMessage(prepareCertificate.getIbftPrePrepareMessage());
+    verify(basicValidator, never()).validatePrepareMessage(any());
+    verify(basicValidator, never()).validateCommmitMessage(any());
   }
 
   @Test
@@ -116,8 +128,6 @@ public class RoundChangeMessageValidatorTest {
 
     when(basicValidator.addPreprepareMessage(any())).thenReturn(true);
     assertThat(validator.validateMessage(msg)).isFalse();
-    verify(basicValidator, never()).validatePrepareMessage(any());
-    verify(basicValidator, never()).validateCommmitMessage(any());
   }
 
   @Test
@@ -156,7 +166,7 @@ public class RoundChangeMessageValidatorTest {
   }
 
   @Test
-  public void roundChangeWithPreprepareFromARoundAheadOfRoundChangeTargetails() {
+  public void roundChangeWithPreprepareFromARoundAheadOfRoundChangeTargetFails() {
     final ConsensusRoundIdentifier futureRound =
         new ConsensusRoundIdentifier(
             currentRound.getSequenceNumber(), currentRound.getRoundNumber() + 2);
@@ -173,5 +183,34 @@ public class RoundChangeMessageValidatorTest {
             targetRound, Optional.of(prepareCertificate));
 
     assertThat(validator.validateMessage(msg)).isFalse();
+  }
+
+  @Test
+  public void roudnChangeWithPastPreprepareForCurrentHeightIsSuccessful() {
+    final IbftSignedMessageData<IbftUnsignedPrepareMessageData> prepareMsg =
+        validatorMessageFactory.createIbftSignedPrepareMessageData(currentRound, block.getHash());
+    final IbftPreparedCertificate prepareCertificate =
+        new IbftPreparedCertificate(
+            proposerMessageFactory.createIbftSignedPrePrepareMessageData(currentRound, block),
+            Lists.newArrayList(prepareMsg));
+
+    final IbftSignedMessageData<IbftUnsignedRoundChangeMessageData> msg =
+        proposerMessageFactory.createIbftSignedRoundChangeMessageData(
+            targetRound, Optional.of(prepareCertificate));
+
+    when(basicValidator.addPreprepareMessage(prepareCertificate.getIbftPrePrepareMessage()))
+        .thenReturn(true);
+    when(basicValidator.validatePrepareMessage(prepareMsg)).thenReturn(true);
+
+    assertThat(validator.validateMessage(msg)).isTrue();
+    verify(validatorFactory, times(1))
+        .createAt(
+            prepareCertificate
+                .getIbftPrePrepareMessage()
+                .getUnsignedMessageData()
+                .getRoundIdentifier());
+    verify(basicValidator, times(1))
+        .addPreprepareMessage(prepareCertificate.getIbftPrePrepareMessage());
+    verify(basicValidator, times(1)).validatePrepareMessage(prepareMsg);
   }
 }
