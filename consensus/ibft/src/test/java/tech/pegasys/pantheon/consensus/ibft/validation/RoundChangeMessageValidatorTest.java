@@ -70,6 +70,11 @@ public class RoundChangeMessageValidatorTest {
 
     when(block.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
     when(validatorFactory.createAt(any())).thenReturn(basicValidator);
+
+    // By default, have all basic messages being valid thus any failures are attributed to logic
+    // in the RoundChangeMessageValidator
+    when(basicValidator.addPreprepareMessage(any())).thenReturn(true);
+    when(basicValidator.validatePrepareMessage(any())).thenReturn(true);
   }
 
   @Test
@@ -183,6 +188,9 @@ public class RoundChangeMessageValidatorTest {
             targetRound, Optional.of(prepareCertificate));
 
     assertThat(validator.validateMessage(msg)).isFalse();
+    verify(validatorFactory, never()).createAt(any());
+    verify(basicValidator, never()).validatePrepareMessage(prepareMsg);
+    verify(basicValidator, never()).validateCommmitMessage(any());
   }
 
   @Test
