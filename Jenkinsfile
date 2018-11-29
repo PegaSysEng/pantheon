@@ -96,27 +96,25 @@ try {
         def channel = '#priv-pegasys-prod-dev'
         if (currentResult == 'SUCCESS') {
             def previousResult = currentBuild.previousBuild?.result
-            if (previousResult != null && previousResult != currentResult) {
+            if (previousResult != null && (previousResult == 'FAILURE' || previousResult == 'UNSTABLE')) {
                 slackSend(
                     color: 'good',
                     message: "Pantheon branch ${env.BRANCH_NAME} build is back to HEALTHY.\nBuild Number: #${env.BUILD_NUMBER}\n${env.BUILD_URL}",
                     channel: channel
                 )
             }
-        } else {
-            if (currentBuild.result == 'FAILURE') {
-                slackSend(
-                    color: 'danger',
-                    message: "Pantheon branch ${env.BRANCH_NAME} build is FAILING.\nBuild Number: #${env.BUILD_NUMBER}\n${env.BUILD_URL}",
-                    channel: channel
-                )
-            } else if (currentBuild.result == 'UNSTABLE') {
-                slackSend(
-                    color: 'warning',
-                    message: "Pantheon branch ${env.BRANCH_NAME} build is UNSTABLE.\nBuild Number: #${env.BUILD_NUMBER}\n${env.BUILD_URL}",
-                    channel: channel
-                )
-            }
+        } else if (currentBuild.result == 'FAILURE') {
+            slackSend(
+                color: 'danger',
+                message: "Pantheon branch ${env.BRANCH_NAME} build is FAILING.\nBuild Number: #${env.BUILD_NUMBER}\n${env.BUILD_URL}",
+                channel: channel
+            )
+        } else if (currentBuild.result == 'UNSTABLE') {
+            slackSend(
+                color: 'warning',
+                message: "Pantheon branch ${env.BRANCH_NAME} build is UNSTABLE.\nBuild Number: #${env.BUILD_NUMBER}\n${env.BUILD_URL}",
+                channel: channel
+            )
         }
     }
 }
