@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.cli;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -161,6 +162,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   // Testing each option
   @Test
   public void callingWithConfigOptionButNoConfigFileShouldDisplayHelp() {
+    assumeFalse(isDockerInstantiation());
 
     parseCommand("--config");
 
@@ -171,6 +173,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButNonExistingFileShouldDisplayHelp() throws IOException {
+    assumeFalse(isDockerInstantiation());
+
     final File tempConfigFile = temp.newFile("an-invalid-file-name-without-extension");
     parseCommand("--config", tempConfigFile.getPath());
 
@@ -181,6 +185,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButTomlFileNotFoundShouldDisplayHelp() {
+    assumeFalse(isDockerInstantiation());
 
     parseCommand("--config", "./an-invalid-file-name-sdsd87sjhqoi34io23.toml");
 
@@ -191,6 +196,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButInvalidContentTomlFileShouldDisplayHelp() throws Exception {
+    assumeFalse(isDockerInstantiation());
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
@@ -212,6 +218,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButInvalidValueTomlFileShouldDisplayHelp() throws Exception {
+    assumeFalse(isDockerInstantiation());
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
@@ -233,6 +240,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void overrideDefaultValuesIfKeyIsPresentInConfigFile() throws IOException {
+    assumeFalse(isDockerInstantiation());
+
     final URL configFile = Resources.getResource("complete_config.toml");
     final Path genesisFile = createFakeGenesisFile();
     final String updatedConfig =
@@ -292,6 +301,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void noOverrideDefaultValuesIfKeyIsNotPresentInConfigFile() throws IOException {
+    assumeFalse(isDockerInstantiation());
+
     final String configFile = Resources.getResource("partial_config.toml").getFile();
 
     parseCommand("--config", configFile);
@@ -344,6 +355,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void dataDirOptionMustBeUsed() throws Exception {
+    assumeFalse(isDockerInstantiation());
+
     final Path path = Paths.get(".");
 
     parseCommand("--datadir", path.toString());
@@ -361,6 +374,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void genesisPathOptionMustBeUsed() throws Exception {
+    assumeFalse(isDockerInstantiation());
+
     final Path genesisFile = createFakeGenesisFile();
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
@@ -843,9 +858,42 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1);
   }
 
+  @Test
+  public void cliOptionsNotShownWhenInDockerContainer() {
+    System.setProperty("pantheon.docker", "true");
+
+    parseCommand("--help");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).doesNotContain("--config");
+    assertThat(commandOutput.toString()).doesNotContain("--datadir");
+    assertThat(commandOutput.toString()).doesNotContain("--genesis");
+    assertThat(commandErrorOutput.toString()).isEmpty();
+
+    System.setProperty("pantheon.docker", "false");
+
+    parseCommand("--help");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).contains("--config");
+    assertThat(commandOutput.toString()).contains("--datadir");
+    assertThat(commandOutput.toString()).contains("--genesis");
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
   private Path createFakeGenesisFile() throws IOException {
     final Path genesisFile = Files.createTempFile("genesisFile", "");
     Files.write(genesisFile, "genesis_config".getBytes(UTF_8));
     return genesisFile;
+  }
+
+  private Boolean isDockerInstantiation() {
+    return Boolean.getBoolean("pantheon.docker");
+  }
+
+  private boolean isFullInstantiation() {
+    return !Boolean.getBoolean("pantheon.docker");
   }
 }
