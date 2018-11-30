@@ -31,7 +31,7 @@ import org.junit.Test;
 public class EthSchedulerTest {
 
   private DeterministicEthScheduler ethScheduler;
-  private MockExecutorService workerExecutor;
+  private MockExecutorService syncWorkerExecutor;
   private MockScheduledExecutor scheduledExecutor;
   private AtomicBoolean shouldTimeout;
 
@@ -39,7 +39,7 @@ public class EthSchedulerTest {
   public void setup() {
     shouldTimeout = new AtomicBoolean(false);
     ethScheduler = new DeterministicEthScheduler(shouldTimeout::get);
-    workerExecutor = ethScheduler.mockWorkerExecutor();
+    syncWorkerExecutor = ethScheduler.mockSyncWorkerExecutor();
     scheduledExecutor = ethScheduler.mockScheduledExecutor();
   }
 
@@ -84,8 +84,8 @@ public class EthSchedulerTest {
     final CompletableFuture<Object> result =
         ethScheduler.scheduleWorkerTask(() -> new CompletableFuture<>());
 
-    assertThat(workerExecutor.getScheduledFutures().size()).isEqualTo(1);
-    final Future<?> future = workerExecutor.getScheduledFutures().get(0);
+    assertThat(syncWorkerExecutor.getScheduledFutures().size()).isEqualTo(1);
+    final Future<?> future = syncWorkerExecutor.getScheduledFutures().get(0);
 
     verify(future, times(0)).cancel(anyBoolean());
     result.cancel(true);
