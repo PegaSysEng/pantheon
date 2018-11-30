@@ -43,6 +43,7 @@ public class EthScheduler {
 
   protected final ExecutorService workerExecutor;
   protected final ScheduledExecutorService scheduler;
+  protected final ExecutorService transactionsExecutor;
 
   EthScheduler(final int workerCount) {
     this(
@@ -56,13 +57,21 @@ public class EthScheduler {
             new ThreadFactoryBuilder()
                 .setDaemon(true)
                 .setNameFormat(EthScheduler.class.getSimpleName() + "Timer")
+                .build()),
+        Executors.newFixedThreadPool(
+            workerCount,
+            new ThreadFactoryBuilder()
+                .setNameFormat(EthScheduler.class.getSimpleName() + "-Transactions")
                 .build()));
   }
 
   protected EthScheduler(
-      final ExecutorService workerExecutor, final ScheduledExecutorService scheduler) {
+      final ExecutorService workerExecutor,
+      final ScheduledExecutorService scheduler,
+      final ExecutorService transactionExecutor) {
     this.workerExecutor = workerExecutor;
     this.scheduler = scheduler;
+    this.transactionsExecutor = transactionExecutor;
   }
 
   public <T> CompletableFuture<T> scheduleWorkerTask(final Supplier<CompletableFuture<T>> future) {
@@ -93,6 +102,10 @@ public class EthScheduler {
 
   public Future<?> scheduleWorkerTask(final Runnable command) {
     return workerExecutor.submit(command);
+  }
+
+  public Future<?> scheduleTransactionTask(final Runnable command) {
+    return transactionsExecutor.submit(command);
   }
 
   public CompletableFuture<Void> scheduleFutureTask(

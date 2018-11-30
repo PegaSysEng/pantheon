@@ -13,18 +13,22 @@
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
+import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol.EthVersion;
@@ -40,12 +44,15 @@ import tech.pegasys.pantheon.ethereum.eth.messages.GetReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.ReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
+import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
+import tech.pegasys.pantheon.ethereum.p2p.wire.RawMessage;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -57,6 +64,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -72,6 +81,7 @@ public final class EthProtocolManagerTest {
   private static Blockchain blockchain;
   private static ProtocolSchedule<Void> protocolSchedule;
   private static BlockDataGenerator gen;
+  private static ProtocolContext<Void> protocolContext;
 
   @BeforeClass
   public static void setup() {
@@ -80,6 +90,7 @@ public final class EthProtocolManagerTest {
     blockchainSetupUtil.importAllBlocks();
     blockchain = blockchainSetupUtil.getBlockchain();
     protocolSchedule = blockchainSetupUtil.getProtocolSchedule();
+    protocolContext = blockchainSetupUtil.getProtocolContext();
     assert (blockchainSetupUtil.getMaxBlockNumber() >= 20L);
   }
 
@@ -742,6 +753,40 @@ public final class EthProtocolManagerTest {
       ethManager.processMessage(EthProtocol.ETH63, new DefaultMessage(peer, statusMessage));
       ethManager.processMessage(EthProtocol.ETH63, new DefaultMessage(peer, messageData));
       done.get();
+    }
+  }
+
+  @Test
+  public void transactionMessagesGoToTheCorrectExecutor() {
+    // Create a mock ethScheduler to hold our mock executors.
+    final ExecutorService worker = mock(ExecutorService.class);
+    final ScheduledExecutorService scheduled = mock(ScheduledExecutorService.class);
+    final ExecutorService transactions = mock(ExecutorService.class);
+    final EthScheduler ethScheduler = new EthScheduler(worker, scheduled, transactions);
+
+    // Create the fake TransactionMessage to feed to the EthManager.
+    final BlockDataGenerator gen = new BlockDataGenerator(1);
+    final List<Transaction> txes = Collections.singletonList(gen.transaction());
+    final MessageData initialMessage = TransactionsMessage.create(txes);
+    final MessageData raw = new RawMessage(EthPV62.TRANSACTIONS, initialMessage.getData());
+    final TransactionsMessage transactionMessage = TransactionsMessage.readFrom(raw);
+
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, 1, true, 1, ethScheduler)) {
+
+      // Create a transaction pool.  This has a side effect of registring a listener for the
+      // transactions message.
+      TransactionPoolFactory.createTransactionPool(
+          protocolSchedule, protocolContext, ethManager.ethContext());
+
+      // Send just a transaction message.
+      final PeerConnection peer = setupPeer(ethManager, (cap, msg, connection) -> {});
+      ethManager.processMessage(EthProtocol.ETH63, new DefaultMessage(peer, transactionMessage));
+
+      // Verify the regular message executor and scheduled executor got nothing to execute.
+      verifyZeroInteractions(worker, scheduled);
+      // Verify our transactions executor got something to execute.
+      verify(transactions).submit((Runnable) any());
     }
   }
 }

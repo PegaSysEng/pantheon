@@ -27,7 +27,7 @@ public class DeterministicEthScheduler extends EthScheduler {
   }
 
   DeterministicEthScheduler(final TimeoutPolicy timeoutPolicy) {
-    super(new MockExecutorService(), new MockScheduledExecutor());
+    super(new MockExecutorService(), new MockScheduledExecutor(), new MockExecutorService());
     this.timeoutPolicy = timeoutPolicy;
   }
 
@@ -37,6 +37,10 @@ public class DeterministicEthScheduler extends EthScheduler {
 
   MockScheduledExecutor mockScheduledExecutor() {
     return (MockScheduledExecutor) scheduler;
+  }
+
+  MockScheduledExecutor mockTransactionsExecutor() {
+    return (MockScheduledExecutor) transactionsExecutor;
   }
 
   @Override
