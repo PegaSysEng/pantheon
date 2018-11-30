@@ -32,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.Collections;
@@ -128,24 +129,26 @@ public class PeerDiscoveryAgentTest extends AbstractPeerDiscoveryTest {
   }
 
   @Test
-  public void shouldEvictPeerOnDisconnect() {
+  public void shouldEvictPeerOnDisconnect() throws IOException {
     final Vertx vertx = Vertx.vertx();
     final SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
     final BytesValue id =
         fromHexString(
             "c7849b663d12a2b5bf05b1ebf5810364f4870d5f1053fbd7500d38bc54c705b453d7511ca8a4a86003d34d4c8ee0bbfcd387aa724f5b240b3ab4bbb994a1e09b");
 
-    final DefaultPeer peer = new DiscoveryPeer(id, "127.0.0.1", 30303);
+    final int port = PeerDiscoveryTestHelper.generateEphemiralPort();
+    final DefaultPeer peer = new DiscoveryPeer(id, "127.0.0.1", port);
     final PeerDiscoveryAgent peerDiscoveryAgent =
         new PeerDiscoveryAgent(
             vertx,
             keyPair,
             DiscoveryConfiguration.create()
                 .setBindHost("127.0.0.1")
+                .setBindPort(port)
                 .setBootstrapPeers(Lists.newArrayList(peer)),
             () -> true,
             new PeerBlacklist());
-    peerDiscoveryAgent.start(30303).join();
+    peerDiscoveryAgent.start(port).join();
 
     assertThat(peerDiscoveryAgent.getPeers().size()).isEqualTo(1);
 
@@ -289,6 +292,7 @@ public class PeerDiscoveryAgentTest extends AbstractPeerDiscoveryTest {
   public void shouldBeActiveWhenConfigIsTrue() {
     final DiscoveryConfiguration config = new DiscoveryConfiguration();
     config.setActive(true);
+    config.setBindPort(0);
 
     final PeerDiscoveryAgent agent = startDiscoveryAgent(config, new PeerBlacklist());
 
