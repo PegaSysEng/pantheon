@@ -21,6 +21,8 @@ import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -49,11 +51,12 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       nodeExecutor = Executors.newCachedThreadPool();
     }
 
+    final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
     final EthNetworkConfig ethNetworkConfig =
         node.ethNetworkConfig()
             .orElse(new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build());
-    PantheonController<?> pantheonController;
+    final PantheonController<?> pantheonController;
     try {
       pantheonController =
           builder.build(
@@ -63,7 +66,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               false,
               node.getMiningParameters(),
               node.isDevMode(),
-              KeyPairUtil.getDefaultKeyFile(node.homeDirectory()));
+              KeyPairUtil.getDefaultKeyFile(node.homeDirectory()),
+              noOpMetricsSystem);
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
     }
@@ -81,7 +85,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
                 node.jsonRpcConfiguration(),
                 node.webSocketConfiguration(),
                 node.homeDirectory(),
-                Collections.emptySet());
+                Collections.emptySet(),
+                noOpMetricsSystem);
 
     nodeExecutor.submit(runner::execute);
 

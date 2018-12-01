@@ -77,7 +77,7 @@ public abstract class CommandTestAbstract {
     // doReturn used because of generic PantheonController
     Mockito.doReturn(mockController)
         .when(mockControllerBuilder)
-        .build(any(), any(), any(), anyBoolean(), any(), anyBoolean(), any());
+        .build(any(), any(), any(), anyBoolean(), any(), anyBoolean(), any(), any());
 
     when(mockSyncConfBuilder.build()).thenReturn(mockSyncConf);
   }

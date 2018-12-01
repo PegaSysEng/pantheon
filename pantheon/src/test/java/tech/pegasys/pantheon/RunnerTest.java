@@ -36,6 +36,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
@@ -92,6 +94,7 @@ public final class RunnerTest {
             //        .fastSyncPivotDistance(blockCount / 2).build();
             .fastSyncPivotDistance(0)
             .build();
+    final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
@@ -101,7 +104,8 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
-            aheadDbNodeKeys)) {
+            aheadDbNodeKeys,
+            noOpMetricsSystem)) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
@@ -113,7 +117,8 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
-            aheadDbNodeKeys);
+            aheadDbNodeKeys,
+            noOpMetricsSystem);
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final ExecutorService executorService = Executors.newFixedThreadPool(2);
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
@@ -131,7 +136,8 @@ public final class RunnerTest {
             aheadJsonRpcConfiguration,
             aheadWebSocketConfiguration,
             dbAhead,
-            Collections.emptySet());
+            Collections.emptySet(),
+            noOpMetricsSystem);
     try {
 
       executorService.submit(runnerAhead::execute);
@@ -146,7 +152,8 @@ public final class RunnerTest {
               MainnetProtocolSchedule.create(),
               fastSyncConfig,
               new MiningParametersTestBuilder().enabled(false).build(),
-              KeyPair.generate());
+              KeyPair.generate(),
+              noOpMetricsSystem);
       final Runner runnerBehind =
           runnerBuilder.build(
               Vertx.vertx(),
@@ -164,7 +171,8 @@ public final class RunnerTest {
               behindJsonRpcConfiguration,
               behindWebSocketConfiguration,
               temp.newFolder().toPath(),
-              Collections.emptySet());
+              Collections.emptySet(),
+              noOpMetricsSystem);
 
       executorService.submit(runnerBehind::execute);
       final Call.Factory client = new OkHttpClient();

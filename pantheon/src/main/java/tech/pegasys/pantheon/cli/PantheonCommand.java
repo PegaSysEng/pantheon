@@ -34,6 +34,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -127,6 +129,8 @@ public class PantheonCommand implements Runnable {
   private final PantheonControllerBuilder controllerBuilder;
   private final Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
+
+  private MetricsSystem metricsSystem;
 
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
@@ -422,6 +426,10 @@ public class PantheonCommand implements Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
+    if (metricsSystem == null) {
+      metricsSystem = PrometheusMetricsSystem.instance();
+    }
+
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
       System.out.println(
@@ -454,7 +462,8 @@ public class PantheonCommand implements Runnable {
           syncWithOttoman,
           new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled),
           isDevMode,
-          getNodePrivateKeyFile());
+          getNodePrivateKeyFile(),
+          metricsSystem);
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(new CommandLine(this), e.getMessage());
     } catch (final IOException e) {
@@ -517,7 +526,8 @@ public class PantheonCommand implements Runnable {
             jsonRpcConfiguration,
             webSocketConfiguration,
             dataDir,
-            bannedNodeIds == null ? Collections.emptySet() : bannedNodeIds);
+            bannedNodeIds == null ? Collections.emptySet() : bannedNodeIds,
+            metricsSystem);
 
     addShutdownHook(runner);
     runner.execute();

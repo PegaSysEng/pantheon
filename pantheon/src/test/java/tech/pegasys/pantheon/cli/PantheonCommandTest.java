@@ -95,6 +95,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             any(),
             any(),
             any(),
+            any(),
             any()))
         .thenReturn(mockRunner);
   }
@@ -138,6 +139,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(defaultJsonRpcConfiguration),
             eq(defaultWebSocketConfiguration),
             any(),
+            any(),
             any());
 
     final ArgumentCaptor<MiningParameters> miningArg =
@@ -152,7 +154,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(false),
             miningArg.capture(),
             eq(false),
-            isNotNull());
+            isNotNull(),
+            any());
 
     verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
 
@@ -277,6 +280,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(jsonRpcConfiguration),
             eq(webSocketConfiguration),
             any(),
+            any(),
             any());
 
     final Collection<String> nodes =
@@ -296,6 +300,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(false),
             any(),
             anyBoolean(),
+            any(),
             any());
 
     // TODO: Re-enable as per NC-1057/NC-1681
@@ -332,9 +337,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(jsonRpcConfiguration),
             eq(webSocketConfiguration),
             any(),
+            any(),
             any());
 
-    verify(mockControllerBuilder).build(any(), any(), any(), eq(false), any(), eq(false), any());
+    verify(mockControllerBuilder)
+        .build(any(), any(), any(), eq(false), any(), eq(false), any(), any());
 
     // TODO: Re-enable as per NC-1057/NC-1681
     // verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
@@ -359,7 +366,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(false),
             any(),
             anyBoolean(),
-            fileArgumentCaptor.capture());
+            fileArgumentCaptor.capture(),
+            any());
 
     assertThat(fileArgumentCaptor.getValue()).isEqualTo(file);
 
@@ -381,7 +389,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(false),
             any(),
             anyBoolean(),
-            eq(path.resolve("key").toFile()));
+            eq(path.resolve("key").toFile()),
+            any());
 
     assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(path);
 
@@ -398,7 +407,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--genesis", genesisFile.toString());
 
     verify(mockControllerBuilder)
-        .build(any(), any(), networkArg.capture(), anyBoolean(), any(), anyBoolean(), any());
+        .build(any(), any(), networkArg.capture(), anyBoolean(), any(), anyBoolean(), any(), any());
 
     assertThat(networkArg.getValue().getGenesisConfig()).isEqualTo("genesis_config");
 
@@ -421,6 +430,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyString(),
             anyInt(),
             anyInt(),
+            any(),
             any(),
             any(),
             any(),
@@ -465,6 +475,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             any(),
             any(),
             any(),
+            any(),
             any());
 
     assertThat(stringListArgumentCaptor.getValue().toArray()).isEqualTo(nodes);
@@ -490,7 +501,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
             any(),
             any(),
             any(),
-            stringListArgumentCaptor.capture());
+            stringListArgumentCaptor.capture(),
+            any());
 
     assertThat(stringListArgumentCaptor.getValue().toArray()).isEqualTo(nodes);
 
@@ -514,6 +526,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             stringArgumentCaptor.capture(),
             intArgumentCaptor.capture(),
             anyInt(),
+            any(),
             any(),
             any(),
             any(),
@@ -541,6 +554,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyString(),
             anyInt(),
             intArgumentCaptor.capture(),
+            any(),
             any(),
             any(),
             any(),
@@ -591,6 +605,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             jsonRpcConfigArgumentCaptor.capture(),
             any(),
             any(),
+            any(),
             any());
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().isEnabled()).isFalse();
@@ -615,6 +630,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             jsonRpcConfigArgumentCaptor.capture(),
             any(),
             any(),
+            any(),
             any());
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().isEnabled()).isTrue();
@@ -637,6 +653,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyInt(),
             anyInt(),
             jsonRpcConfigArgumentCaptor.capture(),
+            any(),
             any(),
             any(),
             any());
@@ -667,6 +684,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             jsonRpcConfigArgumentCaptor.capture(),
             any(),
             any(),
+            any(),
             any());
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().getHost()).isEqualTo(host);
@@ -691,6 +709,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyInt(),
             anyInt(),
             jsonRpcConfigArgumentCaptor.capture(),
+            any(),
             any(),
             any(),
             any());
@@ -719,6 +738,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             jsonRpcConfigArgumentCaptor.capture(),
             any(),
             any(),
+            any(),
             any());
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().getCorsAllowedDomains().toArray())
@@ -745,6 +765,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             jsonRpcConfigArgumentCaptor.capture(),
             any(),
             any(),
+            any(),
             any());
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().getCorsAllowedDomains())
@@ -769,6 +790,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyInt(),
             anyInt(),
             jsonRpcConfigArgumentCaptor.capture(),
+            any(),
             any(),
             any(),
             any());
@@ -843,6 +865,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             any(),
             wsRpcConfigArgumentCaptor.capture(),
             any(),
+            any(),
             any());
 
     assertThat(wsRpcConfigArgumentCaptor.getValue().isEnabled()).isFalse();
@@ -867,6 +890,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             any(),
             wsRpcConfigArgumentCaptor.capture(),
             any(),
+            any(),
             any());
 
     assertThat(wsRpcConfigArgumentCaptor.getValue().isEnabled()).isTrue();
@@ -890,6 +914,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyInt(),
             any(),
             wsRpcConfigArgumentCaptor.capture(),
+            any(),
             any(),
             any());
 
@@ -917,6 +942,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             anyInt(),
             any(),
             wsRpcConfigArgumentCaptor.capture(),
+            any(),
             any(),
             any());
 
@@ -946,7 +972,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         ArgumentCaptor.forClass(MiningParameters.class);
 
     verify(mockControllerBuilder)
-        .build(any(), any(), any(), anyBoolean(), miningArg.capture(), anyBoolean(), any());
+        .build(any(), any(), any(), anyBoolean(), miningArg.capture(), anyBoolean(), any(), any());
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(miningArg.getValue().isMiningEnabled()).isTrue();
@@ -968,7 +994,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         ArgumentCaptor.forClass(MiningParameters.class);
 
     verify(mockControllerBuilder)
-        .build(any(), any(), any(), anyBoolean(), miningArg.capture(), anyBoolean(), any());
+        .build(any(), any(), any(), anyBoolean(), miningArg.capture(), anyBoolean(), any(), any());
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(miningArg.getValue().getCoinbase()).isEqualTo(Optional.of(requestedCoinbase));
@@ -980,7 +1006,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void devModeOptionMustBeUsed() throws Exception {
     parseCommand("--dev-mode");
-    verify(mockControllerBuilder).build(any(), any(), any(), anyBoolean(), any(), eq(true), any());
+    verify(mockControllerBuilder)
+        .build(any(), any(), any(), anyBoolean(), any(), eq(true), any(), any());
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -992,7 +1019,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
     verify(mockControllerBuilder)
-        .build(any(), any(), networkArg.capture(), anyBoolean(), any(), anyBoolean(), any());
+        .build(any(), any(), networkArg.capture(), anyBoolean(), any(), anyBoolean(), any(), any());
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.rinkeby());
@@ -1014,7 +1041,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
     verify(mockControllerBuilder)
-        .build(any(), any(), networkArg.capture(), anyBoolean(), any(), anyBoolean(), any());
+        .build(any(), any(), networkArg.capture(), anyBoolean(), any(), anyBoolean(), any(), any());
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(networkArg.getValue().getGenesisConfig()).isEqualTo("genesis_config");
