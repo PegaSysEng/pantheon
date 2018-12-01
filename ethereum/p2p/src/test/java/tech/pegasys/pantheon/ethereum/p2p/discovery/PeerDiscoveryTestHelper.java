@@ -15,8 +15,6 @@ package tech.pegasys.pantheon.ethereum.p2p.discovery;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
@@ -37,11 +35,5 @@ public class PeerDiscoveryTestHelper {
 
   public static DiscoveryPeer[] generateDiscoveryPeers(final SECP256K1.KeyPair... keypairs) {
     return Stream.of(generatePeers(keypairs)).map(DiscoveryPeer::new).toArray(DiscoveryPeer[]::new);
-  }
-
-  public static int generateEphemiralPort() throws IOException {
-    try (final ServerSocket serverSocket = new ServerSocket(0)) {
-      return serverSocket.getLocalPort();
-    }
   }
 }
