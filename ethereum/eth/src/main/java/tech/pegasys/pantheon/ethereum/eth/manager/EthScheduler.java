@@ -74,7 +74,8 @@ public class EthScheduler {
     this.txWorkerExecutor = txWorkerExecutor;
   }
 
-  public <T> CompletableFuture<T> scheduleWorkerTask(final Supplier<CompletableFuture<T>> future) {
+  public <T> CompletableFuture<T> scheduleSyncWorkerTask(
+      final Supplier<CompletableFuture<T>> future) {
     final CompletableFuture<T> promise = new CompletableFuture<>();
     final Future<?> workerFuture =
         syncWorkerExecutor.submit(
@@ -100,11 +101,11 @@ public class EthScheduler {
     return promise;
   }
 
-  public Future<?> scheduleWorkerTask(final Runnable command) {
+  public Future<?> scheduleSyncWorkerTask(final Runnable command) {
     return syncWorkerExecutor.submit(command);
   }
 
-  public Future<?> scheduleTransactionTask(final Runnable command) {
+  public Future<?> scheduleTxWorkerTask(final Runnable command) {
     return txWorkerExecutor.submit(command);
   }
 
