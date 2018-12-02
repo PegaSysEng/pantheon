@@ -426,9 +426,7 @@ public class PantheonCommand implements Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
-    if (metricsSystem == null) {
-      metricsSystem = PrometheusMetricsSystem.init();
-    }
+    metricsSystem = PrometheusMetricsSystem.init();
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
