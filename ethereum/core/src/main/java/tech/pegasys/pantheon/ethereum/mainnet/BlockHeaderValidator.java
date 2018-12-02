@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
+import static java.util.stream.Collectors.toList;
+
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
@@ -70,10 +72,18 @@ public class BlockHeaderValidator<C> {
       final BlockHeader parent,
       final ProtocolContext<C> protocolContext,
       final Predicate<Rule<C>> filter) {
-    return rules
-        .stream()
-        .filter(filter)
-        .allMatch(rule -> rule.validate(header, parent, protocolContext));
+    final List<Rule<C>> failedRules =
+        rules
+            .stream()
+            .filter(filter)
+            .filter(rule -> !rule.validate(header, parent, protocolContext))
+            .collect(toList());
+    if (!failedRules.isEmpty()) {
+      List<String> failedRuleNames =
+          failedRules.stream().map(r -> r.rule.getClass().getSimpleName()).collect(toList());
+      LOG.error("Block header validation failed on these rules {}", failedRuleNames);
+    }
+    return failedRules.isEmpty();
   }
 
   private Optional<BlockHeader> getParent(
