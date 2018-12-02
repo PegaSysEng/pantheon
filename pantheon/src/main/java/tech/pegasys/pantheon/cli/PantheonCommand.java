@@ -14,8 +14,7 @@ package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static tech.pegasys.pantheon.cli.DefaultValues.CONFIG_FILE_OPTION_NAME;
-import static tech.pegasys.pantheon.cli.DefaultValues.MANDATORY_PATH_FORMAT_HELP;
+import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataDir;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
@@ -80,7 +79,7 @@ import picocli.CommandLine.ParameterException;
   footerHeading = "%n",
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
-public class PantheonCommand implements Runnable {
+public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private static final int DEFAULT_MAX_PEERS = 25;
 
@@ -602,9 +601,7 @@ public class PantheonCommand implements Runnable {
   }
 
   private Path dataDir() {
-    return isFullInstantiation()
-        ? standaloneCommands.dataDir
-        : DefaultValues.getDefaultPantheonDataDir(this);
+    return isFullInstantiation() ? standaloneCommands.dataDir : getDefaultPantheonDataDir(this);
   }
 
   private boolean isFullInstantiation() {

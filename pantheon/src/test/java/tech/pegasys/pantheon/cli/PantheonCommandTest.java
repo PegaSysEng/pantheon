@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.cli;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -162,7 +162,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   // Testing each option
   @Test
   public void callingWithConfigOptionButNoConfigFileShouldDisplayHelp() {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     parseCommand("--config");
 
@@ -173,7 +173,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButNonExistingFileShouldDisplayHelp() throws IOException {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     final File tempConfigFile = temp.newFile("an-invalid-file-name-without-extension");
     parseCommand("--config", tempConfigFile.getPath());
@@ -185,7 +185,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButTomlFileNotFoundShouldDisplayHelp() {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     parseCommand("--config", "./an-invalid-file-name-sdsd87sjhqoi34io23.toml");
 
@@ -196,7 +196,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButInvalidContentTomlFileShouldDisplayHelp() throws Exception {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
@@ -218,7 +218,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithConfigOptionButInvalidValueTomlFileShouldDisplayHelp() throws Exception {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
@@ -240,7 +240,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void overrideDefaultValuesIfKeyIsPresentInConfigFile() throws IOException {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     final URL configFile = Resources.getResource("complete_config.toml");
     final Path genesisFile = createFakeGenesisFile();
@@ -301,7 +301,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void noOverrideDefaultValuesIfKeyIsNotPresentInConfigFile() throws IOException {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     final String configFile = Resources.getResource("partial_config.toml").getFile();
 
@@ -355,7 +355,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void dataDirOptionMustBeUsed() throws Exception {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     final Path path = Paths.get(".");
 
@@ -374,7 +374,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void genesisPathOptionMustBeUsed() throws Exception {
-    assumeFalse(isDockerInstantiation());
+    assumeTrue(isFullInstantiation());
 
     final Path genesisFile = createFakeGenesisFile();
     final ArgumentCaptor<EthNetworkConfig> networkArg =
@@ -887,10 +887,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final Path genesisFile = Files.createTempFile("genesisFile", "");
     Files.write(genesisFile, "genesis_config".getBytes(UTF_8));
     return genesisFile;
-  }
-
-  private Boolean isDockerInstantiation() {
-    return Boolean.getBoolean("pantheon.docker");
   }
 
   private boolean isFullInstantiation() {

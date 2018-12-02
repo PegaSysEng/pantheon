@@ -12,16 +12,14 @@
  */
 package tech.pegasys.pantheon.cli;
 
-import static tech.pegasys.pantheon.cli.DefaultValues.CONFIG_FILE_OPTION_NAME;
-import static tech.pegasys.pantheon.cli.DefaultValues.MANDATORY_PATH_FORMAT_HELP;
-import static tech.pegasys.pantheon.cli.DefaultValues.getDefaultPantheonDataDir;
+import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataDir;
 
 import java.io.File;
 import java.nio.file.Path;
 
 import picocli.CommandLine;
 
-class StandaloneCommand {
+class StandaloneCommand implements DefaultCommandValues {
 
   @CommandLine.Option(
     names = {CONFIG_FILE_OPTION_NAME},
@@ -33,7 +31,7 @@ class StandaloneCommand {
   @CommandLine.Option(
     names = {"--datadir"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
-    description = "the path to Pantheon data directory (default: ${DEFAULT-VALUE})"
+    description = "The path to Pantheon data directory (default: ${DEFAULT-VALUE})"
   )
   final Path dataDir = getDefaultPantheonDataDir(this);
 

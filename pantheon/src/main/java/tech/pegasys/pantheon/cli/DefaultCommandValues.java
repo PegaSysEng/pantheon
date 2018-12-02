@@ -22,12 +22,12 @@ import java.nio.file.Paths;
 
 import picocli.CommandLine;
 
-abstract class DefaultValues {
-  static final String CONFIG_FILE_OPTION_NAME = "--config";
+interface DefaultCommandValues {
+  String CONFIG_FILE_OPTION_NAME = "--config";
 
-  static final String MANDATORY_PATH_FORMAT_HELP = "<PATH>";
-  static final String PANTHEON_HOME_PROPERTY_NAME = "pantheon.home";
-  static final String DEFAULT_DATA_DIR_PATH = "./build/data";
+  String MANDATORY_PATH_FORMAT_HELP = "<PATH>";
+  String PANTHEON_HOME_PROPERTY_NAME = "pantheon.home";
+  String DEFAULT_DATA_DIR_PATH = "./build/data";
 
   static Path getDefaultPantheonDataDir(final Object command) {
     // this property is retrieved from Gradle tasks or Pantheon running shell script.
