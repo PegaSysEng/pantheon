@@ -30,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import com.google.common.base.Suppliers;
 import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.MetricFamilySamples;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
@@ -49,16 +48,9 @@ public class PrometheusMetricsSystem implements MetricsSystem {
   private static final String PANTHEON_PREFIX = "pantheon_";
   private final Map<MetricCategory, Collection<Collector>> collectors = new ConcurrentHashMap<>();
 
-  private static final Supplier<MetricsSystem> INSTANCE =
-      Suppliers.memoize(PrometheusMetricsSystem::init);
-
   PrometheusMetricsSystem() {}
 
-  public static MetricsSystem instance() {
-    return INSTANCE.get();
-  }
-
-  private static MetricsSystem init() {
+  public static MetricsSystem init() {
     final PrometheusMetricsSystem metricsSystem = new PrometheusMetricsSystem();
     metricsSystem.collectors.put(MetricCategory.PROCESS, singleton(new StandardExports()));
     metricsSystem.collectors.put(

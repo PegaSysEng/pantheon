@@ -427,7 +427,7 @@ public class PantheonCommand implements Runnable {
     }
 
     if (metricsSystem == null) {
-      metricsSystem = PrometheusMetricsSystem.instance();
+      metricsSystem = PrometheusMetricsSystem.init();
     }
 
     //noinspection ConstantConditions
