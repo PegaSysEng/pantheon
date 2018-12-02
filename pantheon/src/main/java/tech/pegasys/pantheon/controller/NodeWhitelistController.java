@@ -28,7 +28,9 @@ public class NodeWhitelistController {
 
   public NodeWhitelistController(final PermissioningConfiguration configuration) {
     nodeWhitelist = new ArrayList<>();
-    nodeWhitelist.addAll(configuration.getNodeWhitelist());
+    if (configuration != null && configuration.getNodeWhitelist() != null) {
+      nodeWhitelist.addAll(configuration.getNodeWhitelist());
+    }
   }
 
   public boolean addNode(final String nodeId) {
