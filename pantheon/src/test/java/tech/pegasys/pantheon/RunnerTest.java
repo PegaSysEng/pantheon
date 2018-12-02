@@ -123,21 +123,24 @@ public final class RunnerTest {
     final ExecutorService executorService = Executors.newFixedThreadPool(2);
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
-    final RunnerBuilder runnerBuilder = new RunnerBuilder();
+    final RunnerBuilder runnerBuilder =
+        new RunnerBuilder()
+            .vertx(Vertx.vertx())
+            .discovery(true)
+            .discoveryHost(listenHost)
+            .discoveryPort(0)
+            .maxPeers(3)
+            .metricsSystem(noOpMetricsSystem)
+            .bannedNodeIds(Collections.emptySet());
+
     final Runner runnerAhead =
-        runnerBuilder.build(
-            Vertx.vertx(),
-            controllerAhead,
-            true,
-            Collections.emptyList(),
-            listenHost,
-            0,
-            3,
-            aheadJsonRpcConfiguration,
-            aheadWebSocketConfiguration,
-            dbAhead,
-            Collections.emptySet(),
-            noOpMetricsSystem);
+        runnerBuilder
+            .pantheonController(controllerAhead)
+            .bootstrapPeers(Collections.emptyList())
+            .jsonRpcConfiguration(aheadJsonRpcConfiguration)
+            .webSocketConfiguration(aheadWebSocketConfiguration)
+            .dataDir(dbAhead)
+            .build();
     try {
 
       executorService.submit(runnerAhead::execute);
@@ -155,24 +158,20 @@ public final class RunnerTest {
               KeyPair.generate(),
               noOpMetricsSystem);
       final Runner runnerBehind =
-          runnerBuilder.build(
-              Vertx.vertx(),
-              controllerBehind,
-              true,
-              Collections.singletonList(
-                  new DefaultPeer(
-                      aheadDbNodeKeys.getPublicKey().getEncodedBytes(),
-                      listenHost,
-                      runnerAhead.getP2pUdpPort(),
-                      runnerAhead.getP2pTcpPort())),
-              listenHost,
-              0,
-              3,
-              behindJsonRpcConfiguration,
-              behindWebSocketConfiguration,
-              temp.newFolder().toPath(),
-              Collections.emptySet(),
-              noOpMetricsSystem);
+          runnerBuilder
+              .pantheonController(controllerBehind)
+              .bootstrapPeers(
+                  Collections.singletonList(
+                      new DefaultPeer(
+                          aheadDbNodeKeys.getPublicKey().getEncodedBytes(),
+                          listenHost,
+                          runnerAhead.getP2pUdpPort(),
+                          runnerAhead.getP2pTcpPort())))
+              .jsonRpcConfiguration(behindJsonRpcConfiguration)
+              .webSocketConfiguration(behindWebSocketConfiguration)
+              .dataDir(temp.newFolder().toPath())
+              .metricsSystem(noOpMetricsSystem)
+              .build();
 
       executorService.submit(runnerBehind::execute);
       final Call.Factory client = new OkHttpClient();

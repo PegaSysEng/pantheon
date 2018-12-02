@@ -47,8 +47,8 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -221,7 +221,7 @@ public class PantheonCommand implements Runnable {
     split = ",",
     arity = "1..*"
   )
-  private final Collection<String> bannedNodeIds = null;
+  private final Collection<String> bannedNodeIds = new ArrayList<>();
 
   // TODO: Re-enable as per NC-1057/NC-1681
   //  @Option(
@@ -455,15 +455,16 @@ public class PantheonCommand implements Runnable {
 
   PantheonController<?> buildController() {
     try {
-      return controllerBuilder.build(
-          buildSyncConfig(syncMode),
-          dataDir,
-          ethNetworkConfig(),
-          syncWithOttoman,
-          new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled),
-          isDevMode,
-          getNodePrivateKeyFile(),
-          metricsSystem);
+      return controllerBuilder
+          .synchronizerConfiguration(buildSyncConfig(syncMode))
+          .homePath(dataDir)
+          .ethNetworkConfig(ethNetworkConfig())
+          .syncWithOttoman(syncWithOttoman)
+          .miningParameters(
+              new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
+          .devMode(isDevMode)
+          .nodePrivateKeyFile(getNodePrivateKeyFile())
+          .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(new CommandLine(this), e.getMessage());
     } catch (final IOException e) {
@@ -513,21 +514,22 @@ public class PantheonCommand implements Runnable {
 
     checkNotNull(runnerBuilder);
 
-    // BEWARE: Peer discovery boolean must be inverted as it's negated in the options !
     final Runner runner =
-        runnerBuilder.build(
-            Vertx.vertx(),
-            controller,
-            !noPeerDiscovery,
-            bootstrapNodes,
-            discoveryHostAndPort.getHost(),
-            discoveryHostAndPort.getPort(),
-            maxPeers,
-            jsonRpcConfiguration,
-            webSocketConfiguration,
-            dataDir,
-            bannedNodeIds == null ? Collections.emptySet() : bannedNodeIds,
-            metricsSystem);
+        runnerBuilder
+            .vertx(Vertx.vertx())
+            .pantheonController(controller)
+            // BEWARE: Peer discovery boolean must be inverted as it's negated in the options !
+            .discovery(!noPeerDiscovery)
+            .bootstrapPeers(bootstrapNodes)
+            .discoveryHost(discoveryHostAndPort.getHost())
+            .discoveryPort(discoveryHostAndPort.getPort())
+            .maxPeers(maxPeers)
+            .jsonRpcConfiguration(jsonRpcConfiguration)
+            .webSocketConfiguration(webSocketConfiguration)
+            .dataDir(dataDir)
+            .bannedNodeIds(bannedNodeIds)
+            .metricsSystem(metricsSystem)
+            .build();
 
     addShutdownHook(runner);
     runner.execute();
@@ -540,7 +542,7 @@ public class PantheonCommand implements Runnable {
                 () -> {
                   try {
                     runner.close();
-                  } catch (Exception e) {
+                  } catch (final Exception e) {
                     throw new RuntimeException(e);
                   }
                 }));
@@ -644,7 +646,7 @@ public class PantheonCommand implements Runnable {
   private String genesisConfig() {
     try {
       return Resources.toString(genesisFile.toURI().toURL(), UTF_8);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new ParameterException(
           new CommandLine(this), String.format("Unable to load genesis file %s.", genesisFile), e);
     }
