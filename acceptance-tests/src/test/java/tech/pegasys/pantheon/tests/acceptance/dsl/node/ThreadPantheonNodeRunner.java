@@ -66,6 +66,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .miningParameters(node.getMiningParameters())
               .devMode(node.isDevMode())
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
+              .metricsSystem(noOpMetricsSystem)
               .build();
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
