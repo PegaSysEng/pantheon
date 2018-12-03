@@ -80,11 +80,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
     defaultWebSocketConfiguration = websocketConf;
   }
 
+  @Before
+  public void setup() {
+    resetSystemProps();
+  }
+
   @Override
   @Before
   public void initMocks() throws Exception {
     super.initMocks();
-    resetSystemProps();
 
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
