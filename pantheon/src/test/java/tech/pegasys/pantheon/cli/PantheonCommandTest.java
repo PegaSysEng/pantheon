@@ -421,12 +421,18 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void callingWithNodesWhitelistOptionButNoValueMustDisplayErrorAndUsage() {
+  public void callingWithNodesWhitelistOptionButNoValueMustNotError() {
     parseCommand("--nodes-whitelist");
+
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(permissioningConfigurationArgumentCaptor.getValue().getNodeWhitelist()).isEmpty();
+    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
+
     assertThat(commandOutput.toString()).isEmpty();
-    final String expectedErrorOutputStart =
-        "Missing required parameter for option '--nodes-whitelist' at index 0 (<enode://id@host:port>)";
-    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -440,6 +446,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(permissioningConfigurationArgumentCaptor.getValue().getNodeWhitelist())
         .containsExactlyInAnyOrder(nodes);
+    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();

@@ -382,10 +382,9 @@ public class PantheonCommand implements Runnable {
   @Option(
     names = {"--nodes-whitelist"},
     paramLabel = "<enode://id@host:port>",
-    description =
-        "Comma separated enode URLs for Permissioned networks. " + "Default is an empty list.",
+    description = "Comma separated enode URLs for permissioned networks. Default is an empty list.",
     split = ",",
-    arity = "1..*"
+    arity = "0..*"
   )
   private final Collection<String> nodesWhitelist = null;
 

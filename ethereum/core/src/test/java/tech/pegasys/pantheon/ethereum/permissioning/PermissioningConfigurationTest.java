@@ -24,6 +24,7 @@ public class PermissioningConfigurationTest {
   public void defaultConfiguration() {
     final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
     assertThat(configuration.getNodeWhitelist()).isEmpty();
+    assertThat(configuration.isNodeWhitelistSet()).isFalse();
   }
 
   @Test
@@ -32,6 +33,7 @@ public class PermissioningConfigurationTest {
     final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
     configuration.setNodeWhitelist(Arrays.asList(nodes));
     assertThat(configuration.getNodeWhitelist()).containsExactlyInAnyOrder(nodes);
+    assertThat(configuration.isNodeWhitelistSet()).isTrue();
   }
 
   @Test
@@ -39,5 +41,6 @@ public class PermissioningConfigurationTest {
     final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
     configuration.setNodeWhitelist(null);
     assertThat(configuration.getNodeWhitelist()).isEmpty();
+    assertThat(configuration.isNodeWhitelistSet()).isFalse();
   }
 }

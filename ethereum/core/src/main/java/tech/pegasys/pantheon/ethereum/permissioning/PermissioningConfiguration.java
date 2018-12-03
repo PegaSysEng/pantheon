@@ -18,6 +18,7 @@ import java.util.List;
 
 public class PermissioningConfiguration {
   private List<String> nodeWhitelist;
+  private boolean nodeWhitelistSet;
 
   public List<String> getNodeWhitelist() {
     return nodeWhitelist;
@@ -32,6 +33,11 @@ public class PermissioningConfiguration {
   public void setNodeWhitelist(final Collection<String> nodeWhitelist) {
     if (nodeWhitelist != null) {
       this.nodeWhitelist.addAll(nodeWhitelist);
+      this.nodeWhitelistSet = true;
     }
+  }
+
+  public boolean isNodeWhitelistSet() {
+    return nodeWhitelistSet;
   }
 }

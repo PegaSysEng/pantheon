@@ -25,11 +25,13 @@ public class NodeWhitelistController {
   private static final Logger LOG = LogManager.getLogger();
 
   private static List<String> nodeWhitelist;
+  private static boolean nodeWhitelistSet = false;
 
   public NodeWhitelistController(final PermissioningConfiguration configuration) {
     nodeWhitelist = new ArrayList<>();
     if (configuration != null && configuration.getNodeWhitelist() != null) {
       nodeWhitelist.addAll(configuration.getNodeWhitelist());
+      nodeWhitelistSet = true;
     }
   }
 
@@ -39,5 +41,9 @@ public class NodeWhitelistController {
 
   public boolean removeNode(final String nodeId) {
     return nodeWhitelist.remove(nodeId);
+  }
+
+  public static boolean isNodeWhitelistSet() {
+    return nodeWhitelistSet;
   }
 }
