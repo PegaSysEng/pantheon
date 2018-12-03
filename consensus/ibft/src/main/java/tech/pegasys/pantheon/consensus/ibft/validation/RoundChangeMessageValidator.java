@@ -121,7 +121,7 @@ public class RoundChangeMessageValidator {
 
     if (prepareCertRound.getRoundNumber() >= roundChangeTarget.getRoundNumber()) {
       LOG.info(
-          "Invalid RoundChange message, PreparedCertificate is newer than RoundChange target.");
+          "Invalid RoundChange message, PreparedCertificate not older than RoundChange target.");
       return false;
     }
     return true;

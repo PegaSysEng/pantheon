@@ -92,7 +92,7 @@ public class RoundChangeMessageValidatorTest {
   }
 
   @Test
-  public void roundChangeContainingInvalidPreprepareFails() {
+  public void roundChangeContainingInvalidProposalFails() {
     final PreparedCertificate prepareCertificate =
         new PreparedCertificate(
             proposerMessageFactory.createSignedProposalPayload(currentRound, block),
@@ -114,7 +114,7 @@ public class RoundChangeMessageValidatorTest {
   }
 
   @Test
-  public void roundChangeContainingValidPreprepareButNoPrepareMessagesFails() {
+  public void roundChangeContainingValidProposalButNoPrepareMessagesFails() {
     final PreparedCertificate prepareCertificate =
         new PreparedCertificate(
             proposerMessageFactory.createSignedProposalPayload(currentRound, block),
@@ -164,7 +164,7 @@ public class RoundChangeMessageValidatorTest {
   }
 
   @Test
-  public void roundChangeWithPreprepareFromARoundAheadOfRoundChangeTargetFails() {
+  public void roundChangeWithProposalFromARoundAheadOfRoundChangeTargetFails() {
     final ConsensusRoundIdentifier futureRound =
         new ConsensusRoundIdentifier(
             currentRound.getSequenceNumber(), currentRound.getRoundNumber() + 2);
@@ -187,7 +187,7 @@ public class RoundChangeMessageValidatorTest {
   }
 
   @Test
-  public void roudnChangeWithPastPreprepareForCurrentHeightIsSuccessful() {
+  public void roundChangeWithPastProposalForCurrentHeightIsSuccessful() {
     final SignedData<PreparePayload> prepareMsg =
         validatorMessageFactory.createSignedPreparePayload(currentRound, block.getHash());
     final PreparedCertificate prepareCertificate =
