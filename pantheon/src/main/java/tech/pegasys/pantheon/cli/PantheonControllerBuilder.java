@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.development.DevelopmentProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,22 +32,64 @@ import java.nio.file.Path;
 
 public class PantheonControllerBuilder {
 
-  public PantheonController<?> build(
-      final SynchronizerConfiguration synchronizerConfiguration,
-      final Path homePath,
-      final EthNetworkConfig ethNetworkConfig,
-      final boolean syncWithOttoman,
-      final MiningParameters miningParameters,
-      final boolean isDevMode,
-      final File nodePrivateKeyFile)
-      throws IOException {
+  private SynchronizerConfiguration synchronizerConfiguration;
+  private Path homePath;
+  private EthNetworkConfig ethNetworkConfig;
+  private boolean syncWithOttoman;
+  private MiningParameters miningParameters;
+  private boolean devMode;
+  private File nodePrivateKeyFile;
+  private MetricsSystem metricsSystem;
+
+  public PantheonControllerBuilder synchronizerConfiguration(
+      final SynchronizerConfiguration synchronizerConfiguration) {
+    this.synchronizerConfiguration = synchronizerConfiguration;
+    return this;
+  }
+
+  public PantheonControllerBuilder homePath(final Path homePath) {
+    this.homePath = homePath;
+    return this;
+  }
+
+  public PantheonControllerBuilder ethNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
+    this.ethNetworkConfig = ethNetworkConfig;
+    return this;
+  }
+
+  public PantheonControllerBuilder syncWithOttoman(final boolean syncWithOttoman) {
+    this.syncWithOttoman = syncWithOttoman;
+    return this;
+  }
+
+  public PantheonControllerBuilder miningParameters(final MiningParameters miningParameters) {
+    this.miningParameters = miningParameters;
+    return this;
+  }
+
+  public PantheonControllerBuilder devMode(final boolean devMode) {
+    this.devMode = devMode;
+    return this;
+  }
+
+  public PantheonControllerBuilder nodePrivateKeyFile(final File nodePrivateKeyFile) {
+    this.nodePrivateKeyFile = nodePrivateKeyFile;
+    return this;
+  }
+
+  public PantheonControllerBuilder metricsSystem(final MetricsSystem metricsSystem) {
+    this.metricsSystem = metricsSystem;
+    return this;
+  }
+
+  public PantheonController<?> build() throws IOException {
     // instantiate a controller with mainnet config if no genesis file is defined
     // otherwise use the indicated genesis file
     final KeyPair nodeKeys = loadKeyPair(nodePrivateKeyFile);
 
     final StorageProvider storageProvider =
         RocksDbStorageProvider.create(homePath.resolve(DATABASE_PATH));
-    if (isDevMode) {
+    if (devMode) {
       final GenesisConfigFile genesisConfig = GenesisConfigFile.development();
       return MainnetPantheonController.init(
           storageProvider,
@@ -54,7 +97,8 @@ public class PantheonControllerBuilder {
           DevelopmentProtocolSchedule.create(genesisConfig.getConfigOptions()),
           synchronizerConfiguration,
           miningParameters,
-          nodeKeys);
+          nodeKeys,
+          metricsSystem);
     } else {
       final String genesisConfig = ethNetworkConfig.getGenesisConfig();
       final GenesisConfigFile genesisConfigFile = GenesisConfigFile.fromConfig(genesisConfig);
@@ -65,7 +109,8 @@ public class PantheonControllerBuilder {
           syncWithOttoman,
           ethNetworkConfig.getNetworkId(),
           miningParameters,
-          nodeKeys);
+          nodeKeys,
+          metricsSystem);
     }
   }
 }

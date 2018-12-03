@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
+import tech.pegasys.pantheon.controller.NodeWhitelistController;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -50,8 +51,8 @@ import tech.pegasys.pantheon.ethereum.p2p.netty.NettyP2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.nio.file.Path;
@@ -67,22 +68,90 @@ import io.vertx.core.Vertx;
 
 public class RunnerBuilder {
 
-  public Runner build(
-      final Vertx vertx,
-      final PantheonController<?> pantheonController,
-      final boolean discovery,
-      final Collection<?> bootstrapPeers,
-      final String discoveryHost,
-      final int listenPort,
-      final int maxPeers,
-      final JsonRpcConfiguration jsonRpcConfiguration,
-      final WebSocketConfiguration webSocketConfiguration,
-      final Path dataDir,
-      final Collection<String> bannedNodeIds) {
+  private Vertx vertx;
+  private PantheonController<?> pantheonController;
+  private boolean discovery;
+  private Collection<?> bootstrapPeers;
+  private String discoveryHost;
+  private int listenPort;
+  private int maxPeers;
+  private JsonRpcConfiguration jsonRpcConfiguration;
+  private WebSocketConfiguration webSocketConfiguration;
+  private Path dataDir;
+  private Collection<String> bannedNodeIds;
+  private MetricsSystem metricsSystem;
+  private PermissioningConfiguration permissioningConfiguration;
+
+  public RunnerBuilder vertx(final Vertx vertx) {
+    this.vertx = vertx;
+    return this;
+  }
+
+  public RunnerBuilder pantheonController(final PantheonController<?> pantheonController) {
+    this.pantheonController = pantheonController;
+    return this;
+  }
+
+  public RunnerBuilder discovery(final boolean discovery) {
+    this.discovery = discovery;
+    return this;
+  }
+
+  public RunnerBuilder bootstrapPeers(final Collection<?> bootstrapPeers) {
+    this.bootstrapPeers = bootstrapPeers;
+    return this;
+  }
+
+  public RunnerBuilder discoveryHost(final String discoveryHost) {
+    this.discoveryHost = discoveryHost;
+    return this;
+  }
+
+  public RunnerBuilder discoveryPort(final int listenPort) {
+    this.listenPort = listenPort;
+    return this;
+  }
+
+  public RunnerBuilder maxPeers(final int maxPeers) {
+    this.maxPeers = maxPeers;
+    return this;
+  }
+
+  public RunnerBuilder jsonRpcConfiguration(final JsonRpcConfiguration jsonRpcConfiguration) {
+    this.jsonRpcConfiguration = jsonRpcConfiguration;
+    return this;
+  }
+
+  public RunnerBuilder webSocketConfiguration(final WebSocketConfiguration webSocketConfiguration) {
+    this.webSocketConfiguration = webSocketConfiguration;
+    return this;
+  }
+
+  public RunnerBuilder permissioningConfiguration(
+      final PermissioningConfiguration permissioningConfiguration) {
+    this.permissioningConfiguration = permissioningConfiguration;
+    return this;
+  }
+
+  public RunnerBuilder dataDir(final Path dataDir) {
+    this.dataDir = dataDir;
+    return this;
+  }
+
+  public RunnerBuilder bannedNodeIds(final Collection<String> bannedNodeIds) {
+    this.bannedNodeIds = bannedNodeIds;
+    return this;
+  }
+
+  public RunnerBuilder metricsSystem(final MetricsSystem metricsSystem) {
+    this.metricsSystem = metricsSystem;
+    return this;
+  }
+
+  public Runner build() {
 
     Preconditions.checkNotNull(pantheonController);
 
-    final MetricsSystem metricsSystem = PrometheusMetricsSystem.init();
     final DiscoveryConfiguration discoveryConfiguration;
     if (discovery) {
       final Collection<?> bootstrap;
@@ -187,7 +256,7 @@ public class RunnerBuilder {
               filterManager);
 
       final SubscriptionManager subscriptionManager =
-          createSubscriptionManager(vertx, context.getBlockchain(), transactionPool);
+          createSubscriptionManager(vertx, transactionPool);
 
       createLogsSubscriptionService(
           context.getBlockchain(), context.getWorldStateArchive(), subscriptionManager);
@@ -203,8 +272,17 @@ public class RunnerBuilder {
                   vertx, webSocketConfiguration, subscriptionManager, webSocketsJsonRpcMethods));
     }
 
+    NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(permissioningConfiguration);
+
     return new Runner(
-        vertx, networkRunner, jsonRpcHttpService, webSocketService, pantheonController, dataDir);
+        vertx,
+        networkRunner,
+        jsonRpcHttpService,
+        webSocketService,
+        pantheonController,
+        dataDir,
+        nodeWhitelistController);
   }
 
   private FilterManager createFilterManager(
@@ -251,7 +329,7 @@ public class RunnerBuilder {
   }
 
   private SubscriptionManager createSubscriptionManager(
-      final Vertx vertx, final Blockchain blockchain, final TransactionPool transactionPool) {
+      final Vertx vertx, final TransactionPool transactionPool) {
     final SubscriptionManager subscriptionManager = new SubscriptionManager();
     final PendingTransactionSubscriptionService pendingTransactions =
         new PendingTransactionSubscriptionService(subscriptionManager);
@@ -261,7 +339,7 @@ public class RunnerBuilder {
     return subscriptionManager;
   }
 
-  private LogsSubscriptionService createLogsSubscriptionService(
+  private void createLogsSubscriptionService(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final SubscriptionManager subscriptionManager) {
@@ -270,16 +348,14 @@ public class RunnerBuilder {
             subscriptionManager, new BlockchainQueries(blockchain, worldStateArchive));
 
     blockchain.observeBlockAdded(logsSubscriptionService);
-
-    return logsSubscriptionService;
   }
 
-  private SyncingSubscriptionService createSyncingSubscriptionService(
+  private void createSyncingSubscriptionService(
       final Synchronizer synchronizer, final SubscriptionManager subscriptionManager) {
-    return new SyncingSubscriptionService(subscriptionManager, synchronizer);
+    new SyncingSubscriptionService(subscriptionManager, synchronizer);
   }
 
-  private NewBlockHeadersSubscriptionService createNewBlockHeadersSubscriptionService(
+  private void createNewBlockHeadersSubscriptionService(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final SubscriptionManager subscriptionManager) {
@@ -288,8 +364,6 @@ public class RunnerBuilder {
             subscriptionManager, new BlockchainQueries(blockchain, worldStateArchive));
 
     blockchain.observeBlockAdded(newBlockHeadersSubscriptionService);
-
-    return newBlockHeadersSubscriptionService;
   }
 
   private WebSocketService createWebsocketService(
