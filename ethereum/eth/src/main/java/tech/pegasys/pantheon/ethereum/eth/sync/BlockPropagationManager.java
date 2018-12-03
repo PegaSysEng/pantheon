@@ -265,12 +265,11 @@ public class BlockPropagationManager<C> {
                     block.getHeader().getNumber(),
                     block.getHash());
               } else {
-                final double time = blockTimer.stopTimer();
+                final double timeInMs = blockTimer.stopTimer() * 1000;
                 LOG.info(
-                    "Successfully imported announced block {} ({}) in {}ms.",
-                    block.getHeader().getNumber(),
-                    block.getHash(),
-                    time);
+                    String.format(
+                        "Successfully imported announced block %d (%s) in %01.3fms.",
+                        block.getHeader().getNumber(), block.getHash(), timeInMs));
               }
             });
   }
