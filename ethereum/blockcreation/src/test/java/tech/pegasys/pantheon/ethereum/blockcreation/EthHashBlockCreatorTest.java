@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.EthHasher.Light;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationTestUtils;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -69,7 +70,18 @@ public class EthHashBlockCreatorTest {
     // A Hashrate should not exist in the block creator prior to creating a block
     Assertions.assertThat(blockCreator.getHashesPerSecond().isPresent()).isFalse();
 
-    final Block actualBlock = blockCreator.createBlock(BLOCK_1_TIMESTAMP);
+    UInt256 difficulty =
+        UInt256.of(
+            executionContextTestFixture
+                .getProtocolSchedule()
+                .getByBlockNumber(1)
+                .getDifficultyCalculator()
+                .nextDifficulty(
+                    BLOCK_1_TIMESTAMP,
+                    executionContextTestFixture.getBlockchain().getChainHeadHeader(),
+                    executionContextTestFixture.getProtocolContext()));
+
+    final Block actualBlock = blockCreator.createBlock(BLOCK_1_TIMESTAMP, difficulty);
     final Block expectedBlock = ValidationTestUtils.readBlock(1);
 
     Assertions.assertThat(actualBlock).isEqualTo(expectedBlock);

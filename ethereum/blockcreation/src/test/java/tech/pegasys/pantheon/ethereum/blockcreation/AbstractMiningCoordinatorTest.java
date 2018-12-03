@@ -134,5 +134,10 @@ public class AbstractMiningCoordinatorTest {
         final SyncState syncState) {
       super(blockchain, executor, syncState);
     }
+
+    @Override
+    public boolean newBlockExceedsCurrentOperation(final Block newBlock) {
+      return true;
+    }
   }
 }

@@ -31,31 +31,44 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.util.Subscribers;
 
-import com.google.common.collect.Lists;
-import org.junit.Test;
+import java.math.BigInteger;
 
+import com.google.common.collect.Lists;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+@RunWith(MockitoJUnitRunner.class)
 public class BlockMinerTest {
+
+  @Mock private ProtocolSpec<Void> protocolSpec;
+
+  @Mock private BlockImporter<Void> blockImporter;
+
+  @Mock private EthHashBlockCreator blockCreator;
+
+  private final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
+  private final Block blockToCreate =
+      new Block(
+          headerBuilder.buildHeader(), new BlockBody(Lists.newArrayList(), Lists.newArrayList()));
+  private ProtocolSchedule<Void> protocolSchedule;
+  private final ProtocolContext<Void> protocolContext = new ProtocolContext<>(null, null, null);
+
+  @Before
+  public void setup() {
+    when(protocolSpec.getDifficultyCalculator())
+        .thenReturn((time, parent, context) -> BigInteger.ONE);
+    when(protocolSpec.getBlockImporter()).thenReturn(blockImporter);
+    when(blockCreator.createBlock(anyLong(), any())).thenReturn(blockToCreate);
+
+    protocolSchedule = singleSpecSchedule(protocolSpec);
+  }
 
   @Test
   @SuppressWarnings("unchecked")
   public void blockCreatedIsAddedToBlockChain() throws InterruptedException {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-
-    final Block blockToCreate =
-        new Block(
-            headerBuilder.buildHeader(), new BlockBody(Lists.newArrayList(), Lists.newArrayList()));
-
-    final ProtocolContext<Void> protocolContext = new ProtocolContext<>(null, null, null);
-
-    final EthHashBlockCreator blockCreator = mock(EthHashBlockCreator.class);
-    when(blockCreator.createBlock(anyLong())).thenReturn(blockToCreate);
-
-    final BlockImporter<Void> blockImporter = mock(BlockImporter.class);
-    final ProtocolSpec<Void> protocolSpec = mock(ProtocolSpec.class);
-
-    final ProtocolSchedule<Void> protocolSchedule = singleSpecSchedule(protocolSpec);
-
-    when(protocolSpec.getBlockImporter()).thenReturn(blockImporter);
     when(blockImporter.importBlock(any(), any(), any())).thenReturn(true);
 
     final MinedBlockObserver observer = mock(MinedBlockObserver.class);
@@ -78,22 +91,6 @@ public class BlockMinerTest {
   @Test
   @SuppressWarnings("unchecked")
   public void failureToImportDoesNotTriggerObservers() throws InterruptedException {
-    final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
-
-    final Block blockToCreate =
-        new Block(
-            headerBuilder.buildHeader(), new BlockBody(Lists.newArrayList(), Lists.newArrayList()));
-
-    final ProtocolContext<Void> protocolContext = new ProtocolContext<>(null, null, null);
-
-    final EthHashBlockCreator blockCreator = mock(EthHashBlockCreator.class);
-    when(blockCreator.createBlock(anyLong())).thenReturn(blockToCreate);
-
-    final BlockImporter<Void> blockImporter = mock(BlockImporter.class);
-    final ProtocolSpec<Void> protocolSpec = mock(ProtocolSpec.class);
-    final ProtocolSchedule<Void> protocolSchedule = singleSpecSchedule(protocolSpec);
-
-    when(protocolSpec.getBlockImporter()).thenReturn(blockImporter);
     when(blockImporter.importBlock(any(), any(), any())).thenReturn(false, false, true);
 
     final MinedBlockObserver observer = mock(MinedBlockObserver.class);

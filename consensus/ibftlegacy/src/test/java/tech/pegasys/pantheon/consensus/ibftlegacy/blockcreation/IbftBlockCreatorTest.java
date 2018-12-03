@@ -39,6 +39,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -104,7 +105,7 @@ public class IbftBlockCreatorTest {
             Wei.ZERO,
             parentHeader);
 
-    final Block block = blockCreator.createBlock(Instant.now().getEpochSecond());
+    final Block block = blockCreator.createBlock(Instant.now().getEpochSecond(), UInt256.ONE);
 
     final BlockHeaderValidator<IbftContext> rules =
         IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(0);

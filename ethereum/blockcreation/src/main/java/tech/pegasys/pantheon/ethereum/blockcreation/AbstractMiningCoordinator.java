@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
+import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
@@ -31,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 public abstract class AbstractMiningCoordinator<
         C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>>
     implements BlockAddedObserver, MiningCoordinator {
+
   private static final Logger LOG = getLogger();
   protected boolean isEnabled = false;
   protected volatile Optional<M> currentRunningMiner = Optional.empty();
@@ -95,7 +97,9 @@ public abstract class AbstractMiningCoordinator<
   @Override
   public void onBlockAdded(final BlockAddedEvent event, final Blockchain blockchain) {
     synchronized (this) {
-      if (isEnabled && event.isNewCanonicalHead()) {
+      if (isEnabled
+          && event.isNewCanonicalHead()
+          && newBlockExceedsCurrentOperation(event.getBlock())) {
         haltCurrentMiningOperation();
         if (syncState.isInSync()) {
           startAsyncMiningOperation();
@@ -135,4 +139,6 @@ public abstract class AbstractMiningCoordinator<
   public void setExtraData(final BytesValue extraData) {
     executor.setExtraData(extraData);
   }
+
+  public abstract boolean newBlockExceedsCurrentOperation(final Block newBlock);
 }

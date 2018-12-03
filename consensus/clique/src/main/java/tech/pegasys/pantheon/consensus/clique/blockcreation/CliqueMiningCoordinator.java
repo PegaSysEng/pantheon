@@ -15,7 +15,11 @@ package tech.pegasys.pantheon.consensus.clique.blockcreation;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
+import tech.pegasys.pantheon.util.uint.UInt256;
+
+import java.util.Optional;
 
 public class CliqueMiningCoordinator
     extends AbstractMiningCoordinator<CliqueContext, CliqueBlockMiner> {
@@ -23,5 +27,15 @@ public class CliqueMiningCoordinator
   public CliqueMiningCoordinator(
       final Blockchain blockchain, final CliqueMinerExecutor executor, final SyncState syncState) {
     super(blockchain, executor, syncState);
+  }
+
+  @Override
+  public boolean newBlockExceedsCurrentOperation(final Block newBlock) {
+    final Optional<UInt256> totalDifficulty =
+        blockchain.getTotalDifficultyByHash(newBlock.getHash());
+
+    return totalDifficulty
+        .map(td -> td.compareTo(currentRunningMiner.get().getTotalDifficulty()) >= 0)
+        .orElse(false);
   }
 }

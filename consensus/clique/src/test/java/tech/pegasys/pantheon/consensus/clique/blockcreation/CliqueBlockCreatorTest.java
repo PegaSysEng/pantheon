@@ -44,6 +44,7 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.List;
 
@@ -114,10 +115,11 @@ public class CliqueBlockCreatorTest {
             Wei.ZERO,
             blockchain.getChainHeadHeader());
 
-    final Block createdBlock = blockCreator.createBlock(5L);
+    final Block createdBlock = blockCreator.createBlock(5L, UInt256.ONE);
 
     assertThat(CliqueHelpers.getProposerOfBlock(createdBlock.getHeader()))
         .isEqualTo(proposerAddress);
+    assertThat(createdBlock.getHeader().getDifficulty()).isEqualTo(UInt256.ONE);
   }
 
   @Test
@@ -140,9 +142,10 @@ public class CliqueBlockCreatorTest {
             Wei.ZERO,
             blockchain.getChainHeadHeader());
 
-    final Block createdBlock = blockCreator.createBlock(0L);
+    final Block createdBlock = blockCreator.createBlock(0L, UInt256.of(2));
     assertThat(createdBlock.getHeader().getNonce()).isEqualTo(CliqueBlockInterface.ADD_NONCE);
     assertThat(createdBlock.getHeader().getCoinbase()).isEqualTo(a1);
+    assertThat(createdBlock.getHeader().getDifficulty()).isEqualTo(UInt256.of(2));
   }
 
   @Test
@@ -165,7 +168,7 @@ public class CliqueBlockCreatorTest {
             Wei.ZERO,
             blockchain.getChainHeadHeader());
 
-    final Block createdBlock = blockCreator.createBlock(0L);
+    final Block createdBlock = blockCreator.createBlock(0L, UInt256.ONE);
     assertThat(createdBlock.getHeader().getNonce()).isEqualTo(CliqueBlockInterface.DROP_NONCE);
     assertThat(createdBlock.getHeader().getCoinbase()).isEqualTo(Address.fromHexString("0"));
   }
