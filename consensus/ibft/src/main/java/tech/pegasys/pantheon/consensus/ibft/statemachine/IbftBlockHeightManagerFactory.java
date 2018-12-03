@@ -12,33 +12,46 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-
-import java.util.Collection;
+import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 
 public class IbftBlockHeightManagerFactory {
 
   private final IbftRoundFactory roundFactory;
   private final IbftImmutableState immutableState;
+  private final ProtocolContext<IbftContext> protocolContext;
+  private final BlockHeaderValidator<IbftContext> blockHeaderValidator;
 
   public IbftBlockHeightManagerFactory(
-      final IbftImmutableState immutableState, final IbftRoundFactory roundFactory) {
+      final IbftImmutableState immutableState,
+      final IbftRoundFactory roundFactory,
+      final ProtocolContext<IbftContext> protocolContext) {
     this.roundFactory = roundFactory;
     this.immutableState = immutableState;
+    this.protocolContext = protocolContext;
+    this.blockHeaderValidator = immutableState.getBlockHeaderValidator();
   }
 
   public IbftBlockHeightManager create(final BlockHeader parentHeader) {
-    final Collection<Address> validators = immutableState.getValidators();
+    final long newCHainHeight = parentHeader.getNumber() + 1;
     return new IbftBlockHeightManager(
         parentHeader,
         immutableState,
-        /*
         new RoundChangeManager(
-            IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
-            parentHeader,
-            immutableState),
-            */
+            immutableState.getQuorumSize(),
+            newCHainHeight,
+            immutableState,
+            (roundIdentifier) ->
+                new MessageValidator(
+                    immutableState.getValidators(),
+                    immutableState.getProposerForRound(roundIdentifier),
+                    roundIdentifier,
+                    blockHeaderValidator,
+                    protocolContext,
+                    parentHeader)),
         roundFactory);
   }
 }

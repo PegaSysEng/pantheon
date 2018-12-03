@@ -34,16 +34,19 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class IbftController {
 
   private final Blockchain blockchain;
   private final IbftImmutableState immutableState;
   private IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory;
-  private final List<MessageData> futureMessages = Lists.newArrayList();
+  private final Map<Long, List<MessageData>> futureMessages = Maps.newHashMap();
   private IbftBlockHeightManager currentHeightManager;
 
   public IbftController(
@@ -68,10 +71,10 @@ public class IbftController {
   private void handleMessage(final MessageData messageData) {
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
-        final SignedData<ProposalPayload> prePrepareMsg =
+        final SignedData<ProposalPayload> proposalMsg =
             ProposalMessage.fromMessage(messageData).decode();
-        if (processMessage(prePrepareMsg, messageData)) {
-          currentHeightManager.handlePreprepareMessage(prePrepareMsg);
+        if (processMessage(proposalMsg, messageData)) {
+          currentHeightManager.handleProposalMessage(proposalMsg);
         }
         break;
 
@@ -93,7 +96,7 @@ public class IbftController {
       case IbftV2.ROUND_CHANGE:
         final SignedData<RoundChangePayload> roundChangeMsg =
             RoundChangeMessage.fromMessage(messageData).decode();
-        // if(processMessage(roundChangeMsg, messageData)) {
+        // if (processMessage(roundChangeMsg, messageData)) {
         currentHeightManager.handleRoundChangeMessage(roundChangeMsg);
         // }
         break;
@@ -101,7 +104,6 @@ public class IbftController {
       case IbftV2.NEW_ROUND:
         final SignedData<NewRoundPayload> newRoundMsg =
             NewRoundMessage.fromMessage(messageData).decode();
-        // if(processMessage(newRoundMsg, messageData)) {
         currentHeightManager.handleNewRoundMessage(newRoundMsg);
         // }
         break;
@@ -123,10 +125,15 @@ public class IbftController {
 
   public void startNewHeightManager(final BlockHeader parentHeader) {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
+    currentHeightManager.start();
+    final long newChainHeight = currentHeightManager.getChainHeight();
+    final List<MessageData> messagesToReplay =
+        futureMessages.getOrDefault(newChainHeight, Collections.emptyList());
 
-    // for(futuremessage) {
-    //  handle(message);
-    // }
+    for (MessageData msg : messagesToReplay) {
+      handleMessage(msg);
+    }
+    futureMessages.remove(newChainHeight);
   }
 
   public void handleRoundExpiry(final RoundExpiry expired) {
@@ -141,8 +148,9 @@ public class IbftController {
       if (immutableState.getValidators().contains(msg.getSender())) {
         return true;
       }
-    } else if (msgIsForFutureRound(msgRoundIdentifier)) {
-      futureMessages.add(rawMsg);
+    } else if (msgIsForFutureChainHeight(msgRoundIdentifier)) {
+      addMessageToFutureMessageBuffer(
+          msg.getPayload().getRoundIdentifier().getSequenceNumber(), rawMsg);
     }
     return false;
   }
@@ -151,7 +159,14 @@ public class IbftController {
     return roundIdentifier.getSequenceNumber() == currentHeightManager.getChainHeight();
   }
 
-  private boolean msgIsForFutureRound(final ConsensusRoundIdentifier roundIdentifier) {
+  private boolean msgIsForFutureChainHeight(final ConsensusRoundIdentifier roundIdentifier) {
     return roundIdentifier.getSequenceNumber() > currentHeightManager.getChainHeight();
+  }
+
+  private void addMessageToFutureMessageBuffer(final long chainHeight, final MessageData rawMsg) {
+    if (!futureMessages.containsKey(chainHeight)) {
+      futureMessages.put(chainHeight, Lists.newArrayList());
+    }
+    futureMessages.get(chainHeight).add(rawMsg);
   }
 }

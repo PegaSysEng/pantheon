@@ -97,7 +97,7 @@ public class IbftRound {
     return roundContext.getRoundIdentifier();
   }
 
-  public void createAndSendPreprepareMessage() {
+  public void createAndSendProposalMessage() {
     LOG.error("Creating proposed block.");
     final Clock clk = Clock.systemUTC();
     final Block block = blockCreator.createBlock(clk.millis() / 1000);
@@ -107,8 +107,8 @@ public class IbftRound {
         messageFactory.createSignedProposalPayload(roundContext.getRoundIdentifier(), block));
   }
 
-  public void handlePreprepareMessage(final SignedData<ProposalPayload> msg) {
-    LOG.error("Received a PRE-prepare message.");
+  public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
+    LOG.error("Received a Proposal message.");
     if (isValidPrePrepare(msg)) {
       final Block block = msg.getPayload().getBlock();
       updateContextWithProposedBlock(msg);

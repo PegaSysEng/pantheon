@@ -200,7 +200,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final IbftConfigOptions config = genesisConfig.getConfigOptions().getIbftConfigOptions();
 
-    final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator =
+    final BlockHeaderValidator<IbftContext> blockHeaderValidator =
         IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(
             config.getBlockPeriodSeconds());
 
@@ -221,7 +221,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 Executors.newScheduledThreadPool(1),
                 Clock.systemUTC()),
             blockCreatorFactory,
-            new MessageFactory(nodeKeys));
+            new MessageFactory(nodeKeys),
+            blockHeaderValidator);
 
     final IbftController ibftController =
         new IbftController(
@@ -229,11 +230,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             immutableState,
             new IbftBlockHeightManagerFactory(
                 immutableState,
-                new IbftRoundFactory(
-                    immutableState,
-                    ibftContextBlockHeaderValidator,
-                    protocolContext,
-                    protocolSchedule)));
+                new IbftRoundFactory(immutableState, protocolContext, protocolSchedule),
+                protocolContext));
 
     final IbftProcessor ibftProcessor =
         new IbftProcessor(ibftEventQueue, ibftConfig.getRequestTimeoutMillis(), ibftController);

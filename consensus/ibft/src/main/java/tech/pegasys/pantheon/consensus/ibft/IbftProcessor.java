@@ -82,13 +82,14 @@ public class IbftProcessor implements Runnable {
 
   @Override
   public void run() {
-    /*
+/*
     try {
       // added to ensure blocks created during developer testing wait for the other node(s) to come up.
-      Thread.sleep(3_000);
+      Thread.sleep(10_000);
     } catch (InterruptedException ex) {
     }
     */
+
 
     while (!shutdown) {
       Optional<IbftEvent> newEvent = Optional.empty();

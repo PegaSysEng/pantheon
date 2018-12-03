@@ -12,10 +12,13 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequiredValidatorQuorum;
+
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
@@ -23,6 +26,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 
 import java.util.Collection;
 
@@ -38,6 +42,7 @@ public class IbftImmutableState {
   private final BlockTimer blockTimer;
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final MessageFactory messageFactory;
+  private final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator;
 
   public IbftImmutableState(
       final VoteTally validatorProvider,
@@ -48,7 +53,8 @@ public class IbftImmutableState {
       final RoundTimer roundTimer,
       final BlockTimer blockTimer,
       final IbftBlockCreatorFactory blockCreatorFactory,
-      final MessageFactory messageFactory) {
+      final MessageFactory messageFactory,
+      final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator) {
     this.validatorProvider = validatorProvider;
     this.nodeKeys = nodeKeys;
     this.localAddress = localAddress;
@@ -58,10 +64,11 @@ public class IbftImmutableState {
     this.blockTimer = blockTimer;
     this.blockCreatorFactory = blockCreatorFactory;
     this.messageFactory = messageFactory;
+    this.ibftContextBlockHeaderValidator = ibftContextBlockHeaderValidator;
   }
 
-  public long getQuorumSize() {
-    return 2;
+  public int getQuorumSize() {
+    return calculateRequiredValidatorQuorum(validatorProvider.getValidators().size());
   }
 
   public Collection<Address> getValidators() {
@@ -78,6 +85,10 @@ public class IbftImmutableState {
 
   public ProposerSelector getProposerSelector() {
     return proposerSelector;
+  }
+
+  public boolean isLocalNodeIsProposerForRound(final ConsensusRoundIdentifier roundIdentifier) {
+    return getProposerForRound(roundIdentifier).equals(localAddress);
   }
 
   public IbftNetworkPeers getPeers() {
@@ -102,5 +113,9 @@ public class IbftImmutableState {
 
   public Address getProposerForRound(final ConsensusRoundIdentifier roundIdentifier) {
     return proposerSelector.selectProposerForRound(roundIdentifier);
+  }
+
+  public BlockHeaderValidator<IbftContext> getBlockHeaderValidator() {
+    return ibftContextBlockHeaderValidator;
   }
 }

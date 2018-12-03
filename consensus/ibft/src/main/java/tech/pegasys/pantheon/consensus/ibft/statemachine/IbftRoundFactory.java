@@ -33,7 +33,7 @@ public class IbftRoundFactory {
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final IbftNetworkPeers networkPeers;
   private final MessageFactory messageFactory;
-  private final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator;
+  private final BlockHeaderValidator<IbftContext> blockHeaderValidator;
   private final ProtocolContext<IbftContext> protocolContext;
   private final ProtocolSchedule<IbftContext> protocolSchedule;
   private final KeyPair nodeKeys;
@@ -41,14 +41,13 @@ public class IbftRoundFactory {
 
   public IbftRoundFactory(
       final IbftImmutableState immutableState,
-      final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator,
       final ProtocolContext<IbftContext> protocolContext,
       final ProtocolSchedule<IbftContext> protocolSchedule) {
     this.immutableState = immutableState;
     this.blockCreatorFactory = immutableState.getBlockCreatorFactory();
     this.networkPeers = immutableState.getPeers();
     this.messageFactory = immutableState.getMessageFactory();
-    this.ibftContextBlockHeaderValidator = ibftContextBlockHeaderValidator;
+    this.blockHeaderValidator = immutableState.getBlockHeaderValidator();
     this.protocolContext = protocolContext;
     this.protocolSchedule = protocolSchedule;
     this.nodeKeys = immutableState.getNodeKeys();
@@ -69,7 +68,7 @@ public class IbftRoundFactory {
         networkPeers,
         blockCreator,
         messageFactory,
-        ibftContextBlockHeaderValidator,
+        blockHeaderValidator,
         protocolSchedule,
         protocolContext,
         protocolSchedule.getByBlockNumber(nextBlockHeight).getBlockImporter(),
