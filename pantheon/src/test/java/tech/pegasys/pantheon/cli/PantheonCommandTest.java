@@ -81,8 +81,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Before
-  public void setup() {
-    resetSystemProps();
+  public void resetSystemProps() {
+    System.setProperty("pantheon.docker", "false");
   }
 
   @Override
@@ -887,10 +887,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).contains("--datadir");
     assertThat(commandOutput.toString()).contains("--genesis");
     assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  private void resetSystemProps() {
-    System.setProperty("pantheon.docker", "false");
   }
 
   private Path createFakeGenesisFile() throws IOException {
