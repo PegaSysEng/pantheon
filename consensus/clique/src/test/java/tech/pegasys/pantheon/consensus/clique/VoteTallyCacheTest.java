@@ -20,12 +20,17 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.consensus.common.VoteType.DROP;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
 import tech.pegasys.pantheon.consensus.common.EpochManager;
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
+import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
@@ -36,6 +41,8 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.assertj.core.util.Lists;
@@ -58,8 +65,13 @@ public class VoteTallyCacheTest {
   private Block block_1;
   private Block block_2;
 
+  private final List<Address> validators = Lists.newArrayList();
+
   @Before
   public void constructThreeBlockChain() {
+    for (int i = 0; i < 3; i++) {
+      validators.add(AddressHelpers.ofValue(i));
+    }
     headerBuilder.extraData(
         new CliqueExtraData(
                 BytesValue.wrap(new byte[32]),
@@ -87,7 +99,7 @@ public class VoteTallyCacheTest {
     // The votetallyUpdater should be invoked for the requested block, and all parents including
     // the epoch (genesis) block.
     final ArgumentCaptor<BlockHeader> varArgs = ArgumentCaptor.forClass(BlockHeader.class);
-    cache.getVoteTallyAtBlock(block_2.getHeader());
+    cache.getVoteTallyAfterBlock(block_2.getHeader());
     verify(tallyUpdater, times(3)).updateForBlock(varArgs.capture(), any());
     assertThat(varArgs.getAllValues())
         .isEqualTo(
@@ -97,10 +109,10 @@ public class VoteTallyCacheTest {
 
     // Requesting the vote tally to the parent block should not invoke the voteTallyUpdater as the
     // vote tally was cached from previous operation.
-    cache.getVoteTallyAtBlock(block_1.getHeader());
+    cache.getVoteTallyAfterBlock(block_1.getHeader());
     verifyZeroInteractions(tallyUpdater);
 
-    cache.getVoteTallyAtBlock(block_2.getHeader());
+    cache.getVoteTallyAfterBlock(block_2.getHeader());
     verifyZeroInteractions(tallyUpdater);
   }
 
@@ -113,7 +125,7 @@ public class VoteTallyCacheTest {
     final Block orphanBlock = createEmptyBlock(4, Hash.ZERO);
 
     assertThatExceptionOfType(UncheckedExecutionException.class)
-        .isThrownBy(() -> cache.getVoteTallyAtBlock(orphanBlock.getHeader()))
+        .isThrownBy(() -> cache.getVoteTallyAfterBlock(orphanBlock.getHeader()))
         .withMessageContaining(
             "Supplied block was on a orphaned chain, unable to generate " + "VoteTally.");
   }
@@ -125,19 +137,42 @@ public class VoteTallyCacheTest {
         new VoteTallyCache(blockChain, tallyUpdater, new EpochManager(30_000));
 
     // Load the Cache up to block_2
-    cache.getVoteTallyAtBlock(block_2.getHeader());
+    cache.getVoteTallyAfterBlock(block_2.getHeader());
 
     reset(tallyUpdater);
 
     // Append new blocks to the chain, and ensure the walkback only goes as far as block_2.
     final Block block_3 = createEmptyBlock(4, block_2.getHeader().getHash());
     // Load the Cache up to block_2
-    cache.getVoteTallyAtBlock(block_3.getHeader());
+    cache.getVoteTallyAfterBlock(block_3.getHeader());
 
     // The votetallyUpdater should be invoked for the requested block, and all parents including
     // the epoch (genesis) block.
     final ArgumentCaptor<BlockHeader> varArgs = ArgumentCaptor.forClass(BlockHeader.class);
     verify(tallyUpdater, times(1)).updateForBlock(varArgs.capture(), any());
     assertThat(varArgs.getAllValues()).isEqualTo(Arrays.asList(block_3.getHeader()));
+  }
+
+  @Test
+  public void integrationTestingVotesBeingApplied() {
+    final EpochManager epochManager = new EpochManager(30_000);
+    final CliqueBlockInterface blockInterface = mock(CliqueBlockInterface.class);
+    final VoteTallyUpdater tallyUpdater = new VoteTallyUpdater(epochManager, blockInterface);
+
+    when(blockInterface.extractVoteFromHeader(block_1.getHeader()))
+        .thenReturn(Optional.of(new ValidatorVote(DROP, validators.get(0), validators.get(2))));
+
+    when(blockInterface.extractVoteFromHeader(block_2.getHeader()))
+        .thenReturn(Optional.of(new ValidatorVote(DROP, validators.get(1), validators.get(2))));
+
+    final VoteTallyCache cache = new VoteTallyCache(blockChain, tallyUpdater, epochManager);
+
+    final VoteTally initialVoteTally = cache.getVoteTallyAfterBlock(block_1.getHeader());
+    assertThat(initialVoteTally.getValidators()).containsAll(validators);
+
+    final VoteTally finalVoteTally = cache.getVoteTallyAfterBlock(block_2.getHeader());
+
+    assertThat(initialVoteTally.getValidators())
+        .containsExactly(validators.get(0), validators.get(1));
   }
 }
