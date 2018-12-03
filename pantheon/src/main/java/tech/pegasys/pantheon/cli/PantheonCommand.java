@@ -122,7 +122,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
-  private MetricsSystem metricsSystem;
+  private final MetricsSystem metricsSystem = PrometheusMetricsSystem.init();
 
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
@@ -414,8 +414,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       System.out.println("Setting logging level to " + logLevel.name());
       Configurator.setAllLevels("", logLevel);
     }
-
-    metricsSystem = PrometheusMetricsSystem.init();
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
