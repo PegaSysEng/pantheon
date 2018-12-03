@@ -84,6 +84,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Before
   public void initMocks() throws Exception {
     super.initMocks();
+    resetSystemProps();
 
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
@@ -859,7 +860,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void cliOptionsNotShownWhenInDockerContainer() {
+  public void fullCLIOptionsNotShownWhenInDockerContainer() {
     System.setProperty("pantheon.docker", "true");
 
     parseCommand("--help");
@@ -870,9 +871,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).doesNotContain("--datadir");
     assertThat(commandOutput.toString()).doesNotContain("--genesis");
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
 
-    System.setProperty("pantheon.docker", "false");
-
+  @Test
+  public void fullCLIOptionsShownWhenNotInDockerContainer() {
     parseCommand("--help");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -881,6 +883,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).contains("--datadir");
     assertThat(commandOutput.toString()).contains("--genesis");
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  private void resetSystemProps() {
+    System.setProperty("pantheon.docker", "false");
   }
 
   private Path createFakeGenesisFile() throws IOException {
