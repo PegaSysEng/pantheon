@@ -64,10 +64,10 @@ To create understandable, self-documenting code:
   - Use clear naming for variables, methods, and classes
   - Use US spelling instead of UK. For example, synchronize instead of synchronise
   - Keep methods and classes short and focused on a single responsibility. Preferable maximum lengths:
-    * Lambdas: single line
-    * Methods: fit on a screen
-    * Anonymous classes: less than a screen
-    * Inner classes: not much more than a screen
+    * Lambdas: 1 - 3 lines
+    * Methods: less than 50 lines
+    * Anonymous classes: less than a 50 lines
+    * Inner classes: not much more than 50 lines
     * Classes: a few hundred lines
   - Be thoughtfully organised in terms of method order, package structure, and module usage
   - Follow well-established patterns and conventions
