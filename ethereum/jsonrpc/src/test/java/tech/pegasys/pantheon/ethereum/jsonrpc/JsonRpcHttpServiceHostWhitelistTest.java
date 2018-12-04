@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -90,6 +91,7 @@ public class JsonRpcHttpServiceHostWhitelistTest {
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),
+                    new NoOpMetricsSystem(),
                     supportedCapabilities,
                     JSON_RPC_APIS));
     service = createJsonRpcHttpService();
@@ -100,7 +102,8 @@ public class JsonRpcHttpServiceHostWhitelistTest {
   }
 
   private JsonRpcHttpService createJsonRpcHttpService() throws Exception {
-    return new JsonRpcHttpService(vertx, folder.newFolder().toPath(), jsonRpcConfig, rpcMethods);
+    return new JsonRpcHttpService(
+        vertx, folder.newFolder().toPath(), jsonRpcConfig, new NoOpMetricsSystem(), rpcMethods);
   }
 
   private static JsonRpcConfiguration createJsonRpcConfig() {
