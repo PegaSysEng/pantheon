@@ -31,9 +31,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   protected volatile Collection<CompletableFuture<?>> subTaskFutures =
       new ConcurrentLinkedDeque<>();
 
-  /**
-   * @param ethTasksTimer The metrics timer to use to time the duration of the task.
-   */
+  /** @param ethTasksTimer The metrics timer to use to time the duration of the task. */
   protected AbstractEthTask(final LabelledMetric<OperationTimer> ethTasksTimer) {
     taskTimer = ethTasksTimer.labels(getClass().getSimpleName());
   }
