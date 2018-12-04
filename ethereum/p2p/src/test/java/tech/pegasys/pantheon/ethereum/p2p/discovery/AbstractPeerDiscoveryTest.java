@@ -21,6 +21,8 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PacketType;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PingPacketData;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.List;
@@ -127,7 +129,13 @@ public abstract class AbstractPeerDiscoveryTest {
   protected PeerDiscoveryAgent startDiscoveryAgent(
       final DiscoveryConfiguration config, final PeerBlacklist blacklist) {
     final PeerDiscoveryAgent agent =
-        new PeerDiscoveryAgent(vertx, SECP256K1.KeyPair.generate(), config, () -> true, blacklist);
+        new PeerDiscoveryAgent(
+            vertx,
+            SECP256K1.KeyPair.generate(),
+            config,
+            () -> true,
+            blacklist,
+            new NodeWhitelistController(PermissioningConfiguration.createDefault()));
     try {
       agent.start(BROADCAST_TCP_PORT).get(5, TimeUnit.SECONDS);
     } catch (final Exception ex) {

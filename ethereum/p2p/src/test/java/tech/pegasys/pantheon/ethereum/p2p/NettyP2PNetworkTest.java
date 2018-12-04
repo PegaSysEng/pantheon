@@ -32,10 +32,12 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -75,7 +77,8 @@ public final class NettyP2PNetworkTest {
                 singletonList(cap),
                 () -> false,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem());
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()));
         final P2PNetwork connector =
             new NettyP2PNetwork(
                 vertx,
@@ -87,7 +90,8 @@ public final class NettyP2PNetworkTest {
                 singletonList(cap),
                 () -> false,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem())) {
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
 
       final int listenPort = listener.getSelf().getPort();
       listener.run();
@@ -127,7 +131,8 @@ public final class NettyP2PNetworkTest {
                 capabilities,
                 () -> true,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem());
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()));
         final P2PNetwork connector =
             new NettyP2PNetwork(
                 vertx,
@@ -139,7 +144,8 @@ public final class NettyP2PNetworkTest {
                 capabilities,
                 () -> true,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem())) {
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
       final int listenPort = listener.getSelf().getPort();
       listener.run();
       connector.run();
@@ -194,7 +200,8 @@ public final class NettyP2PNetworkTest {
                 cap,
                 () -> true,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem());
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()));
         final P2PNetwork connector1 =
             new NettyP2PNetwork(
                 vertx,
@@ -206,7 +213,8 @@ public final class NettyP2PNetworkTest {
                 cap,
                 () -> true,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem());
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()));
         final P2PNetwork connector2 =
             new NettyP2PNetwork(
                 vertx,
@@ -218,7 +226,8 @@ public final class NettyP2PNetworkTest {
                 cap,
                 () -> true,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem())) {
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
 
       final int listenPort = listener.getSelf().getPort();
       // Setup listener and first connection
@@ -272,7 +281,8 @@ public final class NettyP2PNetworkTest {
                 singletonList(cap1),
                 () -> false,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem());
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()));
         final P2PNetwork connector =
             new NettyP2PNetwork(
                 vertx,
@@ -284,7 +294,8 @@ public final class NettyP2PNetworkTest {
                 singletonList(cap2),
                 () -> false,
                 new PeerBlacklist(),
-                new NoOpMetricsSystem())) {
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
       final int listenPort = listener.getSelf().getPort();
       listener.run();
       connector.run();
@@ -325,7 +336,8 @@ public final class NettyP2PNetworkTest {
                 singletonList(cap),
                 () -> false,
                 localBlacklist,
-                new NoOpMetricsSystem());
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()));
         final P2PNetwork remoteNetwork =
             new NettyP2PNetwork(
                 vertx,
@@ -337,7 +349,8 @@ public final class NettyP2PNetworkTest {
                 singletonList(cap),
                 () -> false,
                 remoteBlacklist,
-                new NoOpMetricsSystem())) {
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
       final int localListenPort = localNetwork.getSelf().getPort();
       final int remoteListenPort = remoteNetwork.getSelf().getPort();
       final Peer localPeer =
@@ -457,7 +470,8 @@ public final class NettyP2PNetworkTest {
         singletonList(cap),
         () -> false,
         new PeerBlacklist(),
-        new NoOpMetricsSystem());
+        new NoOpMetricsSystem(),
+        new NodeWhitelistController(PermissioningConfiguration.createDefault()));
   }
 
   private Peer mockPeer() {

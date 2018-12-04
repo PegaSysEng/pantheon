@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDropp
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -106,6 +107,7 @@ public class PeerDiscoveryController {
 
   private final PeerDiscoveryAgent agent;
   private final PeerBlacklist peerBlacklist;
+  private final NodeWhitelistController nodeWhitelistController;
 
   private RetryDelayFunction retryDelayFunction = RetryDelayFunction.linear(1.5, 2000, 60000);
 
@@ -130,7 +132,8 @@ public class PeerDiscoveryController {
       final Collection<DiscoveryPeer> bootstrapNodes,
       final long tableRefreshIntervalMs,
       final PeerRequirement peerRequirement,
-      final PeerBlacklist peerBlacklist) {
+      final PeerBlacklist peerBlacklist,
+      final NodeWhitelistController nodeWhitelistController) {
     this.vertx = vertx;
     this.agent = agent;
     this.bootstrapNodes = bootstrapNodes;
@@ -138,6 +141,7 @@ public class PeerDiscoveryController {
     this.tableRefreshIntervalMs = tableRefreshIntervalMs;
     this.peerRequirement = peerRequirement;
     this.peerBlacklist = peerBlacklist;
+    this.nodeWhitelistController = nodeWhitelistController;
   }
 
   public CompletableFuture<?> start() {

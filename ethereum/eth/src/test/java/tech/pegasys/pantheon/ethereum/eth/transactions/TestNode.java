@@ -43,7 +43,9 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -115,7 +117,8 @@ public class TestNode implements Closeable {
                         capabilities,
                         ethProtocolManager,
                         new PeerBlacklist(),
-                        new NoOpMetricsSystem()))
+                        new NoOpMetricsSystem(),
+                        new NodeWhitelistController(PermissioningConfiguration.createDefault())))
             .build();
     network = networkRunner.getNetwork();
     this.port = network.getSelf().getPort();

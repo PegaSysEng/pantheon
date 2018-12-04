@@ -22,6 +22,8 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,7 +110,8 @@ public class PeerDiscoveryObserversTest extends AbstractPeerDiscoveryTest {
             SECP256K1.KeyPair.generate(),
             configWithRandomPorts().getDiscovery().setBootstrapPeers(peers2),
             () -> true,
-            new PeerBlacklist());
+            new PeerBlacklist(),
+            new NodeWhitelistController(PermissioningConfiguration.createDefault()));
 
     // A queue for storing peer bonded events.
     final ArrayBlockingQueue<PeerBondedEvent> queue = new ArrayBlockingQueue<>(10);
@@ -159,7 +162,8 @@ public class PeerDiscoveryObserversTest extends AbstractPeerDiscoveryTest {
                 .getDiscovery()
                 .setBootstrapPeers(Collections.singletonList(peer)),
             () -> true,
-            new PeerBlacklist());
+            new PeerBlacklist(),
+            new NodeWhitelistController(PermissioningConfiguration.createDefault()));
 
     // Create 5 queues and subscribe them to peer bonded events.
     final List<ArrayBlockingQueue<PeerBondedEvent>> queues =

@@ -26,9 +26,11 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PacketType;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PingPacketData;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.SocketAddress;
@@ -137,7 +139,8 @@ public class PeerDiscoveryAgentTest extends AbstractPeerDiscoveryTest {
             keyPair1,
             DiscoveryConfiguration.create().setBindHost("127.0.0.1").setBindPort(0),
             () -> true,
-            new PeerBlacklist());
+            new PeerBlacklist(),
+            new NodeWhitelistController(PermissioningConfiguration.createDefault()));
     peerDiscoveryAgent1.start(0).join();
     final DefaultPeer peer = peerDiscoveryAgent1.getAdvertisedPeer();
 
@@ -151,7 +154,8 @@ public class PeerDiscoveryAgentTest extends AbstractPeerDiscoveryTest {
                 .setBindPort(0)
                 .setBootstrapPeers(Lists.newArrayList(peer)),
             () -> true,
-            new PeerBlacklist());
+            new PeerBlacklist(),
+            new NodeWhitelistController(PermissioningConfiguration.createDefault()));
     peerDiscoveryAgent2.start(0).join();
 
     assertThat(peerDiscoveryAgent2.getPeers().size()).isEqualTo(1);
