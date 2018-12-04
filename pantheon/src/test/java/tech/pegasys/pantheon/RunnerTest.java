@@ -34,8 +34,11 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
@@ -92,6 +95,7 @@ public final class RunnerTest {
             //        .fastSyncPivotDistance(blockCount / 2).build();
             .fastSyncPivotDistance(0)
             .build();
+    final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
@@ -101,7 +105,8 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
-            aheadDbNodeKeys)) {
+            aheadDbNodeKeys,
+            noOpMetricsSystem)) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
@@ -113,25 +118,32 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
-            aheadDbNodeKeys);
+            aheadDbNodeKeys,
+            noOpMetricsSystem);
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final ExecutorService executorService = Executors.newFixedThreadPool(2);
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
-    final RunnerBuilder runnerBuilder = new RunnerBuilder();
+    final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
+    final RunnerBuilder runnerBuilder =
+        new RunnerBuilder()
+            .vertx(Vertx.vertx())
+            .discovery(true)
+            .discoveryHost(listenHost)
+            .discoveryPort(0)
+            .maxPeers(3)
+            .metricsSystem(noOpMetricsSystem)
+            .bannedNodeIds(Collections.emptySet());
+
     final Runner runnerAhead =
-        runnerBuilder.build(
-            Vertx.vertx(),
-            controllerAhead,
-            true,
-            Collections.emptyList(),
-            listenHost,
-            0,
-            3,
-            aheadJsonRpcConfiguration,
-            aheadWebSocketConfiguration,
-            dbAhead,
-            Collections.emptySet());
+        runnerBuilder
+            .pantheonController(controllerAhead)
+            .bootstrapPeers(Collections.emptyList())
+            .jsonRpcConfiguration(aheadJsonRpcConfiguration)
+            .webSocketConfiguration(aheadWebSocketConfiguration)
+            .dataDir(dbAhead)
+            .permissioningConfiguration(aheadPermissioningConfiguration)
+            .build();
     try {
 
       executorService.submit(runnerAhead::execute);
@@ -146,25 +158,23 @@ public final class RunnerTest {
               MainnetProtocolSchedule.create(),
               fastSyncConfig,
               new MiningParametersTestBuilder().enabled(false).build(),
-              KeyPair.generate());
+              KeyPair.generate(),
+              noOpMetricsSystem);
       final Runner runnerBehind =
-          runnerBuilder.build(
-              Vertx.vertx(),
-              controllerBehind,
-              true,
-              Collections.singletonList(
-                  new DefaultPeer(
-                      aheadDbNodeKeys.getPublicKey().getEncodedBytes(),
-                      listenHost,
-                      runnerAhead.getP2pUdpPort(),
-                      runnerAhead.getP2pTcpPort())),
-              listenHost,
-              0,
-              3,
-              behindJsonRpcConfiguration,
-              behindWebSocketConfiguration,
-              temp.newFolder().toPath(),
-              Collections.emptySet());
+          runnerBuilder
+              .pantheonController(controllerBehind)
+              .bootstrapPeers(
+                  Collections.singletonList(
+                      new DefaultPeer(
+                          aheadDbNodeKeys.getPublicKey().getEncodedBytes(),
+                          listenHost,
+                          runnerAhead.getP2pUdpPort(),
+                          runnerAhead.getP2pTcpPort())))
+              .jsonRpcConfiguration(behindJsonRpcConfiguration)
+              .webSocketConfiguration(behindWebSocketConfiguration)
+              .dataDir(temp.newFolder().toPath())
+              .metricsSystem(noOpMetricsSystem)
+              .build();
 
       executorService.submit(runnerBehind::execute);
       final Call.Factory client = new OkHttpClient();
@@ -249,6 +259,11 @@ public final class RunnerTest {
     final WebSocketConfiguration configuration = WebSocketConfiguration.createDefault();
     configuration.setPort(0);
     configuration.setEnabled(true);
+    return configuration;
+  }
+
+  private PermissioningConfiguration permissioningConfiguration() {
+    final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
     return configuration;
   }
 
