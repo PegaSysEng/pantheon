@@ -34,8 +34,11 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
@@ -92,6 +95,7 @@ public final class RunnerTest {
             //        .fastSyncPivotDistance(blockCount / 2).build();
             .fastSyncPivotDistance(0)
             .build();
+    final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
@@ -101,7 +105,8 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
-            aheadDbNodeKeys)) {
+            aheadDbNodeKeys,
+            noOpMetricsSystem)) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
@@ -113,11 +118,13 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
-            aheadDbNodeKeys);
+            aheadDbNodeKeys,
+            noOpMetricsSystem);
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final ExecutorService executorService = Executors.newFixedThreadPool(2);
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
+    final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
@@ -125,6 +132,7 @@ public final class RunnerTest {
             .discoveryHost(listenHost)
             .discoveryPort(0)
             .maxPeers(3)
+            .metricsSystem(noOpMetricsSystem)
             .bannedNodeIds(Collections.emptySet());
 
     final Runner runnerAhead =
@@ -134,6 +142,7 @@ public final class RunnerTest {
             .jsonRpcConfiguration(aheadJsonRpcConfiguration)
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .dataDir(dbAhead)
+            .permissioningConfiguration(aheadPermissioningConfiguration)
             .build();
     try {
 
@@ -149,7 +158,8 @@ public final class RunnerTest {
               MainnetProtocolSchedule.create(),
               fastSyncConfig,
               new MiningParametersTestBuilder().enabled(false).build(),
-              KeyPair.generate());
+              KeyPair.generate(),
+              noOpMetricsSystem);
       final Runner runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
@@ -163,6 +173,7 @@ public final class RunnerTest {
               .jsonRpcConfiguration(behindJsonRpcConfiguration)
               .webSocketConfiguration(behindWebSocketConfiguration)
               .dataDir(temp.newFolder().toPath())
+              .metricsSystem(noOpMetricsSystem)
               .build();
 
       executorService.submit(runnerBehind::execute);
@@ -248,6 +259,11 @@ public final class RunnerTest {
     final WebSocketConfiguration configuration = WebSocketConfiguration.createDefault();
     configuration.setPort(0);
     configuration.setEnabled(true);
+    return configuration;
+  }
+
+  private PermissioningConfiguration permissioningConfiguration() {
+    final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
     return configuration;
   }
 
