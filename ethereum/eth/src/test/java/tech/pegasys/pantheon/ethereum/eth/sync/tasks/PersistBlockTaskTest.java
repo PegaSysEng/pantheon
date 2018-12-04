@@ -24,6 +24,8 @@ import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockExce
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +43,7 @@ public class PersistBlockTaskTest {
   private ProtocolSchedule<Void> protocolSchedule;
   private ProtocolContext<Void> protocolContext;
   private MutableBlockchain blockchain;
+  private final LabelledMetric<OperationTimer> ethTasksTimer = labels -> () -> () -> 0.0D;
 
   @Before
   public void setup() {
@@ -61,7 +64,7 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
     final CompletableFuture<Block> result = task.run();
 
     Awaitility.await().atMost(30, SECONDS).until(result::isDone);
@@ -83,7 +86,7 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
     final CompletableFuture<Block> result = task.run();
 
     Awaitility.await().atMost(30, SECONDS).until(result::isDone);
@@ -107,7 +110,11 @@ public class PersistBlockTaskTest {
     // Create task
     final CompletableFuture<List<Block>> task =
         PersistBlockTask.forSequentialBlocks(
-                protocolSchedule, protocolContext, nextBlocks, HeaderValidationMode.FULL)
+                protocolSchedule,
+                protocolContext,
+                nextBlocks,
+                HeaderValidationMode.FULL,
+                ethTasksTimer)
             .get();
 
     Awaitility.await().atMost(30, SECONDS).until(task::isDone);
@@ -133,7 +140,11 @@ public class PersistBlockTaskTest {
     // Create task
     final CompletableFuture<List<Block>> task =
         PersistBlockTask.forSequentialBlocks(
-                protocolSchedule, protocolContext, nextBlocks, HeaderValidationMode.FULL)
+                protocolSchedule,
+                protocolContext,
+                nextBlocks,
+                HeaderValidationMode.FULL,
+                ethTasksTimer)
             .get();
 
     Awaitility.await().atMost(30, SECONDS).until(task::isDone);
@@ -158,7 +169,11 @@ public class PersistBlockTaskTest {
     // Create task
     final CompletableFuture<List<Block>> task =
         PersistBlockTask.forSequentialBlocks(
-                protocolSchedule, protocolContext, nextBlocks, HeaderValidationMode.FULL)
+                protocolSchedule,
+                protocolContext,
+                nextBlocks,
+                HeaderValidationMode.FULL,
+                ethTasksTimer)
             .get();
 
     Awaitility.await().atMost(30, SECONDS).until(task::isDone);
@@ -183,7 +198,11 @@ public class PersistBlockTaskTest {
     // Create task
     final CompletableFuture<List<Block>> task =
         PersistBlockTask.forUnorderedBlocks(
-                protocolSchedule, protocolContext, nextBlocks, HeaderValidationMode.FULL)
+                protocolSchedule,
+                protocolContext,
+                nextBlocks,
+                HeaderValidationMode.FULL,
+                ethTasksTimer)
             .get();
 
     Awaitility.await().atMost(30, SECONDS).until(task::isDone);
@@ -211,7 +230,11 @@ public class PersistBlockTaskTest {
     // Create task
     final CompletableFuture<List<Block>> task =
         PersistBlockTask.forUnorderedBlocks(
-                protocolSchedule, protocolContext, nextBlocks, HeaderValidationMode.FULL)
+                protocolSchedule,
+                protocolContext,
+                nextBlocks,
+                HeaderValidationMode.FULL,
+                ethTasksTimer)
             .get();
 
     Awaitility.await().atMost(30, SECONDS).until(task::isDone);
@@ -236,7 +259,11 @@ public class PersistBlockTaskTest {
     // Create task
     final CompletableFuture<List<Block>> task =
         PersistBlockTask.forUnorderedBlocks(
-                protocolSchedule, protocolContext, nextBlocks, HeaderValidationMode.FULL)
+                protocolSchedule,
+                protocolContext,
+                nextBlocks,
+                HeaderValidationMode.FULL,
+                ethTasksTimer)
             .get();
 
     Awaitility.await().atMost(30, SECONDS).until(task::isDone);
@@ -263,7 +290,11 @@ public class PersistBlockTaskTest {
     // Create task
     final CompletableFuture<List<Block>> task =
         PersistBlockTask.forUnorderedBlocks(
-                protocolSchedule, protocolContext, nextBlocks, HeaderValidationMode.FULL)
+                protocolSchedule,
+                protocolContext,
+                nextBlocks,
+                HeaderValidationMode.FULL,
+                ethTasksTimer)
             .get();
 
     Awaitility.await().atMost(30, SECONDS).until(task::isDone);
@@ -286,7 +317,7 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
 
     task.cancel();
     final CompletableFuture<Block> result = task.run();
@@ -306,9 +337,9 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
     final PersistBlockTask<Void> taskSpy = Mockito.spy(task);
-    Mockito.doNothing().when(taskSpy).executeTask();
+    Mockito.doNothing().when(taskSpy).executeTaskTimed();
 
     final CompletableFuture<Block> result = taskSpy.run();
     taskSpy.cancel();

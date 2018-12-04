@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.metrics.Observation;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.OperationTimer.TimingContext;
 
+import java.util.Collections;
 import java.util.Comparator;
 
 import org.junit.Test;
@@ -91,23 +92,14 @@ public class PrometheusMetricsSystemTest {
     assertThat(metricsSystem.getMetrics())
         .usingElementComparator(IGNORE_VALUES)
         .containsExactlyInAnyOrder(
-            new Observation(RPC, "request", null, asList("bucket", "0.005")),
-            new Observation(RPC, "request", null, asList("bucket", "0.01")),
-            new Observation(RPC, "request", null, asList("bucket", "0.025")),
-            new Observation(RPC, "request", null, asList("bucket", "0.05")),
-            new Observation(RPC, "request", null, asList("bucket", "0.075")),
-            new Observation(RPC, "request", null, asList("bucket", "0.1")),
-            new Observation(RPC, "request", null, asList("bucket", "0.25")),
-            new Observation(RPC, "request", null, asList("bucket", "0.5")),
-            new Observation(RPC, "request", null, asList("bucket", "0.75")),
-            new Observation(RPC, "request", null, asList("bucket", "1.0")),
-            new Observation(RPC, "request", null, asList("bucket", "2.5")),
-            new Observation(RPC, "request", null, asList("bucket", "5.0")),
-            new Observation(RPC, "request", null, asList("bucket", "7.5")),
-            new Observation(RPC, "request", null, asList("bucket", "10.0")),
-            new Observation(RPC, "request", null, asList("bucket", "+Inf")),
-            new Observation(RPC, "request", null, singletonList("sum")),
-            new Observation(RPC, "request", 1d, singletonList("count")));
+            new Observation(RPC, "request", null, singletonList("0.2")),
+            new Observation(RPC, "request", null, singletonList("0.5")),
+            new Observation(RPC, "request", null, singletonList("0.8")),
+            new Observation(RPC, "request", null, singletonList("0.95")),
+            new Observation(RPC, "request", null, singletonList("0.99")),
+            new Observation(RPC, "request", null, singletonList("1.0")),
+            new Observation(RPC, "request_sum", null, Collections.emptyList()),
+            new Observation(RPC, "request_count", 1d, Collections.emptyList()));
   }
 
   @Test
@@ -120,23 +112,14 @@ public class PrometheusMetricsSystemTest {
     assertThat(metricsSystem.getMetrics())
         .usingElementComparator(IGNORE_VALUES) // We don't know how long it will actually take.
         .containsExactlyInAnyOrder(
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.005")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.01")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.025")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.05")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.075")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.1")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.25")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.5")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "0.75")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "1.0")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "2.5")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "5.0")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "7.5")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "10.0")),
-            new Observation(RPC, "request", null, asList("method", "bucket", "+Inf")),
-            new Observation(RPC, "request", null, asList("method", "sum")),
-            new Observation(RPC, "request", null, asList("method", "count")));
+            new Observation(RPC, "request", null, asList("method", "0.2")),
+            new Observation(RPC, "request", null, asList("method", "0.5")),
+            new Observation(RPC, "request", null, asList("method", "0.8")),
+            new Observation(RPC, "request", null, asList("method", "0.95")),
+            new Observation(RPC, "request", null, asList("method", "0.99")),
+            new Observation(RPC, "request", null, asList("method", "1.0")),
+            new Observation(RPC, "request_sum", null, singletonList("method")),
+            new Observation(RPC, "request_count", null, singletonList("method")));
   }
 
   @Test

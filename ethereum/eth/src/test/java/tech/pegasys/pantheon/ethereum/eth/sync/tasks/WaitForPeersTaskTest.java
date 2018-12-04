@@ -18,6 +18,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -29,18 +31,20 @@ import org.junit.Test;
 public class WaitForPeersTaskTest {
   private EthProtocolManager ethProtocolManager;
   private EthContext ethContext;
+  private LabelledMetric<OperationTimer> ethTasksTimer;
 
   @Before
   public void setupTest() {
     ethProtocolManager = EthProtocolManagerTestUtil.create();
     ethContext = ethProtocolManager.ethContext();
+    ethTasksTimer = labels -> () -> () -> 0.0D;
   }
 
   @Test
   public void completesWhenPeersConnects() throws ExecutionException, InterruptedException {
     // Execute task and wait for response
     final AtomicBoolean successful = new AtomicBoolean(false);
-    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2);
+    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2, ethTasksTimer);
     final CompletableFuture<Void> future = task.run();
     future.whenComplete(
         (result, error) -> {
@@ -56,7 +60,7 @@ public class WaitForPeersTaskTest {
   @Test
   public void doesNotCompleteWhenNoPeerConnects() throws ExecutionException, InterruptedException {
     final AtomicBoolean successful = new AtomicBoolean(false);
-    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2);
+    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2, ethTasksTimer);
     final CompletableFuture<Void> future = task.run();
     future.whenComplete(
         (result, error) -> {
@@ -72,7 +76,7 @@ public class WaitForPeersTaskTest {
   public void doesNotCompleteWhenSomePeersConnects()
       throws ExecutionException, InterruptedException {
     final AtomicBoolean successful = new AtomicBoolean(false);
-    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2);
+    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2, ethTasksTimer);
     final CompletableFuture<Void> future = task.run();
     future.whenComplete(
         (result, error) -> {
@@ -88,7 +92,7 @@ public class WaitForPeersTaskTest {
   @Test
   public void cancel() throws ExecutionException, InterruptedException {
     // Execute task
-    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2);
+    final EthTask<Void> task = WaitForPeersTask.create(ethContext, 2, ethTasksTimer);
     final CompletableFuture<Void> future = task.run();
 
     assertThat(future.isDone()).isFalse();

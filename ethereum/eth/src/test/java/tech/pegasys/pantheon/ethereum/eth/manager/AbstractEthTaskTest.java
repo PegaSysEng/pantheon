@@ -81,6 +81,7 @@ public class AbstractEthTaskTest {
     private final List<CompletableFuture<?>> subtasks;
 
     private EthTaskWithMultipleSubtasks(final List<CompletableFuture<?>> subtasks) {
+      super(labels -> () -> () -> 0.0D);
       this.subtasks = subtasks;
     }
 

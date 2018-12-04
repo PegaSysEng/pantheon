@@ -42,7 +42,8 @@ public class GetBodiesFromPeerTaskTest extends PeerMessageTaskTest<List<Block>> 
   protected EthTask<PeerTaskResult<List<Block>>> createTask(final List<Block> requestedData) {
     final List<BlockHeader> headersToComplete =
         requestedData.stream().map(Block::getHeader).collect(Collectors.toList());
-    return GetBodiesFromPeerTask.forHeaders(protocolSchedule, ethContext, headersToComplete);
+    return GetBodiesFromPeerTask.forHeaders(
+        protocolSchedule, ethContext, headersToComplete, labels -> () -> () -> 0.0D);
   }
 
   @Override

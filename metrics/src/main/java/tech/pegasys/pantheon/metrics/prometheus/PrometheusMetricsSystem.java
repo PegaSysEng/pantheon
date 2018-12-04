@@ -35,7 +35,7 @@ import io.prometheus.client.Collector.MetricFamilySamples;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 import io.prometheus.client.Collector.Type;
 import io.prometheus.client.Counter;
-import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 import io.prometheus.client.hotspot.BufferPoolsExports;
 import io.prometheus.client.hotspot.ClassLoadingExports;
 import io.prometheus.client.hotspot.GarbageCollectorExports;
@@ -84,9 +84,18 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       final String name,
       final String help,
       final String... labelNames) {
-    final Histogram histogram = Histogram.build(name, help).labelNames(labelNames).create();
-    addCollector(category, histogram);
-    return new PrometheusTimer(histogram);
+    final Summary summary =
+        Summary.build(name, help)
+            .quantile(0.2, 0.02)
+            .quantile(0.5, 0.05)
+            .quantile(0.8, 0.02)
+            .quantile(0.95, 0.005)
+            .quantile(0.99, 0.001)
+            .quantile(1.0, 0)
+            .labelNames(labelNames)
+            .create();
+    addCollector(category, summary);
+    return new PrometheusTimer(summary);
   }
 
   @Override

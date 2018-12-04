@@ -18,6 +18,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -29,18 +31,20 @@ import org.junit.Test;
 public class WaitForPeerTaskTest {
   private EthProtocolManager ethProtocolManager;
   private EthContext ethContext;
+  private LabelledMetric<OperationTimer> ethTasksTimer;
 
   @Before
   public void setupTest() {
     ethProtocolManager = EthProtocolManagerTestUtil.create();
     ethContext = ethProtocolManager.ethContext();
+    ethTasksTimer = labels -> () -> () -> 0.0D;
   }
 
   @Test
   public void completesWhenPeerConnects() throws ExecutionException, InterruptedException {
     // Execute task and wait for response
     final AtomicBoolean successful = new AtomicBoolean(false);
-    final EthTask<Void> task = WaitForPeerTask.create(ethContext);
+    final EthTask<Void> task = WaitForPeerTask.create(ethContext, ethTasksTimer);
     final CompletableFuture<Void> future = task.run();
     future.whenComplete(
         (result, error) -> {
@@ -55,7 +59,7 @@ public class WaitForPeerTaskTest {
   @Test
   public void doesNotCompleteWhenNoPeerConnects() throws ExecutionException, InterruptedException {
     final AtomicBoolean successful = new AtomicBoolean(false);
-    final EthTask<Void> task = WaitForPeerTask.create(ethContext);
+    final EthTask<Void> task = WaitForPeerTask.create(ethContext, ethTasksTimer);
     final CompletableFuture<Void> future = task.run();
     future.whenComplete(
         (result, error) -> {
@@ -70,7 +74,7 @@ public class WaitForPeerTaskTest {
   @Test
   public void cancel() throws ExecutionException, InterruptedException {
     // Execute task
-    final EthTask<Void> task = WaitForPeerTask.create(ethContext);
+    final EthTask<Void> task = WaitForPeerTask.create(ethContext, ethTasksTimer);
     final CompletableFuture<Void> future = task.run();
 
     assertThat(future.isDone()).isFalse();

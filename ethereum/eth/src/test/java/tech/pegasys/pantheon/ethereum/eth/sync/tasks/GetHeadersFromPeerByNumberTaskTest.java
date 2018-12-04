@@ -56,7 +56,11 @@ public class GetHeadersFromPeerByNumberTaskTest extends PeerMessageTaskTest<List
       final List<BlockHeader> requestedData) {
     final BlockHeader firstHeader = requestedData.get(0);
     return GetHeadersFromPeerByNumberTask.startingAtNumber(
-        protocolSchedule, ethContext, firstHeader.getNumber(), requestedData.size());
+        protocolSchedule,
+        ethContext,
+        firstHeader.getNumber(),
+        requestedData.size(),
+        labels -> () -> () -> 0.0D);
   }
 
   @Test
@@ -97,7 +101,13 @@ public class GetHeadersFromPeerByNumberTaskTest extends PeerMessageTaskTest<List
     // Execute task and wait for response
     final AbstractGetHeadersFromPeerTask task =
         new GetHeadersFromPeerByNumberTask(
-            protocolSchedule, ethContext, startNumber, count, skip, reverse);
+            protocolSchedule,
+            ethContext,
+            startNumber,
+            count,
+            skip,
+            reverse,
+            labels -> () -> () -> 0.0D);
     final AtomicReference<AbstractPeerTask.PeerTaskResult<List<BlockHeader>>> actualResult =
         new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);

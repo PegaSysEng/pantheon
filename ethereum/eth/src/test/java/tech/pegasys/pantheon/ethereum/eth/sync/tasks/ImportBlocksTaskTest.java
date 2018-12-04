@@ -71,12 +71,13 @@ public class ImportBlocksTaskTest
             shortBlockchain,
             protocolContext.getWorldStateArchive(),
             protocolContext.getConsensusState());
-    return ImportBlocksTask.<Void>fromHeader(
+    return ImportBlocksTask.fromHeader(
         protocolSchedule,
         modifiedContext,
         ethContext,
         firstBlock.getHeader(),
-        requestedData.size());
+        requestedData.size(),
+        labels -> () -> () -> 0.0D);
   }
 
   @Override

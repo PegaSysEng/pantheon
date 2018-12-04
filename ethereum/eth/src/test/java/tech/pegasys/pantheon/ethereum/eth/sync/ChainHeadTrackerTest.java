@@ -46,7 +46,11 @@ public class ChainHeadTrackerTest {
       DevelopmentProtocolSchedule.create(GenesisConfigFile.DEFAULT.getConfigOptions());
   private final TrailingPeerLimiter trailingPeerLimiter = mock(TrailingPeerLimiter.class);
   private final ChainHeadTracker chainHeadTracker =
-      new ChainHeadTracker(ethProtocolManager.ethContext(), protocolSchedule, trailingPeerLimiter);
+      new ChainHeadTracker(
+          ethProtocolManager.ethContext(),
+          protocolSchedule,
+          trailingPeerLimiter,
+          labels -> () -> () -> 0.0D);
 
   @Test
   public void shouldRequestHeaderChainHeadWhenNewPeerConnects() {
