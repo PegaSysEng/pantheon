@@ -43,6 +43,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -58,7 +59,8 @@ public class DetermineCommonAncestorTaskTest {
 
   private final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
   private final BlockDataGenerator blockDataGenerator = new BlockDataGenerator();
-  private final LabelledMetric<OperationTimer> ethTasksTimer = labels -> () -> () -> 0.0D;
+  private final LabelledMetric<OperationTimer> ethTasksTimer =
+      NoOpMetricsSystem.NO_OP_LABELED_TIMER;
   private MutableBlockchain localBlockchain;
   private final int defaultHeaderRequestSize = 10;
   Block genesisBlock;
@@ -116,7 +118,7 @@ public class DetermineCommonAncestorTaskTest {
             defaultHeaderRequestSize,
             ethTasksTimer);
 
-    final CompletableFuture<BlockHeader> future = task.run();
+    final CompletableFuture<BlockHeader> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
     final AtomicReference<Throwable> failure = new AtomicReference<>();
     future.whenComplete(
@@ -155,7 +157,7 @@ public class DetermineCommonAncestorTaskTest {
 
     // Execute task and wait for response
     final AtomicReference<Throwable> failure = new AtomicReference<>();
-    final CompletableFuture<BlockHeader> future = task.run();
+    final CompletableFuture<BlockHeader> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
     future.whenComplete(
         (response, error) -> {
@@ -226,7 +228,7 @@ public class DetermineCommonAncestorTaskTest {
     final DetermineCommonAncestorTask<Void> spy = spy(task);
 
     // Execute task
-    final CompletableFuture<BlockHeader> future = spy.run();
+    final CompletableFuture<BlockHeader> future = spy.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
 
     final AtomicReference<BlockHeader> result = new AtomicReference<>();
@@ -283,7 +285,7 @@ public class DetermineCommonAncestorTaskTest {
     final DetermineCommonAncestorTask<Void> spy = spy(task);
 
     // Execute task
-    final CompletableFuture<BlockHeader> future = spy.run();
+    final CompletableFuture<BlockHeader> future = spy.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
 
     final AtomicReference<BlockHeader> result = new AtomicReference<>();
@@ -355,7 +357,7 @@ public class DetermineCommonAncestorTaskTest {
     final DetermineCommonAncestorTask<Void> spy = spy(task);
 
     // Execute task
-    final CompletableFuture<BlockHeader> future = spy.run();
+    final CompletableFuture<BlockHeader> future = spy.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
 
     final AtomicReference<BlockHeader> result = new AtomicReference<>();
@@ -385,7 +387,7 @@ public class DetermineCommonAncestorTaskTest {
             defaultHeaderRequestSize,
             ethTasksTimer);
 
-    final CompletableFuture<BlockHeader> result = task.run();
+    final CompletableFuture<BlockHeader> result = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     assertThat(result).isCompletedWithValue(genesisBlock.getHeader());
 
     // Make sure we didn't ask for any headers

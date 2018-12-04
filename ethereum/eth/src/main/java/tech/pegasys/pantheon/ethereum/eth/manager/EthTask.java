@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.metrics.OperationTimer;
+
 import java.util.concurrent.CompletableFuture;
 
 public interface EthTask<T> {
 
-  CompletableFuture<T> run();
+  CompletableFuture<T> run(OperationTimer taskTimer);
 
   void cancel();
 }

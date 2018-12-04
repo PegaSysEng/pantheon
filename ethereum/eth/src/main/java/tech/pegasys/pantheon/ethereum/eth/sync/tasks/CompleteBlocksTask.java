@@ -120,10 +120,9 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
     return executeSubTask(
         () -> {
           final GetBodiesFromPeerTask<C> task =
-              GetBodiesFromPeerTask.forHeaders(
-                  protocolSchedule, ethContext, incompleteHeaders, ethTasksTimer);
+              GetBodiesFromPeerTask.forHeaders(protocolSchedule, ethContext, incompleteHeaders);
           assignedPeer.ifPresent(task::assignPeer);
-          return task.run();
+          return task.run(ethTasksTimer.labels(getClass().getSimpleName()));
         });
   }
 

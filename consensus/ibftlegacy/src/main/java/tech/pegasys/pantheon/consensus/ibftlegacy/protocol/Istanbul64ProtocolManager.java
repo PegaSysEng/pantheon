@@ -17,6 +17,8 @@ import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.List;
 
@@ -30,8 +32,9 @@ public class Istanbul64ProtocolManager extends EthProtocolManager {
       final int networkId,
       final boolean fastSyncEnabled,
       final int syncWorkers,
-      final int txWorkers) {
-    super(blockchain, networkId, fastSyncEnabled, syncWorkers, txWorkers);
+      final int txWorkers,
+      final LabelledMetric<OperationTimer> ethTasksTimer) {
+    super(blockchain, networkId, fastSyncEnabled, syncWorkers, txWorkers, ethTasksTimer);
   }
 
   @Override

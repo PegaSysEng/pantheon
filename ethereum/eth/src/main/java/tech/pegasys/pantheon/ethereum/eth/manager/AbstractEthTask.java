@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.Collection;
@@ -26,26 +25,17 @@ import java.util.function.Supplier;
 public abstract class AbstractEthTask<T> implements EthTask<T> {
 
   protected double taskTimeInSec = -1.0D;
-  protected OperationTimer taskTimer;
   protected final AtomicReference<CompletableFuture<T>> result = new AtomicReference<>();
   protected volatile Collection<CompletableFuture<?>> subTaskFutures =
       new ConcurrentLinkedDeque<>();
 
-  protected AbstractEthTask(final LabelledMetric<OperationTimer> ethTasksTimer) {
-
-    taskTimer = ethTasksTimer.labels(getClass().getSimpleName());
-  }
+  protected AbstractEthTask() {}
 
   @Override
-  public final CompletableFuture<T> run() {
+  public final CompletableFuture<T> run(final OperationTimer taskTimer) {
     if (result.compareAndSet(null, new CompletableFuture<>())) {
-      executeTaskTimed();
-      result
-          .get()
-          .whenComplete(
-              (r, t) -> {
-                cleanup();
-              });
+      executeTaskTimed(taskTimer);
+      result.get().whenComplete((r, t) -> cleanup());
     }
     return result.get();
   }
@@ -87,10 +77,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
       if (!isCancelled()) {
         final CompletableFuture<S> subTaskFuture = subTask.get();
         subTaskFutures.add(subTaskFuture);
-        subTaskFuture.whenComplete(
-            (r, t) -> {
-              subTaskFutures.remove(subTaskFuture);
-            });
+        subTaskFuture.whenComplete((r, t) -> subTaskFutures.remove(subTaskFuture));
         return subTaskFuture;
       } else {
         final CompletableFuture<S> future = new CompletableFuture<>();
@@ -128,10 +115,14 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   protected abstract void executeTask();
 
   /** Executes the task while timed by a timer. */
-  public void executeTaskTimed() {
-    final OperationTimer.TimingContext timingContext = taskTimer.startTimer();
-    executeTask();
-    taskTimeInSec = timingContext.stopTimer();
+  public void executeTaskTimed(final OperationTimer taskTimer) {
+    if (taskTimer == null) {
+      executeTask();
+    } else {
+      final OperationTimer.TimingContext timingContext = taskTimer.startTimer();
+      executeTask();
+      taskTimeInSec = timingContext.stopTimer();
+    }
   }
 
   public double getTaskTimeInSec() {

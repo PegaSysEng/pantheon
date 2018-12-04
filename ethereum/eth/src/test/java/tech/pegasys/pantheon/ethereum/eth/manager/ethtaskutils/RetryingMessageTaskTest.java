@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.MaxRetriesReachedException;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -60,7 +61,7 @@ public abstract class RetryingMessageTaskTest<T> extends AbstractMessageTaskTest
     // Execute task and wait for response
     final T requestedData = generateDataToBeRequested();
     final EthTask<T> task = createTask(requestedData);
-    final CompletableFuture<T> future = task.run();
+    final CompletableFuture<T> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     // Respond once with no data
     respondingPeer.respond(emptyResponder);
@@ -93,7 +94,7 @@ public abstract class RetryingMessageTaskTest<T> extends AbstractMessageTaskTest
     // Execute task and wait for response
     final T requestedData = generateDataToBeRequested();
     final EthTask<T> task = createTask(requestedData);
-    final CompletableFuture<T> future = task.run();
+    final CompletableFuture<T> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     // Respond with partial data up until complete.
     respondingPeer.respond(RespondingEthPeer.partialResponder(blockchain, protocolSchedule, 0.25f));
@@ -111,7 +112,7 @@ public abstract class RetryingMessageTaskTest<T> extends AbstractMessageTaskTest
     final T requestedData = generateDataToBeRequested();
 
     final EthTask<T> task = createTask(requestedData);
-    final CompletableFuture<T> future = task.run();
+    final CompletableFuture<T> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     assertThat(future.isDone()).isFalse();
   }
@@ -124,7 +125,7 @@ public abstract class RetryingMessageTaskTest<T> extends AbstractMessageTaskTest
 
     // Execute task and wait for response
     final EthTask<T> task = createTask(requestedData);
-    final CompletableFuture<T> future = task.run();
+    final CompletableFuture<T> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     assertThat(future.isDone()).isFalse();
 
@@ -147,7 +148,7 @@ public abstract class RetryingMessageTaskTest<T> extends AbstractMessageTaskTest
     final T requestedData = generateDataToBeRequested();
 
     final EthTask<T> task = createTask(requestedData);
-    final CompletableFuture<T> future = task.run();
+    final CompletableFuture<T> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     assertThat(future.isDone()).isFalse();
     respondingPeer.respondWhile(responder, () -> !future.isDone());
@@ -167,7 +168,7 @@ public abstract class RetryingMessageTaskTest<T> extends AbstractMessageTaskTest
 
     // Setup and run task
     final EthTask<T> task = createTask(requestedData);
-    final CompletableFuture<T> future = task.run();
+    final CompletableFuture<T> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     assertThat(future.isDone()).isFalse();
 

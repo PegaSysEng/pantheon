@@ -72,7 +72,6 @@ public class PipelinedImportChainSegmentTask<C> extends AbstractEthTask<List<Blo
       final int maxActiveChunks,
       final List<BlockHeader> checkpointHeaders,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethTasksTimer);
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
@@ -215,7 +214,8 @@ public class PipelinedImportChainSegmentTask<C> extends AbstractEthTask<List<Blo
             lastChunkHeader,
             segmentLength,
             ethTasksTimer);
-    return executeSubTask(task::run)
+    return executeSubTask(
+            () -> task.run(ethTasksTimer.labels(DownloadHeaderSequenceTask.class.getSimpleName())))
         .thenApply(
             headers -> {
               final List<BlockHeader> finalHeaders = Lists.newArrayList(firstChunkHeader);
@@ -259,7 +259,8 @@ public class PipelinedImportChainSegmentTask<C> extends AbstractEthTask<List<Blo
         headers.get(headers.size() - 1).getNumber());
     final CompleteBlocksTask<C> task =
         CompleteBlocksTask.forHeaders(protocolSchedule, ethContext, headers, ethTasksTimer);
-    return executeSubTask(task::run);
+    return executeSubTask(
+        () -> task.run(ethTasksTimer.labels(CompleteBlocksTask.class.getSimpleName())));
   }
 
   private CompletableFuture<List<Block>> validateAndImportBlocks(final List<Block> blocks) {

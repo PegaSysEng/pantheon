@@ -30,6 +30,8 @@ import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Arrays;
@@ -92,13 +94,14 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final boolean fastSyncEnabled,
       final int syncWorkers,
       final int txWorkers,
-      final int requestLimit) {
+      final int requestLimit,
+      final LabelledMetric<OperationTimer> ethTasksTimer) {
     this(
         blockchain,
         networkId,
         fastSyncEnabled,
         requestLimit,
-        new EthScheduler(syncWorkers, txWorkers));
+        new EthScheduler(syncWorkers, txWorkers, ethTasksTimer));
   }
 
   public EthProtocolManager(
@@ -106,8 +109,16 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int networkId,
       final boolean fastSyncEnabled,
       final int syncWorkers,
-      final int txWorkers) {
-    this(blockchain, networkId, fastSyncEnabled, syncWorkers, txWorkers, DEFAULT_REQUEST_LIMIT);
+      final int txWorkers,
+      final LabelledMetric<OperationTimer> ethTasksTimer) {
+    this(
+        blockchain,
+        networkId,
+        fastSyncEnabled,
+        syncWorkers,
+        txWorkers,
+        DEFAULT_REQUEST_LIMIT,
+        ethTasksTimer);
   }
 
   public EthContext ethContext() {

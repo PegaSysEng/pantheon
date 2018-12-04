@@ -52,7 +52,6 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
       final EthPeer peer,
       final int headerRequestSize,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethTasksTimer);
     this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
     this.protocolContext = protocolContext;
@@ -96,7 +95,9 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
               if (error != null) {
                 result.get().completeExceptionally(error);
               } else if (!result.get().isDone()) {
-                executeTaskTimed();
+                executeTaskTimed(
+                    ethTasksTimer.labels(
+                        DetermineCommonAncestorTask.this.getClass().getSimpleName()));
               }
             });
   }
@@ -119,10 +120,9 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
                     ethContext,
                     maximumPossibleCommonAncestorNumber,
                     count,
-                    skipInterval,
-                    ethTasksTimer)
+                    skipInterval)
                 .assignPeer(peer)
-                .run());
+                .run(ethTasksTimer.labels(GetHeadersFromPeerByNumberTask.class.getSimpleName())));
   }
 
   /**

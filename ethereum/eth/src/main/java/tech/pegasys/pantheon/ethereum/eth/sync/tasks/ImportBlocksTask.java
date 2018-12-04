@@ -56,7 +56,7 @@ public class ImportBlocksTask<C> extends AbstractPeerTask<List<Block>> {
       final BlockHeader referenceHeader,
       final int maxBlocks,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethContext, ethTasksTimer);
+    super(ethContext);
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.referenceHeader = referenceHeader;
@@ -103,10 +103,9 @@ public class ImportBlocksTask<C> extends AbstractPeerTask<List<Block>> {
                 ethContext,
                 referenceHeader.getHash(),
                 referenceHeader.getNumber(),
-                maxBlocks,
-                ethTasksTimer)
+                maxBlocks)
             .assignPeer(peer);
-    return executeSubTask(task::run);
+    return executeSubTask(() -> task.run(ethTasksTimer.labels(task.getClass().getSimpleName())));
   }
 
   private CompletableFuture<List<Block>> completeBlocks(

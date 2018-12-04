@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator.BlockOptions;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,7 +130,7 @@ public class PipelinedImportChainSegmentTaskTest
     final AtomicReference<List<Block>> actualResult = new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);
 
-    final CompletableFuture<List<Block>> future = task.run();
+    final CompletableFuture<List<Block>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingPeer.respond(responder);
     future.whenComplete(
         (result, error) -> {
@@ -180,7 +181,7 @@ public class PipelinedImportChainSegmentTaskTest
     final AtomicReference<List<Block>> actualResult = new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);
 
-    final CompletableFuture<List<Block>> future = task.run();
+    final CompletableFuture<List<Block>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingPeer.respond(responder);
     future.whenComplete(
         (result, error) -> {
@@ -224,7 +225,7 @@ public class PipelinedImportChainSegmentTaskTest
     final AtomicReference<List<Block>> actualResult = new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);
 
-    final CompletableFuture<List<Block>> future = task.run();
+    final CompletableFuture<List<Block>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     final CountingResponder countingResponder = CountingResponder.wrap(responder);
 
     // Import first segment's headers and bodies
@@ -280,7 +281,7 @@ public class PipelinedImportChainSegmentTaskTest
     final AtomicReference<List<Block>> actualResult = new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);
 
-    final CompletableFuture<List<Block>> future = task.run();
+    final CompletableFuture<List<Block>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     final CountingResponder countingResponder = CountingResponder.wrap(responder);
 
     // Import first segment's header
@@ -340,7 +341,7 @@ public class PipelinedImportChainSegmentTaskTest
     final AtomicReference<List<Block>> actualResult = new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);
 
-    final CompletableFuture<List<Block>> future = task.run();
+    final CompletableFuture<List<Block>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     final CountingResponder countingResponder = CountingResponder.wrap(responder);
 
     // Import first segment's header

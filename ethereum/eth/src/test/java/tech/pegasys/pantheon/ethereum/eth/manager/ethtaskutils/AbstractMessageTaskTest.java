@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -58,7 +59,7 @@ public abstract class AbstractMessageTaskTest<T, R> {
     blockchain = blockchainSetupUtil.getBlockchain();
     protocolSchedule = blockchainSetupUtil.getProtocolSchedule();
     protocolContext = blockchainSetupUtil.getProtocolContext();
-    ethTasksTimer = labels -> () -> () -> 0.0D;
+    ethTasksTimer = NoOpMetricsSystem.NO_OP_LABELED_TIMER;
     assert (blockchainSetupUtil.getMaxBlockNumber() >= 20L);
   }
 
@@ -93,7 +94,7 @@ public abstract class AbstractMessageTaskTest<T, R> {
     final AtomicReference<R> actualResult = new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);
     final EthTask<R> task = createTask(requestedData);
-    final CompletableFuture<R> future = task.run();
+    final CompletableFuture<R> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingPeer.respondWhile(responder, () -> !future.isDone());
     future.whenComplete(
         (result, error) -> {
@@ -117,7 +118,7 @@ public abstract class AbstractMessageTaskTest<T, R> {
     // Execute task and wait for response
     final AtomicBoolean done = new AtomicBoolean(false);
     final EthTask<R> task = createTask(requestedData);
-    final CompletableFuture<R> future = task.run();
+    final CompletableFuture<R> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     future.whenComplete(
         (response, error) -> {
           done.compareAndSet(false, true);
@@ -135,12 +136,12 @@ public abstract class AbstractMessageTaskTest<T, R> {
 
     // Execute task
     final EthTask<R> task = createTask(requestedData);
-    final CompletableFuture<R> future = task.run();
+    final CompletableFuture<R> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     assertThat(future.isDone()).isFalse();
     task.cancel();
     assertThat(future.isDone()).isTrue();
     assertThat(future.isCancelled()).isTrue();
-    assertThat(task.run().isCancelled()).isTrue();
+    assertThat(task.run(NoOpMetricsSystem.NO_OP_TIMER).isCancelled()).isTrue();
   }
 }

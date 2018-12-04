@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.MaxRetriesReachedEx
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,7 +80,7 @@ public class DownloadHeaderSequenceTaskTest extends RetryingMessageTaskTest<List
             10,
             maxRetries,
             ethTasksTimer);
-    final CompletableFuture<List<BlockHeader>> future = task.run();
+    final CompletableFuture<List<BlockHeader>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     // Respond with only the reference header
     final Responder responder =
@@ -108,7 +109,7 @@ public class DownloadHeaderSequenceTaskTest extends RetryingMessageTaskTest<List
             10,
             maxRetries,
             ethTasksTimer);
-    final CompletableFuture<List<BlockHeader>> future = task.run();
+    final CompletableFuture<List<BlockHeader>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     // Filter response to include only reference header and previous header
     final Responder fullResponder = RespondingEthPeer.blockchainResponder(blockchain);

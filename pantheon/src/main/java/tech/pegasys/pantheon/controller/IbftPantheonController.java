@@ -61,8 +61,10 @@ import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -146,13 +148,17 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
+    LabelledMetric<OperationTimer> ethTasksTimer =
+        metricsSystem.createLabelledTimer(
+            MetricCategory.TASKS, "ethTask", "Internal processing tasks", "taskName");
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
             networkId,
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism());
+            syncConfig.transactionsParallelism(),
+            ethTasksTimer);
     final SubProtocol ethSubProtocol = EthProtocol.get();
 
     final SyncState syncState =
@@ -165,8 +171,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             protocolContext,
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem.createLabelledTimer(
-                MetricCategory.TASKS, "ethTask", "Internal processing tasks", "taskName"));
+            ethTasksTimer);
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(

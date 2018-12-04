@@ -49,7 +49,6 @@ public abstract class AbstractRetryingPeerTask<T extends Collection<?>> extends 
       final EthContext ethContext,
       final int maxRetries,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethTasksTimer);
     this.ethContext = ethContext;
     this.ethTasksTimer = ethTasksTimer;
     this.maxRetries = maxRetries;
@@ -77,7 +76,7 @@ public abstract class AbstractRetryingPeerTask<T extends Collection<?>> extends 
                 if (peerResult.size() > 0) {
                   retryCount = 0;
                 }
-                executeTaskTimed();
+                executeTaskTimed(ethTasksTimer.labels(getClass().getSimpleName()));
               }
             });
   }
@@ -95,13 +94,15 @@ public abstract class AbstractRetryingPeerTask<T extends Collection<?>> extends 
     if (cause instanceof NoAvailablePeersException) {
       LOG.info("No peers available, wait for peer.");
       // Wait for new peer to connect
-      final WaitForPeerTask waitTask = WaitForPeerTask.create(ethContext, ethTasksTimer);
+      final WaitForPeerTask waitTask = WaitForPeerTask.create(ethContext);
       executeSubTask(
           () ->
               ethContext
                   .getScheduler()
                   .timeout(waitTask, Duration.ofSeconds(5))
-                  .whenComplete((r, t) -> executeTaskTimed()));
+                  .whenComplete(
+                      (r, t) ->
+                          executeTaskTimed(ethTasksTimer.labels(getClass().getSimpleName()))));
       return;
     }
 
@@ -114,7 +115,9 @@ public abstract class AbstractRetryingPeerTask<T extends Collection<?>> extends 
         () ->
             ethContext
                 .getScheduler()
-                .scheduleFutureTask(this::executeTaskTimed, Duration.ofSeconds(1)));
+                .scheduleFutureTask(
+                    () -> this.executeTaskTimed(ethTasksTimer.labels(getClass().getSimpleName())),
+                    Duration.ofSeconds(1)));
   }
 
   protected abstract boolean isRetryableError(Throwable error);

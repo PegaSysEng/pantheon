@@ -163,9 +163,8 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
                   ethContext,
                   referenceHash,
                   referenceHeaderForNextRequest.getNumber(),
-                  count + 1,
-                  ethTasksTimer);
-          return headersTask.run();
+                  count + 1);
+          return headersTask.run(ethTasksTimer.labels(headersTask.getClass().getSimpleName()));
         });
   }
 

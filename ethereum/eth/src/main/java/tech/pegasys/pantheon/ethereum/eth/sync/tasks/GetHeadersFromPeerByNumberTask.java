@@ -18,8 +18,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
@@ -38,9 +36,8 @@ public class GetHeadersFromPeerByNumberTask extends AbstractGetHeadersFromPeerTa
       final long blockNumber,
       final int count,
       final int skip,
-      final boolean reverse,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(protocolSchedule, ethContext, blockNumber, count, skip, reverse, ethTasksTimer);
+      final boolean reverse) {
+    super(protocolSchedule, ethContext, blockNumber, count, skip, reverse);
     this.blockNumber = blockNumber;
   }
 
@@ -48,10 +45,18 @@ public class GetHeadersFromPeerByNumberTask extends AbstractGetHeadersFromPeerTa
       final ProtocolSchedule<?> protocolSchedule,
       final EthContext ethContext,
       final long firstBlockNumber,
-      final int segmentLength,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final int segmentLength) {
     return new GetHeadersFromPeerByNumberTask(
-        protocolSchedule, ethContext, firstBlockNumber, segmentLength, 0, false, ethTasksTimer);
+        protocolSchedule, ethContext, firstBlockNumber, segmentLength, 0, false);
+  }
+
+  public static AbstractGetHeadersFromPeerTask endingAtNumber(
+      final ProtocolSchedule<?> protocolSchedule,
+      final EthContext ethContext,
+      final long lastlockNumber,
+      final int segmentLength) {
+    return new GetHeadersFromPeerByNumberTask(
+        protocolSchedule, ethContext, lastlockNumber, segmentLength, 0, true);
   }
 
   public static AbstractGetHeadersFromPeerTask endingAtNumber(
@@ -59,29 +64,17 @@ public class GetHeadersFromPeerByNumberTask extends AbstractGetHeadersFromPeerTa
       final EthContext ethContext,
       final long lastlockNumber,
       final int segmentLength,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final int skip) {
     return new GetHeadersFromPeerByNumberTask(
-        protocolSchedule, ethContext, lastlockNumber, segmentLength, 0, true, ethTasksTimer);
-  }
-
-  public static AbstractGetHeadersFromPeerTask endingAtNumber(
-      final ProtocolSchedule<?> protocolSchedule,
-      final EthContext ethContext,
-      final long lastlockNumber,
-      final int segmentLength,
-      final int skip,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
-    return new GetHeadersFromPeerByNumberTask(
-        protocolSchedule, ethContext, lastlockNumber, segmentLength, skip, true, ethTasksTimer);
+        protocolSchedule, ethContext, lastlockNumber, segmentLength, skip, true);
   }
 
   public static AbstractGetHeadersFromPeerTask forSingleNumber(
       final ProtocolSchedule<?> protocolSchedule,
       final EthContext ethContext,
-      final long blockNumber,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final long blockNumber) {
     return new GetHeadersFromPeerByNumberTask(
-        protocolSchedule, ethContext, blockNumber, 1, 0, false, ethTasksTimer);
+        protocolSchedule, ethContext, blockNumber, 1, 0, false);
   }
 
   @Override

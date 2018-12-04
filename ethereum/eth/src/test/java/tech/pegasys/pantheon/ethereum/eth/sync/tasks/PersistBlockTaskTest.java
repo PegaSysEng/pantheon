@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -26,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +45,8 @@ public class PersistBlockTaskTest {
   private ProtocolSchedule<Void> protocolSchedule;
   private ProtocolContext<Void> protocolContext;
   private MutableBlockchain blockchain;
-  private final LabelledMetric<OperationTimer> ethTasksTimer = labels -> () -> () -> 0.0D;
+  private final LabelledMetric<OperationTimer> ethTasksTimer =
+      NoOpMetricsSystem.NO_OP_LABELED_TIMER;
 
   @Before
   public void setup() {
@@ -64,8 +67,8 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
-    final CompletableFuture<Block> result = task.run();
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
+    final CompletableFuture<Block> result = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     Awaitility.await().atMost(30, SECONDS).until(result::isDone);
 
@@ -86,8 +89,8 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
-    final CompletableFuture<Block> result = task.run();
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
+    final CompletableFuture<Block> result = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     Awaitility.await().atMost(30, SECONDS).until(result::isDone);
 
@@ -317,10 +320,10 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
 
     task.cancel();
-    final CompletableFuture<Block> result = task.run();
+    final CompletableFuture<Block> result = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     assertThat(result.isCancelled()).isTrue();
     assertThat(blockchain.contains(nextBlock.getHash())).isFalse();
@@ -337,11 +340,11 @@ public class PersistBlockTaskTest {
     // Create task
     final PersistBlockTask<Void> task =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL, ethTasksTimer);
+            protocolSchedule, protocolContext, nextBlock, HeaderValidationMode.FULL);
     final PersistBlockTask<Void> taskSpy = Mockito.spy(task);
-    Mockito.doNothing().when(taskSpy).executeTaskTimed();
+    Mockito.doNothing().when(taskSpy).executeTaskTimed(any());
 
-    final CompletableFuture<Block> result = taskSpy.run();
+    final CompletableFuture<Block> result = taskSpy.run(NoOpMetricsSystem.NO_OP_TIMER);
     taskSpy.cancel();
 
     assertThat(result.isCancelled()).isTrue();

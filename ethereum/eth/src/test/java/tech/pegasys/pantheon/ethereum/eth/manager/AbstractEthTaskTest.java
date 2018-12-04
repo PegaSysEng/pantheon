@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,7 +32,7 @@ public class AbstractEthTaskTest {
     final EthTaskWithMultipleSubtasks task =
         new EthTaskWithMultipleSubtasks(Lists.newArrayList(subtask1, subtask2));
 
-    task.run();
+    task.run(NoOpMetricsSystem.NO_OP_TIMER);
     task.cancel();
 
     assertThat(subtask1.isCancelled()).isTrue();
@@ -45,7 +47,7 @@ public class AbstractEthTaskTest {
     final EthTaskWithMultipleSubtasks task =
         new EthTaskWithMultipleSubtasks(Lists.newArrayList(subtask1, subtask2, subtask3));
 
-    task.run();
+    task.run(NoOpMetricsSystem.NO_OP_TIMER);
     subtask1.complete(null);
     task.cancel();
 
@@ -63,7 +65,7 @@ public class AbstractEthTaskTest {
     final EthTaskWithMultipleSubtasks task =
         new EthTaskWithMultipleSubtasks(Lists.newArrayList(subtask1, subtask2));
 
-    final CompletableFuture<Void> future = task.run();
+    final CompletableFuture<Void> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     subtask1.complete(null);
     subtask2.complete(null);
     task.cancel();
@@ -81,7 +83,7 @@ public class AbstractEthTaskTest {
     private final List<CompletableFuture<?>> subtasks;
 
     private EthTaskWithMultipleSubtasks(final List<CompletableFuture<?>> subtasks) {
-      super(labels -> () -> () -> 0.0D);
+      super();
       this.subtasks = subtasks;
     }
 

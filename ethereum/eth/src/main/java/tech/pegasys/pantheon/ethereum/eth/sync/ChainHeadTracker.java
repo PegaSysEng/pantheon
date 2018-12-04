@@ -70,12 +70,9 @@ public class ChainHeadTracker implements ConnectCallback {
   public void onPeerConnected(final EthPeer peer) {
     LOG.debug("Requesting chain head info for {}", peer);
     GetHeadersFromPeerByHashTask.forSingleHash(
-            protocolSchedule,
-            ethContext,
-            Hash.wrap(peer.chainState().getBestBlock().getHash()),
-            ethTasksTimer)
+            protocolSchedule, ethContext, Hash.wrap(peer.chainState().getBestBlock().getHash()))
         .assignPeer(peer)
-        .run()
+        .run(ethTasksTimer.labels(GetHeadersFromPeerByHashTask.class.getSimpleName()))
         .whenComplete(
             (peerResult, error) -> {
               if (peerResult != null && !peerResult.getResult().isEmpty()) {

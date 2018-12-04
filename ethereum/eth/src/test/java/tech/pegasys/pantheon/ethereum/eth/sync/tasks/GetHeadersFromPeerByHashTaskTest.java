@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.PeerMessageTaskTest;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +62,7 @@ public class GetHeadersFromPeerByHashTaskTest extends PeerMessageTaskTest<List<B
         ethContext,
         firstHeader.getHash(),
         firstHeader.getNumber(),
-        requestedData.size(),
-        ethTasksTimer);
+        requestedData.size());
   }
 
   @Test
@@ -109,11 +109,11 @@ public class GetHeadersFromPeerByHashTaskTest extends PeerMessageTaskTest<List<B
             startNumber,
             count,
             skip,
-            reverse,
-            ethTasksTimer);
+            reverse);
     final AtomicReference<PeerTaskResult<List<BlockHeader>>> actualResult = new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);
-    final CompletableFuture<PeerTaskResult<List<BlockHeader>>> future = task.run();
+    final CompletableFuture<PeerTaskResult<List<BlockHeader>>> future =
+        task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingPeer.respondWhile(responder, () -> !future.isDone());
     future.whenComplete(
         (result, error) -> {

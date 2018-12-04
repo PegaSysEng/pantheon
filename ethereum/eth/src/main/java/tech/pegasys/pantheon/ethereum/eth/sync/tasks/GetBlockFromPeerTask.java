@@ -43,7 +43,7 @@ public class GetBlockFromPeerTask extends AbstractPeerTask<Block> {
       final EthContext ethContext,
       final Hash hash,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethContext, ethTasksTimer);
+    super(ethContext);
     this.protocolSchedule = protocolSchedule;
     this.ethTasksTimer = ethTasksTimer;
     this.hash = hash;
@@ -80,10 +80,9 @@ public class GetBlockFromPeerTask extends AbstractPeerTask<Block> {
   private CompletableFuture<PeerTaskResult<List<BlockHeader>>> downloadHeader(final EthPeer peer) {
     return executeSubTask(
         () ->
-            GetHeadersFromPeerByHashTask.forSingleHash(
-                    protocolSchedule, ethContext, hash, ethTasksTimer)
+            GetHeadersFromPeerByHashTask.forSingleHash(protocolSchedule, ethContext, hash)
                 .assignPeer(peer)
-                .run());
+                .run(ethTasksTimer.labels(GetHeadersFromPeerByHashTask.class.getSimpleName())));
   }
 
   private CompletableFuture<PeerTaskResult<List<Block>>> completeBlock(
@@ -98,9 +97,9 @@ public class GetBlockFromPeerTask extends AbstractPeerTask<Block> {
         () -> {
           final GetBodiesFromPeerTask<?> task =
               GetBodiesFromPeerTask.forHeaders(
-                  protocolSchedule, ethContext, headerResult.getResult(), ethTasksTimer);
+                  protocolSchedule, ethContext, headerResult.getResult());
           task.assignPeer(headerResult.getPeer());
-          return task.run();
+          return task.run(ethTasksTimer.labels(task.getClass().getSimpleName()));
         });
   }
 }

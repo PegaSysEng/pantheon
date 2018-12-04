@@ -129,13 +129,14 @@ public class Downloader<C> {
   }
 
   private CompletableFuture<?> waitForPeers() {
-    return WaitForPeersTask.create(ethContext, 1, ethTasksTimer).run();
+    return WaitForPeersTask.create(ethContext, 1)
+        .run(ethTasksTimer.labels(WaitForPeersTask.class.getSimpleName()));
   }
 
   private CompletableFuture<?> waitForNewPeer() {
     return ethContext
         .getScheduler()
-        .timeout(WaitForPeerTask.create(ethContext, ethTasksTimer), Duration.ofSeconds(5));
+        .timeout(WaitForPeerTask.create(ethContext), Duration.ofSeconds(5));
   }
 
   private CompletableFuture<SyncTarget> findSyncTarget() {
@@ -166,7 +167,7 @@ public class Downloader<C> {
               bestPeer,
               config.downloaderHeaderRequestSize(),
               ethTasksTimer)
-          .run()
+          .run(ethTasksTimer.labels(DetermineCommonAncestorTask.class.getSimpleName()))
           .handle((r, t) -> r)
           .thenCompose(
               (target) -> {
@@ -291,8 +292,9 @@ public class Downloader<C> {
     }
 
     // Try to pull more checkpoint headers
-    return checkpointHeadersTask(syncTarget)
-        .run()
+    EthTask<PeerTaskResult<List<BlockHeader>>> ethTask = checkpointHeadersTask(syncTarget);
+    return ethTask
+        .run(ethTasksTimer.labels(ethTask.getClass().getSimpleName()))
         .handle(
             (r, t) -> {
               t = ExceptionUtils.rootCause(t);
@@ -331,8 +333,7 @@ public class Downloader<C> {
             lastHeader.getHash(),
             lastHeader.getNumber(),
             config.downloaderHeaderRequestSize() + 1,
-            config.downloaderChainSegmentSize() - 1,
-            ethTasksTimer)
+            config.downloaderChainSegmentSize() - 1)
         .assignPeer(syncTarget.peer());
   }
 
@@ -353,7 +354,10 @@ public class Downloader<C> {
               checkpointHeaders.getFirst(),
               config.downloaderChainSegmentSize(),
               ethTasksTimer);
-      importedBlocks = importTask.run().thenApply(PeerTaskResult::getResult);
+      importedBlocks =
+          importTask
+              .run(ethTasksTimer.labels(importTask.getClass().getSimpleName()))
+              .thenApply(PeerTaskResult::getResult);
     } else {
       final PipelinedImportChainSegmentTask<C> importTask =
           PipelinedImportChainSegmentTask.forCheckpoints(
@@ -363,7 +367,7 @@ public class Downloader<C> {
               config.downloaderParallelism(),
               ethTasksTimer,
               Lists.newArrayList(checkpointHeaders));
-      importedBlocks = importTask.run();
+      importedBlocks = importTask.run(ethTasksTimer.labels(importTask.getClass().getSimpleName()));
     }
 
     return importedBlocks.whenComplete(

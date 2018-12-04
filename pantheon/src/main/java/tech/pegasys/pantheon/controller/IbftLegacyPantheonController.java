@@ -53,8 +53,10 @@ import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -137,6 +139,9 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager;
     final SubProtocol ethSubProtocol;
+    LabelledMetric<OperationTimer> ethTasksTimer =
+        metricsSystem.createLabelledTimer(
+            MetricCategory.TASKS, "ethTask", "Internal processing tasks", "taskName");
     if (ottomanTestnetOperation) {
       LOG.info("Operating on Ottoman testnet.");
       ethSubProtocol = Istanbul64Protocol.get();
@@ -146,7 +151,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig.transactionsParallelism(),
+              ethTasksTimer);
     } else {
       ethSubProtocol = EthProtocol.get();
       ethProtocolManager =
@@ -155,7 +161,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig.transactionsParallelism(),
+              ethTasksTimer);
     }
 
     final SyncState syncState =
@@ -168,8 +175,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             protocolContext,
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem.createLabelledTimer(
-                MetricCategory.TASKS, "ethTask", "Internal processing tasks", "taskName"));
+            ethTasksTimer);
 
     final Runnable closer =
         () -> {

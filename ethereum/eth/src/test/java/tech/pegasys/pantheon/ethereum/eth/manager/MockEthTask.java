@@ -17,7 +17,7 @@ public class MockEthTask extends AbstractEthTask<Object> {
   private boolean executed = false;
 
   protected MockEthTask() {
-    super(labels -> () -> () -> 0.0D);
+    super();
   }
 
   @Override

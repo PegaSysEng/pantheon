@@ -226,7 +226,9 @@ public class BlockPropagationManager<C> {
         GetBlockFromPeerTask.create(protocolSchedule, ethContext, newBlock.hash(), ethTasksTimer)
             .assignPeer(peer);
 
-    return getBlockTask.run().thenCompose((r) -> importOrSavePendingBlock(r.getResult()));
+    return getBlockTask
+        .run(ethTasksTimer.labels(getBlockTask.getClass().getSimpleName()))
+        .thenCompose((r) -> importOrSavePendingBlock(r.getResult()));
   }
 
   @VisibleForTesting
@@ -250,10 +252,11 @@ public class BlockPropagationManager<C> {
     // Import block
     final PersistBlockTask<C> importTask =
         PersistBlockTask.create(
-            protocolSchedule, protocolContext, block, HeaderValidationMode.FULL, ethTasksTimer);
+            protocolSchedule, protocolContext, block, HeaderValidationMode.FULL);
     return ethContext
         .getScheduler()
-        .scheduleSyncWorkerTask(importTask::run)
+        .scheduleSyncWorkerTask(
+            () -> importTask.run(ethTasksTimer.labels(importTask.getClass().getSimpleName())))
         .whenComplete(
             (r, t) -> {
               if (t != null) {

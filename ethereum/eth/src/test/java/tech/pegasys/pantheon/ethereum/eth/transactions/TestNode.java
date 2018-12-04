@@ -100,7 +100,7 @@ public class TestNode implements Closeable {
     final ProtocolContext<Void> protocolContext =
         new ProtocolContext<>(blockchain, worldStateArchive, null);
     final EthProtocolManager ethProtocolManager =
-        new EthProtocolManager(blockchain, 1, false, 1, 1);
+        new EthProtocolManager(blockchain, 1, false, 1, 1, labels -> NoOpMetricsSystem.NO_OP_TIMER);
 
     final NetworkRunner networkRunner =
         NetworkRunner.builder()

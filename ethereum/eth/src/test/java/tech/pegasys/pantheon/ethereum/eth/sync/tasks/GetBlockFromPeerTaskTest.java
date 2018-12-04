@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.AbstractMessageTaskTest;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException.FailureReason;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -67,7 +68,7 @@ public class GetBlockFromPeerTaskTest
 
     // Execute task
     final EthTask<PeerTaskResult<Block>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<Block>> future = task.run();
+    final CompletableFuture<PeerTaskResult<Block>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     final AtomicReference<Throwable> failure = new AtomicReference<>();
     future.whenComplete(
         (r, t) -> {
@@ -82,9 +83,9 @@ public class GetBlockFromPeerTaskTest
     final EthTaskException ethException = (EthTaskException) error;
     assertThat(ethException.reason()).isEqualTo(FailureReason.NO_AVAILABLE_PEERS);
 
-    assertThat(task.run().isCompletedExceptionally()).isTrue();
+    assertThat(task.run(NoOpMetricsSystem.NO_OP_TIMER).isCompletedExceptionally()).isTrue();
     task.cancel();
-    assertThat(task.run().isCompletedExceptionally()).isTrue();
+    assertThat(task.run(NoOpMetricsSystem.NO_OP_TIMER).isCompletedExceptionally()).isTrue();
   }
 
   @Test
@@ -100,7 +101,7 @@ public class GetBlockFromPeerTaskTest
     // Execute task and wait for response
     final AtomicBoolean done = new AtomicBoolean(false);
     final EthTask<PeerTaskResult<Block>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<Block>> future = task.run();
+    final CompletableFuture<PeerTaskResult<Block>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
     final AtomicReference<Throwable> failure = new AtomicReference<>();
     future.whenComplete(
@@ -115,8 +116,8 @@ public class GetBlockFromPeerTaskTest
     assertThat(error).isInstanceOf(EthTaskException.class);
     assertThat(((EthTaskException) error).reason()).isEqualTo(FailureReason.INCOMPLETE_RESULTS);
 
-    assertThat(task.run().isCompletedExceptionally()).isTrue();
+    assertThat(task.run(NoOpMetricsSystem.NO_OP_TIMER).isCompletedExceptionally()).isTrue();
     task.cancel();
-    assertThat(task.run().isCompletedExceptionally()).isTrue();
+    assertThat(task.run(NoOpMetricsSystem.NO_OP_TIMER).isCompletedExceptionally()).isTrue();
   }
 }

@@ -32,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class ImportBlocksTaskTest
         ethContext,
         firstBlock.getHeader(),
         requestedData.size(),
-        labels -> () -> () -> 0.0D);
+        NoOpMetricsSystem.NO_OP_LABELED_TIMER);
   }
 
   @Override
@@ -119,7 +120,8 @@ public class ImportBlocksTaskTest
     final AtomicBoolean done = new AtomicBoolean(false);
     final List<Block> requestedData = generateDataToBeRequested();
     final EthTask<PeerTaskResult<List<Block>>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<List<Block>>> future = task.run();
+    final CompletableFuture<PeerTaskResult<List<Block>>> future =
+        task.run(NoOpMetricsSystem.NO_OP_TIMER);
     future.whenComplete(
         (response, error) -> {
           actualResult.set(response.getResult());
@@ -151,7 +153,8 @@ public class ImportBlocksTaskTest
     final AtomicBoolean done = new AtomicBoolean(false);
     final List<Block> requestedData = generateDataToBeRequested();
     final EthTask<PeerTaskResult<List<Block>>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<List<Block>>> future = task.run();
+    final CompletableFuture<PeerTaskResult<List<Block>>> future =
+        task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
     future.whenComplete(
         (response, error) -> {

@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +29,11 @@ public class DeterministicEthScheduler extends EthScheduler {
   }
 
   DeterministicEthScheduler(final TimeoutPolicy timeoutPolicy) {
-    super(new MockExecutorService(), new MockScheduledExecutor(), new MockExecutorService());
+    super(
+        new MockExecutorService(),
+        new MockScheduledExecutor(),
+        new MockExecutorService(),
+        label -> NoOpMetricsSystem.NO_OP_TIMER);
     this.timeoutPolicy = timeoutPolicy;
   }
 

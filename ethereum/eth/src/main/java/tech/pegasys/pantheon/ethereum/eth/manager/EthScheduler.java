@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.time.Duration;
@@ -44,8 +46,12 @@ public class EthScheduler {
   protected final ExecutorService syncWorkerExecutor;
   protected final ScheduledExecutorService scheduler;
   protected final ExecutorService txWorkerExecutor;
+  private final LabelledMetric<OperationTimer> ethTasksTimer;
 
-  EthScheduler(final int syncWorkerCount, final int txWorkerCount) {
+  EthScheduler(
+      final int syncWorkerCount,
+      final int txWorkerCount,
+      final LabelledMetric<OperationTimer> ethTasksTimer) {
     this(
         Executors.newFixedThreadPool(
             syncWorkerCount,
@@ -62,16 +68,19 @@ public class EthScheduler {
             txWorkerCount,
             new ThreadFactoryBuilder()
                 .setNameFormat(EthScheduler.class.getSimpleName() + "-Transactions")
-                .build()));
+                .build()),
+        ethTasksTimer);
   }
 
   protected EthScheduler(
       final ExecutorService syncWorkerExecutor,
       final ScheduledExecutorService scheduler,
-      final ExecutorService txWorkerExecutor) {
+      final ExecutorService txWorkerExecutor,
+      final LabelledMetric<OperationTimer> ethTasksTimer) {
     this.syncWorkerExecutor = syncWorkerExecutor;
     this.scheduler = scheduler;
     this.txWorkerExecutor = txWorkerExecutor;
+    this.ethTasksTimer = ethTasksTimer;
   }
 
   public <T> CompletableFuture<T> scheduleSyncWorkerTask(
@@ -168,7 +177,8 @@ public class EthScheduler {
   }
 
   public <T> CompletableFuture<T> timeout(final EthTask<T> task, final Duration timeout) {
-    final CompletableFuture<T> future = task.run();
+    final CompletableFuture<T> future =
+        task.run(ethTasksTimer.labels(task.getClass().getSimpleName()));
     final CompletableFuture<T> result = timeout(future, timeout);
     result.whenComplete(
         (r, error) -> {

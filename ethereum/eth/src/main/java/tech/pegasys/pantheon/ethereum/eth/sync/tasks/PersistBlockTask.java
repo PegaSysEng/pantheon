@@ -41,9 +41,7 @@ public class PersistBlockTask<C> extends AbstractEthTask<Block> {
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final Block block,
-      final HeaderValidationMode headerValidationMode,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethTasksTimer);
+      final HeaderValidationMode headerValidationMode) {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.block = block;
@@ -54,10 +52,8 @@ public class PersistBlockTask<C> extends AbstractEthTask<Block> {
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final Block block,
-      final HeaderValidationMode headerValidationMode,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
-    return new PersistBlockTask<>(
-        protocolSchedule, protocolContext, block, headerValidationMode, ethTasksTimer);
+      final HeaderValidationMode headerValidationMode) {
+    return new PersistBlockTask<>(protocolSchedule, protocolContext, block, headerValidationMode);
   }
 
   public static <C> Supplier<CompletableFuture<List<Block>>> forSequentialBlocks(
@@ -104,9 +100,8 @@ public class PersistBlockTask<C> extends AbstractEthTask<Block> {
       final List<Block> list,
       final HeaderValidationMode headerValidationMode,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    return PersistBlockTask.create(
-            protocolSchedule, protocolContext, block, headerValidationMode, ethTasksTimer)
-        .run()
+    return PersistBlockTask.create(protocolSchedule, protocolContext, block, headerValidationMode)
+        .run(ethTasksTimer.labels(PersistBlockTask.class.getSimpleName()))
         .whenComplete(
             (r, t) -> {
               if (r != null) {
@@ -130,8 +125,8 @@ public class PersistBlockTask<C> extends AbstractEthTask<Block> {
         if (future == null) {
           future =
               PersistBlockTask.create(
-                      protocolSchedule, protocolContext, block, headerValidationMode, ethTasksTimer)
-                  .run();
+                      protocolSchedule, protocolContext, block, headerValidationMode)
+                  .run(ethTasksTimer.labels(PersistBlockTask.class.getSimpleName()));
           continue;
         }
         future =
@@ -143,12 +138,8 @@ public class PersistBlockTask<C> extends AbstractEthTask<Block> {
                         successfulImports.add(r);
                       }
                       return PersistBlockTask.create(
-                              protocolSchedule,
-                              protocolContext,
-                              block,
-                              headerValidationMode,
-                              ethTasksTimer)
-                          .run();
+                              protocolSchedule, protocolContext, block, headerValidationMode)
+                          .run(ethTasksTimer.labels(PersistBlockTask.class.getSimpleName()));
                     });
       }
       future.whenComplete(

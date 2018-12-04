@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException.FailureReason;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -51,7 +52,7 @@ public abstract class PeerMessageTaskTest<T> extends AbstractMessageTaskTest<T, 
     final AtomicBoolean done = new AtomicBoolean(false);
     final T requestedData = generateDataToBeRequested();
     final EthTask<PeerTaskResult<T>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<T>> future = task.run();
+    final CompletableFuture<PeerTaskResult<T>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
     future.whenComplete(
         (response, error) -> {
@@ -72,7 +73,7 @@ public abstract class PeerMessageTaskTest<T> extends AbstractMessageTaskTest<T, 
 
     // Execute task
     final EthTask<PeerTaskResult<T>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<T>> future = task.run();
+    final CompletableFuture<PeerTaskResult<T>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     final AtomicReference<Throwable> failure = new AtomicReference<>();
     future.whenComplete((r, t) -> failure.set(t));
 
@@ -84,9 +85,9 @@ public abstract class PeerMessageTaskTest<T> extends AbstractMessageTaskTest<T, 
     final EthTaskException ethException = (EthTaskException) error;
     assertThat(ethException.reason()).isEqualTo(FailureReason.NO_AVAILABLE_PEERS);
 
-    assertThat(task.run().isCompletedExceptionally()).isTrue();
+    assertThat(task.run(NoOpMetricsSystem.NO_OP_TIMER).isCompletedExceptionally()).isTrue();
     task.cancel();
-    assertThat(task.run().isCompletedExceptionally()).isTrue();
+    assertThat(task.run(NoOpMetricsSystem.NO_OP_TIMER).isCompletedExceptionally()).isTrue();
   }
 
   @Test
@@ -102,7 +103,7 @@ public abstract class PeerMessageTaskTest<T> extends AbstractMessageTaskTest<T, 
     // Execute task and wait for response
     final AtomicBoolean done = new AtomicBoolean(false);
     final EthTask<PeerTaskResult<T>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<T>> future = task.run();
+    final CompletableFuture<PeerTaskResult<T>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
     future.whenComplete((response, error) -> done.compareAndSet(false, true));
     assertThat(future.isDone()).isTrue();
@@ -121,7 +122,7 @@ public abstract class PeerMessageTaskTest<T> extends AbstractMessageTaskTest<T, 
 
     // Execute task and wait for response
     final EthTask<PeerTaskResult<T>> task = createTask(requestedData);
-    final CompletableFuture<PeerTaskResult<T>> future = task.run();
+    final CompletableFuture<PeerTaskResult<T>> future = task.run(NoOpMetricsSystem.NO_OP_TIMER);
 
     assertThat(future.isCompletedExceptionally()).isTrue();
     assertThat(
