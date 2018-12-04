@@ -32,6 +32,7 @@ public class WebSocketConfiguration {
   private int port;
   private String host;
   private Collection<RpcApi> rpcApis;
+  private long refreshDelay;
 
   public static WebSocketConfiguration createDefault() {
     final WebSocketConfiguration config = new WebSocketConfiguration();
@@ -109,5 +110,13 @@ public class WebSocketConfiguration {
   @Override
   public int hashCode() {
     return Objects.hashCode(enabled, port, host, rpcApis);
+  }
+
+  public void setRefreshDelay(final long refreshDelay) {
+    this.refreshDelay = refreshDelay;
+  }
+
+  public long getRefreshDelay() {
+    return refreshDelay;
   }
 }

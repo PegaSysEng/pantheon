@@ -49,6 +49,11 @@ public class SubscriptionManager extends AbstractVerticle {
   private final Map<Long, Subscription> subscriptions = new HashMap<>();
   private final Map<String, List<Long>> connectionSubscriptionsMap = new HashMap<>();
   private final SubscriptionBuilder subscriptionBuilder = new SubscriptionBuilder();
+  private final long refreshDelay;
+
+  public SubscriptionManager(final long refreshDelay) {
+    this.refreshDelay = refreshDelay;
+  }
 
   @Override
   public void start() {
@@ -161,5 +166,9 @@ public class SubscriptionManager extends AbstractVerticle {
         .map(Entry::getKey)
         .findFirst()
         .ifPresent(connectionId -> vertx.eventBus().send(connectionId, Json.encode(response)));
+  }
+
+  public long getRefreshDelay() {
+    return refreshDelay;
   }
 }

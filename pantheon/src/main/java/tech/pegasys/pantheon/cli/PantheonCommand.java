@@ -331,6 +331,17 @@ public class PantheonCommand implements Runnable {
   private final Collection<RpcApi> wsApis = null;
 
   @Option(
+    names = {"--ws-refresh-delay"},
+    paramLabel = "<refresh delay>",
+    arity = "1",
+    description =
+        "Refresh delay of websocket subscription sync in milliseconds. "
+            + "default: ${DEFAULT-VALUE}",
+    defaultValue = "5000"
+  )
+  private final long refreshDelay = 5000;
+
+  @Option(
     names = {"--dev-mode"},
     description =
         "set during development to have a custom genesis with specific chain id "
@@ -484,6 +495,7 @@ public class PantheonCommand implements Runnable {
     webSocketConfiguration.setHost(wsHostAndPort.getHost());
     webSocketConfiguration.setPort(wsHostAndPort.getPort());
     webSocketConfiguration.setRpcApis(wsApis);
+    webSocketConfiguration.setRefreshDelay(refreshDelay);
     return webSocketConfiguration;
   }
 
