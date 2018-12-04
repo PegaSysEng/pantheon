@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.controller;
 
+import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.util.ArrayList;
@@ -24,26 +26,30 @@ public class NodeWhitelistController {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private static List<String> nodeWhitelist;
+  private static List<Peer> nodeWhitelist;
   private static boolean nodeWhitelistSet = false;
 
   public NodeWhitelistController(final PermissioningConfiguration configuration) {
     nodeWhitelist = new ArrayList<>();
     if (configuration != null && configuration.getNodeWhitelist() != null) {
-      nodeWhitelist.addAll(configuration.getNodeWhitelist());
+      for (String urlString : configuration.getNodeWhitelist()) {
+        nodeWhitelist.add(DefaultPeer.fromURI(urlString));
+      }
       nodeWhitelistSet = true;
     }
   }
 
-  public boolean addNode(final String nodeId) {
-    return nodeWhitelist.add(nodeId);
+  public boolean addNode(final Peer node) {
+    return nodeWhitelist.add(node);
   }
 
-  public boolean removeNode(final String nodeId) {
-    return nodeWhitelist.remove(nodeId);
+  public boolean removeNode(final Peer node) {
+    return nodeWhitelist.remove(node);
   }
 
   public static boolean isNodeWhitelistSet() {
     return nodeWhitelistSet;
   }
+
+  // isThisNodeInWhitelist(Peer node)
 }

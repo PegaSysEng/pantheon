@@ -194,6 +194,8 @@ public class PeerDiscoveryController {
     if (sender.getId().equals(agent.getAdvertisedPeer().getId())) {
       return;
     }
+    // make enodeUrl from sender
+    // if !NodeWhitelistController.hasInlist() return;
 
     // Load the peer from the table, or use the instance that comes in.
     final Optional<DiscoveryPeer> maybeKnownPeer = peerTable.get(sender);
