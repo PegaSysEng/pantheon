@@ -109,6 +109,6 @@ public class VoteTallyCache {
       voteTallyUpdater.updateForBlock(h, mutableVoteTally);
       voteTallyCache.put(h.getHash(), mutableVoteTally.copy());
     }
-    return tally;
+    return mutableVoteTally;
   }
 }

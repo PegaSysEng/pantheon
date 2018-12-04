@@ -76,7 +76,7 @@ public class VoteTallyCacheTest {
         new CliqueExtraData(
                 BytesValue.wrap(new byte[32]),
                 Signature.create(BigInteger.TEN, BigInteger.TEN, (byte) 1),
-                Lists.emptyList())
+                validators)
             .encode());
 
     genesisBlock = createEmptyBlock(0, Hash.ZERO);
@@ -153,6 +153,9 @@ public class VoteTallyCacheTest {
     assertThat(varArgs.getAllValues()).isEqualTo(Arrays.asList(block_3.getHeader()));
   }
 
+  // A bug was identified in VoteTallyCache whereby a vote cast in the next block *could* be applied
+  // to the parent block (depending on cache creation ordering). This test ensure the problem is
+  // resolved.
   @Test
   public void integrationTestingVotesBeingApplied() {
     final EpochManager epochManager = new EpochManager(30_000);
@@ -167,12 +170,14 @@ public class VoteTallyCacheTest {
 
     final VoteTallyCache cache = new VoteTallyCache(blockChain, tallyUpdater, epochManager);
 
-    final VoteTally initialVoteTally = cache.getVoteTallyAfterBlock(block_1.getHeader());
-    assertThat(initialVoteTally.getValidators()).containsAll(validators);
+    VoteTally voteTally = cache.getVoteTallyAfterBlock(block_1.getHeader());
+    assertThat(voteTally.getValidators()).containsAll(validators);
 
-    final VoteTally finalVoteTally = cache.getVoteTallyAfterBlock(block_2.getHeader());
+    voteTally = cache.getVoteTallyAfterBlock(block_2.getHeader());
 
-    assertThat(initialVoteTally.getValidators())
-        .containsExactly(validators.get(0), validators.get(1));
+    assertThat(voteTally.getValidators()).containsExactly(validators.get(0), validators.get(1));
+
+    voteTally = cache.getVoteTallyAfterBlock(block_1.getHeader());
+    assertThat(voteTally.getValidators()).containsAll(validators);
   }
 }
