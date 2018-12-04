@@ -14,10 +14,11 @@ package tech.pegasys.pantheon.tests.acceptance.clique;
 
 import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
 
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   private PantheonNode minerNode1;
