@@ -166,7 +166,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             ethProtocolManager.ethContext(),
             syncState,
             metricsSystem.createLabelledTimer(
-                MetricCategory.ETH_SCHEDULER, "ethTask", "Internal processing tasks", "taskName"));
+                MetricCategory.ETH_SCHEDULER, "task", "Internal processing tasks", "taskName"));
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(

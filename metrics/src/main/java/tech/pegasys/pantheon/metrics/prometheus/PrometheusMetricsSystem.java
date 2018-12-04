@@ -85,7 +85,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       final String help,
       final String... labelNames) {
     final Summary summary =
-        Summary.build(name, help)
+        Summary.build(convertToPrometheusName(category, name), help)
             .quantile(0.2, 0.02)
             .quantile(0.5, 0.05)
             .quantile(0.8, 0.02)
