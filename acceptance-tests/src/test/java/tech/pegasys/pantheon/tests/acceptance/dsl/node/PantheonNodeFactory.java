@@ -152,7 +152,7 @@ public class PantheonNodeFactory {
     final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
     config.setEnabled(true);
     config.setPort(0);
-    config.hostWhitelist(singletonList("*"));
+    config.hostsWhitelist(singletonList("*"));
     return config;
   }
 

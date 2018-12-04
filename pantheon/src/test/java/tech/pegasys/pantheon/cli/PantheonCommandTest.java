@@ -711,19 +711,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void jsonRpcHostWhitelistAcceptsSingleArgument() {
     parseCommand("--host-whitelist", "a");
 
-    verify(mockRunnerBuilder)
-        .build(
-            any(),
-            any(),
-            anyBoolean(),
-            any(),
-            anyString(),
-            anyInt(),
-            anyInt(),
-            jsonRpcConfigArgumentCaptor.capture(),
-            any(),
-            any(),
-            any());
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist().size()).isEqualTo(1);
     assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist()).contains("a");
@@ -737,19 +726,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void jsonRpcHostWhitelistAcceptsMultipleArguments() {
     parseCommand("--host-whitelist", "a,b");
 
-    verify(mockRunnerBuilder)
-        .build(
-            any(),
-            any(),
-            anyBoolean(),
-            any(),
-            anyString(),
-            anyInt(),
-            anyInt(),
-            jsonRpcConfigArgumentCaptor.capture(),
-            any(),
-            any(),
-            any());
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist().size()).isEqualTo(2);
     assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist()).contains("a", "b");
