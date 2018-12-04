@@ -15,45 +15,45 @@ Some guidelines are personal opinion.  The idea being we make a decision once, d
 
 # 2 General Design Philosophy 
 
-The three key principles are: 
+The key principles are: 
 * Keep It Simple 
 * Idiomatic Java
 * YAGNI (You Ain't Gonna Need It)
 
 ## 2.1 Keep It Simple
 
-Simple does not mean the fewest lines of code. Simple code is code: 
+Simple does not mean the fewest lines of code. Simple code is: 
 * Easy to understand
 * Self-documenting and not dependent on comments to explain what it does
 * Understandable even to inexperienced Java developers
 * Dependent on selecting the right data structures for the task
-* Usually the most performant. Without data showing another approach is faster, stick with the simple design. 
+* Usually the most performant. Without data showing another approach is faster, stick with the simple design 
 * Not simplistic:
 
-  - Ethereum is complex and Pantheon must handle this complexity and operate correctly and securely. 
-  - Pantheon code should align with well-established Ethereum abstractions and terminology used in Ethereum specifications. 
-  - Aim to make the code as simple as possible but no simpler. 
+  - Ethereum is complex and Pantheon must handle this complexity and operate correctly and securely 
+  - Pantheon code should align with well-established Ethereum abstractions and terminology used in Ethereum specifications 
+  - Aim to make the code as simple as possible but no simpler
   
 ## 2.2 Idiomatic Java 
 
 Pantheon embraces typical Java idioms including using an Object Oriented approach to design. This includes:   
 * Providing alternate behaviours via polymorphism instead of having conditional logic scattered through the codebase. For example, `ProtocolSpec` provides a standard interface to blockchain operations and multiple implementations define the different behaviours for each Ethereum milestone. 
-* Encapsulating behaviour and data together within classes. For example, `BytesValue` encapsulates byte data and methods operating on the byte data. `BytesValue.isZero()` is an instance method instead of accepting a `BytesValue` parameter.
+* Encapsulating behaviour and data together in classes. For example, `BytesValue` encapsulates byte data and methods operating on the byte data. `BytesValue.isZero()` is an instance method instead of accepting a `BytesValue` parameter.
 
   `ProtocolSpec` is an exception and does not hold the blockchain data on which it operates. This is because that blockchain data is widely shared and not specifically owned by `ProtocolSpec`.
 * Embracing modern Java features like Optional, Streams and lambdas when they make code simpler and clearer. 
 
    - Do use Streams and map with lambdas to convert values in a list to a different form.
-   - Don't pass lambdas into executors because it makes it harder identify the threading interactions. The lambda makes the code shorter but not clearer. Instead use a separate class or extract a method. 
+   - Don't pass lambdas into executors because it makes it harder to identify the threading interactions. The lambda makes the code shorter but not clearer. Instead use a separate class or extract a method. 
 * For good examples, refer to the APIs the JDK itself exposes. 
 
 >**Note** If you're not sure what idiomatic Java looks like, start by following the typical patterns and naming used in Pantheon.
 
 ## 2.3 You Ain't Gonna Need It (YAGNI)
 
-Pantheon's design prioritizes meeting the current requirements in the simplest, clearest way over attempting to anticipate future functionality. As a result, Pantheon’s design:
+The Pantheon design prioritizes meeting current requirements in the simplest, clearest way over attempting to anticipate future functionality. As a result, Pantheon’s design:
 * Is not set in stone as a big upfront design. The design is adjusted through constant refactoring as new requirements are added and understood.
-* Uses abstraction only where it aids understanding of the current code. Abstraction is not used where it only support future needs.
+* Uses abstraction only where it aids understanding of the current code. Abstraction is not used where it only supports future needs.
 * Avoids over-engineering.
 
 # 3 Specific Design Techniques
@@ -61,27 +61,27 @@ Pantheon's design prioritizes meeting the current requirements in the simplest, 
 # 3.1 Creating Understandable, Self-documenting Code 
 
 To create understandable, self-documenting code:
-  - Use clear naming for variables, methods, and classes.
-  - Use US spelling instead of UK. For example, synchronize instead of synchronise)
+  - Use clear naming for variables, methods, and classes
+  - Use US spelling instead of UK. For example, synchronize instead of synchronise
   - Keep methods and classes short and focused on a single responsibility. Preferable maximum lengths:
     * Lambdas: single line
     * Methods: fit on a screen
     * Anonymous classes: less than a screen
     * Inner classes: not much more than a screen
     * Classes: a few hundred lines
-  - Be thoughtfully organised in terms of method order, package structure, and module usage.
-  - Follow well-established patterns and conventions.
-  - Be consistent.
-  - Make it easy to follow the control flow by _clicking through_ in an IDE.
-  - Make it easier to use the right way than the wrong way. 
-  - Avoid abbreviations. We are a global team and when English is a second language abbreviations reduce readability. The following abbreviations are used: 
+  - Be thoughtfully organised in terms of method order, package structure, and module usage
+  - Follow well-established patterns and conventions
+  - Be consistent
+  - Make it easy to follow the control flow by _clicking through_ in an IDE
+  - Make it easier to use the right way than the wrong way
+  - Avoid abbreviations. We are a global team and when English is a second language abbreviations reduce readability. The following abbreviations are exceptions: 
     * tx -> Transaction
     * IBFT -> Istanbul Byzantine Fault Tolerant (a consensus protocol)
-    * EVS -> Ethereum Virtual Machine 
+    * EVM -> Ethereum Virtual Machine 
     
 # 3.2 Creating Code for Constant Refactoring and Evolving Design
 
-To be able to cope with constant refactoring and evolving design, write code that:
+So the code can cope with constant refactoring and evolving design, write code that:
 * Is well tested. 
 
   Avoid test cases requiring detailed interactions with mocks because these are often brittle.
@@ -92,26 +92,28 @@ To be able to cope with constant refactoring and evolving design, write code tha
 
   >**Note** It is important to scope the responsibility wisely. Responsibilities that are:
   > *  Too small lead to an explosion of classes making things hard to follow
-  > *  Too large lead to the class becoming big and unwieldy.
+  > *  Too large lead to the class becoming big and unwieldy
 
-* Favors composition over inheritance. You can use inheritance, but prefer composition.
+* Favors composition over inheritance. You can use inheritance, but prefer composition
 
 * Uses dependency injection
-  - Constructors should be simple, with dependencies passed in rather than built in the constructor.
-  - Pantheon does not use a dependency injection framework.
+  - Constructors should be simple, with dependencies passed in rather than built in the constructor
+  - Pantheon does not use a dependency injection framework
 
-* Validates method parameters for public methods using the Guava `Preconditions` class. Avoid validating parameters in private methods.
+* Validates method parameters for public methods using the Guava `Preconditions` class. Avoid validating parameters in private methods
 
-* Generally avoids interfaces with a single implementation unless they are explicitly being used to narrow the exposed API.
+* Generally avoids interfaces with a single implementation unless they are explicitly being used to narrow the exposed API
 
-* Uses the most general applicable type. For example,  `List` or `Collection` instead of `ArrayList`.
+* Uses the most general applicable type. For example,  `List` or `Collection` instead of `ArrayList`
 
 ## 3.3 Additional Design Elements
 
-Additional design elements include: 
-* Using Optional rather than returning null when not having a value is a normal case.
-* Considering exception and error handling as part of the overall design.   Pantheon avoids checked exceptions.
-* Giving threads are giving meaningful names. For example:
+
+* Use Optional rather than returning null when not having a value is a normal case
+
+* Consider exception and error handling as part of the overall design.   Pantheon avoids checked exceptions
+
+* Give threads meaningful names. For example:
  `Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat(“Ibft”).build())`
 
   
@@ -129,16 +131,7 @@ To automatically reformat the code before creating a pull request, run:
 
 ### 4.1.1 Install Google Style Settings 
 
-To install the Google style settings in the Intellij IDE, download `intellij-java-google-style.xml` from [here](https://github.com/google/styleguide). 
-
-For Mac OS: 
-1. In Intellij, select **Preferences -> Editor -> Code Style**. 
-2. Select the small gear icon next to **Scheme** and select **Import Scheme → IntelliJ IDEA code style XML**.
-3. Select *GoogleStyle* as the coding style.
-
-For Windows: 
-1. Copy the downloaded file into the `config/codestyles` folder in your IntelliJ settings folder. 
-2. In Intellj, select **Settings -> Editor -> Code Style** and select the *google-styleguide* as the current code style. 
+The Google style settings can be installed in [Intellij](https://github.com/google/google-java-format#intellij) and [Eclipse](https://github.com/google/google-java-format#eclipse). 
 
 ## 4.2 Additional Java Style Guidelines
 
@@ -159,28 +152,29 @@ Method parameters must be final.  Class level and local fields should be final w
 
 ## 4.2.4 Testing
 
-* Don't use a fixed prefix (for example, `test`). Do explain the expected behaviour not just the situation. 
+* Don't use a fixed prefix (for example, `test`). Do explain the expected behaviour not just the situation
   
   Good: `returnTrueWhenValueIsXyz()`
+
   Bad: `valueIsXyz()`
 
 * Use AssertJ for assertions in preference to JUnit’s Assert class.
 
-  To help future-proof the code (avoiding libraries that may be deprecated in the near future), avoid assertions from the `org.assertj.core.api.Java6Assertions` class. Java6 in the name is a concerning signal.
+  To help future-proof the code (avoiding libraries that may be deprecated in the near future), avoid assertions from the `org.assertj.core.api.Java6Assertions` class. Java6 in the name is a concerning signal
 
 ## 4.2.5 Miscellaneous 
 
-* Create loggers with: 
+* When creating loggers it should be the first declaration in the class with: 
 
   `private static final Logger LOG = getLogger();`
 
-* Ternary operators are acceptable when they make the code clearer but should never be nested.
+* Ternary operators are acceptable when they make the code clearer but should never be nested
  
-* Avoid TODO comments. Log a ticket instead.
+* Avoid TODO comments. Log a ticket instead
 
-* Specify Gradle dependency versions in `versions.gradle`.
+* Specify Gradle dependency versions in `versions.gradle`
 
-* Don't use two or more blank lines in a row. 
+* Don't use two or more blank lines in a row
 
 # 5 Logging
 
@@ -189,8 +183,8 @@ Logging is important for understanding what Pantheon is doing at any given time 
 ## 5.1 Log Messages
 
 Make log messages: 
-* Not so frequent they are overwhelming in the log output. 
-* At the appropriate level.
+* Not so frequent they are overwhelming in the log output 
+* At the appropriate level
 * Detailed enough to understand what actually happened. For example: 
    
    `Insufficient validators. Expected 10 but found 4`
@@ -203,24 +197,24 @@ Make log messages:
 
 * _Trace_ 
   
-  Extremely detailed view showing the execution flow. Likely only useful to developers.
+  Extremely detailed view showing the execution flow. Likely only useful to developers
 
 * _Debug_ 
 
-  Information that is diagnostically helpful to a wider group than just developers (for example, sysadmins).
+  Information that is diagnostically helpful to a wider group than just developers (for example, sysadmins)
 
 * _Info_ 
 
-  Generally useful information to log (for example, service start/stop, configuration assumptions). Default logging level.
+  Generally useful information to log (for example, service start/stop, configuration assumptions). Default logging level
 
 * _Warn_ 
 
-  Anything that can potentially cause application oddities but from which Pantheon automatically recovers.
+  Anything that can potentially cause application oddities but from which Pantheon automatically recovers
 
 * _Error_ 
 
-  Any error which is fatal to the operation, but not Pantheon itself (for example, missing data). 
+  Any error which is fatal to the operation, but not Pantheon itself (for example, missing data)
 
 * _Fatal_  
 
-  An error that forces a shutdown of Pantheon.
+  An error that forces a shutdown of Pantheon
