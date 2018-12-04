@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -81,7 +83,7 @@ public class AbstractEthTaskTest {
     private final List<CompletableFuture<?>> subtasks;
 
     private EthTaskWithMultipleSubtasks(final List<CompletableFuture<?>> subtasks) {
-      super(labels -> () -> () -> 0.0D);
+      super(NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
       this.subtasks = subtasks;
     }
 

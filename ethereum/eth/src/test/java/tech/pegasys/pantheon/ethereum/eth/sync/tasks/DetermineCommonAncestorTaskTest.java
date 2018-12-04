@@ -43,6 +43,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -58,7 +59,8 @@ public class DetermineCommonAncestorTaskTest {
 
   private final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
   private final BlockDataGenerator blockDataGenerator = new BlockDataGenerator();
-  private final LabelledMetric<OperationTimer> ethTasksTimer = labels -> () -> () -> 0.0D;
+  private final LabelledMetric<OperationTimer> ethTasksTimer =
+      NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
   private MutableBlockchain localBlockchain;
   private final int defaultHeaderRequestSize = 10;
   Block genesisBlock;

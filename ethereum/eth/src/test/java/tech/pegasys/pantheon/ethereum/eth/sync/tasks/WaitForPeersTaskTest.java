@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -37,7 +38,7 @@ public class WaitForPeersTaskTest {
   public void setupTest() {
     ethProtocolManager = EthProtocolManagerTestUtil.create();
     ethContext = ethProtocolManager.ethContext();
-    ethTasksTimer = labels -> () -> () -> 0.0D;
+    ethTasksTimer = NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
   }
 
   @Test

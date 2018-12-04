@@ -131,7 +131,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
             ethProtocolManager.ethContext(),
             syncState,
             metricsSystem.createLabelledTimer(
-                MetricCategory.TASKS, "ethTask", "Internal processing tasks", "taskName"));
+                MetricCategory.ETH_SCHEDULER, "ethTask", "Internal processing tasks", "taskName"));
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(

@@ -37,6 +37,7 @@ import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator.BlockOptions;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Collections;
@@ -58,7 +59,8 @@ public class BlockPropagationManagerTest {
   private SynchronizerConfiguration syncConfig;
   private final PendingBlocks pendingBlocks = new PendingBlocks();
   private SyncState syncState;
-  private final LabelledMetric<OperationTimer> ethTasksTimer = labels -> () -> () -> 0.0D;
+  private final LabelledMetric<OperationTimer> ethTasksTimer =
+      NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
 
   @BeforeClass
   public static void setupSuite() {

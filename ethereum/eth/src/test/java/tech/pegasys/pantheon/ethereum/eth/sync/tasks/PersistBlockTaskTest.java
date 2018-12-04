@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +44,8 @@ public class PersistBlockTaskTest {
   private ProtocolSchedule<Void> protocolSchedule;
   private ProtocolContext<Void> protocolContext;
   private MutableBlockchain blockchain;
-  private final LabelledMetric<OperationTimer> ethTasksTimer = labels -> () -> () -> 0.0D;
+  private final LabelledMetric<OperationTimer> ethTasksTimer =
+      NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
 
   @Before
   public void setup() {

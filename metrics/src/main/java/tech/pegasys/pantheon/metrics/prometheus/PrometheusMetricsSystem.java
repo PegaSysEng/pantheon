@@ -136,6 +136,9 @@ public class PrometheusMetricsSystem implements MetricsSystem {
     if (familySamples.type == Type.HISTOGRAM) {
       return convertHistogramSampleNamesToLabels(category, sample, familySamples);
     }
+    if (familySamples.type == Type.SUMMARY) {
+      return convertSummarySampleNamesToLabels(category, sample, familySamples);
+    }
     return new Observation(
         category,
         convertFromPrometheusName(category, sample.name),
@@ -150,6 +153,23 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       labelValues.add(labelValues.size() - 1, "bucket");
     } else {
       labelValues.add(sample.name.substring(sample.name.lastIndexOf("_") + 1));
+    }
+    return new Observation(
+        category,
+        convertFromPrometheusName(category, familySamples.name),
+        sample.value,
+        labelValues);
+  }
+
+  private Observation convertSummarySampleNamesToLabels(
+      final MetricCategory category, final Sample sample, final MetricFamilySamples familySamples) {
+    final List<String> labelValues = new ArrayList<>(sample.labelValues);
+    if (sample.name.endsWith("_sum")) {
+      labelValues.add("sum");
+    } else if (sample.name.endsWith("_count")) {
+      labelValues.add("count");
+    } else {
+      labelValues.add(labelValues.size() - 1, "quantile");
     }
     return new Observation(
         category,

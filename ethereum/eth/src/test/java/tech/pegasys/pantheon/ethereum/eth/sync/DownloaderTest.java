@@ -42,6 +42,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 import tech.pegasys.pantheon.ethereum.testutil.BlockDataGenerator;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayList;
@@ -83,7 +84,7 @@ public class DownloaderTest {
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
 
-    ethTashsTimer = labels -> () -> () -> 0.0D;
+    ethTashsTimer = NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
   }
 
   private Downloader<?> downloader(final SynchronizerConfiguration syncConfig) {

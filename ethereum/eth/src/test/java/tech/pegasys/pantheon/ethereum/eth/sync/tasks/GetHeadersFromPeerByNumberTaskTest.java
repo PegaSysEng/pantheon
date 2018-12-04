@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.PeerMessageTaskTest;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class GetHeadersFromPeerByNumberTaskTest extends PeerMessageTaskTest<List
         ethContext,
         firstHeader.getNumber(),
         requestedData.size(),
-        labels -> () -> () -> 0.0D);
+        NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
   }
 
   @Test
@@ -107,7 +108,7 @@ public class GetHeadersFromPeerByNumberTaskTest extends PeerMessageTaskTest<List
             count,
             skip,
             reverse,
-            labels -> () -> () -> 0.0D);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
     final AtomicReference<AbstractPeerTask.PeerTaskResult<List<BlockHeader>>> actualResult =
         new AtomicReference<>();
     final AtomicBoolean done = new AtomicBoolean(false);

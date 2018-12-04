@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.BlockchainSetupUtil;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import org.junit.Test;
@@ -50,7 +51,7 @@ public class ChainHeadTrackerTest {
           ethProtocolManager.ethContext(),
           protocolSchedule,
           trailingPeerLimiter,
-          labels -> () -> () -> 0.0D);
+          NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
 
   @Test
   public void shouldRequestHeaderChainHeadWhenNewPeerConnects() {

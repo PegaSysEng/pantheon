@@ -12,12 +12,14 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+
 public class MockEthTask extends AbstractEthTask<Object> {
 
   private boolean executed = false;
 
   protected MockEthTask() {
-    super(labels -> () -> () -> 0.0D);
+    super(NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
   }
 
   @Override

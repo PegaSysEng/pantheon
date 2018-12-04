@@ -130,8 +130,11 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   /** Executes the task while timed by a timer. */
   public void executeTaskTimed() {
     final OperationTimer.TimingContext timingContext = taskTimer.startTimer();
-    executeTask();
-    taskTimeInSec = timingContext.stopTimer();
+    try {
+      executeTask();
+    } finally {
+      taskTimeInSec = timingContext.stopTimer();
+    }
   }
 
   public double getTaskTimeInSec() {

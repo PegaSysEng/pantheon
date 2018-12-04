@@ -32,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class ImportBlocksTaskTest
         ethContext,
         firstBlock.getHeader(),
         requestedData.size(),
-        labels -> () -> () -> 0.0D);
+        NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
   }
 
   @Override
