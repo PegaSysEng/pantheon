@@ -69,7 +69,7 @@ public class PeerDiscoveryControllerTest {
   private PeerDiscoveryController controller;
   private DiscoveryPeer peer;
   private PeerTable peerTable;
-  private NodeWhitelistController nodeWhitelistController;
+  private NodeWhitelistController defaultNodeWhitelistController;
 
   @Before
   public void initializeMocks() {
@@ -80,7 +80,7 @@ public class PeerDiscoveryControllerTest {
     when(agent.getAdvertisedPeer()).thenReturn(peer);
     peerTable = new PeerTable(peer.getId());
 
-    nodeWhitelistController =
+    defaultNodeWhitelistController =
         new NodeWhitelistController(PermissioningConfiguration.createDefault());
   }
 
@@ -277,7 +277,7 @@ public class PeerDiscoveryControllerTest {
             TABLE_REFRESH_INTERVAL_MS,
             PEER_REQUIREMENT,
             new PeerBlacklist(),
-            nodeWhitelistController);
+            defaultNodeWhitelistController);
     controller.setRetryDelayFunction((prev) -> 999999999L);
     controller.start();
 
@@ -339,7 +339,7 @@ public class PeerDiscoveryControllerTest {
             TABLE_REFRESH_INTERVAL_MS,
             PEER_REQUIREMENT,
             new PeerBlacklist(),
-            nodeWhitelistController);
+            defaultNodeWhitelistController);
     controller.setRetryDelayFunction((prev) -> 999999999L);
     controller.start();
 
@@ -487,7 +487,7 @@ public class PeerDiscoveryControllerTest {
             TABLE_REFRESH_INTERVAL_MS,
             PEER_REQUIREMENT,
             blacklist,
-            nodeWhitelistController);
+            defaultNodeWhitelistController);
 
     final Endpoint agentEndpoint = agent.getAdvertisedPeer().getEndpoint();
 
@@ -573,7 +573,7 @@ public class PeerDiscoveryControllerTest {
                 TABLE_REFRESH_INTERVAL_MS,
                 PEER_REQUIREMENT,
                 blacklist,
-                nodeWhitelistController));
+                defaultNodeWhitelistController));
 
     final Endpoint agentEndpoint = agent.getAdvertisedPeer().getEndpoint();
 
@@ -643,7 +643,7 @@ public class PeerDiscoveryControllerTest {
                 TABLE_REFRESH_INTERVAL_MS,
                 PEER_REQUIREMENT,
                 blacklist,
-                nodeWhitelistController));
+                defaultNodeWhitelistController));
 
     final Endpoint agentEndpoint = agent.getAdvertisedPeer().getEndpoint();
 
@@ -698,7 +698,7 @@ public class PeerDiscoveryControllerTest {
                 TABLE_REFRESH_INTERVAL_MS,
                 PEER_REQUIREMENT,
                 blacklist,
-                nodeWhitelistController));
+                defaultNodeWhitelistController));
 
     final Endpoint agentEndpoint = agent.getAdvertisedPeer().getEndpoint();
 
@@ -752,7 +752,7 @@ public class PeerDiscoveryControllerTest {
                 TABLE_REFRESH_INTERVAL_MS,
                 PEER_REQUIREMENT,
                 blacklist,
-                nodeWhitelistController));
+                defaultNodeWhitelistController));
 
     final Endpoint agentEndpoint = agent.getAdvertisedPeer().getEndpoint();
 
@@ -810,7 +810,7 @@ public class PeerDiscoveryControllerTest {
             TABLE_REFRESH_INTERVAL_MS,
             PEER_REQUIREMENT,
             new PeerBlacklist(),
-            nodeWhitelistController);
+            defaultNodeWhitelistController);
     controller.setRetryDelayFunction((prev) -> 999999999L);
     controller.start();
 
@@ -952,7 +952,7 @@ public class PeerDiscoveryControllerTest {
             TABLE_REFRESH_INTERVAL_MS,
             PEER_REQUIREMENT,
             new PeerBlacklist(),
-            nodeWhitelistController);
+            defaultNodeWhitelistController);
     controller.setRetryDelayFunction(retryDelayFunction);
     controller.start();
   }

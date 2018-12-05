@@ -26,8 +26,8 @@ public class NodeWhitelistController {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private static List<Peer> nodeWhitelist;
-  private static boolean nodeWhitelistSet = false;
+  private final List<Peer> nodeWhitelist;
+  private boolean nodeWhitelistSet = false;
 
   public NodeWhitelistController(final PermissioningConfiguration configuration) {
     nodeWhitelist = new ArrayList<>();
@@ -35,11 +35,14 @@ public class NodeWhitelistController {
       for (String urlString : configuration.getNodeWhitelist()) {
         nodeWhitelist.add(DefaultPeer.fromURI(urlString));
       }
-      nodeWhitelistSet = true;
+      if (configuration.isNodeWhitelistSet()) {
+        nodeWhitelistSet = true;
+      }
     }
   }
 
   public boolean addNode(final Peer node) {
+    nodeWhitelistSet = true;
     return nodeWhitelist.add(node);
   }
 
@@ -47,9 +50,11 @@ public class NodeWhitelistController {
     return nodeWhitelist.remove(node);
   }
 
-  public static boolean isNodeWhitelistSet() {
+  public boolean isNodeWhitelistSet() {
     return nodeWhitelistSet;
   }
 
-  // isThisNodeInWhitelist(Peer node)
+  public boolean isNodeWhitelisted(final Peer node) {
+    return nodeWhitelist.contains(node);
+  }
 }
