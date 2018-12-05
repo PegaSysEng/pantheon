@@ -145,6 +145,7 @@ public class PeerDiscoveryController {
   }
 
   public CompletableFuture<?> start() {
+    LOG.info("start()");
     if (!started.compareAndSet(false, true)) {
       throw new IllegalStateException("The peer table had already been started");
     }
@@ -152,6 +153,7 @@ public class PeerDiscoveryController {
     bootstrapNodes
         .stream()
         .filter(node -> peerTable.tryAdd(node).getOutcome() == Outcome.ADDED)
+        .filter(node -> nodeWhitelistController.isNodeWhitelisted(node))
         .forEach(node -> bond(node, true));
 
     final long timerId =
@@ -160,6 +162,7 @@ public class PeerDiscoveryController {
             (l) -> refreshTableIfRequired());
     tableRefreshTimerId = OptionalLong.of(timerId);
 
+    LOG.info("finished start()");
     return CompletableFuture.completedFuture(null);
   }
 
@@ -187,19 +190,25 @@ public class PeerDiscoveryController {
    * @param sender The sender.
    */
   public void onMessage(final Packet packet, final DiscoveryPeer sender) {
-    LOG.trace(
+    LOG.info(
         "<<< Received {} discovery packet from {} ({}): {}",
         packet.getType(),
         sender.getEndpoint(),
         sender.getId().slice(0, 16),
         packet);
 
+    LOG.info("onMessage: sender " + sender);
     // Message from self. This should not happen.
     if (sender.getId().equals(agent.getAdvertisedPeer().getId())) {
       return;
     }
-    // make enodeUrl from sender
-    // if !NodeWhitelistController.hasInlist() return;
+
+    if (!nodeWhitelistController.isNodeWhitelisted(sender)) {
+      LOG.info("discarding message from non white listed peer " + sender);
+      return;
+    } else {
+      LOG.info("peer is whitelisted " + sender);
+    }
 
     // Load the peer from the table, or use the instance that comes in.
     final Optional<DiscoveryPeer> maybeKnownPeer = peerTable.get(sender);
@@ -244,7 +253,9 @@ public class PeerDiscoveryController {
                           .orElse(emptyList());
 
                   for (final DiscoveryPeer neighbor : neighbors) {
-                    if (peerBlacklist.contains(neighbor) || peerTable.get(neighbor).isPresent()) {
+                    if (!nodeWhitelistController.isNodeWhitelisted(neighbor)
+                        || peerBlacklist.contains(neighbor)
+                        || peerTable.get(neighbor).isPresent()) {
                       continue;
                     }
                     bond(neighbor, false);
@@ -337,6 +348,7 @@ public class PeerDiscoveryController {
    */
   @VisibleForTesting
   void bond(final DiscoveryPeer peer, final boolean bootstrap) {
+    LOG.info("bond.peer " + peer + " bootstrap " + bootstrap);
     peer.setFirstDiscovered(System.currentTimeMillis());
     peer.setStatus(PeerDiscoveryStatus.BONDING);
 
