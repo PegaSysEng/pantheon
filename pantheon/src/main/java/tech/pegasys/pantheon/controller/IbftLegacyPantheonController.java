@@ -169,7 +169,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             ethProtocolManager.ethContext(),
             syncState,
             metricsSystem.createLabelledTimer(
-                MetricCategory.ETH_SCHEDULER, "task", "Internal processing tasks", "taskName"));
+                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"));
 
     final Runnable closer =
         () -> {

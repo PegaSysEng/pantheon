@@ -18,7 +18,7 @@ public enum MetricCategory {
   JVM("jvm", false),
   PROCESS("process", false),
   BLOCKCHAIN("blockchain"),
-  ETH_SCHEDULER("eth_scheduler");
+  SYNCHRONIZER("synchronizer");
 
   private final String name;
   private final boolean pantheonSpecific;
