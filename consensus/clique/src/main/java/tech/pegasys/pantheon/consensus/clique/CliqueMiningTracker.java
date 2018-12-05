@@ -37,4 +37,8 @@ public class CliqueMiningTracker {
   public boolean canMakeBlockNextRound(final BlockHeader header) {
     return CliqueHelpers.addressIsAllowedToProduceNextBlock(localAddress, protocolContext, header);
   }
+
+  public boolean blockCreatedLocally(final BlockHeader header) {
+    return CliqueHelpers.getProposerOfBlock(header).equals(localAddress);
+  }
 }

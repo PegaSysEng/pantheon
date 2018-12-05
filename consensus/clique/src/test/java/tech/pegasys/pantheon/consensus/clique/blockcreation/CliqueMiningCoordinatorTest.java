@@ -206,6 +206,30 @@ public class CliqueMiningCoordinatorTest {
     assertThat(varArgs.getValue()).isEqualTo(blockChain.getChainHeadHeader());
   }
 
+  @Test
+  public void locallyGeneratedBlockInvalidatesMiningEvenIfInTurn() {
+    // Note also - validators is an hard-ordered LIST, thus in-turn will follow said list - block_1
+    // should be created by Proposer, and thus will be in-turn.
+    final CliqueMiningCoordinator coordinator =
+        new CliqueMiningCoordinator(blockChain, minerExecutor, syncState, miningTracker);
+
+    coordinator.enable();
+
+    verify(minerExecutor, times(1)).startAsyncMining(any(), any());
+
+    reset(minerExecutor);
+    when(minerExecutor.startAsyncMining(any(), any())).thenReturn(blockMiner);
+
+    final Block importedBlock = createEmptyBlock(1, blockChain.getChainHeadHash(), proposerKeys);
+    blockChain.appendBlock(importedBlock, Lists.emptyList());
+
+    // The minerExecutor should not be invoked as the mining operation was conducted by an in-turn
+    // validator, and the created block came from an out-turn validator.
+    ArgumentCaptor<BlockHeader> varArgs = ArgumentCaptor.forClass(BlockHeader.class);
+    verify(minerExecutor, times(1)).startAsyncMining(any(), varArgs.capture());
+    assertThat(varArgs.getValue()).isEqualTo(blockChain.getChainHeadHeader());
+  }
+
   private Block createEmptyBlock(
       final long blockNumber, final Hash parentHash, final KeyPair signer) {
     headerTestFixture.number(blockNumber).parentHash(parentHash);

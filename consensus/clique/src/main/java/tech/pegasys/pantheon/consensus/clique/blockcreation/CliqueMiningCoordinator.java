@@ -39,6 +39,14 @@ public class CliqueMiningCoordinator
       return true;
     }
 
+    if (miningTracker.blockCreatedLocally(newChainHeadHeader)) {
+      return true;
+    }
+
+    return networkBlockBetterThanCurrentMiner(newChainHeadHeader);
+  }
+
+  private boolean networkBlockBetterThanCurrentMiner(final BlockHeader newChainHeadHeader) {
     final BlockHeader parentHeader = currentRunningMiner.get().getParentHeader();
     final long currentMinerTargetHeight = parentHeader.getNumber() + 1;
     if (currentMinerTargetHeight < newChainHeadHeader.getNumber()) {
