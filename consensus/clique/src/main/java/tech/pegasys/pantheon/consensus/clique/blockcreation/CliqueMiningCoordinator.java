@@ -13,29 +13,56 @@
 package tech.pegasys.pantheon.consensus.clique.blockcreation;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
+import tech.pegasys.pantheon.consensus.clique.CliqueHelpers;
+import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.util.uint.UInt256;
-
-import java.util.Optional;
 
 public class CliqueMiningCoordinator
     extends AbstractMiningCoordinator<CliqueContext, CliqueBlockMiner> {
 
+  private final Address localAddress;
+  private final ProtocolContext<CliqueContext> protocolContext;
+
   public CliqueMiningCoordinator(
-      final Blockchain blockchain, final CliqueMinerExecutor executor, final SyncState syncState) {
+      final Blockchain blockchain,
+      final CliqueMinerExecutor executor,
+      final SyncState syncState,
+      final ProtocolContext<CliqueContext> protocolContext,
+      final Address localAddress) {
     super(blockchain, executor, syncState);
+    this.localAddress = localAddress;
+    this.protocolContext = protocolContext;
   }
 
   @Override
-  public boolean newBlockExceedsCurrentOperation(final Block newBlock) {
-    final Optional<UInt256> totalDifficulty =
-        blockchain.getTotalDifficultyByHash(newBlock.getHash());
+  protected boolean importedBlockInvalidatesMiningOperation(final Block newBlock) {
+    if (!currentRunningMiner.isPresent()) {
+      return true;
+    }
 
-    return totalDifficulty
-        .map(td -> td.compareTo(currentRunningMiner.get().getTotalDifficulty()) >= 0)
-        .orElse(false);
+    final BlockHeader parentHeader = currentRunningMiner.get().getParentHeader();
+    final long currentMinerTargetHeight = parentHeader.getNumber() + 1;
+    final BlockHeader newHeader = newBlock.getHeader();
+    if (currentMinerTargetHeight < newHeader.getNumber()) {
+      return true;
+    }
+
+    final boolean nodeIsMining = CliqueHelpers.addressIsAllowedToProduceNextBlock(
+        localAddress, protocolContext, parentHeader);
+
+    final boolean nodeIsInTurn = CliqueHelpers.getProposerForBlockAfter(
+        parentHeader,
+        protocolContext.getConsensusState().getVoteTallyCache())
+        .equals(localAddress);
+
+    if (nodeIsMining && nodeIsInTurn) {
+      return false;
+    }
+    return true;
   }
 }

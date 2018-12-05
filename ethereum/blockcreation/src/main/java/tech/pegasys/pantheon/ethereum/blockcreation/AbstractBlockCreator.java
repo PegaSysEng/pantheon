@@ -27,12 +27,14 @@ import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.BodyValidation;
+import tech.pegasys.pantheon.ethereum.mainnet.DifficultyCalculator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -94,7 +96,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
    * body, and will supply an empty Ommers list.
    *
    * <p>Once transactions have been selected and applied to a disposable/temporary world state, the
-   * block reward is paid to the relevant coinbase, and a sealable header is constructed.
+   * block reward is paid to the relevant coinbase, and a sealable header is constucted.
    *
    * <p>The sealableHeader is then provided to child instances for sealing (i.e. proof of work or
    * otherwise).
@@ -104,10 +106,9 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
    * @return a block with appropriately selected transactions, seals and ommers.
    */
   @Override
-  public Block createBlock(final long timestamp, final UInt256 difficulty) {
+  public Block createBlock(final long timestamp) {
     try {
-      final ProcessableBlockHeader processableBlockHeader =
-          createPendingBlockHeader(timestamp, difficulty);
+      final ProcessableBlockHeader processableBlockHeader = createPendingBlockHeader(timestamp);
 
       throwIfStopped();
 
@@ -206,15 +207,19 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
     return Lists.newArrayList();
   }
 
-  private ProcessableBlockHeader createPendingBlockHeader(
-      final long timestamp, final UInt256 difficulty) {
+  private ProcessableBlockHeader createPendingBlockHeader(final long timestamp) {
     final long newBlockNumber = parentHeader.getNumber() + 1;
     final long gasLimit = gasLimitCalculator.apply(parentHeader.getGasLimit());
+
+    final DifficultyCalculator<C> difficultyCalculator =
+        protocolSchedule.getByBlockNumber(newBlockNumber).getDifficultyCalculator();
+    final BigInteger difficulty =
+        difficultyCalculator.nextDifficulty(timestamp, parentHeader, protocolContext);
 
     return BlockHeaderBuilder.create()
         .parentHash(parentHeader.getHash())
         .coinbase(coinbase)
-        .difficulty(difficulty)
+        .difficulty(UInt256.of(difficulty))
         .number(newBlockNumber)
         .gasLimit(gasLimit)
         .timestamp(timestamp)

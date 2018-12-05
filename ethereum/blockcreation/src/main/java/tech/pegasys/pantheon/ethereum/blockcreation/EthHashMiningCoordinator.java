@@ -84,7 +84,7 @@ public class EthHashMiningCoordinator extends AbstractMiningCoordinator<Void, Et
   }
 
   @Override
-  public boolean newBlockExceedsCurrentOperation(final Block newBlock) {
+  protected boolean importedBlockInvalidatesMiningOperation(final Block newBlock) {
     return true;
   }
 }

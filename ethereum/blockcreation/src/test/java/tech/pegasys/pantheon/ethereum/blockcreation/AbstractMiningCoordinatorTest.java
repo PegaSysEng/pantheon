@@ -136,7 +136,7 @@ public class AbstractMiningCoordinatorTest {
     }
 
     @Override
-    public boolean newBlockExceedsCurrentOperation(final Block newBlock) {
+    public boolean importedBlockInvalidatesMiningOperation(final Block newBlock) {
       return true;
     }
   }

@@ -17,11 +17,9 @@ import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
-import tech.pegasys.pantheon.ethereum.mainnet.DifficultyCalculator;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.Subscribers;
-import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.concurrent.CancellationException;
 
@@ -50,8 +48,6 @@ public class BlockMiner<C, M extends AbstractBlockCreator<C>> implements Runnabl
   private final Subscribers<MinedBlockObserver> observers;
   private final AbstractBlockScheduler scheduler;
 
-  private volatile UInt256 totalDifficulty;
-
   public BlockMiner(
       final M blockCreator,
       final ProtocolSchedule<C> protocolSchedule,
@@ -65,8 +61,6 @@ public class BlockMiner<C, M extends AbstractBlockCreator<C>> implements Runnabl
     this.observers = observers;
     this.scheduler = scheduler;
     this.parentHeader = parentHeader;
-
-    this.totalDifficulty = UInt256.of(0);
   }
 
   @Override
@@ -91,17 +85,11 @@ public class BlockMiner<C, M extends AbstractBlockCreator<C>> implements Runnabl
     // Ensure the block is allowed to be mined - i.e. the timestamp on the new block is sufficiently
     // ahead of the parent, and still within allowable clock tolerance.
     LOG.trace("Started a mining operation.");
+
     final long newBlockTimestamp = scheduler.waitUntilNextBlockCanBeMined(parentHeader);
 
-    final DifficultyCalculator<C> diffCalculator =
-        protocolSchedule.getByBlockNumber(parentHeader.getNumber() + 1).getDifficultyCalculator();
-    final UInt256 blocKDifficulty =
-        UInt256.of(diffCalculator.nextDifficulty(newBlockTimestamp, parentHeader, protocolContext));
-
-    totalDifficulty = parentHeader.getDifficulty().plus(blocKDifficulty);
-
     LOG.trace("Mining a new block with timestamp {}", newBlockTimestamp);
-    final Block block = blockCreator.createBlock(newBlockTimestamp, blocKDifficulty);
+    final Block block = blockCreator.createBlock(newBlockTimestamp);
     LOG.info(
         "Block created, importing to local chain, block includes {} transactions",
         block.getBody().getTransactions().size());
@@ -127,7 +115,7 @@ public class BlockMiner<C, M extends AbstractBlockCreator<C>> implements Runnabl
     observers.forEach(obs -> obs.blockMined(block));
   }
 
-  public UInt256 getTotalDifficulty() {
-    return totalDifficulty;
+  public BlockHeader getParentHeader() {
+    return parentHeader;
   }
 }

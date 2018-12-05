@@ -13,8 +13,7 @@
 package tech.pegasys.pantheon.ethereum.blockcreation;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.util.uint.UInt256;
 
 public interface BlockCreator {
-  Block createBlock(final long timestamp, final UInt256 difficulty);
+  Block createBlock(final long timestamp);
 }

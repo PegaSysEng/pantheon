@@ -99,7 +99,7 @@ public abstract class AbstractMiningCoordinator<
     synchronized (this) {
       if (isEnabled
           && event.isNewCanonicalHead()
-          && newBlockExceedsCurrentOperation(event.getBlock())) {
+          && importedBlockInvalidatesMiningOperation(event.getBlock())) {
         haltCurrentMiningOperation();
         if (syncState.isInSync()) {
           startAsyncMiningOperation();
@@ -140,5 +140,5 @@ public abstract class AbstractMiningCoordinator<
     executor.setExtraData(extraData);
   }
 
-  public abstract boolean newBlockExceedsCurrentOperation(final Block newBlock);
+  protected abstract boolean importedBlockInvalidatesMiningOperation(final Block newBlock);
 }

@@ -32,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
@@ -108,6 +109,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
       final int networkId,
       final KeyPair nodeKeys,
       final MetricsSystem metricsSystem) {
+    final Address localAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
     final CliqueConfigOptions cliqueConfig =
         genesisConfig.getConfigOptions().getCliqueConfigOptions();
     final long blocksPerEpoch = cliqueConfig.getEpochLength();
@@ -176,11 +178,12 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             new CliqueBlockScheduler(
                 Clock.systemUTC(),
                 protocolContext.getConsensusState().getVoteTallyCache(),
-                Util.publicKeyToAddress(nodeKeys.getPublicKey()),
+                localAddress,
                 secondsBetweenBlocks),
             epochManger);
     final CliqueMiningCoordinator miningCoordinator =
-        new CliqueMiningCoordinator(blockchain, miningExecutor, syncState);
+        new CliqueMiningCoordinator(
+            blockchain, miningExecutor, syncState, protocolContext, localAddress);
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
 
     // Clique mining is implicitly enabled.
