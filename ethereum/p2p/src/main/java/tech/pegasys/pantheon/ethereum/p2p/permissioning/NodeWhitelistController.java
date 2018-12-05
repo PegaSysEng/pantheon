@@ -19,12 +19,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class NodeWhitelistController {
-
-  private static final Logger LOG = LogManager.getLogger();
 
   private final List<Peer> nodeWhitelist;
   private boolean nodeWhitelistSet = false;
@@ -48,10 +43,6 @@ public class NodeWhitelistController {
 
   public boolean removeNode(final Peer node) {
     return nodeWhitelist.remove(node);
-  }
-
-  public boolean isNodeWhitelistSet() {
-    return nodeWhitelistSet;
   }
 
   public boolean isNodeWhitelisted(final Peer node) {

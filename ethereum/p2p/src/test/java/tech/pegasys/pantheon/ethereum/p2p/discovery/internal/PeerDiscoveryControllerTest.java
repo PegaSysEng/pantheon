@@ -43,6 +43,7 @@ import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -896,20 +897,6 @@ public class PeerDiscoveryControllerTest {
     assertThat(controller.getPeers()).doesNotContain(peers[1]);
   }
 
-  private static Packet mockPingPacket(final Peer from, final Peer to) {
-    final Packet packet = mock(Packet.class);
-
-    final PingPacketData pingPacketData =
-        PingPacketData.create(from.getEndpoint(), to.getEndpoint());
-    when(packet.getPacketData(any())).thenReturn(Optional.of(pingPacketData));
-    final BytesValue id = from.getId();
-    when(packet.getNodeId()).thenReturn(id);
-    when(packet.getType()).thenReturn(PacketType.PING);
-    when(packet.getHash()).thenReturn(Bytes32.ZERO);
-
-    return packet;
-  }
-
   @Test
   public void shouldNotBondWithNonWhitelistedPeer()
       throws InterruptedException, ExecutionException, TimeoutException {
@@ -985,7 +972,50 @@ public class PeerDiscoveryControllerTest {
     verify(controller, times(0)).bond(otherPeer, false);
     verify(controller, times(1)).bond(otherPeer2, false);
   }
-  
+
+  @Test
+  public void shouldNotRespondToPingFromNonWhitelistedDiscoveryPeer() {
+    final DiscoveryPeer[] peers = createPeersInLastBucket(peer, 3);
+    final DiscoveryPeer discoPeer = peers[0];
+
+    final PeerBlacklist blacklist = new PeerBlacklist();
+
+    // don't add disco peer to whitelist
+    PermissioningConfiguration config = PermissioningConfiguration.createDefault();
+    config.setNodeWhitelist(new ArrayList<>());
+    NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+
+    controller =
+        spy(
+            new PeerDiscoveryController(
+                vertx,
+                agent,
+                peerTable,
+                Collections.singletonList(discoPeer),
+                TABLE_REFRESH_INTERVAL_MS,
+                PEER_REQUIREMENT,
+                blacklist,
+                nodeWhitelistController));
+
+    final Packet pingPacket = mockPingPacket(peers[0], peer);
+    controller.onMessage(pingPacket, peers[0]);
+    assertThat(controller.getPeers()).doesNotContain(peers[0]);
+  }
+
+  private static Packet mockPingPacket(final Peer from, final Peer to) {
+    final Packet packet = mock(Packet.class);
+
+    final PingPacketData pingPacketData =
+        PingPacketData.create(from.getEndpoint(), to.getEndpoint());
+    when(packet.getPacketData(any())).thenReturn(Optional.of(pingPacketData));
+    final BytesValue id = from.getId();
+    when(packet.getNodeId()).thenReturn(id);
+    when(packet.getType()).thenReturn(PacketType.PING);
+    when(packet.getHash()).thenReturn(Bytes32.ZERO);
+
+    return packet;
+  }
+
   private static DiscoveryPeer[] createPeersInLastBucket(final Peer host, final int n) {
     final DiscoveryPeer[] newPeers = new DiscoveryPeer[n];
 

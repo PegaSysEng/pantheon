@@ -66,7 +66,7 @@ import org.apache.logging.log4j.Logger;
  *                                                    |           +---+----------------+           |
  * +------------+         +-----------+         +-----+----+          |                      +-----v-----+
  * |            |         |           |         |          <----------+                      |           |
- * |  KNOWN  +--------->  BONDING  +--------->  BONDED  |                                 |  DROPPED  |
+ * |  KNOWN  +--------->  BONDING  +--------->  BONDED     |                                 |  DROPPED  |
  * |            |         |           |         |          ^                                 |           |
  * +------------+         +-----------+         +----------+                                 +-----------+
  *
@@ -145,7 +145,6 @@ public class PeerDiscoveryController {
   }
 
   public CompletableFuture<?> start() {
-    LOG.info("start()");
     if (!started.compareAndSet(false, true)) {
       throw new IllegalStateException("The peer table had already been started");
     }
@@ -162,7 +161,6 @@ public class PeerDiscoveryController {
             (l) -> refreshTableIfRequired());
     tableRefreshTimerId = OptionalLong.of(timerId);
 
-    LOG.info("finished start()");
     return CompletableFuture.completedFuture(null);
   }
 
@@ -190,24 +188,20 @@ public class PeerDiscoveryController {
    * @param sender The sender.
    */
   public void onMessage(final Packet packet, final DiscoveryPeer sender) {
-    LOG.info(
+    LOG.trace(
         "<<< Received {} discovery packet from {} ({}): {}",
         packet.getType(),
         sender.getEndpoint(),
         sender.getId().slice(0, 16),
         packet);
 
-    LOG.info("onMessage: sender " + sender);
     // Message from self. This should not happen.
     if (sender.getId().equals(agent.getAdvertisedPeer().getId())) {
       return;
     }
 
     if (!nodeWhitelistController.isNodeWhitelisted(sender)) {
-      LOG.info("discarding message from non white listed peer " + sender);
       return;
-    } else {
-      LOG.info("peer is whitelisted " + sender);
     }
 
     // Load the peer from the table, or use the instance that comes in.
@@ -348,7 +342,6 @@ public class PeerDiscoveryController {
    */
   @VisibleForTesting
   void bond(final DiscoveryPeer peer, final boolean bootstrap) {
-    LOG.info("bond.peer " + peer + " bootstrap " + bootstrap);
     peer.setFirstDiscovered(System.currentTimeMillis());
     peer.setStatus(PeerDiscoveryStatus.BONDING);
 
