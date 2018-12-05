@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.config.CliqueConfigOptions;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
+import tech.pegasys.pantheon.consensus.clique.CliqueMiningTracker;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import tech.pegasys.pantheon.consensus.clique.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueBlockScheduler;
@@ -183,7 +184,10 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             epochManger);
     final CliqueMiningCoordinator miningCoordinator =
         new CliqueMiningCoordinator(
-            blockchain, miningExecutor, syncState, protocolContext, localAddress);
+            blockchain,
+            miningExecutor,
+            syncState,
+            new CliqueMiningTracker(localAddress, protocolContext));
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
 
     // Clique mining is implicitly enabled.

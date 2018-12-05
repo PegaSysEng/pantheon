@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
-import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
@@ -99,7 +98,7 @@ public abstract class AbstractMiningCoordinator<
     synchronized (this) {
       if (isEnabled
           && event.isNewCanonicalHead()
-          && importedBlockInvalidatesMiningOperation(event.getBlock())) {
+          && newChainHeadInvalidatesMiningOperation(event.getBlock().getHeader())) {
         haltCurrentMiningOperation();
         if (syncState.isInSync()) {
           startAsyncMiningOperation();
@@ -140,5 +139,6 @@ public abstract class AbstractMiningCoordinator<
     executor.setExtraData(extraData);
   }
 
-  protected abstract boolean importedBlockInvalidatesMiningOperation(final Block newBlock);
+  protected abstract boolean newChainHeadInvalidatesMiningOperation(
+      final BlockHeader newChainHeadHeader);
 }

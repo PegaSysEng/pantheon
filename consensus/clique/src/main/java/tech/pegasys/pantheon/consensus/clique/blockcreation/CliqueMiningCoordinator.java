@@ -13,52 +13,40 @@
 package tech.pegasys.pantheon.consensus.clique.blockcreation;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
-import tech.pegasys.pantheon.consensus.clique.CliqueHelpers;
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.consensus.clique.CliqueMiningTracker;
 import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 
 public class CliqueMiningCoordinator
     extends AbstractMiningCoordinator<CliqueContext, CliqueBlockMiner> {
 
-  private final Address localAddress;
-  private final ProtocolContext<CliqueContext> protocolContext;
+  private final CliqueMiningTracker miningTracker;
 
   public CliqueMiningCoordinator(
       final Blockchain blockchain,
       final CliqueMinerExecutor executor,
       final SyncState syncState,
-      final ProtocolContext<CliqueContext> protocolContext,
-      final Address localAddress) {
+      final CliqueMiningTracker miningTracker) {
     super(blockchain, executor, syncState);
-    this.localAddress = localAddress;
-    this.protocolContext = protocolContext;
+    this.miningTracker = miningTracker;
   }
 
   @Override
-  protected boolean importedBlockInvalidatesMiningOperation(final Block newBlock) {
+  protected boolean newChainHeadInvalidatesMiningOperation(final BlockHeader newChainHeadHeader) {
     if (!currentRunningMiner.isPresent()) {
       return true;
     }
 
     final BlockHeader parentHeader = currentRunningMiner.get().getParentHeader();
     final long currentMinerTargetHeight = parentHeader.getNumber() + 1;
-    final BlockHeader newHeader = newBlock.getHeader();
-    if (currentMinerTargetHeight < newHeader.getNumber()) {
+    if (currentMinerTargetHeight < newChainHeadHeader.getNumber()) {
       return true;
     }
 
-    final boolean nodeIsMining = CliqueHelpers.addressIsAllowedToProduceNextBlock(
-        localAddress, protocolContext, parentHeader);
-
-    final boolean nodeIsInTurn = CliqueHelpers.getProposerForBlockAfter(
-        parentHeader,
-        protocolContext.getConsensusState().getVoteTallyCache())
-        .equals(localAddress);
+    final boolean nodeIsMining = miningTracker.canMakeBlockNextRound(parentHeader);
+    final boolean nodeIsInTurn = miningTracker.isProposerAfter(parentHeader);
 
     if (nodeIsMining && nodeIsInTurn) {
       return false;

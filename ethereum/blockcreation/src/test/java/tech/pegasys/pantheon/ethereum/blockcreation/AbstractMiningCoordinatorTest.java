@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 
@@ -136,7 +137,7 @@ public class AbstractMiningCoordinatorTest {
     }
 
     @Override
-    public boolean importedBlockInvalidatesMiningOperation(final Block newBlock) {
+    public boolean newChainHeadInvalidatesMiningOperation(final BlockHeader newChainHeadHeader) {
       return true;
     }
   }
