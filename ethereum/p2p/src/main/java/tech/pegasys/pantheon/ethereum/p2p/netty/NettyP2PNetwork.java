@@ -151,6 +151,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
    * @param peerBlacklist The peers with which this node will not connect
    * @param peerRequirement Queried to determine if enough peers are currently connected.
    * @param metricsSystem The metrics system to capture metrics with.
+   * @param nodeWhitelistController Controls the whitelist of nodes to which this node will connect.
    */
   public NettyP2PNetwork(
       final Vertx vertx,
