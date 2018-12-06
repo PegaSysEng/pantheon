@@ -37,19 +37,19 @@ public class NewRoundMessageValidator {
   private final ProposerSelector proposerSelector;
   private final MessageValidatorFactory messageValidatorFactory;
   private final long quorumSize;
-  private final ConsensusRoundIdentifier roundIdentifier;
+  private final long chainHeight;
 
   public NewRoundMessageValidator(
       final Collection<Address> validators,
       final ProposerSelector proposerSelector,
       final MessageValidatorFactory messageValidatorFactory,
       final long quorumSize,
-      final ConsensusRoundIdentifier roundIdentifier) {
+      final long chainHeight) {
     this.validators = validators;
     this.proposerSelector = proposerSelector;
     this.messageValidatorFactory = messageValidatorFactory;
     this.quorumSize = quorumSize;
-    this.roundIdentifier = roundIdentifier;
+    this.chainHeight = chainHeight;
   }
 
   public boolean validateNewRoundMessage(final SignedData<NewRoundPayload> msg) {
@@ -64,8 +64,7 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    if (msg.getPayload().getRoundChangeIdentifier().getSequenceNumber()
-        != roundIdentifier.getSequenceNumber()) {
+    if (msg.getPayload().getRoundChangeIdentifier().getSequenceNumber() != chainHeight) {
       LOG.info("Invalid NewRound message, not valid for local chain height.");
       return false;
     }
@@ -87,14 +86,15 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    if (!validateRoundChangeMessagesAndEnsureTargetRound(rootRoundIdentifier, roundChangeCert)) {
+    if (!validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
+        rootRoundIdentifier, roundChangeCert)) {
       return false;
     }
 
     return validateProposalMessageMatchesLatestPrepareCertificate(payload);
   }
 
-  private boolean validateRoundChangeMessagesAndEnsureTargetRound(
+  private boolean validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
       final ConsensusRoundIdentifier expectedRound, final RoundChangeCertificate roundChangeCert) {
 
     final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
@@ -116,10 +116,13 @@ public class NewRoundMessageValidator {
                 + "matching target round.");
         return false;
       }
+    }
 
+    for (final SignedData<RoundChangePayload> roundChangeMsg :
+        roundChangeCert.getRoundChangePayloads()) {
       final RoundChangeMessageValidator roundChangeValidator =
           new RoundChangeMessageValidator(
-              messageValidatorFactory, validators, quorumSize, roundIdentifier);
+              messageValidatorFactory, validators, quorumSize, chainHeight);
 
       if (!roundChangeValidator.validateMessage(roundChangeMsg)) {
         LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");
