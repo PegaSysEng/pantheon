@@ -169,11 +169,8 @@ public class NewRoundMessageValidatorTest {
   public void newRoundWithMismatchOfRoundIdentifierToProposalMessageFails() {
     final ConsensusRoundIdentifier mismatchedRound = TestHelpers.createFrom(roundIdentifier, 0, -1);
 
-    msgBuilder.setRoundChangeCertificate(
-        new RoundChangeCertificate(
-            singletonList(
-                validatorMessageFactory.createSignedRoundChangePayload(
-                    mismatchedRound, Optional.empty()))));
+    msgBuilder.setProposalPayload(
+        proposerMessageFactory.createSignedProposalPayload(mismatchedRound, proposedBlock));
 
     final SignedData<NewRoundPayload> inValidMsg = signPayload(msgBuilder.build(), proposerKey);
 
