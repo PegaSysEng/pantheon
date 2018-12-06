@@ -252,7 +252,7 @@ public final class RunnerTest {
     final JsonRpcConfiguration configuration = JsonRpcConfiguration.createDefault();
     configuration.setPort(0);
     configuration.setEnabled(true);
-    configuration.hostsWhitelist(Collections.singletonList("*"));
+    configuration.setHostsWhitelist(Collections.singletonList("*"));
     return configuration;
   }
 
@@ -264,8 +264,7 @@ public final class RunnerTest {
   }
 
   private PermissioningConfiguration permissioningConfiguration() {
-    final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
-    return configuration;
+    return PermissioningConfiguration.createDefault();
   }
 
   private static void setupState(

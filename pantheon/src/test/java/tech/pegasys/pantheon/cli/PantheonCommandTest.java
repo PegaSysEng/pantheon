@@ -714,9 +714,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist().size()).isEqualTo(1);
-    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist()).contains("a");
-    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist()).doesNotContain("localhost");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist().size()).isEqualTo(1);
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist()).contains("a");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist())
+        .doesNotContain("localhost");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -729,9 +730,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist().size()).isEqualTo(2);
-    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist()).contains("a", "b");
-    assertThat(jsonRpcConfigArgumentCaptor.getValue().hostsWhitelist())
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist().size()).isEqualTo(2);
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist()).contains("a", "b");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist())
         .doesNotContain("*", "localhost");
 
     assertThat(commandOutput.toString()).isEmpty();

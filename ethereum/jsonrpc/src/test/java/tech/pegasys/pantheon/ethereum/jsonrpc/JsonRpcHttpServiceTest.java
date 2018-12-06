@@ -131,13 +131,13 @@ public class JsonRpcHttpServiceTest {
     baseUrl = service.url();
   }
 
-  protected static JsonRpcHttpService createJsonRpcHttpService(final JsonRpcConfiguration config)
+  private static JsonRpcHttpService createJsonRpcHttpService(final JsonRpcConfiguration config)
       throws Exception {
     return new JsonRpcHttpService(
         vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
   }
 
-  protected static JsonRpcHttpService createJsonRpcHttpService() throws Exception {
+  private static JsonRpcHttpService createJsonRpcHttpService() throws Exception {
     return new JsonRpcHttpService(
         vertx,
         folder.newFolder().toPath(),
@@ -146,10 +146,10 @@ public class JsonRpcHttpServiceTest {
         rpcMethods);
   }
 
-  protected static JsonRpcConfiguration createJsonRpcConfig() {
+  private static JsonRpcConfiguration createJsonRpcConfig() {
     final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
     config.setPort(0);
-    config.hostsWhitelist(Collections.singletonList("*"));
+    config.setHostsWhitelist(Collections.singletonList("*"));
     return config;
   }
 

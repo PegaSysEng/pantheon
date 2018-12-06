@@ -20,7 +20,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 public class JsonRpcConfiguration {
-  public static final String DEFAULT_JSON_RPC_HOST = "127.0.0.1";
+  private static final String DEFAULT_JSON_RPC_HOST = "127.0.0.1";
   public static final int DEFAULT_JSON_RPC_PORT = 8545;
 
   private boolean enabled;
@@ -88,11 +88,11 @@ public class JsonRpcConfiguration {
     rpcApis.add(rpcApi);
   }
 
-  public Collection<String> hostsWhitelist() {
+  public Collection<String> getHostsWhitelist() {
     return this.hostsWhitelist;
   }
 
-  public void hostsWhitelist(final Collection<String> hostsWhitelist) {
+  public void setHostsWhitelist(final Collection<String> hostsWhitelist) {
     this.hostsWhitelist = hostsWhitelist;
   }
 

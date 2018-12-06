@@ -483,7 +483,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setPort(rpcHostAndPort.getPort());
     jsonRpcConfiguration.setCorsAllowedDomains(rpcCorsAllowedOrigins.getDomains());
     jsonRpcConfiguration.setRpcApis(rpcApis);
-    jsonRpcConfiguration.hostsWhitelist(hostsWhitelist.hostnamesWhitelist());
+    jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist.hostnamesWhitelist());
     return jsonRpcConfiguration;
   }
 

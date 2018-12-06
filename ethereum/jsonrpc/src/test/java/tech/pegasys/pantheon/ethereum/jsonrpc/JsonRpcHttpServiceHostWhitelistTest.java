@@ -129,21 +129,21 @@ public class JsonRpcHttpServiceHostWhitelistTest {
 
   @Test
   public void requestWithAnyHostnameAndWildcardConfigIsAccepted() throws IOException {
-    jsonRpcConfig.hostsWhitelist(Collections.singletonList("*"));
+    jsonRpcConfig.setHostsWhitelist(Collections.singletonList("*"));
     assertThat(doRequest("ally")).isEqualTo(200);
     assertThat(doRequest("foe")).isEqualTo(200);
   }
 
   @Test
   public void requestWithWhitelistedHostIsAccepted() throws IOException {
-    jsonRpcConfig.hostsWhitelist(hostsWhitelist);
+    jsonRpcConfig.setHostsWhitelist(hostsWhitelist);
     assertThat(doRequest("ally")).isEqualTo(200);
     assertThat(doRequest("friend")).isEqualTo(200);
   }
 
   @Test
   public void requestWithUnknownHostIsRejected() throws IOException {
-    jsonRpcConfig.hostsWhitelist(hostsWhitelist);
+    jsonRpcConfig.setHostsWhitelist(hostsWhitelist);
     assertThat(doRequest("foe")).isEqualTo(403);
   }
 

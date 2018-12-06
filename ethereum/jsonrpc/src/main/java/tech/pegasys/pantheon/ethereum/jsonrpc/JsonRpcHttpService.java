@@ -173,23 +173,25 @@ public class JsonRpcHttpService {
     return event -> {
       Optional<String> hostHeader =
           Optional.ofNullable(Iterables.get(Splitter.on(':').split(event.request().host()), 0));
-      if (config.hostsWhitelist().contains("*")
-          || (hostHeader.isPresent()
-              && config
-                  .hostsWhitelist()
-                  .stream()
-                  .anyMatch(
-                      whitelistEntry ->
-                          whitelistEntry.toLowerCase().equals(hostHeader.get().toLowerCase())))) {
+      if (config.getHostsWhitelist().contains("*")
+          || (hostHeader.isPresent() && hostIsInWhitelist(hostHeader))) {
         event.next();
       } else {
         event
             .response()
             .setStatusCode(403)
-            .putHeader("content-type", "application/json; charset=utf-8")
+            .putHeader("Content-Type", "application/json; charset=utf-8")
             .end("{\"message\":\"Host not authorized.\"}");
       }
     };
+  }
+
+  private boolean hostIsInWhitelist(final Optional<String> hostHeader) {
+    return config
+        .getHostsWhitelist()
+        .stream()
+        .anyMatch(
+            whitelistEntry -> whitelistEntry.toLowerCase().equals(hostHeader.get().toLowerCase()));
   }
 
   public CompletableFuture<?> stop() {
