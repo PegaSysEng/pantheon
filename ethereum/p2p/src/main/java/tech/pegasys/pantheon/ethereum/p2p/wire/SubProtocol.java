@@ -37,4 +37,14 @@ public interface SubProtocol {
    * @return true if the given protocol version supports the given message code
    */
   boolean isValidMessageCode(int protocolVersion, int code);
+
+  /**
+   * Returns the name of the particular message for this protocol, suitable for human viewing.
+   *
+   * @param protocolVersion The version of the protocol for the message code.
+   * @param code The message code to be named.
+   * @return A string of the human readable name of the message, or null if it is not a valid
+   *     message for this protocol.
+   */
+  String messageName(int protocolVersion, int code);
 }

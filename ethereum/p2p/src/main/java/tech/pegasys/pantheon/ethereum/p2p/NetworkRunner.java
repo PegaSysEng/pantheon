@@ -17,6 +17,10 @@ import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,14 +54,24 @@ public class NetworkRunner implements AutoCloseable {
   private final P2PNetwork network;
   private final Map<String, SubProtocol> subProtocols;
   private final List<ProtocolManager> protocolManagers;
+  private final LabelledMetric<Counter> inboundMessageCounter;
 
   private NetworkRunner(
       final P2PNetwork network,
       final Map<String, SubProtocol> subProtocols,
-      final List<ProtocolManager> protocolManagers) {
+      final List<ProtocolManager> protocolManagers,
+      final MetricsSystem metricsSystem) {
     this.network = network;
     this.protocolManagers = protocolManagers;
     this.subProtocols = subProtocols;
+    inboundMessageCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.NETWORK,
+            "p2p_messages_inbound",
+            "Count of each P2P message received inbound.",
+            "protocol",
+            "name",
+            "code");
   }
 
   public P2PNetwork getNetwork() {
@@ -115,6 +129,12 @@ public class NetworkRunner implements AutoCloseable {
             cap,
             message -> {
               final int code = message.getData().getCode();
+              inboundMessageCounter
+                  .labels(
+                      cap.toString(),
+                      protocol.messageName(cap.getVersion(), code),
+                      Integer.toString(code))
+                  .inc();
               if (!protocol.isValidMessageCode(cap.getVersion(), code)) {
                 // Handle invalid messages by disconnecting
                 LOG.debug(
@@ -162,6 +182,7 @@ public class NetworkRunner implements AutoCloseable {
     private Function<List<Capability>, P2PNetwork> networkProvider;
     List<ProtocolManager> protocolManagers = new ArrayList<>();
     List<SubProtocol> subProtocols = new ArrayList<>();
+    MetricsSystem metricsSystem;
 
     public NetworkRunner build() {
       final Map<String, SubProtocol> subProtocolMap = new HashMap<>();
@@ -180,7 +201,7 @@ public class NetworkRunner implements AutoCloseable {
         }
       }
       final P2PNetwork network = networkProvider.apply(caps);
-      return new NetworkRunner(network, subProtocolMap, protocolManagers);
+      return new NetworkRunner(network, subProtocolMap, protocolManagers, metricsSystem);
     }
 
     public Builder protocolManagers(final List<ProtocolManager> protocolManagers) {
@@ -200,6 +221,11 @@ public class NetworkRunner implements AutoCloseable {
 
     public Builder subProtocols(final List<SubProtocol> subProtocols) {
       this.subProtocols.addAll(subProtocols);
+      return this;
+    }
+
+    public Builder metricsSystem(final MetricsSystem metricsSystem) {
+      this.metricsSystem = metricsSystem;
       return this;
     }
   }
