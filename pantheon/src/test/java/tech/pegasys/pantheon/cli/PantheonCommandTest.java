@@ -888,7 +888,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     networkValuesCanBeOverridden("goerli");
   }
 
-  private void networkValuesCanBeOverridden(String network) throws Exception {
+  private void networkValuesCanBeOverridden(final String network) throws Exception {
     final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
     final Path genesisFile = createFakeGenesisFile();
     parseCommand(
