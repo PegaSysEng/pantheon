@@ -34,9 +34,9 @@ public class MessageFactory {
   public SignedData<ProposalPayload> createSignedProposalPayload(
       final ConsensusRoundIdentifier roundIdentifier, final Block block) {
 
-    ProposalPayload prePrepareUnsignedMessageData = new ProposalPayload(roundIdentifier, block);
+    final ProposalPayload payload = new ProposalPayload(roundIdentifier, block);
 
-    return createSignedMessage(prePrepareUnsignedMessageData);
+    return createSignedMessage(payload);
   }
 
   public SignedData<PreparePayload> createSignedPreparePayload(
