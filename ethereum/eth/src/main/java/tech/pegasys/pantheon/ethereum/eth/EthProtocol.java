@@ -99,7 +99,7 @@ public class EthProtocol implements SubProtocol {
       case EthPV62.NEW_BLOCK:
         return "NewBlock";
       default:
-        return null;
+        return INVALID_MESSAGE_NAME;
     }
   }
 

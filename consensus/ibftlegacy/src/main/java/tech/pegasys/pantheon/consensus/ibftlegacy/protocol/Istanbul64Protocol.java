@@ -99,7 +99,7 @@ public class Istanbul64Protocol implements SubProtocol {
       case INSTANBUL_MSG:
         return "InstanbulMsg";
       default:
-        return null;
+        return INVALID_MESSAGE_NAME;
     }
   }
 

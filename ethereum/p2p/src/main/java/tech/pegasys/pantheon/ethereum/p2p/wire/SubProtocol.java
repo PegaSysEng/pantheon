@@ -38,13 +38,16 @@ public interface SubProtocol {
    */
   boolean isValidMessageCode(int protocolVersion, int code);
 
+  /** Message name for a message code not valid within this subprotocol. */
+  String INVALID_MESSAGE_NAME = "invalid";
+
   /**
    * Returns the name of the particular message for this protocol, suitable for human viewing.
    *
    * @param protocolVersion The version of the protocol for the message code.
    * @param code The message code to be named.
-   * @return A string of the human readable name of the message, or null if it is not a valid
-   *     message for this protocol.
+   * @return A string of the human readable name of the message, or {@link #INVALID_MESSAGE_NAME} if
+   *     it is not a valid in the protocol.
    */
   String messageName(int protocolVersion, int code);
 }

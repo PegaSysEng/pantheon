@@ -414,7 +414,7 @@ public final class NettyP2PNetworkTest {
 
       @Override
       public String messageName(final int protocolVersion, final int code) {
-        return null;
+        return INVALID_MESSAGE_NAME;
       }
     };
   }
@@ -438,7 +438,7 @@ public final class NettyP2PNetworkTest {
 
       @Override
       public String messageName(final int protocolVersion, final int code) {
-        return null;
+        return INVALID_MESSAGE_NAME;
       }
     };
   }

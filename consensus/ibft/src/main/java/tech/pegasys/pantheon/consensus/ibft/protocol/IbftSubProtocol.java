@@ -66,7 +66,7 @@ public class IbftSubProtocol implements SubProtocol {
       case IbftV2.NEW_ROUND:
         return "NewRound";
       default:
-        return null;
+        return INVALID_MESSAGE_NAME;
     }
   }
 }

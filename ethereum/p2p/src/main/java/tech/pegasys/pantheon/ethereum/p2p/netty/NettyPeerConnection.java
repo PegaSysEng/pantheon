@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.wire.messages.WireMessageCodes;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 
@@ -95,7 +96,10 @@ final class NettyPeerConnection implements PeerConnection {
           .inc();
     } else {
       outboundMessagesCounter
-          .labels("null", Integer.toString(message.getCode()), Integer.toString(message.getCode()))
+          .labels(
+              "Wire",
+              WireMessageCodes.messageName(message.getCode()),
+              Integer.toString(message.getCode()))
           .inc();
     }
 
