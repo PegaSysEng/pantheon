@@ -49,7 +49,6 @@ public class IbftPrePrepareMessageTest {
   @Test
   public void createMessageFromPrePrepareMessage() {
     IbftPrePrepareMessage message = IbftPrePrepareMessage.fromMessage(prePrepareMessage);
-
     assertThat(message).isEqualTo(prePrepareMessage);
   }
 
@@ -57,14 +56,14 @@ public class IbftPrePrepareMessageTest {
   public void createMessageFromGenericMessageData() {
     when(messageData.getCode()).thenReturn(IbftV2.PRE_PREPARE);
     when(messageData.getData()).thenReturn(messageBytes);
-    IbftPrePrepareMessage prepareMessage = IbftPrePrepareMessage.fromMessage(messageData);
+    IbftPrePrepareMessage prePrepareMessage = IbftPrePrepareMessage.fromMessage(messageData);
 
-    assertThat(messageData.getData()).isEqualTo(prepareMessage.getData());
-    assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.PRE_PREPARE);
+    assertThat(prePrepareMessage.getData()).isEqualTo(messageData.getData());
+    assertThat(prePrepareMessage.getCode()).isEqualTo(IbftV2.PRE_PREPARE);
   }
 
   @Test
-  public void createMessageFailsWhenIncorrectMessageType() {
+  public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("Message has code 42 and thus is not a IbftPrePrepareMessage");

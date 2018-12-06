@@ -49,7 +49,6 @@ public class IbftNewRoundMessageTest {
   @Test
   public void createMessageFromNewRoundMessage() {
     IbftNewRoundMessage message = IbftNewRoundMessage.fromMessage(newRoundMessage);
-
     assertThat(message).isEqualTo(newRoundMessage);
   }
 
@@ -59,12 +58,12 @@ public class IbftNewRoundMessageTest {
     when(messageData.getCode()).thenReturn(IbftV2.NEW_ROUND);
     IbftNewRoundMessage newRoundMessage = IbftNewRoundMessage.fromMessage(messageData);
 
-    assertThat(messageData.getData()).isEqualTo(newRoundMessage.getData());
+    assertThat(newRoundMessage.getData()).isEqualTo(messageData.getData());
     assertThat(newRoundMessage.getCode()).isEqualTo(IbftV2.NEW_ROUND);
   }
 
   @Test
-  public void createMessageFailsWhenIncorrectMessageType() {
+  public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("Message has code 42 and thus is not a IbftNewRoundMessage");

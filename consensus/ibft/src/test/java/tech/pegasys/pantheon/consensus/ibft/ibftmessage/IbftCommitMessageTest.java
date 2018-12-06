@@ -49,7 +49,6 @@ public class IbftCommitMessageTest {
   @Test
   public void createMessageFromCommitMessage() {
     IbftCommitMessage message = IbftCommitMessage.fromMessage(commitMessage);
-
     assertThat(message).isEqualTo(commitMessage);
   }
 
@@ -59,12 +58,12 @@ public class IbftCommitMessageTest {
     when(messageData.getCode()).thenReturn(IbftV2.COMMIT);
     IbftCommitMessage commitMessage = IbftCommitMessage.fromMessage(messageData);
 
-    assertThat(messageData.getData()).isEqualTo(commitMessage.getData());
+    assertThat(commitMessage.getData()).isEqualTo(messageData.getData());
     assertThat(commitMessage.getCode()).isEqualTo(IbftV2.COMMIT);
   }
 
   @Test
-  public void createMessageFailsWhenIncorrectMessageType() {
+  public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("Message has code 42 and thus is not a IbftCommitMessage");
