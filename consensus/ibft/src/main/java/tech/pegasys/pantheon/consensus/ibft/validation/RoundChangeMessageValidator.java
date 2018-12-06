@@ -72,10 +72,10 @@ public class RoundChangeMessageValidator {
 
   private boolean validatePrepareCertificate(
       final PreparedCertificate certificate, final ConsensusRoundIdentifier roundChangeTarget) {
-    final SignedData<ProposalPayload> preprepareMessage = certificate.getProposalPayload();
+    final SignedData<ProposalPayload> proposalMessage = certificate.getProposalPayload();
 
     final ConsensusRoundIdentifier prepareCertRound =
-        preprepareMessage.getPayload().getRoundIdentifier();
+        proposalMessage.getPayload().getRoundIdentifier();
 
     if (!validatePreparedCertificateRound(prepareCertRound, roundChangeTarget)) {
       return false;
