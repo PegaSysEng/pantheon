@@ -23,17 +23,13 @@ import org.junit.Test;
 public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   private PantheonNode minerNode1;
   private PantheonNode minerNode2;
-  private PantheonNode minerNode3;
-  private PantheonNode[] allNodes;
 
   @Before
   public void setUp() throws Exception {
     final String[] validators = {"miner1"};
     minerNode1 = pantheon.createCliqueNodeWithValidators("miner1", validators);
     minerNode2 = pantheon.createCliqueNodeWithValidators("miner2", validators);
-    minerNode3 = pantheon.createCliqueNodeWithValidators("miner3", validators);
-    allNodes = new PantheonNode[] {minerNode1, minerNode2, minerNode3};
-    cluster.start(allNodes);
+    cluster.start(minerNode1, minerNode2);
   }
 
   @Test
@@ -44,12 +40,7 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode2));
     cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
     cluster.verify(clique.validatorsAtBlockEqual("0x2", minerNode1, minerNode2));
-
-    minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
-    minerNode2.execute(cliqueTransactions.createAddProposal(minerNode3));
-    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
-    cluster.verify(clique.validatorsAtBlockEqual("0x4", allNodes));
-    cluster.verify(clique.validatorsAtBlockEqual(LATEST, allNodes));
+    cluster.verify(clique.validatorsAtBlockEqual(LATEST, minerNode1, minerNode2));
   }
 
   @Test
@@ -61,10 +52,5 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
     cluster.verify(
         clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 2, minerNode1, minerNode2));
-
-    minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
-    minerNode2.execute(cliqueTransactions.createAddProposal(minerNode3));
-    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
-    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 4, allNodes));
   }
 }
