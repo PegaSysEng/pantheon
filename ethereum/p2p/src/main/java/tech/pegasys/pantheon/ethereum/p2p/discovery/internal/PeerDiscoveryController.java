@@ -152,7 +152,7 @@ public class PeerDiscoveryController {
     bootstrapNodes
         .stream()
         .filter(node -> peerTable.tryAdd(node).getOutcome() == Outcome.ADDED)
-        .filter(node -> nodeWhitelist.isNodeWhitelisted(node))
+        .filter(node -> nodeWhitelist.contains(node))
         .forEach(node -> bond(node, true));
 
     final long timerId =
@@ -200,7 +200,7 @@ public class PeerDiscoveryController {
       return;
     }
 
-    if (!nodeWhitelist.isNodeWhitelisted(sender)) {
+    if (!nodeWhitelist.contains(sender)) {
       return;
     }
 
@@ -247,7 +247,7 @@ public class PeerDiscoveryController {
                           .orElse(emptyList());
 
                   for (final DiscoveryPeer neighbor : neighbors) {
-                    if (!nodeWhitelist.isNodeWhitelisted(neighbor)
+                    if (!nodeWhitelist.contains(neighbor)
                         || peerBlacklist.contains(neighbor)
                         || peerTable.get(neighbor).isPresent()) {
                       continue;
