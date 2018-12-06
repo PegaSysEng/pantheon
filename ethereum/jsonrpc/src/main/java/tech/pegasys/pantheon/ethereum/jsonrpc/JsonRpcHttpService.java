@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
@@ -171,8 +172,7 @@ public class JsonRpcHttpService {
 
   private Handler<RoutingContext> checkWhitelistHostHeader() {
     return event -> {
-      Optional<String> hostHeader =
-          Optional.ofNullable(Iterables.get(Splitter.on(':').split(event.request().host()), 0));
+      Optional<String> hostHeader = getAndValidateHostHeader(event);
       if (config.getHostsWhitelist().contains("*")
           || (hostHeader.isPresent() && hostIsInWhitelist(hostHeader))) {
         event.next();
@@ -184,6 +184,18 @@ public class JsonRpcHttpService {
             .end("{\"message\":\"Host not authorized.\"}");
       }
     };
+  }
+
+  private Optional<String> getAndValidateHostHeader(final RoutingContext event) {
+    Iterable<String> splitHostHeader = Splitter.on(':').split(event.request().host());
+    long hostPieces = stream(splitHostHeader).count();
+    if (hostPieces > 1) {
+      // If the host contains a colon, verify the host is correctly formed - host [ ":" port ]
+      if (hostPieces > 2 || !Iterables.get(splitHostHeader, 1).matches("\\d{1,5}+")) {
+        return Optional.empty();
+      }
+    }
+    return Optional.ofNullable(Iterables.get(splitHostHeader, 0));
   }
 
   private boolean hostIsInWhitelist(final Optional<String> hostHeader) {

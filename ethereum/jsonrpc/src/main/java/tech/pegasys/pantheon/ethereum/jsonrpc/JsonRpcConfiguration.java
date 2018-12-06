@@ -89,7 +89,7 @@ public class JsonRpcConfiguration {
   }
 
   public Collection<String> getHostsWhitelist() {
-    return this.hostsWhitelist;
+    return Collections.unmodifiableCollection(this.hostsWhitelist);
   }
 
   public void setHostsWhitelist(final Collection<String> hostsWhitelist) {

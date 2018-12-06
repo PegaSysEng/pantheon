@@ -138,6 +138,7 @@ public class JsonRpcHttpServiceHostWhitelistTest {
   public void requestWithWhitelistedHostIsAccepted() throws IOException {
     jsonRpcConfig.setHostsWhitelist(hostsWhitelist);
     assertThat(doRequest("ally")).isEqualTo(200);
+    assertThat(doRequest("ally:12345")).isEqualTo(200);
     assertThat(doRequest("friend")).isEqualTo(200);
   }
 
@@ -156,5 +157,13 @@ public class JsonRpcHttpServiceHostWhitelistTest {
     Request build =
         new Request.Builder().post(body).url(baseUrl).addHeader("Host", hostname).build();
     return client.newCall(build).execute().code();
+  }
+
+  @Test
+  public void requestWithMalformedHostIsRejected() throws IOException {
+    jsonRpcConfig.setHostsWhitelist(hostsWhitelist);
+    assertThat(doRequest("ally:friend")).isEqualTo(403);
+    assertThat(doRequest("ally:123456")).isEqualTo(403);
+    assertThat(doRequest("ally:friend:1234")).isEqualTo(403);
   }
 }
