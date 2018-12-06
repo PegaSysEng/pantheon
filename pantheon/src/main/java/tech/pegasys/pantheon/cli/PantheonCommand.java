@@ -424,12 +424,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
-      throw new ParameterException(new CommandLine(this),
+      throw new ParameterException(
+          new CommandLine(this),
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
     if (trueCount(ropsten, rinkeby, goerli) > 1) {
-      throw new ParameterException(new CommandLine(this),
+      throw new ParameterException(
+          new CommandLine(this),
           "Unable to connect to multiple networks simultaneously. Specify one of --ropsten, --rinkeby or --goerli");
     }
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
@@ -444,7 +446,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         permissioningConfiguration());
   }
 
-  private static int trueCount(final Boolean ... b) {
+  private static int trueCount(final Boolean... b) {
     return (int) Arrays.stream(b).filter(bool -> bool).count();
   }
 
