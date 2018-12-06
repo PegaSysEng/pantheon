@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,9 +22,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedRoundCha
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -34,7 +33,6 @@ public class IbftRoundChangeMessageTest {
   @Mock private BytesValue messageBytes;
   @Mock private MessageData messageData;
   @Mock private IbftRoundChangeMessage roundChangeMessage;
-  @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   public void createMessageFromRoundChangeMessageData() {
@@ -50,7 +48,7 @@ public class IbftRoundChangeMessageTest {
   @Test
   public void createMessageFromRoundChangeMessage() {
     IbftRoundChangeMessage message = IbftRoundChangeMessage.fromMessage(roundChangeMessage);
-    assertThat(message).isEqualTo(roundChangeMessage);
+    assertThat(message).isSameAs(roundChangeMessage);
   }
 
   @Test
@@ -66,8 +64,8 @@ public class IbftRoundChangeMessageTest {
   @Test
   public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Message has code 42 and thus is not a IbftRoundChangeMessage");
-    IbftRoundChangeMessage.fromMessage(messageData);
+    assertThatThrownBy(() -> IbftRoundChangeMessage.fromMessage(messageData))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Message has code 42 and thus is not a IbftRoundChangeMessage");
   }
 }

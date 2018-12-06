@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,9 +22,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedPrePrepa
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -34,7 +33,6 @@ public class IbftPrePrepareMessageTest {
   @Mock private BytesValue messageBytes;
   @Mock private MessageData messageData;
   @Mock private IbftPrePrepareMessage prePrepareMessage;
-  @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   public void createMessageFromPrePrepareMessageData() {
@@ -49,7 +47,7 @@ public class IbftPrePrepareMessageTest {
   @Test
   public void createMessageFromPrePrepareMessage() {
     IbftPrePrepareMessage message = IbftPrePrepareMessage.fromMessage(prePrepareMessage);
-    assertThat(message).isEqualTo(prePrepareMessage);
+    assertThat(message).isSameAs(prePrepareMessage);
   }
 
   @Test
@@ -65,8 +63,8 @@ public class IbftPrePrepareMessageTest {
   @Test
   public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Message has code 42 and thus is not a IbftPrePrepareMessage");
-    IbftPrePrepareMessage.fromMessage(messageData);
+    assertThatThrownBy(() -> IbftPrePrepareMessage.fromMessage(messageData))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Message has code 42 and thus is not a IbftPrePrepareMessage");
   }
 }
