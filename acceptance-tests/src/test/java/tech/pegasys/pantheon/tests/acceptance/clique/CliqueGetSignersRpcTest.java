@@ -59,7 +59,8 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
 
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode2));
     cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
-    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 2, minerNode1, minerNode2));
+    cluster.verify(
+        clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 2, minerNode1, minerNode2));
 
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
     minerNode2.execute(cliqueTransactions.createAddProposal(minerNode3));
