@@ -25,45 +25,45 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
   private PantheonNode minerNode2;
   private PantheonNode minerNode3;
   private PantheonNode[] allNodes;
-  private PantheonNode[] initialNodes;
 
   @Before
   public void setUp() throws Exception {
-    final String[] validators = {"miner1", "miner2"};
+    final String[] validators = {"miner1"};
     minerNode1 = pantheon.createCliqueNodeWithValidators("miner1", validators);
     minerNode2 = pantheon.createCliqueNodeWithValidators("miner2", validators);
     minerNode3 = pantheon.createCliqueNodeWithValidators("miner3", validators);
-    initialNodes = new PantheonNode[] {minerNode1, minerNode2};
     allNodes = new PantheonNode[] {minerNode1, minerNode2, minerNode3};
     cluster.start(allNodes);
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockNumber() {
-    cluster.verify(clique.validatorsAtBlockEqual("0x0", initialNodes));
-    cluster.waitUntil(wait.chainHeadIsAt(1));
+    cluster.verify(clique.validatorsAtBlockEqual("0x0", minerNode1));
+    minerNode1.waitUntil(wait.chainHeadIsAt(1));
+
+    minerNode1.execute(cliqueTransactions.createAddProposal(minerNode2));
+    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
+    cluster.verify(clique.validatorsAtBlockEqual("0x2", minerNode1, minerNode2));
+
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
     minerNode2.execute(cliqueTransactions.createAddProposal(minerNode3));
-
-    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
-    cluster.verify(clique.validatorsAtBlockEqual("0x2", initialNodes));
-
-    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
-    cluster.verify(clique.validatorsAtBlockEqual("0x3", allNodes));
+    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
+    cluster.verify(clique.validatorsAtBlockEqual("0x4", allNodes));
     cluster.verify(clique.validatorsAtBlockEqual(LATEST, allNodes));
   }
 
   @Test
   public void shouldBeAbleToGetValidatorsForBlockHash() {
-    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 0, initialNodes));
-    cluster.waitUntil(wait.chainHeadIsAt(1));
+    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 0, minerNode1));
+    minerNode1.waitUntil(wait.chainHeadIsAt(1));
+
+    minerNode1.execute(cliqueTransactions.createAddProposal(minerNode2));
+    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
+    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 2, minerNode1, minerNode2));
+
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
     minerNode2.execute(cliqueTransactions.createAddProposal(minerNode3));
-
-    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
-    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 2, initialNodes));
-
-    minerNode1.waitUntil(wait.chainHeadHasProgressed(minerNode1, 1));
-    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 3, allNodes));
+    cluster.waitUntil(wait.chainHeadHasProgressed(minerNode1, 2));
+    cluster.verify(clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 4, allNodes));
   }
 }
