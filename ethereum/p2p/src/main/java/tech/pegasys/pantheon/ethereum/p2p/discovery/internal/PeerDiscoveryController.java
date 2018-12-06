@@ -107,7 +107,7 @@ public class PeerDiscoveryController {
 
   private final PeerDiscoveryAgent agent;
   private final PeerBlacklist peerBlacklist;
-  private final NodeWhitelistController nodeWhitelistController;
+  private final NodeWhitelistController nodeWhitelist;
 
   private RetryDelayFunction retryDelayFunction = RetryDelayFunction.linear(1.5, 2000, 60000);
 
@@ -133,7 +133,7 @@ public class PeerDiscoveryController {
       final long tableRefreshIntervalMs,
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
-      final NodeWhitelistController nodeWhitelistController) {
+      final NodeWhitelistController nodeWhitelist) {
     this.vertx = vertx;
     this.agent = agent;
     this.bootstrapNodes = bootstrapNodes;
@@ -141,7 +141,7 @@ public class PeerDiscoveryController {
     this.tableRefreshIntervalMs = tableRefreshIntervalMs;
     this.peerRequirement = peerRequirement;
     this.peerBlacklist = peerBlacklist;
-    this.nodeWhitelistController = nodeWhitelistController;
+    this.nodeWhitelist = nodeWhitelist;
   }
 
   public CompletableFuture<?> start() {
@@ -152,7 +152,7 @@ public class PeerDiscoveryController {
     bootstrapNodes
         .stream()
         .filter(node -> peerTable.tryAdd(node).getOutcome() == Outcome.ADDED)
-        .filter(node -> nodeWhitelistController.isNodeWhitelisted(node))
+        .filter(node -> nodeWhitelist.isNodeWhitelisted(node))
         .forEach(node -> bond(node, true));
 
     final long timerId =
@@ -200,7 +200,7 @@ public class PeerDiscoveryController {
       return;
     }
 
-    if (!nodeWhitelistController.isNodeWhitelisted(sender)) {
+    if (!nodeWhitelist.isNodeWhitelisted(sender)) {
       return;
     }
 
@@ -247,7 +247,7 @@ public class PeerDiscoveryController {
                           .orElse(emptyList());
 
                   for (final DiscoveryPeer neighbor : neighbors) {
-                    if (!nodeWhitelistController.isNodeWhitelisted(neighbor)
+                    if (!nodeWhitelist.isNodeWhitelisted(neighbor)
                         || peerBlacklist.contains(neighbor)
                         || peerTable.get(neighbor).isPresent()) {
                       continue;
