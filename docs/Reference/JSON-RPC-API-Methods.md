@@ -1,6 +1,14 @@
+## Breaking Change in v0.8.3
+
+From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist` option](Using-JSON-RPC-API#breaking-change-in-v083). 
+
 ## JSON-RPC Methods
 
 The following lists the Pantheon JSON-RPC API commands:
+
+#### admin Methods
+
+* [admin_peers](#admin_peers)
 
 #### web3 Methods
 
@@ -51,7 +59,7 @@ The following lists the Pantheon JSON-RPC API commands:
 ### debug Methods
 
 * [debug_metrics](#debug_metrics)
-* [debug_TraceTransaction](#debug_tracetransaction)
+* [debug_traceTransaction](#debug_tracetransaction)
 
 ### miner Methods
 
@@ -73,6 +81,57 @@ ________________________________________
 ## JSON-RPC API Reference
 
 ________________________________________
+#### admin_peers
+
+Returns networking information about connected remote nodes. 
+
+##### Parameters
+
+None
+
+##### Returns
+
+`result` : *array* of *objects* - Object returned for each remote node. 
+
+Properties of the remote node object are: 
+* `version` - P2P protocol version
+* `name` - Client name
+* `caps` - P2P message capabilities 
+* `network` - Addresses of local node and remote node
+* `port` - Port
+* `id` - Node public key. Excluding the `0x` prefix, the node public key is the ID in the enode URL `enode://<id ex 0x>@<host:port>`. 
+
+##### Request
+
+```bash
+curl -X POST --data '{"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}' <JSON-RPC-endpoint:port>
+```
+
+##### Result
+
+```json
+{
+  "jsonrpc" : "2.0",
+  "id" : 1,
+  "result" : [ 
+    {
+      "version" : "0x5",
+      "name" : "Geth/v1.8.20-unstable-92639b67/linux-amd64/go1.11.1",
+      "caps" : [
+        "eth/62", 
+        "eth/63"
+        ],
+      "network" : {
+        "localAddress" : "192.168.1.229:51279",
+        "remoteAddress" : "52.3.158.184:30303"
+      },
+      "port" : "0x0",
+      "id" : "0x343149e4feefa15d882d9fe4ac7d88f885bd05ebb735e547f12e12080a9fa07c8014ca6fd7f373123488102fe5e34111f8509cf0b7de3f5b44339c9f25e87cb8"
+    } 
+  ]
+}
+```
+________________________________________
 #### web3_clientVersion
 
 Returns the current client version.
@@ -85,13 +144,12 @@ None
 
 `result` : *string* - Current client version.
 
-##### Request Data
+##### Request
 
-```json
-{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":53}
+```bash
+curl -X POST --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}' <JSON-RPC-endpoint:port>
 ```
 
-For an explanation of how to make an HTTP or WebSockets request using this data, see [HTTP and WebSocket Requests](Using-JSON-RPC-API#http-and-websocket-requests).
 
 ##### Result
 
@@ -940,7 +998,7 @@ Object - [Transaction object](Objects#transaction-object), or `null` when no tra
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByHash","params":["0xa52be92809541220ee0aaaede6047d9a6c5d0cd96a517c854d944ee70a0ebb44"],"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -991,7 +1049,7 @@ This request returns the third transaction in the 82990 block on the Ropsten tes
 
 **Note:** Your node must be synchronized to at least the block containing the transaction for the request to return it.  
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByBlockHashAndIndex","params":["0xbf137c3a7a1ebdfac21252765e5d7f40d115c2757e4a4abee929be88c624fdb7", "0x2"], "id":1}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1089,7 +1147,7 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionReceipt","params":["0x504ce587a65bdbdb6414a0c6c16d86a04dd79bfcc4f2950eec9634b30ce5370f"],"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1134,7 +1192,7 @@ Creates a topic filter with the specified options to notify (log) when the state
 
 For example, params could be specified as follows:
 ```json
-params: [{
+[{
   "fromBlock": "earliest",
   "toBlock": "0x4",
   "address": "0xc94770007dda54cF92009BFF0dE90c06F603a09f",
@@ -1148,7 +1206,7 @@ params: [{
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newFilter","params":[{"topics":[]}],"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1164,9 +1222,10 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newFilter","params":[{"topic
 
 Invalid params error:
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newFilter","params":[{"fromBlock": "earliest","toBlock": "latest","address": "0xDD37f65dB31c107F773E82a4F85C693058fEf7a9","topics": []}],"id":53}' 127.0.0.1:8545
-
+```
+```bash
 {
   "jsonrpc" : "2.0",
   "id" : 53,
@@ -1192,7 +1251,7 @@ None
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newBlockFilter","params":[],"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1224,7 +1283,7 @@ None
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newPendingTransactionFilter","params":[],"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1261,7 +1320,7 @@ This method deletes filters of any type: block filters, pending transaction filt
 
 The following request deletes the block filter with an ID of 0x4:
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_uninstallFilter","params":["0x4"],"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1296,7 +1355,7 @@ Polls the specified filter and returns an array of logs that have occurred since
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getFilterChanges","params":["0xa"]:"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1330,7 +1389,7 @@ Same as [eth_getFilterChanges](#eth_getfilterchanges).
 
 The following example requests logs for filter ID 0x16 (22 decimal):
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getFilterLogs","params":["0x3"]"id":53}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1374,7 +1433,7 @@ The request above returns the logs for the 82893 block on the Ropsten testnet. Y
 
 **Note:** You must be synchronized to at least the requested block for the request to return the logs.
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getLogs","params":[{"blockhash":"0x677bf4b962464e6dfd548d6a30b6c703dd78c7cc3602825a7013a6e90a001d2a"}], "id":1}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1449,7 +1508,7 @@ Discards a proposal to add or remove a signer with the specified address.
 
 ##### Request 
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1477,7 +1536,7 @@ Lists signers for the specified block.
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}' <JSON-RPC-endpoint:port>
 ``` 
 
@@ -1505,7 +1564,7 @@ Lists signers for the specified block.
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSignersAtHash","params":["0x98b2ddb5106b03649d2d337d42154702796438b3c74fd25a5782940e84237a48"], "id":1}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1535,7 +1594,7 @@ Proposes adding or removing a signer with the specified address.
 
 ###### Request 
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-endpoint:port>
 ``` 
 
@@ -1565,7 +1624,7 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
 
 ###### Request 
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"clique_proposals","params":[], "id":1}' <JSON-RPC-endpoint:port>
 ``` 
 
@@ -1584,9 +1643,11 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"clique_proposals","params":[], "
 ________________________________________
 #### debug_metrics
 
-Returns metrics related for the JVM, blockchain, and peers. 
+>**Note** This method is only available only from v0.8.3 or when [building from source](Installation).
 
-The metrics displayed for the JVM vary depending on the JVM and the metrics displayed for the blockchain and peers may change from time to time. 
+Returns metrics providing information on the internal operation of Pantheon. 
+
+The available metrics may change over time. The JVM metrics may vary based on the JVM implementation being used. 
 
 The metric types are: 
 * Timer
@@ -1603,7 +1664,7 @@ None
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"debug_metrics","params":[],"id":1}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1729,7 +1790,7 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceTransaction","params":["0x2cc6c94c21685b7e0f8ddabf277a5ccf98db157c62619cde8baea696a74ed18e",{"disableStorage":true}],"id":1}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1773,7 +1834,7 @@ None
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"miner_start","params":[],"id":1}' <JSON-RPC-endpoint:port>
 ```
 
@@ -1803,7 +1864,7 @@ None
 
 ##### Request
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"miner_stop","params":[],"id":1}' <JSON-RPC-endpoint:port>
 ```
 

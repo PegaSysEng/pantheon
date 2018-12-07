@@ -6,6 +6,19 @@
 - [Block Parameter](#block-parameter)
 - [Not Supported by Pantheon](#not-supported-by-pantheon)
 
+## Breaking Change in v0.8.3
+
+From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the `--host-whitelist` option. If not specified, the default value for `--host-whitelist` is `localhost`. 
+
+If using the URL `http://127.0.0.1` to make JSON-RPC calls, use `--host-whitelist` to specify the hostname `127.0.0.1` or update the hostname to `localhost`. 
+
+If your application publishes RPC ports, specify the hostnames when starting Pantheon. For example:  
+```bash
+pantheon --host-whitelist=foo.com
+```
+ 
+Specify `*` or `all` for `--host-whitelist` to effectively disable host protection and replicate pre-v0.8.3 behavior. This is not recommended for production code. 
+
 ## Using the Pantheon JSON-RPC API
 
 ### Postman
@@ -30,7 +43,7 @@ The transport attributes are:
 
 To make RPC over HTTP requests, you can use the `curl` tool, available in many systems using [curl source code or pre-compiled packages](https://curl.haxx.se/download.html).
 
-```json
+```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
 ```
 

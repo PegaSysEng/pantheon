@@ -41,7 +41,6 @@ ws-listen="9.10.11.12:9101" # IP:port
 
 # Chain
 genesis="~/genesis.json" # Path to the custom genesis file
-sync-mode="fast"# should be FAST or FULL (or fast or full)
 
 # Mining
 miner-enabled=true
@@ -70,6 +69,16 @@ miner-coinbase="0x0000000000000000000000000000000000000002"
 
 > **Note:** The `--genesis` option is overridden by the `--dev-mode` option. If both are specified, the specified genesis file is ignored and the development mode configuration used. 
 <br>
+
+
+ <dt><code>--host-whitelist=&lt;hostname></code></dt>
+
+<dd>Comma-separated list of hostnames to allow access to the HTTP JSON-RPC API. Default is <code>localhost</code>. </dd>
+
+To allow all hostnames, use `*` or `all`. We don't recommend this for production code.
+
+> **Note:** This option is only available from v0.8.3 or when [building from source](Installation). Earlier versions allow access by all hostnames. 
+
   <dt><code>--max-peers=&lt;INTEGER></code></dt>
   <dd>Specifies the maximum P2P peer connections that can be established. The default is 25.</dd>
 <br>
@@ -111,8 +120,8 @@ miner-coinbase="0x0000000000000000000000000000000000000002"
  >**Note** This option is only available from v0.8.2 or when [building from source](Installation). 
 
 <br>
-  <dt><code>--nodes-whitelist=[&lt;enode://id@host:port>[,&lt;enode://id@host:port>...]...]</code></dt>
-  <dd>Comma-separated enode URLs for permissioned networks. 
+  <dt><code>--nodes-whitelist[=&lt;enode://id@host:port>[,&lt;enode://id@host:port>...]...]</code></dt>
+  <dd>Comma-separated enode URLs for permissioned networks. If you specify an empty list or <code>--nodes-whitelist</code> without a list, your node will not connect to any other nodes.
 </dd>
 
  >**Note** This option is only available from v0.8.3 or when [building from source](Installation). 
@@ -132,10 +141,13 @@ miner-coinbase="0x0000000000000000000000000000000000000002"
 <br>
   <dt><code>--rinkeby</code></dt>
   <dd>Uses the Rinkeby test network. Default is <code>false</code>.</dd>
+  
+  <br>
+  <br>
   <dt><code>--ropsten</code></dt>
   <dd>Uses the Ropsten test network. Default is <code>false</code>.</dd>
 
-> **Note** This option is only available when [building from source](Installation). For v0.8.1, refer [here](Starting-Pantheon#run-a-node-on-ropsten-testnet). 
+> **Note** This option is only available only from v0.8.2 or when [building from source](Installation). For v0.8.1, refer [here](Starting-Pantheon#run-a-node-on-ropsten-testnet). 
 <br>
   <dt><code>--rpc-enabled</code></dt>
   <dd>Set to <code>true</code> to enable the JSON-RPC service (RPC over HTTP). The default is <code>false</code>.</dd>
