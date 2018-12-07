@@ -708,6 +708,62 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void jsonRpcHostWhitelistAcceptsSingleArgument() {
+    parseCommand("--host-whitelist", "a");
+
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist().size()).isEqualTo(1);
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist()).contains("a");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist())
+        .doesNotContain("localhost");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistAcceptsMultipleArguments() {
+    parseCommand("--host-whitelist", "a,b");
+
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist().size()).isEqualTo(2);
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist()).contains("a", "b");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist())
+        .doesNotContain("*", "localhost");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistStarWithAnotherHostnameMustFail() {
+    final String[] origins = {"friend", "*"};
+    parseCommand("--host-whitelist", String.join(",", origins));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Value '*' can't be used with other hostnames");
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistAllWithAnotherHostnameMustFail() {
+    final String[] origins = {"friend", "all"};
+    parseCommand("--host-whitelist", String.join(",", origins));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Value 'all' can't be used with other hostnames");
+  }
+
+  @Test
   public void wsRpcEnabledPropertyDefaultIsFalse() {
     parseCommand();
 
@@ -839,11 +895,60 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void ropstenValuesAreUsed() throws Exception {
+    parseCommand("--ropsten");
+
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilder).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.ropsten());
+  }
+
+  @Test
+  public void goerliValuesAreUsed() throws Exception {
+    parseCommand("--goerli");
+
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilder).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.goerli());
+  }
+
+  @Test
+  public void noSeveralNetworkOptions() throws Exception {
+    parseCommand("--goerli", "--rinkeby");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).contains("Unable to connect to multiple networks");
+  }
+
+  @Test
   public void rinkebyValuesCanBeOverridden() throws Exception {
+    networkValuesCanBeOverridden("rinkeby");
+  }
+
+  @Test
+  public void goerliValuesCanBeOverridden() throws Exception {
+    networkValuesCanBeOverridden("goerli");
+  }
+
+  private void networkValuesCanBeOverridden(final String network) throws Exception {
     final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
     final Path genesisFile = createFakeGenesisFile();
     parseCommand(
-        "--rinkeby",
+        "--" + network,
         "--network-id",
         "1",
         "--bootnodes",
