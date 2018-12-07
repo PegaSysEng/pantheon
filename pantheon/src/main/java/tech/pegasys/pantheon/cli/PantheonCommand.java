@@ -19,6 +19,7 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonD
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
+import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
@@ -33,8 +34,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -228,6 +230,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean ropsten = false;
 
   @Option(
+    names = {"--goerli"},
+    description = "Use the Goerli test network (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean goerli = false;
+
+  @Option(
     names = {"--p2p-listen"},
     paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
     description = "Host and port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
@@ -303,6 +311,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
   private final Collection<RpcApi> wsApis = null;
+
+  @Option(
+    names = {"--host-whitelist"},
+    paramLabel = "<hostname>",
+    description =
+        "Comma separated list of hostnames to whitelist for RPC access.  default: ${DEFAULT-VALUE}",
+    defaultValue = "localhost",
+    converter = JsonRPCWhitelistHostsProperty.JsonRPCWhitelistHostsConverter.class
+  )
+  private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
   @Option(
     names = {"--dev-mode"},
@@ -417,15 +435,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
-      System.out.println(
+      throw new ParameterException(
+          new CommandLine(this),
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
-      return;
     }
-    if (ropsten && rinkeby) {
-      System.out.println(
-          "Unable to connect to multiple networks simultaneously. Remove one of --ropsten or --rinkeby");
-      return;
+    if (trueCount(ropsten, rinkeby, goerli) > 1) {
+      throw new ParameterException(
+          new CommandLine(this),
+          "Unable to connect to multiple networks simultaneously. Specify one of --ropsten, --rinkeby or --goerli");
     }
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
     synchronize(
@@ -437,6 +455,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         jsonRpcConfiguration(),
         webSocketConfiguration(),
         permissioningConfiguration());
+  }
+
+  private static int trueCount(final Boolean... b) {
+    return (int) Arrays.stream(b).filter(bool -> bool).count();
   }
 
   PantheonController<?> buildController() {
@@ -472,6 +494,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setPort(rpcHostAndPort.getPort());
     jsonRpcConfiguration.setCorsAllowedDomains(rpcCorsAllowedOrigins.getDomains());
     jsonRpcConfiguration.setRpcApis(rpcApis);
+    jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist.hostnamesWhitelist());
     return jsonRpcConfiguration;
   }
 
@@ -570,6 +593,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       predefinedNetworkConfig = EthNetworkConfig.rinkeby();
     } else if (ropsten) {
       predefinedNetworkConfig = EthNetworkConfig.ropsten();
+    } else if (goerli) {
+      predefinedNetworkConfig = EthNetworkConfig.goerli();
     } else {
       predefinedNetworkConfig = EthNetworkConfig.mainnet();
     }

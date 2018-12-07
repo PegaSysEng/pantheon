@@ -33,8 +33,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
+import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -252,6 +252,7 @@ public final class RunnerTest {
     final JsonRpcConfiguration configuration = JsonRpcConfiguration.createDefault();
     configuration.setPort(0);
     configuration.setEnabled(true);
+    configuration.setHostsWhitelist(Collections.singletonList("*"));
     return configuration;
   }
 
@@ -263,8 +264,7 @@ public final class RunnerTest {
   }
 
   private PermissioningConfiguration permissioningConfiguration() {
-    final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
-    return configuration;
+    return PermissioningConfiguration.createDefault();
   }
 
   private static void setupState(
