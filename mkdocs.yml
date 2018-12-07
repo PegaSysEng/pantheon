@@ -16,7 +16,6 @@ theme:
         - yaml
 
 nav:
-    - Overview: Overview.md
     - Installation:
         - Install Binary Distribution: Installation/Install-Binaries.md
         - Build from Source: Installation/Build-From-Source.md

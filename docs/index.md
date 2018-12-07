@@ -1,33 +1,22 @@
-# Pantheon Documentation
+## What is Pantheon?
 
-Welcome to the Pantheon wiki! Pantheon documentation is published here.
+Pantheon is an open-source Ethereum client developed under the Apache 2.0 license and written in Java. It runs on the Ethereum public network, private networks, and test networks such as Rinkeby and Ropsten. Pantheon implements Proof of Work (Ethash) and Proof of Authority (Clique) consensus mechanisms. 
 
-* [Overview](https://github.com/PegaSysEng/pantheon/wiki/Overview)
-* [Installation](https://github.com/PegaSysEng/pantheon/wiki/Installation)
-    * [Install Binary Distribution](https://github.com/PegaSysEng/pantheon/wiki/Install-Binaries)
-    * [Build from Source](https://github.com/PegaSysEng/pantheon/wiki/Build-From-Source)
-* [Getting Started](Getting-Started)
-    * [Starting Pantheon](https://github.com/PegaSysEng/pantheon/wiki/Starting-Pantheon)
-    * [Running Pantheon from Docker Image](https://github.com/PegaSysEng/pantheon/wiki/Run-Docker-Image)
-    * [Private Network Quickstart](https://github.com/PegaSysEng/pantheon/wiki/Private-Network-Quickstart)    
-* Configuring Pantheon 
-    * [Network ID and Chain ID](https://github.com/PegaSysEng/pantheon/wiki/NetworkID-And-ChainID)
-    * [Node Keys](https://github.com/PegaSysEng/pantheon/wiki/Node-Keys)
-    * [Networking](https://github.com/PegaSysEng/pantheon/wiki/Networking)
-    * [Accounts for Testing](https://github.com/PegaSysEng/pantheon/wiki/Accounts-for-Testing)
-    * [Logging](https://github.com/PegaSysEng/pantheon/wiki/Logging)
-    * [Testing and Developing Nodes](https://github.com/PegaSysEng/pantheon/wiki/Testing-Developing-Nodes)
-    * [Proof of Authority](https://github.com/PegaSysEng/pantheon/wiki/Proof-of-Authority)
-    * [Passing JVM Options](https://github.com/PegaSysEng/pantheon/wiki/Passing-JVM-Options)
-* Using Pantheon
-    * [Using Wallets for Account Management](https://github.com/PegaSysEng/pantheon/wiki/Account-Management)
-    * [Creating and Sending Transactions](https://github.com/PegaSysEng/pantheon/wiki/Transactions)
-    * [Mining](https://github.com/PegaSysEng/pantheon/wiki/Mining)
-    * [RPC Pub/Sub](https://github.com/PegaSysEng/pantheon/wiki/RPC-PubSub)
-    * [Debugging Pantheon](https://github.com/PegaSysEng/pantheon/wiki/Debugging)
-* Reference    
-    * [Pantheon Command Line](https://github.com/PegaSysEng/pantheon/wiki/Pantheon-CLI-Syntax)
-    * [Pantheon JSON-RPC API](https://github.com/PegaSysEng/pantheon/wiki/JSON-RPC-API)
-        * [Using the JSON-RPC API](Using-JSON-RPC-API)
-        * [JSON-RPC API Methods](JSON-RPC-API-Methods)
-        * [JSON-RPC API Objects](Objects)
+You can use Pantheon to develop enterprise applications requiring secure, high-performance transaction processing in a private network. 
+
+Our roadmap includes Pantheon with privacy features, alternative consensus mechanisms, and other enterprise features.
+
+
+## What can you do with Pantheon?
+
+Pantheon includes a [command line interface](https://github.com/PegaSysEng/pantheon/wiki/Pantheon-CLI-Syntax) and [JSON-RPC API](https://github.com/PegaSysEng/pantheon/wiki/JSON-RPC-API) for running, maintaining, debugging, and monitoring node operations in an Ethereum network. You can use the API via RPC over HTTP or via WebSockets transport, and Pub/Sub is supported. The API supports typical Ethereum functionalities such as:
+
+* Ether token mining
+* Smart contract development
+* Decentralized application (Dapp) development
+
+## What does Pantheon support?
+
+The Pantheon client supports common smart contract and Dapp development, deployment, and operational use cases, using tools such as [Truffle](http://truffleframework.com/), [Remix](https://github.com/ethereum/remix), and [web3j](https://web3j.io/). The client supports common JSON-RPC API methods such as eth, net, web3, debug, and miner.
+
+Pantheon doesn't support [Account management](https://github.com/PegaSysEng/pantheon/wiki/Account-Management).
