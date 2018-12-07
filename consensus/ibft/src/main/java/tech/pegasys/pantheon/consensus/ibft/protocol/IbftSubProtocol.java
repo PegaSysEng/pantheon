@@ -55,8 +55,8 @@ public class IbftSubProtocol implements SubProtocol {
   @Override
   public String messageName(final int protocolVersion, final int code) {
     switch (code) {
-      case IbftV2.PRE_PREPARE:
-        return "PrePrepare";
+      case IbftV2.PROPOSAL:
+        return "Proposal";
       case IbftV2.PREPARE:
         return "Prepare";
       case IbftV2.COMMIT:
