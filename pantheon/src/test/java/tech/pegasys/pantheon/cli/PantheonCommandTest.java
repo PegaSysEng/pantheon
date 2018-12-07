@@ -512,6 +512,21 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void nodesWhitelistWithEmptyListAndNonEmptyBootnodesMustDisplayError() {
+    final String bootNodeNotWhitelisted = "enode://004@123:4567";
+    parseCommand(
+        "--bootnodes",
+        String.join(",", bootNodeNotWhitelisted),
+        "--nodes-whitelist");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Cannot start node with bootnode(s) that are not in node-whitelist");
+  }
+
+  @Test
   public void bannedNodeIdsOptionMustBeUsed() {
     final String[] nodes = {"0001", "0002", "0003"};
     parseCommand("--banned-nodeids", String.join(",", nodes));
