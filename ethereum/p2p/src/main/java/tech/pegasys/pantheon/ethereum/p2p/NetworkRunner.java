@@ -129,13 +129,13 @@ public class NetworkRunner implements AutoCloseable {
             cap,
             message -> {
               final int code = message.getData().getCode();
-              inboundMessageCounter
-                  .labels(
-                      cap.toString(),
-                      protocol.messageName(cap.getVersion(), code),
-                      Integer.toString(code))
-                  .inc();
               if (!protocol.isValidMessageCode(cap.getVersion(), code)) {
+                inboundMessageCounter
+                    .labels(
+                        cap.toString(),
+                        protocol.messageName(cap.getVersion(), code),
+                        Integer.toString(code))
+                    .inc();
                 // Handle invalid messages by disconnecting
                 LOG.debug(
                     "Invalid message code ({}-{}, {}) received from peer, disconnecting from:",
