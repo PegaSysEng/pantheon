@@ -445,6 +445,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           new CommandLine(this),
           "Unable to connect to multiple networks simultaneously. Specify one of --ropsten, --rinkeby or --goerli");
     }
+    // ensure all bootstrapNodes are in the whitelist
+    PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
+    if (permissioningConfiguration.isNodeWhitelistSet() && bootstrapNodes != null) {
+      for (String bootnode : bootstrapNodes) {
+        if (!permissioningConfiguration.contains(bootnode)) {
+          throw new ParameterException(
+              new CommandLine(this),
+              "Cannot start node with bootnode(s) that are not in node-whitelist " + bootnode);
+        }
+      }
+    }
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
     synchronize(
         buildController(),
@@ -454,7 +465,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         p2pHostAndPort,
         jsonRpcConfiguration(),
         webSocketConfiguration(),
-        permissioningConfiguration());
+        permissioningConfiguration);
   }
 
   private static int trueCount(final Boolean... b) {

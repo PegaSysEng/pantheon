@@ -40,4 +40,8 @@ public class PermissioningConfiguration {
   public boolean isNodeWhitelistSet() {
     return nodeWhitelistSet;
   }
+
+  public boolean contains(final String node) {
+    return !isNodeWhitelistSet() || nodeWhitelist.contains(node);
+  }
 }

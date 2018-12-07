@@ -474,6 +474,44 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void nodesWhitelistOptionMustIncludeBootnodes() {
+    final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
+    parseCommand(
+        "--bootnodes",
+        String.join(",", nodes[0], nodes[1]),
+        "--nodes-whitelist",
+        String.join(",", nodes));
+
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(permissioningConfigurationArgumentCaptor.getValue().getNodeWhitelist())
+        .containsExactlyInAnyOrder(nodes);
+    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void nodesWhitelistOptionWhichDoesNotIncludeBootnodesMustDisplayError() {
+    final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
+    final String bootNodeNotWhitelisted = "enode://004@123:4567";
+    parseCommand(
+        "--bootnodes",
+        String.join(",", bootNodeNotWhitelisted, nodes[2]),
+        "--nodes-whitelist",
+        String.join(",", nodes));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Cannot start node with bootnode(s) that are not in node-whitelist");
+  }
+
+  @Test
   public void bannedNodeIdsOptionMustBeUsed() {
     final String[] nodes = {"0001", "0002", "0003"};
     parseCommand("--banned-nodeids", String.join(",", nodes));
@@ -581,6 +619,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void rpcApisPropertyWithInvalidEntryMustDisplayError() {
+    parseCommand("--rpc-api", "BOB");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).contains("Invalid value for option '--rpc-api'");
   }
 
   @Test
