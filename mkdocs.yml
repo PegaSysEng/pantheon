@@ -1,0 +1,57 @@
+site_name: Pantheon
+site_url: https://pantheon.readthedocs.io/
+site_description: Pantheon Java Ethereum client documentation.
+site_author: Pantheon community
+
+repo_url: https://github.com/PegaSysEng/pantheon
+
+theme:
+    name: readthedocs
+    highlightjs: true
+    hljs_languages:
+        - java
+        - bash
+        - toml
+        - json
+        - yaml
+
+nav:
+    - Overview: Overview.md
+    - Installation:
+        - Install Binary Distribution: Installation/Install-Binaries.md
+        - Build from Source: Installation/Build-From-Source.md
+    - Getting Started:
+        - Starting Pantheon: Getting-Started/Starting-Pantheon.md
+        - Running Pantheon from Docker Image: Getting-Started/Run-Docker-Image.md
+        - Private Network Quickstart: Getting-Started/Private-Network-Quickstart.md
+    - Configuring Pantheon:
+        - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
+        - Node Keys: Configuring-Pantheon/Node-Keys.md
+        - Networking: Configuring-Pantheon/Networking.md
+        - Accounts for Testing: Configuring-Pantheon/Accounts-for-Testing.md
+        - Logging: Configuring-Pantheon/Logging.md
+        - Testing and Developing Nodes: Configuring-Pantheon/Testing-Developing-Nodes.md
+        - Proof of Authority: Configuring-Pantheon/Proof-of-Authority.md
+        - Passing JVM Options: Configuring-Pantheon/Passing-JVM-Options.md
+    - Using Pantheon:
+        - Using Wallets for Account Management: Using-Pantheon/Account-Management.md
+        - Creating and Sending Transactions: Using-Pantheon/Transactions.md
+        - Mining: Using-Pantheon/Mining.md
+        - RPC Pub/Sub: Using-Pantheon/RPC-PubSub.md
+        - Debugging Pantheon: Using-Pantheon/Debugging.md
+    - Reference:
+        - Pantheon Command Line: Reference/Pantheon-CLI-Syntax.md
+        - Pantheon JSON-RPC API:
+          - Reference/JSON-RPC-API.md
+          - Using the JSON-RPC API: Reference/Using-JSON-RPC-API.md
+          - JSON-RPC API Methods: Reference/JSON-RPC-API-Methods.md
+          - JSON-RPC API Objects: Reference/Objects.md
+
+markdown_extensions:
+    - toc:
+        permalink: 
+    - admonition
+    - def_list
+
+plugins:
+    - search

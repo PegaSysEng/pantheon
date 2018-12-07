@@ -1,0 +1,33 @@
+### Accounts for Testing
+ 
+You can use existing accounts for testing by including them in the genesis file for a private network. Alternatively, Pantheon provides predefined accounts in development mode. 
+ 
+ #### Development Mode
+ 
+ When you start Pantheon with the [`--dev-mode` command line option](Pantheon-CLI-Syntax), the `dev.json` genesis file is used by default. 
+ 
+ The `dev.json` genesis file defines the accounts below that can be used for testing. 
+ 
+ > **Warning** Do not use the following accounts on mainnet or any public network except for testing. The private keys are displayed here so the accounts are not secure.  
+ 
+ ##### Account 1 (Miner Coinbase Account)
+
+   * Address: `0xfe3b557e8fb62b89f4916b721be55ceb828dbd73`
+   * Private key : `0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63`
+   * Initial balance : `0xad78ebc5ac6200000` (200000000000000000000 in decimal)  
+ ##### Account 2
+ 
+   * Address: `0x627306090abaB3A6e1400e9345bC60c78a8BEf57`
+   * Private key : `0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3`
+   * Initial balance : `0x90000000000000000000000` (2785365088392105618523029504 in decimal)
+ ##### Account 3
+ 
+   * Address: `0xf17f52151EbEF6C7334FAD080c5704D77216b732`
+   * Private key : `0xae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f`
+   * Initial balance : `0x90000000000000000000000` (2785365088392105618523029504 in decimal)
+ 
+ #### Genesis File 
+ 
+To use existing test accounts, specify the accounts and balances in a genesis file for your test network. For an example of defining accounts in the genesis file, refer to [`dev.json`](https://github.com/PegaSysEng/pantheon/blob/master/config/src/main/resources/dev.json).
+ 
+Use the [`--genesis` command line option](https://github.com/PegaSysEng/pantheon/wiki/Pantheon-CLI-Syntax) to start Pantheon with the genesis file defining the existing accounts. 

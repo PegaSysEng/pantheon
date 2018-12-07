@@ -1,0 +1,1 @@
+Questions or feedback? You can discuss issues and obtain free support on [Gitter](https://gitter.im/PegaSysEng/pantheon). For paid professional support, contact us at support@pegasys.tech.

@@ -1,0 +1,12 @@
+# Pantheon Installation
+
+You can install Pantheon by:
+* [Installing the binary distribution](Install-Binaries) 
+* [Building from source](Build-From-Source) 
+
+>**Note** To run a single node to connect the Ethereum mainnet or a public testnet, running from the [Pantheon docker image](Run-Docker-Image) is the fastest way to get started.
+
+## Disk Space and RAM Requirements
+Your computer should have at least 4 GB RAM. 
+
+Disk space needed varies depending on the network on which you run nodes. A small test network might require 200 MB while a mainnet node might require 1.5TB. If syncing a node on mainnet, allow 1.5 TB to 2 TB for the full blockchain archive.
