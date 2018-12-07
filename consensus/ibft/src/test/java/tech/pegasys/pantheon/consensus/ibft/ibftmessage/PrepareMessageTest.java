@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftSignedMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedPrepareMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -28,25 +28,25 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class IbftPrepareMessageTest {
-  @Mock private IbftSignedMessageData<IbftUnsignedPrepareMessageData> prepareMessageData;
+public class PrepareMessageTest {
+  @Mock private SignedData<PreparePayload> preparePayload;
   @Mock private BytesValue messageBytes;
   @Mock private MessageData messageData;
-  @Mock private IbftPrepareMessage prepareMessage;
+  @Mock private PrepareMessage prepareMessage;
 
   @Test
   public void createMessageFromPrepareMessageData() {
-    when(prepareMessageData.encode()).thenReturn(messageBytes);
-    IbftPrepareMessage prepareMessage = IbftPrepareMessage.create(prepareMessageData);
+    when(preparePayload.encode()).thenReturn(messageBytes);
+    PrepareMessage prepareMessage = PrepareMessage.create(preparePayload);
 
     assertThat(prepareMessage.getData()).isEqualTo(messageBytes);
     assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.PREPARE);
-    verify(prepareMessageData).encode();
+    verify(preparePayload).encode();
   }
 
   @Test
   public void createMessageFromPrepareMessage() {
-    IbftPrepareMessage message = IbftPrepareMessage.fromMessage(prepareMessage);
+    PrepareMessage message = PrepareMessage.fromMessage(prepareMessage);
     assertThat(message).isSameAs(prepareMessage);
   }
 
@@ -54,7 +54,7 @@ public class IbftPrepareMessageTest {
   public void createMessageFromGenericMessageData() {
     when(messageData.getData()).thenReturn(messageBytes);
     when(messageData.getCode()).thenReturn(IbftV2.PREPARE);
-    IbftPrepareMessage prepareMessage = IbftPrepareMessage.fromMessage(messageData);
+    PrepareMessage prepareMessage = PrepareMessage.fromMessage(messageData);
 
     assertThat(prepareMessage.getData()).isEqualTo(messageData.getData());
     assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.PREPARE);
@@ -63,8 +63,8 @@ public class IbftPrepareMessageTest {
   @Test
   public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
-    assertThatThrownBy(() -> IbftPrepareMessage.fromMessage(messageData))
+    assertThatThrownBy(() -> PrepareMessage.fromMessage(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Message has code 42 and thus is not a IbftPrepareMessage");
+        .hasMessageContaining("Message has code 42 and thus is not a PrepareMessage");
   }
 }

@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftSignedMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedCommitMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -28,43 +28,43 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class IbftCommitMessageTest {
-  @Mock private IbftSignedMessageData<IbftUnsignedCommitMessageData> commitMessageData;
+public class RoundChangeMessageTest {
+  @Mock private SignedData<RoundChangePayload> roundChangePayload;
   @Mock private BytesValue messageBytes;
   @Mock private MessageData messageData;
-  @Mock private IbftCommitMessage commitMessage;
+  @Mock private RoundChangeMessage roundChangeMessage;
 
   @Test
-  public void createMessageFromCommitMessageData() {
-    when(commitMessageData.encode()).thenReturn(messageBytes);
-    IbftCommitMessage commitMessage = IbftCommitMessage.create(commitMessageData);
+  public void createMessageFromRoundChangeMessageData() {
+    when(roundChangePayload.encode()).thenReturn(messageBytes);
+    RoundChangeMessage roundChangeMessage = RoundChangeMessage.create(roundChangePayload);
 
-    assertThat(commitMessage.getData()).isEqualTo(messageBytes);
-    assertThat(commitMessage.getCode()).isEqualTo(IbftV2.COMMIT);
-    verify(commitMessageData).encode();
+    assertThat(roundChangeMessage.getData()).isEqualTo(messageBytes);
+    assertThat(roundChangeMessage.getCode()).isEqualTo(IbftV2.ROUND_CHANGE);
+    verify(roundChangePayload).encode();
   }
 
   @Test
-  public void createMessageFromCommitMessage() {
-    IbftCommitMessage message = IbftCommitMessage.fromMessage(commitMessage);
-    assertThat(message).isSameAs(commitMessage);
+  public void createMessageFromRoundChangeMessage() {
+    RoundChangeMessage message = RoundChangeMessage.fromMessage(roundChangeMessage);
+    assertThat(message).isSameAs(roundChangeMessage);
   }
 
   @Test
   public void createMessageFromGenericMessageData() {
     when(messageData.getData()).thenReturn(messageBytes);
-    when(messageData.getCode()).thenReturn(IbftV2.COMMIT);
-    IbftCommitMessage commitMessage = IbftCommitMessage.fromMessage(messageData);
+    when(messageData.getCode()).thenReturn(IbftV2.ROUND_CHANGE);
+    RoundChangeMessage roundChangeMessage = RoundChangeMessage.fromMessage(messageData);
 
-    assertThat(commitMessage.getData()).isEqualTo(messageData.getData());
-    assertThat(commitMessage.getCode()).isEqualTo(IbftV2.COMMIT);
+    assertThat(roundChangeMessage.getData()).isEqualTo(messageData.getData());
+    assertThat(roundChangeMessage.getCode()).isEqualTo(IbftV2.ROUND_CHANGE);
   }
 
   @Test
   public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
-    assertThatThrownBy(() -> IbftCommitMessage.fromMessage(messageData))
+    assertThatThrownBy(() -> RoundChangeMessage.fromMessage(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Message has code 42 and thus is not a IbftCommitMessage");
+        .hasMessageContaining("Message has code 42 and thus is not a RoundChangeMessage");
   }
 }
