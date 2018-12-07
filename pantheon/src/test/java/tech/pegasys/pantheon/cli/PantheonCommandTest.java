@@ -514,10 +514,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void nodesWhitelistWithEmptyListAndNonEmptyBootnodesMustDisplayError() {
     final String bootNodeNotWhitelisted = "enode://004@123:4567";
-    parseCommand(
-        "--bootnodes",
-        String.join(",", bootNodeNotWhitelisted),
-        "--nodes-whitelist");
+    parseCommand("--bootnodes", String.join(",", bootNodeNotWhitelisted), "--nodes-whitelist");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
