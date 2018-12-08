@@ -107,15 +107,14 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    for (final SignedData<RoundChangePayload> roundChangeMsg :
-        roundChangeCert.getRoundChangePayloads()) {
-      final RoundChangePayload msgData = roundChangeMsg.getPayload();
-      if (!msgData.getRoundChangeIdentifier().equals(expectedRound)) {
-        LOG.info(
-            "Invalid NewRound message, not all embedded RoundChange messages have a "
-                + "matching target round.");
-        return false;
-      }
+    if (!roundChangeCert
+        .getRoundChangePayloads()
+        .stream()
+        .allMatch(p -> p.getPayload().getRoundChangeIdentifier().equals(expectedRound))) {
+      LOG.info(
+          "Invalid NewRound message, not all embedded RoundChange messages have a "
+              + "matching target round.");
+      return false;
     }
 
     for (final SignedData<RoundChangePayload> roundChangeMsg :
