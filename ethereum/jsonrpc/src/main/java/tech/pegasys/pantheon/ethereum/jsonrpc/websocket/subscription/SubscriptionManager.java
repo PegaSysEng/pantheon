@@ -55,6 +55,10 @@ public class SubscriptionManager extends AbstractVerticle {
     this.refreshDelay = refreshDelay;
   }
 
+  public SubscriptionManager() {
+    this.refreshDelay = 5000;
+  }
+
   @Override
   public void start() {
     vertx.eventBus().consumer(EVENTBUS_REMOVE_SUBSCRIPTIONS_ADDRESS, this::removeSubscriptions);

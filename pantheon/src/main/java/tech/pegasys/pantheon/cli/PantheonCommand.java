@@ -304,6 +304,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Collection<RpcApi> wsApis = null;
 
+  private Long refreshDelay;
+
   @Option(
     names = {"--ws-refresh-delay"},
     paramLabel = "<refresh delay>",
@@ -313,7 +315,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + "default: ${DEFAULT-VALUE}",
     defaultValue = "5000"
   )
-  private final long refreshDelay = 5000;
+  private void setRefreshDelay(Long refreshDelay) {
+    if (refreshDelay < 1 || refreshDelay > 3600000) {
+      throw new ParameterException(
+          new CommandLine(this),
+          "refreshDelay must be a positive integer smaller than 3600000 (1 hour)");
+    }
+    this.refreshDelay = refreshDelay;
+  }
 
   @Option(
     names = {"--dev-mode"},
