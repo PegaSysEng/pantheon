@@ -10,19 +10,13 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft.ibftmessagedata;
+package tech.pegasys.pantheon.consensus.ibft;
 
-import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+public class TestHelpers {
 
-public abstract class AbstractIbftUnsignedInRoundMessageData
-    extends AbstractIbftUnsignedMessageData {
-  protected final ConsensusRoundIdentifier roundIdentifier;
-
-  protected AbstractIbftUnsignedInRoundMessageData(final ConsensusRoundIdentifier roundIdentifier) {
-    this.roundIdentifier = roundIdentifier;
-  }
-
-  public ConsensusRoundIdentifier getRoundIdentifier() {
-    return roundIdentifier;
+  public static ConsensusRoundIdentifier createFrom(
+      final ConsensusRoundIdentifier initial, final int offSetSequence, final int offSetRound) {
+    return new ConsensusRoundIdentifier(
+        initial.getSequenceNumber() + offSetSequence, initial.getRoundNumber() + offSetRound);
   }
 }

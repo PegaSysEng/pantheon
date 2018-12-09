@@ -13,11 +13,11 @@
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftPreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftSignedMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedPrePrepareMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedPrepareMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.IbftUnsignedRoundChangeMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
 import java.util.Collection;
@@ -32,21 +32,20 @@ public class RoundChangeMessageValidator {
   private final MessageValidatorFactory messageValidatorFactory;
   private final Collection<Address> validators;
   private final long minimumPrepareMessages;
-  private final ConsensusRoundIdentifier currentRound;
+  private final long chainHeight;
 
   public RoundChangeMessageValidator(
       final MessageValidatorFactory messageValidatorFactory,
       final Collection<Address> validators,
       final long minimumPrepareMessages,
-      final ConsensusRoundIdentifier currentRound) {
+      final long chainHeight) {
     this.messageValidatorFactory = messageValidatorFactory;
     this.validators = validators;
     this.minimumPrepareMessages = minimumPrepareMessages;
-    this.currentRound = currentRound;
+    this.chainHeight = chainHeight;
   }
 
-  public boolean validateMessage(
-      final IbftSignedMessageData<IbftUnsignedRoundChangeMessageData> msg) {
+  public boolean validateMessage(final SignedData<RoundChangePayload> msg) {
 
     if (!validators.contains(msg.getSender())) {
       LOG.info(
@@ -55,57 +54,54 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    final ConsensusRoundIdentifier roundChangeTarget =
-        msg.getUnsignedMessageData().getRoundChangeIdentifier();
+    final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundChangeIdentifier();
 
-    if (roundChangeTarget.getSequenceNumber() != currentRound.getSequenceNumber()) {
+    if (targetRound.getSequenceNumber() != chainHeight) {
       LOG.info("Invalid RoundChange message, not valid for local chain height.");
       return false;
     }
 
-    if (msg.getUnsignedMessageData().getPreparedCertificate().isPresent()) {
-      final IbftPreparedCertificate certificate =
-          msg.getUnsignedMessageData().getPreparedCertificate().get();
+    if (msg.getPayload().getPreparedCertificate().isPresent()) {
+      final PreparedCertificate certificate = msg.getPayload().getPreparedCertificate().get();
 
-      return validatePrepareCertificate(certificate, roundChangeTarget);
+      return validatePrepareCertificate(certificate, targetRound);
     }
 
     return true;
   }
 
   private boolean validatePrepareCertificate(
-      final IbftPreparedCertificate certificate, final ConsensusRoundIdentifier roundChangeTarget) {
-    final IbftSignedMessageData<IbftUnsignedPrePrepareMessageData> preprepareMessage =
-        certificate.getIbftPrePrepareMessage();
+      final PreparedCertificate certificate, final ConsensusRoundIdentifier roundChangeTarget) {
+    final SignedData<ProposalPayload> proposalMessage = certificate.getProposalPayload();
 
-    final ConsensusRoundIdentifier prepareCertRound =
-        preprepareMessage.getUnsignedMessageData().getRoundIdentifier();
+    final ConsensusRoundIdentifier proposalRoundIdentifier =
+        proposalMessage.getPayload().getRoundIdentifier();
 
-    if (!validatePreprepareCertificateRound(prepareCertRound, roundChangeTarget)) {
+    if (!validatePreparedCertificateRound(proposalRoundIdentifier, roundChangeTarget)) {
       return false;
     }
 
-    final MessageValidator messageValidator = messageValidatorFactory.createAt(prepareCertRound);
+    final MessageValidator messageValidator =
+        messageValidatorFactory.createAt(proposalRoundIdentifier);
     return validateConsistencyOfPrepareCertificateMessages(certificate, messageValidator);
   }
 
   private boolean validateConsistencyOfPrepareCertificateMessages(
-      final IbftPreparedCertificate certificate, final MessageValidator messageValidator) {
+      final PreparedCertificate certificate, final MessageValidator messageValidator) {
 
-    if (!messageValidator.addPreprepareMessage(certificate.getIbftPrePrepareMessage())) {
-      LOG.info("Invalid RoundChange message, embedded Preprepare message failed validation.");
+    if (!messageValidator.addSignedProposalPayload(certificate.getProposalPayload())) {
+      LOG.info("Invalid RoundChange message, embedded Proposal message failed validation.");
       return false;
     }
 
-    if (certificate.getIbftPrepareMessages().size() < minimumPrepareMessages) {
+    if (certificate.getPreparePayloads().size() < minimumPrepareMessages) {
       LOG.info(
-          "Invalid RoundChange message, insufficient prepare messages exist to justify "
+          "Invalid RoundChange message, insufficient Prepare messages exist to justify "
               + "prepare certificate.");
       return false;
     }
 
-    for (final IbftSignedMessageData<IbftUnsignedPrepareMessageData> prepareMsg :
-        certificate.getIbftPrepareMessages()) {
+    for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
       if (!messageValidator.validatePrepareMessage(prepareMsg)) {
         LOG.info("Invalid RoundChange message, embedded Prepare message failed validation.");
         return false;
@@ -115,18 +111,18 @@ public class RoundChangeMessageValidator {
     return true;
   }
 
-  private boolean validatePreprepareCertificateRound(
+  private boolean validatePreparedCertificateRound(
       final ConsensusRoundIdentifier prepareCertRound,
       final ConsensusRoundIdentifier roundChangeTarget) {
 
     if (prepareCertRound.getSequenceNumber() != roundChangeTarget.getSequenceNumber()) {
-      LOG.info("Invalid RoundChange message, PreprepareCertificate is not for local chain height.");
+      LOG.info("Invalid RoundChange message, PreparedCertificate is not for local chain height.");
       return false;
     }
 
     if (prepareCertRound.getRoundNumber() >= roundChangeTarget.getRoundNumber()) {
       LOG.info(
-          "Invalid RoundChange message, PreprepareCertificate is newer than RoundChange target.");
+          "Invalid RoundChange message, PreparedCertificate not older than RoundChange target.");
       return false;
     }
     return true;

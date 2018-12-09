@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.config.CliqueConfigOptions;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
+import tech.pegasys.pantheon.consensus.clique.CliqueMiningTracker;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import tech.pegasys.pantheon.consensus.clique.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueBlockScheduler;
@@ -32,6 +33,7 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
@@ -54,6 +56,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.IOException;
@@ -107,6 +110,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
       final int networkId,
       final KeyPair nodeKeys,
       final MetricsSystem metricsSystem) {
+    final Address localAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
     final CliqueConfigOptions cliqueConfig =
         genesisConfig.getConfigOptions().getCliqueConfigOptions();
     final long blocksPerEpoch = cliqueConfig.getEpochLength();
@@ -156,7 +160,8 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             protocolContext,
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem);
+            metricsSystem.createLabelledTimer(
+                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"));
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
@@ -174,11 +179,15 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             new CliqueBlockScheduler(
                 Clock.systemUTC(),
                 protocolContext.getConsensusState().getVoteTallyCache(),
-                Util.publicKeyToAddress(nodeKeys.getPublicKey()),
+                localAddress,
                 secondsBetweenBlocks),
             epochManger);
     final CliqueMiningCoordinator miningCoordinator =
-        new CliqueMiningCoordinator(blockchain, miningExecutor, syncState);
+        new CliqueMiningCoordinator(
+            blockchain,
+            miningExecutor,
+            syncState,
+            new CliqueMiningTracker(localAddress, protocolContext));
     miningCoordinator.addMinedBlockObserver(ethProtocolManager);
 
     // Clique mining is implicitly enabled.
