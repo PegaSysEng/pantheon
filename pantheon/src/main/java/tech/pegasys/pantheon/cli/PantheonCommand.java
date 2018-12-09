@@ -323,7 +323,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + "default: ${DEFAULT-VALUE}",
     defaultValue = "5000"
   )
-  private void setRefreshDelay(Long refreshDelay) {
+  private void setRefreshDelay(final Long refreshDelay) {
     if (refreshDelay < 1 || refreshDelay > 3600000) {
       throw new ParameterException(
           new CommandLine(this),
