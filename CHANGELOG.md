@@ -118,7 +118,7 @@ Specify `*` or `all` for `--host-whitelist` to effectively disable host protecti
  - Updated client version to be ethstats friendly (PR [#258](https://github.com/PegaSysEng/pantheon/pull/258))
  - Added `--node-private-key` option to allow nodekey file to be specified separately to data directory ([#233](https://github.com/PegaSysEng/pantheon/issues/233) thanks to [@peterbroadhurst](https://github.com/peterbroadhurst) for requesting)  (PR [#234](https://github.com/PegaSysEng/pantheon/pull/234))
  - Added `--banned-nodeids` option to prevent connection to specific nodes (PR [#254](https://github.com/PegaSysEng/pantheon/pull/254))
- - Send client quitting disconnect message to peers on shutdown ([#184](https://github.com/PegaSysEng/pantheon/issues/184)) (PR [#253](https://github.com/PegaSysEng/pantheon/pull/253))
+ - Send client quitting disconnect message to networkPeers on shutdown ([#184](https://github.com/PegaSysEng/pantheon/issues/184)) (PR [#253](https://github.com/PegaSysEng/pantheon/pull/253))
  - Improved error message for port conflict error (PR [#232](https://github.com/PegaSysEng/pantheon/pull/232))
  - Improved documentation by adding the following pages:
     * [Getting Started](https://github.com/PegaSysEng/pantheon/wiki/Getting-Started)

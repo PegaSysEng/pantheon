@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequiredValidatorQuorum;
 
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
-import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
@@ -42,9 +41,10 @@ public class IbftFinalState {
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final MessageFactory messageFactory;
   private final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator;
+  private final IbftMessageTransmitter messageTransmitter;
 
   public IbftFinalState(
-      final VoteTally validatorProvider,
+      final ValidatorProvider validatorProvider,
       final KeyPair nodeKeys,
       final Address localAddress,
       final ProposerSelector proposerSelector,
@@ -64,6 +64,7 @@ public class IbftFinalState {
     this.blockCreatorFactory = blockCreatorFactory;
     this.messageFactory = messageFactory;
     this.ibftContextBlockHeaderValidator = ibftContextBlockHeaderValidator;
+    this.messageTransmitter = new IbftMessageTransmitter(messageFactory, peers);
   }
 
   public int getQuorumSize() {
@@ -116,5 +117,9 @@ public class IbftFinalState {
 
   public BlockHeaderValidator<IbftContext> getBlockHeaderValidator() {
     return ibftContextBlockHeaderValidator;
+  }
+
+  public IbftMessageTransmitter getTransmitter() {
+    return messageTransmitter;
   }
 }
