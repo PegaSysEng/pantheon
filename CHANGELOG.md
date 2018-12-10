@@ -9,6 +9,7 @@ From v0.8.3, incoming HTTP requests are only accepted from hostnames specified u
 If using the URL `http://127.0.0.1` to make JSON-RPC calls, use `--host-whitelist` to specify the hostname `127.0.0.1` or update the hostname to `localhost`. 
 
 If your application publishes RPC ports, specify the hostnames when starting Pantheon. For example:  
+
 ```json
 pantheon --host-whitelist=example.com
 ```
@@ -36,7 +37,7 @@ Specify `*` or `all` for `--host-whitelist` to effectively disable host protecti
 - Implement iterative peer search [\#268](https://github.com/PegaSysEng/pantheon/pull/268) 
 - Added RLP enc/dec for PrePrepare, Commit and NewRound messages [\#200](https://github.com/PegaSysEng/pantheon/pull/200) 
 - IBFT block mining [\#169](https://github.com/PegaSysEng/pantheon/pull/169) 
-- Added `--goerli` CLI option [\#370](https://github.com/PegaSysEng/pantheon/pull/370) (Thanks to [Nashatyrev](https://github.com/Nashatyrev))
+- Added `--goerli` CLI option [\#370](https://github.com/PegaSysEng/pantheon/pull/370) (Thanks to [@Nashatyrev](https://github.com/Nashatyrev))
 - Begin capturing metrics to better understand Pantheon's behaviour [\#326](https://github.com/PegaSysEng/pantheon/pull/326)
 - Documentation updates include:
    * Added Coding Conventions [\#342](https://github.com/PegaSysEng/pantheon/pull/342)
@@ -62,7 +63,6 @@ Specify `*` or `all` for `--host-whitelist` to effectively disable host protecti
 - Add an `UNKNOWN` `DisconnectReason` [\#359](https://github.com/PegaSysEng/pantheon/pull/359) 
 - New round validation [\#353](https://github.com/PegaSysEng/pantheon/pull/353) 
 - Update get validators for block hash test to start from block 1 [\#352](https://github.com/PegaSysEng/pantheon/pull/352) 
-- Ignore clique AT for now [\#351](https://github.com/PegaSysEng/pantheon/pull/351) 
 - Idiomatic Builder Pattern [\#345](https://github.com/PegaSysEng/pantheon/pull/345) 
 - Revert `Repair Clique Proposer Selection` \#339 - Breaks Görli testnet [\#343](https://github.com/PegaSysEng/pantheon/pull/343) 
 - No fixed ports in tests [\#340](https://github.com/PegaSysEng/pantheon/pull/340) 
