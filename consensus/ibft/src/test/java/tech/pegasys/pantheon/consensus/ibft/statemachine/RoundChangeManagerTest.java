@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
@@ -62,7 +63,9 @@ public class RoundChangeManagerTest {
 
     final ProtocolContext<IbftContext> protocolContext =
         new ProtocolContext<>(
-            mock(MutableBlockchain.class), mock(WorldStateArchive.class), mock(IbftContext.class));
+            mock(MutableBlockchain.class),
+            mock(WorldStateArchive.class),
+            new IbftContext(new VoteTally(validators), null));
 
     @SuppressWarnings("unchecked")
     BlockHeaderValidator<IbftContext> headerValidator =
@@ -74,7 +77,6 @@ public class RoundChangeManagerTest {
     messageValidators.put(
         ri1,
         new MessageValidator(
-            validators,
             Util.publicKeyToAddress(proposerKey.getPublicKey()),
             ri1,
             headerValidator,
@@ -84,7 +86,6 @@ public class RoundChangeManagerTest {
     messageValidators.put(
         ri2,
         new MessageValidator(
-            validators,
             Util.publicKeyToAddress(validator1Key.getPublicKey()),
             ri2,
             headerValidator,
@@ -94,7 +95,6 @@ public class RoundChangeManagerTest {
     messageValidators.put(
         ri3,
         new MessageValidator(
-            validators,
             Util.publicKeyToAddress(validator2Key.getPublicKey()),
             ri3,
             headerValidator,

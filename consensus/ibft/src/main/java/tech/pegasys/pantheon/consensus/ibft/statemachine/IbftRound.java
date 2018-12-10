@@ -84,10 +84,30 @@ public class IbftRound {
   public void createAndSendProposalMessage(final long headerTimeStampSeconds) {
     LOG.info("Creating proposed block.");
     final Block block = blockCreator.createBlock(headerTimeStampSeconds);
-    transmitter.multicastProposal(roundState.getRoundIdentifier(), block);
+    final SignedData<ProposalPayload> proposal =
+        transmitter.multicastProposal(roundState.getRoundIdentifier(), block);
+    updateStateWithProposedBlock(proposal);
+  }
 
-    updateStateWithProposedBlock(
-        messageFactory.createSignedProposalPayload(roundState.getRoundIdentifier(), block));
+  public void startRoundWith(
+      final RoundChangeCertificate roundChangeCertificate, final long headerTimestamp) {
+    final Optional<PreparedCertificate> latestCertificate =
+        findLatestPreparedCertificate(roundChangeCertificate.getRoundChangePayloads());
+    if (!latestCertificate.isPresent()) {
+      final Block block = blockCreator.createBlock(headerTimestamp);
+      transmitter.multicastNewRound(
+          getRoundIdentifier(),
+          roundChangeCertificate,
+          messageFactory.createSignedProposalPayload(getRoundIdentifier(), block));
+    } else {
+      // TODO(tmm) The block here CANNOT simply be the same block as before :( We need to replace
+      // round numbers and stuff to make it actually validate.
+      transmitter.multicastNewRound(
+          getRoundIdentifier(),
+          roundChangeCertificate,
+          latestCertificate.get().getProposalPayload());
+      updateStateWithProposedBlock(latestCertificate.get().getProposalPayload());
+    }
   }
 
   public void startRoundWith(

@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -75,11 +76,12 @@ public class MessageValidatorTest {
 
     final ProtocolContext<IbftContext> protocolContext =
         new ProtocolContext<>(
-            mock(MutableBlockchain.class), mock(WorldStateArchive.class), mock(IbftContext.class));
+            mock(MutableBlockchain.class),
+            mock(WorldStateArchive.class),
+            new IbftContext(new VoteTally(validators), null));
 
     validator =
         new MessageValidator(
-            validators,
             Util.publicKeyToAddress(proposerKey.getPublicKey()),
             roundIdentifier,
             headerValidator,

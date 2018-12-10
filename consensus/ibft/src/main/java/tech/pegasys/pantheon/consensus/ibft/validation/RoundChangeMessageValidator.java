@@ -129,7 +129,8 @@ public class RoundChangeMessageValidator {
   }
 
   @FunctionalInterface
-  public interface MessageValidatorForHeightFactory {
+  public interface MessageValidatorFactory {
+
     MessageValidator createAt(final ConsensusRoundIdentifier roundIdentifier);
   }
 }
