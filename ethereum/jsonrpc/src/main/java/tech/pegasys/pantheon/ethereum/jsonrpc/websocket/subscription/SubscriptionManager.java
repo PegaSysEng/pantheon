@@ -50,13 +50,14 @@ public class SubscriptionManager extends AbstractVerticle {
   private final Map<String, List<Long>> connectionSubscriptionsMap = new HashMap<>();
   private final SubscriptionBuilder subscriptionBuilder = new SubscriptionBuilder();
   private final long refreshDelay;
+  private final long DEFAULT_REFRESH_DELAY = 5000;
 
   public SubscriptionManager(final long refreshDelay) {
     this.refreshDelay = refreshDelay;
   }
 
   public SubscriptionManager() {
-    this.refreshDelay = 5000;
+    this.refreshDelay = DEFAULT_REFRESH_DELAY;
   }
 
   @Override
