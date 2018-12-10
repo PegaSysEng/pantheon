@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.JsonRpcResult;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
@@ -50,14 +51,13 @@ public class SubscriptionManager extends AbstractVerticle {
   private final Map<String, List<Long>> connectionSubscriptionsMap = new HashMap<>();
   private final SubscriptionBuilder subscriptionBuilder = new SubscriptionBuilder();
   private final long refreshDelay;
-  private final long DEFAULT_REFRESH_DELAY = 5000;
 
   public SubscriptionManager(final long refreshDelay) {
     this.refreshDelay = refreshDelay;
   }
 
   public SubscriptionManager() {
-    this.refreshDelay = DEFAULT_REFRESH_DELAY;
+    this.refreshDelay = WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY;
   }
 
   @Override
