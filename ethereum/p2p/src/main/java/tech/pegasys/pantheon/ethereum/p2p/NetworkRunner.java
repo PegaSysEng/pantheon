@@ -133,8 +133,8 @@ public class NetworkRunner implements AutoCloseable {
                 inboundMessageCounter
                     .labels(
                         cap.toString(),
-                        protocol.messageName(cap.getVersion(), code),
-                        Integer.toString(code))
+                        "Invalid",
+                        "")
                     .inc();
                 // Handle invalid messages by disconnecting
                 LOG.debug(
@@ -146,6 +146,12 @@ public class NetworkRunner implements AutoCloseable {
                 message.getConnection().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
                 return;
               }
+              inboundMessageCounter
+                  .labels(
+                      cap.toString(),
+                      protocol.messageName(cap.getVersion(), code),
+                      Integer.toString(code))
+                  .inc();
               protocolManager.processMessage(cap, message);
             });
       }
