@@ -96,6 +96,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private static final Wei DEFAULT_MIN_TRANSACTION_GAS_PRICE = Wei.of(1000);
   private static final BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
+  private static final long DEFAULT_MAX_REFRESH_DELAY = 3600000;
+  private static final long DEFAULT_MIN_REFRESH_DELAY = 1;
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
@@ -321,10 +323,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description =
         "Refresh delay of websocket subscription sync in milliseconds. "
             + "default: ${DEFAULT-VALUE}",
-    defaultValue = "5000"
+    defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
   )
   private void setRefreshDelay(final Long refreshDelay) {
-    if (refreshDelay < 1 || refreshDelay > 3600000) {
+    if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
       throw new ParameterException(
           new CommandLine(this),
           "refreshDelay must be a positive integer smaller than 3600000 (1 hour)");
