@@ -12,7 +12,11 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
+import java.util.Set;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
@@ -43,7 +47,10 @@ public class RoundChangeManager {
 
   public static class RoundChangeStatus {
     private final int quorumSize;
-    private final List<SignedData<RoundChangePayload>> receivedMessages = Lists.newArrayList();
+
+    @VisibleForTesting
+    final Map<Address, SignedData<RoundChangePayload>> receivedMessages = Maps.newHashMap();
+
     private boolean actioned = false;
 
     public RoundChangeStatus(final int quorumSize) {
@@ -52,7 +59,7 @@ public class RoundChangeManager {
 
     public void addMessage(final SignedData<RoundChangePayload> msg) {
       if (!actioned) {
-        receivedMessages.add(msg);
+        receivedMessages.put(msg.getSender(), msg);
       }
     }
 
@@ -63,7 +70,7 @@ public class RoundChangeManager {
     public RoundChangeCertificate createRoundChangeCertificate() {
       if (roundChangeReady()) {
         actioned = true;
-        return new RoundChangeCertificate(receivedMessages);
+        return new RoundChangeCertificate(receivedMessages.values());
       } else {
         throw new IllegalStateException("Unable to create RoundChangeCertificate at this time.");
       }
@@ -71,22 +78,22 @@ public class RoundChangeManager {
   }
 
   private static final Logger LOG = LogManager.getLogger();
-  private final Map<ConsensusRoundIdentifier, RoundChangeStatus> roundChangeCache =
+  @VisibleForTesting
+  final Map<ConsensusRoundIdentifier, RoundChangeStatus> roundChangeCache =
       Maps.newHashMap();
   private final Collection<Address> validators;
   private final int quorumSize;
-  private final long chainHeight;
+  private final long sequenceNumber;
   private final MessageValidatorFactory messageValidityFactory;
 
   public RoundChangeManager(
-      final int quorumSize,
-      final long currentChainHeight,
-      final IbftFinalState finalState,
+      final long sequenceNumber,
+      final Collection<Address> validators,
       final MessageValidatorFactory messageValidityFactory) {
-    this.quorumSize = quorumSize;
-    this.validators = finalState.getValidators();
+    this.validators = validators;
     this.messageValidityFactory = messageValidityFactory;
-    this.chainHeight = currentChainHeight;
+    this.sequenceNumber = sequenceNumber;
+    this.quorumSize = IbftHelpers.calculateRequiredValidatorQuorum(validators.size());
   }
 
   public Optional<RoundChangeCertificate> appendRoundChangeMessage(
@@ -95,8 +102,8 @@ public class RoundChangeManager {
     final ConsensusRoundIdentifier msgTargetRound = msg.getPayload().getRoundChangeIdentifier();
     final RoundChangeMessageValidator messageValidator =
         new RoundChangeMessageValidator(
-            messageValidityFactory, validators, quorumSize, chainHeight);
-    if (messageValidator.validateMessage(msg)) {
+            messageValidityFactory, validators, quorumSize, sequenceNumber);
+    if (!messageValidator.validateMessage(msg)) {
       LOG.info("RoundChange message was invalid.");
       return Optional.empty();
     }
