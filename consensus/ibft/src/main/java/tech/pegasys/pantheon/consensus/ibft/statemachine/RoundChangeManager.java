@@ -46,6 +46,7 @@ public class RoundChangeManager {
   public static class RoundChangeStatus {
     private final int quorumSize;
 
+    // Store only 1 round change per round per validator
     @VisibleForTesting
     final Map<Address, SignedData<RoundChangePayload>> receivedMessages = Maps.newHashMap();
 
@@ -119,15 +120,7 @@ public class RoundChangeManager {
 
   /* Called when a given round has completed/timed-out such that msgs cached can be removed */
   public void discardCompletedRound(final ConsensusRoundIdentifier completedRoundIdentifier) {
-    List<ConsensusRoundIdentifier> cacheKeysToRemove = Lists.newArrayList();
-    for (final ConsensusRoundIdentifier msgRoundId : roundChangeCache.keySet()) {
-      if (isAnEarlierOrEqualRound(msgRoundId, completedRoundIdentifier)) {
-        cacheKeysToRemove.add(msgRoundId);
-      }
-    }
-    for (final ConsensusRoundIdentifier msgRoundId : cacheKeysToRemove) {
-      roundChangeCache.remove(msgRoundId);
-    }
+    roundChangeCache.entrySet().removeIf(entry -> isAnEarlierOrEqualRound(entry.getKey(), completedRoundIdentifier));
   }
 
   private boolean isAnEarlierOrEqualRound(
