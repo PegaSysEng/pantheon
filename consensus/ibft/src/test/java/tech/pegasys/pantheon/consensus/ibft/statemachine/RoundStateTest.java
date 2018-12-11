@@ -90,7 +90,7 @@ public class RoundStateTest {
   }
 
   @Test
-  public void singleVlidatorIsPreparedWithJustProposal() {
+  public void singleValidatorIsPreparedWithJustProposal() {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
     final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
 

@@ -72,18 +72,14 @@ public class RoundState {
   }
 
   public void addPreparedPeer(final SignedData<PreparePayload> prepareMsg) {
-    if (!proposalMessage.isPresent()) {
-      preparePayloads.add(prepareMsg);
-    } else if (validator.validatePrepareMessage(prepareMsg)) {
+    if (!proposalMessage.isPresent() || validator.validatePrepareMessage(prepareMsg)) {
       preparePayloads.add(prepareMsg);
     }
     updateState();
   }
 
   public void addCommitSeal(final SignedData<CommitPayload> commitPayload) {
-    if (!proposalMessage.isPresent()) {
-      commitPayloads.add(commitPayload);
-    } else if (validator.validateCommmitMessage(commitPayload)) {
+    if (!proposalMessage.isPresent() || validator.validateCommmitMessage(commitPayload)) {
       commitPayloads.add(commitPayload);
     }
 
