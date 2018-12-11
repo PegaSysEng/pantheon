@@ -15,10 +15,13 @@ package tech.pegasys.pantheon.ethereum.p2p.config;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import tech.pegasys.pantheon.ethereum.core.Address;
 
 public class PermissioningConfiguration {
   private List<String> nodeWhitelist;
+  private List<String> accountWhitelist;
   private boolean nodeWhitelistSet;
+  private boolean accountWhitelistSet;
 
   public List<String> getNodeWhitelist() {
     return nodeWhitelist;
@@ -27,6 +30,7 @@ public class PermissioningConfiguration {
   public static PermissioningConfiguration createDefault() {
     final PermissioningConfiguration config = new PermissioningConfiguration();
     config.nodeWhitelist = new ArrayList<>();
+    config.accountWhitelist = new ArrayList<>();
     return config;
   }
 
@@ -39,5 +43,18 @@ public class PermissioningConfiguration {
 
   public boolean isNodeWhitelistSet() {
     return nodeWhitelistSet;
+  }
+
+  public List<String> getAccountWhitelist() { return accountWhitelist; }
+
+  public void setAccountWhitelist(final Collection<String> accountWhitelist) {
+    if (accountWhitelist != null) {
+      this.accountWhitelist.addAll(accountWhitelist);
+      this.accountWhitelistSet = true;
+    }
+  }
+
+  public boolean isAccountWhitelistSet() {
+    return accountWhitelistSet;
   }
 }
