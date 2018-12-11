@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,44 +80,62 @@ public class RoundChangeManager {
   @VisibleForTesting
   final Map<ConsensusRoundIdentifier, RoundChangeStatus> roundChangeCache = Maps.newHashMap();
 
-  private final Collection<Address> validators;
   private final int quorumSize;
-  private final long sequenceNumber;
-  private final MessageValidatorFactory messageValidityFactory;
+  private final RoundChangeMessageValidator roundChangeMessageValidator;
 
   public RoundChangeManager(
       final long sequenceNumber,
       final Collection<Address> validators,
       final MessageValidatorFactory messageValidityFactory) {
-    this.validators = validators;
-    this.messageValidityFactory = messageValidityFactory;
-    this.sequenceNumber = sequenceNumber;
     this.quorumSize = IbftHelpers.calculateRequiredValidatorQuorum(validators.size());
-  }
-
-  public Optional<RoundChangeCertificate> appendRoundChangeMessage(
-      final SignedData<RoundChangePayload> msg) {
-    // validate the received msg
-    final ConsensusRoundIdentifier msgTargetRound = msg.getPayload().getRoundChangeIdentifier();
-    final RoundChangeMessageValidator messageValidator =
+    this.roundChangeMessageValidator =
         new RoundChangeMessageValidator(
             messageValidityFactory, validators, quorumSize, sequenceNumber);
-    if (!messageValidator.validateMessage(msg)) {
+  }
+
+  /**
+   * Adds the round message to this manager and return a certificate if it passes the threshold
+   * @param msg The signed round change message to add
+   * @return Empty if the round change threshold hasn't been hit, otherwise a round change certificate
+   */
+  public Optional<RoundChangeCertificate> appendRoundChangeMessage(
+      final SignedData<RoundChangePayload> msg) {
+
+    // validate the received msg
+    if (! isMessageValid(msg)) {
       LOG.info("RoundChange message was invalid.");
       return Optional.empty();
     }
-    if (!roundChangeCache.containsKey(msgTargetRound)) {
-      roundChangeCache.put(msgTargetRound, new RoundChangeStatus(quorumSize));
-    }
-    final RoundChangeStatus roundChangeStatus = roundChangeCache.get(msgTargetRound);
-    roundChangeStatus.addMessage(msg);
+
+    RoundChangeStatus roundChangeStatus = storeRoundChangeMessage(msg);
+
     if (roundChangeStatus.roundChangeReady()) {
       return Optional.of(roundChangeStatus.createRoundChangeCertificate());
     }
+
     return Optional.empty();
   }
 
-  /* Called when a given round has completed/timed-out such that msgs cached can be removed */
+  private boolean isMessageValid(final SignedData<RoundChangePayload> msg) {
+    return roundChangeMessageValidator.validateMessage(msg);
+  }
+
+  private RoundChangeStatus storeRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
+    final ConsensusRoundIdentifier msgTargetRound = msg.getPayload().getRoundChangeIdentifier();
+
+    if (!roundChangeCache.containsKey(msgTargetRound)) {
+      roundChangeCache.put(msgTargetRound, new RoundChangeStatus(quorumSize));
+    }
+
+    final RoundChangeStatus roundChangeStatus = roundChangeCache.get(msgTargetRound);
+    roundChangeStatus.addMessage(msg);
+    return roundChangeStatus;
+  }
+
+  /**
+   * Clears old rounds from storage that have been superseded by a given round
+   * @param completedRoundIdentifier round identifier that has been identified as superseded
+   */
   public void discardCompletedRound(final ConsensusRoundIdentifier completedRoundIdentifier) {
     roundChangeCache.entrySet().removeIf(entry -> isAnEarlierOrEqualRound(entry.getKey(), completedRoundIdentifier));
   }
