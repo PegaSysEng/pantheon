@@ -15,77 +15,52 @@ package tech.pegasys.pantheon.cli.custom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import tech.pegasys.pantheon.cli.custom.EnodeURLProperty.EnodeURLPropertyConverter;
+import java.net.URI;
 
 import org.junit.Test;
 
-public class EnodeURLPropertyTest {
+public class EnodeToURIPropertyConverterTest {
 
-  private final EnodeURLPropertyConverter converter = new EnodeURLPropertyConverter();
-
-  @Test
-  public void newInstanceOfEnodeURLWithDiscoveryPort() {
-    EnodeURLProperty enodeURLProperty =
-        new EnodeURLProperty("6f8a80d1", "192.168.0.1", 30303, 30301);
-
-    assertThat(enodeURLProperty.getNodeId()).isEqualTo("6f8a80d1");
-    assertThat(enodeURLProperty.getIp()).isEqualTo("192.168.0.1");
-    assertThat(enodeURLProperty.getListeningPort()).isEqualTo(30303);
-    assertThat(enodeURLProperty.getDiscoveryPort().isPresent()).isTrue();
-    assertThat(enodeURLProperty.getDiscoveryPort().getAsInt()).isEqualTo(30301);
-  }
-
-  @Test
-  public void newInstanceOfEnodeURLWithoutDiscoveryPort() {
-    EnodeURLProperty enodeURLProperty = new EnodeURLProperty("6f8a80d1", "192.168.0.1", 30303);
-
-    assertThat(enodeURLProperty.getNodeId()).isEqualTo("6f8a80d1");
-    assertThat(enodeURLProperty.getIp()).isEqualTo("192.168.0.1");
-    assertThat(enodeURLProperty.getListeningPort()).isEqualTo(30303);
-    assertThat(enodeURLProperty.getDiscoveryPort().isPresent()).isFalse();
-  }
+  private final EnodeToURIPropertyConverter converter = new EnodeToURIPropertyConverter();
 
   @Test
   public void convertEnodeURLWithDiscoveryPort() {
     String value = "enode://6f8a80d1@192.168.0.1:30303?discport=30301";
-    EnodeURLProperty expectedProperty =
-        new EnodeURLProperty("6f8a80d1", "192.168.0.1", 30303, 30301);
+    URI expectedURI = URI.create(value);
 
-    EnodeURLProperty convertedProperty = new EnodeURLPropertyConverter().convert(value);
+    URI convertedURI = converter.convert(value);
 
-    assertThat(convertedProperty).isEqualTo(expectedProperty);
+    assertThat(convertedURI).isEqualTo(expectedURI);
   }
 
   @Test
   public void convertEnodeURLWithoutDiscoveryPort() {
     String value = "enode://6f8a80d1@192.168.0.1:30303";
-    EnodeURLProperty expectedProperty = new EnodeURLProperty("6f8a80d1", "192.168.0.1", 30303);
+    URI expectedURI = URI.create(value);
 
-    EnodeURLProperty convertedProperty = new EnodeURLPropertyConverter().convert(value);
+    URI convertedURI = converter.convert(value);
 
-    assertThat(convertedProperty).isEqualTo(expectedProperty);
+    assertThat(convertedURI).isEqualTo(expectedURI);
   }
 
   @Test
   public void convertEnodeURLWithIPV6() {
     String value = "enode://6f8a80d1@2001:0db8:85a3:0:0:8a2e:0370:7334:30303?discport=30301";
-    EnodeURLProperty expectedProperty =
-        new EnodeURLProperty("6f8a80d1", "2001:0db8:85a3:0:0:8a2e:0370:7334", 30303, 30301);
+    URI expectedURI = URI.create(value);
 
-    EnodeURLProperty convertedProperty = new EnodeURLPropertyConverter().convert(value);
+    URI convertedURI = converter.convert(value);
 
-    assertThat(convertedProperty).isEqualTo(expectedProperty);
+    assertThat(convertedURI).isEqualTo(expectedURI);
   }
 
   @Test
   public void convertEnodeURLWithIPV6InCompactForm() {
     String value = "enode://6f8a80d1@fe80::200:f8ff:fe21:67cf:30303?discport=30301";
-    EnodeURLProperty expectedProperty =
-        new EnodeURLProperty("6f8a80d1", "fe80::200:f8ff:fe21:67cf", 30303, 30301);
+    URI expectedURI = URI.create(value);
 
-    EnodeURLProperty convertedProperty = new EnodeURLPropertyConverter().convert(value);
+    URI convertedURI = converter.convert(value);
 
-    assertThat(convertedProperty).isEqualTo(expectedProperty);
+    assertThat(convertedURI).isEqualTo(expectedURI);
   }
 
   @Test

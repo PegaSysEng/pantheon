@@ -43,14 +43,16 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
@@ -277,7 +279,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--config", toml.toString());
 
     verify(mockRunnerBuilder).discovery(eq(false));
-    verify(mockRunnerBuilder).bootstrapPeers(stringListArgumentCaptor.capture());
+    verify(mockRunnerBuilder).bootstrapPeers(uriListArgumentCaptor.capture());
     verify(mockRunnerBuilder).discoveryHost(eq("1.2.3.4"));
     verify(mockRunnerBuilder).discoveryPort(eq(1234));
     verify(mockRunnerBuilder).maxPeers(eq(42));
@@ -285,9 +287,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
     verify(mockRunnerBuilder).build();
 
-    final Collection<String> nodes =
-        asList("enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567");
-    assertThat(stringListArgumentCaptor.getValue()).isEqualTo(nodes);
+    final Collection<URI> nodes =
+        asList(
+            URI.create("enode://001@192.168.0.1:4567"),
+            URI.create("enode://002@192.168.0.1:4567"),
+            URI.create("enode://003@192.168.0.1:4567"));
+    assertThat(uriListArgumentCaptor.getValue()).isEqualTo(nodes);
 
     final EthNetworkConfig networkConfig =
         new Builder(EthNetworkConfig.mainnet())
@@ -421,6 +426,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void callingWithInvalidBootnodesMustDisplayErrorAndUsage() {
+    parseCommand("--bootnodes", "invalid_enode_url");
+    assertThat(commandOutput.toString()).isEmpty();
+    final String expectedErrorOutputStart =
+        "Invalid value for option '--bootnodes' at index 0 (<enode://id@host:port>)";
+    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
+  }
+
+  @Test
   public void callingWithBannedNodeidsOptionButNoValueMustDisplayErrorAndUsage() {
     parseCommand("--banned-nodeids");
     assertThat(commandOutput.toString()).isEmpty();
@@ -431,13 +445,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void bootnodesOptionMustBeUsed() {
-    final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
+    final String[] nodes = {
+      "enode://001@192.168.0.1:4567", "enode://002@192.168.0.1:4567", "enode://003@192.168.0.1:4567"
+    };
     parseCommand("--bootnodes", String.join(",", nodes));
 
-    verify(mockRunnerBuilder).bootstrapPeers(stringListArgumentCaptor.capture());
+    verify(mockRunnerBuilder).bootstrapPeers(uriListArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(stringListArgumentCaptor.getValue().toArray()).isEqualTo(nodes);
+    assertThat(uriListArgumentCaptor.getValue())
+        .isEqualTo(Stream.of(nodes).map(URI::create).collect(Collectors.toList()));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -481,15 +498,36 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void callingWithInvalidNodesWhitelistMustDisplayErrorAndUsage() {
+    parseCommand("--nodes-whitelist", "invalid_enode_url");
+    assertThat(commandOutput.toString()).isEmpty();
+    /*
+     Because of the way Picocli handles errors parsing errors for lists with arity 0..*, we don't
+     get the nice error msg with that was wrong. It only shows to the user the values that weren't
+     parsed correctly.
+    */
+    final String expectedErrorOutputStart = "Unmatched argument: invalid_enode_url";
+    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
+  }
+
+  @Test
   public void nodesWhitelistOptionMustBeUsed() {
-    final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
+    final String[] nodes = {
+      "enode://001@192.168.0.1:4567", "enode://002@192.168.0.1:4567", "enode://003@192.168.0.1:4567"
+    };
     parseCommand("--nodes-whitelist", String.join(",", nodes));
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().getNodeWhitelist())
+    assertThat(
+            permissioningConfigurationArgumentCaptor
+                .getValue()
+                .getNodeWhitelist()
+                .stream()
+                .map(URI::toString)
+                .collect(Collectors.toList()))
         .containsExactlyInAnyOrder(nodes);
     assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
 
@@ -969,7 +1007,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   private void networkValuesCanBeOverridden(final String network) throws Exception {
-    final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
+    final String[] nodes = {
+      "enode://001@192.168.0.1:4567", "enode://002@192.168.0.1:4567", "enode://003@192.168.0.1:4567"
+    };
     final Path genesisFile = createFakeGenesisFile();
     parseCommand(
         "--" + network,
@@ -989,7 +1029,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(networkArg.getValue().getGenesisConfig()).isEqualTo("genesis_config");
-    assertThat(networkArg.getValue().getBootNodes()).isEqualTo(Arrays.asList(nodes));
+    assertThat(networkArg.getValue().getBootNodes())
+        .isEqualTo(Stream.of(nodes).map(URI::create).collect(Collectors.toList()));
     assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1);
   }
 
