@@ -303,10 +303,6 @@ public class BlockchainQueriesTest {
     // create initial blockchain
     final BlockchainWithData data = setupBlockchain(3);
     final Block targetBlock = data.blockData.get(data.blockData.size() - 1).block;
-    final List<Block> blocks =
-        data.blockData.stream().map(b -> b.block).collect(Collectors.toList());
-    final List<List<TransactionReceipt>> blockReceipts =
-        blocks.stream().map(gen::receipts).collect(Collectors.toList());
 
     // check that logs have removed = false
     List<LogWithMetadata> logs =
@@ -325,12 +321,6 @@ public class BlockchainQueriesTest {
                 data.blockchain.getBlockHeader(forkBlock).get().getDifficulty().plus(10L));
     final Block fork = gen.block(options);
     final List<TransactionReceipt> forkReceipts = gen.receipts(fork);
-
-    // final List<Block> reorgedChain = new ArrayList<>(blocks.subList(0, forkBlock));
-    // reorgedChain.add(fork);
-    // final List<List<TransactionReceipt>> reorgedReceipts =
-    //     new ArrayList<>(blockReceipts.subList(0, forkBlock));
-    // reorgedReceipts.add(forkReceipts);
 
     // Add fork
     data.blockchain.appendBlock(fork, forkReceipts);
@@ -543,10 +533,7 @@ public class BlockchainQueriesTest {
     final MutableBlockchain blockchain = createInMemoryBlockchain(blocks.get(0));
     blockData
         .subList(1, blockData.size())
-        .forEach(
-            b -> {
-              blockchain.appendBlock(b.block, b.receipts);
-            });
+        .forEach(b -> blockchain.appendBlock(b.block, b.receipts));
 
     return new BlockchainWithData(blockchain, blockData, worldStateArchive);
   }
