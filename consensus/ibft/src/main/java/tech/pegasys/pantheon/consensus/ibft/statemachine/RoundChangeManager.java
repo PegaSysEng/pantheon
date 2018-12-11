@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidat
 import tech.pegasys.pantheon.ethereum.core.Address;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -95,14 +94,16 @@ public class RoundChangeManager {
 
   /**
    * Adds the round message to this manager and return a certificate if it passes the threshold
+   *
    * @param msg The signed round change message to add
-   * @return Empty if the round change threshold hasn't been hit, otherwise a round change certificate
+   * @return Empty if the round change threshold hasn't been hit, otherwise a round change
+   *     certificate
    */
   public Optional<RoundChangeCertificate> appendRoundChangeMessage(
       final SignedData<RoundChangePayload> msg) {
 
     // validate the received msg
-    if (! isMessageValid(msg)) {
+    if (!isMessageValid(msg)) {
       LOG.info("RoundChange message was invalid.");
       return Optional.empty();
     }
@@ -134,10 +135,13 @@ public class RoundChangeManager {
 
   /**
    * Clears old rounds from storage that have been superseded by a given round
+   *
    * @param completedRoundIdentifier round identifier that has been identified as superseded
    */
   public void discardCompletedRound(final ConsensusRoundIdentifier completedRoundIdentifier) {
-    roundChangeCache.entrySet().removeIf(entry -> isAnEarlierOrEqualRound(entry.getKey(), completedRoundIdentifier));
+    roundChangeCache
+        .entrySet()
+        .removeIf(entry -> isAnEarlierOrEqualRound(entry.getKey(), completedRoundIdentifier));
   }
 
   private boolean isAnEarlierOrEqualRound(
