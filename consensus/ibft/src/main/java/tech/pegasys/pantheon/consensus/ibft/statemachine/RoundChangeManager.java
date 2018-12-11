@@ -12,9 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
-import java.util.Set;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
@@ -29,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
@@ -78,9 +76,10 @@ public class RoundChangeManager {
   }
 
   private static final Logger LOG = LogManager.getLogger();
+
   @VisibleForTesting
-  final Map<ConsensusRoundIdentifier, RoundChangeStatus> roundChangeCache =
-      Maps.newHashMap();
+  final Map<ConsensusRoundIdentifier, RoundChangeStatus> roundChangeCache = Maps.newHashMap();
+
   private final Collection<Address> validators;
   private final int quorumSize;
   private final long sequenceNumber;

@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequiredValidatorQuorum;
 
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
-import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;

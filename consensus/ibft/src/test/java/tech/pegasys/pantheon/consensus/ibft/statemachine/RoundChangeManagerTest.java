@@ -1,15 +1,20 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
@@ -24,6 +29,15 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RoundChangeManagerTest {
 
@@ -90,7 +104,8 @@ public class RoundChangeManagerTest {
     manager = new RoundChangeManager(2, validators, messageValidators::get);
   }
 
-  private SignedData<RoundChangePayload> makeRoundChangeMessage(KeyPair key, ConsensusRoundIdentifier round) {
+  private SignedData<RoundChangePayload> makeRoundChangeMessage(
+      final KeyPair key, final ConsensusRoundIdentifier round) {
     MessageFactory messageFactory = new MessageFactory(key);
     return messageFactory.createSignedRoundChangePayload(round, Optional.empty());
   }
@@ -119,38 +134,44 @@ public class RoundChangeManagerTest {
 
   @Test
   public void becomesReadyAtThreshold() {
-    SignedData<RoundChangePayload> roundChangeDataProposer = makeRoundChangeMessage(proposerKey,
-        ri2);
-    SignedData<RoundChangePayload> roundChangeDataValidator1 = makeRoundChangeMessage(validator1Key,
-        ri2);
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer)).isEqualTo(Optional.empty());
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1)).satisfies(
-        Optional::isPresent);
+    SignedData<RoundChangePayload> roundChangeDataProposer =
+        makeRoundChangeMessage(proposerKey, ri2);
+    SignedData<RoundChangePayload> roundChangeDataValidator1 =
+        makeRoundChangeMessage(validator1Key, ri2);
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
+        .isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1))
+        .satisfies(Optional::isPresent);
   }
 
   @Test
   public void doesntReadyWithDifferentRounds() {
-    SignedData<RoundChangePayload> roundChangeDataProposer = makeRoundChangeMessage(proposerKey,
-        ri2);
-    SignedData<RoundChangePayload> roundChangeDataValidator1 = makeRoundChangeMessage(validator1Key,
-        ri3);
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer)).isEqualTo(Optional.empty());
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1)).isEqualTo(Optional.empty());
+    SignedData<RoundChangePayload> roundChangeDataProposer =
+        makeRoundChangeMessage(proposerKey, ri2);
+    SignedData<RoundChangePayload> roundChangeDataValidator1 =
+        makeRoundChangeMessage(validator1Key, ri3);
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
+        .isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1))
+        .isEqualTo(Optional.empty());
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
     assertThat(manager.roundChangeCache.get(ri3).receivedMessages.size()).isEqualTo(1);
   }
 
   @Test
   public void discardsPreviousRounds() {
-    SignedData<RoundChangePayload> roundChangeDataProposer = makeRoundChangeMessage(proposerKey,
-        ri1);
-    SignedData<RoundChangePayload> roundChangeDataValidator1 = makeRoundChangeMessage(validator1Key,
-        ri2);
-    SignedData<RoundChangePayload> roundChangeDataValidator2 = makeRoundChangeMessage(validator2Key,
-        ri3);
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer)).isEqualTo(Optional.empty());
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1)).isEqualTo(Optional.empty());
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator2)).isEqualTo(Optional.empty());
+    SignedData<RoundChangePayload> roundChangeDataProposer =
+        makeRoundChangeMessage(proposerKey, ri1);
+    SignedData<RoundChangePayload> roundChangeDataValidator1 =
+        makeRoundChangeMessage(validator1Key, ri2);
+    SignedData<RoundChangePayload> roundChangeDataValidator2 =
+        makeRoundChangeMessage(validator2Key, ri3);
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
+        .isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1))
+        .isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator2))
+        .isEqualTo(Optional.empty());
     manager.discardCompletedRound(ri1);
     assertThat(manager.roundChangeCache.get(ri1)).isNull();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
