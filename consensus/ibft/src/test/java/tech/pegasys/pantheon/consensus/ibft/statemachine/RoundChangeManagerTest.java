@@ -113,22 +113,22 @@ public class RoundChangeManagerTest {
   @Test
   public void rejectsInvalidRoundChangeMessage() {
     SignedData<RoundChangePayload> roundChangeData = makeRoundChangeMessage(nonValidatorKey, ri1);
-    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEmpty();
     assertThat(manager.roundChangeCache.get(ri1)).isNull();
   }
 
   @Test
   public void acceptsValidRoundChangeMessage() {
     SignedData<RoundChangePayload> roundChangeData = makeRoundChangeMessage(proposerKey, ri2);
-    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEmpty();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
   }
 
   @Test
   public void doesntAcceptDuplicateValidRoundChangeMessage() {
     SignedData<RoundChangePayload> roundChangeData = makeRoundChangeMessage(proposerKey, ri2);
-    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEqualTo(Optional.empty());
-    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEmpty();
+    assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEmpty();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
   }
 
