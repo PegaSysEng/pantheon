@@ -145,7 +145,7 @@ public class RoundChangeManagerTest {
   }
 
   @Test
-  public void doesntReadyWithDifferentRounds() {
+  public void doesntReachReadyWhenSuppliedWithDifferentRounds() {
     SignedData<RoundChangePayload> roundChangeDataProposer =
         makeRoundChangeMessage(proposerKey, ri2);
     SignedData<RoundChangePayload> roundChangeDataValidator1 =
