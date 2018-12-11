@@ -15,10 +15,9 @@ package tech.pegasys.pantheon.consensus.ibft.ibftmessagedata;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
-import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
@@ -33,11 +32,11 @@ public class CommitPayloadTest {
 
   @Test
   public void roundTripRlp() {
-    final Block block = TestHelpers.createProposalBlock();
     final Signature signature = Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0);
+    final Hash hash = Hash.fromHexStringLenient("0x8523ba6e7c5f59ae87");
 
     final CommitPayload expectedCommitPayload =
-        new CommitPayload(ROUND_IDENTIFIER, block.getHash(), signature);
+        new CommitPayload(ROUND_IDENTIFIER, hash, signature);
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     expectedCommitPayload.writeTo(rlpOut);
 
@@ -45,7 +44,7 @@ public class CommitPayloadTest {
     final CommitPayload commitPayload = CommitPayload.readFrom(rlpInput);
     assertThat(commitPayload.getRoundIdentifier()).isEqualTo(ROUND_IDENTIFIER);
     assertThat(commitPayload.getCommitSeal()).isEqualTo(signature);
-    assertThat(commitPayload.getDigest()).isEqualTo(block.getHash());
+    assertThat(commitPayload.getDigest()).isEqualTo(hash);
     assertThat(commitPayload.getMessageType()).isEqualTo(IbftV2.COMMIT);
   }
 }
