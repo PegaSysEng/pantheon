@@ -329,7 +329,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
       throw new ParameterException(
           new CommandLine(this),
-          "refreshDelay must be a positive integer smaller than 3600000 (1 hour)");
+          String.format(
+              "refreshDelay must be a positive integer between %s and %s",
+              String.valueOf(DEFAULT_MIN_REFRESH_DELAY),
+              String.valueOf(DEFAULT_MAX_REFRESH_DELAY)));
     }
     this.refreshDelay = refreshDelay;
   }
