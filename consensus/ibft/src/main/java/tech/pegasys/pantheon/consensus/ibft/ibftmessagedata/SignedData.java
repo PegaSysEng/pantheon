@@ -20,6 +20,9 @@ import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 public class SignedData<M extends AbstractPayload> {
 
   protected final Address sender;
@@ -125,5 +128,33 @@ public class SignedData<M extends AbstractPayload> {
       final AbstractPayload unsignedMessageData, final Signature signature) {
 
     return Util.signatureToAddress(signature, MessageFactory.hashForSignature(unsignedMessageData));
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final SignedData<?> that = (SignedData<?>) o;
+    return Objects.equals(sender, that.sender)
+        && Objects.equals(signature, that.signature)
+        && Objects.equals(unsignedPayload, that.unsignedPayload);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(sender, signature, unsignedPayload);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", SignedData.class.getSimpleName() + "[", "]")
+        .add("sender=" + sender)
+        .add("signature=" + signature)
+        .add("unsignedPayload=" + unsignedPayload)
+        .toString();
   }
 }

@@ -19,6 +19,9 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 public class CommitPayload extends InRoundPayload {
   private static final int TYPE = IbftV2.COMMIT;
   private final Hash digest;
@@ -34,7 +37,6 @@ public class CommitPayload extends InRoundPayload {
   }
 
   public static CommitPayload readFrom(final RLPInput rlpInput) {
-
     rlpInput.enterList();
     final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
     final Hash digest = readDigest(rlpInput);
@@ -46,7 +48,6 @@ public class CommitPayload extends InRoundPayload {
 
   @Override
   public void writeTo(final RLPOutput rlpOutput) {
-
     rlpOutput.startList();
     roundIdentifier.writeTo(rlpOutput);
     rlpOutput.writeBytesValue(digest);
@@ -65,5 +66,33 @@ public class CommitPayload extends InRoundPayload {
 
   public Signature getCommitSeal() {
     return commitSeal;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    final CommitPayload that = (CommitPayload) o;
+    return Objects.equals(digest, that.digest) && Objects.equals(commitSeal, that.commitSeal);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), digest, commitSeal);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", CommitPayload.class.getSimpleName() + "[", "]")
+        .add("digest=" + digest)
+        .add("commitSeal=" + commitSeal)
+        .toString();
   }
 }

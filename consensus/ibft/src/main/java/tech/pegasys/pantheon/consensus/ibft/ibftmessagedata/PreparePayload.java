@@ -18,6 +18,9 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 public class PreparePayload extends InRoundPayload {
   private static final int TYPE = IbftV2.PREPARE;
   private final Hash digest;
@@ -53,5 +56,32 @@ public class PreparePayload extends InRoundPayload {
 
   public Hash getDigest() {
     return digest;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    final PreparePayload that = (PreparePayload) o;
+    return Objects.equals(digest, that.digest);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), digest);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", PreparePayload.class.getSimpleName() + "[", "]")
+        .add("digest=" + digest)
+        .toString();
   }
 }
