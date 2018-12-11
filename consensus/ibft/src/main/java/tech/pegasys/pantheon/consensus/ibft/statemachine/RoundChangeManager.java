@@ -124,12 +124,12 @@ public class RoundChangeManager {
   private RoundChangeStatus storeRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
     final ConsensusRoundIdentifier msgTargetRound = msg.getPayload().getRoundChangeIdentifier();
 
-    if (!roundChangeCache.containsKey(msgTargetRound)) {
-      roundChangeCache.put(msgTargetRound, new RoundChangeStatus(quorumSize));
-    }
+    final RoundChangeStatus roundChangeStatus =
+        roundChangeCache.computeIfAbsent(
+            msgTargetRound, ignored -> new RoundChangeStatus(quorumSize));
 
-    final RoundChangeStatus roundChangeStatus = roundChangeCache.get(msgTargetRound);
     roundChangeStatus.addMessage(msg);
+
     return roundChangeStatus;
   }
 
