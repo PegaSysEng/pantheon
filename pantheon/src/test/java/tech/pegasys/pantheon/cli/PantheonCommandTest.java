@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
 import tech.pegasys.pantheon.PantheonInfo;
-import tech.pegasys.pantheon.cli.EthNetworkConfig.Builder;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -290,7 +289,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(stringListArgumentCaptor.getValue()).isEqualTo(nodes);
 
     final EthNetworkConfig networkConfig =
-        new Builder(EthNetworkConfig.mainnet())
+        new EthNetworkConfig.Builder(EthNetworkConfig.mainnet())
             .setGenesisConfig(GENESIS_CONFIG_TESTDATA)
             .setBootNodes(nodes)
             .build();

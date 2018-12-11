@@ -33,7 +33,7 @@ import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldState;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.LogsQuery.Builder;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.LogsQuery;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayList;
@@ -310,7 +310,7 @@ public class BlockchainQueriesTest {
 
     // check that logs have removed = false
     List<LogWithMetadata> logs =
-        data.blockchainQueries.matchingLogs(targetBlock.getHash(), new Builder().build());
+        data.blockchainQueries.matchingLogs(targetBlock.getHash(), new LogsQuery.Builder().build());
     assertThat(logs).isNotEmpty();
     assertThat(logs).allMatch(l -> !l.isRemoved());
 
@@ -326,17 +326,18 @@ public class BlockchainQueriesTest {
     final Block fork = gen.block(options);
     final List<TransactionReceipt> forkReceipts = gen.receipts(fork);
 
-    final List<Block> reorgedChain = new ArrayList<>(blocks.subList(0, forkBlock));
-    reorgedChain.add(fork);
-    final List<List<TransactionReceipt>> reorgedReceipts =
-        new ArrayList<>(blockReceipts.subList(0, forkBlock));
-    reorgedReceipts.add(forkReceipts);
+    // final List<Block> reorgedChain = new ArrayList<>(blocks.subList(0, forkBlock));
+    // reorgedChain.add(fork);
+    // final List<List<TransactionReceipt>> reorgedReceipts =
+    //     new ArrayList<>(blockReceipts.subList(0, forkBlock));
+    // reorgedReceipts.add(forkReceipts);
 
     // Add fork
     data.blockchain.appendBlock(fork, forkReceipts);
 
     // check that logs have removed = true
-    logs = data.blockchainQueries.matchingLogs(targetBlock.getHash(), new Builder().build());
+    logs =
+        data.blockchainQueries.matchingLogs(targetBlock.getHash(), new LogsQuery.Builder().build());
     assertThat(logs).isNotEmpty();
     assertThat(logs).allMatch(LogWithMetadata::isRemoved);
   }
