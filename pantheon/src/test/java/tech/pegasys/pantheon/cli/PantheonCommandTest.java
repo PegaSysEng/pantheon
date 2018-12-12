@@ -461,7 +461,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--ws-refresh-delay", "-2000");
 
     assertThat(commandOutput.toString()).isEmpty();
-    final String expectedErrorMsg = "refreshDelay must be a positive integer";
+    final String expectedErrorMsg = "refreshDelay must be a positive integer between";
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorMsg);
   }
 
