@@ -19,6 +19,7 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonD
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
+import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -45,6 +46,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,6 +98,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private static final Wei DEFAULT_MIN_TRANSACTION_GAS_PRICE = Wei.of(1000);
   private static final BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
+  private static final long DEFAULT_MAX_REFRESH_DELAY = 3600000;
+  private static final long DEFAULT_MIN_REFRESH_DELAY = 1;
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
@@ -168,9 +172,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         "Comma separated enode URLs for P2P discovery bootstrap. "
             + "Default is a predefined list.",
     split = ",",
-    arity = "1..*"
+    arity = "1..*",
+    converter = EnodeToURIPropertyConverter.class
   )
-  private final Collection<String> bootstrapNodes = null;
+  private final Collection<URI> bootstrapNodes = null;
 
   @Option(
     names = {"--max-peers"},
@@ -312,6 +317,29 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Collection<RpcApi> wsApis = null;
 
+  private Long refreshDelay;
+
+  @Option(
+    names = {"--ws-refresh-delay"},
+    paramLabel = "<refresh delay>",
+    arity = "1",
+    description =
+        "Refresh delay of websocket subscription sync in milliseconds. "
+            + "default: ${DEFAULT-VALUE}",
+    defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
+  )
+  private void setRefreshDelay(final Long refreshDelay) {
+    if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
+      throw new ParameterException(
+          new CommandLine(this),
+          String.format(
+              "refreshDelay must be a positive integer between %s and %s",
+              String.valueOf(DEFAULT_MIN_REFRESH_DELAY),
+              String.valueOf(DEFAULT_MAX_REFRESH_DELAY)));
+    }
+    this.refreshDelay = refreshDelay;
+  }
+
   @Option(
     names = {"--host-whitelist"},
     paramLabel = "<hostname>",
@@ -376,9 +404,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description =
         "Comma separated enode URLs for permissioned networks. You may specify an empty list.",
     split = ",",
-    arity = "0..*"
+    arity = "0..*",
+    converter = EnodeToURIPropertyConverter.class
   )
-  private final Collection<String> nodesWhitelist = null;
+  private final Collection<URI> nodesWhitelist = null;
 
   public PantheonCommand(
       final BlockImporter blockImporter,
@@ -504,6 +533,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setHost(wsHostAndPort.getHost());
     webSocketConfiguration.setPort(wsHostAndPort.getPort());
     webSocketConfiguration.setRpcApis(wsApis);
+    webSocketConfiguration.setRefreshDelay(refreshDelay);
     return webSocketConfiguration;
   }
 
