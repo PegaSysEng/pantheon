@@ -83,9 +83,9 @@ public class CommitPayload implements InRoundPayload {
       return false;
     }
     final CommitPayload that = (CommitPayload) o;
-    return Objects.equals(roundIdentifier, that.roundIdentifier) &&
-        Objects.equals(digest, that.digest) &&
-        Objects.equals(commitSeal, that.commitSeal);
+    return Objects.equals(roundIdentifier, that.roundIdentifier)
+        && Objects.equals(digest, that.digest)
+        && Objects.equals(commitSeal, that.commitSeal);
   }
 
   @Override
