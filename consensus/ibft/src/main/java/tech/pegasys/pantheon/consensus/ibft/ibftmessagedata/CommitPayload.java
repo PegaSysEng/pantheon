@@ -82,16 +82,15 @@ public class CommitPayload implements InRoundPayload {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
-      return false;
-    }
     final CommitPayload that = (CommitPayload) o;
-    return Objects.equals(digest, that.digest) && Objects.equals(commitSeal, that.commitSeal);
+    return Objects.equals(roundIdentifier, that.roundIdentifier) &&
+        Objects.equals(digest, that.digest) &&
+        Objects.equals(commitSeal, that.commitSeal);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), digest, commitSeal);
+    return Objects.hash(roundIdentifier, digest, commitSeal);
   }
 
   @Override
