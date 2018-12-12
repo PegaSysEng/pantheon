@@ -80,6 +80,7 @@ nav:
 
 markdown_extensions:
     - toc:
+        separator: "_"
         permalink: true
     - admonition
     - footnotes
