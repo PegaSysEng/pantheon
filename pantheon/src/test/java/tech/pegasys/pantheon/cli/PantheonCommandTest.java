@@ -66,6 +66,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 
 public class PantheonCommandTest extends CommandTestAbstract {
+  private final String VALID_NODE_ID =
+      "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
+
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
   private static final JsonRpcConfiguration defaultJsonRpcConfiguration;
   private static final WebSocketConfiguration defaultWebSocketConfiguration;
@@ -289,9 +292,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final Collection<URI> nodes =
         asList(
-            URI.create("enode://001@192.168.0.1:4567"),
-            URI.create("enode://002@192.168.0.1:4567"),
-            URI.create("enode://003@192.168.0.1:4567"));
+            URI.create("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"),
+            URI.create("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"),
+            URI.create("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"));
     assertThat(uriListArgumentCaptor.getValue()).isEqualTo(nodes);
 
     final EthNetworkConfig networkConfig =
@@ -446,7 +449,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void bootnodesOptionMustBeUsed() {
     final String[] nodes = {
-      "enode://001@192.168.0.1:4567", "enode://002@192.168.0.1:4567", "enode://003@192.168.0.1:4567"
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
     };
     parseCommand("--bootnodes", String.join(",", nodes));
 
@@ -513,7 +518,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void nodesWhitelistOptionMustBeUsed() {
     final String[] nodes = {
-      "enode://001@192.168.0.1:4567", "enode://002@192.168.0.1:4567", "enode://003@192.168.0.1:4567"
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
     };
     parseCommand("--nodes-whitelist", String.join(",", nodes));
 
@@ -1008,7 +1015,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   private void networkValuesCanBeOverridden(final String network) throws Exception {
     final String[] nodes = {
-      "enode://001@192.168.0.1:4567", "enode://002@192.168.0.1:4567", "enode://003@192.168.0.1:4567"
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
     };
     final Path genesisFile = createFakeGenesisFile();
     parseCommand(

@@ -12,6 +12,10 @@
  */
 package tech.pegasys.pantheon.cli.custom;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+import tech.pegasys.pantheon.util.NetworkUtility;
+
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,15 +31,15 @@ public class EnodeToURIPropertyConverter implements ITypeConverter<URI> {
   private static final String IPV6_COMPACT_PATTERN =
       "((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)::((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)";
   private static final String DISCOVERY_PORT_PATTERN = "\\?discport=(?<discovery>\\d+)";
+  private static final String HEX_STRING_PATTERN = "[0-9a-fA-F]+";
 
   private static final String ENODE_URL_PATTERN =
       "enode://(?<nodeId>\\w+)@(?<ip>" + IP_REPLACE_MARKER + "):(?<listening>\\d+)";
 
   @Override
   public URI convert(final String value) throws IllegalArgumentException {
-    if (value == null || "".equals(value)) {
-      throw new IllegalArgumentException("Can't convert null/empty string to EnodeURLProperty.");
-    }
+    checkArgument(
+        value != null && !value.isEmpty(), "Can't convert null/empty string to EnodeURLProperty.");
 
     final boolean containsDiscoveryPort = value.contains("discport");
     final boolean isIPV4 = Pattern.compile(".*" + IPV4_PATTERN + ".*").matcher(value).matches();
@@ -64,12 +68,11 @@ public class EnodeToURIPropertyConverter implements ITypeConverter<URI> {
     }
 
     final Matcher matcher = Pattern.compile(pattern).matcher(value);
-    if (!matcher.matches()) {
-      throw new IllegalArgumentException(
-          "Invalid enode URL syntax. Enode URL should have the following format 'enode://<node_id>@<ip>:<listening_port>[?discport=<discovery_port>]'.");
-    }
+    checkArgument(
+        matcher.matches(),
+        "Invalid enode URL syntax. Enode URL should have the following format 'enode://<node_id>@<ip>:<listening_port>[?discport=<discovery_port>]'.");
 
-    final String nodeId = matcher.group("nodeId");
+    final String nodeId = getAndValidateNodeId(matcher);
     final String ip = matcher.group("ip");
     final Integer listeningPort = getAndValidatePort(matcher, "listening");
 
@@ -82,14 +85,23 @@ public class EnodeToURIPropertyConverter implements ITypeConverter<URI> {
     }
   }
 
+  private String getAndValidateNodeId(Matcher matcher) {
+    final String invalidNodeIdErrorMsg =
+        "Enode URL contains an invalid node ID. Node ID must have 128 characters and shouldn't include the '0x' hex prefix.";
+    final String nodeId = matcher.group("nodeId");
+
+    checkArgument(nodeId.matches(HEX_STRING_PATTERN), invalidNodeIdErrorMsg);
+    checkArgument(nodeId.length() == 128, invalidNodeIdErrorMsg);
+
+    return nodeId;
+  }
+
   private Integer getAndValidatePort(final Matcher matcher, final String portName) {
     int port = Integer.valueOf(matcher.group(portName));
-    if (port < 0 || port > 65535) {
-      throw new IllegalArgumentException(
-          "Invalid " + portName + " port range. Port should be between 0 - 65535");
-    } else {
-      return port;
-    }
+    checkArgument(
+        NetworkUtility.isValidPort(port),
+        "Invalid " + portName + " port range. Port should be between 0 - 65535");
+    return port;
   }
 
   private boolean containsDiscoveryPort(final String value) {
