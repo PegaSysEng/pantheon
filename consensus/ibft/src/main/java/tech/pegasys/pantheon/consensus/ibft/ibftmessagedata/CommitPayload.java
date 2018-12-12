@@ -97,6 +97,7 @@ public class CommitPayload implements InRoundPayload {
   @Override
   public String toString() {
     return new StringJoiner(", ", CommitPayload.class.getSimpleName() + "[", "]")
+        .add("roundIdentifier=" + roundIdentifier)
         .add("digest=" + digest)
         .add("commitSeal=" + commitSeal)
         .toString();
