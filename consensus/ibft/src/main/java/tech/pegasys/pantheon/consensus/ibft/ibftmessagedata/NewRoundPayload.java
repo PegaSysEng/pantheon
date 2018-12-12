@@ -21,14 +21,10 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public class NewRoundPayload extends AbstractPayload {
-
+public class NewRoundPayload implements Payload {
   private static final int TYPE = IbftV2.NEW_ROUND;
-
   private final ConsensusRoundIdentifier roundChangeIdentifier;
-
   private final RoundChangeCertificate roundChangeCertificate;
-
   private final SignedData<ProposalPayload> proposalPayload;
 
   public NewRoundPayload(

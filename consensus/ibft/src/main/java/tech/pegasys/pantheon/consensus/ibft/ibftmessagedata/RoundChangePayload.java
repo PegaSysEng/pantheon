@@ -21,10 +21,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-public class RoundChangePayload extends AbstractPayload {
-
+public class RoundChangePayload implements Payload {
   private static final int TYPE = IbftV2.ROUND_CHANGE;
-
   private final ConsensusRoundIdentifier roundChangeIdentifier;
 
   // The validator may not hae any prepared certificate

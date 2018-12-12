@@ -22,13 +22,13 @@ import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public class ProposalPayload extends InRoundPayload {
-
+public class ProposalPayload implements InRoundPayload {
   private static final int TYPE = IbftV2.PROPOSAL;
+  private final ConsensusRoundIdentifier roundIdentifier;
   private final Block block;
 
   public ProposalPayload(final ConsensusRoundIdentifier roundIdentifier, final Block block) {
-    super(roundIdentifier);
+    this.roundIdentifier = roundIdentifier;
     this.block = block;
   }
 
@@ -60,6 +60,11 @@ public class ProposalPayload extends InRoundPayload {
   }
 
   @Override
+  public ConsensusRoundIdentifier getRoundIdentifier() {
+    return roundIdentifier;
+  }
+
+  @Override
   public boolean equals(final Object o) {
     if (this == o) {
       return true;
@@ -67,21 +72,20 @@ public class ProposalPayload extends InRoundPayload {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
-      return false;
-    }
     final ProposalPayload that = (ProposalPayload) o;
-    return Objects.equals(block, that.block);
+    return Objects.equals(roundIdentifier, that.roundIdentifier)
+        && Objects.equals(block, that.block);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), block);
+    return Objects.hash(roundIdentifier, block);
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", ProposalPayload.class.getSimpleName() + "[", "]")
+        .add("roundIdentifier=" + roundIdentifier)
         .add("block=" + block)
         .toString();
   }

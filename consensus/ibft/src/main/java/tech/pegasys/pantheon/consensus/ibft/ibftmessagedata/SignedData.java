@@ -23,8 +23,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public class SignedData<M extends AbstractPayload> {
-
+public class SignedData<M extends Payload> {
   protected final Address sender;
   protected final Signature signature;
   protected final M unsignedPayload;
@@ -112,7 +111,7 @@ public class SignedData<M extends AbstractPayload> {
     return from(unsignedMessageData, signature);
   }
 
-  protected static <M extends AbstractPayload> SignedData<M> from(
+  protected static <M extends Payload> SignedData<M> from(
       final M unsignedMessageData, final Signature signature) {
 
     final Address sender = recoverSender(unsignedMessageData, signature);
@@ -125,7 +124,7 @@ public class SignedData<M extends AbstractPayload> {
   }
 
   protected static Address recoverSender(
-      final AbstractPayload unsignedMessageData, final Signature signature) {
+      final Payload unsignedMessageData, final Signature signature) {
 
     return Util.signatureToAddress(signature, MessageFactory.hashForSignature(unsignedMessageData));
   }

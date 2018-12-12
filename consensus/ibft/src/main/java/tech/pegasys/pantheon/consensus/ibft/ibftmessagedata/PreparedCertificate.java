@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class PreparedCertificate {
-
   private final SignedData<ProposalPayload> proposalPayload;
   private final Collection<SignedData<PreparePayload>> preparePayloads;
 
