@@ -85,7 +85,7 @@ public class EnodeToURIPropertyConverter implements ITypeConverter<URI> {
     }
   }
 
-  private String getAndValidateNodeId(Matcher matcher) {
+  private String getAndValidateNodeId(final Matcher matcher) {
     final String invalidNodeIdErrorMsg =
         "Enode URL contains an invalid node ID. Node ID must have 128 characters and shouldn't include the '0x' hex prefix.";
     final String nodeId = matcher.group("nodeId");
