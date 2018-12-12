@@ -6,7 +6,9 @@ site_author: Pantheon community
 repo_url: https://github.com/PegaSysEng/pantheon
 
 theme:
-    name: readthedocs
+    name: material
+    custom_dir: docs/custom_theme
+    navigation_depth: 4
     highlightjs: true
     hljs_languages:
         - java
@@ -23,6 +25,15 @@ nav:
         - Starting Pantheon: Getting-Started/Starting-Pantheon.md
         - Running Pantheon from Docker Image: Getting-Started/Run-Docker-Image.md
         - Private Network Quickstart: Getting-Started/Private-Network-Quickstart.md
+    - Community:
+        - Develop:
+            - Building Pantheon: development/building.md
+            - Code coverage: development/code-coverage.md
+            - Logging:  development/logging.md
+            - Running with Gradle: devlopment/running-with-gradle.md
+        - Contribute:
+            - Code review: community/code-reviews.md
+            - Community membership: community/community-membership.md
     - Configuring Pantheon:
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
@@ -51,6 +62,7 @@ markdown_extensions:
         permalink: 
     - admonition
     - def_list
+    - pymdownx.superfences
 
 plugins:
     - search

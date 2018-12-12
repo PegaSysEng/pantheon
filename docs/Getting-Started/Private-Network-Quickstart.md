@@ -98,19 +98,19 @@ Access the explorer by copying and pasting the `Web block explorer address` disp
 
 The block explorer displays a summary of the private network:
 
-![Block Explorer](images/ExplorerSummary.png)
+![Block Explorer](/images/ExplorerSummary.png)
 
 Notice the explorer indicates 6 peers: the 4 regular nodes, the mining node and the bootnode.
 
 Click on the block number to the right of **Best Block** to display the block details. 
 
-![Block Details](images/ExplorerBlockDetails.png)
+![Block Details](/images/ExplorerBlockDetails.png)
 
 You can explore blocks by clicking on the blocks under **Bk** down the left-hand side. 
 
 You can search for a specific block, transaction hash, or address by clicking the magnifying glass in the top left-hand corner. 
 
-![Explorer Search](images/ExplorerSearch.png)
+![Explorer Search](/images/ExplorerSearch.png)
 
 ## Run JSON-RPC Requests 
 
