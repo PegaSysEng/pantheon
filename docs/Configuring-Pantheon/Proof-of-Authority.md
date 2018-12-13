@@ -1,4 +1,7 @@
-## Proof of Authority
+description: Pantheon Clique Proof-of-Authority (PoA) consensus protocol implementation
+path: blob/master/ethereum/core/src/main/resources/
+source: rinkeby.json
+<!--- END of page meta data -->
 
 Pantheon implements the Clique Proof-of-Authority (PoA) consensus protocol. Clique is used by the Rinkeby testnet and can be used for private networks. 
 
@@ -10,54 +13,61 @@ To use Clique in a private network, Pantheon requires a PoA genesis file. When c
 
 A PoA genesis file defines properties specific to Clique:
 
-```json
-{
-  "config": {
-    ....
-    "clique": {
-      "period": 15,
-      "epoch": 30000
+!!! example "Genesis JSON file (stripped)"
+    ```json
+    {
+      "config": {
+        ....
+        "clique": {
+          "period": 15,
+          "epoch": 30000
+        }
+      },
+      ...
+      "extraData": "0x0000000000000000000000000000000000000000000000000000000000000000dd37f65db31c107f773e82a4f85c693058fef7a90000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      ...
     }
-  },
-  ...
-  "extraData": "0x0000000000000000000000000000000000000000000000000000000000000000dd37f65db31c107f773e82a4f85c693058fef7a90000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  ...
-}
-```
+    ```
+    
 The properties specific to Clique are:
+
 * `period` - Block time in seconds. 
 * `epoch` - Number of blocks after which to reset all votes.
 * `extraData` - Initial signers are specified after the 32 bytes reserved for vanity data. 
 
-To connect to the Rinkeby testnet, start Pantheon with the `--rinkeby` option. To start a node on a PoA private network, use the `--network-id` and `--genesis` options. 
+To connect to the Rinkeby testnet, start Pantheon with the [`--rinkeby`](/Reference/Pantheon-CLI-Syntax/#rinkeby) command line option. To start a node on a PoA private network, use the [`--network-id`](/Reference/Pantheon-CLI-Syntax/#network-id) command line option and [`--genesis`](/Reference/Pantheon-CLI-Syntax/#genesis`) option. 
 
 ### Adding and Removing Signers
 
-To propose adding or removing signers using the JSON-RPC methods, you must enable the RPC interface using the [`--rpc-enabled` option](Pantheon-CLI-Syntax#options). If also using the [`--rpc-api` option](Pantheon-CLI-Syntax#options), include `CLIQUE`.
+To propose adding or removing signers using the JSON-RPC methods, you must enable the RPC interface using the [`--rpc-enabled`](/Reference/Pantheon-CLI-Syntax/#rpc-enabled) option. If also using the [`--rpc-api`](/Reference/Pantheon-CLI-Syntax/#rpc-api) option, include `CLIQUE`.
 
 The JSON-RPC methods to add or remove signers are:
-* [clique_propose](JSON-RPC-API-Methods#clique_propose)
-* [clique_getSigners](JSON-RPC-API-Methods#clique_getsigners)
-* [clique_discard](JSON-RPC-API-Methods#clique_discard)
 
-To propose adding a signer, call `clique_propose` specifying the address of the proposed signer and `true`. For example, 
-```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-endpoint:port>
-``` 
+* [clique_propose](/Reference/JSON-RPC-API-Methods#clique_propose)
+* [clique_getSigners](/Reference/JSON-RPC-API-Methods#clique_getsigners)
+* [clique_discard](/Reference/JSON-RPC-API-Methods#clique_discard)
+
+To propose adding a signer, call `clique_propose` specifying the address of the proposed signer and `true`.
+!!! example "JSON-RPC clique_propose request example"
+    ```bash
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-endpoint:port>
+    ``` 
 
 When the next block is created by the signer, a vote is added to the block for the proposed signer.  
 
 When more than half of the existing signers propose adding the signer and their votes have been distributed in blocks, the signer is added and can begin signing blocks. 
 
-Use `clique_getSigners` to return a list of the signers and to confirm that your proposed signer has been added.  
-```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}' <JSON-RPC-endpoint:port>
-```  
+Use `clique_getSigners` to return a list of the signers and to confirm that your proposed signer has been added. 
+!!! example "JSON-RPC clique_getSigners request example"
+    ```bash
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}' <JSON-RPC-endpoint:port>
+    ```  
  
-To discard your proposal after confirming the signer was added, call `clique_discard` specifying the address of the proposed signer. For example:
- ```bash
- curl -X POST --data '{"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-endpoint:port>
- ```
+To discard your proposal after confirming the signer was added, call `clique_discard` specifying the address of the proposed signer.
+!!! example "JSON-RPC clique_discard request example"
+    ```bash
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-endpoint:port>
+    ```
 
 The process for removing a signer is the same as adding a signer except you specify `false` as the second parameter of `clique_propose`. 
 

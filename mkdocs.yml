@@ -14,6 +14,18 @@ site_name: Pantheon
 site_url: https://pantheon.readthedocs.io/
 site_description: Pantheon Java Ethereum client documentation.
 site_author: Pantheon community
+copyright: Pantheon and its documentation are licensed under Apache 2.0 license
+google_analytics: ['UA-36723568-3', 'pantheon.readthedocs.io']
+
+#extra project infos and template customisation
+extra:
+  support:
+    gitter: https://gitter.im/PegaSysEng/pantheon
+    email: support@pegasys.tech
+    footer_layout:
+      background_color: lightseagreen
+      links_color: white
+
 
 # Repository
 repo_name: PegaSysEng/pantheon
@@ -23,7 +35,7 @@ edit_uri: ""
 theme:
     name: material
     custom_dir: docs/custom_theme
-    navigation_depth: 4
+    navigation_depth: 3
     highlightjs: true
     hljs_languages:
         - java
@@ -33,28 +45,22 @@ theme:
         - yaml
     palette:
         primary: blue-grey
-        accent: green
+        accent: teal
     favicon: favicon.ico
     logo:
       icon: account_balance
+#    feature:
+#      tabs: true
 nav:
     - Installation:
-        - Overview: Installation/Installation.md
+        - Installation overview: Installation/Overview.md
         - Install Binary Distribution: Installation/Install-Binaries.md
         - Build from Source: Installation/Build-From-Source.md
     - Getting Started:
+        - Getting started overview: Getting-Started/Getting-Started.md
         - Starting Pantheon: Getting-Started/Starting-Pantheon.md
         - Running Pantheon from Docker Image: Getting-Started/Run-Docker-Image.md
         - Private Network Quickstart: Getting-Started/Private-Network-Quickstart.md
-    - Community:
-        - Develop:
-            - Building Pantheon: development/building.md
-            - Code coverage: development/code-coverage.md
-            - Logging:  development/logging.md
-            - Running with Gradle: development/running-with-gradle.md
-        - Contribute:
-            - Code review: community/code-reviews.md
-            - Community membership: community/community-membership.md
     - Configuring Pantheon:
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
@@ -65,15 +71,23 @@ nav:
         - Proof of Authority: Configuring-Pantheon/Proof-of-Authority.md
         - Passing JVM Options: Configuring-Pantheon/Passing-JVM-Options.md
     - Using Pantheon:
-        - Using Wallets for Account Management: Using-Pantheon/Account-Management.md
         - Creating and Sending Transactions: Using-Pantheon/Transactions.md
+        - Using Wallets for Account Management: Using-Pantheon/Account-Management.md
         - Mining: Using-Pantheon/Mining.md
         - RPC Pub/Sub: Using-Pantheon/RPC-PubSub.md
         - Debugging Pantheon: Using-Pantheon/Debugging.md
-    - Reference:
+    - Developement:
+        - Building Pantheon: development/building.md
+        - Code coverage: development/code-coverage.md
+        - Logging:  development/logging.md
+        - Running with Gradle: development/running-with-gradle.md
+    - Contribute:
+        - Code review: community/code-reviews.md
+        - Community membership: community/community-membership.md
+    - References:
         - Pantheon Command Line: Reference/Pantheon-CLI-Syntax.md
         - Pantheon JSON-RPC API:
-          - Reference/JSON-RPC-API.md
+          - JSON-RPC API overview: Reference/JSON-RPC-API.md
           - Using the JSON-RPC API: Reference/Using-JSON-RPC-API.md
           - JSON-RPC API Methods: Reference/JSON-RPC-API-Methods.md
           - JSON-RPC API Objects: Reference/Objects.md
@@ -89,6 +103,7 @@ markdown_extensions:
     - pymdownx.betterem:
           smart_enable: all
     - pymdownx.caret
+    - pymdownx.keys
     - pymdownx.critic
     - pymdownx.details
     - pymdownx.emoji:

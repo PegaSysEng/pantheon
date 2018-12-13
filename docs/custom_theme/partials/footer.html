@@ -22,6 +22,21 @@
 
 {% import "partials/language.html" as lang with context %}
 
+<style>
+  .feedback{
+    padding: 1em;
+    text-align: center;
+    background-color: {{config.extra.support.footer_layout.background_color}};
+  }
+  .feedback a {
+    color: {{config.extra.support.footer_layout.links_color}} !important;
+  }
+</style>
+
+<div class="feedback md-typeset">
+  <p>Questions or feedback? You can discuss issues and obtain free support on <a href="{{config.extra.support.gitter}}">Gitter</a>. For paid professional support, contact us at <a href="mailto:{{config.extra.support.email}}">{{config.extra.support.email}}</a>.</p>
+</div>
+
 <!-- Application footer -->
 <footer class="md-footer">
 
@@ -88,7 +103,6 @@
             {{ config.copyright }}
           </div>
         {% endif %}
-        Questions or feedback? You can discuss issues and obtain free support on <a href="https://gitter.im/PegaSysEng/pantheon">Gitter</a>. For paid professional support, contact us at <a href="mailto:support@pegasys.tech">support@pegasys.tech</a>.
       </div>
 
       <!-- Social links -->

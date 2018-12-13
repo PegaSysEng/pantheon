@@ -1,99 +1,24 @@
-## Breaking Change in v0.8.3
-
-From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist` option](Using-JSON-RPC-API#breaking-change-in-v083). 
-
-## JSON-RPC Methods
+!!! danger "Breaking Change in v0.8.3"
+    From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Using-JSON-RPC-API#breaking-change-in-v083) option. 
 
 The following lists the Pantheon JSON-RPC API commands:
 
-#### admin Methods
+## admin Methods
 
-* [admin_peers](#admin_peers)
-
-#### web3 Methods
-
-* [web3_clientVersion](#web3_clientversion)
-* [web3_sha3](#web3_sha3)
-
-#### net Methods
-
-* [net_version](#net_version)
-* [net_listening](#net_listening)
-* [net_peerCount](#net_peercount)
-
-#### eth Methods
-
-* [eth_syncing](#eth_syncing)
-* [eth_chainId](#eth_chainId)
-* [eth_coinbase](#eth_coinbase)
-* [eth_mining](#eth_mining)
-* [eth_gasPrice](#eth_gasprice)
-* [eth_accounts](#eth_accounts)
-* [eth_blockNumber](#eth_blocknumber)
-* [eth_getBalance](#eth_getbalance)
-* [eth_getStorageAt](#eth_getstorageat)
-* [eth_getTransactionCount](#eth_gettransactioncount)
-* [eth_getBlockTransactionCountByHash](#eth_getblocktransactioncountbyhash)
-* [eth_getBlockTransactionCountByNumber](#eth_getblocktransactioncountbynumber)
-* [eth_getUncleCountByBlockHash](#eth_getunclecountbyblockhash)
-* [eth_getUncleCountByBlockNumber](#eth_getunclecountbyblocknumber)
-* [eth_getCode](#eth_getcode)
-* [eth_sendRawTransaction](#eth_sendrawtransaction)
-* [eth_call](#eth_call)
-* [eth_estimateGas](#eth_estimategas)
-* [eth_getBlockByHash](#eth_getblockbyhash)
-* [eth_getBlockByNumber](#eth_getblockbynumber)
-* [eth_getTransactionByHash](#eth_gettransactionbyhash)
-* [eth_getTransactionByBlockHashAndIndex](#eth_gettransactionbyblockhashandindex)
-* [eth_getTransactionByBlockNumberAndIndex](#eth_gettransactionbyblocknumberandindex)
-* [eth_getTransactionReceipt](#eth_gettransactionreceipt)
-* [eth_newFilter](#eth_newfilter)
-* [eth_newBlockFilter](#eth_newblockfilter)
-* [eth_newPendingTransactionFilter](#eth_newpendingtransactionfilter)
-* [eth_uninstallFilter](#eth_uninstallfilter)
-* [eth_getFilterChanges](#eth_getfilterchanges)
-* [eth_getFilterLogs](#eth_getfilterlogs)
-* [eth_getLogs](#eth_getlogs)
-* [eth_getWork](#eth_getwork)
-
-### debug Methods
-
-* [debug_metrics](#debug_metrics)
-* [debug_traceTransaction](#debug_tracetransaction)
-
-### miner Methods
-
-* [miner_start](#miner_start)
-* [miner_stop](#miner_stop)
-
-### clique Methods
-
-* [clique_discard](#clique_discard)
-* [clique_getSigners](#clique_getsigners)
-* [clique_getSignersAtHash](#clique_getsignersathash)
-* [clique_propose](#clique_propose)
-* [clique_proposals](#clique_proposals)
-
-#### ibft Methods
-
-IBFT is not currently supported. Support for IBFT is in active development. 
-________________________________________
-## JSON-RPC API Reference
-
-________________________________________
-#### admin_peers
+### admin_peers
 
 Returns networking information about connected remote nodes. 
 
-##### Parameters
+#### Parameters
 
 None
 
-##### Returns
+#### Returns
 
 `result` : *array* of *objects* - Object returned for each remote node. 
 
-Properties of the remote node object are: 
+Properties of the remote node object are:
+
 * `version` - P2P protocol version
 * `name` - Client name
 * `caps` - P2P message capabilities 
@@ -101,36 +26,33 @@ Properties of the remote node object are:
 * `port` - Port
 * `id` - Node public key. Excluding the `0x` prefix, the node public key is the ID in the enode URL `enode://<id ex 0x>@<host:port>`. 
 
-##### Request
-
-```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}' <JSON-RPC-endpoint:port>
-```
-
-##### Result
-
-```json
-{
-  "jsonrpc" : "2.0",
-  "id" : 1,
-  "result" : [ 
+!!! example
+    ```bash tab="Curl request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}' <JSON-RPC-endpoint:port>
+    ```
+    
+    ```json tab="JSON result"
     {
-      "version" : "0x5",
-      "name" : "Geth/v1.8.20-unstable-92639b67/linux-amd64/go1.11.1",
-      "caps" : [
-        "eth/62", 
-        "eth/63"
-        ],
-      "network" : {
-        "localAddress" : "192.168.1.229:51279",
-        "remoteAddress" : "52.3.158.184:30303"
-      },
-      "port" : "0x0",
-      "id" : "0x343149e4feefa15d882d9fe4ac7d88f885bd05ebb735e547f12e12080a9fa07c8014ca6fd7f373123488102fe5e34111f8509cf0b7de3f5b44339c9f25e87cb8"
-    } 
-  ]
-}
-```
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : [ 
+        {
+          "version" : "0x5",
+          "name" : "Geth/v1.8.20-unstable-92639b67/linux-amd64/go1.11.1",
+          "caps" : [
+            "eth/62", 
+            "eth/63"
+            ],
+          "network" : {
+            "localAddress" : "192.168.1.229:51279",
+            "remoteAddress" : "52.3.158.184:30303"
+          },
+          "port" : "0x0",
+          "id" : "0x343149e4feefa15d882d9fe4ac7d88f885bd05ebb735e547f12e12080a9fa07c8014ca6fd7f373123488102fe5e34111f8509cf0b7de3f5b44339c9f25e87cb8"
+        } 
+      ]
+    }
+    ```
 ________________________________________
 #### web3_clientVersion
 
@@ -1879,3 +1801,6 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_stop","params":[],"id":1}'
 ```
 
 
+## ibft Methods
+
+IBFT is not currently supported. Support for IBFT is in active development. 

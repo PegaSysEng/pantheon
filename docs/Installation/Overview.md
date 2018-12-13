@@ -1,10 +1,14 @@
-# Pantheon Installation
+title: Installation overview
+description: Overview and requirements to install Pantheon
+<!--- END of page meta data -->
 
 You can install Pantheon by:
+
 * [Installing the binary distribution](Install-Binaries) 
 * [Building from source](Build-From-Source) 
 
->**Note** To run a single node to connect the Ethereum mainnet or a public testnet, running from the [Pantheon docker image](Run-Docker-Image) is the fastest way to get started.
+!!! note 
+    To run a single node to connect the Ethereum mainnet or a public testnet, running from the [Pantheon docker image](Run-Docker-Image) is the fastest way to get started.
 
 ## Disk Space and RAM Requirements
 Your computer should have at least 4 GB RAM. 

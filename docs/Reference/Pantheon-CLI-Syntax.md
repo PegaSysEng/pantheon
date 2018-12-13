@@ -1,8 +1,9 @@
-## Pantheon Command Line Interface Reference
+description: Code review guidelines for Pantheon developers
+<!--- END of page meta data -->
 
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.
 
-```
+```bash
 pantheon [OPTIONS] [COMMAND]
 ```
 
@@ -11,13 +12,24 @@ Runs the Pantheon Ethereum full node client.
 
 ## Options
 
-<dl>
-<dt><code>--banned-nodeids=&lt;bannedNodeId&gt[,&lt;bannedNodeId&gt;...]...</code></dt>
+### banned-nodeids
+
+!!!abstract "Usage"
+
+    ```bash tab="Syntax"
+    --banned-nodeids=<bannedNodeId>[,<bannedNodeId>...]...
+    ```
+    
+    ```bash tab="Example"
+    --banned-nodeids=enode://c35c3...d615f@1.2.3.4:30303,enode://f42c13...fc456@1.2.3.5:30303
+    ```
+
+    List of node IDs with which this node will not peer. The node ID is the public key of the node. You can specify the banned node IDs with or without the `0x` prefix.
   
-  <dd>List of node IDs with which this node will not peer. The node ID is the public key of the node. You can specify the banned node IDs with or without the <code>0x</code> prefix.</dd>
-  
-  >**Note** This option is only available from v0.8.2 or when [building from source](Installation). 
+!!!info
+    This option is only available from v0.8.2 or when [building from source](Installation). 
  
+### bootnodes
   <dt><code>--bootnodes=&lt;enode://id@host:port&gt;[,&lt;enode://id@host:port&gt;...]...</code></dt>
   
   <dd>List of comma-separated enode URLs for P2P discovery bootstrap. </dd>
@@ -55,6 +67,8 @@ miner-coinbase="0x0000000000000000000000000000000000000002"
 
 > **Note:** This option is not used when running Pantheon from the [Docker image](Run-Docker-Image#persisting-data). 
 <br>
+
+### dev-mode
   <dt><code>--dev-mode</code></dt>
   <dd>
   Set this option to <code>true</code> to run in development mode. For example, specify this option to perform CPU mining more easily in a private test network. In development mode, a custom genesis configuration specifies the chain ID. When using this option, also set the <code>--network-id</code> option to the network you use for development. Default is <code>false</code>.
