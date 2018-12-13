@@ -79,6 +79,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
     "enode://" + VALID_NODE_ID + "@192.168.0.3:4567"
   };
 
+  final String[] ropstenBootnodes = {
+      "enode://6332792c4a00e3e4ee0926ed89e0d27ef985424d97b6a45bf0f23e51f0dcb5e66b875777506458aea7af6f9e4ffb69f43f3778ee73c81ed9d34c51c4b16b0b0f@52.232.243.152:30303",
+      "enode://94c15d1b9e2fe7ce56e458b9a3b672ef11894ddedd0c6f247e0f1d3487f52b66208fb4aeb8179fce6e3a749ea93ed147c37976d67af557508d199d9594c35f09@192.81.208.223:30303"
+  };
+
   static {
     final JsonRpcConfiguration rpcConf = JsonRpcConfiguration.createDefault();
     rpcConf.addRpcApi(CliqueRpcApis.CLIQUE);
@@ -488,22 +493,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  @Ignore("don't think we can start with empty whitelist because we can't specify empty bootnodes")
-  public void callingWithNodesWhitelistOptionButNoValueMustNotError() {
-    parseCommand("--nodes-whitelist");
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().getNodeWhitelist()).isEmpty();
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
   public void callingWithInvalidNodesWhitelistMustDisplayErrorAndUsage() {
     parseCommand("--nodes-whitelist", "invalid_enode_url");
     assertThat(commandOutput.toString()).isEmpty();
@@ -574,6 +563,45 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand(
         "--bootnodes",
         String.join(",", bootNodeNotWhitelisted, validENodeStrings[2]),
+        "--nodes-whitelist",
+        String.join(",", validENodeStrings));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Cannot start node with bootnode(s) that are not in node-whitelist");
+  }
+
+  @Test
+  public void ropstenWithNodesWhitelistOptionWhichDoesIncludeRopstenBootnodesMustNotDisplayError() {
+    parseCommand(
+        "--ropsten",
+        "--nodes-whitelist",
+        String.join(",", ropstenBootnodes));
+
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(
+        permissioningConfigurationArgumentCaptor
+            .getValue()
+            .getNodeWhitelist()
+            .stream()
+            .map(URI::toString)
+            .collect(Collectors.toList()))
+        .containsExactlyInAnyOrder(ropstenBootnodes);
+    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void ropstenWithNodesWhitelistOptionWhichDoesNotIncludeRopstenBootnodesMustDisplayError() {
+    parseCommand(
+        "--ropsten",
         "--nodes-whitelist",
         String.join(",", validENodeStrings));
 
