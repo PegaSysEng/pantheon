@@ -258,7 +258,7 @@ public class DockerQuickstartTest {
 
       Awaitility.await()
           .ignoreExceptions()
-          .atMost(30, TimeUnit.SECONDS)
+          .atMost(45, TimeUnit.SECONDS)
           .untilAsserted(() -> assertThat(wsConnection[0]).isNotNull());
     } finally {
       assertThat(wsConnection[0]).isNotNull();
