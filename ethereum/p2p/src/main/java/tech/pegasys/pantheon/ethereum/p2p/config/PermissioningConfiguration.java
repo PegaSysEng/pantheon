@@ -42,7 +42,7 @@ public class PermissioningConfiguration {
     return nodeWhitelistSet;
   }
 
-  public boolean contains(final String node) {
+  public boolean contains(final URI node) {
     return !isNodeWhitelistSet() || nodeWhitelist.contains(node);
   }
 }

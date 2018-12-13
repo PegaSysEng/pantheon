@@ -73,6 +73,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   private static final WebSocketConfiguration defaultWebSocketConfiguration;
   private static final String GENESIS_CONFIG_TESTDATA = "genesis_config";
 
+  final String[] validENodeStrings = {
+    "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+    "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
+    "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
+  };
+
   static {
     final JsonRpcConfiguration rpcConf = JsonRpcConfiguration.createDefault();
     rpcConf.addRpcApi(CliqueRpcApis.CLIQUE);
@@ -487,6 +493,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  @Ignore("don't think we can start with empty whitelist because we can't specify empty bootnodes")
   public void callingWithNodesWhitelistOptionButNoValueMustNotError() {
     parseCommand("--nodes-whitelist");
 
@@ -516,12 +523,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void nodesWhitelistOptionMustBeUsed() {
-    final String[] nodes = {
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
-    };
-    parseCommand("--nodes-whitelist", String.join(",", nodes));
+    parseCommand(
+        "--nodes-whitelist",
+        String.join(",", validENodeStrings),
+        "--bootnodes",
+        validENodeStrings[0]);
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
@@ -534,7 +540,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
                 .stream()
                 .map(URI::toString)
                 .collect(Collectors.toList()))
-        .containsExactlyInAnyOrder(nodes);
+        .containsExactlyInAnyOrder(validENodeStrings);
     assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
 
     assertThat(commandOutput.toString()).isEmpty();
@@ -543,19 +549,24 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void nodesWhitelistOptionMustIncludeBootnodes() {
-    final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
     parseCommand(
         "--bootnodes",
-        String.join(",", nodes[0], nodes[1]),
+        String.join(",", validENodeStrings[0], validENodeStrings[1]),
         "--nodes-whitelist",
-        String.join(",", nodes));
+        String.join(",", validENodeStrings));
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().getNodeWhitelist())
-        .containsExactlyInAnyOrder(nodes);
+    assertThat(
+            permissioningConfigurationArgumentCaptor
+                .getValue()
+                .getNodeWhitelist()
+                .stream()
+                .map(URI::toString)
+                .collect(Collectors.toList()))
+        .containsExactlyInAnyOrder(validENodeStrings);
     assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
 
     assertThat(commandOutput.toString()).isEmpty();
@@ -564,13 +575,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void nodesWhitelistOptionWhichDoesNotIncludeBootnodesMustDisplayError() {
-    final String[] nodes = {"enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"};
-    final String bootNodeNotWhitelisted = "enode://004@123:4567";
+    final String bootNodeNotWhitelisted = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
     parseCommand(
         "--bootnodes",
-        String.join(",", bootNodeNotWhitelisted, nodes[2]),
+        String.join(",", bootNodeNotWhitelisted, validENodeStrings[2]),
         "--nodes-whitelist",
-        String.join(",", nodes));
+        String.join(",", validENodeStrings));
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -581,8 +591,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void nodesWhitelistWithEmptyListAndNonEmptyBootnodesMustDisplayError() {
-    final String bootNodeNotWhitelisted = "enode://004@123:4567";
-    parseCommand("--bootnodes", String.join(",", bootNodeNotWhitelisted), "--nodes-whitelist");
+    parseCommand("--bootnodes", String.join(",", validENodeStrings[0]), "--nodes-whitelist");
 
     verifyZeroInteractions(mockRunnerBuilder);
 

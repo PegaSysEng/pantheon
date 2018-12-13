@@ -34,8 +34,10 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -53,6 +55,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
@@ -473,18 +476,29 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           new CommandLine(this),
           "Unable to connect to multiple networks simultaneously. Specify one of --ropsten, --rinkeby or --goerli");
     }
+
+    final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
+
     // ensure all bootstrapNodes are in the whitelist
     PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
-    if (permissioningConfiguration.isNodeWhitelistSet() && bootstrapNodes != null) {
-      for (String bootnode : bootstrapNodes) {
-        if (!permissioningConfiguration.contains(bootnode)) {
+    List<Peer> bs =
+        DiscoveryConfiguration.getBootstrapPeersFromUnknownCollection(
+            ethNetworkConfig.getBootNodes());
+    if (permissioningConfiguration.isNodeWhitelistSet() && bs != null) {
+      List<Peer> whitelist =
+          permissioningConfiguration
+              .getNodeWhitelist()
+              .stream()
+              .map(DefaultPeer::fromURI)
+              .collect(Collectors.toList());
+      for (Peer bootnode : bs) {
+        if (!whitelist.contains(bootnode)) {
           throw new ParameterException(
               new CommandLine(this),
               "Cannot start node with bootnode(s) that are not in node-whitelist " + bootnode);
         }
       }
     }
-    final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
     synchronize(
         buildController(),
         noPeerDiscovery,

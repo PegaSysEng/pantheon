@@ -148,6 +148,19 @@ public class DiscoveryConfiguration {
     return this;
   }
 
+  public static List<Peer> getBootstrapPeersFromUnknownCollection(
+      final Collection<?> bootstrapPeers) {
+    List<Peer> bs;
+    if (bootstrapPeers.stream().allMatch(URI.class::isInstance)) {
+      bs = bootstrapPeers.stream().map(URI.class::cast).map(DefaultPeer::fromURI).collect(toList());
+    } else if (bootstrapPeers.stream().allMatch(Peer.class::isInstance)) {
+      bs = bootstrapPeers.stream().map(Peer.class::cast).collect(toList());
+    } else {
+      throw new IllegalArgumentException("Expected a list of Peers or a list of enode URIs");
+    }
+    return bs;
+  }
+
   public String getAdvertisedHost() {
     return advertisedHost;
   }
