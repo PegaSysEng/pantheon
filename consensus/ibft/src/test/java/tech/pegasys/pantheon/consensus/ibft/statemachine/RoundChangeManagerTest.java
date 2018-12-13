@@ -140,8 +140,7 @@ public class RoundChangeManagerTest {
         makeRoundChangeMessage(validator1Key, ri2);
     assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
         .isEqualTo(Optional.empty());
-    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1))
-        .satisfies(Optional::isPresent);
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1).isPresent()).isTrue();
   }
 
   @Test
@@ -176,5 +175,22 @@ public class RoundChangeManagerTest {
     assertThat(manager.roundChangeCache.get(ri1)).isNull();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
     assertThat(manager.roundChangeCache.get(ri3).receivedMessages.size()).isEqualTo(1);
+  }
+
+  @Test
+  public void stopsAcceptingMessagesAfterReady() {
+    SignedData<RoundChangePayload> roundChangeDataProposer =
+        makeRoundChangeMessage(proposerKey, ri2);
+    SignedData<RoundChangePayload> roundChangeDataValidator1 =
+        makeRoundChangeMessage(validator1Key, ri2);
+    SignedData<RoundChangePayload> roundChangeDataValidator2 =
+        makeRoundChangeMessage(validator2Key, ri2);
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
+        .isEqualTo(Optional.empty());
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1).isPresent()).isTrue();
+    assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(2);
+    assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator2))
+        .isEqualTo(Optional.empty());
+    assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(2);
   }
 }
