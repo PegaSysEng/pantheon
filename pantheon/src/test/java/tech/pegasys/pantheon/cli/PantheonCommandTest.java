@@ -75,8 +75,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   final String[] validENodeStrings = {
     "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-    "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-    "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
+    "enode://" + VALID_NODE_ID + "@192.168.0.2:4567",
+    "enode://" + VALID_NODE_ID + "@192.168.0.3:4567"
   };
 
   static {
@@ -453,18 +453,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void bootnodesOptionMustBeUsed() {
-    final String[] nodes = {
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
-    };
-    parseCommand("--bootnodes", String.join(",", nodes));
+    parseCommand("--bootnodes", String.join(",", validENodeStrings));
 
     verify(mockRunnerBuilder).bootstrapPeers(uriListArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(uriListArgumentCaptor.getValue())
-        .isEqualTo(Stream.of(nodes).map(URI::create).collect(Collectors.toList()));
+        .isEqualTo(Stream.of(validENodeStrings).map(URI::create).collect(Collectors.toList()));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1082,18 +1077,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   private void networkValuesCanBeOverridden(final String network) throws Exception {
-    final String[] nodes = {
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
-      "enode://" + VALID_NODE_ID + "@192.168.0.1:4567"
-    };
     final Path genesisFile = createFakeGenesisFile();
     parseCommand(
         "--" + network,
         "--network-id",
         "1",
         "--bootnodes",
-        String.join(",", nodes),
+        String.join(",", validENodeStrings),
         "--genesis",
         genesisFile.toString());
 
@@ -1107,7 +1097,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(networkArg.getValue().getGenesisConfig()).isEqualTo("genesis_config");
     assertThat(networkArg.getValue().getBootNodes())
-        .isEqualTo(Stream.of(nodes).map(URI::create).collect(Collectors.toList()));
+        .isEqualTo(Stream.of(validENodeStrings).map(URI::create).collect(Collectors.toList()));
     assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1);
   }
 
