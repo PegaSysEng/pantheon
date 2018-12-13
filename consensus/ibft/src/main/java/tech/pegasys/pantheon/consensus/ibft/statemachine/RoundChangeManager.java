@@ -108,7 +108,7 @@ public class RoundChangeManager {
       return Optional.empty();
     }
 
-    RoundChangeStatus roundChangeStatus = storeRoundChangeMessage(msg);
+    final RoundChangeStatus roundChangeStatus = storeRoundChangeMessage(msg);
 
     if (roundChangeStatus.roundChangeReady()) {
       return Optional.of(roundChangeStatus.createRoundChangeCertificate());
