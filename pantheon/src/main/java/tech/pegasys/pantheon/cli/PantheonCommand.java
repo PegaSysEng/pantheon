@@ -19,6 +19,7 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonD
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
+import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -29,7 +30,6 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
@@ -45,6 +45,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,7 +124,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final BlockImporter blockImporter;
 
   private final PantheonControllerBuilder controllerBuilder;
-  private final Builder synchronizerConfigurationBuilder;
+  private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
   private final MetricsSystem metricsSystem = PrometheusMetricsSystem.init();
@@ -170,9 +171,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         "Comma separated enode URLs for P2P discovery bootstrap. "
             + "Default is a predefined list.",
     split = ",",
-    arity = "1..*"
+    arity = "1..*",
+    converter = EnodeToURIPropertyConverter.class
   )
-  private final Collection<String> bootstrapNodes = null;
+  private final Collection<URI> bootstrapNodes = null;
 
   @Option(
     names = {"--max-peers"},
@@ -401,15 +403,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description =
         "Comma separated enode URLs for permissioned networks. You may specify an empty list.",
     split = ",",
-    arity = "0..*"
+    arity = "0..*",
+    converter = EnodeToURIPropertyConverter.class
   )
-  private final Collection<String> nodesWhitelist = null;
+  private final Collection<URI> nodesWhitelist = null;
 
   public PantheonCommand(
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
-      final Builder synchronizerConfigurationBuilder) {
+      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder) {
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
