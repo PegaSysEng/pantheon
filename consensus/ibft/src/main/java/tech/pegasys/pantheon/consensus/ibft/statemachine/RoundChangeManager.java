@@ -102,7 +102,6 @@ public class RoundChangeManager {
   public Optional<RoundChangeCertificate> appendRoundChangeMessage(
       final SignedData<RoundChangePayload> msg) {
 
-    // validate the received msg
     if (!isMessageValid(msg)) {
       LOG.info("RoundChange message was invalid.");
       return Optional.empty();
