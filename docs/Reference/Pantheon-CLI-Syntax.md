@@ -1,4 +1,4 @@
-description: Code review guidelines for Pantheon developers
+description: Pantheon command line interface reference
 <!--- END of page meta data -->
 
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.

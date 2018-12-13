@@ -1,4 +1,5 @@
-## Objects
+description: Pantheon JSON-RPC API objects reference
+<!--- END of page meta data -->
 
 The following objects are parameters for or returned by JSON-RPC Methods:
 * [Block](#block-object)

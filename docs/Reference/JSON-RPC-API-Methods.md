@@ -1,3 +1,6 @@
+description: Pantheon JSON-RPC API methods reference
+<!--- END of page meta data -->
+
 !!! danger "Breaking Change in v0.8.3"
     From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Using-JSON-RPC-API#breaking-change-in-v083) option. 
 

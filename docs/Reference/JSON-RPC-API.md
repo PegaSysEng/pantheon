@@ -1,4 +1,5 @@
-# Pantheon JSON-RPC API
+description: Pantheon JSON-RPC API reference
+<!--- END of page meta data -->
 
 The Pantheon JSON-RPC API uses the [JSON](http://json.org/) (RFC 4627) data format, which can represent objects and data fields as collections of name/value pairs, in a relatively readable, hierarchical form. Values have specific data types such as QUANTITIES (decimal integers, hexadecimal numbers, strings) and UNFORMATTED DATA (byte arrays, account addresses, hashes, and bytecode arrays).
 
@@ -6,4 +7,4 @@ RPC is the remote procedure call protocol (RFC 1831), which is stateless and tra
 
 * [Using the Pantheon JSON-RPC API](Using-JSON-RPC-API.md)
 * [JSON-RPC API Methods](JSON-RPC-API-Methods.md)
-* [JSON-RPC API Objects](Objects.md)
+* [JSON-RPC API Objects](JSON-RPC-API-Objects.md)

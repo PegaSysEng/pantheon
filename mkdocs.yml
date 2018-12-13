@@ -90,7 +90,7 @@ nav:
           - JSON-RPC API overview: Reference/JSON-RPC-API.md
           - Using the JSON-RPC API: Reference/Using-JSON-RPC-API.md
           - JSON-RPC API Methods: Reference/JSON-RPC-API-Methods.md
-          - JSON-RPC API Objects: Reference/Objects.md
+          - JSON-RPC API Objects: Reference/JSON-RPC-API-Objects.md
 
 markdown_extensions:
     - toc:
@@ -106,8 +106,7 @@ markdown_extensions:
     - pymdownx.keys
     - pymdownx.critic
     - pymdownx.details
-    - pymdownx.emoji:
-          emoji_generator: !!python/name:pymdownx.emoji.to_svg
+    - pymdownx.emoji
     - pymdownx.inlinehilite
     - pymdownx.magiclink
     - pymdownx.mark
