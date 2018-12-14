@@ -188,7 +188,7 @@ The default is unlimited but the number of trailing peers cannot exceed the valu
 ```
 
 ```bash tab="Example"
---miner-coinbase=0xfe3b557e8fb62b89f4916b721be55ceb828dbd73
+--miner-coinbase=fe3b557e8fb62b89f4916b721be55ceb828dbd73
 ```
 
 Account to which mining rewards are paid.
