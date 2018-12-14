@@ -49,6 +49,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -517,14 +518,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(
-            permissioningConfigurationArgumentCaptor
-                .getValue()
-                .getNodeWhitelist()
-                .stream()
-                .map(URI::toString)
-                .collect(Collectors.toList()))
-        .containsExactlyInAnyOrder(validENodeStrings);
+    final List<String> enodeURLAsStringList =
+        permissioningConfigurationArgumentCaptor
+            .getValue()
+            .getNodeWhitelist()
+            .stream()
+            .map(URI::toString)
+            .collect(Collectors.toList());
+
+    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(validENodeStrings);
     assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
 
     assertThat(commandOutput.toString()).isEmpty();
@@ -543,14 +545,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(
-            permissioningConfigurationArgumentCaptor
-                .getValue()
-                .getNodeWhitelist()
-                .stream()
-                .map(URI::toString)
-                .collect(Collectors.toList()))
-        .containsExactlyInAnyOrder(validENodeStrings);
+    final List<String> enodeURLAsStringList =
+        permissioningConfigurationArgumentCaptor
+            .getValue()
+            .getNodeWhitelist()
+            .stream()
+            .map(URI::toString)
+            .collect(Collectors.toList());
+
+    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(validENodeStrings);
     assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
 
     assertThat(commandOutput.toString()).isEmpty();
@@ -581,14 +584,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(
-            permissioningConfigurationArgumentCaptor
-                .getValue()
-                .getNodeWhitelist()
-                .stream()
-                .map(URI::toString)
-                .collect(Collectors.toList()))
-        .containsExactlyInAnyOrder(ropstenBootnodes);
+    final List<String> enodeURLAsStringList =
+        permissioningConfigurationArgumentCaptor
+            .getValue()
+            .getNodeWhitelist()
+            .stream()
+            .map(URI::toString)
+            .collect(Collectors.toList());
+
+    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(ropstenBootnodes);
     assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
 
     assertThat(commandOutput.toString()).isEmpty();
