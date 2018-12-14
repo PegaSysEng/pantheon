@@ -13,15 +13,28 @@
 package tech.pegasys.pantheon.consensus.ibft.ibftmessagedata;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
+import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
+import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public abstract class InRoundPayload extends AbstractPayload {
-  protected final ConsensusRoundIdentifier roundIdentifier;
+public interface Payload {
 
-  protected InRoundPayload(final ConsensusRoundIdentifier roundIdentifier) {
-    this.roundIdentifier = roundIdentifier;
+  void writeTo(final RLPOutput rlpOutput);
+
+  ConsensusRoundIdentifier getRoundIdentifier();
+
+  default BytesValue encoded() {
+    BytesValueRLPOutput rlpOutput = new BytesValueRLPOutput();
+    writeTo(rlpOutput);
+
+    return rlpOutput.encoded();
   }
 
-  public ConsensusRoundIdentifier getRoundIdentifier() {
-    return roundIdentifier;
+  int getMessageType();
+
+  static Hash readDigest(final RLPInput ibftMessageData) {
+    return Hash.wrap(ibftMessageData.readBytes32());
   }
 }

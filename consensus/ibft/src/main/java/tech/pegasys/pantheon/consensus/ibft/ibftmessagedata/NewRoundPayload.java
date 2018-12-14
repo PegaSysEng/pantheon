@@ -17,14 +17,14 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
-public class NewRoundPayload extends AbstractPayload {
+import java.util.Collections;
+import java.util.Objects;
+import java.util.StringJoiner;
 
+public class NewRoundPayload implements Payload {
   private static final int TYPE = IbftV2.NEW_ROUND;
-
   private final ConsensusRoundIdentifier roundChangeIdentifier;
-
   private final RoundChangeCertificate roundChangeCertificate;
-
   private final SignedData<ProposalPayload> proposalPayload;
 
   public NewRoundPayload(
@@ -36,7 +36,8 @@ public class NewRoundPayload extends AbstractPayload {
     this.proposalPayload = proposalPayload;
   }
 
-  public ConsensusRoundIdentifier getRoundChangeIdentifier() {
+  @Override
+  public ConsensusRoundIdentifier getRoundIdentifier() {
     return roundChangeIdentifier;
   }
 
@@ -71,7 +72,77 @@ public class NewRoundPayload extends AbstractPayload {
   }
 
   @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final NewRoundPayload that = (NewRoundPayload) o;
+    return Objects.equals(roundChangeIdentifier, that.roundChangeIdentifier)
+        && Objects.equals(roundChangeCertificate, that.roundChangeCertificate)
+        && Objects.equals(proposalPayload, that.proposalPayload);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(roundChangeIdentifier, roundChangeCertificate, proposalPayload);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", NewRoundPayload.class.getSimpleName() + "[", "]")
+        .add("roundChangeIdentifier=" + roundChangeIdentifier)
+        .add("roundChangeCertificate=" + roundChangeCertificate)
+        .add("proposalPayload=" + proposalPayload)
+        .toString();
+  }
+
+  @Override
   public int getMessageType() {
     return TYPE;
+  }
+
+  public static class Builder {
+
+    private ConsensusRoundIdentifier roundChangeIdentifier = new ConsensusRoundIdentifier(1, 0);
+
+    private RoundChangeCertificate roundChangeCertificate =
+        new RoundChangeCertificate(Collections.emptyList());
+
+    private SignedData<ProposalPayload> proposalPayload = null;
+
+    public Builder() {}
+
+    public Builder(
+        final ConsensusRoundIdentifier roundChangeIdentifier,
+        final RoundChangeCertificate roundChangeCertificate,
+        final SignedData<ProposalPayload> proposalPayload) {
+      this.roundChangeIdentifier = roundChangeIdentifier;
+      this.roundChangeCertificate = roundChangeCertificate;
+      this.proposalPayload = proposalPayload;
+    }
+
+    public static Builder fromExisting(final NewRoundPayload payload) {
+      return new Builder(
+          payload.roundChangeIdentifier, payload.roundChangeCertificate, payload.proposalPayload);
+    }
+
+    public void setRoundChangeIdentifier(final ConsensusRoundIdentifier roundChangeIdentifier) {
+      this.roundChangeIdentifier = roundChangeIdentifier;
+    }
+
+    public void setRoundChangeCertificate(final RoundChangeCertificate roundChangeCertificate) {
+      this.roundChangeCertificate = roundChangeCertificate;
+    }
+
+    public void setProposalPayload(final SignedData<ProposalPayload> proposalPayload) {
+      this.proposalPayload = proposalPayload;
+    }
+
+    public NewRoundPayload build() {
+      return new NewRoundPayload(roundChangeIdentifier, roundChangeCertificate, proposalPayload);
+    }
   }
 }

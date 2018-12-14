@@ -10,26 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.testutil;
+package tech.pegasys.pantheon.ethereum.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Log;
-import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
-import tech.pegasys.pantheon.ethereum.core.MutableAccount;
-import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
@@ -181,10 +167,10 @@ public class BlockDataGenerator {
         .gasLimit(gasLimit)
         .gasUsed(gasUsed)
         .timestamp(Instant.now().truncatedTo(ChronoUnit.SECONDS).getEpochSecond())
-        .extraData(bytes32())
+        .extraData(options.getExtraData(bytes32()))
         .mixHash(hash())
         .nonce(blockNonce)
-        .blockHashFunction(MainnetBlockHashFunction::createHash)
+        .blockHashFunction(options.getBlockHashFunction(MainnetBlockHashFunction::createHash))
         .buildBlockHeader();
   }
 
@@ -322,6 +308,8 @@ public class BlockDataGenerator {
     private Optional<Hash> stateRoot = Optional.empty();
     private Optional<UInt256> difficulty = Optional.empty();
     private Optional<List<Transaction>> transactions = Optional.empty();
+    private Optional<BytesValue> extraData = Optional.empty();
+    private Optional<BlockHashFunction> blockHashFunction = Optional.empty();
 
     public static BlockOptions create() {
       return new BlockOptions();
@@ -345,6 +333,14 @@ public class BlockDataGenerator {
 
     public UInt256 getDifficulty(final UInt256 defaultValue) {
       return difficulty.orElse(defaultValue);
+    }
+
+    public BytesValue getExtraData(final Bytes32 defaultValue) {
+      return extraData.orElse(defaultValue);
+    }
+
+    public BlockHashFunction getBlockHashFunction(final BlockHashFunction defaultValue) {
+      return blockHashFunction.orElse(defaultValue);
     }
 
     public BlockOptions addTransaction(final Transaction... tx) {
@@ -372,6 +368,16 @@ public class BlockDataGenerator {
 
     public BlockOptions setDifficulty(final UInt256 difficulty) {
       this.difficulty = Optional.of(difficulty);
+      return this;
+    }
+
+    public BlockOptions setExtraData(final BytesValue extraData) {
+      this.extraData = Optional.of(extraData);
+      return this;
+    }
+
+    public BlockOptions setBlockHashFunction(final BlockHashFunction blockHashFunction) {
+      this.blockHashFunction = Optional.of(blockHashFunction);
       return this;
     }
   }

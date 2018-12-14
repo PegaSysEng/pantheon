@@ -15,10 +15,15 @@ package tech.pegasys.pantheon.consensus.ibft.ibftmessagedata;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
+
+import com.google.common.collect.Lists;
 
 public class RoundChangeCertificate {
-
   private final Collection<SignedData<RoundChangePayload>> roundChangePayloads;
 
   public RoundChangeCertificate(
@@ -44,5 +49,44 @@ public class RoundChangeCertificate {
 
   public Collection<SignedData<RoundChangePayload>> getRoundChangePayloads() {
     return roundChangePayloads;
+  }
+
+  public static class Builder {
+    private final List<SignedData<RoundChangePayload>> roundChangePayloads = Lists.newArrayList();
+
+    public Builder() {}
+
+    public void appendRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
+      roundChangePayloads.add(msg);
+    }
+
+    public RoundChangeCertificate buildCertificate() {
+      return new RoundChangeCertificate(roundChangePayloads);
+    }
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final RoundChangeCertificate that = (RoundChangeCertificate) o;
+    return Objects.equals(
+        new ArrayList<>(roundChangePayloads), new ArrayList<>(that.roundChangePayloads));
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(roundChangePayloads);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", RoundChangeCertificate.class.getSimpleName() + "[", "]")
+        .add("roundChangePayloads=" + roundChangePayloads)
+        .toString();
   }
 }
