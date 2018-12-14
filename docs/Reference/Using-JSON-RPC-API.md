@@ -1,23 +1,21 @@
-## Contents
+description: How to use Pantheon JSON-RPC API
+<!--- END of page meta data -->
 
-- [Postman](#postman)
-- [Endpoint Address and Port](#endpoint-address-and-port)
-- [HTTP and WebSocket Requests](#http-and-websocket-requests)
-- [Block Parameter](#block-parameter)
-- [Not Supported by Pantheon](#not-supported-by-pantheon)
+!!!attention "Breaking Change in v0.8.3"
 
-## Breaking Change in v0.8.3
+    From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Pantheon-CLI-Syntax.md#host-whitelist) option.
+    If not specified, the default value for [`--host-whitelist`](Pantheon-CLI-Syntax.md#host-whitelist) is `localhost`. 
 
-From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the `--host-whitelist` option. If not specified, the default value for `--host-whitelist` is `localhost`. 
+    If using the URL `http://127.0.0.1` to make JSON-RPC calls, use [`--host-whitelist`](Pantheon-CLI-Syntax.md#host-whitelist) to specify the hostname `127.0.0.1` or update the hostname to `localhost`. 
 
-If using the URL `http://127.0.0.1` to make JSON-RPC calls, use `--host-whitelist` to specify the hostname `127.0.0.1` or update the hostname to `localhost`. 
-
-If your application publishes RPC ports, specify the hostnames when starting Pantheon. For example:  
-```bash
-pantheon --host-whitelist=foo.com
-```
+    If your application publishes RPC ports, specify the hostnames when starting Pantheon. For example:  
+    ```bash
+    pantheon --host-whitelist=foo.com
+    ```
  
-Specify `*` or `all` for `--host-whitelist` to effectively disable host protection and replicate pre-v0.8.3 behavior. This is not recommended for production code. 
+    Specify `*` or `all` for [`--host-whitelist`](Pantheon-CLI-Syntax.md#host-whitelist) to effectively disable host protection and replicate pre-v0.8.3 behavior.
+    
+    **This is not recommended for production code.**
 
 ## Using the Pantheon JSON-RPC API
 
@@ -30,10 +28,14 @@ Use the button to import our collection of examples to [Postman](https://www.get
 ### Endpoint Address and Port
 
 In this reference, the placeholder
-`<JSON-RPC-http-endpoint:port>` and `<JSON-RPC-ws-endpoint:port>` means an endpoint (IP address and port) of the JSON-RPC service of a Pantheon node respectively for http endpoint and for WebSocket endpoint.
-To activate JSON-RPC using http or WebSocket, see [--rpc-listen and --ws-listen options in the CLI documentation](https://github.com/PegaSysEng/pantheon/wiki/Pantheon-CLI-Syntax).
+`<JSON-RPC-http-endpoint:port>` and `<JSON-RPC-ws-endpoint:port>` means an endpoint (IP address and port) 
+of the JSON-RPC service of a Pantheon node respectively for http endpoint and for WebSocket endpoint.
+
+To activate JSON-RPC using http or WebSocket, see [`--rpc-listen`](../Reference/Pantheon-CLI-Syntax.md#rpc-listen) 
+and [`--ws-listen`](../Reference/Pantheon-CLI-Syntax.md#ws-listen) options in the CLI documentation.
 
 The transport attributes are:
+
 * HTTP: Listens by default on port 8545
 * WebSockets: Listens by default on port 8546
 
@@ -44,7 +46,7 @@ The transport attributes are:
 To make RPC over HTTP requests, you can use the `curl` tool, available in many systems using [curl source code or pre-compiled packages](https://curl.haxx.se/download.html).
 
 ```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+$ curl -X POST --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
 ```
 
 #### WebSockets
@@ -54,26 +56,30 @@ To make requests over WebSockets, this reference uses [wscat](https://github.com
 First connect to the WebSockets server using `wscat` (you only need to connect once per session):
 
 ```bash
-wscat -c ws://<JSON-RPC-ws-endpoint:port>
+$ wscat -c ws://<JSON-RPC-ws-endpoint:port>
 ```
 
-After the connection is established, the terminal will display a '>' prompt. Send individual requests as a JSON data package at each prompt:
+After the connection is established, the terminal will display a '>' prompt.
+Send individual requests as a JSON data package at each prompt:
 
-```json
-{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":53}
+```bash
+> {"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":53}
 ```
 
-The [RPC Pub/Sub methods](RPC-PubSub) can also be used over WebSockets.
+The [RPC Pub/Sub methods](../Using-Pantheon/RPC-PubSub.md) can also be used over WebSockets.
 
 ### Block Parameter
 
-When you make requests that might have different results depending on the block accessed, the block parameter specifies the block. Several methods, such as [eth_getTransactionByBlockNumberAndIndex](JSON-RPC-API-Methods#eth_gettransactionbyblocknumberandindex), have a block parameter.
+When you make requests that might have different results depending on the block accessed, 
+the block parameter specifies the block. 
+Several methods, such as [eth_getTransactionByBlockNumberAndIndex](JSON-RPC-API-Methods.md#eth_gettransactionbyblocknumberandindex), have a block parameter.
 
 The block parameter can have the following values:
+
 * `blockNumber` : `quantity` - Block number. Can be specified in hexadecimal or decimal. 0 represents the genesis block.
 * `earliest` : `tag` - Earliest (genesis) block. 
 * `latest` : `tag` - Last block mined.
-* `pending` : `tag` - Last block mined plus pending transactions. Use only with [eth_getTransactionCount](JSON-RPC-API-Methods#eth_gettransactioncount).  
+* `pending` : `tag` - Last block mined plus pending transactions. Use only with [eth_getTransactionCount](JSON-RPC-API-Methods.md#eth_gettransactioncount).  
 
 ## Not Supported by Pantheon
 
@@ -81,11 +87,10 @@ The block parameter can have the following values:
 
 Account management relies on private key management in the client which is not implemented by Pantheon. 
 
-Use [`eth_sendRawTransaction`](JSON-RPC-API-Methods#eth_sendrawtransaction) to send signed transactions; `eth_sendTransaction` is not implemented. 
+Use [`eth_sendRawTransaction`](JSON-RPC-API-Methods.md#eth_sendrawtransaction) to send signed transactions; `eth_sendTransaction` is not implemented. 
 
-Use third-party wallets for [account management](Account-Management). 
+Use third-party wallets for [account management](../Using-Pantheon/Account-Management.md). 
 
 ### Protocols
 
-Pantheon does not implement the Whisper and Swarm protocols. 
-  
+Pantheon does not implement the Whisper and Swarm protocols.
