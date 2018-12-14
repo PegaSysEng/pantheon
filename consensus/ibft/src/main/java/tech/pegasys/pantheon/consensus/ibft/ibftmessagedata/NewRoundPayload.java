@@ -36,6 +36,7 @@ public class NewRoundPayload implements Payload {
     this.proposalPayload = proposalPayload;
   }
 
+  @Override
   public ConsensusRoundIdentifier getRoundIdentifier() {
     return roundChangeIdentifier;
   }
