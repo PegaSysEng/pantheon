@@ -1,4 +1,4 @@
-description: Pantheon command line interface reference
+description: Code review guidelines for Pantheon developers
 <!--- END of page meta data -->
 
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.
@@ -9,22 +9,19 @@ pantheon [OPTIONS] [COMMAND]
 
 Runs the Pantheon Ethereum full node client.
 
-
 ## Options
 
 ### banned-nodeids
 
-!!!abstract "Usage"
+```bash tab="Syntax"
+--banned-nodeids=<bannedNodeId>[,<bannedNodeId>...]...
+```
 
-    ```bash tab="Syntax"
-    --banned-nodeids=<bannedNodeId>[,<bannedNodeId>...]...
-    ```
-    
-    ```bash tab="Example"
-    --banned-nodeids=enode://c35c3...d615f@1.2.3.4:30303,enode://f42c13...fc456@1.2.3.5:30303
-    ```
+```bash tab="Example"
+--banned-nodeids=enode://c35c3...d615f@1.2.3.4:30303,enode://f42c13...fc456@1.2.3.5:30303
+```
 
-    List of node IDs with which this node will not peer. The node ID is the public key of the node. You can specify the banned node IDs with or without the `0x` prefix.
+List of node IDs with which this node will not peer. The node ID is the public key of the node. You can specify the banned node IDs with or without the `0x` prefix.
   
 !!!info
     This option is only available from v0.8.2 or when [building from source](Installation). 

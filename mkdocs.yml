@@ -35,7 +35,6 @@ edit_uri: ""
 theme:
     name: material
     custom_dir: docs/custom_theme
-    navigation_depth: 3
     highlightjs: true
     hljs_languages:
         - java
@@ -49,8 +48,6 @@ theme:
     favicon: favicon.ico
     logo:
       icon: account_balance
-#    feature:
-#      tabs: true
 nav:
     - Installation:
         - Installation overview: Installation/Overview.md
@@ -60,7 +57,7 @@ nav:
         - Getting started overview: Getting-Started/Getting-Started.md
         - Starting Pantheon: Getting-Started/Starting-Pantheon.md
         - Running Pantheon from Docker Image: Getting-Started/Run-Docker-Image.md
-        - Private Network Quickstart: Getting-Started/Private-Network-Quickstart.md
+        - Private Network Quickstart tutorial: Getting-Started/Private-Network-Quickstart.md
     - Configuring Pantheon:
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
@@ -96,6 +93,8 @@ markdown_extensions:
     - toc:
         separator: "_"
         permalink: true
+    - markdown_include.include:
+        base_path: docs
     - admonition
     - footnotes
     - def_list

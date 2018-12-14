@@ -1,3 +1,6 @@
+description: Run Pantheon using the official docker image
+<!--- END of page meta data -->
+
 # Run Pantheon from Docker Image
 
 A Docker image is provided to run a Pantheon node in a Docker container. 
