@@ -21,9 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Execution context for draining queued ibft events and applying them to a maintained state
- */
+/** Execution context for draining queued ibft events and applying them to a maintained state */
 public class IbftProcessor implements Runnable {
 
   private static final Logger LOG = LogManager.getLogger();
@@ -68,9 +66,7 @@ public class IbftProcessor implements Runnable {
     this.stateMachine = stateMachine;
   }
 
-  /**
-   * Indicate to the processor that it should gracefully stop at its next opportunity
-   */
+  /** Indicate to the processor that it should gracefully stop at its next opportunity */
   public void stop() {
     shutdown = true;
   }

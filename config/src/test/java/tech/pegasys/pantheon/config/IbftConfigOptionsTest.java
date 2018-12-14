@@ -25,7 +25,7 @@ public class IbftConfigOptionsTest {
 
   private static final int EXPECTED_DEFAULT_EPOCH_LENGTH = 30_000;
   private static final int EXPECTED_DEFAULT_BLOCK_PERIOD = 1;
-  private static final int EXPECTED_DEFAULT_REQUEST_TIMEOUT = 10_000;
+  private static final int EXPECTED_DEFAULT_REQUEST_TIMEOUT = 1;
 
   @Test
   public void shouldGetEpochLengthFromConfig() {
