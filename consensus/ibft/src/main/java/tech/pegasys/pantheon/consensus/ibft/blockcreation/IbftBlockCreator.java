@@ -19,15 +19,12 @@ import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 
 import java.util.function.Function;
 
@@ -66,8 +63,9 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
             .populateFrom(sealableBlockHeader)
             .mixHash(IbftHelpers.EXPECTED_MIX_HASH)
             .nonce(0L)
-            .blockHashFunction(blockHeader -> IbftBlockHashing
-                .calculateDataHashForCommittedSeal(blockHeader, extraData));
+            .blockHashFunction(
+                blockHeader ->
+                    IbftBlockHashing.calculateDataHashForCommittedSeal(blockHeader, extraData));
 
     return builder.buildBlockHeader();
   }
