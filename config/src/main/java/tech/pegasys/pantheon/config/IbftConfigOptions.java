@@ -36,7 +36,7 @@ public class IbftConfigOptions {
     return ibftConfigRoot.getInteger("blockperiodseconds", DEFAULT_BLOCK_PERIOD_SECONDS);
   }
 
-  public int getRequestTimeoutMillis() {
-    return ibftConfigRoot.getInteger("requesttimeout", DEFAULT_ROUND_EXPIRY_MILLISECONDS);
+  public int getRequestTimeoutSeconds() {
+    return ibftConfigRoot.getInteger("requesttimeoutseconds", DEFAULT_ROUND_EXPIRY_MILLISECONDS);
   }
 }
