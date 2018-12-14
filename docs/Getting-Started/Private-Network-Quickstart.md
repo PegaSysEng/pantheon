@@ -4,7 +4,7 @@ description: Pantheon private network quickstart tutorial
 This tutorial describes how to use Pantheon to run a private network of Pantheon nodes in a Docker container.
 
 !!! note
-    To run the Private Network Quickstart, you must install Pantheon by [cloning and building](/Installation/Build-From-Source).
+    To run the Private Network Quickstart, you must install Pantheon by [cloning and building](../Installation/Build-From-Source.md).
     
     If you have installed Pantheon from the [packaged binaries](Intallation/Install-Binaries) or are running the [Docker image](Run-Docker-Image), you can proceed with [Starting Pantheon](Starting-Pantheon).
 
@@ -24,7 +24,7 @@ To run this tutorial, you must have the following installed:
 
 ## Clone Pantheon Source Code
 
-As indicated in [the installation section](Installation#clone-the-pantheon-repository), clone the repository.
+As indicated in [the installation section](../Installation/Build-From-Source.md#clone-the-pantheon-repository), clone the repository.
 
 ## Build Docker Images and Start Services and Network
  

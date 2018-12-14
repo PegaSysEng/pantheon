@@ -1,4 +1,5 @@
-# Install Chocolatey
+description: Install Pantheon on Windows from Chocolatey package manager
+<!--- END of page meta data -->
 
 To install Chocolatey: 
 
@@ -6,13 +7,13 @@ To install Chocolatey:
 
 2. Run: 
 
-   ```bash
+   ```bat
    @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
    ``` 
    
 3. Display the Chocolatey help to confirm installation: 
 
-   ```bash
+   ```bat
    choco -?
    ```
    

@@ -12,7 +12,7 @@ Pantheon uses Log4J2 for logging. There are two methods to configure logging beh
 
 ## Basic Log Level Setting
 
-Use the [`--logging`](/Reference/Pantheon-CLI-Syntax/#logging) command line option to specify the logging verbosity. The `--logging` option changes the volume of events displayed in the log. 
+Use the [`--logging`](../Reference/Pantheon-CLI-Syntax.md#logging) command line option to specify the logging verbosity. The [`--logging`](../Reference/Pantheon-CLI-Syntax.md#logging) option changes the volume of events displayed in the log. 
 
 ## Advanced Custom Logging
 
@@ -44,6 +44,6 @@ If you have more specific requirements, you can create your own [log4j2 configur
 
 For Bash-based executions, you can set the variable for only the scope of the program execution by setting it before starting Pantheon.  For example, to set the debug logging and start Pantheon connected to the Rinkeby testnet:
 
-```bash tab="Bash"
-LOG4J_CONFIGURATION_FILE=./debug.xml bin/pantheon --rinkeby
+```bash
+$ LOG4J_CONFIGURATION_FILE=./debug.xml bin/pantheon --rinkeby
 ```

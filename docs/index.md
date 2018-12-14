@@ -13,7 +13,7 @@ Our roadmap includes Pantheon with privacy features, alternative consensus mecha
 
 ## What can you do with Pantheon?
 
-Pantheon includes a [command line interface](https://github.com/PegaSysEng/pantheon/wiki/Pantheon-CLI-Syntax) and [JSON-RPC API](https://github.com/PegaSysEng/pantheon/wiki/JSON-RPC-API) for running, maintaining, debugging, and monitoring node operations in an Ethereum network. You can use the API via RPC over HTTP or via WebSockets transport, and Pub/Sub is supported. The API supports typical Ethereum functionalities such as:
+Pantheon includes a [command line interface](Reference/Pantheon-CLI-Syntax.md) and [JSON-RPC API](Reference/JSON-RPC-API.md) for running, maintaining, debugging, and monitoring node operations in an Ethereum network. You can use the API via RPC over HTTP or via WebSockets transport, and Pub/Sub is supported. The API supports typical Ethereum functionalities such as:
 
 * Ether token mining
 * Smart contract development
@@ -23,4 +23,4 @@ Pantheon includes a [command line interface](https://github.com/PegaSysEng/panth
 
 The Pantheon client supports common smart contract and Dapp development, deployment, and operational use cases, using tools such as [Truffle](http://truffleframework.com/), [Remix](https://github.com/ethereum/remix), and [web3j](https://web3j.io/). The client supports common JSON-RPC API methods such as eth, net, web3, debug, and miner.
 
-Pantheon doesn't support [Account management](https://github.com/PegaSysEng/pantheon/wiki/Account-Management).
+Pantheon doesn't support [Account management](Using-Pantheon/Account-Management.md).

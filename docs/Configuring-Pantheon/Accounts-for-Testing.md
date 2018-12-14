@@ -5,7 +5,7 @@ You can use existing accounts for testing by including them in the genesis file 
  
 ## Development Mode
  
- When you start Pantheon with the [`--dev-mode` command line option](/Reference/Pantheon-CLI-Syntax/#dev-mode), the `dev.json` genesis file is used by default. 
+ When you start Pantheon with the [`--dev-mode`](/Reference/Pantheon-CLI-Syntax/#dev-mode) command line option, the `dev.json` genesis file is used by default. 
  
  The `dev.json` genesis file defines the accounts below that can be used for testing. 
 
@@ -15,4 +15,4 @@ You can use existing accounts for testing by including them in the genesis file 
  
 To use existing test accounts, specify the accounts and balances in a genesis file for your test network. For an example of defining accounts in the genesis file, refer to [`dev.json`](https://github.com/PegaSysEng/pantheon/blob/master/config/src/main/resources/dev.json).
  
-Use the [`--genesis` command line option](/Reference/Pantheon-CLI-Syntax/#genesis) to start Pantheon with the genesis file defining the existing accounts. 
+Use the [`--genesis`](/Reference/Pantheon-CLI-Syntax/#genesis) command line option to start Pantheon with the genesis file defining the existing accounts. 

@@ -1,17 +1,11 @@
 description: Pantheon JSON-RPC API objects reference
 <!--- END of page meta data -->
 
-The following objects are parameters for or returned by JSON-RPC Methods:
-* [Block](#block-object)
-* [Filter Options](#filter-options-object)
-* [Log](#log-object)
-* [Transaction](#transaction-object) 
-* [Transaction Call](#transaction-call-object) 
-* [Transaction Receipt](#transaction-receipt-object)
+The following objects are parameters for or returned by JSON-RPC Methods.
 
-#### Block Object
+## Block Object
 
-Returned by [eth_getBlockByHash](JSON-RPC-API-Methods#eth_getblockbyhash) and [eth_getBlockByNumber](JSON-RPC-API-Methods#eth_getblockbynumber).
+Returned by [eth_getBlockByHash](JSON-RPC-API-Methods.md#eth_getblockbyhash) and [eth_getBlockByNumber](JSON-RPC-API-Methods.md#eth_getblockbynumber).
 
 | Key   |   Type | Value  |  
 |-------|:-----------------:|------| 
@@ -35,26 +29,26 @@ Returned by [eth_getBlockByHash](JSON-RPC-API-Methods#eth_getblockbyhash) and [e
 | `transactions` | Array | Array of [transaction objects](#transaction-object), or 32 byte transaction hashes depending on the specified boolean parameter.|
 | `uncles` | Array | Array of uncle hashes.| 
 
-#### Filter Options Object
+## Filter Options Object
 
-Parameter for [eth_newFilter](JSON-RPC-API-Methods#eth_newfilter) and [eth_getLogs](JSON-RPC-API-Methods#eth_getlogs). 
+Parameter for [eth_newFilter](JSON-RPC-API-Methods.md#eth_newfilter) and [eth_getLogs](JSON-RPC-API-Methods.md#eth_getlogs). 
 
 | Key   |   Type            | Required/Optional | Value  |  
 |-------|:-----------------:|:-----------------:|------|
-| `fromBlock`| Quantity &#124;Tag | Optional | Integer block number or `latest`, `pending`, `earliest`. See [Block Parameter](Using-JSON-RPC-API#block-parameter). Default is `latest`.|
-| `toBlock` | Quantity &#124;Tag | Optional | Integer block number or `latest`, `pending`, `earliest`. See [Block Parameter](Using-JSON-RPC-API#block-parameter). Default is `latest`.|
+| `fromBlock`| Quantity &#124;Tag | Optional | Integer block number or `latest`, `pending`, `earliest`. See [Block Parameter](Using-JSON-RPC-API.md#block-parameter). Default is `latest`.|
+| `toBlock` | Quantity &#124;Tag | Optional | Integer block number or `latest`, `pending`, `earliest`. See [Block Parameter](Using-JSON-RPC-API.md#block-parameter). Default is `latest`.|
 | `address`| Data &#124; Array | Optional | Contract address or array of addresses from which logs originate.|
 | `topics` | Array of Data, 32 bytes each | Optional| Array of 32-byte topics. Topics are order-dependent. Each topic can also be an array of DATA with "or" options. |
 
-[eth_getLogs](JSON-RPC-API-Methods#eth_getlogs) has an additional key. 
+[eth_getLogs](JSON-RPC-API-Methods.md#eth_getlogs) has an additional key. 
 
 | Key   |   Type            | Required/Optional | Value  |  
 |------------|:-----------------:|:-----------------:|------|
 | `blockhash`|Data, 32 bytes | Optional | Hash of block for which to return logs. If `blockhash` is specified, `fromBlock` and `toBlock` cannot be specified. | 
 
-#### Log Object 
+## Log Object 
 
-Returned by [eth_getFilterChanges](JSON-RPC-API-Methods#eth_getfilterchanges) and [transaction receipt objects](Objects#transaction-receipt-object) can contain an array of log objects.  
+Returned by [eth_getFilterChanges](JSON-RPC-API-Methods.md#eth_getfilterchanges) and [transaction receipt objects](#transaction-receipt-object) can contain an array of log objects.  
 
 | Key   |   Type            |  Value  |  
 |------------|:-----------------:|------|
@@ -68,9 +62,9 @@ Returned by [eth_getFilterChanges](JSON-RPC-API-Methods#eth_getfilterchanges) an
 | `data` | Data | Non-indexed arguments of log. | 
 | `topics` |  Array of Data, 32 bytes each | 0 to 4 indexed log arguments. In Solidity, the first topic is the hash of the signature of the event (for example, `Deposit(address, bytes32, unit256)`) except you declare the event with an anonymous specifier.) 
 
-### Trace Object
+## Trace Object
 
-Returned by [debug_traceTransaction](JSON-RPC-API-Methods#debug_traceTransaction).
+Returned by [debug_traceTransaction](JSON-RPC-API-Methods.md#debug_traceTransaction).
 
 | Key   |   Type            |  Value  |  
 |------------|:-----------------:|------|
@@ -79,7 +73,7 @@ Returned by [debug_traceTransaction](JSON-RPC-API-Methods#debug_traceTransaction
 | `returnValue` | String | Bytes returned from transaction execution (without a `0x` prefix)|
 | `structLogs` | Array | Array of structured log objects |
 
-#### Structured Log Object
+### Structured Log Object
 
 Part of the [Trace object](#trace-object). 
 
@@ -95,9 +89,9 @@ Part of the [Trace object](#trace-object).
 | `memory` | Array of 32 byte arrays | Memory space of the contract before executing current operation | 
 | `storage` | Object | Storage entries changed by the current transaction |
 
-### Transaction Object
+## Transaction Object
 
-Returned by [eth_getTransactionByHash](JSON-RPC-API-Methods#eth_gettransactionbyhash), [eth_getTransactionByBlockHashAndIndex](JSON-RPC-API-Methods#eth_gettransactionbyblockhashandindex), and [eth_getTransactionsByBlockNumberAndIndex](JSON-RPC-API-Methods#eth_gettransactionbyblocknumberandindex).
+Returned by [eth_getTransactionByHash](JSON-RPC-API-Methods.md#eth_gettransactionbyhash), [eth_getTransactionByBlockHashAndIndex](JSON-RPC-API-Methods.md#eth_gettransactionbyblockhashandindex), and [eth_getTransactionsByBlockNumberAndIndex](JSON-RPC-API-Methods.md#eth_gettransactionbyblocknumberandindex).
 
 | Key   |   Type            |  Value  |  
 |------------|:-----------------:|------|
@@ -116,11 +110,12 @@ Returned by [eth_getTransactionByHash](JSON-RPC-API-Methods#eth_gettransactionby
 | `r` | Data, 32 bytes | ECDSA signature r|
 | `s` | Data, 32 bytes | ECDSA signature s|
 
-### Transaction Call Object
+## Transaction Call Object
 
-Parameter for [eth_call](JSON-RPC-API-Methods#eth_call) and [eth_estimateGas](JSON-RPC-API-Methods#eth_estimategas).
+Parameter for [eth_call](JSON-RPC-API-Methods.md#eth_call) and [eth_estimateGas](JSON-RPC-API-Methods.md#eth_estimategas).
 
-**Note:** All parameters are optional for [eth_estimateGas](JSON-RPC-API-Methods#eth_estimategas)
+!!!note
+    All parameters are optional for [eth_estimateGas](JSON-RPC-API-Methods.md#eth_estimategas)
 
 | Key   | Type | Required/Optional | Value |  
 |-------|:------:|:------:| ------------------|
@@ -131,9 +126,9 @@ Parameter for [eth_call](JSON-RPC-API-Methods#eth_call) and [eth_estimateGas](JS
 | `value`| Quantity, Integer | Optional |  Value sent with this transaction.| 
 | `data`|Data | Optional |  Hash of the method signature and encoded parameters. For details see Ethereum Contract ABI.|
 
-### Transaction Receipt Object 
+## Transaction Receipt Object 
 
-Returned by [eth_getTransactionReceipt](JSON-RPC-API-Methods#eth_gettransactionreceipt).
+Returned by [eth_getTransactionReceipt](JSON-RPC-API-Methods.md#eth_gettransactionreceipt).
 
 | Key   |   Type            |  Value  |  
 |------------|:-----------------:|------|
@@ -150,7 +145,8 @@ Returned by [eth_getTransactionReceipt](JSON-RPC-API-Methods#eth_gettransactionr
 | `transactionHash`| Data, 32 bytes | Hash of the transaction.
 | `transactionIndex`| Quantity, Integer | Index position of transaction in the block.
 
-**Note:** For pre-Byzantium transactions, the transaction receipt object includes the following instead of `status`:
+!!!note
+    For pre-Byzantium transactions, the transaction receipt object includes the following instead of `status`:
 
 | Key   |   Type            |  Value  |  
 |------------|:-----------------:|------|

@@ -9,7 +9,7 @@ Bootnodes are used to initially discover peers.
 
 ### Mainnet and Public Testnets
 
-For mainnet and Rinkeby, Pantheon predefines a list of enonde URLs. For Ropsten, bootnodes are specified using the [`--bootnodes`](/Reference/Pantheon-CLI-Syntax/#bootnodes) option. 
+For mainnet and Rinkeby, Pantheon predefines a list of enonde URLs. For Ropsten, bootnodes are specified using the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option. 
 
 ### Private Networks
 
@@ -25,7 +25,7 @@ To start a bootnode for a private network:
     
 2. Start the bootnode, specifying:
 
-    * An empty string for the [`--bootnodes`](/Reference/Pantheon-CLI-Syntax/#bootnodes) option because this is the bootnode. 
+    * An empty string for the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option because this is the bootnode. 
     * The network ID for your private network.
     
     !!! example

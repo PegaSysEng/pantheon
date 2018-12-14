@@ -91,7 +91,6 @@ nav:
 
 markdown_extensions:
     - toc:
-        separator: "_"
         permalink: true
     - markdown_include.include:
         base_path: docs

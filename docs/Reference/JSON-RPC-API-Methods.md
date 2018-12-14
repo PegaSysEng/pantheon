@@ -2,7 +2,7 @@ description: Pantheon JSON-RPC API methods reference
 <!--- END of page meta data -->
 
 !!! danger "Breaking Change in v0.8.3"
-    From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Using-JSON-RPC-API#breaking-change-in-v083) option. 
+    From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Using-JSON-RPC-API.md#breaking-change-in-v083) option. 
 
 The following lists the Pantheon JSON-RPC API commands:
 
@@ -284,9 +284,10 @@ None
 
 ### eth_chainId
 
-Returns the [chain ID](NetworkID-And-ChainID).
+Returns the [chain ID](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 
-> **Note** This method is only available from v0.8.2 or when you [build from source](Installation). 
+!!!note
+    This method is only available from v0.8.2 or when you [build from source](../Installation/Build-From-Source.md). 
 
 *Parameters*
 
@@ -418,7 +419,8 @@ None
 
 Returns a list of account addresses that the client owns.
 
-**NOTE:** This method returns an empty object because Pantheon [does not support account management](Using-JSON-RPC-API#account-management-not-supported-by-pantheon).
+!!!note
+    This method returns an empty object because Pantheon [does not support account management](Using-JSON-RPC-API.md#account-management-not-supported-by-pantheon).
 
 *Parameters*
 
@@ -487,7 +489,7 @@ Returns the account balance of the specified address.
 
 `DATA` - 20-byte account address from which to retrieve the balance.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 *Returns*
 
@@ -522,7 +524,7 @@ Returns the value of a storage position at a specified address.
 
 `QUANTITY` - Integer index of the storage position.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Objects#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](JSON-RPC-API-Objects.md#block-parameter).
 
 *Returns*
 
@@ -557,7 +559,7 @@ Returns the number of transactions sent from a specified address.
 
 `DATA` - 20-byte account address.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 *Returns*
 
@@ -619,7 +621,7 @@ Returns the number of transactions in a block matching the specified block numbe
 
 *Parameters*
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 *Returns*
 
@@ -681,7 +683,7 @@ Returns the number of uncles in a block matching the specified block number.
 
 *Parameters*
 
-`QUANTITY|TAG` - Integer representing either the 0-based index of the block within the blockchain, or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+`QUANTITY|TAG` - Integer representing either the 0-based index of the block within the blockchain, or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 *Returns*
 
@@ -714,7 +716,7 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 `DATA` - 20-byte contract address.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 *Returns*
 
@@ -743,11 +745,12 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 Sends a signed transaction. A transaction can send ether, deploy a contract, or interact with a contract.  
 
-You can interact with contracts using [eth_sendRawTransaction or eth_call](Transactions#eth_call-or-eth_sendrawtransaction).
+You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
-To avoid exposing your private key, create signed transactions offline and send the signed transaction data using this method. For information on creating signed transactions and using `eth_sendRawTransaction`, refer to [Using Pantheon](Transactions).  
+To avoid exposing your private key, create signed transactions offline and send the signed transaction data using this method. For information on creating signed transactions and using `eth_sendRawTransaction`, refer to [Using Pantheon](../Using-Pantheon/Transactions.md).  
 
-**Note: Pantheon does not implement [eth_sendTransaction](Using-JSON-RPC-API#account-management-not-supported-by-pantheon).**  
+!!!important
+    Pantheon does not implement [eth_sendTransaction](Using-JSON-RPC-API.md#account-management-not-supported-by-pantheon).
 
 *Parameters*
 
@@ -783,13 +786,13 @@ To avoid exposing your private key, create signed transactions offline and send 
 
 Invokes a contract function locally and does not change the state of the blockchain. 
 
-You can interact with contracts using [eth_sendRawTransaction or eth_call](Transactions#eth_call-or-eth_sendrawtransaction).
+You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
 *Parameters*
 
-*OBJECT* - [Transaction call object](Objects#transaction-call-object).
+*OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
-*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Objects#block-parameter).
+*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](JSON-RPC-API-Objects.md#block-parameter).
 
 *Returns*
 
@@ -823,9 +826,9 @@ Generates and returns an estimate of how much gas is necessary to allow the tran
 !!!note
     Parameters are the same as the eth_call parameters, except that all properties are optional. If you do not specify a `gas` limit, Pantheon uses the gas limit from the pending block as an upper bound. As a result, the returned estimate might not be enough to execute the call or transaction when the amount of gas is higher than the pending block's gas limit.
 
-*OBJECT* - [Transaction call object](Objects#transaction-call-object).
+*OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
-*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 *Returns*
 
@@ -858,11 +861,11 @@ Returns information about the block by hash.
 
 `DATA` - 32-byte hash of a block.
 
-`Boolean` - If `true`, returns the full [transaction objects](Objects#transaction-object); if `false`, returns the transaction hashes.
+`Boolean` - If `true`, returns the full [transaction objects](JSON-RPC-API-Objects.md#transaction-object); if `false`, returns the transaction hashes.
 
 *Returns*
 
-`result` : *OBJECT* - [Block object](Objects#block-object) , or `null` when no block is found. 
+`result` : *OBJECT* - [Block object](JSON-RPC-API-Objects.md#block-object) , or `null` when no block is found. 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -909,13 +912,13 @@ Returns information about a block by block number.
 
 *Parameters*
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
-`Boolean` - If `true`, returns the full [transaction objects](Objects#transaction-object); if `false`, returns only the hashes of the transactions.
+`Boolean` - If `true`, returns the full [transaction objects](JSON-RPC-API-Objects.md#transaction-object); if `false`, returns only the hashes of the transactions.
 
 *Returns*
 
-`result` : *OBJECT* - [Block object](Objects#block-object) , or `null` when no block is found. 
+`result` : *OBJECT* - [Block object](JSON-RPC-API-Objects.md#block-object) , or `null` when no block is found. 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -966,7 +969,7 @@ Returns transaction information for the specified transaction hash.
 
 *Returns*
 
-Object - [Transaction object](Objects#transaction-object), or `null` when no transaction is found.
+Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `null` when no transaction is found.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -1014,7 +1017,7 @@ Returns transaction information for the specified block hash and transaction ind
 
 *Returns*
 
-Object - [Transaction object](Objects#transaction-object), or `null` when no transaction is found.
+Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `null` when no transaction is found.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -1056,13 +1059,13 @@ Returns transaction information for the specified block number and transaction i
 
 *Parameters*
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 `QUANTITY` - The transaction index position.
 
 *Returns*
 
-Object - [Transaction object](Objects#transaction-object), or `null` when no transaction is found.
+Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `null` when no transaction is found.
 
 !!!note
     Your node must be synchronized to at least the block containing the transaction for the request to return it.
@@ -1113,7 +1116,7 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 *Returns*
 
-`Object` - [Transaction receipt object](Objects#transaction-receipt-object), or `null` when no receipt is found.
+`Object` - [Transaction receipt object](JSON-RPC-API-Objects.md#transaction-receipt-object), or `null` when no receipt is found.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -1153,7 +1156,7 @@ Creates a topic filter with the specified options to notify (log) when the state
 
 *Parameters*
 
-`Object` - [Filter options object](Objects#filter-options-object). 
+`Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object). 
 
 !!!note
     Topics are order-dependent. A transaction with a log containing topics `[A, B]` would be matched with the following topic filters:
@@ -1333,10 +1336,8 @@ Polls the specified filter and returns an array of logs that have occurred since
 `result` : `Array of Object` - List of logs, or an empty array if nothing has changed since the last poll.
 
 * For filters created with `eth_newBlockFilter`, returns 32-byte *DATA* block hashes; for example `["0x3454645634534..."]`.
-
 * For filters created with `eth_newPendingTransactionFilter`, returns transaction hashes (32-byte *DATA*); for example `["0x6345343454645..."]`.
-
-* For filters created with `eth_newFilter`, returns [log objects](Objects#log-object). 
+* For filters created with `eth_newFilter`, returns [log objects](JSON-RPC-API-Objects.md#log-object). 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -1406,7 +1407,7 @@ Returns an array of all logs matching a specified filter object.
 
 *Parameters*
 
-`Object` - [Filter options object](Objects#filter-options-object)
+`Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object)
 
 *Returns*
 
@@ -1525,7 +1526,7 @@ Lists signers for the specified block.
 
 *Parameters* 
 
-`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API#block-parameter). 
+`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter). 
 
 *Returns*
 
@@ -1802,7 +1803,7 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 *Returns*
 
-`result`:`object` - [Trace object](Objects#trace-object). 
+`result`:`object` - [Trace object](JSON-RPC-API-Objects.md#trace-object). 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -1841,7 +1842,7 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 ### miner_start
 
-Starts the CPU mining process. To start mining, a miner coinbase must have been previously specified using the [`--miner-coinbase`](Pantheon-CLI-Syntax) command line option.  
+Starts the CPU mining process. To start mining, a miner coinbase must have been previously specified using the [`--miner-coinbase`](../Reference/Pantheon-CLI-Syntax.md#miner-coinbase) command line option.  
 
 *Parameters*
 
@@ -1903,4 +1904,4 @@ None
 
 ## ibft Methods
 
-IBFT is not currently supported. Support for IBFT is in active development. 
+:construction: IBFT is not currently supported. Support for IBFT is in active development. 

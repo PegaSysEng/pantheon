@@ -21,17 +21,19 @@ docker run pegasyseng/pantheon:latest
 
 ## Command Line Options 
  
-You cannot use the following Pantheon command line options when running Pantheon from the Docker image: 
-* `--datadir`, see [Persisting Data](#persisting-data)
-* `--config`, see [Custom Configuration File](#custom-configuration-file)
-* `--genesis`, see [Custom Genesis File](#custom-genesis-file).
-* `--rpc-listen`, `--p2plisten`, `--ws-listen`, see [Exposing Ports](#exposing-ports)
-
-All other [Pantheon command line options](https://github.com/PegaSysEng/pantheon/wiki/Pantheon-CLI-Syntax) work in the same way as when Pantheon is installed locally.
+!!!attention
+    You cannot use the following Pantheon command line options when running Pantheon from the Docker image:
+    
+    * [`--datadir`](../Reference/Pantheon-CLI-Syntax.md#datadir), see [Persisting Data](#persisting-data)
+    * [`--config`](../Reference/Pantheon-CLI-Syntax.md#config), see [Custom Configuration File](#custom-configuration-file)
+    * [`--genesis`](../Reference/Pantheon-CLI-Syntax.md#genesis), see [Custom Genesis File](#custom-genesis-file).
+    * [`--rpc-listen`](../Reference/Pantheon-CLI-Syntax.md#rpc-listen), [`--p2plisten`](../Reference/Pantheon-CLI-Syntax.md#p2plisten), [`--ws-listen`](../Reference/Pantheon-CLI-Syntax.md#ws-listen), see [Exposing Ports](#exposing-ports)
+    
+    All other [Pantheon command line options](/Reference/Pantheon-CLI-Syntax) work in the same way as when Pantheon is installed locally.
 
 ### Persisting Data 
 
-Specify a Docker volume to persist data between stopping and restarting the container. This is the equivalent of specifying the `-datadir` option. 
+Specify a Docker volume to persist data between stopping and restarting the container. This is the equivalent of specifying the [`--datadir`](../Reference/Pantheon-CLI-Syntax.md#datadir) option. 
 
 If a Docker volume is not specified, all data saved to the data directory is removed each time the container is stopped. 
 
@@ -46,7 +48,7 @@ Where `<pantheonDataDir>` is the volume to which the data is saved.
 
 ### Custom Configuration File 
 
-Specify a custom configuration file to provide a file containing key/value pairs for command line options. This is the equivalent of specifying the `--config` option. 
+Specify a custom configuration file to provide a file containing key/value pairs for command line options. This is the equivalent of specifying the [`--config`](../Reference/Pantheon-CLI-Syntax.md#config) option. 
 
 To run Pantheon specifying a custom configuration file: 
 ```bash
@@ -54,10 +56,11 @@ docker run --mount type=bind,source=/<path/myconf.toml>,target=/etc/pantheon/pan
 
 ```
 
-Where `myconf.toml` is your custom configuration file and `path` is the absolute path to the file. For example:
-```bash
-docker run --mount type=bind,source=/Users/username/pantheon/myconf.toml,target=/etc/pantheon/pantheon.conf pegasyseng/pantheon:latest
-```
+Where `myconf.toml` is your custom configuration file and `path` is the absolute path to the file.
+!!!example
+    ```bash
+    docker run --mount type=bind,source=/Users/username/pantheon/myconf.toml,target=/etc/pantheon/pantheon.conf pegasyseng/pantheon:latest
+    ```
 
 ### Custom Genesis File 
 
@@ -68,24 +71,27 @@ To run Pantheon specifying a custom genesis file:
 docker run --mount type=bind,source=</path/mygenesis.json>,target=/etc/pantheon/genesis.json pegasyseng/pantheon:latest
 ```
 
-Where `mygenesis.json` is your custom configuration file and `path` is the absolute path to the file. For example:
-```bash
-docker run --mount type=bind,source=/Users/username/pantheon/mygenesis.json,target=/etc/pantheon/genesis.json pegasyseng/pantheon:latest
-```
+Where `mygenesis.json` is your custom configuration file and `path` is the absolute path to the file.
+
+!!!example
+    ```bash
+    docker run --mount type=bind,source=/Users/username/pantheon/mygenesis.json,target=/etc/pantheon/genesis.json pegasyseng/pantheon:latest
+    ```
 
 ### Exposing Ports
 
-Expose ports for P2P peer discovery, JSON-RPC service, and WebSockets. This is required to use the defaults ports or specify different ports (the equivalent of specifying the `--rpc-listen`, `--p2p-listen`, `--ws-listen` options).
+Expose ports for P2P peer discovery, JSON-RPC service, and WebSockets. This is required to use the defaults ports or specify different ports (the equivalent of specifying the [`--rpc-listen`](../Reference/Pantheon-CLI-Syntax.md#rpc-listen), [`--p2p-listen`](../Reference/Pantheon-CLI-Syntax.md#p2p-listen), [`--ws-listen`](../Reference/Pantheon-CLI-Syntax.md#ws-listen) options).
 
 To run Pantheon exposing local ports for access: 
 ```bash
 docker run -p <localportJSON-RPC>:8545 -p <localportWS>:8546 -p <localportP2P>:30303 pegasyseng/pantheon:latest --rpc-enabled --ws-enabled
 ```
 
-For example, to enable RPC calls to http://127.0.0.1:8545 and P2P discovery on http://127.0.0.1:13001:
-```bash
-docker run -p 8545:8545 -p 13001:30303 pegasyseng/pantheon:latest --rpc-enabled
-```
+!!!example
+    To enable RPC calls to http://127.0.0.1:8545 and P2P discovery on http://127.0.0.1:13001:
+    ```bash
+    docker run -p 8545:8545 -p 13001:30303 pegasyseng/pantheon:latest --rpc-enabled
+    ```
  
 ## Starting Pantheon 
 

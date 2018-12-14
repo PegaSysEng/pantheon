@@ -1,108 +1,113 @@
-# Building Pantheon from Source
+description: Building Pantheon from source code
+<!--- END of page meta data -->
 
 ## Prerequisites
 
 * [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
-  > **IMPORTANT:** Pantheon requires Java 8+ to compile; earlier versions are not supported.
+!!!important
+    Pantheon requires Java 8+ to compile; earlier versions are not supported.
 
 * [Git](https://git-scm.com/downloads) or [GitHub Desktop](https://desktop.github.com/)
 
 ## Running Locally
 
-* [Installation on Linux / Unix / Mac OS X](#installation-on-linux--unix--mac-os-x)
+* [Installation on Linux / Unix / Mac OS X](#installation-on-linux-unix-mac-os-x)
 * [Installation on Windows](#installation-on-windows)
 
-## Running Virtually
+## Running On Virtual Machine
 
 * [Installation on VM](#installation-on-vm)
 
 
 ## Installation on Linux / Unix / Mac OS X
 
-#### Clone the Pantheon Repository
+###Clone the Pantheon Repository
 
 Clone the **PegaSysEng/pantheon** repo to your home directory (`/home/<user>`):
 
-```
-git clone --recursive https://github.com/PegaSysEng/pantheon.git
+```bash
+$ git clone --recursive https://github.com/PegaSysEng/pantheon.git
 ```
 
-#### Build Pantheon
+### Build Pantheon
 
 After cloning, go to the `pantheon` directory.
 
 Build Pantheon with the Gradle wrapper `gradlew`, omitting tests as follows:
 
-```
-./gradlew build -x test
+```bash
+$ ./gradlew build -x test
 ```
 
 Go to the distribution directory: 
 ```bash
-cd build/distributions/
+$ cd build/distributions/
 ```
 
 Expand the distribution archive: 
 ```bash
-tar -xzf pantheon-<version>.tar.gz
+$ tar -xzf pantheon-<version>.tar.gz
 ```
 
 Move to the expanded folder and display the Pantheon help to confirm installation. 
 ````bash
-cd pantheon-<version>/
-bin/pantheon --help
+$ cd pantheon-<version>/
+$ bin/pantheon --help
 ````
 
-Continue with the [Private Network Quickstart](Private-Network-Quickstart) or [Starting Pantheon](Starting-Pantheon).
+Continue with the [Private Network Quickstart](../Getting-Started/Private-Network-Quickstart.md) or [Starting Pantheon](../Getting-Started/Starting-Pantheon.md).
 
 
 ## Installation on Windows
 
-> **Note**  Pantheon is currently supported only on 64-bit versions of Windows, and requires a 64-bit version of JDK/JRE. We recommend that you also remove any 32-bit JDK/JRE installations.
+!!!note
+    Pantheon is currently supported only on 64-bit versions of Windows, and requires a 64-bit version of JDK/JRE. 
+    We recommend that you also remove any 32-bit JDK/JRE installations.
 
-#### Install Pantheon
+### Install Pantheon
 
 In Git bash, go to your working directory for repositories. Clone the `PegaSysEng/pantheon` repo into this directory:
 
-```bash
+```bat
 git clone --recursive https://github.com/PegaSysEng/pantheon
 ```
 
-#### Build Pantheon
+### Build Pantheon
 
 Go to the `pantheon` directory:
 
-```bash
+```bat
 cd pantheon
 ```
 
 Open a Windows command prompt. Build Pantheon with the Gradle wrapper `gradlew`, omitting tests as follows:
 
-```bash
+```bat
 gradlew build -x test
 ```
 
-> **Note** To run `gradlew`, you must have the **JAVA_HOME** system variable set to the Java installation directory.
-For example: `JAVA_HOME = C:\Program Files\Java\jdk1.8.0_181`.
+!!!note
+    To run `gradlew`, you must have the **JAVA_HOME** system variable set to the Java installation directory.
+    For example: `JAVA_HOME = C:\Program Files\Java\jdk1.8.0_181`.
 
 Go to the distribution directory: 
-```bash
+```bat
 cd build\distributions
 ```
 
 Expand the distribution archive: 
-```bash
+```bat
 tar -xzf pantheon-<version>.tar.gz
 ```
 
 Move to the expanded folder and display the Pantheon help to confirm installation. 
-````bash
+```bat
 cd pantheon-<version>
 bin\pantheon --help
-````
+```
 
-Continue with the [Private Network Quickstart](Private-Network-Quickstart) or [Starting Pantheon](Starting-Pantheon).
+Continue with the [Private Network Quickstart](../Getting-Started/Private-Network-Quickstart.md) or [Starting Pantheon](../Getting-Started/Starting-Pantheon.md).
 
 
 ## Installation on VM
