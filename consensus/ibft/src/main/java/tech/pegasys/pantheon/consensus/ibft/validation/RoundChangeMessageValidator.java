@@ -29,13 +29,13 @@ public class RoundChangeMessageValidator {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private final MessageValidatorFactory messageValidatorFactory;
+  private final HeightSpecificMessageValidatorFactory messageValidatorFactory;
   private final Collection<Address> validators;
   private final long minimumPrepareMessages;
   private final long chainHeight;
 
   public RoundChangeMessageValidator(
-      final MessageValidatorFactory messageValidatorFactory,
+      final HeightSpecificMessageValidatorFactory messageValidatorFactory,
       final Collection<Address> validators,
       final long minimumPrepareMessages,
       final long chainHeight) {
@@ -129,8 +129,7 @@ public class RoundChangeMessageValidator {
   }
 
   @FunctionalInterface
-  public interface MessageValidatorFactory {
-
+  public interface HeightSpecificMessageValidatorFactory {
     MessageValidator createAt(final ConsensusRoundIdentifier roundIdentifier);
   }
 }
