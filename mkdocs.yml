@@ -34,8 +34,8 @@ repo_url: https://github.com/PegaSysEng/pantheon
 edit_uri: ""
 
 theme:
-    name: material
-    custom_dir: docs/custom_theme
+    name: mkdocs
+#    custom_dir: docs/custom_theme
     highlightjs: true
     hljs_languages:
         - java
