@@ -1,6 +1,8 @@
 description: Install Pantheon on Windows from Chocolatey package manager
 <!--- END of page meta data -->
 
+# Install Chocolatey
+
 To install Chocolatey: 
 
 1. Open **cmd.exe** as the administrative user by right-clicking on **cmd.exe** in the Start menu and selecting **Run as administrator**. 

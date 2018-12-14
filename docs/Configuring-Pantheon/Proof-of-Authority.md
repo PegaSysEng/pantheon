@@ -3,6 +3,8 @@ path: blob/master/ethereum/core/src/main/resources/
 source: rinkeby.json
 <!--- END of page meta data -->
 
+# Proof of Authority
+
 Pantheon implements the Clique Proof-of-Authority (PoA) consensus protocol. Clique is used by the Rinkeby testnet and can be used for private networks. 
 
 In PoA networks, transactions and blocks are validated by approved accounts, known as signers. Signers take turns to create the next block. Existing signers propose and vote to add or remove signers. 

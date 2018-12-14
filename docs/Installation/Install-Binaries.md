@@ -1,6 +1,8 @@
 description: Install Pantheon from binary distribution
 <!--- END of page meta data -->
 
+# Install Binary Distribution
+
 ## Mac OS with Homebrew
 
 ### Prerequisites

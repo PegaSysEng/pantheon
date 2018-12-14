@@ -1,6 +1,8 @@
 description: Ethereum accounts used for testing only on private network
 <!--- END of page meta data -->
 
+# Accounts for Testing
+
 You can use existing accounts for testing by including them in the genesis file for a private network. Alternatively, Pantheon provides predefined accounts in development mode. 
  
 ## Development Mode

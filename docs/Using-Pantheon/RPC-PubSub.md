@@ -1,6 +1,8 @@
 description: Using RPC Pub/Sub with Pantheon Web Socket API
 <!--- END of page meta data -->
 
+# RPC Pub/Sub
+
 ## Introduction 
 
 Use the RPC Pub/Sub methods over [WebSockets](../Reference/Using-JSON-RPC-API.md#endpoint-address-and-port) 

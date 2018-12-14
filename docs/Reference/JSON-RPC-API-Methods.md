@@ -1,6 +1,8 @@
 description: Pantheon JSON-RPC API methods reference
 <!--- END of page meta data -->
 
+# JSON-RPC API Methods
+
 !!! danger "Breaking Change in v0.8.3"
     From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Using-JSON-RPC-API.md#breaking-change-in-v083) option. 
 
@@ -320,11 +322,13 @@ None
 
 Returns the client coinbase address. The coinbase address is the account to which mining rewards are paid. 
 
-To set a coinbase address, start Pantheon with the `--miner-coinbase` option set to a valid Ethereum account address. You can get the Ethereum account address from a client such as MetaMask or Etherscan. For example:
+To set a coinbase address, start Pantheon with the `--miner-coinbase` option set to a valid Ethereum account address.
+You can get the Ethereum account address from a client such as MetaMask or Etherscan. For example:
 
-```bash
-bin/pantheon --miner-coinbase="0xDD37f65dB31c107F773E82a4F85C693058fEf7a9" --rpc-enabled
-```
+!!!example
+    ```bash
+    $ bin/pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-enabled
+    ```
 
 *Parameters*
 
@@ -349,7 +353,7 @@ None
     {
       "jsonrpc" : "2.0",
       "id" : 53,
-      "result" : "0xdd37f65db31c107f773e82a4f85c693058fef7a9"
+      "result" : "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
     }
     ```
 

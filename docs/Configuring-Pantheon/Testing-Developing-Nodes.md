@@ -3,6 +3,8 @@ path: blob/master/ethereum/core/src/main/resources/
 source: rinkeby.json
 <!--- END of page meta data -->
 
+# Testing and Developing Nodes
+
 ## Bootnodes
 
 Bootnodes are used to initially discover peers. 

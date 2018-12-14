@@ -3,6 +3,8 @@ path: blob/master/pantheon/src/main/resources/
 source: log4j2.xml
 <!--- END of page meta data -->
 
+# Logging
+
 Pantheon uses Log4J2 for logging. There are two methods to configure logging behavior: 
 * Basic - changes the log level. 
 * Advanced - configures the output and format of the logs. 

@@ -1,6 +1,8 @@
 description: How to use Pantheon JSON-RPC API
 <!--- END of page meta data -->
 
+# Using the JSON-RPC API
+
 !!!attention "Breaking Change in v0.8.3"
 
     From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Pantheon-CLI-Syntax.md#host-whitelist) option.

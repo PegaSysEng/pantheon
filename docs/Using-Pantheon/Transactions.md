@@ -1,6 +1,8 @@
 description: Some use cases of creating transactions on a Pantheon network
 <!--- END of page meta data -->
 
+# Creating and Sending Transactions
+
 You can send signed transactions using the [`eth_sendRawTransaction`](../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction) JSON-RPC API method.
 
 These examples describe how to create a signed raw transaction that can be passed to [`eth_sendRawTransaction`](../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction).

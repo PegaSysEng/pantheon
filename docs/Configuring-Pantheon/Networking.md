@@ -1,6 +1,8 @@
 description: Pantheon networking is about P2P discovery and communication between peers and access to the JSON RPC APIs
 <!--- END of page meta data -->
 
+# Networking
+
 Pantheon uses the network to find and connect to peers. 
 
 ## Firewalls and Incoming Connections

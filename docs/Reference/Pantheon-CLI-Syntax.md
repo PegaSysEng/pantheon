@@ -1,6 +1,8 @@
 description: Pantheon commande line interface reference
 <!--- END of page meta data -->
 
+# Pantheon Command Line
+
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.
 
 ```bash
@@ -514,11 +516,11 @@ Pantheon subcommands are:
 ### import
 
 ```bash tab="Syntax"
-pantheon import <block-file>
+$ pantheon import <block-file>
 ```
 
 ```bash tab="Example"
-pantheon import /home/me/me_project/mainnet.blocks
+$ pantheon import /home/me/me_project/mainnet.blocks
 ```
 
 Imports blocks from the specified file into the blockchain database
@@ -526,11 +528,11 @@ Imports blocks from the specified file into the blockchain database
 ### export-pub-key
 
 ```bash tab="Syntax"
-pantheon export-pub-key <key-file>
+$ pantheon export-pub-key <key-file>
 ```
 
 ```bash tab="Example"
-pantheon export-pub-key /home/me/me_project/not_precious_pub_key
+$ pantheon export-pub-key /home/me/me_project/not_precious_pub_key
 ```
 
 Exports node public key to the specified file. 

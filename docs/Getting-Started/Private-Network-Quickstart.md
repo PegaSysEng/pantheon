@@ -1,6 +1,8 @@
 description: Pantheon private network quickstart tutorial
 <!--- END of page meta data -->
 
+# Private Network Quickstart tutorial
+
 This tutorial describes how to use Pantheon to run a private network of Pantheon nodes in a Docker container.
 
 !!! note

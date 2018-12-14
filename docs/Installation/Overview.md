@@ -2,6 +2,8 @@ title: Installation overview
 description: Overview and requirements to install Pantheon
 <!--- END of page meta data -->
 
+# Installation Overview
+
 You can install Pantheon by:
 
 * [Installing the binary distribution](Install-Binaries.md) 

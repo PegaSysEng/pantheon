@@ -1,6 +1,8 @@
 description: Building Pantheon from source code
 <!--- END of page meta data -->
 
+# Build from Source
+
 ## Prerequisites
 
 * [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)

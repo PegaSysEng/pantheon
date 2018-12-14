@@ -1,7 +1,7 @@
 description: Run Pantheon using the official docker image
 <!--- END of page meta data -->
 
-# Run Pantheon from Docker Image
+# Running Pantheon from Docker Image
 
 A Docker image is provided to run a Pantheon node in a Docker container. 
 
@@ -80,11 +80,13 @@ Where `mygenesis.json` is your custom configuration file and `path` is the absol
 
 ### Exposing Ports
 
-Expose ports for P2P peer discovery, JSON-RPC service, and WebSockets. This is required to use the defaults ports or specify different ports (the equivalent of specifying the [`--rpc-listen`](../Reference/Pantheon-CLI-Syntax.md#rpc-listen), [`--p2p-listen`](../Reference/Pantheon-CLI-Syntax.md#p2p-listen), [`--ws-listen`](../Reference/Pantheon-CLI-Syntax.md#ws-listen) options).
+Expose ports for P2P peer discovery, JSON-RPC service, and WebSockets. This is required to use the 
+defaults ports or specify different ports (the equivalent of specifying the [`--rpc-listen`](../Reference/Pantheon-CLI-Syntax.md#rpc-listen), 
+[`--p2p-listen`](../Reference/Pantheon-CLI-Syntax.md#p2p-listen), [`--ws-listen`](../Reference/Pantheon-CLI-Syntax.md#ws-listen) options).
 
 To run Pantheon exposing local ports for access: 
 ```bash
-docker run -p <localportJSON-RPC>:8545 -p <localportWS>:8546 -p <localportP2P>:30303 pegasyseng/pantheon:latest --rpc-enabled --ws-enabled
+$ docker run -p <localportJSON-RPC>:8545 -p <localportWS>:8546 -p <localportP2P>:30303 pegasyseng/pantheon:latest --rpc-enabled --ws-enabled
 ```
 
 !!!example

@@ -1,6 +1,8 @@
 description: Getting started with Pantheon
 <!--- END of page meta data -->
 
+# Getting started overview
+
 You can get started with Pantheon by:
 
 * Starting a node as described in [Starting Pantheon](Starting-Pantheon.md)

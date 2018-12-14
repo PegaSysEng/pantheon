@@ -1,6 +1,8 @@
 description: Pantheon JSON-RPC API objects reference
 <!--- END of page meta data -->
 
+# JSON-RPC API Objects
+
 The following objects are parameters for or returned by JSON-RPC Methods.
 
 ## Block Object

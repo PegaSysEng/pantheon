@@ -1,6 +1,8 @@
 description: Using Pantheon for PoW CPU mining
 <!--- END of page meta data -->
 
+# Mining
+
 Start Pantheon with the following options to enable CPU mining: 
 ```bash
 bin/pantheon --miner-enabled --miner-coinbase <account>

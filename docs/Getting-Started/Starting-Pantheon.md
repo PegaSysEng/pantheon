@@ -1,6 +1,8 @@
 description: Starting Pantheon
 <!--- END of page meta data -->
 
+# Starting Pantheon
+
 Pantheon nodes can be used for varying purposes as described in the [Overview](../index.md).
 Nodes can connect to the Ethereum mainnet, public testnets such as Ropsten, or private networks.
 
