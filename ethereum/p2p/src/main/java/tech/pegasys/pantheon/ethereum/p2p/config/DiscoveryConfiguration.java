@@ -137,28 +137,22 @@ public class DiscoveryConfiguration {
   }
 
   public DiscoveryConfiguration setBootstrapPeers(final Collection<?> bootstrapPeers) {
-    if (bootstrapPeers.stream().allMatch(URI.class::isInstance)) {
-      this.bootstrapPeers =
-          bootstrapPeers.stream().map(URI.class::cast).map(DefaultPeer::fromURI).collect(toList());
-    } else if (bootstrapPeers.stream().allMatch(Peer.class::isInstance)) {
-      this.bootstrapPeers = bootstrapPeers.stream().map(Peer.class::cast).collect(toList());
-    } else {
-      throw new IllegalArgumentException("Expected a list of Peers or a list of enode URIs");
-    }
+    this.bootstrapPeers = getBootstrapPeersFromGenericCollection(bootstrapPeers);
     return this;
   }
 
-  public static List<Peer> getBootstrapPeersFromUnknownCollection(
+  public static List<Peer> getBootstrapPeersFromGenericCollection(
       final Collection<?> bootstrapPeers) {
-    List<Peer> bs;
+    List<Peer> bootnodes;
     if (bootstrapPeers.stream().allMatch(URI.class::isInstance)) {
-      bs = bootstrapPeers.stream().map(URI.class::cast).map(DefaultPeer::fromURI).collect(toList());
+      bootnodes =
+          bootstrapPeers.stream().map(URI.class::cast).map(DefaultPeer::fromURI).collect(toList());
     } else if (bootstrapPeers.stream().allMatch(Peer.class::isInstance)) {
-      bs = bootstrapPeers.stream().map(Peer.class::cast).collect(toList());
+      bootnodes = bootstrapPeers.stream().map(Peer.class::cast).collect(toList());
     } else {
       throw new IllegalArgumentException("Expected a list of Peers or a list of enode URIs");
     }
-    return bs;
+    return bootnodes;
   }
 
   public String getAdvertisedHost() {

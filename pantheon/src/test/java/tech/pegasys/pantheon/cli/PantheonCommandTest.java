@@ -570,7 +570,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in node-whitelist");
+        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
   }
 
   @Test
@@ -603,7 +603,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in node-whitelist");
+        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
   }
 
   @Test
@@ -614,7 +614,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in node-whitelist");
+        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
   }
 
   @Test

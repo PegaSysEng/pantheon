@@ -478,27 +478,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
-
-    // ensure all bootstrapNodes are in the whitelist
     PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
-    List<Peer> bs =
-        DiscoveryConfiguration.getBootstrapPeersFromUnknownCollection(
-            ethNetworkConfig.getBootNodes());
-    if (permissioningConfiguration.isNodeWhitelistSet() && bs != null) {
-      List<Peer> whitelist =
-          permissioningConfiguration
-              .getNodeWhitelist()
-              .stream()
-              .map(DefaultPeer::fromURI)
-              .collect(Collectors.toList());
-      for (Peer bootnode : bs) {
-        if (!whitelist.contains(bootnode)) {
-          throw new ParameterException(
-              new CommandLine(this),
-              "Cannot start node with bootnode(s) that are not in node-whitelist " + bootnode);
-        }
-      }
-    }
+    ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
+
     synchronize(
         buildController(),
         noPeerDiscovery,
@@ -508,6 +490,29 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         jsonRpcConfiguration(),
         webSocketConfiguration(),
         permissioningConfiguration);
+  }
+
+  private void ensureAllBootnodesAreInWhitelist(
+      final EthNetworkConfig ethNetworkConfig,
+      final PermissioningConfiguration permissioningConfiguration) {
+    List<Peer> bootnodes =
+        DiscoveryConfiguration.getBootstrapPeersFromGenericCollection(
+            ethNetworkConfig.getBootNodes());
+    if (permissioningConfiguration.isNodeWhitelistSet() && bootnodes != null) {
+      List<Peer> whitelist =
+          permissioningConfiguration
+              .getNodeWhitelist()
+              .stream()
+              .map(DefaultPeer::fromURI)
+              .collect(Collectors.toList());
+      for (Peer bootnode : bootnodes) {
+        if (!whitelist.contains(bootnode)) {
+          throw new ParameterException(
+              new CommandLine(this),
+              "Cannot start node with bootnode(s) that are not in nodes-whitelist " + bootnode);
+        }
+      }
+    }
   }
 
   private static int trueCount(final Boolean... b) {

@@ -43,7 +43,7 @@ public class PermissioningConfigurationTest {
   }
 
   @Test
-  public void setNodeWhiteListPassingNull() {
+  public void setNodeWhiteListPassingNullShouldNotChangeWhitelistSetFlag() {
     final PermissioningConfiguration configuration = PermissioningConfiguration.createDefault();
     configuration.setNodeWhitelist(null);
     assertThat(configuration.getNodeWhitelist()).isEmpty();
