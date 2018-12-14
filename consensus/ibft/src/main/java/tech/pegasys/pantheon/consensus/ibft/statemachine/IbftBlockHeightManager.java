@@ -87,17 +87,23 @@ public class IbftBlockHeightManager {
                 roundIdentifier,
                 finalState.getQuorumSize(),
                 messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
+  }
 
+  public void start() {
     startNewRound(0);
+    if (finalState.isLocalNodeProposerForRound(currentRound.getRoundIdentifier())) {
+      blockTimer.startTimer(currentRound.getRoundIdentifier(), parentHeader);
+    }
+
   }
 
   public void roundExpired(final RoundExpiry expire) {
-    if (expire.getView().equals(currentRound.getRoundIdentifier())) {
+    if (!expire.getView().equals(currentRound.getRoundIdentifier())) {
       LOG.debug("Ignoring Round timer expired which does not match current round.");
       return;
     }
 
-    LOG.debug("Round has expired, creating PrepareCertificate and notifying peers.");
+    LOG.debug("Round has expired, creating PreparedCertificate and notifying peers.");
     final Optional<PreparedCertificate> preparedCertificate =
         currentRound.createPrepareCertificate();
 
@@ -111,7 +117,7 @@ public class IbftBlockHeightManager {
     // Start a new round, and notify peers.
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
-    // TODO(tmm): This is kinda wrong, maybe the new round should not have started just yet...
+    // TODO(tmm): This is seems somewhat wrong, maybe the new round should not have started just yet
     final SignedData<RoundChangePayload> roundChangePayload =
         transmitter.multicastRoundChange(
             currentRound.getRoundIdentifier(), bestPreparedCertificate);
@@ -168,11 +174,12 @@ public class IbftBlockHeightManager {
   public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
     final Optional<RoundChangeCertificate> result =
         roundChangeManager.appendRoundChangeMessage(msg);
+
     if (result.isPresent()) {
-      final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundChangeIdentifier();
+      final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
+      startNewRound(targetRound.getRoundNumber());
 
       if (finalState.isLocalNodeProposerForRound(targetRound)) {
-        startNewRound(targetRound.getRoundNumber());
         currentRound.startRoundWith(result.get(), clock.millis() / 1000);
       }
     }
@@ -188,17 +195,12 @@ public class IbftBlockHeightManager {
       currentRound = roundFactory.createNewRound(parentHeader, roundNumber);
     }
 
-    if (finalState.isLocalNodeProposerForRound(currentRound.getRoundIdentifier())) {
-      if (currentRound.getRoundIdentifier().getRoundNumber() == 0) {
-        blockTimer.startTimer(currentRound.getRoundIdentifier(), parentHeader);
-      }
-    }
     roundTimer.startTimer(currentRound.getRoundIdentifier());
   }
 
   public void handleNewRoundMessage(final SignedData<NewRoundPayload> msg) {
     if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
-      startNewRound(msg.getPayload().getRoundChangeIdentifier().getRoundNumber());
+      startNewRound(msg.getPayload().getRoundIdentifier().getRoundNumber());
       currentRound.handleProposalMessage(msg.getPayload().getProposalPayload());
     }
   }

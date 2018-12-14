@@ -110,7 +110,7 @@ public class NewRoundMessageValidatorTest {
     final MessageFactory messageCreator = new MessageFactory(signingKey);
 
     return messageCreator.createSignedNewRoundPayload(
-        payload.getRoundChangeIdentifier(),
+        payload.getRoundIdentifier(),
         payload.getRoundChangeCertificate(),
         payload.getProposalPayload());
   }
