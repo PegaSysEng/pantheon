@@ -27,9 +27,6 @@
     padding: 1em;
     text-align: center;
     background-color: {{config.extra.support.footer_layout.background_color}};
-    background-image: url({{' assets/images/pegasys-logo-bg.png' | url }});
-    background-repeat: no-repeat;
-    background-size: contain;
   }
   .feedback a {
     color: {{config.extra.support.footer_layout.links_color}} !important;
@@ -43,8 +40,9 @@
       <!--font-size: larger;-->
   }
   .rst-versions {
-    border-color: lightseagreen;
-    border-style: solid;
+    border-color: lightseagreen !important;
+    border-style: solid !important;
+    background: {{config.theme.palette.primary}} !important;
     font-size: large;
   }
 </style>
