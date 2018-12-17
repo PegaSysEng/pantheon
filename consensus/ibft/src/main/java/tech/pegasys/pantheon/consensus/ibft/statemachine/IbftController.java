@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -44,6 +46,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class IbftController {
+  private static final Logger LOG = LogManager.getLogger();
   private final Blockchain blockchain;
   private final IbftFinalState ibftFinalState;
   private final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory;
@@ -129,11 +132,19 @@ public class IbftController {
   }
 
   public void handleBlockTimerExpiry(final BlockTimerExpiry blockTimerExpiry) {
-    currentHeightManager.handleBlockTimerExpiry(blockTimerExpiry.getRoundIndentifier());
+    if (isMsgForCurrentHeight(blockTimerExpiry.getRoundIndentifier())) {
+      currentHeightManager.handleBlockTimerExpiry(blockTimerExpiry.getRoundIndentifier());
+    } else {
+      LOG.debug("Block timer event is not for current block height and been discarded");
+    }
   }
 
-  public void handleRoundExpiry(final RoundExpiry expired) {
-    currentHeightManager.roundExpired(expired);
+  public void handleRoundExpiry(final RoundExpiry roundExpiry) {
+    if (isMsgForCurrentHeight(roundExpiry.getView())) {
+      currentHeightManager.roundExpired(roundExpiry);
+    } else {
+      LOG.debug("Round expiry event is not for current block height and been discarded");
+    }
   }
 
   public void startNewHeightManager(final BlockHeader parentHeader) {
@@ -151,6 +162,8 @@ public class IbftController {
       return isMsgFromKnownValidator(msg);
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
+    } else {
+      LOG.debug("IBFT message is not for current block height and been discarded");
     }
     return false;
   }
@@ -173,4 +186,5 @@ public class IbftController {
     }
     futureMessages.get(chainHeight).add(rawMsg);
   }
+
 }

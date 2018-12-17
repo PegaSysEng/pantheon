@@ -13,11 +13,14 @@
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -275,6 +278,26 @@ public class IbftControllerTest {
     setupRoundChange(roundIdentifier, validator);
     when(blockHeightManager.getChainHeight()).thenReturn(1L);
     verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(roundChangeMessage));
+  }
+
+  @Test
+  public void roundExpiryForPastHeightIsDiscarded() {
+    final RoundExpiry roundExpiry = new RoundExpiry(roundIdentifier);
+    when(blockHeightManager.getChainHeight()).thenReturn(1L);
+    ibftController.start();
+    ibftController.handleRoundExpiry(roundExpiry);
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager, never()).roundExpired(any());
+  }
+
+  @Test
+  public void blockTimerForPastHeightIsDiscarded() {
+    final BlockTimerExpiry blockTimerExpiry = new BlockTimerExpiry(roundIdentifier);
+    when(blockHeightManager.getChainHeight()).thenReturn(1L);
+    ibftController.start();
+    ibftController.handleBlockTimerExpiry(blockTimerExpiry);
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager, never()).handleBlockTimerExpiry(any());
   }
 
   @Test
