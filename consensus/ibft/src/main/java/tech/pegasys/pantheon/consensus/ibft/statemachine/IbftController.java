@@ -14,11 +14,6 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import java.util.List;
-import java.util.Map;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -40,6 +35,13 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class IbftController {
   private final Blockchain blockchain;
@@ -173,7 +175,8 @@ public class IbftController {
     return roundIdentifier.getSequenceNumber() > currentHeightManager.getChainHeight();
   }
 
-  private boolean isMsgForCurrentOrFutureChainHeight(final ConsensusRoundIdentifier roundIdentifier) {
+  private boolean isMsgForCurrentOrFutureChainHeight(
+      final ConsensusRoundIdentifier roundIdentifier) {
     return roundIdentifier.getSequenceNumber() >= currentHeightManager.getChainHeight();
   }
 

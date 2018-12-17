@@ -15,12 +15,14 @@ package tech.pegasys.pantheon.consensus.ibft;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvent;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents.Type;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
-import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvent;
-import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents.Type;
 
 public class IbftEventQueueTest {
 

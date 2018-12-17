@@ -1,3 +1,15 @@
+/*
+ * Copyright 2018 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -6,16 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -37,6 +39,18 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IbftControllerTest {
@@ -75,7 +89,8 @@ public class IbftControllerTest {
 
   @Before
   public void setup() {
-    ibftController = new IbftController(blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages);
+    ibftController =
+        new IbftController(blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages);
     when(blockChain.getChainHeadHeader()).thenReturn(blockHeader);
     when(blockHeightManagerFactory.create(blockHeader)).thenReturn(blockHeightManager);
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
@@ -96,8 +111,10 @@ public class IbftControllerTest {
     setupRoundChange(futureRoundIdentifier, validator);
     setupNewRound(futureRoundIdentifier, validator);
 
-    futureMessages.put(2L, ImmutableList.of(prepareMessage, proposalMessage, commitMessage,
-        roundChangeMessage, newRoundMessage));
+    futureMessages.put(
+        2L,
+        ImmutableList.of(
+            prepareMessage, proposalMessage, commitMessage, roundChangeMessage, newRoundMessage));
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
 
     ibftController.start();
@@ -119,8 +136,10 @@ public class IbftControllerTest {
     setupRoundChange(futureRoundIdentifier, validator);
     setupNewRound(futureRoundIdentifier, validator);
 
-    futureMessages.put(2L, ImmutableList.of(prepareMessage, proposalMessage, commitMessage,
-        roundChangeMessage, newRoundMessage));
+    futureMessages.put(
+        2L,
+        ImmutableList.of(
+            prepareMessage, proposalMessage, commitMessage, roundChangeMessage, newRoundMessage));
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
 
     final NewChainHead newChainHead = new NewChainHead(blockHeader);
@@ -155,7 +174,6 @@ public class IbftControllerTest {
 
     verify(blockHeightManager).handleBlockTimerExpiry(roundIdentifier);
   }
-
 
   @Test
   public void proposalForCurrentHeightIsPassedToBlockHeightManager() {
@@ -290,24 +308,24 @@ public class IbftControllerTest {
   @Test
   public void proposalForFutureHeightIsBuffered() {
     setupProposal(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs = ImmutableMap.of(2L,
-        ImmutableList.of(proposalMessage));
+    final Map<Long, List<MessageData>> expectedFutureMsgs =
+        ImmutableMap.of(2L, ImmutableList.of(proposalMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(proposalMessage), expectedFutureMsgs);
   }
 
   @Test
   public void prepareForFutureHeightIsBuffered() {
     setupPrepare(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs = ImmutableMap.of(2L,
-        ImmutableList.of(prepareMessage));
+    final Map<Long, List<MessageData>> expectedFutureMsgs =
+        ImmutableMap.of(2L, ImmutableList.of(prepareMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(prepareMessage), expectedFutureMsgs);
   }
 
   @Test
   public void commitForFutureHeightIsBuffered() {
     setupCommit(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs = ImmutableMap.of(2L,
-        ImmutableList.of(commitMessage));
+    final Map<Long, List<MessageData>> expectedFutureMsgs =
+        ImmutableMap.of(2L, ImmutableList.of(commitMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(commitMessage), expectedFutureMsgs);
   }
 
@@ -321,8 +339,8 @@ public class IbftControllerTest {
     verifyNoMoreInteractions(blockHeightManager);
   }
 
-  private void verifyHasFutureMessages(final IbftReceivedMessageEvent msg,
-      final Map<Long, List<MessageData>> expectedFutureMsgs) {
+  private void verifyHasFutureMessages(
+      final IbftReceivedMessageEvent msg, final Map<Long, List<MessageData>> expectedFutureMsgs) {
     ibftController.start();
     ibftController.handleMessageEvent(msg);
 
@@ -333,7 +351,8 @@ public class IbftControllerTest {
     verifyNoMoreInteractions(blockHeightManager);
   }
 
-  private void setupProposal(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+  private void setupProposal(
+      final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
     when(signedProposal.getPayload()).thenReturn(proposalPayload);
     when(signedProposal.getSender()).thenReturn(validator);
     when(proposalPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
@@ -341,8 +360,8 @@ public class IbftControllerTest {
     when(proposalMessage.decode()).thenReturn(signedProposal);
   }
 
-  private void setupPrepare(final ConsensusRoundIdentifier roundIdentifier,
-      final Address validator) {
+  private void setupPrepare(
+      final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
     when(signedPrepare.getPayload()).thenReturn(preparePayload);
     when(signedPrepare.getSender()).thenReturn(validator);
     when(preparePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
@@ -350,7 +369,8 @@ public class IbftControllerTest {
     when(prepareMessage.decode()).thenReturn(signedPrepare);
   }
 
-  private void setupCommit(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+  private void setupCommit(
+      final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
     when(signedCommit.getPayload()).thenReturn(commitPayload);
     when(signedCommit.getSender()).thenReturn(validator);
     when(commitPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
@@ -358,7 +378,8 @@ public class IbftControllerTest {
     when(commitMessage.decode()).thenReturn(signedCommit);
   }
 
-  private void setupNewRound(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+  private void setupNewRound(
+      final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
     when(signedNewRound.getPayload()).thenReturn(newRoundPayload);
     when(signedNewRound.getSender()).thenReturn(validator);
     when(newRoundPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
@@ -366,7 +387,8 @@ public class IbftControllerTest {
     when(newRoundMessage.decode()).thenReturn(signedNewRound);
   }
 
-  private void setupRoundChange(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+  private void setupRoundChange(
+      final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
     when(signedRoundChange.getPayload()).thenReturn(roundChangePayload);
     when(signedRoundChange.getSender()).thenReturn(validator);
     when(roundChangePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
