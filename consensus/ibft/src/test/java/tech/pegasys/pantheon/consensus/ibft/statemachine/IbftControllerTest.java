@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -85,8 +86,8 @@ public class IbftControllerTest {
   private final Map<Long, List<MessageData>> futureMessages = new HashMap<>();
   private final Address validator = Address.fromHexString("0x0");
   private final Address unknownValidator = Address.fromHexString("0x2");
+  private final ConsensusRoundIdentifier futureRoundIdentifier = new ConsensusRoundIdentifier(2, 0);
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(0, 0);
-  private ConsensusRoundIdentifier futureRoundIdentifier = new ConsensusRoundIdentifier(2, 0);
   private IbftController ibftController;
 
   @Before
@@ -107,27 +108,31 @@ public class IbftControllerTest {
 
   @Test
   public void startsNewBlockHeightManagerAndReplaysFutureMessages() {
+    final ConsensusRoundIdentifier roundIdentifierHeight3 = new ConsensusRoundIdentifier(3, 0);
     setupPrepare(futureRoundIdentifier, validator);
-    setupProposal(futureRoundIdentifier, validator);
+    setupProposal(roundIdentifierHeight3, validator);
     setupCommit(futureRoundIdentifier, validator);
     setupRoundChange(futureRoundIdentifier, validator);
-    setupNewRound(futureRoundIdentifier, validator);
+    setupNewRound(roundIdentifierHeight3, validator);
 
-    futureMessages.put(
-        2L,
-        ImmutableList.of(
-            prepareMessage, proposalMessage, commitMessage, roundChangeMessage, newRoundMessage));
+    final List<MessageData> height2Msgs =
+        newArrayList(prepareMessage, commitMessage, roundChangeMessage);
+    final List<MessageData> height3Msgs = newArrayList(proposalMessage, newRoundMessage);
+    futureMessages.put(2L, height2Msgs);
+    futureMessages.put(3L, height3Msgs);
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
 
     ibftController.start();
+    assertThat(futureMessages.keySet()).hasSize(1);
+    assertThat(futureMessages.get(3L)).isEqualTo(height3Msgs);
     verify(blockHeightManagerFactory).create(blockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
-    verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(blockHeightManager, never()).handleProposalMessage(signedProposal);
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
     verify(blockHeightManager).handleCommitMessage(signedCommit);
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
-    verify(blockHeightManager).handleNewRoundMessage(signedNewRound);
+    verify(blockHeightManager, never()).handleNewRoundMessage(signedNewRound);
   }
 
   @Test

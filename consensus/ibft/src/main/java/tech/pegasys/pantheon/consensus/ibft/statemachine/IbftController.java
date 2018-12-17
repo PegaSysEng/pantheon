@@ -135,7 +135,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(blockTimerExpiry.getRoundIndentifier())) {
       currentHeightManager.handleBlockTimerExpiry(blockTimerExpiry.getRoundIndentifier());
     } else {
-      LOG.debug("Block timer event is not for current block height and been discarded");
+      LOG.info("Block timer event discarded as it is not for current block height");
     }
   }
 
@@ -143,7 +143,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundExpiry.getView())) {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
-      LOG.debug("Round expiry event is not for current block height and been discarded");
+      LOG.info("Round expiry event discarded as it is not for current block height");
     }
   }
 
@@ -151,7 +151,8 @@ public class IbftController {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
-    futureMessages.getOrDefault(newChainHeight, emptyList()).forEach(this::handleMessage);
+    List<MessageData> orDefault = futureMessages.getOrDefault(newChainHeight, emptyList());
+    orDefault.forEach(this::handleMessage);
     futureMessages.remove(newChainHeight);
   }
 
@@ -163,7 +164,7 @@ public class IbftController {
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
-      LOG.debug("IBFT message is not for current block height and been discarded");
+      LOG.info("IBFT message discarded as it is not for the current block height");
     }
     return false;
   }
