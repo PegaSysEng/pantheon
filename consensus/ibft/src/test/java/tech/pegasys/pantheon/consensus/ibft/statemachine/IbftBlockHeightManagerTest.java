@@ -53,9 +53,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IbftBlockHeightManagerTest {
@@ -100,22 +98,19 @@ public class IbftBlockHeightManagerTest {
     // Ensure the created IbftRound has the valid ConsensusRoundIdentifier;
     when(roundFactory.createNewRound(any(), anyInt()))
         .thenAnswer(
-            new Answer<IbftRound>() {
-              @Override
-              public IbftRound answer(final InvocationOnMock invocation) {
-                final int round = (int) invocation.getArgument(1);
-                final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, round);
-                when(roundState.getRoundIdentifier()).thenReturn(roundId);
-                return new IbftRound(
-                    roundState,
-                    blockCreator,
-                    protocolContext,
-                    blockImporter,
-                    new Subscribers<>(),
-                    localNodeKeys,
-                    messageFactory,
-                    messageTransmitter);
-              }
+            invocation -> {
+              final int round = (int) invocation.getArgument(1);
+              final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, round);
+              when(roundState.getRoundIdentifier()).thenReturn(roundId);
+              return new IbftRound(
+                  roundState,
+                  blockCreator,
+                  protocolContext,
+                  blockImporter,
+                  new Subscribers<>(),
+                  localNodeKeys,
+                  messageFactory,
+                  messageTransmitter);
             });
   }
 
