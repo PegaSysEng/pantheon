@@ -65,7 +65,7 @@ public class IbftHelpers {
       final RoundChangePayload payload = roundChangeMsg.getPayload();
       if (payload.getPreparedCertificate().isPresent()) {
         if (!result.isPresent()) {
-          result = Optional.of(payload.getPreparedCertificate().get());
+          result = payload.getPreparedCertificate();
         } else {
           final PreparedCertificate currentLatest = result.get();
           final PreparedCertificate nextCert = payload.getPreparedCertificate().get();
