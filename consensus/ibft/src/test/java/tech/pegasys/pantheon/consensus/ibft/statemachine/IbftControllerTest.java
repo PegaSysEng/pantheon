@@ -215,8 +215,9 @@ public class IbftControllerTest {
   }
 
   @Test
-  public void newRoundForFutureHeightIsPassedToBlockHeightManager() {
-    setupNewRound(futureRoundIdentifier, validator);
+  public void newRoundForCurrentHeightIsPassedToBlockHeightManager() {
+    roundIdentifier = new ConsensusRoundIdentifier(0, 1);
+    setupNewRound(roundIdentifier, validator);
     ibftController.start();
     ibftController.handleMessageEvent(new IbftReceivedMessageEvent(newRoundMessage));
 
@@ -228,8 +229,9 @@ public class IbftControllerTest {
   }
 
   @Test
-  public void roundChangeForFutureHeightIsPassedToBlockHeightManager() {
-    setupRoundChange(futureRoundIdentifier, validator);
+  public void roundChangeForCurrentHeightIsPassedToBlockHeightManager() {
+    roundIdentifier = new ConsensusRoundIdentifier(0, 1);
+    setupRoundChange(roundIdentifier, validator);
     ibftController.start();
     ibftController.handleMessageEvent(new IbftReceivedMessageEvent(roundChangeMessage));
 
@@ -327,6 +329,22 @@ public class IbftControllerTest {
     final Map<Long, List<MessageData>> expectedFutureMsgs =
         ImmutableMap.of(2L, ImmutableList.of(commitMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(commitMessage), expectedFutureMsgs);
+  }
+
+  @Test
+  public void newRoundForFutureHeightIsBuffered() {
+    setupNewRound(futureRoundIdentifier, validator);
+    final Map<Long, List<MessageData>> expectedFutureMsgs =
+        ImmutableMap.of(2L, ImmutableList.of(newRoundMessage));
+    verifyHasFutureMessages(new IbftReceivedMessageEvent(newRoundMessage), expectedFutureMsgs);
+  }
+
+  @Test
+  public void roundChangeForFutureHeightIsBuffered() {
+    setupRoundChange(futureRoundIdentifier, validator);
+    final Map<Long, List<MessageData>> expectedFutureMsgs =
+        ImmutableMap.of(2L, ImmutableList.of(roundChangeMessage));
+    verifyHasFutureMessages(new IbftReceivedMessageEvent(roundChangeMessage), expectedFutureMsgs);
   }
 
   private void verifyNotHandledAndNoFutureMsgs(final IbftReceivedMessageEvent msg) {

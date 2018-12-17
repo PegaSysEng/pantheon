@@ -105,7 +105,7 @@ public class IbftController {
       case IbftV2.ROUND_CHANGE:
         final SignedData<RoundChangePayload> roundChangeMsg =
             RoundChangeMessage.fromMessage(messageData).decode();
-        if (processRoundMessage(roundChangeMsg)) {
+        if (processMessage(roundChangeMsg, messageData)) {
           currentHeightManager.handleRoundChangeMessage(roundChangeMsg);
         }
         break;
@@ -113,7 +113,7 @@ public class IbftController {
       case IbftV2.NEW_ROUND:
         final SignedData<NewRoundPayload> newRoundMsg =
             NewRoundMessage.fromMessage(messageData).decode();
-        if (processRoundMessage(newRoundMsg)) {
+        if (processMessage(newRoundMsg, messageData)) {
           currentHeightManager.handleNewRoundMessage(newRoundMsg);
         }
         break;
@@ -132,6 +132,10 @@ public class IbftController {
     currentHeightManager.handleBlockTimerExpiry(blockTimerExpiry.getRoundIndentifier());
   }
 
+  public void handleRoundExpiry(final RoundExpiry expired) {
+    currentHeightManager.roundExpired(expired);
+  }
+
   public void startNewHeightManager(final BlockHeader parentHeader) {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
@@ -140,27 +144,18 @@ public class IbftController {
     futureMessages.remove(newChainHeight);
   }
 
-  public void handleRoundExpiry(final RoundExpiry expired) {
-    currentHeightManager.roundExpired(expired);
-  }
-
   private boolean processMessage(
       final SignedData<? extends Payload> msg, final MessageData rawMsg) {
     final ConsensusRoundIdentifier msgRoundIdentifier = msg.getPayload().getRoundIdentifier();
     if (isMsgForCurrentHeight(msgRoundIdentifier)) {
-      return isMsgForKnownValidator(msg);
+      return isMsgFromKnownValidator(msg);
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     }
     return false;
   }
 
-  private boolean processRoundMessage(final SignedData<? extends Payload> msg) {
-    final ConsensusRoundIdentifier msgRoundIdentifier = msg.getPayload().getRoundIdentifier();
-    return isMsgForCurrentOrFutureChainHeight(msgRoundIdentifier) && isMsgForKnownValidator(msg);
-  }
-
-  private boolean isMsgForKnownValidator(final SignedData<? extends Payload> msg) {
+  private boolean isMsgFromKnownValidator(final SignedData<? extends Payload> msg) {
     return ibftFinalState.getValidators().contains(msg.getSender());
   }
 
@@ -170,11 +165,6 @@ public class IbftController {
 
   private boolean isMsgForFutureChainHeight(final ConsensusRoundIdentifier roundIdentifier) {
     return roundIdentifier.getSequenceNumber() > currentHeightManager.getChainHeight();
-  }
-
-  private boolean isMsgForCurrentOrFutureChainHeight(
-      final ConsensusRoundIdentifier roundIdentifier) {
-    return roundIdentifier.getSequenceNumber() >= currentHeightManager.getChainHeight();
   }
 
   private void addMessageToFutureMessageBuffer(final long chainHeight, final MessageData rawMsg) {
