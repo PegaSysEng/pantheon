@@ -32,13 +32,11 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.util.Subscribers;
 
@@ -59,7 +57,6 @@ public class IbftRound {
   private final KeyPair nodeKeys;
   private final MessageFactory messageFactory; // used only to create stored local msgs
   private final IbftMessageTransmitter transmitter;
-  private final Address localAddress;
 
   public IbftRound(
       final RoundState roundState,
@@ -105,7 +102,7 @@ public class IbftRound {
           messageFactory.createSignedProposalPayload(getRoundIdentifier(), block));
     } else {
       final SignedData<ProposalPayload> proposal =
-          createProposalFromPreparedCertificate(latestCertificate.get(), headerTimestamp);
+          createProposalFromPreparedCertificate(latestCertificate.get());
       transmitter.multicastNewRound(getRoundIdentifier(), roundChangeCertificate, proposal);
       updateStateWithProposedBlock(proposal);
     }
