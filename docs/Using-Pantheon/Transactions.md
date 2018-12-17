@@ -63,7 +63,7 @@ All accounts and private keys in the examples are from the `dev.json` genesis fi
 
     The following is an example of JavaScript that displays a signed transaction string to send ether.
     
-    ```javascript
+    ```javascript linenums="1"
     const web3 = require('web3')
     const ethTx = require('ethereumjs-tx')
     
@@ -109,7 +109,7 @@ All accounts and private keys in the examples are from the `dev.json` genesis fi
 !!!example
     The following is an example of JavaScript that displays a signed raw transaction string to deploy a contract.
     
-    ```javascript
+    ```javascript linenums="1"
     const web3 = require('web3')
     const ethTx = require('ethereumjs-tx')
     

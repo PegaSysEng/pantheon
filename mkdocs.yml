@@ -99,7 +99,6 @@ markdown_extensions:
     - pymdownx.critic
     - pymdownx.details
     - pymdownx.emoji
-    - pymdownx.inlinehilite
     - pymdownx.magiclink
     - pymdownx.mark
     - pymdownx.smartsymbols
