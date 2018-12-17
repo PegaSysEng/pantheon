@@ -70,8 +70,7 @@ public class IbftController {
   }
 
   public void start() {
-    final BlockHeader parentHeader = blockchain.getChainHeadHeader();
-    startNewHeightManager(parentHeader);
+    startNewHeightManager(blockchain.getChainHeadHeader());
   }
 
   public void handleMessageEvent(final IbftReceivedMessageEvent msg) {
@@ -126,8 +125,7 @@ public class IbftController {
   }
 
   public void handleNewBlockEvent(final NewChainHead newChainHead) {
-    final BlockHeader newHead = newChainHead.getNewChainHeadHeader();
-    startNewHeightManager(newHead);
+    startNewHeightManager(newChainHead.getNewChainHeadHeader());
   }
 
   public void handleBlockTimerExpiry(final BlockTimerExpiry blockTimerExpiry) {
@@ -138,8 +136,7 @@ public class IbftController {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
-    final List<MessageData> replayMsgs = futureMessages.getOrDefault(newChainHeight, emptyList());
-    replayMsgs.forEach(this::handleMessage);
+    futureMessages.getOrDefault(newChainHeight, emptyList()).forEach(this::handleMessage);
     futureMessages.remove(newChainHeight);
   }
 
