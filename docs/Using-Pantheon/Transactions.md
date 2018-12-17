@@ -7,7 +7,7 @@ You can send signed transactions using the [`eth_sendRawTransaction`](../Referen
 
 These examples describe how to create a signed raw transaction that can be passed to [`eth_sendRawTransaction`](../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction).
 
-tip!!!
+!!!tip
     To avoid exposing your private keys, create signed transactions offline.
 
 The examples use the following libraries to create signed transactions:

@@ -52,14 +52,14 @@ theme:
       icon: account_balance
 nav:
     - Installation:
-        - Installation overview: Installation/Overview.md
+        - Installation Overview: Installation/Overview.md
         - Install Binary Distribution: Installation/Install-Binaries.md
         - Build from Source: Installation/Build-From-Source.md
     - Getting Started:
-        - Getting started overview: Getting-Started/Getting-Started.md
+        - Getting Started Overview: Getting-Started/Getting-Started.md
         - Starting Pantheon: Getting-Started/Starting-Pantheon.md
         - Running Pantheon from Docker Image: Getting-Started/Run-Docker-Image.md
-        - Private Network Quickstart tutorial: Getting-Started/Private-Network-Quickstart.md
+        - Private Network Quickstart Tutorial: Getting-Started/Private-Network-Quickstart.md
     - Configuring Pantheon:
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
@@ -75,25 +75,17 @@ nav:
         - Mining: Using-Pantheon/Mining.md
         - RPC Pub/Sub: Using-Pantheon/RPC-PubSub.md
         - Debugging Pantheon: Using-Pantheon/Debugging.md
-    - Developement:
-        - Building Pantheon: development/building.md
-        - Code coverage: development/code-coverage.md
-        - Logging:  development/logging.md
-        - Running with Gradle: development/running-with-gradle.md
-    - Contribute:
-        - Code review: community/code-reviews.md
-        - Community membership: community/community-membership.md
-    - References:
+    - Reference:
         - Pantheon Command Line: Reference/Pantheon-CLI-Syntax.md
         - Pantheon JSON-RPC API:
-          - JSON-RPC API overview: Reference/JSON-RPC-API.md
+          - JSON-RPC API Overview: Reference/JSON-RPC-API.md
           - Using the JSON-RPC API: Reference/Using-JSON-RPC-API.md
           - JSON-RPC API Methods: Reference/JSON-RPC-API-Methods.md
           - JSON-RPC API Objects: Reference/JSON-RPC-API-Objects.md
 
 markdown_extensions:
     - toc:
-        permalink: true
+        permalink: 
     - markdown_include.include:
         base_path: docs
     - admonition
@@ -116,6 +108,7 @@ markdown_extensions:
           custom_checkbox: true
     - pymdownx.tilde
     - meta
+    - smarty
 
 plugins:
     - search

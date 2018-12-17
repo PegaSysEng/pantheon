@@ -22,6 +22,8 @@
 
 {% import "partials/language.html" as lang with context %}
 
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+
 <style>
   .feedback{
     padding: 1em;
@@ -47,6 +49,12 @@
 
   .rst-versions .rst-current-version {
     background-color: #475c64 !important;
+  }
+
+  .headerlink {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: small;
   }
 </style>
 
@@ -116,7 +124,7 @@
     <div class="md-footer-meta__inner md-grid">
 
       <!-- Copyright and theme information -->
-      <div class="md-footer-copyright">
+      <div class="md-footer-copyright" style="padding-top: 0px; padding-bottom: 0px;">
         {% if config.copyright %}
           <div class="md-footer-copyright__highlight">
             {{ config.copyright }}

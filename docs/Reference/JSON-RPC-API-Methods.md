@@ -37,9 +37,7 @@ Properties of the remote node object are:
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}
+    {"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -71,11 +69,11 @@ Properties of the remote node object are:
 
 Returns the current client version.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *string* - Current client version.
 
@@ -85,9 +83,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}
+    {"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -102,11 +98,11 @@ None
 
 Returns a [SHA3](https://en.wikipedia.org/wiki/SHA-3) hash of the specified data. The result value is a [Keccak-256](https://keccak.team/keccak.html) hash, not the standardized SHA3-256.
 
-*Parameters*
+**Parameters**
 
 `DATA` - Data to convert to a SHA3 hash.
 
-*Returns*
+**Returns**
 
 `result` (*DATA*) - SHA3 result of the input data.
 
@@ -116,9 +112,7 @@ Returns a [SHA3](https://en.wikipedia.org/wiki/SHA-3) hash of the specified data
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"web3_sha3","params":["0x68656c6c6f20776f726c00"],"id":53}
+    {"jsonrpc":"2.0","method":"web3_sha3","params":["0x68656c6c6f20776f726c00"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -135,11 +129,11 @@ Returns a [SHA3](https://en.wikipedia.org/wiki/SHA-3) hash of the specified data
 
 Returns the current chain ID.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *string* - Current chain ID.
 - `1` - Ethereum Mainnet
@@ -179,11 +173,11 @@ None
 
 Indicates whether the client is actively listening for network connections.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` (*BOOLEAN*) - `true` if the client is actively listening for network connections; otherwise `false`.
 
@@ -193,9 +187,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"net_listening","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"net_listening","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -210,11 +202,11 @@ None
 
 Returns the number of peers currently connected to the client.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *integer* - Number of connected peers in hexadecimal.
 
@@ -224,9 +216,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -243,19 +233,19 @@ None
 
 Returns an object with data about the synchronization status, or `false` if not synchronizing.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *Object|Boolean* - Object with synchronization status data or `false`, when not synchronizing:
 
 * `startingBlock` : *quantity* - Index of the highest block on the blockchain when the network synchronization starts.
 
-  If you start with an empty blockchain, the starting block is the beginning of the blockchain (`startingBlock` = 0).
+    If you start with an empty blockchain, the starting block is the beginning of the blockchain (`startingBlock` = 0).
 
-  If you import a block file using `pantheon import <block-file>`, the synchronization starts at the head of the blockchain, and the starting block is the next block synchronized. For example, if you imported 1000 blocks, the import would include blocks 0 to 999, so in that case `startingBlock` = 1000.
+    If you import a block file using `pantheon import <block-file>`, the synchronization starts at the head of the blockchain, and the starting block is the next block synchronized. For example, if you imported 1000 blocks, the import would include blocks 0 to 999, so in that case `startingBlock` = 1000.
 
 * `currentBlock` : *quantity* - Index of the latest block (also known as the best block) for the current node. This is the same index that [eth_blockNumber](#eth_blocknumber) returns.
 
@@ -267,9 +257,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":51}
+    {"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":51}
     ```
     
     ```json tab="JSON result"
@@ -291,11 +279,11 @@ Returns the [chain ID](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 !!!note
     This method is only available from v0.8.2 or when you [build from source](../Installation/Build-From-Source.md). 
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *quantity* - Chain ID in hexadecimal.
 
@@ -305,9 +293,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":51}
+    {"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":51}
     ```
     
     ```json tab="JSON result"
@@ -330,11 +316,11 @@ You can get the Ethereum account address from a client such as MetaMask or Ether
     $ bin/pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-enabled
     ```
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *data* - Coinbase address.
 
@@ -344,9 +330,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_coinbase","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"eth_coinbase","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -361,11 +345,11 @@ None
 
 Indicates whether the client is actively mining new blocks. Mining is paused while the client synchronizes with the network regardless of command settings or methods called. 
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` (*BOOLEAN*) - `true` if the client is actively mining new blocks; otherwise `false`.
 
@@ -375,9 +359,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_mining","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"eth_mining","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -392,11 +374,11 @@ None
 
 Returns the current gas unit price in wei.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *quantity* - Current gas unit price in wei as a hexadecimal value.
 
@@ -406,9 +388,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_gasPrice","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"eth_gasPrice","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -426,11 +406,11 @@ Returns a list of account addresses that the client owns.
 !!!note
     This method returns an empty object because Pantheon [does not support account management](Using-JSON-RPC-API.md#account-management-not-supported-by-pantheon).
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `Array of data` : List of 20-byte account addresses owned by the client.
 
@@ -440,9 +420,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -457,11 +435,11 @@ None
 
 Returns the index of the current block the client is processing.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Hexadecimal integer representing the 0-based index of the block that the client is currently processing.
 
@@ -472,9 +450,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":51}
+    {"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":51}
     ```
     
     ```json tab="JSON result"
@@ -489,13 +465,13 @@ None
 
 Returns the account balance of the specified address.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 20-byte account address from which to retrieve the balance.
 
 `QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Integer value of the current balance in wei.
 
@@ -505,9 +481,7 @@ Returns the account balance of the specified address.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getBalance","params":["0xdd37f65db31c107f773e82a4f85c693058fef7a9", "latest"],"id":53}
+    {"jsonrpc":"2.0","method":"eth_getBalance","params":["0xdd37f65db31c107f773e82a4f85c693058fef7a9", "latest"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -522,7 +496,7 @@ Returns the account balance of the specified address.
 
 Returns the value of a storage position at a specified address.
 
-*Parameters*
+**Parameters**
 
 `DATA` - A 20-byte storage address.
 
@@ -530,7 +504,7 @@ Returns the value of a storage position at a specified address.
 
 `QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](JSON-RPC-API-Objects.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` : *DATA* - The value at the specified storage position.
 
@@ -542,9 +516,7 @@ Returns the value of a storage position at a specified address.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method": "eth_getStorageAt","params": ["0x‭3B3F3E‬","0x0","latest"],"id": 53}
+    {"jsonrpc":"2.0","method": "eth_getStorageAt","params": ["0x‭3B3F3E‬","0x0","latest"],"id": 53}
     ```
     
     ```json tab="JSON result"
@@ -559,13 +531,13 @@ Returns the value of a storage position at a specified address.
 
 Returns the number of transactions sent from a specified address.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 20-byte account address.
 
 `QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Integer representing the number of transactions sent from the specified address.
 
@@ -575,9 +547,7 @@ Returns the number of transactions sent from a specified address.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getTransactionCount","params":["0xc94770007dda54cF92009BFF0dE90c06F603a09f","latest"],"id":1}
+    {"jsonrpc":"2.0","method":"eth_getTransactionCount","params":["0xc94770007dda54cF92009BFF0dE90c06F603a09f","latest"],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -592,11 +562,11 @@ Returns the number of transactions sent from a specified address.
 
 Returns the number of transactions in the block matching the given block hash.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 32-byte block hash.
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Integer representing the number of transactions in the specified block.
 
@@ -606,9 +576,7 @@ Returns the number of transactions in the block matching the given block hash.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":53}
+    {"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -623,11 +591,11 @@ Returns the number of transactions in the block matching the given block hash.
 
 Returns the number of transactions in a block matching the specified block number.
 
-*Parameters*
+**Parameters**
 
 `QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Integer representing the number of transactions in the specified block.
 
@@ -637,9 +605,7 @@ Returns the number of transactions in a block matching the specified block numbe
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByNumber","params":["0xe8"],"id":51}
+    {"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByNumber","params":["0xe8"],"id":51}
     ```
     
     ```json tab="JSON result"
@@ -654,11 +620,11 @@ Returns the number of transactions in a block matching the specified block numbe
 
 Returns the number of uncles in a block from a block matching the given block hash.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 32-byte block hash.
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Integer representing the number of uncles in the specified block.
 
@@ -668,9 +634,7 @@ Returns the number of uncles in a block from a block matching the given block ha
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getUncleCountByBlockHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":1}
+    {"jsonrpc":"2.0","method":"eth_getUncleCountByBlockHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -685,11 +649,11 @@ Returns the number of uncles in a block from a block matching the given block ha
 
 Returns the number of uncles in a block matching the specified block number.
 
-*Parameters*
+**Parameters**
 
 `QUANTITY|TAG` - Integer representing either the 0-based index of the block within the blockchain, or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Integer representing the number of uncles in the specified block.
 
@@ -699,9 +663,7 @@ Returns the number of uncles in a block matching the specified block number.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getUncleCountByBlockNumber","params":["0xe8"],"id":1}
+    {"jsonrpc":"2.0","method":"eth_getUncleCountByBlockNumber","params":["0xe8"],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -716,13 +678,13 @@ Returns the number of uncles in a block matching the specified block number.
 
 Returns the code of the smart contract at the specified address. Compiled smart contract code is stored as a hexadecimal value. 
 
-*Parameters*
+**Parameters**
 
 `DATA` - 20-byte contract address.
 
 `QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` : *DATA* - Code stored at the specified address.
 
@@ -732,9 +694,7 @@ Returns the code of the smart contract at the specified address. Compiled smart 
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getCode","params":["0xa50a51c09a5c451c52bb714527e1974b686d8e77", "latest"],"id":53}
+    {"jsonrpc":"2.0","method":"eth_getCode","params":["0xa50a51c09a5c451c52bb714527e1974b686d8e77", "latest"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -756,14 +716,14 @@ To avoid exposing your private key, create signed transactions offline and send 
 !!!important
     Pantheon does not implement [eth_sendTransaction](Using-JSON-RPC-API.md#account-management-not-supported-by-pantheon).
 
-*Parameters*
+**Parameters**
 
 `DATA` - Hash of the signed raw transaction in hexadecimal format; for example:
 
 `params: ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]`
 
 
-*Returns*
+**Returns**
 
 `result` : `DATA` - 32-byte transaction hash, or zero hash if the transaction is not yet available.
 
@@ -773,9 +733,7 @@ To avoid exposing your private key, create signed transactions offline and send 
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}
+    {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -792,13 +750,13 @@ Invokes a contract function locally and does not change the state of the blockch
 
 You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
-*Parameters*
+**Parameters**
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
 *QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](JSON-RPC-API-Objects.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` (*DATA*) - Return value of the executed contract.
 
@@ -808,9 +766,7 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x69498dd54bd25aa0c886cf1f8b8ae0856d55ff13","value":"0x1"}, "latest"],"id":53}
+    {"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x69498dd54bd25aa0c886cf1f8b8ae0856d55ff13","value":"0x1"}, "latest"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -825,7 +781,7 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 Generates and returns an estimate of how much gas is necessary to allow the transaction to complete. (Per Etherscan: gas price * gas used.) The transaction is added to the blockchain. The estimate may be significantly more than the amount of gas actually used by the transaction for reasons including EVM mechanics and node performance.
 
-*Parameters*
+**Parameters**
 
 !!!note
     Parameters are the same as the eth_call parameters, except that all properties are optional. If you do not specify a `gas` limit, Pantheon uses the gas limit from the pending block as an upper bound. As a result, the returned estimate might not be enough to execute the call or transaction when the amount of gas is higher than the pending block's gas limit.
@@ -834,7 +790,7 @@ Generates and returns an estimate of how much gas is necessary to allow the tran
 
 *QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
-*Returns*
+**Returns**
 
 `result` (*QUANTITY*) -  Amount of gas used.
 
@@ -844,9 +800,7 @@ Generates and returns an estimate of how much gas is necessary to allow the tran
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0x687422eea2cb73b5d3e242ba5456b782919afc85","to":"0xdd37f65db31c107f773e82a4f85c693058fef7a9","value":"0x1"}],"id":53}
+    {"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0x687422eea2cb73b5d3e242ba5456b782919afc85","to":"0xdd37f65db31c107f773e82a4f85c693058fef7a9","value":"0x1"}],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -861,13 +815,13 @@ Generates and returns an estimate of how much gas is necessary to allow the tran
 
 Returns information about the block by hash.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 32-byte hash of a block.
 
 `Boolean` - If `true`, returns the full [transaction objects](JSON-RPC-API-Objects.md#transaction-object); if `false`, returns the transaction hashes.
 
-*Returns*
+**Returns**
 
 `result` : *OBJECT* - [Block object](JSON-RPC-API-Objects.md#block-object) , or `null` when no block is found. 
 
@@ -877,9 +831,7 @@ Returns information about the block by hash.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getBlockByHash","params":["0x16b69965a5949262642cfb5e86368ddbbe57ab9f17d999174a65fd0e66580d8f", false],"id":53}
+    {"jsonrpc":"2.0","method":"eth_getBlockByHash","params":["0x16b69965a5949262642cfb5e86368ddbbe57ab9f17d999174a65fd0e66580d8f", false],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -914,13 +866,13 @@ Returns information about the block by hash.
 
 Returns information about a block by block number.
 
-*Parameters*
+**Parameters**
 
 `QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 `Boolean` - If `true`, returns the full [transaction objects](JSON-RPC-API-Objects.md#transaction-object); if `false`, returns only the hashes of the transactions.
 
-*Returns*
+**Returns**
 
 `result` : *OBJECT* - [Block object](JSON-RPC-API-Objects.md#block-object) , or `null` when no block is found. 
 
@@ -930,9 +882,7 @@ Returns information about a block by block number.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["0x64", true],"id":1}
+    {"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["0x64", true],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -967,11 +917,11 @@ Returns information about a block by block number.
 
 Returns transaction information for the specified transaction hash.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 32-byte transaction hash.
 
-*Returns*
+**Returns**
 
 Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `null` when no transaction is found.
 
@@ -981,9 +931,7 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getTransactionByHash","params":["0xa52be92809541220ee0aaaede6047d9a6c5d0cd96a517c854d944ee70a0ebb44"],"id":53}
+    {"jsonrpc":"2.0","method":"eth_getTransactionByHash","params":["0xa52be92809541220ee0aaaede6047d9a6c5d0cd96a517c854d944ee70a0ebb44"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1013,13 +961,13 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
 
 Returns transaction information for the specified block hash and transaction index position.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 32-byte hash of a block.
 
 `QUANTITY` - Integer representing the transaction index position.
 
-*Returns*
+**Returns**
 
 Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `null` when no transaction is found.
 
@@ -1029,9 +977,7 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getTransactionByBlockHashAndIndex","params":["0xbf137c3a7a1ebdfac21252765e5d7f40d115c2757e4a4abee929be88c624fdb7", "0x2"], "id":1}
+    {"jsonrpc":"2.0","method":"eth_getTransactionByBlockHashAndIndex","params":["0xbf137c3a7a1ebdfac21252765e5d7f40d115c2757e4a4abee929be88c624fdb7", "0x2"], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1061,13 +1007,13 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
 
 Returns transaction information for the specified block number and transaction index position.
 
-*Parameters*
+**Parameters**
 
 `QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
 
 `QUANTITY` - The transaction index position.
 
-*Returns*
+**Returns**
 
 Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `null` when no transaction is found.
 
@@ -1082,9 +1028,7 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getTransactionByBlockNumberAndIndex","params":["82990", "0x2"], "id":1}
+    {"jsonrpc":"2.0","method":"eth_getTransactionByBlockNumberAndIndex","params":["82990", "0x2"], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1114,11 +1058,11 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
 
 Returns the receipt of a transaction by transaction hash. Receipts for pending transactions are not available.
 
-*Parameters*
+**Parameters**
 
 `DATA` - 32-byte hash of a transaction.
 
-*Returns*
+**Returns**
 
 `Object` - [Transaction receipt object](JSON-RPC-API-Objects.md#transaction-receipt-object), or `null` when no receipt is found.
 
@@ -1128,9 +1072,7 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getTransactionReceipt","params":["0x504ce587a65bdbdb6414a0c6c16d86a04dd79bfcc4f2950eec9634b30ce5370f"],"id":53}
+    {"jsonrpc":"2.0","method":"eth_getTransactionReceipt","params":["0x504ce587a65bdbdb6414a0c6c16d86a04dd79bfcc4f2950eec9634b30ce5370f"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1158,7 +1100,7 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 Creates a topic filter with the specified options to notify (log) when the state changes. To determine whether the state has changed, call [eth_getFilterChanges](#eth_getfilterchanges).
 
-*Parameters*
+**Parameters**
 
 `Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object). 
 
@@ -1182,7 +1124,7 @@ Creates a topic filter with the specified options to notify (log) when the state
         }]
         ```
 
-*Returns*
+**Returns**
 
 `result` : *QUANTITY* - Filter ID.
 
@@ -1192,9 +1134,7 @@ Creates a topic filter with the specified options to notify (log) when the state
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_newFilter","params":[{"topics":[]}],"id":53}
+    {"jsonrpc":"2.0","method":"eth_newFilter","params":[{"topics":[]}],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1213,9 +1153,7 @@ Invalid params error:
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_newFilter","params":[{"fromBlock": "earliest","toBlock": "latest","address": "0xDD37f65dB31c107F773E82a4F85C693058fEf7a9","topics": []}],"id":53}
+    {"jsonrpc":"2.0","method":"eth_newFilter","params":[{"fromBlock": "earliest","toBlock": "latest","address": "0xDD37f65dB31c107F773E82a4F85C693058fEf7a9","topics": []}],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1233,11 +1171,11 @@ Invalid params error:
 
 Creates a filter in the node that notifies when a new block arrives. To determine whether the state has changed, call [eth_getFilterChanges](#eth_getfilterchanges).
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `QUANTITY` - Hexadecimal integer filter ID. Each time you call this method, it creates a new filter, and the index is incremented by 1.
 
@@ -1247,9 +1185,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_newBlockFilter","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"eth_newBlockFilter","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1264,11 +1200,11 @@ None
 
 Creates a filter in the node that notifies when new pending transactions arrive. To check if the state has changed, call [eth_getFilterChanges](#eth_getfilterchanges).
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `QUANTITY` - Hexadecimal integer filter ID. Each time you call this method, it creates a new filter, and the index is incremented by 1.
 
@@ -1278,9 +1214,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_newPendingTransactionFilter","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"eth_newPendingTransactionFilter","params":[],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1298,11 +1232,11 @@ Uninstalls a filter with the specified ID. This method should always be called w
 This method deletes filters of any type: block filters, pending transaction filters, and state (topic) filters.
 
 
-*Parameters*
+**Parameters**
 
 `QUANTITY` - Hexadecimal integer filter ID specifying the filter to be deleted.
 
-*Returns*
+**Returns**
 
 `Boolean` - `true` if the filter was successfully uninstalled; otherwise `false`.
 
@@ -1314,9 +1248,7 @@ This method deletes filters of any type: block filters, pending transaction filt
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_uninstallFilter","params":["0x4"],"id":53}
+    {"jsonrpc":"2.0","method":"eth_uninstallFilter","params":["0x4"],"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1331,11 +1263,11 @@ This method deletes filters of any type: block filters, pending transaction filt
 
 Polls the specified filter and returns an array of logs that have occurred since the last poll.
 
-*Parameters*
+**Parameters**
 
 `QUANTITY` - Hexadecimal integer filter ID.
 
-*Returns*
+**Returns**
 
 `result` : `Array of Object` - List of logs, or an empty array if nothing has changed since the last poll.
 
@@ -1349,9 +1281,7 @@ Polls the specified filter and returns an array of logs that have occurred since
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getFilterChanges","params":["0xa"]:"id":53}
+    {"jsonrpc":"2.0","method":"eth_getFilterChanges","params":["0xa"]:"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1366,11 +1296,11 @@ Polls the specified filter and returns an array of logs that have occurred since
 
 Returns an array of logs matching the filter with the specified ID.
 
-*Parameters*
+**Parameters**
 
 `QUANTITY` - Integer representing the filter ID.
 
-*Returns*
+**Returns**
 
 Same as [eth_getFilterChanges](#eth_getfilterchanges).
 
@@ -1382,9 +1312,7 @@ Same as [eth_getFilterChanges](#eth_getfilterchanges).
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getFilterLogs","params":["0x3"]"id":53}
+    {"jsonrpc":"2.0","method":"eth_getFilterLogs","params":["0x3"]"id":53}
     ```
     
     ```json tab="JSON result"
@@ -1409,11 +1337,11 @@ Same as [eth_getFilterChanges](#eth_getfilterchanges).
 
 Returns an array of all logs matching a specified filter object.
 
-*Parameters*
+**Parameters**
 
 `Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object)
 
-*Returns*
+**Returns**
 
 Same as [eth_getFilterChanges](#eth_getfilterchanges).
 
@@ -1428,9 +1356,7 @@ Same as [eth_getFilterChanges](#eth_getfilterchanges).
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getLogs","params":[{"blockhash":"0x677bf4b962464e6dfd548d6a30b6c703dd78c7cc3602825a7013a6e90a001d2a"}], "id":1}
+    {"jsonrpc":"2.0","method":"eth_getLogs","params":[{"blockhash":"0x677bf4b962464e6dfd548d6a30b6c703dd78c7cc3602825a7013a6e90a001d2a"}], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1455,11 +1381,11 @@ Same as [eth_getFilterChanges](#eth_getfilterchanges).
 
 Returns the hash of the current block, the seed hash, and the target boundary condition to be met.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` : `Array of DATA` with the following fields:
 
@@ -1473,9 +1399,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"eth_getWork","params":[],"id":1}
+    {"jsonrpc":"2.0","method":"eth_getWork","params":[],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -1497,11 +1421,11 @@ None
 
 Discards a proposal to add or remove a signer with the specified address. 
 
-*Parameters* 
+**Parameters** 
 
 `data` - 20-byte address of proposed signer. 
 
-*Returns* 
+**Returns** 
 
 `result: boolean` - `true`
 
@@ -1511,9 +1435,7 @@ Discards a proposal to add or remove a signer with the specified address.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}
+    {"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1528,11 +1450,11 @@ Discards a proposal to add or remove a signer with the specified address.
 
 Lists signers for the specified block. 
 
-*Parameters* 
+**Parameters** 
 
 `quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter). 
 
-*Returns*
+**Returns**
 
 `result: array of data` - List of 20-byte addresses of signers. 
 
@@ -1542,9 +1464,7 @@ Lists signers for the specified block.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}
+    {"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1559,11 +1479,11 @@ Lists signers for the specified block.
 
 Lists signers for the specified block.
 
-*Parameters*
+**Parameters**
 
 `data` - 32-byte block hash. 
 
-*Returns* 
+**Returns** 
 
 `result: array of data` - List of 20-byte addresses of signers.
 
@@ -1573,9 +1493,7 @@ Lists signers for the specified block.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"clique_getSignersAtHash","params":["0x98b2ddb5106b03649d2d337d42154702796438b3c74fd25a5782940e84237a48"], "id":1}
+    {"jsonrpc":"2.0","method":"clique_getSignersAtHash","params":["0x98b2ddb5106b03649d2d337d42154702796438b3c74fd25a5782940e84237a48"], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1590,13 +1508,13 @@ Lists signers for the specified block.
 
 Proposes adding or removing a signer with the specified address. 
 
-*Parameters*
+**Parameters**
 
 `data` - 20-byte address.
  
 `boolean` -  `true` to propose adding signer or `false` to propose removing signer. 
 
-*Returns* 
+**Returns** 
 
 `result: boolean` - `true`
    
@@ -1606,9 +1524,7 @@ Proposes adding or removing a signer with the specified address.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}
+    {"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1623,11 +1539,11 @@ Proposes adding or removing a signer with the specified address.
 
 Returns current proposals. 
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns* 
+**Returns** 
 
 `result`:_object_ - Map of account addresses to corresponding boolean values indicating the proposal for each account. 
 
@@ -1639,9 +1555,7 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"clique_proposals","params":[], "id":1}
+    {"jsonrpc":"2.0","method":"clique_proposals","params":[], "id":1}
     ```
     
     ```json tab="JSON result"
@@ -1672,11 +1586,11 @@ The metric types are:
 * Counter
 * Gauge
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result`:`object`
 
@@ -1686,9 +1600,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"debug_metrics","params":[],"id":1}
+    {"jsonrpc":"2.0","method":"debug_metrics","params":[],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -1796,7 +1708,7 @@ None
 
 Reruns the transaction with the same state as when the transaction was executed. 
 
-*Parameters*
+**Parameters**
 
 `transactionHash` : `data` - Transaction hash.
 
@@ -1805,7 +1717,7 @@ Reruns the transaction with the same state as when the transaction was executed.
 * `disableMemory` : `boolean` - `true` disables memory capture. 
 * `disableStack` : `boolean` - `true` disables stack capture. 
 
-*Returns*
+**Returns**
 
 `result`:`object` - [Trace object](JSON-RPC-API-Objects.md#trace-object). 
 
@@ -1815,9 +1727,7 @@ Reruns the transaction with the same state as when the transaction was executed.
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"debug_traceTransaction","params":["0x2cc6c94c21685b7e0f8ddabf277a5ccf98db157c62619cde8baea696a74ed18e",{"disableStorage":true}],"id":1}
+    {"jsonrpc":"2.0","method":"debug_traceTransaction","params":["0x2cc6c94c21685b7e0f8ddabf277a5ccf98db157c62619cde8baea696a74ed18e",{"disableStorage":true}],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -1848,11 +1758,11 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 Starts the CPU mining process. To start mining, a miner coinbase must have been previously specified using the [`--miner-coinbase`](../Reference/Pantheon-CLI-Syntax.md#miner-coinbase) command line option.  
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` :  `boolean` - `true` if the mining start request was received successfully; otherwise returns an error. 
 
@@ -1862,9 +1772,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"miner_start","params":[],"id":1}
+    {"jsonrpc":"2.0","method":"miner_start","params":[],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -1879,11 +1787,11 @@ None
 
 Stops the CPU mining process on the client.
 
-*Parameters*
+**Parameters**
 
 None
 
-*Returns*
+**Returns**
 
 `result` :  `boolean` - `true` if the mining stop request was received successfully; otherwise returns an error. 
 
@@ -1893,9 +1801,7 @@ None
     ```
     
     ```bash tab="wscat WS request"
-    $ wscat -c <JSON-RPC-ws-endpoint:port>
-    connected (press CTRL+C to quit)
-    > {"jsonrpc":"2.0","method":"miner_stop","params":[],"id":1}
+    {"jsonrpc":"2.0","method":"miner_stop","params":[],"id":1}
     ```
     
     ```json tab="JSON result"

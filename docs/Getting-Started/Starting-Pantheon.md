@@ -44,9 +44,10 @@ call [JSON-RPC API methods](../Reference/JSON-RPC-API-Methods.md) to confirm the
     
     * `eth_syncing` returns the starting, current, and highest block. 
     
-       ```bash
-       $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}' 127.0.0.1:8545
+        ```bash
+        $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}' 127.0.0.1:8545
         ``` 
+          
         For example, after connecting to mainnet `eth_syncing` will return something similar to: 
         
         ```json
@@ -59,7 +60,7 @@ call [JSON-RPC API methods](../Reference/JSON-RPC-API-Methods.md) to confirm the
             "highestBlock" : "0x66c0"
           }
         }
-       ```
+        ```
 
 ## Run a Node on Ethereum  Mainnet 
 

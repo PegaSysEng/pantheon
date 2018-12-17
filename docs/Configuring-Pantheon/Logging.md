@@ -5,7 +5,8 @@ source: log4j2.xml
 
 # Logging
 
-Pantheon uses Log4J2 for logging. There are two methods to configure logging behavior: 
+Pantheon uses Log4J2 for logging. There are two methods to configure logging behavior:
+
 * Basic - changes the log level. 
 * Advanced - configures the output and format of the logs. 
 
