@@ -32,10 +32,10 @@ public class MessageValidatorFactory {
   public MessageValidatorFactory(
       final ProposerSelector proposerSelector,
       final BlockHeaderValidator<IbftContext> blockHeaderValidator,
-      final ProtocolContext<IbftContext> protcolContext) {
+      final ProtocolContext<IbftContext> protocolContext) {
     this.proposerSelector = proposerSelector;
     this.blockHeaderValidator = blockHeaderValidator;
-    this.protocolContext = protcolContext;
+    this.protocolContext = protocolContext;
   }
 
   public MessageValidator createMessageValidator(
