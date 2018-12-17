@@ -140,11 +140,11 @@ public class RoundChangeManager {
   public void discardCompletedRound(final ConsensusRoundIdentifier completedRoundIdentifier) {
     roundChangeCache
         .entrySet()
-        .removeIf(entry -> isAnEarlierOrEqualRound(entry.getKey(), completedRoundIdentifier));
+        .removeIf(entry -> isAnEarlierRound(entry.getKey(), completedRoundIdentifier));
   }
 
-  private boolean isAnEarlierOrEqualRound(
+  private boolean isAnEarlierRound(
       final ConsensusRoundIdentifier left, final ConsensusRoundIdentifier right) {
-    return left.getRoundNumber() <= right.getRoundNumber();
+    return left.getRoundNumber() < right.getRoundNumber();
   }
 }

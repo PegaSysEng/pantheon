@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
@@ -53,6 +54,7 @@ public class IbftBlockHeightManager {
   private final RoundTimer roundTimer;
   private final BlockTimer blockTimer;
   private final IbftMessageTransmitter transmitter;
+  private final MessageFactory messageFactory;
   private final Map<Integer, RoundState> futureRoundStateBuffer = Maps.newHashMap();
   private final NewRoundMessageValidator newRoundMessageValidator;
   private final Clock clock;
@@ -75,6 +77,7 @@ public class IbftBlockHeightManager {
     this.roundTimer = finalState.getRoundTimer();
     this.blockTimer = finalState.getBlockTimer();
     this.transmitter = finalState.getTransmitter();
+    this.messageFactory = finalState.getMessageFactory();
     this.clock = clock;
     this.roundChangeManager = roundChangeManager;
     this.finalState = finalState;
@@ -94,7 +97,6 @@ public class IbftBlockHeightManager {
     if (finalState.isLocalNodeProposerForRound(currentRound.getRoundIdentifier())) {
       blockTimer.startTimer(currentRound.getRoundIdentifier(), parentHeader);
     }
-
   }
 
   public void roundExpired(final RoundExpiry expire) {
@@ -111,17 +113,16 @@ public class IbftBlockHeightManager {
       bestPreparedCertificate = preparedCertificate;
     }
 
-    // discard roundchange messages from finished round
-    roundChangeManager.discardCompletedRound(currentRound.getRoundIdentifier());
-
-    // Start a new round, and notify peers.
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
-    // TODO(tmm): This is seems somewhat wrong, maybe the new round should not have started just yet
-    final SignedData<RoundChangePayload> roundChangePayload =
-        transmitter.multicastRoundChange(
+    final SignedData<RoundChangePayload> localRoundChange =
+        messageFactory.createSignedRoundChangePayload(
             currentRound.getRoundIdentifier(), bestPreparedCertificate);
-    handleRoundChangeMessage(roundChangePayload);
+    transmitter.multicastRoundChange(currentRound.getRoundIdentifier(), bestPreparedCertificate);
+
+    // Its possible the locally created RoundChange triggers the transmission of a NewRound
+    // message - so it must be handled accordingly.
+    handleRoundChangeMessage(localRoundChange);
   }
 
   public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
@@ -177,7 +178,9 @@ public class IbftBlockHeightManager {
 
     if (result.isPresent()) {
       final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
-      startNewRound(targetRound.getRoundNumber());
+      if (targetRound.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
+        startNewRound(targetRound.getRoundNumber());
+      }
 
       if (finalState.isLocalNodeProposerForRound(targetRound)) {
         currentRound.startRoundWith(result.get(), clock.millis() / 1000);
@@ -194,7 +197,8 @@ public class IbftBlockHeightManager {
     } else {
       currentRound = roundFactory.createNewRound(parentHeader, roundNumber);
     }
-
+    // discard roundChange messages from the current and previous rounds
+    roundChangeManager.discardCompletedRound(currentRound.getRoundIdentifier());
     roundTimer.startTimer(currentRound.getRoundIdentifier());
   }
 

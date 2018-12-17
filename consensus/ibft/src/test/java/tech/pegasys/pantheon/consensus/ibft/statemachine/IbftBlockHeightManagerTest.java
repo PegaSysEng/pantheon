@@ -18,12 +18,13 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.TestHelpers.createFrom;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -65,30 +66,18 @@ public class IbftBlockHeightManagerTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
 
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
-  @Mock
-  private IbftFinalState finalState;
-  @Mock
-  private IbftMessageTransmitter messageTransmitter;
-  @Mock
-  private RoundChangeManager roundChangeManager;
-  @Mock
-  private IbftRoundFactory roundFactory;
-  @Mock
-  private Clock clock;
-  @Mock
-  private MessageValidatorFactory messageValidatorFactory;
-  @Mock
-  private IbftBlockCreator blockCreator;
-  @Mock
-  private Block block;
-  @Mock
-  private BlockImporter<IbftContext> blockImporter;
-  @Mock
-  private RoundState roundState;
-  @Mock
-  private BlockTimer blockTimer;
-  @Mock
-  private RoundTimer roundTimer;
+  @Mock private IbftFinalState finalState;
+  @Mock private IbftMessageTransmitter messageTransmitter;
+  @Mock private RoundChangeManager roundChangeManager;
+  @Mock private IbftRoundFactory roundFactory;
+  @Mock private Clock clock;
+  @Mock private MessageValidatorFactory messageValidatorFactory;
+  @Mock private IbftBlockCreator blockCreator;
+  @Mock private Block block;
+  @Mock private BlockImporter<IbftContext> blockImporter;
+  @Mock private RoundState roundState;
+  @Mock private BlockTimer blockTimer;
+  @Mock private RoundTimer roundTimer;
 
   private ProtocolContext<IbftContext> protocolContext;
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
@@ -108,9 +97,14 @@ public class IbftBlockHeightManagerTest {
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
 
+    // Ensure the created IbftRound has the valid ConsensusRoundIdentifier;
     when(roundFactory.createNewRound(any(), anyInt()))
-        .thenAnswer(
-            new IbftRound(
+        .thenAnswer(new Answer<IbftRound>() {
+          public IbftRound answer(InvocationOnMock invocation) {
+            final int round = (int)invocation.getArgument(1);
+            final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, round);
+            when(roundState.getRoundIdentifier()).thenReturn(roundId);
+            return new IbftRound(
                 roundState,
                 blockCreator,
                 protocolContext,
@@ -118,7 +112,9 @@ public class IbftBlockHeightManagerTest {
                 new Subscribers<>(),
                 localNodeKeys,
                 messageFactory,
-                messageTransmitter));
+                messageTransmitter);
+          }
+        });
   }
 
   @Test
@@ -198,7 +194,6 @@ public class IbftBlockHeightManagerTest {
 
     manager.roundExpired(new RoundExpiry(roundIdentifier));
     verify(roundFactory).createNewRound(any(), eq(1));
-
   }
 
   @Test
@@ -230,6 +225,5 @@ public class IbftBlockHeightManagerTest {
   }
 
   @Test
-  public void messagesForFutureRoundsAreBufferedAndUsedToPreloadNewRoundWhenItIsStarted() {
-  }
+  public void messagesForFutureRoundsAreBufferedAndUsedToPreloadNewRoundWhenItIsStarted() {}
 }
