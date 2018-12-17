@@ -47,6 +47,6 @@ public class NodeWhitelistController {
   }
 
   public boolean contains(final Peer node) {
-    return (!nodeWhitelistSet || (nodeWhitelistSet && nodeWhitelist.contains(node)));
+    return (!nodeWhitelistSet || (nodeWhitelist.contains(node)));
   }
 }

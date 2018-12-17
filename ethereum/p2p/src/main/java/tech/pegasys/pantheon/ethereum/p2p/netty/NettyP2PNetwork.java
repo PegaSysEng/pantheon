@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
+import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
@@ -142,6 +143,8 @@ public final class NettyP2PNetwork implements P2PNetwork {
 
   private final LabelledMetric<Counter> outboundMessagesCounter;
 
+  private final NodeWhitelistController nodeWhitelist;
+
   /**
    * Creates a peer networking service for production purposes.
    *
@@ -156,7 +159,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
    * @param peerBlacklist The peers with which this node will not connect
    * @param peerRequirement Queried to determine if enough peers are currently connected.
    * @param metricsSystem The metrics system to capture metrics with.
-   * @param nodeWhitelistController Controls the whitelist of nodes to which this node will connect.
+   * @param nodeWhitelist Controls the whitelist of nodes to which this node will connect.
    */
   public NettyP2PNetwork(
       final Vertx vertx,
@@ -166,18 +169,14 @@ public final class NettyP2PNetwork implements P2PNetwork {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
-      final NodeWhitelistController nodeWhitelistController) {
+      final NodeWhitelistController nodeWhitelist) {
 
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
+    this.nodeWhitelist = nodeWhitelist;
     peerDiscoveryAgent =
         new PeerDiscoveryAgent(
-            vertx,
-            keyPair,
-            config.getDiscovery(),
-            peerRequirement,
-            peerBlacklist,
-            nodeWhitelistController);
+            vertx, keyPair, config.getDiscovery(), peerRequirement, peerBlacklist, nodeWhitelist);
 
     outboundMessagesCounter =
         metricsSystem.createLabelledCounter(
@@ -268,8 +267,17 @@ public final class NettyP2PNetwork implements P2PNetwork {
                 connection.disconnect(DisconnectReason.TOO_MANY_PEERS);
                 return;
               }
+
+              // get all the info needed to check the peer against the whitelist
+              Peer peer =
+                  new DefaultPeer(
+                      connection.getPeer().getNodeId(),
+                      ch.remoteAddress().getAddress().getHostAddress(),
+                      connection.getPeer().getPort());
+
               // Reject incoming connections that are blacklisted
-              if (peerBlacklist.contains(connection)) {
+              //   OR not whitelisted (if --node-whitelist)
+              if (peerBlacklist.contains(connection) || !nodeWhitelist.contains(peer)) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
                 return;
               }
