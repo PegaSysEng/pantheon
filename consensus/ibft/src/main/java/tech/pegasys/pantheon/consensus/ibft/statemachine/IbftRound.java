@@ -78,7 +78,6 @@ public class IbftRound {
     this.nodeKeys = nodeKeys;
     this.messageFactory = messageFactory;
     this.transmitter = transmitter;
-    this.localAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
   }
 
   public ConsensusRoundIdentifier getRoundIdentifier() {
@@ -105,8 +104,6 @@ public class IbftRound {
           roundChangeCertificate,
           messageFactory.createSignedProposalPayload(getRoundIdentifier(), block));
     } else {
-      // TODO(tmm) The block here CANNOT simply be the same block as before :( We need to replace
-      // round numbers and stuff to make it actually validate.
       final SignedData<ProposalPayload> proposal =
           createProposalFromPreparedCertificate(latestCertificate.get(), headerTimestamp);
       transmitter.multicastNewRound(getRoundIdentifier(), roundChangeCertificate, proposal);
@@ -115,7 +112,7 @@ public class IbftRound {
   }
 
   private SignedData<ProposalPayload> createProposalFromPreparedCertificate(
-      final PreparedCertificate preparedCertificate, final long headerTimestamp) {
+      final PreparedCertificate preparedCertificate) {
     final Block block = preparedCertificate.getProposalPayload().getPayload().getBlock();
 
     final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
@@ -126,8 +123,7 @@ public class IbftRound {
             prevExtraData.getVote(),
             getRoundIdentifier().getRoundNumber(),
             prevExtraData.getValidators());
-    // When creating a New Round From a preparedCert, the proposer, roundNumber and timestamp
-    // must all be updated to represent the new round
+
     final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
     headerBuilder
         .extraData(extraDataToPublish.encode())
@@ -135,7 +131,7 @@ public class IbftRound {
             blockHeader ->
                 IbftBlockHashing.calculateDataHashForCommittedSeal(
                     blockHeader, extraDataToPublish));
-    BlockHeader newHeader = headerBuilder.buildBlockHeader();
+    final BlockHeader newHeader = headerBuilder.buildBlockHeader();
     final Block newBlock = new Block(newHeader, block.getBody());
     return messageFactory.createSignedProposalPayload(getRoundIdentifier(), newBlock);
   }
