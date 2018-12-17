@@ -14,8 +14,6 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -44,6 +42,8 @@ import java.util.Map;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class IbftController {
   private static final Logger LOG = LogManager.getLogger();
@@ -186,5 +186,4 @@ public class IbftController {
     }
     futureMessages.get(chainHeight).add(rawMsg);
   }
-
 }
