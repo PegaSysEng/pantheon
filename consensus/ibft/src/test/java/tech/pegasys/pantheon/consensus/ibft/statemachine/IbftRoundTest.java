@@ -140,10 +140,6 @@ public class IbftRoundTest {
 
   @Test
   public void sendsAProposalWhenRequested() {
-    // Transmitter must return the payload of the message it sent.
-    when(transmitter.multicastProposal(any(), any()))
-        .thenReturn(messageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock));
-
     final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
     final IbftRound round =
         new IbftRound(
@@ -164,9 +160,6 @@ public class IbftRoundTest {
 
   @Test
   public void singleValidatorImportBlocksImmediatelyOnProposalCreation() {
-    when(transmitter.multicastProposal(any(), any()))
-        .thenReturn(messageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock));
-
     final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
     final IbftRound round =
         new IbftRound(
@@ -230,9 +223,6 @@ public class IbftRoundTest {
 
   @Test
   public void localNodeProposesToNetworkOfTwoValidatorsImportsOnReceptionOfCommitFromPeer() {
-    when(transmitter.multicastProposal(any(), any()))
-        .thenReturn(messageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock));
-
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(

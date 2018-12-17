@@ -45,31 +45,25 @@ public class IbftMessageTransmitter {
     this.networkPeers = networkPeers;
   }
 
-  public SignedData<ProposalPayload> multicastProposal(
-      final ConsensusRoundIdentifier roundIdentifier, final Block block) {
+  public void multicastProposal(final ConsensusRoundIdentifier roundIdentifier, final Block block) {
     final SignedData<ProposalPayload> signedPayload =
         messageFactory.createSignedProposalPayload(roundIdentifier, block);
 
     final ProposalMessage message = ProposalMessage.create(signedPayload);
 
     networkPeers.multicastToValidators(message);
-
-    return signedPayload;
   }
 
-  public SignedData<PreparePayload> multicastPrepare(
-      final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
+  public void multicastPrepare(final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
     final SignedData<PreparePayload> signedPayload =
         messageFactory.createSignedPreparePayload(roundIdentifier, digest);
 
     final PrepareMessage message = PrepareMessage.create(signedPayload);
 
     networkPeers.multicastToValidators(message);
-
-    return signedPayload;
   }
 
-  public SignedData<CommitPayload> multicastCommit(
+  public void multicastCommit(
       final ConsensusRoundIdentifier roundIdentifier,
       final Hash digest,
       final Signature commitSeal) {
@@ -79,10 +73,9 @@ public class IbftMessageTransmitter {
     final CommitMessage message = CommitMessage.create(signedPayload);
 
     networkPeers.multicastToValidators(message);
-    return signedPayload;
   }
 
-  public SignedData<RoundChangePayload> multicastRoundChange(
+  public void multicastRoundChange(
       final ConsensusRoundIdentifier roundIdentifier,
       final Optional<PreparedCertificate> preparedCertificate) {
 
@@ -92,11 +85,9 @@ public class IbftMessageTransmitter {
     final RoundChangeMessage message = RoundChangeMessage.create(signedPayload);
 
     networkPeers.multicastToValidators(message);
-
-    return signedPayload;
   }
 
-  public SignedData<NewRoundPayload> multicastNewRound(
+  public void multicastNewRound(
       final ConsensusRoundIdentifier roundIdentifier,
       final RoundChangeCertificate roundChangeCertificate,
       final SignedData<ProposalPayload> proposalPayload) {
@@ -108,7 +99,5 @@ public class IbftMessageTransmitter {
     final NewRoundMessage message = NewRoundMessage.create(signedPayload);
 
     networkPeers.multicastToValidators(message);
-
-    return signedPayload;
   }
 }

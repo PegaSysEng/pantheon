@@ -112,7 +112,7 @@ public class NewRoundMessageValidator {
     if (!roundChangeCert
         .getRoundChangePayloads()
         .stream()
-        .allMatch(p -> p.getPayload().getRoundChangeIdentifier().equals(expectedRound))) {
+        .allMatch(p -> p.getPayload().getRoundIdentifier().equals(expectedRound))) {
       LOG.info(
           "Invalid NewRound message, not all embedded RoundChange messages have a "
               + "matching target round.");
@@ -161,29 +161,5 @@ public class NewRoundMessageValidator {
     }
 
     return true;
-  }
-
-  private Optional<PreparedCertificate> findLatestPreparedCertificate(
-      final Collection<SignedData<RoundChangePayload>> msgs) {
-
-    Optional<PreparedCertificate> result = Optional.empty();
-
-    for (SignedData<RoundChangePayload> roundChangeMsg : msgs) {
-      final RoundChangePayload payload = roundChangeMsg.getPayload();
-      if (payload.getPreparedCertificate().isPresent()) {
-        if (!result.isPresent()) {
-          result = Optional.of(payload.getPreparedCertificate().get());
-        } else {
-          final PreparedCertificate currentLatest = result.get();
-          final PreparedCertificate nextCert = payload.getPreparedCertificate().get();
-
-          if (currentLatest.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()
-              < nextCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()) {
-            result = Optional.of(nextCert);
-          }
-        }
-      }
-    }
-    return result;
   }
 }

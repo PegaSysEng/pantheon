@@ -52,6 +52,7 @@ public class IbftRoundFactory {
             roundIdentifier,
             finalState.getQuorumSize(),
             new MessageValidator(
+                finalState.getValidators(),
                 finalState.getProposerForRound(roundIdentifier),
                 roundIdentifier,
                 finalState.getBlockHeaderValidator(),

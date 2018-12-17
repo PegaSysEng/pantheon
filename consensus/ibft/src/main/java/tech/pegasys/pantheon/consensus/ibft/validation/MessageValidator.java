@@ -50,12 +50,13 @@ public class MessageValidator {
   private Optional<SignedData<ProposalPayload>> proposal = Optional.empty();
 
   public MessageValidator(
+      final Collection<Address> validators,
       final Address expectedProposer,
       final ConsensusRoundIdentifier roundIdentifier,
       final BlockHeaderValidator<IbftContext> headerValidator,
       final ProtocolContext<IbftContext> protocolContext,
       final BlockHeader parentHeader) {
-    this.validators = protocolContext.getConsensusState().getVoteTally().getValidators();
+    this.validators = validators;
     this.expectedProposer = expectedProposer;
     this.roundIdentifier = roundIdentifier;
     this.headerValidator = headerValidator;

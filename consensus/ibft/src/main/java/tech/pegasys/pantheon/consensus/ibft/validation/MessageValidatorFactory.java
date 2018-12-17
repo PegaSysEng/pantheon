@@ -41,6 +41,7 @@ public class MessageValidatorFactory {
   public MessageValidator createMessageValidator(
       final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
     return new MessageValidator(
+        protocolContext.getConsensusState().getVoteTally().getValidators(),
         proposerSelector.selectProposerForRound(roundIdentifier),
         roundIdentifier,
         blockHeaderValidator,
