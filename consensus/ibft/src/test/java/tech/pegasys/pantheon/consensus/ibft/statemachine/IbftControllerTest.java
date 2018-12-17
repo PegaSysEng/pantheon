@@ -1,0 +1,333 @@
+package tech.pegasys.pantheon.consensus.ibft.statemachine;
+
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+
+@RunWith(MockitoJUnitRunner.class)
+public class IbftControllerTest {
+  @Mock private Blockchain blockChain;
+  @Mock private IbftFinalState ibftFinalState;
+  @Mock private IbftBlockHeightManagerFactory blockHeightManagerFactory;
+  @Mock private BlockHeader parentBlockHeader;
+  @Mock private IbftBlockHeightManager blockHeightManager;
+
+  @Mock private SignedData<ProposalPayload> signedProposal;
+  @Mock private ProposalMessage proposalMessage;
+  @Mock private ProposalPayload proposalPayload;
+
+  @Mock private SignedData<PreparePayload> signedPrepare;
+  @Mock private PrepareMessage prepareMessage;
+  @Mock private PreparePayload preparePayload;
+
+  @Mock private SignedData<CommitPayload> signedCommit;
+  @Mock private CommitMessage commitMessage;
+  @Mock private CommitPayload commitPayload;
+
+  @Mock private SignedData<NewRoundPayload> signedNewRound;
+  @Mock private NewRoundMessage newRoundMessage;
+  @Mock private NewRoundPayload newRoundPayload;
+
+  @Mock private SignedData<RoundChangePayload> signedRoundChange;
+  @Mock private RoundChangeMessage roundChangeMessage;
+  @Mock private RoundChangePayload roundChangePayload;
+
+  private final Map<Long, List<MessageData>> futureMessages = new HashMap<>();
+  private final Address validator = Address.fromHexString("0x0");
+  private final Address unknownValidator = Address.fromHexString("0x2");
+  private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(0, 0);
+  private ConsensusRoundIdentifier futureRoundIdentifier = new ConsensusRoundIdentifier(2, 0);
+  private IbftController ibftController;
+
+  @Before
+  public void setup() {
+    ibftController = new IbftController(blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages);
+    when(blockChain.getChainHeadHeader()).thenReturn(parentBlockHeader);
+    when(blockHeightManagerFactory.create(parentBlockHeader)).thenReturn(blockHeightManager);
+    when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
+  }
+
+  @Test
+  public void createsNewBlockHeightManagerWhenStarted() {
+    ibftController.start();
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManagerFactory).create(parentBlockHeader);
+  }
+
+  @Test
+  public void createsNewBlockHeightManagerOnNewChainHeadEvent() {
+    ibftController.start();
+
+  }
+
+  @Test
+  public void startsNewBlockHeightManagerAndReplaysFutureMessages() {
+    setupPrepare(futureRoundIdentifier, validator);
+    setupProposal(futureRoundIdentifier, validator);
+    setupCommit(futureRoundIdentifier, validator);
+    setupRoundChange(futureRoundIdentifier, validator);
+    setupNewRound(futureRoundIdentifier, validator);
+
+    futureMessages.put(2L, ImmutableList.of(prepareMessage, proposalMessage, commitMessage,
+        roundChangeMessage, newRoundMessage));
+    when(blockHeightManager.getChainHeight()).thenReturn(2L);
+
+    ibftController.start();
+    verify(blockHeightManagerFactory).create(parentBlockHeader);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(blockHeightManager).handlePrepareMessage(signedPrepare);
+    verify(blockHeightManager).handleCommitMessage(signedCommit);
+    verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
+    verify(blockHeightManager).handleNewRoundMessage(signedNewRound);
+  }
+
+  @Test
+  public void proposalForCurrentHeightIsPassedToBlockHeightManager() {
+    setupProposal(roundIdentifier, validator);
+    ibftController.start();
+    ibftController.handleMessageEvent(new IbftReceivedMessageEvent(proposalMessage));
+
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verifyNoMoreInteractions(blockHeightManager);
+  }
+
+  @Test
+  public void prepareForCurrentHeightIsPassedToBlockHeightManager() {
+    setupPrepare(roundIdentifier, validator);
+    ibftController.start();
+    ibftController.handleMessageEvent(new IbftReceivedMessageEvent(prepareMessage));
+
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager).handlePrepareMessage(signedPrepare);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verifyNoMoreInteractions(blockHeightManager);
+  }
+
+  @Test
+  public void commitForCurrentHeightIsPassedToBlockHeightManager() {
+    setupCommit(roundIdentifier, validator);
+    ibftController.start();
+    ibftController.handleMessageEvent(new IbftReceivedMessageEvent(commitMessage));
+
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager).handleCommitMessage(signedCommit);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verifyNoMoreInteractions(blockHeightManager);
+  }
+
+  @Test
+  public void newRoundForFutureHeightIsPassedToBlockHeightManager() {
+    setupNewRound(futureRoundIdentifier, validator);
+    ibftController.start();
+    ibftController.handleMessageEvent(new IbftReceivedMessageEvent(newRoundMessage));
+
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager).handleNewRoundMessage(signedNewRound);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verifyNoMoreInteractions(blockHeightManager);
+  }
+
+  @Test
+  public void roundChangeForFutureHeightIsPassedToBlockHeightManager() {
+    setupRoundChange(futureRoundIdentifier, validator);
+    ibftController.start();
+    ibftController.handleMessageEvent(new IbftReceivedMessageEvent(roundChangeMessage));
+
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verifyNoMoreInteractions(blockHeightManager);
+  }
+
+  @Test
+  public void proposalForPastHeightIsDiscarded() {
+    setupProposal(roundIdentifier, validator);
+    when(blockHeightManager.getChainHeight()).thenReturn(1L);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(proposalMessage));
+  }
+
+  @Test
+  public void prepareForPastHeightIsDiscarded() {
+    setupPrepare(roundIdentifier, validator);
+    when(blockHeightManager.getChainHeight()).thenReturn(1L);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(prepareMessage));
+  }
+
+  @Test
+  public void commitForPastHeightIsDiscarded() {
+    setupCommit(roundIdentifier, validator);
+    when(blockHeightManager.getChainHeight()).thenReturn(1L);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(commitMessage));
+  }
+
+  @Test
+  public void newRoundForPastHeightIsDiscarded() {
+    setupNewRound(roundIdentifier, validator);
+    when(blockHeightManager.getChainHeight()).thenReturn(1L);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(newRoundMessage));
+  }
+
+  @Test
+  public void roundChangeForPastHeightIsDiscarded() {
+    setupRoundChange(roundIdentifier, validator);
+    when(blockHeightManager.getChainHeight()).thenReturn(1L);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(roundChangeMessage));
+  }
+
+  @Test
+  public void proposalForUnknownValidatorIsDiscarded() {
+    setupProposal(roundIdentifier, unknownValidator);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(proposalMessage));
+  }
+
+  @Test
+  public void prepareForUnknownValidatorIsDiscarded() {
+    setupPrepare(roundIdentifier, unknownValidator);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(prepareMessage));
+  }
+
+  @Test
+  public void commitForUnknownValidatorIsDiscarded() {
+    setupCommit(roundIdentifier, unknownValidator);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(commitMessage));
+  }
+
+  @Test
+  public void newRoundForUnknownValidatorIsDiscarded() {
+    setupNewRound(roundIdentifier, unknownValidator);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(newRoundMessage));
+  }
+
+  @Test
+  public void roundChangeForUnknownValidatorIsDiscarded() {
+    setupRoundChange(roundIdentifier, unknownValidator);
+    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(roundChangeMessage));
+  }
+
+  @Test
+  public void proposalForFutureHeightIsBuffered() {
+    setupProposal(futureRoundIdentifier, validator);
+    final Map<Long, List<MessageData>> expectedFutureMsgs = ImmutableMap.of(2L,
+        ImmutableList.of(proposalMessage));
+    verifyHasFutureMessages(new IbftReceivedMessageEvent(proposalMessage), expectedFutureMsgs);
+  }
+
+  @Test
+  public void prepareForFutureHeightIsBuffered() {
+    setupPrepare(futureRoundIdentifier, validator);
+    final Map<Long, List<MessageData>> expectedFutureMsgs = ImmutableMap.of(2L,
+        ImmutableList.of(prepareMessage));
+    verifyHasFutureMessages(new IbftReceivedMessageEvent(prepareMessage), expectedFutureMsgs);
+  }
+
+  @Test
+  public void commitForFutureHeightIsBuffered() {
+    setupCommit(futureRoundIdentifier, validator);
+    final Map<Long, List<MessageData>> expectedFutureMsgs = ImmutableMap.of(2L,
+        ImmutableList.of(commitMessage));
+    verifyHasFutureMessages(new IbftReceivedMessageEvent(commitMessage), expectedFutureMsgs);
+  }
+
+  private void verifyNotHandledAndNoFutureMsgs(final IbftReceivedMessageEvent msg) {
+    ibftController.start();
+    ibftController.handleMessageEvent(msg);
+
+    assertThat(futureMessages).isEmpty();
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verifyNoMoreInteractions(blockHeightManager);
+  }
+
+  private void verifyHasFutureMessages(final IbftReceivedMessageEvent msg,
+      final Map<Long, List<MessageData>> expectedFutureMsgs) {
+    ibftController.start();
+    ibftController.handleMessageEvent(msg);
+
+    assertThat(futureMessages).hasSize(expectedFutureMsgs.size());
+    assertThat(futureMessages).isEqualTo(expectedFutureMsgs);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verifyNoMoreInteractions(blockHeightManager);
+  }
+
+  private void setupProposal(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+    when(signedProposal.getPayload()).thenReturn(proposalPayload);
+    when(signedProposal.getSender()).thenReturn(validator);
+    when(proposalPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(proposalMessage.getCode()).thenReturn(IbftV2.PROPOSAL);
+    when(proposalMessage.decode()).thenReturn(signedProposal);
+  }
+
+  private void setupPrepare(final ConsensusRoundIdentifier roundIdentifier,
+      final Address validator) {
+    when(signedPrepare.getPayload()).thenReturn(preparePayload);
+    when(signedPrepare.getSender()).thenReturn(validator);
+    when(preparePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(prepareMessage.getCode()).thenReturn(IbftV2.PREPARE);
+    when(prepareMessage.decode()).thenReturn(signedPrepare);
+  }
+
+  private void setupCommit(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+    when(signedCommit.getPayload()).thenReturn(commitPayload);
+    when(signedCommit.getSender()).thenReturn(validator);
+    when(commitPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(commitMessage.getCode()).thenReturn(IbftV2.COMMIT);
+    when(commitMessage.decode()).thenReturn(signedCommit);
+  }
+
+  private void setupNewRound(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+    when(signedNewRound.getPayload()).thenReturn(newRoundPayload);
+    when(signedNewRound.getSender()).thenReturn(validator);
+    when(newRoundPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(newRoundMessage.getCode()).thenReturn(IbftV2.NEW_ROUND);
+    when(newRoundMessage.decode()).thenReturn(signedNewRound);
+  }
+
+  private void setupRoundChange(final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
+    when(signedRoundChange.getPayload()).thenReturn(roundChangePayload);
+    when(signedRoundChange.getSender()).thenReturn(validator);
+    when(roundChangePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(roundChangeMessage.getCode()).thenReturn(IbftV2.ROUND_CHANGE);
+    when(roundChangeMessage.decode()).thenReturn(signedRoundChange);
+  }
+}
