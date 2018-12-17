@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
@@ -29,7 +30,7 @@ public class IbftBlockHeightManager {
 
   public void handleCommitMessage(final SignedData<CommitPayload> commitMsg) {}
 
-  public void handleBlockTimerExpiry() {}
+  public void handleBlockTimerExpiry(final ConsensusRoundIdentifier roundIndentifier) {}
 
   public void handleRoundChangeMessage(final SignedData<RoundChangePayload> roundChangeMsg) {}
 

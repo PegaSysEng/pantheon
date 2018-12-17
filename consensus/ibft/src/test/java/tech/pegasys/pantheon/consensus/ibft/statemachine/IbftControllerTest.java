@@ -17,7 +17,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessage;
@@ -40,7 +43,7 @@ public class IbftControllerTest {
   @Mock private Blockchain blockChain;
   @Mock private IbftFinalState ibftFinalState;
   @Mock private IbftBlockHeightManagerFactory blockHeightManagerFactory;
-  @Mock private BlockHeader parentBlockHeader;
+  @Mock private BlockHeader blockHeader;
   @Mock private IbftBlockHeightManager blockHeightManager;
 
   @Mock private SignedData<ProposalPayload> signedProposal;
@@ -73,8 +76,8 @@ public class IbftControllerTest {
   @Before
   public void setup() {
     ibftController = new IbftController(blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages);
-    when(blockChain.getChainHeadHeader()).thenReturn(parentBlockHeader);
-    when(blockHeightManagerFactory.create(parentBlockHeader)).thenReturn(blockHeightManager);
+    when(blockChain.getChainHeadHeader()).thenReturn(blockHeader);
+    when(blockHeightManagerFactory.create(blockHeader)).thenReturn(blockHeightManager);
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
   }
 
@@ -82,13 +85,7 @@ public class IbftControllerTest {
   public void createsNewBlockHeightManagerWhenStarted() {
     ibftController.start();
     assertThat(futureMessages).isEmpty();
-    verify(blockHeightManagerFactory).create(parentBlockHeader);
-  }
-
-  @Test
-  public void createsNewBlockHeightManagerOnNewChainHeadEvent() {
-    ibftController.start();
-
+    verify(blockHeightManagerFactory).create(blockHeader);
   }
 
   @Test
@@ -104,7 +101,7 @@ public class IbftControllerTest {
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
 
     ibftController.start();
-    verify(blockHeightManagerFactory).create(parentBlockHeader);
+    verify(blockHeightManagerFactory).create(blockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verify(blockHeightManager).handleProposalMessage(signedProposal);
@@ -113,6 +110,52 @@ public class IbftControllerTest {
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
     verify(blockHeightManager).handleNewRoundMessage(signedNewRound);
   }
+
+  @Test
+  public void createsNewBlockHeightManagerAndReplaysFutureMessagesOnNewChainHeadEvent() {
+    setupPrepare(futureRoundIdentifier, validator);
+    setupProposal(futureRoundIdentifier, validator);
+    setupCommit(futureRoundIdentifier, validator);
+    setupRoundChange(futureRoundIdentifier, validator);
+    setupNewRound(futureRoundIdentifier, validator);
+
+    futureMessages.put(2L, ImmutableList.of(prepareMessage, proposalMessage, commitMessage,
+        roundChangeMessage, newRoundMessage));
+    when(blockHeightManager.getChainHeight()).thenReturn(2L);
+
+    final NewChainHead newChainHead = new NewChainHead(blockHeader);
+    ibftController.handleNewBlockEvent(newChainHead);
+
+    verify(blockHeightManagerFactory).create(blockHeader);
+    verify(blockHeightManager, atLeastOnce()).getChainHeight();
+    verify(blockHeightManager).start();
+    verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(blockHeightManager).handlePrepareMessage(signedPrepare);
+    verify(blockHeightManager).handleCommitMessage(signedCommit);
+    verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
+    verify(blockHeightManager).handleNewRoundMessage(signedNewRound);
+  }
+
+  @Test
+  public void handlesRoundExpiry() {
+    final RoundExpiry roundExpiry = new RoundExpiry(roundIdentifier);
+
+    ibftController.start();
+    ibftController.handleRoundExpiry(roundExpiry);
+
+    verify(blockHeightManager).roundExpired(roundExpiry);
+  }
+
+  @Test
+  public void handlesBlockTimerExpiry() {
+    final BlockTimerExpiry blockTimerExpiry = new BlockTimerExpiry(roundIdentifier);
+
+    ibftController.start();
+    ibftController.handleBlockTimerExpiry(blockTimerExpiry);
+
+    verify(blockHeightManager).handleBlockTimerExpiry(roundIdentifier);
+  }
+
 
   @Test
   public void proposalForCurrentHeightIsPassedToBlockHeightManager() {

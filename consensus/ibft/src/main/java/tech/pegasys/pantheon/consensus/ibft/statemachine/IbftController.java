@@ -22,6 +22,7 @@ import java.util.Map;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
@@ -122,8 +123,13 @@ public class IbftController {
     }
   }
 
+  public void handleNewBlockEvent(final NewChainHead newChainHead) {
+    final BlockHeader newHead = newChainHead.getNewChainHeadHeader();
+    startNewHeightManager(newHead);
+  }
+
   public void handleBlockTimerExpiry(final BlockTimerExpiry blockTimerExpiry) {
-    currentHeightManager.handleBlockTimerExpiry();
+    currentHeightManager.handleBlockTimerExpiry(blockTimerExpiry.getRoundIndentifier());
   }
 
   public void startNewHeightManager(final BlockHeader parentHeader) {
