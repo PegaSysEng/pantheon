@@ -147,7 +147,7 @@ public class IbftController {
     }
   }
 
-  public void startNewHeightManager(final BlockHeader parentHeader) {
+  private void startNewHeightManager(final BlockHeader parentHeader) {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
