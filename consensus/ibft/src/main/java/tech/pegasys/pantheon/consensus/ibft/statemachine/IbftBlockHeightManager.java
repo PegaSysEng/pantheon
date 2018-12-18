@@ -48,6 +48,12 @@ import org.apache.logging.log4j.Logger;
  */
 public class IbftBlockHeightManager {
 
+  private enum MessageAge {
+    PRIOR_ROUND,
+    CURRENT_ROUND,
+    FUTURE_ROUND
+  }
+
   private static final Logger LOG = LogManager.getLogger();
 
   private final IbftRoundFactory roundFactory;
@@ -164,12 +170,13 @@ public class IbftBlockHeightManager {
 
   private void actionOrBufferMessage(
       final SignedData<? extends Payload> msg,
-      final Action inRoundHandler,
+      final Runnable inRoundHandler,
       final Consumer<RoundState> buffer) {
-    final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
-    if (msgRoundId.equals(currentRound.getRoundIdentifier())) {
-      inRoundHandler.apply();
-    } else if (msgRoundId.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
+    final MessageAge messageAge = determineAgeOfMessage(msg);
+    if (messageAge == MessageAge.CURRENT_ROUND) {
+      inRoundHandler.run();
+    } else if (messageAge == MessageAge.FUTURE_ROUND) {
+      final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
       final RoundState roundstate =
           futureRoundStateBuffer.computeIfAbsent(
               msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
@@ -180,10 +187,15 @@ public class IbftBlockHeightManager {
   public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
     final Optional<RoundChangeCertificate> result =
         roundChangeManager.appendRoundChangeMessage(msg);
+    MessageAge messageAge = determineAgeOfMessage(msg);
+    if (messageAge == MessageAge.PRIOR_ROUND) {
+      LOG.info("Received RoundChange Message for a prior round.");
+      return;
+    }
 
     if (result.isPresent()) {
-      final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
-      if (targetRound.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
+      ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
+      if (messageAge == MessageAge.FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
       }
 
@@ -198,7 +210,7 @@ public class IbftBlockHeightManager {
       currentRound =
           roundFactory.createNewRoundWithState(
               parentHeader, futureRoundStateBuffer.get(roundNumber));
-      futureRoundStateBuffer.entrySet().removeIf(k -> k.getKey() <= roundNumber);
+      futureRoundStateBuffer.keySet().removeIf(k -> k <= roundNumber);
     } else {
       currentRound = roundFactory.createNewRound(parentHeader, roundNumber);
     }
@@ -208,10 +220,16 @@ public class IbftBlockHeightManager {
   }
 
   public void handleNewRoundMessage(final SignedData<NewRoundPayload> msg) {
+    MessageAge messageAge = determineAgeOfMessage(msg);
+    if (messageAge == MessageAge.PRIOR_ROUND) {
+      LOG.info("Received NewRound Message for a prior round.");
+      return;
+    }
+
     if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
-      final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
-      if (targetRound.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
-        startNewRound(targetRound.getRoundNumber());
+
+      if (determineAgeOfMessage(msg) == MessageAge.FUTURE_ROUND) {
+        startNewRound(msg.getPayload().getRoundIdentifier().getRoundNumber());
       }
       currentRound.handleProposalMessage(msg.getPayload().getProposalPayload());
     }
@@ -221,8 +239,14 @@ public class IbftBlockHeightManager {
     return currentRound.getRoundIdentifier().getSequenceNumber();
   }
 
-  @FunctionalInterface
-  private interface Action {
-    void apply();
+  private MessageAge determineAgeOfMessage(final SignedData<? extends Payload> msg) {
+    int messageRoundNumber = msg.getPayload().getRoundIdentifier().getRoundNumber();
+    int currentRoundNumber = currentRound.getRoundIdentifier().getRoundNumber();
+    if (messageRoundNumber > currentRoundNumber) {
+      return MessageAge.FUTURE_ROUND;
+    } else if (messageRoundNumber == currentRoundNumber) {
+      return MessageAge.CURRENT_ROUND;
+    }
+    return MessageAge.PRIOR_ROUND;
   }
 }
