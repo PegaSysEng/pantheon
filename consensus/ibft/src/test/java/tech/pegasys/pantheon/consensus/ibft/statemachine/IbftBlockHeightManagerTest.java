@@ -128,7 +128,7 @@ public class IbftBlockHeightManagerTest {
     when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
     when(messageValidatorFactory.createNewRoundValidator(any()))
         .thenReturn(newRoundMessageValidator);
-
+    when(messageValidatorFactory.create
 
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
@@ -150,6 +150,19 @@ public class IbftBlockHeightManagerTest {
                   messageFactory,
                   messageTransmitter);
             });
+
+    when(roundFactory.createNewRoundWithState(any(), any())).thenAnswer(invocation -> {
+      final RoundState providedRoundState = invocation.getArgument(1);
+      return new IbftRound(
+          providedRoundState,
+          blockCreator,
+          protocolContext,
+          blockImporter,
+          new Subscribers<>(),
+          localNodeKeys,
+          messageFactory,
+          messageTransmitter);
+    });
   }
 
   @Test
