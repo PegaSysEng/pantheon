@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,6 +31,7 @@ import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
@@ -40,6 +42,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -47,6 +50,8 @@ import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockBody;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -63,6 +68,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IbftBlockHeightManagerTest {
@@ -106,6 +112,19 @@ public class IbftBlockHeightManagerTest {
 
   private ProtocolContext<IbftContext> protocolContext;
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
+  private Block createdBlock;
+
+  private void buildCreatedBlock() {
+
+    IbftExtraData extraData =
+        new IbftExtraData(BytesValue.wrap(new byte[32]), emptyList(), Optional.empty(), 0,
+            validators);
+
+    final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
+    headerTestFixture.extraData(extraData.encode());
+    final BlockHeader header = headerTestFixture.buildHeader();
+    createdBlock = new Block(header, new BlockBody(emptyList(), emptyList()));
+  }
 
   @Before
   public void setup() {
@@ -116,6 +135,13 @@ public class IbftBlockHeightManagerTest {
       validatorMessageFactory.add(new MessageFactory(key));
     }
 
+    buildCreatedBlock();
+
+    final MessageValidator messageValidator = mock(MessageValidator.class);
+    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+
     // when(finalState.getValidators()).thenReturn(validators);
     // when(finalState.getNodeKeys()).thenReturn(localNodeKeys);
     // when(finalState.getLocalAddress()).thenReturn(localAddress);
@@ -123,12 +149,12 @@ public class IbftBlockHeightManagerTest {
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
     when(finalState.getRoundTimer()).thenReturn(roundTimer);
     when(finalState.getMessageFactory()).thenReturn(messageFactory);
-    when(blockCreator.createBlock(anyLong())).thenReturn(block);
+    when(blockCreator.createBlock(anyLong())).thenReturn(createdBlock);
     when(roundState.getRoundIdentifier()).thenReturn(roundIdentifier);
     when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
     when(messageValidatorFactory.createNewRoundValidator(any()))
         .thenReturn(newRoundMessageValidator);
-    when(messageValidatorFactory.create
+    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(messageValidator);
 
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
@@ -300,7 +326,7 @@ public class IbftBlockHeightManagerTest {
     // Force a new round to be started at new round number.
     final SignedData<NewRoundPayload> newRound = messageFactory.createSignedNewRoundPayload(
         futureRoundIdentifier, new RoundChangeCertificate(Collections.emptyList()),
-        messageFactory.createSignedProposalPayload(futureRoundIdentifier, block));
+        messageFactory.createSignedProposalPayload(futureRoundIdentifier, createdBlock));
 
     manager.handleNewRoundMessage(newRound);
   }
