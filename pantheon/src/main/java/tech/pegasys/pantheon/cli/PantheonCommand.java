@@ -34,8 +34,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -405,6 +405,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Collection<String> nodesWhitelist = null;
 
+  // Permissioning: A list of whitelist addresses can be passed.
+  @Option(
+    names = {"--accounts-whitelist"},
+    paramLabel = "<eth_address>",
+    description =
+        "Comma separated list of hex representation of eth_address. You may specify an empty list.",
+    split = ",",
+    arity = "0..*"
+  )
+  private final Collection<String> accountWhitelist = null;
+
   public PantheonCommand(
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
@@ -537,6 +548,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+    permissioningConfiguration.setAccountWhitelist(accountWhitelist);
     return permissioningConfiguration;
   }
 
