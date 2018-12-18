@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataDir;
 
+import java.net.URI;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
@@ -34,7 +35,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -403,7 +404,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     split = ",",
     arity = "0..*"
   )
-  private final Collection<String> nodesWhitelist = null;
+  private final Collection<URI> nodesWhitelist = null;
+
+  @Option(
+    names = {"--accounts-whitelist"},
+      paramLabel = "hexStringOfAccountPublicKey",
+      description =
+          "Comma separate hexString of Account Public key to be whitelisted "
+              + "for the permissioned networks, You may specify an empty list",
+      split = ",",
+      arity = "0..*"
+  )
+  private final Collection<String> accountsWhitelist = null;
 
   public PantheonCommand(
       final BlockImporter blockImporter,
@@ -537,6 +549,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+    permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
     return permissioningConfiguration;
   }
 
