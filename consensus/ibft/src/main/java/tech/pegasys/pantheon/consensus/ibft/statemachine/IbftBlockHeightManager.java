@@ -140,27 +140,31 @@ public class IbftBlockHeightManager {
 
   public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
     LOG.info("Received a Proposal message.");
-    actionOrBufferMessage(msg,
+    actionOrBufferMessage(
+        msg,
         () -> currentRound.handleProposalMessage(msg),
         (roundstate) -> roundstate.setProposedBlock(msg));
   }
 
   public void handlePrepareMessage(final SignedData<PreparePayload> msg) {
     LOG.info("Received a prepare message.");
-    actionOrBufferMessage(msg,
+    actionOrBufferMessage(
+        msg,
         () -> currentRound.handlePrepareMessage(msg),
         (roundstate) -> roundstate.addPrepareMessage(msg));
   }
 
   public void handleCommitMessage(final SignedData<CommitPayload> msg) {
     LOG.info("Received a commit message.");
-    actionOrBufferMessage(msg,
+    actionOrBufferMessage(
+        msg,
         () -> currentRound.handleCommitMessage(msg),
         (roundstate) -> roundstate.addCommitMessage(msg));
   }
 
   private void actionOrBufferMessage(
-      final SignedData<? extends Payload> msg, final Action inRoundHandler,
+      final SignedData<? extends Payload> msg,
+      final Action inRoundHandler,
       final Consumer<RoundState> buffer) {
     final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
     if (msgRoundId.equals(currentRound.getRoundIdentifier())) {

@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.TestHelpers.createFrom;
 
+import java.math.BigInteger;
+import java.util.Collections;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -30,17 +33,23 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
+import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.util.Subscribers;
 
@@ -60,28 +69,53 @@ public class IbftBlockHeightManagerTest {
 
   private KeyPair localNodeKeys = KeyPair.generate();
   private Address localAddress = Util.publicKeyToAddress(localNodeKeys.getPublicKey());
-  private List<Address> validators = Lists.newArrayList();
+
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
 
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
-  @Mock private IbftFinalState finalState;
-  @Mock private IbftMessageTransmitter messageTransmitter;
-  @Mock private RoundChangeManager roundChangeManager;
-  @Mock private IbftRoundFactory roundFactory;
-  @Mock private Clock clock;
-  @Mock private MessageValidatorFactory messageValidatorFactory;
-  @Mock private IbftBlockCreator blockCreator;
-  @Mock private Block block;
-  @Mock private BlockImporter<IbftContext> blockImporter;
-  @Mock private RoundState roundState;
-  @Mock private BlockTimer blockTimer;
-  @Mock private RoundTimer roundTimer;
+  @Mock
+  private IbftFinalState finalState;
+  @Mock
+  private IbftMessageTransmitter messageTransmitter;
+  @Mock
+  private RoundChangeManager roundChangeManager;
+  @Mock
+  private IbftRoundFactory roundFactory;
+  @Mock
+  private Clock clock;
+  @Mock
+  private MessageValidatorFactory messageValidatorFactory;
+  @Mock
+  private IbftBlockCreator blockCreator;
+  @Mock
+  private Block block;
+  @Mock
+  private BlockImporter<IbftContext> blockImporter;
+  @Mock
+  private RoundState roundState;
+  @Mock
+  private BlockTimer blockTimer;
+  @Mock
+  private RoundTimer roundTimer;
+  @Mock
+  private NewRoundMessageValidator newRoundMessageValidator;
+
+  private final List<KeyPair> validatorKeys = Lists.newArrayList();
+  private List<Address> validators = Lists.newArrayList();
+  private List<MessageFactory> validatorMessageFactory = Lists.newArrayList();
 
   private ProtocolContext<IbftContext> protocolContext;
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
 
   @Before
   public void setup() {
+    for (int i = 0; i < 3; i++) {
+      final KeyPair key = KeyPair.generate();
+      validatorKeys.add(key);
+      validators.add(Util.publicKeyToAddress(key.getPublicKey()));
+      validatorMessageFactory.add(new MessageFactory(key));
+    }
+
     // when(finalState.getValidators()).thenReturn(validators);
     // when(finalState.getNodeKeys()).thenReturn(localNodeKeys);
     // when(finalState.getLocalAddress()).thenReturn(localAddress);
@@ -91,6 +125,10 @@ public class IbftBlockHeightManagerTest {
     when(finalState.getMessageFactory()).thenReturn(messageFactory);
     when(blockCreator.createBlock(anyLong())).thenReturn(block);
     when(roundState.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
+    when(messageValidatorFactory.createNewRoundValidator(any()))
+        .thenReturn(newRoundMessageValidator);
+
 
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
@@ -222,5 +260,35 @@ public class IbftBlockHeightManagerTest {
   }
 
   @Test
-  public void messagesForFutureRoundsAreBufferedAndUsedToPreloadNewRoundWhenItIsStarted() {}
+  public void messagesForFutureRoundsAreBufferedAndUsedToPreloadNewRoundWhenItIsStarted() {
+    final ConsensusRoundIdentifier futureRoundIdentifier = createFrom(roundIdentifier, 0, +2);
+
+    final IbftBlockHeightManager manager =
+        new IbftBlockHeightManager(
+            headerTestFixture.buildHeader(),
+            finalState,
+            roundChangeManager,
+            roundFactory,
+            clock,
+            messageValidatorFactory);
+    manager.start();
+
+    final SignedData<PreparePayload> preparePayload =
+        validatorMessageFactory.get(0).createSignedPreparePayload(futureRoundIdentifier,
+            Hash.fromHexStringLenient("0"));
+    final SignedData<CommitPayload> commitPayload =
+        validatorMessageFactory.get(1).createSignedCommitPayload(futureRoundIdentifier,
+            Hash.fromHexStringLenient("0"),
+            Signature.create(BigInteger.ONE, BigInteger.ONE, (byte) 1));
+
+    manager.handlePrepareMessage(preparePayload);
+    manager.handleCommitMessage(commitPayload);
+
+    // Force a new round to be started at new round number.
+    final SignedData<NewRoundPayload> newRound = messageFactory.createSignedNewRoundPayload(
+        futureRoundIdentifier, new RoundChangeCertificate(Collections.emptyList()),
+        messageFactory.createSignedProposalPayload(futureRoundIdentifier, block));
+
+    manager.handleNewRoundMessage(newRound);
+  }
 }
