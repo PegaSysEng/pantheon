@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -48,5 +49,9 @@ public class NodeWhitelistController {
 
   public boolean contains(final Peer node) {
     return (!nodeWhitelistSet || (nodeWhitelist.contains(node)));
+  }
+
+  public boolean contains(final BytesValue nodeId, final String host, final int port) {
+    return (!nodeWhitelistSet || (nodeWhitelist.contains(new DefaultPeer(nodeId, host, port))));
   }
 }

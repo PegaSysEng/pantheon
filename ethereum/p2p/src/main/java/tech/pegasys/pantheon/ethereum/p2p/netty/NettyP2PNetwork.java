@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
@@ -268,16 +267,13 @@ public final class NettyP2PNetwork implements P2PNetwork {
                 return;
               }
 
-              // get all the info needed to check the peer against the whitelist
-              Peer peer =
-                  new DefaultPeer(
-                      connection.getPeer().getNodeId(),
-                      ch.remoteAddress().getAddress().getHostAddress(),
-                      connection.getPeer().getPort());
-
               // Reject incoming connections that are blacklisted
               //   OR not whitelisted (if --node-whitelist)
-              if (peerBlacklist.contains(connection) || !nodeWhitelist.contains(peer)) {
+              if (peerBlacklist.contains(connection)
+                  || !nodeWhitelist.contains(
+                      connection.getPeer().getNodeId(),
+                      ch.remoteAddress().getAddress().getHostAddress(),
+                      connection.getPeer().getPort())) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
                 return;
               }
