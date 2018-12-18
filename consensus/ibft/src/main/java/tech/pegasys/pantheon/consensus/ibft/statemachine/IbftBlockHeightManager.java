@@ -219,7 +219,6 @@ public class IbftBlockHeightManager {
 
   @FunctionalInterface
   private interface Action {
-
     void apply();
   }
 }
