@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.DefaultMessageValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -52,7 +52,7 @@ public class IbftRoundFactory {
         new RoundState(
             roundIdentifier,
             finalState.getQuorumSize(),
-            new MessageValidator(
+            new DefaultMessageValidator(
                 finalState.getValidators(),
                 finalState.getProposerForRound(roundIdentifier),
                 roundIdentifier,

@@ -36,7 +36,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class MessageValidator {
+public class DefaultMessageValidator {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -49,7 +49,7 @@ public class MessageValidator {
 
   private Optional<SignedData<ProposalPayload>> proposal = Optional.empty();
 
-  public MessageValidator(
+  public DefaultMessageValidator(
       final Collection<Address> validators,
       final Address expectedProposer,
       final ConsensusRoundIdentifier roundIdentifier,

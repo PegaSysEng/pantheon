@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.DefaultMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 public class RoundState {
 
   private final ConsensusRoundIdentifier roundIdentifier;
-  private final MessageValidator validator;
+  private final DefaultMessageValidator validator;
   private final long quorumSize;
 
   private Optional<SignedData<ProposalPayload>> proposalMessage = Optional.empty();
@@ -49,7 +49,7 @@ public class RoundState {
   public RoundState(
       final ConsensusRoundIdentifier roundIdentifier,
       final int quorumSize,
-      final MessageValidator validator) {
+      final DefaultMessageValidator validator) {
     this.roundIdentifier = roundIdentifier;
     this.quorumSize = quorumSize;
     this.validator = validator;

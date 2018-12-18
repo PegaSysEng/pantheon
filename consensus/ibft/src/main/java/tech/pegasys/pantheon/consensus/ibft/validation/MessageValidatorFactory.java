@@ -38,9 +38,9 @@ public class MessageValidatorFactory {
     this.protocolContext = protocolContext;
   }
 
-  public MessageValidator createMessageValidator(
+  public DefaultMessageValidator createMessageValidator(
       final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
-    return new MessageValidator(
+    return new DefaultMessageValidator(
         protocolContext.getConsensusState().getVoteTally().getValidators(),
         proposerSelector.selectProposerForRound(roundIdentifier),
         roundIdentifier,

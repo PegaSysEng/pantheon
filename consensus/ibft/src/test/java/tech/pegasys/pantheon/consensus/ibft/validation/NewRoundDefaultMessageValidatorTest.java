@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
-public class NewRoundMessageValidatorTest {
+public class NewRoundDefaultMessageValidatorTest {
 
   private final KeyPair proposerKey = KeyPair.generate();
   private final KeyPair validatorKey = KeyPair.generate();
@@ -61,7 +61,7 @@ public class NewRoundMessageValidatorTest {
   private final ProposerSelector proposerSelector = mock(ProposerSelector.class);
   private final MessageValidatorForHeightFactory validatorFactory =
       mock(MessageValidatorForHeightFactory.class);
-  private final MessageValidator messageValidator = mock(MessageValidator.class);
+  private final DefaultMessageValidator defaultMessageValidator = mock(DefaultMessageValidator.class);
 
   private final SignedData<NewRoundPayload> validMsg =
       createValidNewRoundMessageSignedBy(proposerKey);
@@ -76,9 +76,9 @@ public class NewRoundMessageValidatorTest {
 
     when(proposerSelector.selectProposerForRound(any())).thenReturn(proposerAddress);
 
-    when(validatorFactory.createAt(any())).thenReturn(messageValidator);
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(validatorFactory.createAt(any())).thenReturn(defaultMessageValidator);
+    when(defaultMessageValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(defaultMessageValidator.validatePrepareMessage(any())).thenReturn(true);
 
     when(proposedBlock.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
 
@@ -236,7 +236,7 @@ public class NewRoundMessageValidatorTest {
     msgBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
 
     // The prepare Message in the RoundChange Cert will be deemed illegal.
-    when(messageValidator.validatePrepareMessage(any())).thenReturn(false);
+    when(defaultMessageValidator.validatePrepareMessage(any())).thenReturn(false);
 
     final SignedData<NewRoundPayload> msg = signPayload(msgBuilder.build(), proposerKey);
 

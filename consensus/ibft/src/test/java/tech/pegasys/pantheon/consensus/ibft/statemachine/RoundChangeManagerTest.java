@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.DefaultMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -69,11 +69,11 @@ public class RoundChangeManagerTest {
         (BlockHeaderValidator<IbftContext>) mock(BlockHeaderValidator.class);
     BlockHeader parentHeader = mock(BlockHeader.class);
 
-    Map<ConsensusRoundIdentifier, MessageValidator> messageValidators = Maps.newHashMap();
+    Map<ConsensusRoundIdentifier, DefaultMessageValidator> messageValidators = Maps.newHashMap();
 
     messageValidators.put(
         ri1,
-        new MessageValidator(
+        new DefaultMessageValidator(
             validators,
             Util.publicKeyToAddress(proposerKey.getPublicKey()),
             ri1,
@@ -83,7 +83,7 @@ public class RoundChangeManagerTest {
 
     messageValidators.put(
         ri2,
-        new MessageValidator(
+        new DefaultMessageValidator(
             validators,
             Util.publicKeyToAddress(validator1Key.getPublicKey()),
             ri2,
@@ -93,7 +93,7 @@ public class RoundChangeManagerTest {
 
     messageValidators.put(
         ri3,
-        new MessageValidator(
+        new DefaultMessageValidator(
             validators,
             Util.publicKeyToAddress(validator2Key.getPublicKey()),
             ri3,
