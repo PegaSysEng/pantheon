@@ -22,9 +22,9 @@ import org.junit.Test;
 public class PermissioningConfigurationTest {
 
   final URI[] nodes = {
-      URI.create("enode://001@123:4567"),
-      URI.create("enode://002@123:4567"),
-      URI.create("enode://003@123:4567")
+    URI.create("enode://001@123:4567"),
+    URI.create("enode://002@123:4567"),
+    URI.create("enode://003@123:4567")
   };
 
   @Test

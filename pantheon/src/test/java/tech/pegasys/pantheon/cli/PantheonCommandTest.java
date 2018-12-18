@@ -567,7 +567,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
-
   @Test
   public void nodesWhitelistOptionMustIncludeBootnodes() {
     parseCommand(

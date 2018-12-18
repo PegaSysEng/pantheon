@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataDir;
 
-import java.net.URI;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
@@ -30,13 +29,12 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -46,6 +44,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,7 +123,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final BlockImporter blockImporter;
 
   private final PantheonControllerBuilder controllerBuilder;
-  private final Builder synchronizerConfigurationBuilder;
+  private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
   private final MetricsSystem metricsSystem = PrometheusMetricsSystem.init();
@@ -408,12 +407,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--accounts-whitelist"},
-      paramLabel = "hexStringOfAccountPublicKey",
-      description =
-          "Comma separate hexString of Account Public key to be whitelisted "
-              + "for the permissioned networks, You may specify an empty list",
-      split = ",",
-      arity = "0..*"
+    paramLabel = "hexStringOfAccountPublicKey",
+    description =
+        "Comma separate hexString of Account Public key to be whitelisted "
+            + "for the permissioned networks, You may specify an empty list",
+    split = ",",
+    arity = "0..*"
   )
   private final Collection<String> accountsWhitelist = null;
 
@@ -421,7 +420,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
-      final Builder synchronizerConfigurationBuilder) {
+      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder) {
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
