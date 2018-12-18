@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import java.util.function.Consumer;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -34,6 +33,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import java.time.Clock;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.google.common.collect.Maps;
@@ -159,20 +159,19 @@ public class IbftBlockHeightManager {
         (roundstate) -> roundstate.addCommitMessage(msg));
   }
 
-  private void actionOrBufferMessage(final SignedData<? extends Payload> msg,
-      final Action handler, final Consumer<RoundState> buffer) {
+  private void actionOrBufferMessage(
+      final SignedData<? extends Payload> msg, final Action inRoundHandler,
+      final Consumer<RoundState> buffer) {
     final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
     if (msgRoundId.equals(currentRound.getRoundIdentifier())) {
-      handler.apply();
+      inRoundHandler.apply();
     } else if (msgRoundId.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
-      final RoundState roundstate = futureRoundStateBuffer.computeIfAbsent(
-          msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
+      final RoundState roundstate =
+          futureRoundStateBuffer.computeIfAbsent(
+              msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
       buffer.accept(roundstate);
     }
   }
-
-  private void upddateState(final RoundState state)
-
 
   public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
     final Optional<RoundChangeCertificate> result =
@@ -219,7 +218,8 @@ public class IbftBlockHeightManager {
   }
 
   @FunctionalInterface
-  public interface Action {
+  private interface Action {
+
     void apply();
   }
 }
