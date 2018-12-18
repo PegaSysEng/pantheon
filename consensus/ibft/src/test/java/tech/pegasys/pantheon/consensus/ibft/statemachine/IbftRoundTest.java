@@ -33,7 +33,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.DefaultMessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -77,7 +77,7 @@ public class IbftRoundTest {
   @Mock private IbftMessageTransmitter transmitter;
 
   @Mock private IbftBlockCreator blockCreator;
-  @Mock private DefaultMessageValidator defaultMessageValidator;
+  @Mock private MessageValidator messageValidator;
 
   @Captor private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
 
@@ -94,9 +94,9 @@ public class IbftRoundTest {
             worldStateArchive,
             new IbftContext(new VoteTally(Collections.emptyList()), new VoteProposer()));
 
-    when(defaultMessageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(defaultMessageValidator.validatePrepareMessage(any())).thenReturn(true);
-    when(defaultMessageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
 
     proposedExtraData =
         new IbftExtraData(
@@ -120,7 +120,7 @@ public class IbftRoundTest {
 
   @Test
   public void onReceptionOfValidProposalSendsAPrepareToNetworkPeers() {
-    final RoundState roundState = new RoundState(roundIdentifier, 3, defaultMessageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -140,7 +140,7 @@ public class IbftRoundTest {
 
   @Test
   public void sendsAProposalWhenRequested() {
-    final RoundState roundState = new RoundState(roundIdentifier, 3, defaultMessageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -160,7 +160,7 @@ public class IbftRoundTest {
 
   @Test
   public void singleValidatorImportBlocksImmediatelyOnProposalCreation() {
-    final RoundState roundState = new RoundState(roundIdentifier, 1, defaultMessageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -180,7 +180,7 @@ public class IbftRoundTest {
 
   @Test
   public void twoValidatorNetworkSendsPrepareOnProposalReceptionThenSendsCommitOnCommitReceive() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, defaultMessageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -223,7 +223,7 @@ public class IbftRoundTest {
 
   @Test
   public void localNodeProposesToNetworkOfTwoValidatorsImportsOnReceptionOfCommitFromPeer() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, defaultMessageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -259,7 +259,7 @@ public class IbftRoundTest {
 
   @Test
   public void aNewRoundMessageWithAnewBlockIsSentUponReceptionOfARoundChangeWithNoCertificate() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, defaultMessageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -281,11 +281,8 @@ public class IbftRoundTest {
 
   @Test
   public void aNewRoundMessageWithTheSameBlockIsSentUponReceptionOfARoundChangeWithCertificate() {
-    SignedData<ProposalPayload> mockedSentMessage =
-        messageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock);
-
     final ConsensusRoundIdentifier priorRoundChange = new ConsensusRoundIdentifier(1, 0);
-    final RoundState roundState = new RoundState(roundIdentifier, 2, defaultMessageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,

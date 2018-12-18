@@ -61,7 +61,7 @@ public class NewRoundDefaultMessageValidatorTest {
   private final ProposerSelector proposerSelector = mock(ProposerSelector.class);
   private final MessageValidatorForHeightFactory validatorFactory =
       mock(MessageValidatorForHeightFactory.class);
-  private final DefaultMessageValidator defaultMessageValidator = mock(DefaultMessageValidator.class);
+  private final MessageValidator messageValidator = mock(MessageValidator.class);
 
   private final SignedData<NewRoundPayload> validMsg =
       createValidNewRoundMessageSignedBy(proposerKey);
@@ -76,9 +76,9 @@ public class NewRoundDefaultMessageValidatorTest {
 
     when(proposerSelector.selectProposerForRound(any())).thenReturn(proposerAddress);
 
-    when(validatorFactory.createAt(any())).thenReturn(defaultMessageValidator);
-    when(defaultMessageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(defaultMessageValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(validatorFactory.createAt(any())).thenReturn(messageValidator);
+    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
 
     when(proposedBlock.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
 
@@ -236,7 +236,7 @@ public class NewRoundDefaultMessageValidatorTest {
     msgBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
 
     // The prepare Message in the RoundChange Cert will be deemed illegal.
-    when(defaultMessageValidator.validatePrepareMessage(any())).thenReturn(false);
+    when(messageValidator.validatePrepareMessage(any())).thenReturn(false);
 
     final SignedData<NewRoundPayload> msg = signPayload(msgBuilder.build(), proposerKey);
 

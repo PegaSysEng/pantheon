@@ -81,15 +81,15 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    final DefaultMessageValidator defaultMessageValidator =
+    final MessageValidator messageValidator =
         messageValidatorFactory.createAt(proposalRoundIdentifier);
-    return validateConsistencyOfPrepareCertificateMessages(certificate, defaultMessageValidator);
+    return validateConsistencyOfPrepareCertificateMessages(certificate, messageValidator);
   }
 
   private boolean validateConsistencyOfPrepareCertificateMessages(
-      final PreparedCertificate certificate, final DefaultMessageValidator defaultMessageValidator) {
+      final PreparedCertificate certificate, final MessageValidator messageValidator) {
 
-    if (!defaultMessageValidator.addSignedProposalPayload(certificate.getProposalPayload())) {
+    if (!messageValidator.addSignedProposalPayload(certificate.getProposalPayload())) {
       LOG.info("Invalid RoundChange message, embedded Proposal message failed validation.");
       return false;
     }
@@ -102,7 +102,7 @@ public class RoundChangeMessageValidator {
     }
 
     for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
-      if (!defaultMessageValidator.validatePrepareMessage(prepareMsg)) {
+      if (!messageValidator.validatePrepareMessage(prepareMsg)) {
         LOG.info("Invalid RoundChange message, embedded Prepare message failed validation.");
         return false;
       }
@@ -130,6 +130,6 @@ public class RoundChangeMessageValidator {
 
   @FunctionalInterface
   public interface MessageValidatorForHeightFactory {
-    DefaultMessageValidator createAt(final ConsensusRoundIdentifier roundIdentifier);
+    MessageValidator createAt(final ConsensusRoundIdentifier roundIdentifier);
   }
 }

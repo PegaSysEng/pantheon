@@ -36,7 +36,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class DefaultMessageValidator {
+public class DefaultMessageValidator implements MessageValidator {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -64,6 +64,7 @@ public class DefaultMessageValidator {
     this.parentHeader = parentHeader;
   }
 
+  @Override
   public boolean addSignedProposalPayload(final SignedData<ProposalPayload> msg) {
 
     if (proposal.isPresent()) {
@@ -124,6 +125,7 @@ public class DefaultMessageValidator {
     return true;
   }
 
+  @Override
   public boolean validatePrepareMessage(final SignedData<PreparePayload> msg) {
     final String msgType = "Prepare";
 
@@ -139,6 +141,7 @@ public class DefaultMessageValidator {
     return validateDigestMatchesProposal(msg.getPayload().getDigest(), msgType);
   }
 
+  @Override
   public boolean validateCommmitMessage(final SignedData<CommitPayload> msg) {
     final String msgType = "Commit";
 
