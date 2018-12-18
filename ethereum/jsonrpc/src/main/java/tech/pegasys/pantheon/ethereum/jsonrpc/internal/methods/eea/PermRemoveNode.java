@@ -23,28 +23,27 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 
-public class PermAddNode implements JsonRpcMethod {
+public class PermRemoveNode implements JsonRpcMethod {
 
   private final P2PNetwork p2pNetwork;
   private final JsonRpcParameter parameters;
 
-
-  public PermAddNode(final P2PNetwork p2pNetwork, final JsonRpcParameter parameters) {
+  public PermRemoveNode(final P2PNetwork p2pNetwork, final JsonRpcParameter parameters) {
     this.p2pNetwork = p2pNetwork;
     this.parameters = parameters;
   }
 
   @Override
   public String getName() {
-    return "perm_addNode";
+    return "perm_removeNode";
   }
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
     final StringParameter filter = parameters.required(req.getParams(), 0, StringParameter.class);
-    DefaultPeer newNode = DefaultPeer.fromURI(filter.getValue());
-    boolean result = p2pNetwork.getNodeWhitelistController().addNode(newNode);
-    if(result) {
+    DefaultPeer node = DefaultPeer.fromURI(filter.getValue());
+    boolean result = p2pNetwork.getNodeWhitelistController().removeNode(node);
+    if (result) {
       return new JsonRpcSuccessResponse(req.getId(), new Object[] {});
     } else {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);

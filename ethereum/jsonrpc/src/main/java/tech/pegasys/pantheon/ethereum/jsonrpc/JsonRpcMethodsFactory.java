@@ -64,6 +64,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetPeerCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3Sha3;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.eea.PermAddNode;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.eea.PermRemoveNode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerSetCoinbase;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerSetEtherbase;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerStart;
@@ -224,6 +226,12 @@ public class JsonRpcMethodsFactory {
           new MinerStop(miningCoordinator),
           minerSetCoinbase,
           new MinerSetEtherbase(minerSetCoinbase));
+    }
+    if (rpcApis.contains(RpcApis.PERM)) {
+      addMethods(
+          enabledMethods,
+          new PermAddNode(p2pNetwork, parameter),
+          new PermRemoveNode(p2pNetwork, parameter));
     }
     if (rpcApis.contains(RpcApis.ADMIN)) {
       addMethods(enabledMethods, new AdminPeers(p2pNetwork));
