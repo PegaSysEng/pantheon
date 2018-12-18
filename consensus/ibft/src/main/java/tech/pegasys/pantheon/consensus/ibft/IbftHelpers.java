@@ -12,8 +12,18 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
+import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
+
+import java.util.Collection;
+import java.util.Optional;
 
 public class IbftHelpers {
 
@@ -22,5 +32,51 @@ public class IbftHelpers {
 
   public static int calculateRequiredValidatorQuorum(final int validatorCount) {
     return Util.fastDivCeiling(2 * validatorCount, 3);
+  }
+
+  public static Block createSealedBlock(
+      final Block block, final Collection<Signature> commitSeals) {
+    final BlockHeader initialHeader = block.getHeader();
+    final IbftExtraData initialExtraData = IbftExtraData.decode(initialHeader.getExtraData());
+
+    final IbftExtraData sealedExtraData =
+        new IbftExtraData(
+            initialExtraData.getVanityData(),
+            commitSeals,
+            initialExtraData.getVote(),
+            initialExtraData.getRound(),
+            initialExtraData.getValidators());
+
+    final BlockHeader sealedHeader =
+        BlockHeaderBuilder.fromHeader(initialHeader)
+            .extraData(sealedExtraData.encode())
+            .blockHashFunction(IbftBlockHashing::calculateHashOfIbftBlockOnChain)
+            .buildBlockHeader();
+
+    return new Block(sealedHeader, block.getBody());
+  }
+
+  public static Optional<PreparedCertificate> findLatestPreparedCertificate(
+      final Collection<SignedData<RoundChangePayload>> msgs) {
+
+    Optional<PreparedCertificate> result = Optional.empty();
+
+    for (SignedData<RoundChangePayload> roundChangeMsg : msgs) {
+      final RoundChangePayload payload = roundChangeMsg.getPayload();
+      if (payload.getPreparedCertificate().isPresent()) {
+        if (!result.isPresent()) {
+          result = payload.getPreparedCertificate();
+        } else {
+          final PreparedCertificate currentLatest = result.get();
+          final PreparedCertificate nextCert = payload.getPreparedCertificate().get();
+
+          if (currentLatest.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()
+              < nextCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()) {
+            result = Optional.of(nextCert);
+          }
+        }
+      }
+    }
+    return result;
   }
 }

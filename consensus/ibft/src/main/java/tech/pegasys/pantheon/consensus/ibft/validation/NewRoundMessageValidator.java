@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPreparedCertificate;
+
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
@@ -20,7 +22,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorFactory;
+import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorForHeightFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
 import java.util.Collection;
@@ -35,14 +37,14 @@ public class NewRoundMessageValidator {
 
   private final Collection<Address> validators;
   private final ProposerSelector proposerSelector;
-  private final MessageValidatorFactory messageValidatorFactory;
+  private final MessageValidatorForHeightFactory messageValidatorFactory;
   private final long quorumSize;
   private final long chainHeight;
 
   public NewRoundMessageValidator(
       final Collection<Address> validators,
       final ProposerSelector proposerSelector,
-      final MessageValidatorFactory messageValidatorFactory,
+      final MessageValidatorForHeightFactory messageValidatorFactory,
       final long quorumSize,
       final long chainHeight) {
     this.validators = validators;
@@ -55,7 +57,7 @@ public class NewRoundMessageValidator {
   public boolean validateNewRoundMessage(final SignedData<NewRoundPayload> msg) {
 
     final NewRoundPayload payload = msg.getPayload();
-    final ConsensusRoundIdentifier rootRoundIdentifier = payload.getRoundChangeIdentifier();
+    final ConsensusRoundIdentifier rootRoundIdentifier = payload.getRoundIdentifier();
     final Address expectedProposer = proposerSelector.selectProposerForRound(rootRoundIdentifier);
     final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
 
@@ -64,12 +66,12 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    if (msg.getPayload().getRoundChangeIdentifier().getSequenceNumber() != chainHeight) {
+    if (msg.getPayload().getRoundIdentifier().getSequenceNumber() != chainHeight) {
       LOG.info("Invalid NewRound message, not valid for local chain height.");
       return false;
     }
 
-    if (msg.getPayload().getRoundChangeIdentifier().getRoundNumber() == 0) {
+    if (msg.getPayload().getRoundIdentifier().getRoundNumber() == 0) {
       LOG.info("Invalid NewRound message, illegally targets a new round of 0.");
       return false;
     }
@@ -110,7 +112,7 @@ public class NewRoundMessageValidator {
     if (!roundChangeCert
         .getRoundChangePayloads()
         .stream()
-        .allMatch(p -> p.getPayload().getRoundChangeIdentifier().equals(expectedRound))) {
+        .allMatch(p -> p.getPayload().getRoundIdentifier().equals(expectedRound))) {
       LOG.info(
           "Invalid NewRound message, not all embedded RoundChange messages have a "
               + "matching target round.");
@@ -159,29 +161,5 @@ public class NewRoundMessageValidator {
     }
 
     return true;
-  }
-
-  private Optional<PreparedCertificate> findLatestPreparedCertificate(
-      final Collection<SignedData<RoundChangePayload>> msgs) {
-
-    Optional<PreparedCertificate> result = Optional.empty();
-
-    for (SignedData<RoundChangePayload> roundChangeMsg : msgs) {
-      final RoundChangePayload payload = roundChangeMsg.getPayload();
-      if (payload.getPreparedCertificate().isPresent()) {
-        if (!result.isPresent()) {
-          result = Optional.of(payload.getPreparedCertificate().get());
-        } else {
-          final PreparedCertificate currentLatest = result.get();
-          final PreparedCertificate nextCert = payload.getPreparedCertificate().get();
-
-          if (currentLatest.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()
-              < nextCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()) {
-            result = Optional.of(nextCert);
-          }
-        }
-      }
-    }
-    return result;
   }
 }
