@@ -171,7 +171,7 @@ public class RoundChangeManagerTest {
         .isEqualTo(Optional.empty());
     assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator2))
         .isEqualTo(Optional.empty());
-    manager.discardCompletedRound(ri2);
+    manager.discardRoundsPriorTo(ri2);
     assertThat(manager.roundChangeCache.get(ri1)).isNull();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
     assertThat(manager.roundChangeCache.get(ri3).receivedMessages.size()).isEqualTo(1);

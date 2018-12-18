@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import java.util.function.Consumer;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -19,6 +20,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
@@ -61,7 +63,7 @@ public class IbftBlockHeightManager {
   private final Function<ConsensusRoundIdentifier, RoundState> roundStateCreator;
   private final IbftFinalState finalState;
 
-  private Optional<PreparedCertificate> bestPreparedCertificate = Optional.empty();
+  private Optional<PreparedCertificate> latestPreparedCertificate = Optional.empty();
 
   private IbftRound currentRound;
 
@@ -99,6 +101,17 @@ public class IbftBlockHeightManager {
     }
   }
 
+  public void handleBlockTimerExpiry(final ConsensusRoundIdentifier roundIdentifier) {
+    if (roundIdentifier.equals(currentRound.getRoundIdentifier())) {
+      currentRound.createAndSendProposalMessage(clock.millis() / 1000);
+    } else {
+      LOG.info(
+          "Block timer expired for a round ({}) other than current ({})",
+          roundIdentifier,
+          currentRound.getRoundIdentifier());
+    }
+  }
+
   public void roundExpired(final RoundExpiry expire) {
     if (!expire.getView().equals(currentRound.getRoundIdentifier())) {
       LOG.debug("Ignoring Round timer expired which does not match current round.");
@@ -110,15 +123,15 @@ public class IbftBlockHeightManager {
         currentRound.createPrepareCertificate();
 
     if (preparedCertificate.isPresent()) {
-      bestPreparedCertificate = preparedCertificate;
+      latestPreparedCertificate = preparedCertificate;
     }
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
     final SignedData<RoundChangePayload> localRoundChange =
         messageFactory.createSignedRoundChangePayload(
-            currentRound.getRoundIdentifier(), bestPreparedCertificate);
-    transmitter.multicastRoundChange(currentRound.getRoundIdentifier(), bestPreparedCertificate);
+            currentRound.getRoundIdentifier(), latestPreparedCertificate);
+    transmitter.multicastRoundChange(currentRound.getRoundIdentifier(), latestPreparedCertificate);
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
     // message - so it must be handled accordingly.
@@ -127,50 +140,39 @@ public class IbftBlockHeightManager {
 
   public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
     LOG.info("Received a Proposal message.");
-    final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
-    if (msgRoundId.equals(currentRound.getRoundIdentifier())) {
-      currentRound.handleProposalMessage(msg);
-    } else if (msgRoundId.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
-      futureRoundStateBuffer.computeIfAbsent(
-          msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      futureRoundStateBuffer.get(msgRoundId.getRoundNumber()).setProposedBlock(msg);
-    }
+    actionOrBufferMessage(msg,
+        () -> currentRound.handleProposalMessage(msg),
+        (roundstate) -> roundstate.setProposedBlock(msg));
   }
 
   public void handlePrepareMessage(final SignedData<PreparePayload> msg) {
     LOG.info("Received a prepare message.");
-    final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
-    if (msgRoundId.equals(currentRound.getRoundIdentifier())) {
-      currentRound.handlePrepareMessage(msg);
-    } else if (msgRoundId.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
-      futureRoundStateBuffer.computeIfAbsent(
-          msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      futureRoundStateBuffer.get(msgRoundId.getRoundNumber()).addPrepareMessage(msg);
-    }
+    actionOrBufferMessage(msg,
+        () -> currentRound.handlePrepareMessage(msg),
+        (roundstate) -> roundstate.addPrepareMessage(msg));
   }
 
   public void handleCommitMessage(final SignedData<CommitPayload> msg) {
     LOG.info("Received a commit message.");
+    actionOrBufferMessage(msg,
+        () -> currentRound.handleCommitMessage(msg),
+        (roundstate) -> roundstate.addCommitMessage(msg));
+  }
+
+  private void actionOrBufferMessage(final SignedData<? extends Payload> msg,
+      final Action handler, final Consumer<RoundState> buffer) {
     final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
     if (msgRoundId.equals(currentRound.getRoundIdentifier())) {
-      currentRound.handleCommitMessage(msg);
+      handler.apply();
     } else if (msgRoundId.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
-      futureRoundStateBuffer.computeIfAbsent(
+      final RoundState roundstate = futureRoundStateBuffer.computeIfAbsent(
           msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      futureRoundStateBuffer.get(msgRoundId.getRoundNumber()).addCommitMessage(msg);
+      buffer.accept(roundstate);
     }
   }
 
-  public void handleBlockTimerExpiry(final ConsensusRoundIdentifier roundIdentifier) {
-    if (roundIdentifier.equals(currentRound.getRoundIdentifier())) {
-      currentRound.createAndSendProposalMessage(clock.millis() / 1000);
-    } else {
-      LOG.info(
-          "BLock timer expired for a round ({}) other than current ({})",
-          roundIdentifier,
-          currentRound.getRoundIdentifier());
-    }
-  }
+  private void upddateState(final RoundState state)
+
 
   public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
     final Optional<RoundChangeCertificate> result =
@@ -198,18 +200,26 @@ public class IbftBlockHeightManager {
       currentRound = roundFactory.createNewRound(parentHeader, roundNumber);
     }
     // discard roundChange messages from the current and previous rounds
-    roundChangeManager.discardCompletedRound(currentRound.getRoundIdentifier());
+    roundChangeManager.discardRoundsPriorTo(currentRound.getRoundIdentifier());
     roundTimer.startTimer(currentRound.getRoundIdentifier());
   }
 
   public void handleNewRoundMessage(final SignedData<NewRoundPayload> msg) {
     if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
-      startNewRound(msg.getPayload().getRoundIdentifier().getRoundNumber());
+      final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
+      if (targetRound.getRoundNumber() > currentRound.getRoundIdentifier().getRoundNumber()) {
+        startNewRound(targetRound.getRoundNumber());
+      }
       currentRound.handleProposalMessage(msg.getPayload().getProposalPayload());
     }
   }
 
   public long getChainHeight() {
     return currentRound.getRoundIdentifier().getSequenceNumber();
+  }
+
+  @FunctionalInterface
+  public interface Action {
+    void apply();
   }
 }
