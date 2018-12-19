@@ -37,6 +37,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import java.time.Clock;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -150,26 +151,23 @@ public class IbftBlockHeightManager {
 
   public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
     LOG.info("Received a Proposal message.");
-    actionOrBufferMessage(
-        msg, currentRound::handleProposalMessage, (roundstate) -> roundstate.setProposedBlock(msg));
+    actionOrBufferMessage(msg, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
   public void handlePrepareMessage(final SignedData<PreparePayload> msg) {
     LOG.info("Received a prepare message.");
-    actionOrBufferMessage(
-        msg, currentRound::handlePrepareMessage, (roundstate) -> roundstate.addPrepareMessage(msg));
+    actionOrBufferMessage(msg, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
   public void handleCommitMessage(final SignedData<CommitPayload> msg) {
     LOG.info("Received a commit message.");
-    actionOrBufferMessage(
-        msg, currentRound::handleCommitMessage, (roundstate) -> roundstate.addCommitMessage(msg));
+    actionOrBufferMessage(msg, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
   private <T extends Payload> void actionOrBufferMessage(
       final SignedData<T> msg,
       final Consumer<SignedData<T>> inRoundHandler,
-      final Consumer<RoundState> buffer) {
+      final BiConsumer<RoundState, SignedData<T>> buffer) {
     final Payload payload = msg.getPayload();
     final MessageAge messageAge = determineAgeOfPayload(payload);
     if (messageAge == CURRENT_ROUND) {
@@ -179,7 +177,7 @@ public class IbftBlockHeightManager {
       final RoundState roundstate =
           futureRoundStateBuffer.computeIfAbsent(
               msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      buffer.accept(roundstate);
+      buffer.accept(roundstate, msg);
     }
   }
 

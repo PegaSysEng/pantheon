@@ -26,8 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.TestHelpers.createFrom;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -71,6 +69,8 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -81,33 +81,19 @@ public class IbftBlockHeightManagerTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
 
-  @Mock
-  private IbftFinalState finalState;
-  @Mock
-  private IbftMessageTransmitter messageTransmitter;
-  @Mock
-  private RoundChangeManager roundChangeManager;
-  @Mock
-  private IbftRoundFactory roundFactory;
-  @Mock
-  private Clock clock;
-  @Mock
-  private MessageValidatorFactory messageValidatorFactory;
-  @Mock
-  private IbftBlockCreator blockCreator;
-  @Mock
-  private BlockImporter<IbftContext> blockImporter;
-  @Mock
-  private RoundState roundState;
-  @Mock
-  private BlockTimer blockTimer;
-  @Mock
-  private RoundTimer roundTimer;
-  @Mock
-  private NewRoundMessageValidator newRoundMessageValidator;
+  @Mock private IbftFinalState finalState;
+  @Mock private IbftMessageTransmitter messageTransmitter;
+  @Mock private RoundChangeManager roundChangeManager;
+  @Mock private IbftRoundFactory roundFactory;
+  @Mock private Clock clock;
+  @Mock private MessageValidatorFactory messageValidatorFactory;
+  @Mock private IbftBlockCreator blockCreator;
+  @Mock private BlockImporter<IbftContext> blockImporter;
+  @Mock private BlockTimer blockTimer;
+  @Mock private RoundTimer roundTimer;
+  @Mock private NewRoundMessageValidator newRoundMessageValidator;
 
-  @Captor
-  private ArgumentCaptor<Optional<PreparedCertificate>> preparedCaptor;
+  @Captor private ArgumentCaptor<Optional<PreparedCertificate>> preparedCaptor;
 
   private final List<KeyPair> validatorKeys = Lists.newArrayList();
   private List<Address> validators = Lists.newArrayList();
@@ -143,10 +129,6 @@ public class IbftBlockHeightManagerTest {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
     when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
     when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
-
-    // when(finalState.getValidators()).thenReturn(validators);
-    // when(finalState.getNodeKeys()).thenReturn(localNodeKeys);
-    // when(finalState.getLocalAddress()).thenReturn(localAddress);
     when(finalState.getTransmitter()).thenReturn(messageTransmitter);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
     when(finalState.getRoundTimer()).thenReturn(roundTimer);
@@ -382,6 +364,5 @@ public class IbftBlockHeightManagerTest {
 
     assertThat(preparedCert.get().getPreparePayloads())
         .containsOnly(preparePayload, secondPreparePayload);
-
   }
 }

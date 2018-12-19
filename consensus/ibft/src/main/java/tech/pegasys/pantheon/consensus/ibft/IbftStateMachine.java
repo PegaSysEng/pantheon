@@ -27,7 +27,7 @@ public class IbftStateMachine {
   /**
    * Attempt to consume the event and update the maintained state
    *
-   * @param event the external Action that has occurred
+   * @param event the external action that has occurred
    * @param roundTimer timer that will fire expiry events that are expected to be received back into
    *     this machine
    * @return whether this event was consumed or requires reprocessing later once the state machine

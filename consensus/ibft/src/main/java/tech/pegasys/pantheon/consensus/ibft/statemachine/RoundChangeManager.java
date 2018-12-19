@@ -138,9 +138,7 @@ public class RoundChangeManager {
    * @param completedRoundIdentifier round identifier that has been identified as superseded
    */
   public void discardRoundsPriorTo(final ConsensusRoundIdentifier completedRoundIdentifier) {
-    roundChangeCache
-        .entrySet()
-        .removeIf(entry -> isAnEarlierRound(entry.getKey(), completedRoundIdentifier));
+    roundChangeCache.keySet().removeIf(k -> isAnEarlierRound(k, completedRoundIdentifier));
   }
 
   private boolean isAnEarlierRound(
