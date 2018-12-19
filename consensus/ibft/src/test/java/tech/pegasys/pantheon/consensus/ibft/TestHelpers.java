@@ -12,17 +12,14 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import static java.util.Collections.singletonList;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator.BlockOptions;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-
-import java.util.Optional;
-
-import com.google.common.collect.Lists;
 
 public class TestHelpers {
 
@@ -32,14 +29,14 @@ public class TestHelpers {
         initial.getSequenceNumber() + offSetSequence, initial.getRoundNumber() + offSetRound);
   }
 
-  public static Block createProposalBlock() {
+  public static Block createProposalBlock(List<Address> validators, int round) {
     final BytesValue extraData =
         new IbftExtraData(
                 BytesValue.wrap(new byte[32]),
-                Lists.newArrayList(),
+                Collections.emptyList(),
                 Optional.empty(),
-                0,
-                singletonList(Address.fromHexString(String.format("%020d", 1))))
+                round,
+            validators)
             .encode();
     final BlockOptions blockOptions =
         BlockOptions.create()
