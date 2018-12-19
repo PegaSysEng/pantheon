@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
@@ -119,6 +120,20 @@ public class PantheonNodeFactory {
             .setName(name)
             .setJsonRpcConfiguration(jsonRpcConfig)
             .setWebSocketConfiguration(webSocketConfig)
+            .build());
+  }
+
+  public PantheonNode createNodeWithNodesWhitelist(
+      final String name, final List<URI> nodesWhitelist) throws IOException {
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .jsonRpcEnabled()
+            .setPermissioningConfiguration(permissioningConfiguration)
             .build());
   }
 

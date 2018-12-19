@@ -318,6 +318,10 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return devMode;
   }
 
+  PermissioningConfiguration getPermissioningConfiguration() {
+    return permissioningConfiguration;
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
