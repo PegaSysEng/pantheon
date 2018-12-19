@@ -314,6 +314,7 @@ public class IbftRoundTest {
     verify(transmitter, times(1))
         .multicastNewRound(
             eq(roundIdentifier), eq(roundChangeCertificate), payloadArgCaptor.capture());
+    assertThat(roundState.isPrepared()).isTrue(); // receiving NewRound is sufficient for 2 nodes.
 
     final IbftExtraData proposedExtraData =
         IbftExtraData.decode(
