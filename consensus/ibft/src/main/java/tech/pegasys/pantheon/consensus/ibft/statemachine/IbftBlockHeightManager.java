@@ -12,18 +12,10 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.PRIOR_ROUND;
 import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.CURRENT_ROUND;
 import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.FUTURE_ROUND;
+import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.PRIOR_ROUND;
 
-import com.google.common.collect.Maps;
-import java.time.Clock;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -41,6 +33,16 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+
+import java.time.Clock;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import com.google.common.collect.Maps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Responsible for starting/clearing Consensus rounds at a given block height. One of these is
@@ -149,25 +151,19 @@ public class IbftBlockHeightManager {
   public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
     LOG.info("Received a Proposal message.");
     actionOrBufferMessage(
-        msg,
-        currentRound::handleProposalMessage,
-        (roundstate) -> roundstate.setProposedBlock(msg));
+        msg, currentRound::handleProposalMessage, (roundstate) -> roundstate.setProposedBlock(msg));
   }
 
   public void handlePrepareMessage(final SignedData<PreparePayload> msg) {
     LOG.info("Received a prepare message.");
     actionOrBufferMessage(
-        msg,
-        currentRound::handlePrepareMessage,
-        (roundstate) -> roundstate.addPrepareMessage(msg));
+        msg, currentRound::handlePrepareMessage, (roundstate) -> roundstate.addPrepareMessage(msg));
   }
 
   public void handleCommitMessage(final SignedData<CommitPayload> msg) {
     LOG.info("Received a commit message.");
     actionOrBufferMessage(
-        msg,
-        currentRound::handleCommitMessage,
-        (roundstate) -> roundstate.addCommitMessage(msg));
+        msg, currentRound::handleCommitMessage, (roundstate) -> roundstate.addCommitMessage(msg));
   }
 
   private <T extends Payload> void actionOrBufferMessage(

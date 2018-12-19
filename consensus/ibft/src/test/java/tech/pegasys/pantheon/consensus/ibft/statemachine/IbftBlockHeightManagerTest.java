@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -25,6 +26,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.TestHelpers.createFrom;
 
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -37,6 +40,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
@@ -77,18 +81,33 @@ public class IbftBlockHeightManagerTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
 
-  @Mock private IbftFinalState finalState;
-  @Mock private IbftMessageTransmitter messageTransmitter;
-  @Mock private RoundChangeManager roundChangeManager;
-  @Mock private IbftRoundFactory roundFactory;
-  @Mock private Clock clock;
-  @Mock private MessageValidatorFactory messageValidatorFactory;
-  @Mock private IbftBlockCreator blockCreator;
-  @Mock private BlockImporter<IbftContext> blockImporter;
-  @Mock private RoundState roundState;
-  @Mock private BlockTimer blockTimer;
-  @Mock private RoundTimer roundTimer;
-  @Mock private NewRoundMessageValidator newRoundMessageValidator;
+  @Mock
+  private IbftFinalState finalState;
+  @Mock
+  private IbftMessageTransmitter messageTransmitter;
+  @Mock
+  private RoundChangeManager roundChangeManager;
+  @Mock
+  private IbftRoundFactory roundFactory;
+  @Mock
+  private Clock clock;
+  @Mock
+  private MessageValidatorFactory messageValidatorFactory;
+  @Mock
+  private IbftBlockCreator blockCreator;
+  @Mock
+  private BlockImporter<IbftContext> blockImporter;
+  @Mock
+  private RoundState roundState;
+  @Mock
+  private BlockTimer blockTimer;
+  @Mock
+  private RoundTimer roundTimer;
+  @Mock
+  private NewRoundMessageValidator newRoundMessageValidator;
+
+  @Captor
+  private ArgumentCaptor<Optional<PreparedCertificate>> preparedCaptor;
 
   private final List<KeyPair> validatorKeys = Lists.newArrayList();
   private List<Address> validators = Lists.newArrayList();
@@ -325,5 +344,44 @@ public class IbftBlockHeightManagerTest {
     // Final state sets the Quorum Size to 3, so should send a Prepare and also a commit
     verify(messageTransmitter, times(1)).multicastPrepare(eq(futureRoundIdentifier), any());
     verify(messageTransmitter, times(1)).multicastPrepare(eq(futureRoundIdentifier), any());
+  }
+
+  @Test
+  public void preparedCertificateIncludedInRoundChangeMessageOnRoundTimeoutExpired() {
+    final IbftBlockHeightManager manager =
+        new IbftBlockHeightManager(
+            headerTestFixture.buildHeader(),
+            finalState,
+            roundChangeManager,
+            roundFactory,
+            clock,
+            messageValidatorFactory);
+    manager.start();
+    manager.handleBlockTimerExpiry(roundIdentifier); // Trigger a Proposal creation.
+
+    final SignedData<PreparePayload> preparePayload =
+        validatorMessageFactory
+            .get(0)
+            .createSignedPreparePayload(roundIdentifier, Hash.fromHexStringLenient("0"));
+    final SignedData<PreparePayload> secondPreparePayload =
+        validatorMessageFactory
+            .get(1)
+            .createSignedPreparePayload(roundIdentifier, Hash.fromHexStringLenient("0"));
+    manager.handlePrepareMessage(preparePayload);
+    manager.handlePrepareMessage(secondPreparePayload);
+
+    manager.roundExpired(new RoundExpiry(roundIdentifier));
+
+    final ConsensusRoundIdentifier nextRound = createFrom(roundIdentifier, 0, +1);
+
+    verify(messageTransmitter, times(1))
+        .multicastRoundChange(eq(nextRound), preparedCaptor.capture());
+    final Optional<PreparedCertificate> preparedCert = preparedCaptor.getValue();
+
+    assertThat(preparedCert).isNotEmpty();
+
+    assertThat(preparedCert.get().getPreparePayloads())
+        .containsOnly(preparePayload, secondPreparePayload);
+
   }
 }
