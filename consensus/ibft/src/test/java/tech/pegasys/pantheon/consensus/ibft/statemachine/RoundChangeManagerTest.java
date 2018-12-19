@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -80,39 +81,32 @@ public class RoundChangeManagerTest {
     when(headerValidator.validateHeader(any(), any(), any(), any())).thenReturn(true);
     BlockHeader parentHeader = mock(BlockHeader.class);
 
-    Map<ConsensusRoundIdentifier, MessageValidator> messageValidators = Maps.newHashMap();
+    RoundChangeMessageValidator.MessageValidatorForHeightFactory messageValidatorFactory =
+        mock(RoundChangeMessageValidator.MessageValidatorForHeightFactory.class);
 
-    messageValidators.put(
+    when(messageValidatorFactory.createAt(ri1)).thenAnswer(invocation -> new MessageValidator(
+        validators,
+        Util.publicKeyToAddress(proposerKey.getPublicKey()),
         ri1,
-        new MessageValidator(
-            validators,
-            Util.publicKeyToAddress(proposerKey.getPublicKey()),
-            ri1,
-            headerValidator,
-            protocolContext,
-            parentHeader));
-
-    messageValidators.put(
+        headerValidator,
+        protocolContext,
+        parentHeader));
+    when(messageValidatorFactory.createAt(ri2)).thenAnswer(invocation -> new MessageValidator(
+        validators,
+        Util.publicKeyToAddress(validator1Key.getPublicKey()),
         ri2,
-        new MessageValidator(
-            validators,
-            Util.publicKeyToAddress(validator1Key.getPublicKey()),
-            ri2,
-            headerValidator,
-            protocolContext,
-            parentHeader));
-
-    messageValidators.put(
+        headerValidator,
+        protocolContext,
+        parentHeader));
+    when(messageValidatorFactory.createAt(ri3)).thenAnswer(invocation -> new MessageValidator(
+        validators,
+        Util.publicKeyToAddress(validator2Key.getPublicKey()),
         ri3,
-        new MessageValidator(
-            validators,
-            Util.publicKeyToAddress(validator2Key.getPublicKey()),
-            ri3,
-            headerValidator,
-            protocolContext,
-            parentHeader));
+        headerValidator,
+        protocolContext,
+        parentHeader));
 
-    manager = new RoundChangeManager(2, validators, messageValidators::get);
+    manager = new RoundChangeManager(2, validators, messageValidatorFactory);
   }
 
   private SignedData<RoundChangePayload> makeRoundChangeMessage(
