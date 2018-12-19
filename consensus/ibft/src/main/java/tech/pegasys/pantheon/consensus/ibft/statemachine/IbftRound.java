@@ -105,7 +105,7 @@ public class IbftRound {
       proposal = createProposalFromPreparedCertificate(latestCertificate.get());
     }
     transmitter.multicastNewRound(getRoundIdentifier(), roundChangeCertificate, proposal);
-    handleProposalMessage(proposal);
+    updateStateWithProposedBlock(proposal);
   }
 
   private SignedData<ProposalPayload> createProposalFromPreparedCertificate(
