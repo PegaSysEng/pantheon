@@ -13,11 +13,17 @@
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
@@ -25,15 +31,19 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.Before;
@@ -112,7 +122,8 @@ public class RoundChangeManagerTest {
   }
 
   private SignedData<RoundChangePayload> makeRoundChangeMessageWithPreparedCert(
-      final KeyPair key, final ConsensusRoundIdentifier round,
+      final KeyPair key,
+      final ConsensusRoundIdentifier round,
       final List<KeyPair> prepareProviders) {
     Preconditions.checkArgument(!prepareProviders.contains(key));
 
@@ -121,13 +132,18 @@ public class RoundChangeManagerTest {
     final ConsensusRoundIdentifier proposalRound = TestHelpers.createFrom(round, 0, -1);
     final Block block = TestHelpers.createProposalBlock(validators, proposalRound.getRoundNumber());
     // Proposal must come from an earlier round.
-    final SignedData<ProposalPayload> proposal = messageFactory.createSignedProposalPayload(
-        proposalRound, block);
+    final SignedData<ProposalPayload> proposal =
+        messageFactory.createSignedProposalPayload(proposalRound, block);
 
-    final List<SignedData<PreparePayload>> preparePayloads = prepareProviders.stream().map(k -> {
-      final MessageFactory prepareFactory = new MessageFactory(k);
-      return prepareFactory.createSignedPreparePayload(proposalRound, block.getHash());
-    }).collect(Collectors.toList());
+    final List<SignedData<PreparePayload>> preparePayloads =
+        prepareProviders
+            .stream()
+            .map(
+                k -> {
+                  final MessageFactory prepareFactory = new MessageFactory(k);
+                  return prepareFactory.createSignedPreparePayload(proposalRound, block.getHash());
+                })
+            .collect(Collectors.toList());
 
     final PreparedCertificate cert = new PreparedCertificate(proposal, preparePayloads);
 
@@ -220,8 +236,8 @@ public class RoundChangeManagerTest {
 
   @Test
   public void roundChangeMessagesWithPreparedCertificateMustHaveSufficientPrepareMessages() {
-    //Specifically, prepareMessage count is ONE LESS than the calculated quorum size (as the
-    //proposal acts as the extra msg).
+    // Specifically, prepareMessage count is ONE LESS than the calculated quorum size (as the
+    // proposal acts as the extra msg).
     // There are 3 validators, therefore, should only need 2 prepare message to be acceptable.
 
     // These tests are run at ri2, such that validators can be found for past round at ri1.
@@ -230,8 +246,8 @@ public class RoundChangeManagerTest {
     assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEmpty();
     assertThat(manager.roundChangeCache.get(ri2)).isNull();
 
-    roundChangeData = makeRoundChangeMessageWithPreparedCert(proposerKey, ri2,
-            Lists.newArrayList(validator1Key));
+    roundChangeData =
+        makeRoundChangeMessageWithPreparedCert(proposerKey, ri2, Lists.newArrayList(validator1Key));
     assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEmpty();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
   }
