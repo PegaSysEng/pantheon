@@ -12,22 +12,12 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.google.common.base.Preconditions;
-import java.util.Collections;
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
@@ -35,8 +25,6 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
-import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
@@ -194,7 +182,7 @@ public class RoundChangeManagerTest {
   }
 
   @Test
-  public void discardsPreviousRounds() {
+  public void discardsRoundPreviousToThatRequested() {
     SignedData<RoundChangePayload> roundChangeDataProposer =
         makeRoundChangeMessage(proposerKey, ri1);
     SignedData<RoundChangePayload> roundChangeDataValidator1 =
@@ -207,7 +195,7 @@ public class RoundChangeManagerTest {
         .isEqualTo(Optional.empty());
     assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator2))
         .isEqualTo(Optional.empty());
-    manager.discardRoundsPriorTo(ri1);
+    manager.discardRoundsPriorTo(ri2);
     assertThat(manager.roundChangeCache.get(ri1)).isNull();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
     assertThat(manager.roundChangeCache.get(ri3).receivedMessages.size()).isEqualTo(1);
