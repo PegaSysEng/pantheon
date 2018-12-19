@@ -40,8 +40,7 @@ public class Cluster implements AutoCloseable {
   private final ClusterConfiguration clusterConfiguration;
 
   public Cluster(final Net net) {
-    this.net = net;
-    this.clusterConfiguration = new ClusterConfigurationBuilder().build();
+    this(new ClusterConfigurationBuilder().build(), net);
   }
 
   public Cluster(final ClusterConfiguration clusterConfiguration, final Net net) {
