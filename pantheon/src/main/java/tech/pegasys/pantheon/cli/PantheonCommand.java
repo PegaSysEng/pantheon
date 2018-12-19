@@ -35,9 +35,9 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -74,17 +74,17 @@ import picocli.CommandLine.ParameterException;
 
 @SuppressWarnings("FieldCanBeLocal") // because Picocli injected fields report false positives
 @Command(
-    description = "This command runs the Pantheon Ethereum client full node.",
-    abbreviateSynopsis = true,
-    name = "pantheon",
-    mixinStandardHelpOptions = true,
-    versionProvider = VersionProvider.class,
-    header = "Usage:",
-    synopsisHeading = "%n",
-    descriptionHeading = "%nDescription:%n%n",
-    optionListHeading = "%nOptions:%n",
-    footerHeading = "%n",
-    footer = "Pantheon is licensed under the Apache License 2.0"
+  description = "This command runs the Pantheon Ethereum client full node.",
+  abbreviateSynopsis = true,
+  name = "pantheon",
+  mixinStandardHelpOptions = true,
+  versionProvider = VersionProvider.class,
+  header = "Usage:",
+  synopsisHeading = "%n",
+  descriptionHeading = "%nDescription:%n%n",
+  optionListHeading = "%nOptions:%n",
+  footerHeading = "%n",
+  footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements DefaultCommandValues, Runnable {
 
@@ -109,7 +109,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final String uppercaseName = name.trim().toUpperCase();
 
       return Stream.<Function<String, Optional<RpcApi>>>of(
-          RpcApis::valueOf, CliqueRpcApis::valueOf, IbftRpcApis::valueOf)
+              RpcApis::valueOf, CliqueRpcApis::valueOf, IbftRpcApis::valueOf)
           .map(f -> f.apply(uppercaseName))
           .filter(Optional::isPresent)
           .map(Optional::get)
@@ -142,10 +142,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
   @Option(
-      names = {"--node-private-key"},
-      paramLabel = MANDATORY_PATH_FORMAT_HELP,
-      description =
-          "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)"
+    names = {"--node-private-key"},
+    paramLabel = MANDATORY_PATH_FORMAT_HELP,
+    description =
+        "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)"
   )
   private final File nodePrivateKeyFile = null;
 
@@ -159,8 +159,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Also many other software use the same negative option scheme for false defaults
   // meaning that it's probably the right way to handle disabling options.
   @Option(
-      names = {"--no-discovery"},
-      description = "Disable p2p peer discovery (default: ${DEFAULT-VALUE})"
+    names = {"--no-discovery"},
+    description = "Disable p2p peer discovery (default: ${DEFAULT-VALUE})"
   )
   private final Boolean noPeerDiscovery = false;
 
@@ -168,37 +168,37 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // and a hardcoded list will be used otherwise by the Runner.
   // NOTE: we have no control over default value here.
   @Option(
-      names = {"--bootnodes"},
-      paramLabel = "<enode://id@host:port>",
-      description =
-          "Comma separated enode URLs for P2P discovery bootstrap. "
-              + "Default is a predefined list.",
-      split = ",",
-      arity = "1..*",
-      converter = EnodeToURIPropertyConverter.class
+    names = {"--bootnodes"},
+    paramLabel = "<enode://id@host:port>",
+    description =
+        "Comma separated enode URLs for P2P discovery bootstrap. "
+            + "Default is a predefined list.",
+    split = ",",
+    arity = "1..*",
+    converter = EnodeToURIPropertyConverter.class
   )
   private final Collection<URI> bootstrapNodes = null;
 
   @Option(
-      names = {"--max-peers"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
+    names = {"--max-peers"},
+    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+    description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
   )
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
   @Option(
-      names = {"--max-trailing-peers"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description =
-          "Maximum p2p peer connections for peers that are trailing behind our chain head (default: unlimited)"
+    names = {"--max-trailing-peers"},
+    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+    description =
+        "Maximum p2p peer connections for peers that are trailing behind our chain head (default: unlimited)"
   )
   private final Integer maxTrailingPeers = Integer.MAX_VALUE;
 
   @Option(
-      names = {"--banned-nodeids"},
-      description = "A list of node IDs to ban from the p2p network.",
-      split = ",",
-      arity = "1..*"
+    names = {"--banned-nodeids"},
+    description = "A list of node IDs to ban from the p2p network.",
+    split = ",",
+    arity = "1..*"
   )
   private final Collection<String> bannedNodeIds = new ArrayList<>();
 
@@ -215,120 +215,120 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Boolean option to indicate if the client have to sync against the ottoman test network
   // (see https://github.com/ethereum/EIPs/issues/650).
   @Option(
-      names = {"--ottoman"},
-      description =
-          "Synchronize against the Ottoman test network, only useful if using an iBFT genesis file"
-              + " - see https://github.com/ethereum/EIPs/issues/650 (default: ${DEFAULT-VALUE})"
+    names = {"--ottoman"},
+    description =
+        "Synchronize against the Ottoman test network, only useful if using an iBFT genesis file"
+            + " - see https://github.com/ethereum/EIPs/issues/650 (default: ${DEFAULT-VALUE})"
   )
   private final Boolean syncWithOttoman = false;
 
   @Option(
-      names = {"--rinkeby"},
-      description =
-          "Use the Rinkeby test network"
-              + " - see https://github.com/ethereum/EIPs/issues/225 (default: ${DEFAULT-VALUE})"
+    names = {"--rinkeby"},
+    description =
+        "Use the Rinkeby test network"
+            + " - see https://github.com/ethereum/EIPs/issues/225 (default: ${DEFAULT-VALUE})"
   )
   private final Boolean rinkeby = false;
 
   @Option(
-      names = {"--ropsten"},
-      description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
+    names = {"--ropsten"},
+    description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
   )
   private final Boolean ropsten = false;
 
   @Option(
-      names = {"--goerli"},
-      description = "Use the Goerli test network (default: ${DEFAULT-VALUE})"
+    names = {"--goerli"},
+    description = "Use the Goerli test network (default: ${DEFAULT-VALUE})"
   )
   private final Boolean goerli = false;
 
   @Option(
-      names = {"--p2p-listen"},
-      paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
-      description = "Host and port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
-      arity = "1"
+    names = {"--p2p-listen"},
+    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
+    description = "Host and port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
   )
   private final HostAndPort p2pHostAndPort = getDefaultHostAndPort(DefaultPeer.DEFAULT_PORT);
 
   @Option(
-      names = {"--network-id"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description = "P2P network identifier (default: ${DEFAULT-VALUE})",
-      arity = "1"
+    names = {"--network-id"},
+    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+    description = "P2P network identifier (default: ${DEFAULT-VALUE})",
+    arity = "1"
   )
   private final Integer networkId = null;
 
   @Option(
-      names = {"--rpc-enabled"},
-      description = "Set if the JSON-RPC service should be started (default: ${DEFAULT-VALUE})"
+    names = {"--rpc-enabled"},
+    description = "Set if the JSON-RPC service should be started (default: ${DEFAULT-VALUE})"
   )
   private final Boolean isJsonRpcEnabled = false;
 
   @Option(
-      names = {"--rpc-listen"},
-      paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
-      description = "Host and port for JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
-      arity = "1"
+    names = {"--rpc-listen"},
+    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
+    description = "Host and port for JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
   )
   private final HostAndPort rpcHostAndPort =
       getDefaultHostAndPort(JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT);
 
   // A list of origins URLs that are accepted by the JsonRpcHttpServer (CORS)
   @Option(
-      names = {"--rpc-cors-origins"},
-      description = "Comma separated origin domain URLs for CORS validation (default: none)",
-      converter = CorsAllowedOriginsProperty.CorsAllowedOriginsPropertyConverter.class
+    names = {"--rpc-cors-origins"},
+    description = "Comma separated origin domain URLs for CORS validation (default: none)",
+    converter = CorsAllowedOriginsProperty.CorsAllowedOriginsPropertyConverter.class
   )
   private final CorsAllowedOriginsProperty rpcCorsAllowedOrigins = new CorsAllowedOriginsProperty();
 
   @Option(
-      names = {"--rpc-api"},
-      paramLabel = "<api name>",
-      split = ",",
-      arity = "1..*",
-      converter = RpcApisConverter.class,
-      description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}",
-      defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
+    names = {"--rpc-api"},
+    paramLabel = "<api name>",
+    split = ",",
+    arity = "1..*",
+    converter = RpcApisConverter.class,
+    description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}",
+    defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
   private final Collection<RpcApi> rpcApis = null;
 
   @Option(
-      names = {"--ws-enabled"},
-      description =
-          "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})"
+    names = {"--ws-enabled"},
+    description =
+        "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})"
   )
   private final Boolean isWsRpcEnabled = false;
 
   @Option(
-      names = {"--ws-listen"},
-      paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
-      description = "Host and port for WS-RPC (WebSocket) to listen on (default: ${DEFAULT-VALUE})",
-      arity = "1"
+    names = {"--ws-listen"},
+    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
+    description = "Host and port for WS-RPC (WebSocket) to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
   )
   private final HostAndPort wsHostAndPort =
       getDefaultHostAndPort(WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT);
 
   @Option(
-      names = {"--ws-api"},
-      paramLabel = "<api name>",
-      split = ",",
-      arity = "1..*",
-      converter = RpcApisConverter.class,
-      description = "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}",
-      defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
+    names = {"--ws-api"},
+    paramLabel = "<api name>",
+    split = ",",
+    arity = "1..*",
+    converter = RpcApisConverter.class,
+    description = "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}",
+    defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
   private final Collection<RpcApi> wsApis = null;
 
   private Long refreshDelay;
 
   @Option(
-      names = {"--ws-refresh-delay"},
-      paramLabel = "<refresh delay>",
-      arity = "1",
-      description =
-          "Refresh delay of websocket subscription sync in milliseconds. "
-              + "default: ${DEFAULT-VALUE}",
-      defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
+    names = {"--ws-refresh-delay"},
+    paramLabel = "<refresh delay>",
+    arity = "1",
+    description =
+        "Refresh delay of websocket subscription sync in milliseconds. "
+            + "default: ${DEFAULT-VALUE}",
+    defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
   )
   private void setRefreshDelay(final Long refreshDelay) {
     if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
@@ -343,82 +343,82 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   @Option(
-      names = {"--host-whitelist"},
-      paramLabel = "<hostname>",
-      description =
-          "Comma separated list of hostnames to whitelist for RPC access.  default: ${DEFAULT-VALUE}",
-      defaultValue = "localhost",
-      converter = JsonRPCWhitelistHostsProperty.JsonRPCWhitelistHostsConverter.class
+    names = {"--host-whitelist"},
+    paramLabel = "<hostname>",
+    description =
+        "Comma separated list of hostnames to whitelist for RPC access.  default: ${DEFAULT-VALUE}",
+    defaultValue = "localhost",
+    converter = JsonRPCWhitelistHostsProperty.JsonRPCWhitelistHostsConverter.class
   )
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
   @Option(
-      names = {"--dev-mode"},
-      description =
-          "set during development to have a custom genesis with specific chain id "
-              + "and reduced difficulty to enable CPU mining (default: ${DEFAULT-VALUE})."
+    names = {"--dev-mode"},
+    description =
+        "set during development to have a custom genesis with specific chain id "
+            + "and reduced difficulty to enable CPU mining (default: ${DEFAULT-VALUE})."
   )
   private final Boolean isDevMode = false;
 
   @Option(
-      names = {"--logging", "-l"},
-      description = "Logging verbosity: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
+    names = {"--logging", "-l"},
+    description = "Logging verbosity: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
   )
   private final Level logLevel = null;
 
   @Option(
-      names = {"--miner-enabled"},
-      description = "set if node should perform mining (default: ${DEFAULT-VALUE})"
+    names = {"--miner-enabled"},
+    description = "set if node should perform mining (default: ${DEFAULT-VALUE})"
   )
   private final Boolean isMiningEnabled = false;
 
   @Option(
-      names = {"--miner-coinbase"},
-      description =
-          "the account to which mining rewards are to be paid, must be specified if "
-              + "mining is enabled.",
-      arity = "1"
+    names = {"--miner-coinbase"},
+    description =
+        "the account to which mining rewards are to be paid, must be specified if "
+            + "mining is enabled.",
+    arity = "1"
   )
   private final Address coinbase = null;
 
   @Option(
-      names = {"--miner-minTransactionGasPriceWei"},
-      description =
-          "the minimum price offered by a transaction for it to be included in a mined "
-              + "block (default: ${DEFAULT-VALUE}).",
-      arity = "1"
+    names = {"--miner-minTransactionGasPriceWei"},
+    description =
+        "the minimum price offered by a transaction for it to be included in a mined "
+            + "block (default: ${DEFAULT-VALUE}).",
+    arity = "1"
   )
   private final Wei minTransactionGasPrice = DEFAULT_MIN_TRANSACTION_GAS_PRICE;
 
   @Option(
-      names = {"--miner-extraData"},
-      description =
-          "a hex string representing the (32) bytes to be included in the extra data "
-              + "field of a mined block. (default: ${DEFAULT-VALUE}).",
-      arity = "1"
+    names = {"--miner-extraData"},
+    description =
+        "a hex string representing the (32) bytes to be included in the extra data "
+            + "field of a mined block. (default: ${DEFAULT-VALUE}).",
+    arity = "1"
   )
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   // Permissioning: A list of whitelist nodes can be passed.
   @Option(
-      names = {"--nodes-whitelist"},
-      paramLabel = "<enode://id@host:port>",
-      description =
-          "Comma separated enode URLs for permissioned networks. You may specify an empty list.",
-      split = ",",
-      arity = "0..*",
-      converter = EnodeToURIPropertyConverter.class
+    names = {"--nodes-whitelist"},
+    paramLabel = "<enode://id@host:port>",
+    description =
+        "Comma separated enode URLs for permissioned networks. You may specify an empty list.",
+    split = ",",
+    arity = "0..*",
+    converter = EnodeToURIPropertyConverter.class
   )
   private final Collection<URI> nodesWhitelist = null;
 
   @Option(
-      names = {"--accounts-whitelist"},
-      paramLabel = "<hexString of account public key>",
-      description =
-          "Comma separated hexString of account public key "
-              + "for permissioned/role-based transaction. You may specify an empty list.",
-      split = ",",
-      arity = "0..*"
+    names = {"--accounts-whitelist"},
+    paramLabel = "<hexString of account public key>",
+    description =
+        "Comma separated hexString of account public key "
+            + "for permissioned/role-based transaction. You may specify an empty list.",
+    split = ",",
+    arity = "0..*"
   )
   private final Collection<String> accountsWhitelist = null;
 
