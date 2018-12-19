@@ -40,13 +40,11 @@ import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -84,27 +82,36 @@ public class RoundChangeManagerTest {
     RoundChangeMessageValidator.MessageValidatorForHeightFactory messageValidatorFactory =
         mock(RoundChangeMessageValidator.MessageValidatorForHeightFactory.class);
 
-    when(messageValidatorFactory.createAt(ri1)).thenAnswer(invocation -> new MessageValidator(
-        validators,
-        Util.publicKeyToAddress(proposerKey.getPublicKey()),
-        ri1,
-        headerValidator,
-        protocolContext,
-        parentHeader));
-    when(messageValidatorFactory.createAt(ri2)).thenAnswer(invocation -> new MessageValidator(
-        validators,
-        Util.publicKeyToAddress(validator1Key.getPublicKey()),
-        ri2,
-        headerValidator,
-        protocolContext,
-        parentHeader));
-    when(messageValidatorFactory.createAt(ri3)).thenAnswer(invocation -> new MessageValidator(
-        validators,
-        Util.publicKeyToAddress(validator2Key.getPublicKey()),
-        ri3,
-        headerValidator,
-        protocolContext,
-        parentHeader));
+    when(messageValidatorFactory.createAt(ri1))
+        .thenAnswer(
+            invocation ->
+                new MessageValidator(
+                    validators,
+                    Util.publicKeyToAddress(proposerKey.getPublicKey()),
+                    ri1,
+                    headerValidator,
+                    protocolContext,
+                    parentHeader));
+    when(messageValidatorFactory.createAt(ri2))
+        .thenAnswer(
+            invocation ->
+                new MessageValidator(
+                    validators,
+                    Util.publicKeyToAddress(validator1Key.getPublicKey()),
+                    ri2,
+                    headerValidator,
+                    protocolContext,
+                    parentHeader));
+    when(messageValidatorFactory.createAt(ri3))
+        .thenAnswer(
+            invocation ->
+                new MessageValidator(
+                    validators,
+                    Util.publicKeyToAddress(validator2Key.getPublicKey()),
+                    ri3,
+                    headerValidator,
+                    protocolContext,
+                    parentHeader));
 
     manager = new RoundChangeManager(2, validators, messageValidatorFactory);
   }
