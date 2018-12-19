@@ -70,16 +70,24 @@ public class IbftRoundTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
   private ProtocolContext<IbftContext> protocolContext;
 
-  @Mock private MutableBlockchain blockChain;
-  @Mock private WorldStateArchive worldStateArchive;
-  @Mock private BlockImporter<IbftContext> blockImporter;
-  @Mock private Subscribers<MinedBlockObserver> subscribers;
-  @Mock private IbftMessageTransmitter transmitter;
+  @Mock
+  private MutableBlockchain blockChain;
+  @Mock
+  private WorldStateArchive worldStateArchive;
+  @Mock
+  private BlockImporter<IbftContext> blockImporter;
+  @Mock
+  private Subscribers<MinedBlockObserver> subscribers;
+  @Mock
+  private IbftMessageTransmitter transmitter;
 
-  @Mock private IbftBlockCreator blockCreator;
-  @Mock private MessageValidator messageValidator;
+  @Mock
+  private IbftBlockCreator blockCreator;
+  @Mock
+  private MessageValidator messageValidator;
 
-  @Captor private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
+  @Captor
+  private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
 
   private Block proposedBlock;
   private IbftExtraData proposedExtraData;
@@ -120,7 +128,7 @@ public class IbftRoundTest {
 
   @Test
   public void onReceptionOfValidProposalSendsAPrepareToNetworkPeers() {
-    final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -281,9 +289,6 @@ public class IbftRoundTest {
 
   @Test
   public void aNewRoundMessageWithTheSameBlockIsSentUponReceptionOfARoundChangeWithCertificate() {
-    SignedData<ProposalPayload> mockedSentMessage =
-        messageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock);
-
     final ConsensusRoundIdentifier priorRoundChange = new ConsensusRoundIdentifier(1, 0);
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
@@ -314,11 +319,16 @@ public class IbftRoundTest {
     verify(transmitter, times(1))
         .multicastNewRound(
             eq(roundIdentifier), eq(roundChangeCertificate), payloadArgCaptor.capture());
-    assertThat(roundState.isPrepared()).isTrue(); // receiving NewRound is sufficient for 2 nodes.
 
     final IbftExtraData proposedExtraData =
         IbftExtraData.decode(
             payloadArgCaptor.getValue().getPayload().getBlock().getHeader().getExtraData());
     assertThat(proposedExtraData.getRound()).isEqualTo(roundIdentifier.getRoundNumber());
+
+    // Inject a single Prepare message, and confirm the roundState has gone to Prepared (which
+    // indicates the block has entered the roundState (note: all msgs are deemed valid due to mocks)
+    round.handlePrepareMessage(
+        messageFactory.createSignedPreparePayload(roundIdentifier, proposedBlock.getHash()));
+    assertThat(roundState.isPrepared()).isTrue();
   }
 }
