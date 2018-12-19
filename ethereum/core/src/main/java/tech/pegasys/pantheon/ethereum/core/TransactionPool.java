@@ -134,14 +134,11 @@ public class TransactionPool implements BlockAddedObserver {
       return basicValidationResult;
     }
 
-    if (accountWhitelistController.isPresent()
-        && accountWhitelistController.get().isAccountWhiteListSet()) {
-      String sender = transaction.getSender().toString();
-      if (!accountWhitelistController.get().contains(sender)) {
-        return ValidationResult.invalid(
-            TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED,
-            String.format("Sender %s is not on the Account Whitelist", sender));
-      }
+    String sender = transaction.getSender().toString();
+    if (!checkIfAccountIsWhitelisted(sender)) {
+      return ValidationResult.invalid(
+          TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED,
+          String.format("Sender %s is not on the Account Whitelist", sender));
     }
 
     final BlockHeader chainHeadBlockHeader = getChainHeadBlockHeader();
@@ -158,6 +155,20 @@ public class TransactionPool implements BlockAddedObserver {
             transaction,
             getSenderAccount(transaction, chainHeadBlockHeader),
             pendingTransactions.getNextNonceForSender(transaction.getSender()));
+  }
+
+  private boolean checkIfAccountIsWhitelisted(String account) {
+    if (useWhitelist()) {
+      if (!accountWhitelistController.get().contains(account)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public boolean useWhitelist() {
+    return (accountWhitelistController.isPresent()
+        && accountWhitelistController.get().isAccountWhiteListSet());
   }
 
   private Account getSenderAccount(

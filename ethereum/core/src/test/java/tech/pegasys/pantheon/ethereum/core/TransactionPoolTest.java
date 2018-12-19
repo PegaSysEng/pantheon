@@ -388,6 +388,16 @@ public class TransactionPoolTest {
     verifyZeroInteractions(batchAddedListener);
   }
 
+  @Test
+  public void shouldAllowTransactionWhenAccountWhitelistControllerIsNotPresent() {
+    givenTransactionIsValid(transaction1);
+    assertThat(transactionPool.useWhitelist()).isFalse();
+
+    assertThat(transactionPool.addLocalTransaction(transaction1)).isEqualTo(valid());
+
+    assertTransactionPending(transaction1);
+  }
+
   private void assertTransactionPending(final Transaction t) {
     assertThat(transactions.getTransactionByHash(t.hash())).contains(t);
   }

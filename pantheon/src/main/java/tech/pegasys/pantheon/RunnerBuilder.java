@@ -222,10 +222,11 @@ public class RunnerBuilder {
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
 
-    AccountWhitelistController accountWhitelistController =
-        new AccountWhitelistController(permissioningConfiguration);
-
-    transactionPool.setAccountWhitelist(accountWhitelistController);
+    if (permissioningConfiguration.isAccountWhitelistSet()) {
+      AccountWhitelistController accountWhitelistController =
+          new AccountWhitelistController(permissioningConfiguration);
+      transactionPool.setAccountWhitelist(accountWhitelistController);
+    }
 
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
