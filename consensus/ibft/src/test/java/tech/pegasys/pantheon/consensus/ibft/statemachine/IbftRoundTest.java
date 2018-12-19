@@ -121,7 +121,7 @@ public class IbftRoundTest {
 
   @Test
   public void onReceptionOfValidProposalSendsAPrepareToNetworkPeers() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
