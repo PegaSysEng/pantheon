@@ -157,7 +157,7 @@ public class TransactionPool implements BlockAddedObserver {
             pendingTransactions.getNextNonceForSender(transaction.getSender()));
   }
 
-  private boolean checkIfAccountIsWhitelisted(String account) {
+  private boolean checkIfAccountIsWhitelisted(final String account) {
     if (useWhitelist()) {
       if (!accountWhitelistController.get().contains(account)) {
         return false;
