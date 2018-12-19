@@ -12,6 +12,18 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.PRIOR_ROUND;
+import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.CURRENT_ROUND;
+import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.FUTURE_ROUND;
+
+import com.google.common.collect.Maps;
+import java.time.Clock;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -30,16 +42,6 @@ import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
-import java.time.Clock;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import com.google.common.collect.Maps;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * Responsible for starting/clearing Consensus rounds at a given block height. One of these is
  * created when a new block is imported to the chain. It immediately then creates a Round-0 object,
@@ -48,7 +50,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class IbftBlockHeightManager {
 
-  private enum MessageAge {
+  protected enum MessageAge {
     PRIOR_ROUND,
     CURRENT_ROUND,
     FUTURE_ROUND
@@ -148,7 +150,7 @@ public class IbftBlockHeightManager {
     LOG.info("Received a Proposal message.");
     actionOrBufferMessage(
         msg,
-        () -> currentRound.handleProposalMessage(msg),
+        currentRound::handleProposalMessage,
         (roundstate) -> roundstate.setProposedBlock(msg));
   }
 
@@ -156,7 +158,7 @@ public class IbftBlockHeightManager {
     LOG.info("Received a prepare message.");
     actionOrBufferMessage(
         msg,
-        () -> currentRound.handlePrepareMessage(msg),
+        currentRound::handlePrepareMessage,
         (roundstate) -> roundstate.addPrepareMessage(msg));
   }
 
@@ -164,19 +166,20 @@ public class IbftBlockHeightManager {
     LOG.info("Received a commit message.");
     actionOrBufferMessage(
         msg,
-        () -> currentRound.handleCommitMessage(msg),
+        currentRound::handleCommitMessage,
         (roundstate) -> roundstate.addCommitMessage(msg));
   }
 
-  private void actionOrBufferMessage(
-      final SignedData<? extends Payload> msg,
-      final Runnable inRoundHandler,
+  private <T extends Payload> void actionOrBufferMessage(
+      final SignedData<T> msg,
+      final Consumer<SignedData<T>> inRoundHandler,
       final Consumer<RoundState> buffer) {
-    final MessageAge messageAge = determineAgeOfMessage(msg);
-    if (messageAge == MessageAge.CURRENT_ROUND) {
-      inRoundHandler.run();
-    } else if (messageAge == MessageAge.FUTURE_ROUND) {
-      final ConsensusRoundIdentifier msgRoundId = msg.getPayload().getRoundIdentifier();
+    final Payload payload = msg.getPayload();
+    final MessageAge messageAge = determineAgeOfPayload(payload);
+    if (messageAge == CURRENT_ROUND) {
+      inRoundHandler.accept(msg);
+    } else if (messageAge == FUTURE_ROUND) {
+      final ConsensusRoundIdentifier msgRoundId = payload.getRoundIdentifier();
       final RoundState roundstate =
           futureRoundStateBuffer.computeIfAbsent(
               msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
@@ -187,15 +190,15 @@ public class IbftBlockHeightManager {
   public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
     final Optional<RoundChangeCertificate> result =
         roundChangeManager.appendRoundChangeMessage(msg);
-    MessageAge messageAge = determineAgeOfMessage(msg);
-    if (messageAge == MessageAge.PRIOR_ROUND) {
+    MessageAge messageAge = determineAgeOfPayload(msg.getPayload());
+    if (messageAge == PRIOR_ROUND) {
       LOG.info("Received RoundChange Message for a prior round.");
       return;
     }
 
     if (result.isPresent()) {
       ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
-      if (messageAge == MessageAge.FUTURE_ROUND) {
+      if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
       }
 
@@ -220,18 +223,19 @@ public class IbftBlockHeightManager {
   }
 
   public void handleNewRoundMessage(final SignedData<NewRoundPayload> msg) {
-    MessageAge messageAge = determineAgeOfMessage(msg);
-    if (messageAge == MessageAge.PRIOR_ROUND) {
+    final NewRoundPayload payload = msg.getPayload();
+    final MessageAge messageAge = determineAgeOfPayload(payload);
+
+    if (messageAge == PRIOR_ROUND) {
       LOG.info("Received NewRound Message for a prior round.");
       return;
     }
 
     if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
-
-      if (determineAgeOfMessage(msg) == MessageAge.FUTURE_ROUND) {
-        startNewRound(msg.getPayload().getRoundIdentifier().getRoundNumber());
+      if (messageAge == FUTURE_ROUND) {
+        startNewRound(payload.getRoundIdentifier().getRoundNumber());
       }
-      currentRound.handleProposalMessage(msg.getPayload().getProposalPayload());
+      currentRound.handleProposalMessage(payload.getProposalPayload());
     }
   }
 
@@ -239,14 +243,14 @@ public class IbftBlockHeightManager {
     return currentRound.getRoundIdentifier().getSequenceNumber();
   }
 
-  private MessageAge determineAgeOfMessage(final SignedData<? extends Payload> msg) {
-    int messageRoundNumber = msg.getPayload().getRoundIdentifier().getRoundNumber();
+  private MessageAge determineAgeOfPayload(final Payload payload) {
+    int messageRoundNumber = payload.getRoundIdentifier().getRoundNumber();
     int currentRoundNumber = currentRound.getRoundIdentifier().getRoundNumber();
     if (messageRoundNumber > currentRoundNumber) {
-      return MessageAge.FUTURE_ROUND;
+      return FUTURE_ROUND;
     } else if (messageRoundNumber == currentRoundNumber) {
-      return MessageAge.CURRENT_ROUND;
+      return CURRENT_ROUND;
     }
-    return MessageAge.PRIOR_ROUND;
+    return PRIOR_ROUND;
   }
 }
