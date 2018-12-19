@@ -129,7 +129,7 @@ public class IbftBlockHeightManager {
       return;
     }
 
-    LOG.debug("Round has expired, creating PreparedCertificate and notifying peers.");
+    LOG.info("Round has expired, creating PreparedCertificate and notifying peers.");
     final Optional<PreparedCertificate> preparedCertificate =
         currentRound.createPrepareCertificate();
 
@@ -184,14 +184,15 @@ public class IbftBlockHeightManager {
   public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
     final Optional<RoundChangeCertificate> result =
         roundChangeManager.appendRoundChangeMessage(msg);
-    MessageAge messageAge = determineAgeOfPayload(msg.getPayload());
+    final MessageAge messageAge = determineAgeOfPayload(msg.getPayload());
     if (messageAge == PRIOR_ROUND) {
       LOG.info("Received RoundChange Message for a prior round.");
       return;
     }
+    ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
+    LOG.info("Received a RoundChange message for {}", targetRound.toString());
 
     if (result.isPresent()) {
-      ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
       if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
       }
@@ -203,6 +204,7 @@ public class IbftBlockHeightManager {
   }
 
   private void startNewRound(final int roundNumber) {
+    LOG.info("Starting new round {}", roundNumber);
     if (futureRoundStateBuffer.containsKey(roundNumber)) {
       currentRound =
           roundFactory.createNewRoundWithState(
@@ -224,6 +226,7 @@ public class IbftBlockHeightManager {
       LOG.info("Received NewRound Message for a prior round.");
       return;
     }
+    LOG.info("Received NewRound Message for {}", payload.getRoundIdentifier().toString());
 
     if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
       if (messageAge == FUTURE_ROUND) {
