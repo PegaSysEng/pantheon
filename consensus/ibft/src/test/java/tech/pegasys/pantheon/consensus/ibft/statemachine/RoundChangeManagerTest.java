@@ -243,7 +243,7 @@ public class RoundChangeManagerTest {
     assertThat(manager.roundChangeCache.get(ri2)).isNull();
 
     roundChangeData = makeRoundChangeMessageWithPreparedCert(proposerKey, ri2,
-            Lists.newArrayList(validator1Key, validator2Key));
+            Lists.newArrayList(validator1Key));
     assertThat(manager.appendRoundChangeMessage(roundChangeData)).isEmpty();
     assertThat(manager.roundChangeCache.get(ri2).receivedMessages.size()).isEqualTo(1);
   }
