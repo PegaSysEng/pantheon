@@ -70,29 +70,22 @@ public class IbftRoundTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
   private ProtocolContext<IbftContext> protocolContext;
 
-  @Mock
-  private MutableBlockchain blockChain;
-  @Mock
-  private WorldStateArchive worldStateArchive;
-  @Mock
-  private BlockImporter<IbftContext> blockImporter;
-  @Mock
-  private Subscribers<MinedBlockObserver> subscribers;
-  @Mock
-  private IbftMessageTransmitter transmitter;
+  @Mock private MutableBlockchain blockChain;
+  @Mock private WorldStateArchive worldStateArchive;
+  @Mock private BlockImporter<IbftContext> blockImporter;
+  @Mock private Subscribers<MinedBlockObserver> subscribers;
+  @Mock private IbftMessageTransmitter transmitter;
 
-  @Mock
-  private IbftBlockCreator blockCreator;
-  @Mock
-  private MessageValidator messageValidator;
+  @Mock private IbftBlockCreator blockCreator;
+  @Mock private MessageValidator messageValidator;
 
-  @Captor
-  private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
+  @Captor private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
 
   private Block proposedBlock;
   private IbftExtraData proposedExtraData;
 
-  final Signature remoteCommitSeal = Signature.create(BigInteger.ONE, BigInteger.ONE, (byte) 1);
+  private final Signature remoteCommitSeal =
+      Signature.create(BigInteger.ONE, BigInteger.ONE, (byte) 1);
 
   @Before
   public void setup() {
@@ -113,11 +106,11 @@ public class IbftRoundTest {
             Optional.empty(),
             0,
             Collections.emptyList());
-    BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
+    final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
     headerTestFixture.extraData(proposedExtraData.encode());
     headerTestFixture.number(1);
 
-    BlockHeader header = headerTestFixture.buildHeader();
+    final BlockHeader header = headerTestFixture.buildHeader();
     proposedBlock =
         new Block(header, new BlockBody(Collections.emptyList(), Collections.emptyList()));
 
@@ -324,6 +317,37 @@ public class IbftRoundTest {
         IbftExtraData.decode(
             payloadArgCaptor.getValue().getPayload().getBlock().getHeader().getExtraData());
     assertThat(proposedExtraData.getRound()).isEqualTo(roundIdentifier.getRoundNumber());
+
+    // Inject a single Prepare message, and confirm the roundState has gone to Prepared (which
+    // indicates the block has entered the roundState (note: all msgs are deemed valid due to mocks)
+    round.handlePrepareMessage(
+        messageFactory.createSignedPreparePayload(roundIdentifier, proposedBlock.getHash()));
+    assertThat(roundState.isPrepared()).isTrue();
+  }
+
+  @Test
+  public void creatingNewBlockFromEmptyPreparedCertificateUpdatesInternalState() {
+    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
+    final IbftRound round =
+        new IbftRound(
+            roundState,
+            blockCreator,
+            protocolContext,
+            blockImporter,
+            subscribers,
+            localNodeKeys,
+            messageFactory,
+            transmitter);
+
+    final RoundChangeCertificate roundChangeCertificate =
+        new RoundChangeCertificate(
+            Collections.singletonList(
+                messageFactory.createSignedRoundChangePayload(roundIdentifier, Optional.empty())));
+
+    round.startRoundWith(roundChangeCertificate, 15);
+    verify(transmitter, times(1))
+        .multicastNewRound(
+            eq(roundIdentifier), eq(roundChangeCertificate), payloadArgCaptor.capture());
 
     // Inject a single Prepare message, and confirm the roundState has gone to Prepared (which
     // indicates the block has entered the roundState (note: all msgs are deemed valid due to mocks)
