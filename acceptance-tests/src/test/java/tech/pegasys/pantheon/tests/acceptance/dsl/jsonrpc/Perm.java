@@ -17,7 +17,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddAccountsToWh
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetExpectedAccountsWhitelist;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveAccountsFromWhitelistSuccessfully;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddNodeSuccess;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveNodeSuccess;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermTransaction;
 
+import java.util.List;
 import java.util.Arrays;
 
 public class Perm {
@@ -40,5 +44,19 @@ public class Perm {
   public Condition expectAccountsWhitelist(final String... expectedAccounts) {
     return new GetExpectedAccountsWhitelist(
         transactions.getAccountsWhiteList(), Arrays.asList(expectedAccounts));
+}
+
+  public Perm(final PermTransaction transactions) {
+    this.transactions = transactions;
+  }
+
+  private final PermTransaction transactions;
+
+  public Condition addNodesToWhitelist(final List<String> enodes) {
+    return new AddNodeSuccess(transactions.addNodesToWhitelist(enodes));
+  }
+
+  public Condition removeNodesFromWhitelist(final List<String> enodes) {
+    return new RemoveNodeSuccess(transactions.removeNodesFromWhitelist(enodes));
   }
 }

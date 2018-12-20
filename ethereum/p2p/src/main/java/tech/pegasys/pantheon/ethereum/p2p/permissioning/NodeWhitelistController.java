@@ -42,11 +42,32 @@ public class NodeWhitelistController {
     return nodeWhitelist.add(node);
   }
 
-  public boolean removeNode(final Peer node) {
+  private boolean removeNode(final Peer node) {
     return nodeWhitelist.remove(node);
   }
 
-  public boolean contains(final Peer node) {
+  public void addNodes(final List<DefaultPeer> peers) throws Exception {
+    for (DefaultPeer peer : peers) {
+      boolean b = nodeWhitelist.contains(peer);
+      if (b) {
+        throw new Exception(
+            String.format("Specified peer: %s already exists in whitelist.", peer.getId()));
+      }
+    }
+    peers.forEach(this::addNode);
+  }
+
+  public void removeNodes(final List<DefaultPeer> peers) throws Exception {
+    for (DefaultPeer peer : peers) {
+      if (!(nodeWhitelist.contains(peer))) {
+        throw new Exception(
+            String.format("Specified peer: %s does not exist in whitelist.", peer.getId()));
+      }
+    }
+    peers.forEach(this::removeNode);
+  }
+
+  public boolean isPermitted(final Peer node) {
     return (!nodeWhitelistSet || (nodeWhitelistSet && nodeWhitelist.contains(node)));
   }
 }

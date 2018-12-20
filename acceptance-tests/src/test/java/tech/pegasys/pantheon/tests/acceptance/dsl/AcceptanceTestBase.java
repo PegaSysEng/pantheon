@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.web3.Web3Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitConditions;
 
@@ -55,6 +56,7 @@ public class AcceptanceTestBase {
     cliqueTransactions = new CliqueTransactions();
     clique = new CliqueConditions(ethTransactions, cliqueTransactions);
     net = new Net(new NetTransactions());
+    perm = new Perm(new PermTransaction());
     cluster = new Cluster(net);
     transactions = new Transactions(accounts);
     perm = new Perm(transactions);

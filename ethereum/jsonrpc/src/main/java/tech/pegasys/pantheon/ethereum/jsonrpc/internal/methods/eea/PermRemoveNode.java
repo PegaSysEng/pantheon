@@ -23,6 +23,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import com.google.common.base.Splitter;
+
 public class PermRemoveNode implements JsonRpcMethod {
 
   private final P2PNetwork p2pNetwork;
@@ -35,18 +41,29 @@ public class PermRemoveNode implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return "perm_removeNode";
+    return "perm_removeNodesFromWhitelist";
   }
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
-    final StringParameter filter = parameters.required(req.getParams(), 0, StringParameter.class);
-    DefaultPeer node = DefaultPeer.fromURI(filter.getValue());
-    boolean result = p2pNetwork.getNodeWhitelistController().removeNode(node);
-    if (result) {
-      return new JsonRpcSuccessResponse(req.getId(), new Object[] {});
-    } else {
+    final StringParameter enodes = parameters.required(req.getParams(), 0, StringParameter.class);
+    Iterable<String> splitEnodes = Splitter.on(',').split(enodes.getValue());
+    try {
+      List<DefaultPeer> peers =
+          StreamSupport.stream(splitEnodes.spliterator(), true)
+              .map(this::parsePeers)
+              .collect(Collectors.toList());
+
+      p2pNetwork.getNodeWhitelistController().removeNodes(peers);
+      return new JsonRpcSuccessResponse(req.getId(), true);
+    } catch (IllegalArgumentException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
+    } catch (Exception e) {
+      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INTERNAL_ERROR);
     }
+  }
+
+  private DefaultPeer parsePeers(final String enodeURI) {
+    return DefaultPeer.fromURI(enodeURI);
   }
 }
