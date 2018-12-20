@@ -44,7 +44,7 @@ public class IbftFinalState {
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final MessageFactory messageFactory;
   private final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator;
-  private Subscribers<MinedBlockObserver> minedBlockObservers;
+  private final Subscribers<MinedBlockObserver> minedBlockObservers;
   private final IbftMessageTransmitter messageTransmitter;
   private final Clock clock;
 
