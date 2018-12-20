@@ -102,7 +102,8 @@ public class IbftController {
             PrepareMessageData.fromMessageData(messageData).decode();
         if (processMessage(signedPreparePayload, message)) {
           currentHeightManager.handlePrepareMessage(signedPreparePayload);
-          gossiper.gossipPreparePayload(signedPreparePayload, message.getConnection().getPeer().getAddress());
+          gossiper.gossipPreparePayload(
+              signedPreparePayload, message.getConnection().getPeer().getAddress());
         }
         break;
 
@@ -111,7 +112,8 @@ public class IbftController {
             CommitMessageData.fromMessageData(messageData).decode();
         if (processMessage(signedCommitPayload, message)) {
           currentHeightManager.handleCommitMessage(signedCommitPayload);
-          gossiper.gossipCommitPayload(signedCommitPayload, message.getConnection().getPeer().getAddress());
+          gossiper.gossipCommitPayload(
+              signedCommitPayload, message.getConnection().getPeer().getAddress());
         }
         break;
 
