@@ -88,47 +88,50 @@ public class IbftController {
     final MessageData messageData = message.getData();
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
-        final SignedData<ProposalPayload> proposalMsg =
+        final SignedData<ProposalPayload> signedProposalPayload =
             ProposalMessageData.fromMessageData(messageData).decode();
-        if (processMessage(proposalMsg, message)) {
-          currentHeightManager.handleProposalMessage(proposalMsg);
-          gossiper.gossipProposalPayload(proposalMsg, message.getConnection().getPeer().getAddress());
+        if (processMessage(signedProposalPayload, message)) {
+          currentHeightManager.handleProposalMessage(signedProposalPayload);
+          gossiper.gossipProposalPayload(
+              signedProposalPayload, message.getConnection().getPeer().getAddress());
         }
         break;
 
       case IbftV2.PREPARE:
-        final SignedData<PreparePayload> prepareMsg =
+        final SignedData<PreparePayload> signedPreparePayload =
             PrepareMessageData.fromMessageData(messageData).decode();
-        if (processMessage(prepareMsg, message)) {
-          currentHeightManager.handlePrepareMessage(prepareMsg);
-          gossiper.gossipPreparePayload(prepareMsg, message.getConnection().getPeer().getAddress());
+        if (processMessage(signedPreparePayload, message)) {
+          currentHeightManager.handlePrepareMessage(signedPreparePayload);
+          gossiper.gossipPreparePayload(signedPreparePayload, message.getConnection().getPeer().getAddress());
         }
         break;
 
       case IbftV2.COMMIT:
-        final SignedData<CommitPayload> commitMsg =
+        final SignedData<CommitPayload> signedCommitPayload =
             CommitMessageData.fromMessageData(messageData).decode();
-        if (processMessage(commitMsg, message)) {
-          currentHeightManager.handleCommitMessage(commitMsg);
-          gossiper.gossipCommitPayload(commitMsg, message.getConnection().getPeer().getAddress());
+        if (processMessage(signedCommitPayload, message)) {
+          currentHeightManager.handleCommitMessage(signedCommitPayload);
+          gossiper.gossipCommitPayload(signedCommitPayload, message.getConnection().getPeer().getAddress());
         }
         break;
 
       case IbftV2.ROUND_CHANGE:
-        final SignedData<RoundChangePayload> roundChangeMsg =
+        final SignedData<RoundChangePayload> signedRoundChangePayload =
             RoundChangeMessageData.fromMessageData(messageData).decode();
-        if (processMessage(roundChangeMsg, message)) {
-          currentHeightManager.handleRoundChangeMessage(roundChangeMsg);
-          gossiper.gossipRoundChangePayload(roundChangeMsg, message.getConnection().getPeer().getAddress());
+        if (processMessage(signedRoundChangePayload, message)) {
+          currentHeightManager.handleRoundChangeMessage(signedRoundChangePayload);
+          gossiper.gossipRoundChangePayload(
+              signedRoundChangePayload, message.getConnection().getPeer().getAddress());
         }
         break;
 
       case IbftV2.NEW_ROUND:
-        final SignedData<NewRoundPayload> newRoundMsg =
+        final SignedData<NewRoundPayload> signedNewRoundPayload =
             NewRoundMessageData.fromMessageData(messageData).decode();
-        if (processMessage(newRoundMsg, message)) {
-          currentHeightManager.handleNewRoundMessage(newRoundMsg);
-          gossiper.gossipNewRoundPayload(newRoundMsg, message.getConnection().getPeer().getAddress());
+        if (processMessage(signedNewRoundPayload, message)) {
+          currentHeightManager.handleNewRoundMessage(signedNewRoundPayload);
+          gossiper.gossipNewRoundPayload(
+              signedNewRoundPayload, message.getConnection().getPeer().getAddress());
         }
         break;
 

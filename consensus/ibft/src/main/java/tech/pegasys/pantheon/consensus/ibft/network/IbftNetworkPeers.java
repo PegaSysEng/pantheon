@@ -12,17 +12,11 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.network;
 
-import com.google.common.collect.Lists;
-import com.sun.tools.javac.util.List;
-import java.util.Arrays;
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
-import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
 import java.util.Map;
@@ -60,7 +54,8 @@ public class IbftNetworkPeers {
     sendMessageToSpecificAddresses(validators, message);
   }
 
-  public void multicastToValidatorsExcept(final MessageData message, Collection<Address> exceptAddresses) {
+  public void multicastToValidatorsExcept(
+      final MessageData message, Collection<Address> exceptAddresses) {
     final Collection<Address> validators = validatorProvider.getValidators();
     validators.removeIf(exceptAddresses::contains);
     sendMessageToSpecificAddresses(validators, message);
