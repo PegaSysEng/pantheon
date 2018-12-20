@@ -16,6 +16,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -38,10 +39,13 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
+import tech.pegasys.pantheon.consensus.ibft.network.MockPeerFactory;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
+import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -64,27 +68,27 @@ public class IbftControllerTest {
   @Mock private IbftBlockHeightManager blockHeightManager;
 
   @Mock private SignedData<ProposalPayload> signedProposal;
-  @Mock private Message proposalMessage;
+  private Message proposalMessage;
   @Mock private ProposalMessageData proposalMessageData;
   @Mock private ProposalPayload proposalPayload;
 
   @Mock private SignedData<PreparePayload> signedPrepare;
-  @Mock private Message prepareMessage;
+  private Message prepareMessage;
   @Mock private PrepareMessageData prepareMessageData;
   @Mock private PreparePayload preparePayload;
 
   @Mock private SignedData<CommitPayload> signedCommit;
-  @Mock private Message commitMessage;
+  private Message commitMessage;
   @Mock private CommitMessageData commitMessageData;
   @Mock private CommitPayload commitPayload;
 
   @Mock private SignedData<NewRoundPayload> signedNewRound;
-  @Mock private Message newRoundMessage;
+  private Message newRoundMessage;
   @Mock private NewRoundMessageData newRoundMessageData;
   @Mock private NewRoundPayload newRoundPayload;
 
   @Mock private SignedData<RoundChangePayload> signedRoundChange;
-  @Mock private Message roundChangeMessage;
+  private Message roundChangeMessage;
   @Mock private RoundChangeMessageData roundChangeMessageData;
   @Mock private RoundChangePayload roundChangePayload;
 
@@ -97,11 +101,12 @@ public class IbftControllerTest {
 
   @Before
   public void setup() {
-    ibftController =
-        new IbftController(blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages);
     when(blockChain.getChainHeadHeader()).thenReturn(blockHeader);
     when(blockHeightManagerFactory.create(blockHeader)).thenReturn(blockHeightManager);
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
+    when(ibftFinalState.getPeers()).thenReturn(mock(IbftNetworkPeers.class));
+    ibftController =
+        new IbftController(blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages);
   }
 
   @Test
@@ -408,7 +413,7 @@ public class IbftControllerTest {
     when(proposalPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
     when(proposalMessageData.getCode()).thenReturn(IbftV2.PROPOSAL);
     when(proposalMessageData.decode()).thenReturn(signedProposal);
-    when(proposalMessage.getData()).thenReturn(proposalMessageData);
+    proposalMessage = new DefaultMessage(MockPeerFactory.create(), proposalMessageData);
   }
 
   private void setupPrepare(
@@ -418,7 +423,7 @@ public class IbftControllerTest {
     when(preparePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
     when(prepareMessageData.getCode()).thenReturn(IbftV2.PREPARE);
     when(prepareMessageData.decode()).thenReturn(signedPrepare);
-    when(prepareMessage.getData()).thenReturn(prepareMessageData);
+    prepareMessage = new DefaultMessage(MockPeerFactory.create(), prepareMessageData);
   }
 
   private void setupCommit(
@@ -428,7 +433,7 @@ public class IbftControllerTest {
     when(commitPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
     when(commitMessageData.getCode()).thenReturn(IbftV2.COMMIT);
     when(commitMessageData.decode()).thenReturn(signedCommit);
-    when(commitMessage.getData()).thenReturn(commitMessageData);
+    commitMessage = new DefaultMessage(MockPeerFactory.create(), commitMessageData);
   }
 
   private void setupNewRound(
@@ -438,7 +443,7 @@ public class IbftControllerTest {
     when(newRoundPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
     when(newRoundMessageData.getCode()).thenReturn(IbftV2.NEW_ROUND);
     when(newRoundMessageData.decode()).thenReturn(signedNewRound);
-    when(newRoundMessage.getData()).thenReturn(newRoundMessageData);
+    newRoundMessage = new DefaultMessage(MockPeerFactory.create(), newRoundMessageData);
   }
 
   private void setupRoundChange(
@@ -448,6 +453,6 @@ public class IbftControllerTest {
     when(roundChangePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
     when(roundChangeMessageData.getCode()).thenReturn(IbftV2.ROUND_CHANGE);
     when(roundChangeMessageData.decode()).thenReturn(signedRoundChange);
-    when(roundChangeMessage.getData()).thenReturn(roundChangeMessageData);
+    roundChangeMessage = new DefaultMessage(MockPeerFactory.create(), roundChangeMessageData);
   }
 }
