@@ -19,12 +19,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.Remo
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
-import java.util.List;
 
 public class PermRemoveNodeTransaction implements Transaction<Boolean> {
-  private final List<String> enodes;
+  private final String enodes;
 
-  public PermRemoveNodeTransaction(final List<String> enodes) {
+  public PermRemoveNodeTransaction(final String enodes) {
     this.enodes = enodes;
   }
 

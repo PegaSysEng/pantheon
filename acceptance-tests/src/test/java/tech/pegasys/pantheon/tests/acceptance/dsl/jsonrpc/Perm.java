@@ -52,11 +52,11 @@ public class Perm {
 
   private final PermTransaction transactions;
 
-  public Condition addNodesToWhitelist(final List<String> enodes) {
+  public Condition addNodesToWhitelist(final String enodes) {
     return new AddNodeSuccess(transactions.addNodesToWhitelist(enodes));
   }
 
-  public Condition removeNodesFromWhitelist(final List<String> enodes) {
+  public Condition removeNodesFromWhitelist(final String enodes) {
     return new RemoveNodeSuccess(transactions.removeNodesFromWhitelist(enodes));
   }
 }

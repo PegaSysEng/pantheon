@@ -19,12 +19,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
-import java.util.List;
 
 public class PermAddNodeTransaction implements Transaction<Boolean> {
-  private final List<String> enodes;
+  private final String enodes;
 
-  public PermAddNodeTransaction(final List<String> enodes) {
+  public PermAddNodeTransaction(final String enodes) {
     this.enodes = enodes;
   }
 
