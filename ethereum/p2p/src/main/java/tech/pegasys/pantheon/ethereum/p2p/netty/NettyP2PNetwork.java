@@ -267,14 +267,11 @@ public final class NettyP2PNetwork implements P2PNetwork {
                 return;
               }
 
-              // Reject incoming connections that are blacklisted
-              //   OR not whitelisted (if --node-whitelist)
-              if (peerBlacklist.contains(connection)
-                  || !nodeWhitelist.contains(
-                      connection.getPeer().getNodeId(),
-                      ch.remoteAddress().getAddress().getHostAddress(),
-                      connection.getPeer().getPort(),
-                      connection.getPeer().getPort())) {
+              boolean isPeerBlacklisted = peerBlacklist.contains(connection);
+              boolean isPeerNotWhitelisted = !isPeerWhitelisted(connection, ch);
+
+              if (isPeerBlacklisted
+                  || isPeerNotWhitelisted) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
                 return;
               }
@@ -286,6 +283,14 @@ public final class NettyP2PNetwork implements P2PNetwork {
             });
       }
     };
+  }
+
+  private boolean isPeerWhitelisted(PeerConnection connection, SocketChannel ch) {
+    return !nodeWhitelist.contains(
+        connection.getPeer().getNodeId(),
+        ch.remoteAddress().getAddress().getHostAddress(),
+        connection.getPeer().getPort(),
+        connection.getPeer().getPort());
   }
 
   private int connectionCount() {
