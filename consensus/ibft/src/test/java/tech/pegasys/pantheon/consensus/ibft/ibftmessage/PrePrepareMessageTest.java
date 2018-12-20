@@ -32,12 +32,12 @@ public class PrePrepareMessageTest {
   @Mock private SignedData<ProposalPayload> prePrepareMessageData;
   @Mock private BytesValue messageBytes;
   @Mock private MessageData messageData;
-  @Mock private ProposalMessage proposalMessage;
+  @Mock private ProposalMessageData proposalMessage;
 
   @Test
   public void createMessageFromPrePrepareMessageData() {
     when(prePrepareMessageData.encode()).thenReturn(messageBytes);
-    ProposalMessage proposalMessage = ProposalMessage.create(prePrepareMessageData);
+    ProposalMessageData proposalMessage = ProposalMessageData.create(prePrepareMessageData);
 
     assertThat(proposalMessage.getData()).isEqualTo(messageBytes);
     assertThat(proposalMessage.getCode()).isEqualTo(IbftV2.PROPOSAL);
@@ -46,7 +46,7 @@ public class PrePrepareMessageTest {
 
   @Test
   public void createMessageFromPrePrepareMessage() {
-    ProposalMessage message = ProposalMessage.fromMessage(proposalMessage);
+    ProposalMessageData message = ProposalMessageData.fromMessageData(proposalMessage);
     assertThat(message).isSameAs(proposalMessage);
   }
 
@@ -54,7 +54,7 @@ public class PrePrepareMessageTest {
   public void createMessageFromGenericMessageData() {
     when(messageData.getCode()).thenReturn(IbftV2.PROPOSAL);
     when(messageData.getData()).thenReturn(messageBytes);
-    ProposalMessage proposalMessage = ProposalMessage.fromMessage(messageData);
+    ProposalMessageData proposalMessage = ProposalMessageData.fromMessageData(messageData);
 
     assertThat(proposalMessage.getData()).isEqualTo(messageData.getData());
     assertThat(proposalMessage.getCode()).isEqualTo(IbftV2.PROPOSAL);
@@ -63,8 +63,8 @@ public class PrePrepareMessageTest {
   @Test
   public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
-    assertThatThrownBy(() -> ProposalMessage.fromMessage(messageData))
+    assertThatThrownBy(() -> ProposalMessageData.fromMessageData(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Message has code 42 and thus is not a ProposalMessage");
+        .hasMessageContaining("Message has code 42 and thus is not a ProposalMessageData");
   }
 }

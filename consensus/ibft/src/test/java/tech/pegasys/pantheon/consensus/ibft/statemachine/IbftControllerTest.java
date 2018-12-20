@@ -26,12 +26,12 @@ import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessage;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
@@ -64,23 +64,23 @@ public class IbftControllerTest {
   @Mock private IbftBlockHeightManager blockHeightManager;
 
   @Mock private SignedData<ProposalPayload> signedProposal;
-  @Mock private ProposalMessage proposalMessage;
+  @Mock private ProposalMessageData proposalMessage;
   @Mock private ProposalPayload proposalPayload;
 
   @Mock private SignedData<PreparePayload> signedPrepare;
-  @Mock private PrepareMessage prepareMessage;
+  @Mock private PrepareMessageData prepareMessage;
   @Mock private PreparePayload preparePayload;
 
   @Mock private SignedData<CommitPayload> signedCommit;
-  @Mock private CommitMessage commitMessage;
+  @Mock private CommitMessageData commitMessage;
   @Mock private CommitPayload commitPayload;
 
   @Mock private SignedData<NewRoundPayload> signedNewRound;
-  @Mock private NewRoundMessage newRoundMessage;
+  @Mock private NewRoundMessageData newRoundMessage;
   @Mock private NewRoundPayload newRoundPayload;
 
   @Mock private SignedData<RoundChangePayload> signedRoundChange;
-  @Mock private RoundChangeMessage roundChangeMessage;
+  @Mock private RoundChangeMessageData roundChangeMessage;
   @Mock private RoundChangePayload roundChangePayload;
 
   private final Map<Long, List<MessageData>> futureMessages = new HashMap<>();

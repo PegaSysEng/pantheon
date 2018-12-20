@@ -19,12 +19,12 @@ import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessage;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
@@ -84,7 +84,7 @@ public class IbftController {
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
         final SignedData<ProposalPayload> proposalMsg =
-            ProposalMessage.fromMessage(messageData).decode();
+            ProposalMessageData.fromMessageData(messageData).decode();
         if (processMessage(proposalMsg, messageData)) {
           currentHeightManager.handleProposalMessage(proposalMsg);
         }
@@ -92,14 +92,14 @@ public class IbftController {
 
       case IbftV2.PREPARE:
         final SignedData<PreparePayload> prepareMsg =
-            PrepareMessage.fromMessage(messageData).decode();
+            PrepareMessageData.fromMessageData(messageData).decode();
         if (processMessage(prepareMsg, messageData)) {
           currentHeightManager.handlePrepareMessage(prepareMsg);
         }
         break;
 
       case IbftV2.COMMIT:
-        final SignedData<CommitPayload> commitMsg = CommitMessage.fromMessage(messageData).decode();
+        final SignedData<CommitPayload> commitMsg = CommitMessageData.fromMessageData(messageData).decode();
         if (processMessage(commitMsg, messageData)) {
           currentHeightManager.handleCommitMessage(commitMsg);
         }
@@ -107,7 +107,7 @@ public class IbftController {
 
       case IbftV2.ROUND_CHANGE:
         final SignedData<RoundChangePayload> roundChangeMsg =
-            RoundChangeMessage.fromMessage(messageData).decode();
+            RoundChangeMessageData.fromMessageData(messageData).decode();
         if (processMessage(roundChangeMsg, messageData)) {
           currentHeightManager.handleRoundChangeMessage(roundChangeMsg);
         }
@@ -115,7 +115,7 @@ public class IbftController {
 
       case IbftV2.NEW_ROUND:
         final SignedData<NewRoundPayload> newRoundMsg =
-            NewRoundMessage.fromMessage(messageData).decode();
+            NewRoundMessageData.fromMessageData(messageData).decode();
         if (processMessage(newRoundMsg, messageData)) {
           currentHeightManager.handleNewRoundMessage(newRoundMsg);
         }

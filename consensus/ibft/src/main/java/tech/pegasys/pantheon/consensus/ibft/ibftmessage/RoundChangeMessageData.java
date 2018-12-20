@@ -12,32 +12,32 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public class NewRoundMessage extends AbstractIbftMessage {
+public class RoundChangeMessageData extends AbstractIbftMessageData {
 
-  private static final int MESSAGE_CODE = IbftV2.NEW_ROUND;
+  private static final int MESSAGE_CODE = IbftV2.ROUND_CHANGE;
 
-  private NewRoundMessage(final BytesValue data) {
+  private RoundChangeMessageData(final BytesValue data) {
     super(data);
   }
 
-  public static NewRoundMessage fromMessage(final MessageData message) {
-    return fromMessage(message, MESSAGE_CODE, NewRoundMessage.class, NewRoundMessage::new);
+  public static RoundChangeMessageData fromMessageData(final MessageData messageData) {
+    return fromMessageData(messageData, MESSAGE_CODE, RoundChangeMessageData.class, RoundChangeMessageData::new);
   }
 
   @Override
-  public SignedData<NewRoundPayload> decode() {
-    return SignedData.readSignedNewRoundPayloadFrom(RLP.input(data));
+  public SignedData<RoundChangePayload> decode() {
+    return SignedData.readSignedRoundChangePayloadFrom(RLP.input(data));
   }
 
-  public static NewRoundMessage create(final SignedData<NewRoundPayload> signedPayload) {
+  public static RoundChangeMessageData create(final SignedData<RoundChangePayload> signedPayload) {
 
-    return new NewRoundMessage(signedPayload.encode());
+    return new RoundChangeMessageData(signedPayload.encode());
   }
 
   @Override
