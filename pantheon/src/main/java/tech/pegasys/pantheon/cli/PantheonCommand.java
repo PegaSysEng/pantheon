@@ -414,9 +414,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--accounts-whitelist"},
-    paramLabel = "<hexString of account public key>",
+    paramLabel = "<hex string of account public key>",
     description =
-        "Comma separated hexString of account public keys "
+        "Comma separated hex strings of account public keys "
             + "for permissioned/role-based transactions. You may specify an empty list.",
     split = ",",
     arity = "0..*"
