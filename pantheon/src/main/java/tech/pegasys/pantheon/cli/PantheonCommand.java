@@ -404,7 +404,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     names = {"--nodes-whitelist"},
     paramLabel = "<enode://id@host:port>",
     description =
-        "Comma separated enode URLs for permissioned networks. You may specify an empty list.",
+        "Comma separated enode URLs for permissioned networks. "
+            + "Not intended to be used with mainnet or public testnets.",
     split = ",",
     arity = "0..*",
     converter = EnodeToURIPropertyConverter.class
@@ -415,8 +416,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     names = {"--accounts-whitelist"},
     paramLabel = "<hexString of account public key>",
     description =
-        "Comma separated hexString of account public key "
-            + "for permissioned/role-based transaction. You may specify an empty list.",
+        "Comma separated hexString of account public keys "
+            + "for permissioned/role-based transactions. You may specify an empty list.",
     split = ",",
     arity = "0..*"
   )
