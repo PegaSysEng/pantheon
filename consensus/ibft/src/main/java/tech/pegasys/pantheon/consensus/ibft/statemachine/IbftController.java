@@ -88,7 +88,7 @@ public class IbftController {
         final SignedData<ProposalPayload> proposalMsg =
             ProposalMessageData.fromMessageData(messageData).decode();
         if (processMessage(proposalMsg, message)) {
-          currentHeightManager.handleProposalMessage(proposalMsg);
+          currentHeightManager.handleProposalMessage(proposalMsg, message);
         }
         break;
 
@@ -166,7 +166,7 @@ public class IbftController {
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
-      LOG.info("IBFT message discarded as it is not for the current block height");
+      LOG.info("IBFT message discarded as it is from a previous block height");
     }
     return false;
   }

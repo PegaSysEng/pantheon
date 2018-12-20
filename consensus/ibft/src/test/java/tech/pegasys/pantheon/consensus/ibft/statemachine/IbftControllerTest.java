@@ -136,7 +136,7 @@ public class IbftControllerTest {
     verify(blockHeightManagerFactory).create(blockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
-    verify(blockHeightManager, never()).handleProposalMessage(signedProposal);
+    verify(blockHeightManager, never()).handleProposalMessage(signedProposal, proposalMessage);
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
     verify(blockHeightManager).handleCommitMessage(signedCommit);
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
@@ -163,7 +163,7 @@ public class IbftControllerTest {
     verify(blockHeightManagerFactory).create(blockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
-    verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(blockHeightManager).handleProposalMessage(signedProposal, proposalMessage);
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
     verify(blockHeightManager).handleCommitMessage(signedCommit);
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
@@ -197,7 +197,7 @@ public class IbftControllerTest {
     ibftController.handleMessageEvent(new IbftReceivedMessageEvent(proposalMessage));
 
     assertThat(futureMessages).isEmpty();
-    verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(blockHeightManager).handleProposalMessage(signedProposal, proposalMessage);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);
@@ -392,24 +392,13 @@ public class IbftControllerTest {
     verifyNoMoreInteractions(blockHeightManager);
   }
 
-  public static <A, B> List<Pair<A, B>> zip(List<A> as, List<B> bs) {
-    return IntStream.range(0, Math.min(as.size(), bs.size()))
-        .mapToObj(i -> new Pair<>(as.get(i), bs.get(i)))
-        .collect(Collectors.toList());
-  }
-
   private void verifyHasFutureMessages(
       final IbftReceivedMessageEvent msg, final Map<Long, List<Message>> expectedFutureMsgs) {
     ibftController.start();
     ibftController.handleMessageEvent(msg);
 
     assertThat(futureMessages).hasSize(expectedFutureMsgs.size());
-    assertThat(futureMessages)
-        .allSatisfy(
-            (round, messages) ->
-                assertThat(zip(expectedFutureMsgs.get(round), messages))
-                    .allSatisfy(
-                        (m) -> assertThat(m.getKey().getData()).isEqualTo(m.getValue().getData())));
+    assertThat(futureMessages).isEqualTo(expectedFutureMsgs);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);

@@ -44,6 +44,7 @@ import java.util.function.Function;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 
 /**
  * Responsible for starting/clearing Consensus rounds at a given block height. One of these is
@@ -149,47 +150,47 @@ public class IbftBlockHeightManager {
     handleRoundChangeMessage(localRoundChange);
   }
 
-  public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
+  public void handleProposalMessage(final SignedData<ProposalPayload> msgData, final Message msg) {
     LOG.info("Received a Proposal message.");
-    actionOrBufferMessage(msg, currentRound::handleProposalMessage, RoundState::setProposedBlock);
+    actionOrBufferMessage(msgData, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
-  public void handlePrepareMessage(final SignedData<PreparePayload> msg) {
+  public void handlePrepareMessage(final SignedData<PreparePayload> msgData) {
     LOG.info("Received a prepare message.");
-    actionOrBufferMessage(msg, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
+    actionOrBufferMessage(msgData, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
-  public void handleCommitMessage(final SignedData<CommitPayload> msg) {
+  public void handleCommitMessage(final SignedData<CommitPayload> msgData) {
     LOG.info("Received a commit message.");
-    actionOrBufferMessage(msg, currentRound::handleCommitMessage, RoundState::addCommitMessage);
+    actionOrBufferMessage(msgData, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
   private <T extends Payload> void actionOrBufferMessage(
-      final SignedData<T> msg,
+      final SignedData<T> msgData,
       final Consumer<SignedData<T>> inRoundHandler,
       final BiConsumer<RoundState, SignedData<T>> buffer) {
-    final Payload payload = msg.getPayload();
+    final Payload payload = msgData.getPayload();
     final MessageAge messageAge = determineAgeOfPayload(payload);
     if (messageAge == CURRENT_ROUND) {
-      inRoundHandler.accept(msg);
+      inRoundHandler.accept(msgData);
     } else if (messageAge == FUTURE_ROUND) {
       final ConsensusRoundIdentifier msgRoundId = payload.getRoundIdentifier();
       final RoundState roundstate =
           futureRoundStateBuffer.computeIfAbsent(
               msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      buffer.accept(roundstate, msg);
+      buffer.accept(roundstate, msgData);
     }
   }
 
-  public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
+  public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msgData) {
     final Optional<RoundChangeCertificate> result =
-        roundChangeManager.appendRoundChangeMessage(msg);
-    final MessageAge messageAge = determineAgeOfPayload(msg.getPayload());
+        roundChangeManager.appendRoundChangeMessage(msgData);
+    final MessageAge messageAge = determineAgeOfPayload(msgData.getPayload());
     if (messageAge == PRIOR_ROUND) {
       LOG.info("Received RoundChange Message for a prior round.");
       return;
     }
-    ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
+    ConsensusRoundIdentifier targetRound = msgData.getPayload().getRoundIdentifier();
     LOG.info("Received a RoundChange message for {}", targetRound.toString());
 
     if (result.isPresent()) {
@@ -218,8 +219,8 @@ public class IbftBlockHeightManager {
     roundTimer.startTimer(currentRound.getRoundIdentifier());
   }
 
-  public void handleNewRoundMessage(final SignedData<NewRoundPayload> msg) {
-    final NewRoundPayload payload = msg.getPayload();
+  public void handleNewRoundMessage(final SignedData<NewRoundPayload> msgData) {
+    final NewRoundPayload payload = msgData.getPayload();
     final MessageAge messageAge = determineAgeOfPayload(payload);
 
     if (messageAge == PRIOR_ROUND) {
@@ -228,7 +229,7 @@ public class IbftBlockHeightManager {
     }
     LOG.info("Received NewRound Message for {}", payload.getRoundIdentifier().toString());
 
-    if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
+    if (newRoundMessageValidator.validateNewRoundMessage(msgData)) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(payload.getRoundIdentifier().getRoundNumber());
       }
