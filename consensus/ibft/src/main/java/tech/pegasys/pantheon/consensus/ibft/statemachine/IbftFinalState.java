@@ -24,8 +24,10 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
+import tech.pegasys.pantheon.util.Subscribers;
 
 import java.time.Clock;
 import java.util.Collection;
@@ -42,6 +44,7 @@ public class IbftFinalState {
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final MessageFactory messageFactory;
   private final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator;
+  private Subscribers<MinedBlockObserver> minedBlockObservers;
   private final IbftMessageTransmitter messageTransmitter;
   private final Clock clock;
 
@@ -56,7 +59,8 @@ public class IbftFinalState {
       final IbftBlockCreatorFactory blockCreatorFactory,
       final MessageFactory messageFactory,
       final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator,
-      final Clock clock) {
+      final Clock clock,
+      final Subscribers<MinedBlockObserver> minedBlockObservers) {
     this.validatorProvider = validatorProvider;
     this.nodeKeys = nodeKeys;
     this.localAddress = localAddress;
@@ -67,8 +71,9 @@ public class IbftFinalState {
     this.blockCreatorFactory = blockCreatorFactory;
     this.messageFactory = messageFactory;
     this.ibftContextBlockHeaderValidator = ibftContextBlockHeaderValidator;
-    this.messageTransmitter = new IbftMessageTransmitter(messageFactory, peers);
+    this.minedBlockObservers = minedBlockObservers;
     this.clock = clock;
+    this.messageTransmitter = new IbftMessageTransmitter(messageFactory, peers);
   }
 
   public int getQuorumSize() {
@@ -129,5 +134,9 @@ public class IbftFinalState {
 
   public Clock getClock() {
     return clock;
+  }
+
+  public Subscribers<MinedBlockObserver> getMinedBlockObservers() {
+    return minedBlockObservers;
   }
 }
