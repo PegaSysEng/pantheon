@@ -41,11 +41,14 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import javafx.util.Pair;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -64,26 +67,31 @@ public class IbftControllerTest {
   @Mock private IbftBlockHeightManager blockHeightManager;
 
   @Mock private SignedData<ProposalPayload> signedProposal;
-  @Mock private ProposalMessageData proposalMessage;
+  @Mock private Message proposalMessage;
+  @Mock private ProposalMessageData proposalMessageData;
   @Mock private ProposalPayload proposalPayload;
 
   @Mock private SignedData<PreparePayload> signedPrepare;
-  @Mock private PrepareMessageData prepareMessage;
+  @Mock private Message prepareMessage;
+  @Mock private PrepareMessageData prepareMessageData;
   @Mock private PreparePayload preparePayload;
 
   @Mock private SignedData<CommitPayload> signedCommit;
-  @Mock private CommitMessageData commitMessage;
+  @Mock private Message commitMessage;
+  @Mock private CommitMessageData commitMessageData;
   @Mock private CommitPayload commitPayload;
 
   @Mock private SignedData<NewRoundPayload> signedNewRound;
-  @Mock private NewRoundMessageData newRoundMessage;
+  @Mock private Message newRoundMessage;
+  @Mock private NewRoundMessageData newRoundMessageData;
   @Mock private NewRoundPayload newRoundPayload;
 
   @Mock private SignedData<RoundChangePayload> signedRoundChange;
-  @Mock private RoundChangeMessageData roundChangeMessage;
+  @Mock private Message roundChangeMessage;
+  @Mock private RoundChangeMessageData roundChangeMessageData;
   @Mock private RoundChangePayload roundChangePayload;
 
-  private final Map<Long, List<MessageData>> futureMessages = new HashMap<>();
+  private final Map<Long, List<Message>> futureMessages = new HashMap<>();
   private final Address validator = Address.fromHexString("0x0");
   private final Address unknownValidator = Address.fromHexString("0x2");
   private final ConsensusRoundIdentifier futureRoundIdentifier = new ConsensusRoundIdentifier(2, 0);
@@ -115,9 +123,9 @@ public class IbftControllerTest {
     setupRoundChange(futureRoundIdentifier, validator);
     setupNewRound(roundIdentifierHeight3, validator);
 
-    final List<MessageData> height2Msgs =
+    final List<Message> height2Msgs =
         newArrayList(prepareMessage, commitMessage, roundChangeMessage);
-    final List<MessageData> height3Msgs = newArrayList(proposalMessage, newRoundMessage);
+    final List<Message> height3Msgs = newArrayList(proposalMessage, newRoundMessage);
     futureMessages.put(2L, height2Msgs);
     futureMessages.put(3L, height3Msgs);
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
@@ -337,7 +345,7 @@ public class IbftControllerTest {
   @Test
   public void proposalForFutureHeightIsBuffered() {
     setupProposal(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs =
+    final Map<Long, List<Message>> expectedFutureMsgs =
         ImmutableMap.of(2L, ImmutableList.of(proposalMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(proposalMessage), expectedFutureMsgs);
   }
@@ -345,7 +353,7 @@ public class IbftControllerTest {
   @Test
   public void prepareForFutureHeightIsBuffered() {
     setupPrepare(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs =
+    final Map<Long, List<Message>> expectedFutureMsgs =
         ImmutableMap.of(2L, ImmutableList.of(prepareMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(prepareMessage), expectedFutureMsgs);
   }
@@ -353,7 +361,7 @@ public class IbftControllerTest {
   @Test
   public void commitForFutureHeightIsBuffered() {
     setupCommit(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs =
+    final Map<Long, List<Message>> expectedFutureMsgs =
         ImmutableMap.of(2L, ImmutableList.of(commitMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(commitMessage), expectedFutureMsgs);
   }
@@ -361,7 +369,7 @@ public class IbftControllerTest {
   @Test
   public void newRoundForFutureHeightIsBuffered() {
     setupNewRound(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs =
+    final Map<Long, List<Message>> expectedFutureMsgs =
         ImmutableMap.of(2L, ImmutableList.of(newRoundMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(newRoundMessage), expectedFutureMsgs);
   }
@@ -369,7 +377,7 @@ public class IbftControllerTest {
   @Test
   public void roundChangeForFutureHeightIsBuffered() {
     setupRoundChange(futureRoundIdentifier, validator);
-    final Map<Long, List<MessageData>> expectedFutureMsgs =
+    final Map<Long, List<Message>> expectedFutureMsgs =
         ImmutableMap.of(2L, ImmutableList.of(roundChangeMessage));
     verifyHasFutureMessages(new IbftReceivedMessageEvent(roundChangeMessage), expectedFutureMsgs);
   }
@@ -384,13 +392,24 @@ public class IbftControllerTest {
     verifyNoMoreInteractions(blockHeightManager);
   }
 
+  public static <A, B> List<Pair<A, B>> zip(List<A> as, List<B> bs) {
+    return IntStream.range(0, Math.min(as.size(), bs.size()))
+        .mapToObj(i -> new Pair<>(as.get(i), bs.get(i)))
+        .collect(Collectors.toList());
+  }
+
   private void verifyHasFutureMessages(
-      final IbftReceivedMessageEvent msg, final Map<Long, List<MessageData>> expectedFutureMsgs) {
+      final IbftReceivedMessageEvent msg, final Map<Long, List<Message>> expectedFutureMsgs) {
     ibftController.start();
     ibftController.handleMessageEvent(msg);
 
     assertThat(futureMessages).hasSize(expectedFutureMsgs.size());
-    assertThat(futureMessages).isEqualTo(expectedFutureMsgs);
+    assertThat(futureMessages)
+        .allSatisfy(
+            (round, messages) ->
+                assertThat(zip(expectedFutureMsgs.get(round), messages))
+                    .allSatisfy(
+                        (m) -> assertThat(m.getKey().getData()).isEqualTo(m.getValue().getData())));
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);
@@ -401,8 +420,9 @@ public class IbftControllerTest {
     when(signedProposal.getPayload()).thenReturn(proposalPayload);
     when(signedProposal.getSender()).thenReturn(validator);
     when(proposalPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
-    when(proposalMessage.getCode()).thenReturn(IbftV2.PROPOSAL);
-    when(proposalMessage.decode()).thenReturn(signedProposal);
+    when(proposalMessageData.getCode()).thenReturn(IbftV2.PROPOSAL);
+    when(proposalMessageData.decode()).thenReturn(signedProposal);
+    when(proposalMessage.getData()).thenReturn(proposalMessageData);
   }
 
   private void setupPrepare(
@@ -410,8 +430,9 @@ public class IbftControllerTest {
     when(signedPrepare.getPayload()).thenReturn(preparePayload);
     when(signedPrepare.getSender()).thenReturn(validator);
     when(preparePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
-    when(prepareMessage.getCode()).thenReturn(IbftV2.PREPARE);
-    when(prepareMessage.decode()).thenReturn(signedPrepare);
+    when(prepareMessageData.getCode()).thenReturn(IbftV2.PREPARE);
+    when(prepareMessageData.decode()).thenReturn(signedPrepare);
+    when(prepareMessage.getData()).thenReturn(prepareMessageData);
   }
 
   private void setupCommit(
@@ -419,8 +440,9 @@ public class IbftControllerTest {
     when(signedCommit.getPayload()).thenReturn(commitPayload);
     when(signedCommit.getSender()).thenReturn(validator);
     when(commitPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
-    when(commitMessage.getCode()).thenReturn(IbftV2.COMMIT);
-    when(commitMessage.decode()).thenReturn(signedCommit);
+    when(commitMessageData.getCode()).thenReturn(IbftV2.COMMIT);
+    when(commitMessageData.decode()).thenReturn(signedCommit);
+    when(commitMessage.getData()).thenReturn(commitMessageData);
   }
 
   private void setupNewRound(
@@ -428,8 +450,9 @@ public class IbftControllerTest {
     when(signedNewRound.getPayload()).thenReturn(newRoundPayload);
     when(signedNewRound.getSender()).thenReturn(validator);
     when(newRoundPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
-    when(newRoundMessage.getCode()).thenReturn(IbftV2.NEW_ROUND);
-    when(newRoundMessage.decode()).thenReturn(signedNewRound);
+    when(newRoundMessageData.getCode()).thenReturn(IbftV2.NEW_ROUND);
+    when(newRoundMessageData.decode()).thenReturn(signedNewRound);
+    when(newRoundMessage.getData()).thenReturn(newRoundMessageData);
   }
 
   private void setupRoundChange(
@@ -437,7 +460,8 @@ public class IbftControllerTest {
     when(signedRoundChange.getPayload()).thenReturn(roundChangePayload);
     when(signedRoundChange.getSender()).thenReturn(validator);
     when(roundChangePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
-    when(roundChangeMessage.getCode()).thenReturn(IbftV2.ROUND_CHANGE);
-    when(roundChangeMessage.decode()).thenReturn(signedRoundChange);
+    when(roundChangeMessageData.getCode()).thenReturn(IbftV2.ROUND_CHANGE);
+    when(roundChangeMessageData.decode()).thenReturn(signedRoundChange);
+    when(roundChangeMessage.getData()).thenReturn(roundChangeMessageData);
   }
 }

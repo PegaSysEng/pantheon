@@ -27,7 +27,8 @@ public class ProposalMessageData extends AbstractIbftMessageData {
   }
 
   public static ProposalMessageData fromMessageData(final MessageData messageData) {
-    return fromMessageData(messageData, MESSAGE_CODE, ProposalMessageData.class, ProposalMessageData::new);
+    return fromMessageData(
+        messageData, MESSAGE_CODE, ProposalMessageData.class, ProposalMessageData::new);
   }
 
   @Override

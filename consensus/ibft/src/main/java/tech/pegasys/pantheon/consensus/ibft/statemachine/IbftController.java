@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class IbftController {
   private final Blockchain blockchain;
   private final IbftFinalState ibftFinalState;
   private final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory;
-  private final Map<Long, List<MessageData>> futureMessages;
+  private final Map<Long, List<Message>> futureMessages;
   private IbftBlockHeightManager currentHeightManager;
 
   public IbftController(
@@ -65,7 +66,7 @@ public class IbftController {
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
-      final Map<Long, List<MessageData>> futureMessages) {
+      final Map<Long, List<Message>> futureMessages) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
@@ -77,15 +78,16 @@ public class IbftController {
   }
 
   public void handleMessageEvent(final IbftReceivedMessageEvent msg) {
-    handleMessage(msg.getMessageData());
+    handleMessage(msg.getMessage());
   }
 
-  private void handleMessage(final MessageData messageData) {
+  private void handleMessage(final Message message) {
+    final MessageData messageData = message.getData();
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
         final SignedData<ProposalPayload> proposalMsg =
             ProposalMessageData.fromMessageData(messageData).decode();
-        if (processMessage(proposalMsg, messageData)) {
+        if (processMessage(proposalMsg, message)) {
           currentHeightManager.handleProposalMessage(proposalMsg);
         }
         break;
@@ -93,14 +95,15 @@ public class IbftController {
       case IbftV2.PREPARE:
         final SignedData<PreparePayload> prepareMsg =
             PrepareMessageData.fromMessageData(messageData).decode();
-        if (processMessage(prepareMsg, messageData)) {
+        if (processMessage(prepareMsg, message)) {
           currentHeightManager.handlePrepareMessage(prepareMsg);
         }
         break;
 
       case IbftV2.COMMIT:
-        final SignedData<CommitPayload> commitMsg = CommitMessageData.fromMessageData(messageData).decode();
-        if (processMessage(commitMsg, messageData)) {
+        final SignedData<CommitPayload> commitMsg =
+            CommitMessageData.fromMessageData(messageData).decode();
+        if (processMessage(commitMsg, message)) {
           currentHeightManager.handleCommitMessage(commitMsg);
         }
         break;
@@ -108,7 +111,7 @@ public class IbftController {
       case IbftV2.ROUND_CHANGE:
         final SignedData<RoundChangePayload> roundChangeMsg =
             RoundChangeMessageData.fromMessageData(messageData).decode();
-        if (processMessage(roundChangeMsg, messageData)) {
+        if (processMessage(roundChangeMsg, message)) {
           currentHeightManager.handleRoundChangeMessage(roundChangeMsg);
         }
         break;
@@ -116,7 +119,7 @@ public class IbftController {
       case IbftV2.NEW_ROUND:
         final SignedData<NewRoundPayload> newRoundMsg =
             NewRoundMessageData.fromMessageData(messageData).decode();
-        if (processMessage(newRoundMsg, messageData)) {
+        if (processMessage(newRoundMsg, message)) {
           currentHeightManager.handleNewRoundMessage(newRoundMsg);
         }
         break;
@@ -151,13 +154,12 @@ public class IbftController {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
-    List<MessageData> orDefault = futureMessages.getOrDefault(newChainHeight, emptyList());
+    List<Message> orDefault = futureMessages.getOrDefault(newChainHeight, emptyList());
     orDefault.forEach(this::handleMessage);
     futureMessages.remove(newChainHeight);
   }
 
-  private boolean processMessage(
-      final SignedData<? extends Payload> msg, final MessageData rawMsg) {
+  private boolean processMessage(final SignedData<? extends Payload> msg, final Message rawMsg) {
     final ConsensusRoundIdentifier msgRoundIdentifier = msg.getPayload().getRoundIdentifier();
     if (isMsgForCurrentHeight(msgRoundIdentifier)) {
       return isMsgFromKnownValidator(msg);
@@ -181,7 +183,7 @@ public class IbftController {
     return roundIdentifier.getSequenceNumber() > currentHeightManager.getChainHeight();
   }
 
-  private void addMessageToFutureMessageBuffer(final long chainHeight, final MessageData rawMsg) {
+  private void addMessageToFutureMessageBuffer(final long chainHeight, final Message rawMsg) {
     if (!futureMessages.containsKey(chainHeight)) {
       futureMessages.put(chainHeight, Lists.newArrayList());
     }

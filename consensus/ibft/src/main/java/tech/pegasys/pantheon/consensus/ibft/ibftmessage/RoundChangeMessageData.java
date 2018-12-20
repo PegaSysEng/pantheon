@@ -27,7 +27,8 @@ public class RoundChangeMessageData extends AbstractIbftMessageData {
   }
 
   public static RoundChangeMessageData fromMessageData(final MessageData messageData) {
-    return fromMessageData(messageData, MESSAGE_CODE, RoundChangeMessageData.class, RoundChangeMessageData::new);
+    return fromMessageData(
+        messageData, MESSAGE_CODE, RoundChangeMessageData.class, RoundChangeMessageData::new);
   }
 
   @Override

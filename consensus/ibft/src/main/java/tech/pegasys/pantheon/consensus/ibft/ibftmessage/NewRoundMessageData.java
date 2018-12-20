@@ -27,7 +27,8 @@ public class NewRoundMessageData extends AbstractIbftMessageData {
   }
 
   public static NewRoundMessageData fromMessageData(final MessageData messageData) {
-    return fromMessageData(messageData, MESSAGE_CODE, NewRoundMessageData.class, NewRoundMessageData::new);
+    return fromMessageData(
+        messageData, MESSAGE_CODE, NewRoundMessageData.class, NewRoundMessageData::new);
   }
 
   @Override

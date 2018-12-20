@@ -27,7 +27,8 @@ public class CommitMessageData extends AbstractIbftMessageData {
   }
 
   public static CommitMessageData fromMessageData(final MessageData messageData) {
-    return fromMessageData(messageData, MESSAGE_CODE, CommitMessageData.class, CommitMessageData::new);
+    return fromMessageData(
+        messageData, MESSAGE_CODE, CommitMessageData.class, CommitMessageData::new);
   }
 
   @Override

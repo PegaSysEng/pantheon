@@ -39,7 +39,8 @@ public abstract class AbstractIbftMessageData extends AbstractMessageData {
     final int code = messageData.getCode();
     if (code != messageCode) {
       throw new IllegalArgumentException(
-          String.format("MessageData  has code %d and thus is not a %s", code, clazz.getSimpleName()));
+          String.format(
+              "MessageData  has code %d and thus is not a %s", code, clazz.getSimpleName()));
     }
 
     return constructor.apply(messageData.getData());

@@ -27,7 +27,8 @@ public class PrepareMessageData extends AbstractIbftMessageData {
   }
 
   public static PrepareMessageData fromMessageData(final MessageData messageData) {
-    return fromMessageData(messageData, MESSAGE_CODE, PrepareMessageData.class, PrepareMessageData::new);
+    return fromMessageData(
+        messageData, MESSAGE_CODE, PrepareMessageData.class, PrepareMessageData::new);
   }
 
   @Override
