@@ -28,6 +28,9 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 
+import java.util.List;
+
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,7 +69,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
   @Test
   public void shouldThrowInvalidJsonRpcParametersExceptionWhenBadEnode() {
-    final JsonRpcRequest request = buildRequest(badEnode);
+    final JsonRpcRequest request = buildRequest(Lists.newArrayList(badEnode));
     final JsonRpcResponse expected =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
     final JsonRpcResponse actual = method.response(request);
@@ -76,7 +79,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
   @Test
   public void shouldThrowInvalidJsonRpcParametersExceptionWhenNoEnode() {
-    final JsonRpcRequest request = buildRequest("");
+    final JsonRpcRequest request = buildRequest(Lists.newArrayList(""));
     final JsonRpcResponse expected =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
     final JsonRpcResponse actual = method.response(request);
@@ -86,7 +89,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
   @Test
   public void shouldRemoveSingleValidNode() throws Exception {
-    final JsonRpcRequest request = buildRequest(enode1);
+    final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1));
     final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), SUCCESS_RESULT);
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
@@ -101,7 +104,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
   @Test
   public void shouldRemoveMultipleValidNodes() throws Exception {
-    final JsonRpcRequest request = buildRequest(String.format("%s,%s,%s", enode1, enode2, enode3));
+    final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1, enode2, enode3));
     final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), SUCCESS_RESULT);
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
@@ -114,7 +117,7 @@ public class PermRemoveNodesFromWhitelistTest {
     verifyNoMoreInteractions(nodeWhitelistController);
   }
 
-  private JsonRpcRequest buildRequest(final String enode) {
-    return new JsonRpcRequest("2.0", METHOD_NAME, new Object[] {enode});
+  private JsonRpcRequest buildRequest(final List<String> enodeList) {
+    return new JsonRpcRequest("2.0", METHOD_NAME, new Object[] {enodeList});
   }
 }

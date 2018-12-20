@@ -112,17 +112,18 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
   public Request<?, AddNodeResponse> addNodesToWhitelist(final List<String> enodes) {
     return new Request<>("perm_addNodesToWhitelist", enodes, web3jService, AddNodeResponse.class);
   public Request<?, AddNodeResponse> addNodesToWhitelist(final String enodes) {
+  public Request<?, AddNodeResponse> addNodesToWhitelist(final List<String> enodeList) {
     return new Request<>(
         "perm_addNodesToWhitelist",
-        Collections.singletonList(enodes),
+        Collections.singletonList(enodeList),
         web3jService,
         AddNodeResponse.class);
   }
 
-  public Request<?, RemoveNodeResponse> removeNodesFromWhitelist(final String enodes) {
+  public Request<?, RemoveNodeResponse> removeNodesFromWhitelist(final List<String> enodeList) {
     return new Request<>(
         "perm_removeNodesFromWhitelist",
-        Collections.singletonList(enodes),
+        Collections.singletonList(enodeList),
         web3jService,
         RemoveNodeResponse.class);
   }

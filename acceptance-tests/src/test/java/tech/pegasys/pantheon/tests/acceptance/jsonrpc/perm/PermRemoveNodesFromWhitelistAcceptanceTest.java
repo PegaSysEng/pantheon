@@ -43,11 +43,11 @@ public class PermRemoveNodesFromWhitelistAcceptanceTest extends AcceptanceTestBa
 
   @Test
   public void shouldRemoveSinglePeer() {
-    node.verify(perm.removeNodesFromWhitelist(enode1));
+    node.verify(perm.removeNodesFromWhitelist(Lists.newArrayList(enode1)));
   }
 
   @Test
   public void shouldRemoveMultiplePeers() {
-    node.verify(perm.removeNodesFromWhitelist(String.format("%s,%s,%s", enode1, enode2, enode3)));
+    node.verify(perm.removeNodesFromWhitelist(Lists.newArrayList(enode1, enode2, enode3)));
   }
 }

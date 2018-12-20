@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.eea;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.StringParameter;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.StringListParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
@@ -25,9 +25,6 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import com.google.common.base.Splitter;
 
 public class PermAddNodesToWhitelist implements JsonRpcMethod {
 
@@ -46,11 +43,14 @@ public class PermAddNodesToWhitelist implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
-    final StringParameter enodes = parameters.required(req.getParams(), 0, StringParameter.class);
-    Iterable<String> splitEnodes = Splitter.on(',').split(enodes.getValue());
+    final StringListParameter enodeListParam =
+        parameters.required(req.getParams(), 0, StringListParameter.class);
+
     try {
       List<DefaultPeer> peers =
-          StreamSupport.stream(splitEnodes.spliterator(), true)
+          enodeListParam
+              .getStringList()
+              .parallelStream()
               .map(this::parsePeer)
               .collect(Collectors.toList());
 

@@ -24,6 +24,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermTransacti
 import java.util.List;
 import java.util.Arrays;
 
+import java.util.List;
+
 public class Perm {
 
   public Perm(final Transactions transactions) {
@@ -53,11 +55,11 @@ public class Perm {
 
   private final PermTransactions transactions;
 
-  public Condition addNodesToWhitelist(final String enodes) {
-    return new AddNodeSuccess(transactions.addNodesToWhitelist(enodes));
+  public Condition addNodesToWhitelist(final List<String> enodeList) {
+    return new AddNodeSuccess(transactions.addNodesToWhitelist(enodeList));
   }
 
-  public Condition removeNodesFromWhitelist(final String enodes) {
-    return new RemoveNodeSuccess(transactions.removeNodesFromWhitelist(enodes));
+  public Condition removeNodesFromWhitelist(final List<String> enodeList) {
+    return new RemoveNodeSuccess(transactions.removeNodesFromWhitelist(enodeList));
   }
 }

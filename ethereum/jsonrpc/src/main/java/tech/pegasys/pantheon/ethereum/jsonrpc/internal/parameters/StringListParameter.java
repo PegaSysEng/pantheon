@@ -12,18 +12,23 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class StringParameter {
+public class StringListParameter {
 
-  private final String stringValue;
+  private final List<String> stringList = new ArrayList<>();
 
   @JsonCreator
-  public StringParameter(final String value) {
-    this.stringValue = value;
+  public StringListParameter(final List<String> strings) {
+    if (strings != null) {
+      stringList.addAll(strings);
+    }
   }
 
-  public String getValue() {
-    return stringValue;
+  public List<String> getStringList() {
+    return stringList;
   }
 }

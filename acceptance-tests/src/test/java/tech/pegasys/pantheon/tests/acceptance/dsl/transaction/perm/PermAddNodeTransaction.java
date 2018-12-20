@@ -19,18 +19,19 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
+import java.util.List;
 
 public class PermAddNodeTransaction implements Transaction<Boolean> {
-  private final String enodes;
+  private final List<String> enodeList;
 
-  public PermAddNodeTransaction(final String enodes) {
-    this.enodes = enodes;
+  public PermAddNodeTransaction(final List<String> enodeList) {
+    this.enodeList = enodeList;
   }
 
   @Override
   public Boolean execute(final PantheonWeb3j node) {
     try {
-      final AddNodeResponse result = node.addNodesToWhitelist(enodes).send();
+      final AddNodeResponse result = node.addNodesToWhitelist(enodeList).send();
       assertThat(result).isNotNull();
       return result.getResult();
     } catch (final IOException e) {

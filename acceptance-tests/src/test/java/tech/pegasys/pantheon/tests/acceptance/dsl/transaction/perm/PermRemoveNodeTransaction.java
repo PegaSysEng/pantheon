@@ -19,18 +19,19 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.Remo
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
+import java.util.List;
 
 public class PermRemoveNodeTransaction implements Transaction<Boolean> {
-  private final String enodes;
+  private final List<String> enodeList;
 
-  public PermRemoveNodeTransaction(final String enodes) {
-    this.enodes = enodes;
+  public PermRemoveNodeTransaction(final List<String> enodeList) {
+    this.enodeList = enodeList;
   }
 
   @Override
   public Boolean execute(final PantheonWeb3j node) {
     try {
-      final RemoveNodeResponse result = node.removeNodesFromWhitelist(enodes).send();
+      final RemoveNodeResponse result = node.removeNodesFromWhitelist(enodeList).send();
       assertThat(result).isNotNull();
       return result.getResult();
     } catch (final IOException e) {

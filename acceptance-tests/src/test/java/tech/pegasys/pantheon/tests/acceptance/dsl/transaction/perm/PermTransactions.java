@@ -12,12 +12,14 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm;
 
+import java.util.List;
+
 public class PermTransactions {
-  public PermAddNodeTransaction addNodesToWhitelist(final String enodes) {
-    return new PermAddNodeTransaction(enodes);
+  public PermAddNodeTransaction addNodesToWhitelist(final List<String> enodeList) {
+    return new PermAddNodeTransaction(enodeList);
   }
 
-  public PermRemoveNodeTransaction removeNodesFromWhitelist(final String enodes) {
-    return new PermRemoveNodeTransaction(enodes);
+  public PermRemoveNodeTransaction removeNodesFromWhitelist(final List<String> enodeList) {
+    return new PermRemoveNodeTransaction(enodeList);
   }
 }
