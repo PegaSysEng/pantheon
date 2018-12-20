@@ -46,9 +46,6 @@ import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import javafx.util.Pair;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -136,7 +133,7 @@ public class IbftControllerTest {
     verify(blockHeightManagerFactory).create(blockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
-    verify(blockHeightManager, never()).handleProposalMessage(signedProposal, proposalMessage);
+    verify(blockHeightManager, never()).handleProposalMessage(signedProposal);
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
     verify(blockHeightManager).handleCommitMessage(signedCommit);
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
@@ -163,7 +160,7 @@ public class IbftControllerTest {
     verify(blockHeightManagerFactory).create(blockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
-    verify(blockHeightManager).handleProposalMessage(signedProposal, proposalMessage);
+    verify(blockHeightManager).handleProposalMessage(signedProposal);
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
     verify(blockHeightManager).handleCommitMessage(signedCommit);
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
@@ -197,7 +194,7 @@ public class IbftControllerTest {
     ibftController.handleMessageEvent(new IbftReceivedMessageEvent(proposalMessage));
 
     assertThat(futureMessages).isEmpty();
-    verify(blockHeightManager).handleProposalMessage(signedProposal, proposalMessage);
+    verify(blockHeightManager).handleProposalMessage(signedProposal);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);

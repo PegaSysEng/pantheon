@@ -44,7 +44,6 @@ import java.util.function.Function;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 
 /**
  * Responsible for starting/clearing Consensus rounds at a given block height. One of these is
@@ -150,14 +149,16 @@ public class IbftBlockHeightManager {
     handleRoundChangeMessage(localRoundChange);
   }
 
-  public void handleProposalMessage(final SignedData<ProposalPayload> msgData, final Message msg) {
+  public void handleProposalMessage(final SignedData<ProposalPayload> msgData) {
     LOG.info("Received a Proposal message.");
-    actionOrBufferMessage(msgData, currentRound::handleProposalMessage, RoundState::setProposedBlock);
+    actionOrBufferMessage(
+        msgData, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
   public void handlePrepareMessage(final SignedData<PreparePayload> msgData) {
     LOG.info("Received a prepare message.");
-    actionOrBufferMessage(msgData, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
+    actionOrBufferMessage(
+        msgData, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
   public void handleCommitMessage(final SignedData<CommitPayload> msgData) {

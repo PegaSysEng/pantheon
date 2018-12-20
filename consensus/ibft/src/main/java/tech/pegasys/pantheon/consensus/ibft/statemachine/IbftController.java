@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static java.util.Collections.emptyList;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -53,6 +54,7 @@ public class IbftController {
   private final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory;
   private final Map<Long, List<Message>> futureMessages;
   private IbftBlockHeightManager currentHeightManager;
+  private final IbftGossip gossiper;
 
   public IbftController(
       final Blockchain blockchain,
@@ -71,6 +73,7 @@ public class IbftController {
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessages = futureMessages;
+    this.gossiper = new IbftGossip(ibftFinalState.getPeers());
   }
 
   public void start() {
@@ -88,7 +91,8 @@ public class IbftController {
         final SignedData<ProposalPayload> proposalMsg =
             ProposalMessageData.fromMessageData(messageData).decode();
         if (processMessage(proposalMsg, message)) {
-          currentHeightManager.handleProposalMessage(proposalMsg, message);
+          currentHeightManager.handleProposalMessage(proposalMsg);
+          gossiper.gossipProposalPayload(proposalMsg, message.getConnection().getPeer().getAddress());
         }
         break;
 
@@ -97,6 +101,7 @@ public class IbftController {
             PrepareMessageData.fromMessageData(messageData).decode();
         if (processMessage(prepareMsg, message)) {
           currentHeightManager.handlePrepareMessage(prepareMsg);
+          gossiper.gossipPreparePayload(prepareMsg, message.getConnection().getPeer().getAddress());
         }
         break;
 
@@ -105,6 +110,7 @@ public class IbftController {
             CommitMessageData.fromMessageData(messageData).decode();
         if (processMessage(commitMsg, message)) {
           currentHeightManager.handleCommitMessage(commitMsg);
+          gossiper.gossipCommitPayload(commitMsg, message.getConnection().getPeer().getAddress());
         }
         break;
 
@@ -113,6 +119,7 @@ public class IbftController {
             RoundChangeMessageData.fromMessageData(messageData).decode();
         if (processMessage(roundChangeMsg, message)) {
           currentHeightManager.handleRoundChangeMessage(roundChangeMsg);
+          gossiper.gossipRoundChangePayload(roundChangeMsg, message.getConnection().getPeer().getAddress());
         }
         break;
 
@@ -121,6 +128,7 @@ public class IbftController {
             NewRoundMessageData.fromMessageData(messageData).decode();
         if (processMessage(newRoundMsg, message)) {
           currentHeightManager.handleNewRoundMessage(newRoundMsg);
+          gossiper.gossipNewRoundPayload(newRoundMsg, message.getConnection().getPeer().getAddress());
         }
         break;
 

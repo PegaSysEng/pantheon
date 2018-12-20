@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.network;
 
+import com.google.common.collect.Lists;
+import com.sun.tools.javac.util.List;
+import java.util.Arrays;
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -43,17 +46,23 @@ public class IbftNetworkPeers {
   }
 
   public void peerAdded(final PeerConnection newConnection) {
-    final Address peerAddress = getAddressFrom(newConnection);
+    final Address peerAddress = newConnection.getPeer().getAddress();
     peerConnections.put(peerAddress, newConnection);
   }
 
   public void peerRemoved(final PeerConnection removedConnection) {
-    final Address peerAddress = getAddressFrom(removedConnection);
+    final Address peerAddress = removedConnection.getPeer().getAddress();
     peerConnections.remove(peerAddress);
   }
 
   public void multicastToValidators(final MessageData message) {
     final Collection<Address> validators = validatorProvider.getValidators();
+    sendMessageToSpecificAddresses(validators, message);
+  }
+
+  public void multicastToValidatorsExcept(final MessageData message, Collection<Address> exceptAddresses) {
+    final Collection<Address> validators = validatorProvider.getValidators();
+    validators.removeIf(exceptAddresses::contains);
     sendMessageToSpecificAddresses(validators, message);
   }
 
@@ -71,11 +80,5 @@ public class IbftNetworkPeers {
                 LOG.trace("Lost connection to a validator.");
               }
             });
-  }
-
-  private Address getAddressFrom(final PeerConnection connection) {
-    final BytesValue peerNodeId = connection.getPeer().getNodeId();
-    final PublicKey remotePublicKey = PublicKey.create(peerNodeId);
-    return Util.publicKeyToAddress(remotePublicKey);
   }
 }

@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
 
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.AbstractMessageData;
@@ -24,7 +25,7 @@ public abstract class AbstractIbftMessageData extends AbstractMessageData {
     super(data);
   }
 
-  public abstract SignedData<?> decode();
+  public abstract SignedData<? extends Payload> decode();
 
   protected static <T extends AbstractIbftMessageData> T fromMessageData(
       final MessageData messageData,
