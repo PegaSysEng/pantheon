@@ -273,6 +273,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
                   || !nodeWhitelist.contains(
                       connection.getPeer().getNodeId(),
                       ch.remoteAddress().getAddress().getHostAddress(),
+                      connection.getPeer().getPort(),
                       connection.getPeer().getPort())) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
                 return;

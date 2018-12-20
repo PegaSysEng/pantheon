@@ -28,13 +28,11 @@ public class NodeWhitelistController {
 
   public NodeWhitelistController(final PermissioningConfiguration configuration) {
     nodeWhitelist = new ArrayList<>();
-    if (configuration != null && configuration.getNodeWhitelist() != null) {
+    if (configuration.isNodeWhitelistSet() && configuration.getNodeWhitelist() != null) {
       for (URI uri : configuration.getNodeWhitelist()) {
         nodeWhitelist.add(DefaultPeer.fromURI(uri));
       }
-      if (configuration.isNodeWhitelistSet()) {
-        nodeWhitelistSet = true;
-      }
+      nodeWhitelistSet = true;
     }
   }
 
@@ -51,7 +49,9 @@ public class NodeWhitelistController {
     return (!nodeWhitelistSet || (nodeWhitelist.contains(node)));
   }
 
-  public boolean contains(final BytesValue nodeId, final String host, final int port) {
-    return (!nodeWhitelistSet || (nodeWhitelist.contains(new DefaultPeer(nodeId, host, port))));
+  public boolean contains(
+      final BytesValue nodeId, final String host, final int udpPort, final int tcpPort) {
+    return (!nodeWhitelistSet
+        || (nodeWhitelist.contains(new DefaultPeer(nodeId, host, udpPort, tcpPort))));
   }
 }
