@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PermAddNodeAcceptanceTest extends AcceptanceTestBase {
+public class PermAddNodesToWhitelistAcceptanceTest extends AcceptanceTestBase {
 
   private Node node;
 

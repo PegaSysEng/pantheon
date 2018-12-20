@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveAccountsF
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddNodeSuccess;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveNodeSuccess;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermTransactions;
 
 import java.util.List;
 import java.util.Arrays;
@@ -47,10 +47,11 @@ public class Perm {
 }
 
   public Perm(final PermTransaction transactions) {
+  public Perm(final PermTransactions transactions) {
     this.transactions = transactions;
   }
 
-  private final PermTransaction transactions;
+  private final PermTransactions transactions;
 
   public Condition addNodesToWhitelist(final String enodes) {
     return new AddNodeSuccess(transactions.addNodesToWhitelist(enodes));

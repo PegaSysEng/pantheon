@@ -171,6 +171,7 @@ public class PantheonNodeFactory {
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .setJsonRpcConfiguration(rpcConfig)
+            .jsonRpcEnabled()
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
   }

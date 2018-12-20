@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PermRemoveNodeAcceptanceTest extends AcceptanceTestBase {
+public class PermRemoveNodesFromWhitelistAcceptanceTest extends AcceptanceTestBase {
 
   private Node node;
 
@@ -35,7 +35,7 @@ public class PermRemoveNodeAcceptanceTest extends AcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     node =
-        pantheon.createNodeWithNodesWhitelistAndPermRPC(
+        pantheon.createNodeWithNodesWhitelist(
             "node1",
             Lists.newArrayList(URI.create(enode1), URI.create(enode2), URI.create(enode3)));
     cluster.start(node);

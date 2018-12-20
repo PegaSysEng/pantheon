@@ -35,10 +35,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PermAddNodeTest {
+public class PermAddNodesToWhitelistTest {
 
   private static final boolean JSON_SUCCESS = true;
-  private PermAddNode method;
+  private PermAddNodesToWhitelist method;
   private static final String METHOD_NAME = "perm_addNodesToWhitelist";
 
   private final String enode1 =
@@ -56,7 +56,7 @@ public class PermAddNodeTest {
 
   @Before
   public void setUp() {
-    method = new PermAddNode(p2pNetwork, params);
+    method = new PermAddNodesToWhitelist(p2pNetwork, params);
   }
 
   @Test
@@ -65,8 +65,19 @@ public class PermAddNodeTest {
   }
 
   @Test
-  public void shouldThrowInvalidJsonRpcParametersExceptionWhenBadEnode() {
+  public void shouldThrowInvalidJsonRpcParametersExceptionWhenOnlyBadEnode() {
     final JsonRpcRequest request = buildRequest(badEnode);
+    final JsonRpcResponse expected =
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
+    final JsonRpcResponse actual = method.response(request);
+
+    assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
+  }
+
+  @Test
+  public void shouldThrowInvalidJsonRpcParametersExceptionWhenBadEnodeInList() {
+    final JsonRpcRequest request =
+        buildRequest(String.format("%s,%s,%s", enode2, badEnode, enode1));
     final JsonRpcResponse expected =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
     final JsonRpcResponse actual = method.response(request);

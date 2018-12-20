@@ -29,19 +29,19 @@ import java.util.stream.StreamSupport;
 
 import com.google.common.base.Splitter;
 
-public class PermRemoveNode implements JsonRpcMethod {
+public class PermAddNodesToWhitelist implements JsonRpcMethod {
 
   private final P2PNetwork p2pNetwork;
   private final JsonRpcParameter parameters;
 
-  public PermRemoveNode(final P2PNetwork p2pNetwork, final JsonRpcParameter parameters) {
+  public PermAddNodesToWhitelist(final P2PNetwork p2pNetwork, final JsonRpcParameter parameters) {
     this.p2pNetwork = p2pNetwork;
     this.parameters = parameters;
   }
 
   @Override
   public String getName() {
-    return "perm_removeNodesFromWhitelist";
+    return "perm_addNodesToWhitelist";
   }
 
   @Override
@@ -51,10 +51,10 @@ public class PermRemoveNode implements JsonRpcMethod {
     try {
       List<DefaultPeer> peers =
           StreamSupport.stream(splitEnodes.spliterator(), true)
-              .map(this::parsePeers)
+              .map(this::parsePeer)
               .collect(Collectors.toList());
 
-      p2pNetwork.getNodeWhitelistController().removeNodes(peers);
+      p2pNetwork.getNodeWhitelistController().addNodes(peers);
       return new JsonRpcSuccessResponse(req.getId(), true);
     } catch (IllegalArgumentException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
@@ -63,7 +63,7 @@ public class PermRemoveNode implements JsonRpcMethod {
     }
   }
 
-  private DefaultPeer parsePeers(final String enodeURI) {
+  private DefaultPeer parsePeer(final String enodeURI) {
     return DefaultPeer.fromURI(enodeURI);
   }
 }

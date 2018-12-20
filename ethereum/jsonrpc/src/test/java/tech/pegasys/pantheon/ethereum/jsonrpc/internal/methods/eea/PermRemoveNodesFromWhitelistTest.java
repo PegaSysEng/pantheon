@@ -35,10 +35,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PermRemoveNodeTest {
+public class PermRemoveNodesFromWhitelistTest {
 
   private static final boolean SUCCESS_RESULT = true;
-  private PermRemoveNode method;
+  private PermRemoveNodesFromWhitelist method;
   private static final String METHOD_NAME = "perm_removeNodesFromWhitelist";
 
   private final String enode1 =
@@ -56,7 +56,7 @@ public class PermRemoveNodeTest {
 
   @Before
   public void setUp() {
-    method = new PermRemoveNode(p2pNetwork, params);
+    method = new PermRemoveNodesFromWhitelist(p2pNetwork, params);
   }
 
   @Test
@@ -79,17 +79,6 @@ public class PermRemoveNodeTest {
     final JsonRpcRequest request = buildRequest("");
     final JsonRpcResponse expected =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
-    final JsonRpcResponse actual = method.response(request);
-
-    assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
-  }
-
-  @Test
-  public void shouldThrowExceptionWhenEnodeNotInWhitelist() {
-    final JsonRpcRequest request = buildRequest("");
-    final JsonRpcResponse expected =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
-
     final JsonRpcResponse actual = method.response(request);
 
     assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
