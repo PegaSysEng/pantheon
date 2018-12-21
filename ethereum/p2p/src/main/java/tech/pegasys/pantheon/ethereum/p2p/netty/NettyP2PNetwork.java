@@ -142,7 +142,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
 
   private final LabelledMetric<Counter> outboundMessagesCounter;
 
-  private final NodeWhitelistController nodeWhitelist;
+  private final NodeWhitelistController nodeWhitelistController;
 
   /**
    * Creates a peer networking service for production purposes.
@@ -158,7 +158,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
    * @param peerBlacklist The peers with which this node will not connect
    * @param peerRequirement Queried to determine if enough peers are currently connected.
    * @param metricsSystem The metrics system to capture metrics with.
-   * @param nodeWhitelist Controls the whitelist of nodes to which this node will connect.
+   * @param nodeWhitelistController Controls the whitelist of nodes to which this node will connect.
    */
   public NettyP2PNetwork(
       final Vertx vertx,
@@ -168,14 +168,19 @@ public final class NettyP2PNetwork implements P2PNetwork {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
-      final NodeWhitelistController nodeWhitelist) {
+      final NodeWhitelistController nodeWhitelistController) {
 
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
-    this.nodeWhitelist = nodeWhitelist;
+    this.nodeWhitelistController = nodeWhitelistController;
     peerDiscoveryAgent =
         new PeerDiscoveryAgent(
-            vertx, keyPair, config.getDiscovery(), peerRequirement, peerBlacklist, nodeWhitelist);
+            vertx,
+            keyPair,
+            config.getDiscovery(),
+            peerRequirement,
+            peerBlacklist,
+            nodeWhitelistController);
 
     outboundMessagesCounter =
         metricsSystem.createLabelledCounter(
@@ -270,8 +275,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
               boolean isPeerBlacklisted = peerBlacklist.contains(connection);
               boolean isPeerNotWhitelisted = !isPeerWhitelisted(connection, ch);
 
-              if (isPeerBlacklisted
-                  || isPeerNotWhitelisted) {
+              if (isPeerBlacklisted || isPeerNotWhitelisted) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
                 return;
               }
@@ -286,7 +290,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
   }
 
   private boolean isPeerWhitelisted(final PeerConnection connection, final SocketChannel ch) {
-    return !nodeWhitelist.contains(
+    return !nodeWhitelistController.contains(
         connection.getPeer().getNodeId(),
         ch.remoteAddress().getAddress().getHostAddress(),
         connection.getPeer().getPort(),
