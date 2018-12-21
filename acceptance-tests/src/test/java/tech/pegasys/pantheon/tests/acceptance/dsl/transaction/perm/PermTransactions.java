@@ -22,4 +22,8 @@ public class PermTransactions {
   public PermRemoveNodeTransaction removeNodesFromWhitelist(final List<String> enodeList) {
     return new PermRemoveNodeTransaction(enodeList);
   }
+
+  public PermGetNodesWhitelistTransaction getNodesWhiteList() {
+    return new PermGetNodesWhitelistTransaction();
+  }
 }

@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetExpectedAcco
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveAccountsFromWhitelistSuccessfully;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddNodeSuccess;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetNodesWhitelistPopulated;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveNodeSuccess;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermTransactions;
 
@@ -61,5 +62,9 @@ public class Perm {
 
   public Condition removeNodesFromWhitelist(final List<String> enodeList) {
     return new RemoveNodeSuccess(transactions.removeNodesFromWhitelist(enodeList));
+  }
+
+  public Condition getNodesWhitelist() {
+    return new GetNodesWhitelistPopulated(transactions.getNodesWhiteList());
   }
 }

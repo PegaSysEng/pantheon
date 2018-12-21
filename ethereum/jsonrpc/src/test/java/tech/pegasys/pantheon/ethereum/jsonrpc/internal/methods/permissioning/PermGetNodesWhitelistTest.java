@@ -107,7 +107,7 @@ public class PermGetNodesWhitelistTest {
   public void shouldReturnFailResponseWhenListNotSet() {
     final JsonRpcRequest request = buildRequest();
     final JsonRpcResponse expected =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INTERNAL_ERROR);
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.NODE_WHITELIST_NOT_SET);
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(false);

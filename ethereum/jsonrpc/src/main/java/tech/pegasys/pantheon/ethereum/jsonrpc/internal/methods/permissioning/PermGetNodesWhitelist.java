@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 
 import java.util.List;
@@ -42,8 +41,14 @@ public class PermGetNodesWhitelist implements JsonRpcMethod {
   public JsonRpcResponse response(final JsonRpcRequest req) {
     if (p2pNetwork.getNodeWhitelistController().nodeWhitelistSet()) {
       List<Peer> nodesWhitelist = p2pNetwork.getNodeWhitelistController().getNodesWhitelist();
-      List<Endpoint> collect =
-          nodesWhitelist.parallelStream().map(Peer::getEndpoint).collect(Collectors.toList());
+
+      // TODO: The endpoint stuff is a placeholder and isn't returning the value we need.  Need to
+      // convert to enode URI.
+      List<String> collect =
+          nodesWhitelist
+              .parallelStream()
+              .map(s -> s.getEndpoint().toString())
+              .collect(Collectors.toList());
       return new JsonRpcSuccessResponse(req.getId(), collect);
     } else {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_NOT_SET);
