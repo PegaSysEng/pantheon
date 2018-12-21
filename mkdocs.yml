@@ -11,12 +11,12 @@
     
 # Project information
 site_name: Pantheon
-site_url: https://pantheon.readthedocs.io/
+site_url: https://doc.pantheon.pegasys.tech/
 site_description: Pantheon Java Ethereum client documentation.
 site_author: Pantheon community
 copyright: Pantheon and its documentation are licensed under Apache 2.0 license /
   This <a href="https://readthedocs.org/">Readthedocs.org</a> documentation is maintained with love by <a href="https://pegasys.tech/">PegaSys</a>.
-#google_analytics: ['UA-36723568-3', 'pantheon.readthedocs.io']
+google_analytics: ['UA-117921923-2', 'doc.pantheon.pegasys.tech']
 
 #extra project info and template customisation
 extra:
@@ -36,14 +36,6 @@ edit_uri: ""
 theme:
     name: material
     custom_dir: docs/custom_theme
-    highlightjs: true
-    hljs_languages:
-        - java
-        - bash
-        - bat
-        - toml
-        - json
-        - yaml
     palette:
         primary: blue-grey
         accent: teal
@@ -86,11 +78,14 @@ nav:
 markdown_extensions:
     - toc:
         permalink: 
+        toc_depth: 3
+    - pymdownx.highlight:
     - markdown_include.include:
         base_path: docs
     - admonition
     - footnotes
     - def_list
+    - abbr
     - pymdownx.arithmatex
     - pymdownx.betterem:
           smart_enable: all
