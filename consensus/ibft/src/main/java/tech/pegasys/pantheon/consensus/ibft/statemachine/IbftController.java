@@ -60,7 +60,12 @@ public class IbftController {
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory) {
-    this(blockchain, ibftFinalState, ibftBlockHeightManagerFactory, Maps.newHashMap());
+    this(
+        blockchain,
+        ibftFinalState,
+        ibftBlockHeightManagerFactory,
+        Maps.newHashMap(),
+        new IbftGossip(ibftFinalState.getPeers()));
   }
 
   @VisibleForTesting
@@ -68,12 +73,13 @@ public class IbftController {
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
-      final Map<Long, List<Message>> futureMessages) {
+      final Map<Long, List<Message>> futureMessages,
+      final IbftGossip gossiper) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessages = futureMessages;
-    this.gossiper = new IbftGossip(ibftFinalState.getPeers());
+    this.gossiper = gossiper;
   }
 
   public void start() {

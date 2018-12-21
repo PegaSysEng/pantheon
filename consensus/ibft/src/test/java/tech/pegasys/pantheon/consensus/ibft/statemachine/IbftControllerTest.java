@@ -16,13 +16,13 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -39,7 +39,6 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.consensus.ibft.network.MockPeerFactory;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -97,6 +96,7 @@ public class IbftControllerTest {
   private final Address unknownValidator = Address.fromHexString("0x2");
   private final ConsensusRoundIdentifier futureRoundIdentifier = new ConsensusRoundIdentifier(2, 0);
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(0, 0);
+  @Mock private IbftGossip ibftGossip;
   private IbftController ibftController;
 
   @Before
@@ -104,9 +104,9 @@ public class IbftControllerTest {
     when(blockChain.getChainHeadHeader()).thenReturn(blockHeader);
     when(blockHeightManagerFactory.create(blockHeader)).thenReturn(blockHeightManager);
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
-    when(ibftFinalState.getPeers()).thenReturn(mock(IbftNetworkPeers.class));
     ibftController =
-        new IbftController(blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages);
+        new IbftController(
+            blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages, ibftGossip);
   }
 
   @Test
@@ -140,8 +140,11 @@ public class IbftControllerTest {
     verify(blockHeightManager).start();
     verify(blockHeightManager, never()).handleProposalMessage(signedProposal);
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
+    verify(ibftGossip).gossipPreparePayload(signedPrepare, null);
     verify(blockHeightManager).handleCommitMessage(signedCommit);
+    verify(ibftGossip).gossipCommitPayload(signedCommit, null);
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
+    verify(ibftGossip).gossipRoundChangePayload(signedRoundChange, null);
     verify(blockHeightManager, never()).handleNewRoundMessage(signedNewRound);
   }
 
@@ -166,10 +169,15 @@ public class IbftControllerTest {
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(ibftGossip).gossipProposalPayload(signedProposal, null);
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
+    verify(ibftGossip).gossipPreparePayload(signedPrepare, null);
     verify(blockHeightManager).handleCommitMessage(signedCommit);
+    verify(ibftGossip).gossipCommitPayload(signedCommit, null);
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
+    verify(ibftGossip).gossipRoundChangePayload(signedRoundChange, null);
     verify(blockHeightManager).handleNewRoundMessage(signedNewRound);
+    verify(ibftGossip).gossipNewRoundPayload(signedNewRound, null);
   }
 
   @Test
@@ -200,6 +208,7 @@ public class IbftControllerTest {
 
     assertThat(futureMessages).isEmpty();
     verify(blockHeightManager).handleProposalMessage(signedProposal);
+    verify(ibftGossip).gossipProposalPayload(signedProposal, null);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);
@@ -213,6 +222,7 @@ public class IbftControllerTest {
 
     assertThat(futureMessages).isEmpty();
     verify(blockHeightManager).handlePrepareMessage(signedPrepare);
+    verify(ibftGossip).gossipPreparePayload(signedPrepare, null);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);
@@ -226,6 +236,7 @@ public class IbftControllerTest {
 
     assertThat(futureMessages).isEmpty();
     verify(blockHeightManager).handleCommitMessage(signedCommit);
+    verify(ibftGossip).gossipCommitPayload(signedCommit, null);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);
@@ -240,6 +251,7 @@ public class IbftControllerTest {
 
     assertThat(futureMessages).isEmpty();
     verify(blockHeightManager).handleNewRoundMessage(signedNewRound);
+    verify(ibftGossip).gossipNewRoundPayload(signedNewRound, null);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);
@@ -254,6 +266,7 @@ public class IbftControllerTest {
 
     assertThat(futureMessages).isEmpty();
     verify(blockHeightManager).handleRoundChangeMessage(signedRoundChange);
+    verify(ibftGossip).gossipRoundChangePayload(signedRoundChange, null);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verifyNoMoreInteractions(blockHeightManager);

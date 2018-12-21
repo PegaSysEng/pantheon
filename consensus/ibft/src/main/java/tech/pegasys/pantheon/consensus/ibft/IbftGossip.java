@@ -40,6 +40,7 @@ public class IbftGossip {
   private final IbftNetworkPeers peers;
 
   private static final int SEEN_MESSAGES_SIZE = 10_000;
+  // Set that starts evicting members when it hits capacity
   private final Set<Signature> seenMessages =
       Collections.newSetFromMap(
           new LinkedHashMap<Signature, Boolean>() {
