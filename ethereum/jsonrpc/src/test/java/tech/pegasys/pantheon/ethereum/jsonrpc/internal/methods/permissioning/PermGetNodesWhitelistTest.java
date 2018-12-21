@@ -51,7 +51,6 @@ public class PermGetNodesWhitelistTest {
       "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.11:4567";
   private final String enode3 =
       "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.12:4567";
-  private final String badEnode = "enod://dog@cat:fish";
 
   @Mock private P2PNetwork p2pNetwork;
   @Mock private NodeWhitelistController nodeWhitelistController;
@@ -69,7 +68,8 @@ public class PermGetNodesWhitelistTest {
   @Test
   public void shouldReturnSuccessResponseWhenListPopulated() {
     final JsonRpcRequest request = buildRequest();
-    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), new Object[] {});
+    final JsonRpcResponse expected =
+        new JsonRpcSuccessResponse(request.getId(), Lists.newArrayList(enode1, enode2, enode3));
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(true);

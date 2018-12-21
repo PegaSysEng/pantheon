@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import com.google.common.collect.Lists;
 import org.assertj.core.api.ThrowableAssert;
