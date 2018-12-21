@@ -10,60 +10,43 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.eea;
+package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.StringListParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PermAddNodesToWhitelist implements JsonRpcMethod {
+public class PermGetNodesWhitelist implements JsonRpcMethod {
 
   private final P2PNetwork p2pNetwork;
-  private final JsonRpcParameter parameters;
 
-  public PermAddNodesToWhitelist(final P2PNetwork p2pNetwork, final JsonRpcParameter parameters) {
+  public PermGetNodesWhitelist(final P2PNetwork p2pNetwork) {
     this.p2pNetwork = p2pNetwork;
-    this.parameters = parameters;
   }
 
   @Override
   public String getName() {
-    return "perm_addNodesToWhitelist";
+    return "perm_getNodesWhitelist";
   }
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
-    final StringListParameter enodeListParam =
-        parameters.required(req.getParams(), 0, StringListParameter.class);
-
-    try {
-      List<DefaultPeer> peers =
-          enodeListParam
-              .getStringList()
-              .parallelStream()
-              .map(this::parsePeer)
-              .collect(Collectors.toList());
-
-      p2pNetwork.getNodeWhitelistController().addNodes(peers);
-      return new JsonRpcSuccessResponse(req.getId(), true);
-    } catch (IllegalArgumentException e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
-    } catch (Exception e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INTERNAL_ERROR);
+    if (p2pNetwork.getNodeWhitelistController().nodeWhitelistSet()) {
+      List<Peer> nodesWhitelist = p2pNetwork.getNodeWhitelistController().getNodesWhitelist();
+      List<Endpoint> collect =
+          nodesWhitelist.parallelStream().map(Peer::getEndpoint).collect(Collectors.toList());
+      return new JsonRpcSuccessResponse(req.getId(), collect);
+    } else {
+      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_NOT_SET);
     }
-  }
-
-  private DefaultPeer parsePeer(final String enodeURI) {
-    return DefaultPeer.fromURI(enodeURI);
   }
 }

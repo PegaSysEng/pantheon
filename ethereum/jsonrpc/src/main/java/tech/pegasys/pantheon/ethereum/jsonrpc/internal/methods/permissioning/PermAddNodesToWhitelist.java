@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.eea;
+package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -26,20 +26,19 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
+public class PermAddNodesToWhitelist implements JsonRpcMethod {
 
   private final P2PNetwork p2pNetwork;
   private final JsonRpcParameter parameters;
 
-  public PermRemoveNodesFromWhitelist(
-      final P2PNetwork p2pNetwork, final JsonRpcParameter parameters) {
+  public PermAddNodesToWhitelist(final P2PNetwork p2pNetwork, final JsonRpcParameter parameters) {
     this.p2pNetwork = p2pNetwork;
     this.parameters = parameters;
   }
 
   @Override
   public String getName() {
-    return "perm_removeNodesFromWhitelist";
+    return "perm_addNodesToWhitelist";
   }
 
   @Override
@@ -55,12 +54,12 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
               .map(this::parsePeer)
               .collect(Collectors.toList());
 
-      p2pNetwork.getNodeWhitelistController().removeNodes(peers);
+      p2pNetwork.getNodeWhitelistController().addNodes(peers);
       return new JsonRpcSuccessResponse(req.getId(), true);
     } catch (IllegalArgumentException e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
+      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_INVALID_ENTRY);
     } catch (Exception e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INTERNAL_ERROR);
+      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_DUPLICATED_ENTRY);
     }
   }
 

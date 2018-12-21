@@ -22,14 +22,14 @@ import java.util.List;
 
 public class NodeWhitelistController {
 
-  private final List<Peer> nodeWhitelist;
+  private final List<Peer> nodesWhitelist;
   private boolean nodeWhitelistSet = false;
 
   public NodeWhitelistController(final PermissioningConfiguration configuration) {
-    nodeWhitelist = new ArrayList<>();
+    nodesWhitelist = new ArrayList<>();
     if (configuration != null && configuration.getNodeWhitelist() != null) {
       for (URI uri : configuration.getNodeWhitelist()) {
-        nodeWhitelist.add(DefaultPeer.fromURI(uri));
+        nodesWhitelist.add(DefaultPeer.fromURI(uri));
       }
       if (configuration.isNodeWhitelistSet()) {
         nodeWhitelistSet = true;
@@ -39,16 +39,16 @@ public class NodeWhitelistController {
 
   public boolean addNode(final Peer node) {
     nodeWhitelistSet = true;
-    return nodeWhitelist.add(node);
+    return nodesWhitelist.add(node);
   }
 
   private boolean removeNode(final Peer node) {
-    return nodeWhitelist.remove(node);
+    return nodesWhitelist.remove(node);
   }
 
   public void addNodes(final List<DefaultPeer> peers) throws Exception {
     for (DefaultPeer peer : peers) {
-      boolean b = nodeWhitelist.contains(peer);
+      boolean b = nodesWhitelist.contains(peer);
       if (b) {
         throw new Exception(
             String.format("Specified peer: %s already exists in whitelist.", peer.getId()));
@@ -59,7 +59,7 @@ public class NodeWhitelistController {
 
   public void removeNodes(final List<DefaultPeer> peers) throws Exception {
     for (DefaultPeer peer : peers) {
-      if (!(nodeWhitelist.contains(peer))) {
+      if (!(nodesWhitelist.contains(peer))) {
         throw new Exception(
             String.format("Specified peer: %s does not exist in whitelist.", peer.getId()));
       }
@@ -68,6 +68,14 @@ public class NodeWhitelistController {
   }
 
   public boolean isPermitted(final Peer node) {
-    return (!nodeWhitelistSet || (nodeWhitelistSet && nodeWhitelist.contains(node)));
+    return (!nodeWhitelistSet || (nodeWhitelistSet && nodesWhitelist.contains(node)));
+  }
+
+  public List<Peer> getNodesWhitelist() {
+    return nodesWhitelist;
+  }
+
+  public boolean nodeWhitelistSet() {
+    return nodeWhitelistSet;
   }
 }
