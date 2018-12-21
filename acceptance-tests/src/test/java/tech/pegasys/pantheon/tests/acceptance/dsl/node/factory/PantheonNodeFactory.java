@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
+import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import com.google.common.io.Resources;
 
@@ -149,25 +151,16 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  private Optional<String> createCliqueGenesisConfig(final Collection<RunnableNode> validators) {
-    String genesisTemplate = cliqueGenesisTemplateConfig();
-    String cliqueExtraData = encodeCliqueExtraData(validators);
-    String genesis = genesisTemplate.replaceAll("%cliqueExtraData%", cliqueExtraData);
-    return Optional.of(genesis);
-  }
-
-  private String encodeCliqueExtraData(final Collection<RunnableNode> nodes) {
-    final List<Address> addresses = nodes.stream().map(RunnableNode::getAddress).collect(toList());
-    return CliqueExtraData.createGenesisExtraDataString(addresses);
-  }
-
-  private String cliqueGenesisTemplateConfig() {
-    try {
-      URI uri = Resources.getResource("clique/clique.json").toURI();
-      return Resources.toString(uri.toURL(), Charset.defaultCharset());
-    } catch (URISyntaxException | IOException e) {
-      throw new IllegalStateException("Unable to get test clique genesis config");
-    }
+  public PantheonNode createIbftNode(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .setJsonRpcConfiguration(jsonRpcConfigWithClique())
+            .setWebSocketConfiguration(createWebSocketEnabledConfig())
+            .setDevMode(false)
+            .setGenesisConfigProvider(this::createIbftGenesisConfig)
+            .build());
   }
 
   public PantheonNode createCliqueNodeWithValidators(final String name, final String... validators)
@@ -183,6 +176,38 @@ public class PantheonNodeFactory {
             .setGenesisConfigProvider(
                 nodes -> createCliqueGenesisConfigForValidators(asList(validators), nodes))
             .build());
+  }
+
+  private Optional<String> createCliqueGenesisConfig(final Collection<RunnableNode> validators) {
+    final String template = genesisTemplateConfig("clique/clique.json");
+    return updateGenesisExtraData(
+        validators, template, CliqueExtraData::createGenesisExtraDataString);
+  }
+
+  private Optional<String> createIbftGenesisConfig(final Collection<RunnableNode> validators) {
+    final String template = genesisTemplateConfig("ibft/ibft.json");
+    return updateGenesisExtraData(
+        validators, template, IbftExtraData::createGenesisExtraDataString);
+  }
+
+  private Optional<String> updateGenesisExtraData(
+      final Collection<RunnableNode> validators,
+      final String genesisTemplate,
+      final Function<List<Address>, String> extraDataCreator) {
+    final List<Address> addresses =
+        validators.stream().map(RunnableNode::getAddress).collect(toList());
+    final String extraDataString = extraDataCreator.apply(addresses);
+    final String genesis = genesisTemplate.replaceAll("%extraData%", extraDataString);
+    return Optional.of(genesis);
+  }
+
+  private String genesisTemplateConfig(final String template) {
+    try {
+      URI uri = Resources.getResource(template).toURI();
+      return Resources.toString(uri.toURL(), Charset.defaultCharset());
+    } catch (URISyntaxException | IOException e) {
+      throw new IllegalStateException("Unable to get test genesis config " + template);
+    }
   }
 
   private Optional<String> createCliqueGenesisConfigForValidators(
