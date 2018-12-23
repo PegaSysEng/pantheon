@@ -30,9 +30,9 @@ public class PermAddAccountsToWhitelist implements JsonRpcMethod {
   private final AccountWhitelistController whitelistController;
 
   public PermAddAccountsToWhitelist(
-      final JsonRpcParameter parameters, final AccountWhitelistController whitelistController) {
-    this.parameters = parameters;
+      final AccountWhitelistController whitelistController, final JsonRpcParameter parameters) {
     this.whitelistController = whitelistController;
+    this.parameters = parameters;
   }
 
   @Override
