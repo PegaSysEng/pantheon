@@ -44,7 +44,13 @@ public enum JsonRpcError {
   COINBASE_NOT_SET(-32010, "Coinbase not set. Unable to start mining without a coinbase."),
 
   // Wallet errors
-  COINBASE_NOT_SPECIFIED(-32000, "Coinbase must be explicitly specified");
+  COINBASE_NOT_SPECIFIED(-32000, "Coinbase must be explicitly specified"),
+
+  // Permissioning errors
+  ACCOUNT_WHITELIST_NOT_SET(-32000, "Account whitelist hasn't been set"),
+  ACCOUNT_WHITELIST_DUPLICATED_ENTRY(-32000, "Account whitelist can't contain duplicated entries"),
+  ACCOUNT_WHITELIST_ABSENT_ENTRY(-32000, "Can't remove absent account from whitelist"),
+  ACCOUNT_WHITELIST_INVALID_ENTRY(-32000, "Can't add invalid account address to the whitelist");
 
   private final int code;
   private final String message;
