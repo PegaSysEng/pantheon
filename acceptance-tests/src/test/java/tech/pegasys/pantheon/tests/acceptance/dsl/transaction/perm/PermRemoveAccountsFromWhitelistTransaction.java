@@ -25,12 +25,12 @@ public class PermRemoveAccountsFromWhitelistTransaction implements Transaction<B
 
   private final List<String> accounts;
 
-  public PermRemoveAccountsFromWhitelistTransaction(List<String> accounts) {
+  public PermRemoveAccountsFromWhitelistTransaction(final List<String> accounts) {
     this.accounts = accounts;
   }
 
   @Override
-  public Boolean execute(PantheonWeb3j node) {
+  public Boolean execute(final PantheonWeb3j node) {
     try {
       RemoveAccountsFromWhitelistResponse response =
           node.removeAccountsFromWhitelist(accounts).send();

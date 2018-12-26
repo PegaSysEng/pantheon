@@ -26,13 +26,13 @@ public class GetExpectedAccountsWhitelist implements Condition {
   private final List<String> expectedList;
 
   public GetExpectedAccountsWhitelist(
-      PermGetAccountsWhitelistTransaction transaction, List<String> expectedList) {
+      final PermGetAccountsWhitelistTransaction transaction, final List<String> expectedList) {
     this.transaction = transaction;
     this.expectedList = expectedList;
   }
 
   @Override
-  public void verify(Node node) {
+  public void verify(final Node node) {
     List<String> accounts = node.execute(transaction);
     assertThat(accounts).containsExactlyInAnyOrder(expectedList.toArray(new String[] {}));
   }

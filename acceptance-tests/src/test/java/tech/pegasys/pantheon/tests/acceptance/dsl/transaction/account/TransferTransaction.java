@@ -87,7 +87,7 @@ public class TransferTransaction implements Transaction<Hash> {
     return transactionCount;
   }
 
-  public String signedTransactionData(BigInteger nonce) {
+  public String signedTransactionData(final BigInteger nonce) {
     final RawTransaction transaction =
         RawTransaction.createEtherTransaction(
             nonce,

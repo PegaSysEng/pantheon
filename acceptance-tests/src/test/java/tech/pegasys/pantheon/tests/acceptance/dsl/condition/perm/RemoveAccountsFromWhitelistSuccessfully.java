@@ -23,12 +23,12 @@ public class RemoveAccountsFromWhitelistSuccessfully implements Condition {
   private final PermRemoveAccountsFromWhitelistTransaction transaction;
 
   public RemoveAccountsFromWhitelistSuccessfully(
-      PermRemoveAccountsFromWhitelistTransaction transaction) {
+      final PermRemoveAccountsFromWhitelistTransaction transaction) {
     this.transaction = transaction;
   }
 
   @Override
-  public void verify(Node node) {
+  public void verify(final Node node) {
     Boolean result = node.execute(transaction);
     assertThat(result).isTrue();
   }

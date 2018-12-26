@@ -22,12 +22,13 @@ public class AddAccountsToWhitelistSuccessfully implements Condition {
 
   private final PermAddAccountsToWhitelistTransaction transaction;
 
-  public AddAccountsToWhitelistSuccessfully(PermAddAccountsToWhitelistTransaction transaction) {
+  public AddAccountsToWhitelistSuccessfully(
+      final PermAddAccountsToWhitelistTransaction transaction) {
     this.transaction = transaction;
   }
 
   @Override
-  public void verify(Node node) {
+  public void verify(final Node node) {
     Boolean result = node.execute(transaction);
     assertThat(result).isTrue();
   }

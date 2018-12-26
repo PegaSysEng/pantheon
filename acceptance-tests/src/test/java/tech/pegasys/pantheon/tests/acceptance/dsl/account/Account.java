@@ -29,7 +29,6 @@ public class Account {
   private final EthTransactions eth;
   private final String name;
   private final KeyPair keyPair;
-  private long nonce = 0;
 
   private Account(final EthTransactions eth, final String name, final KeyPair keyPair) {
     this.name = name;

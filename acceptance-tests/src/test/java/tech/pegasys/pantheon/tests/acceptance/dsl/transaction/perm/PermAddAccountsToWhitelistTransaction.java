@@ -25,12 +25,12 @@ public class PermAddAccountsToWhitelistTransaction implements Transaction<Boolea
 
   private final List<String> accounts;
 
-  public PermAddAccountsToWhitelistTransaction(List<String> accounts) {
+  public PermAddAccountsToWhitelistTransaction(final List<String> accounts) {
     this.accounts = accounts;
   }
 
   @Override
-  public Boolean execute(PantheonWeb3j node) {
+  public Boolean execute(final PantheonWeb3j node) {
     try {
       AddAccountsToWhitelistResponse response = node.addAccountsToWhitelist(accounts).send();
       assertThat(response.getResult()).isTrue();

@@ -24,7 +24,7 @@ import java.util.List;
 public class PermGetAccountsWhitelistTransaction implements Transaction<List<String>> {
 
   @Override
-  public List<String> execute(PantheonWeb3j node) {
+  public List<String> execute(final PantheonWeb3j node) {
     try {
       GetAccountsWhitelistResponse response = node.getAccountsWhitelist().send();
       assertThat(response.getResult()).isNotNull();
