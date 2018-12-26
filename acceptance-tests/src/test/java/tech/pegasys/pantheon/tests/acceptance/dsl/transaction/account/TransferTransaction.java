@@ -21,9 +21,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Optional;
 
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
@@ -36,31 +38,64 @@ public class TransferTransaction implements Transaction<Hash> {
   private final Account recipient;
   private final String amount;
   private final Unit unit;
+  private final Optional<BigInteger> nonce;
 
   public TransferTransaction(
       final Account sender, final Account recipient, final String amount, final Unit unit) {
+    this(sender, recipient, amount, unit, null);
+  }
+
+  public TransferTransaction(
+      final Account sender,
+      final Account recipient,
+      final String amount,
+      final Unit unit,
+      final BigInteger nonce) {
     this.sender = sender;
     this.recipient = recipient;
     this.amount = amount;
     this.unit = unit;
+    if (nonce != null) {
+      this.nonce = Optional.of(nonce);
+    } else {
+      this.nonce = Optional.empty();
+    }
   }
 
   @Override
   public Hash execute(final PantheonWeb3j node) {
-    final RawTransaction transaction =
-        RawTransaction.createEtherTransaction(
-            sender.getNextNonce(),
-            MINIMUM_GAS_PRICE,
-            TRANSFER_GAS_COST,
-            recipient.getAddress(),
-            Convert.toWei(amount, unit).toBigIntegerExact());
-    final String signedTransactionData =
-        toHexString(TransactionEncoder.signMessage(transaction, sender.web3jCredentials()));
+    final BigInteger transactionCount = nonce.orElse(getAccountNonce(node));
+    final String signedTransactionData = signedTransactionData(transactionCount);
     try {
       return Hash.fromHexString(
           node.ethSendRawTransaction(signedTransactionData).send().getTransactionHash());
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private BigInteger getAccountNonce(final PantheonWeb3j node) {
+    BigInteger transactionCount;
+    try {
+      transactionCount =
+          node.ethGetTransactionCount(sender.getAddress(), DefaultBlockParameterName.LATEST)
+              .send()
+              .getTransactionCount();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return transactionCount;
+  }
+
+  public String signedTransactionData(BigInteger nonce) {
+    final RawTransaction transaction =
+        RawTransaction.createEtherTransaction(
+            nonce,
+            MINIMUM_GAS_PRICE,
+            TRANSFER_GAS_COST,
+            recipient.getAddress(),
+            Convert.toWei(amount, unit).toBigIntegerExact());
+
+    return toHexString(TransactionEncoder.signMessage(transaction, sender.web3jCredentials()));
   }
 }

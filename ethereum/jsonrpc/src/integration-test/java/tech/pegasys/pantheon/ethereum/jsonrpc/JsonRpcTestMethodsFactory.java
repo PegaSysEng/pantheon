@@ -16,8 +16,6 @@ import static org.mockito.Mockito.mock;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import java.util.HashSet;
-import java.util.Map;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -40,6 +38,9 @@ import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+
+import java.util.HashSet;
+import java.util.Map;
 
 /** Provides a facade to construct the JSON-RPC component. */
 public class JsonRpcTestMethodsFactory {
@@ -78,7 +79,8 @@ public class JsonRpcTestMethodsFactory {
             blockchainQueries, transactionPool, new FilterIdGenerator(), new FilterRepository());
     final EthHashMiningCoordinator miningCoordinator = mock(EthHashMiningCoordinator.class);
     final MetricsSystem metricsSystem = new NoOpMetricsSystem();
-    final AccountWhitelistController accountWhitelistController = mock(AccountWhitelistController.class);
+    final AccountWhitelistController accountWhitelistController =
+        mock(AccountWhitelistController.class);
 
     return new JsonRpcMethodsFactory()
         .methods(

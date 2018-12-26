@@ -21,8 +21,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.account.ExpectAccoun
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
-import java.math.BigInteger;
-
 import org.web3j.crypto.Credentials;
 import org.web3j.utils.Convert.Unit;
 
@@ -56,10 +54,6 @@ public class Account {
 
   public String getAddress() {
     return Address.extract(Hash.hash(keyPair.getPublicKey().getEncodedBytes())).toString();
-  }
-
-  public BigInteger getNextNonce() {
-    return BigInteger.valueOf(nonce++);
   }
 
   public Condition balanceEquals(final String expectedBalance, final Unit balanceUnit) {
