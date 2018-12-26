@@ -69,11 +69,11 @@ public class AccountsWhitelistAcceptanceTest extends AcceptanceTestBase {
   }
 
   private void verifyTransferForbidden(final Account sender, final Account beneficiary) {
-    TransferTransaction transfer = transactions.createTransfer(sender, beneficiary, 1);
     BigInteger nonce = node.execute(transactions.getTransactionCount(sender.getAddress()));
+    TransferTransaction transfer = transactions.createTransfer(sender, beneficiary, 1, nonce);
     node.verify(
         eth.sendRawTransactionExceptional(
-            transfer.signedTransactionData(nonce),
+            transfer.signedTransactionData(),
             "Sender account not authorized to send transactions"));
   }
 }

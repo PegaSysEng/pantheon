@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermAddAccoun
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermGetAccountsWhitelistTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermRemoveAccountsFromWhitelistTransaction;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +44,11 @@ public class Transactions {
   public TransferTransaction createTransfer(
       final Account sender, final Account recipient, final int amount) {
     return new TransferTransaction(sender, recipient, String.valueOf(amount), Unit.ETHER);
+  }
+
+  public TransferTransaction createTransfer(
+      final Account sender, final Account recipient, final int amount, final BigInteger nonce) {
+    return new TransferTransaction(sender, recipient, String.valueOf(amount), Unit.ETHER, nonce);
   }
 
   public TransferTransactionSet createIncrementalTransfers(

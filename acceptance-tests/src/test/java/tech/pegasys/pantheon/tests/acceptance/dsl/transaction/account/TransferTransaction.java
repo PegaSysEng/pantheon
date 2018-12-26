@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
-import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
@@ -64,8 +63,7 @@ public class TransferTransaction implements Transaction<Hash> {
 
   @Override
   public Hash execute(final PantheonWeb3j node) {
-    final BigInteger transactionCount = nonce.orElse(getAccountNonce(node));
-    final String signedTransactionData = signedTransactionData(transactionCount);
+    final String signedTransactionData = signedTransactionData();
     try {
       return Hash.fromHexString(
           node.ethSendRawTransaction(signedTransactionData).send().getTransactionHash());
@@ -74,23 +72,10 @@ public class TransferTransaction implements Transaction<Hash> {
     }
   }
 
-  private BigInteger getAccountNonce(final PantheonWeb3j node) {
-    BigInteger transactionCount;
-    try {
-      transactionCount =
-          node.ethGetTransactionCount(sender.getAddress(), DefaultBlockParameterName.LATEST)
-              .send()
-              .getTransactionCount();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    return transactionCount;
-  }
-
-  public String signedTransactionData(final BigInteger nonce) {
+  public String signedTransactionData() {
     final RawTransaction transaction =
         RawTransaction.createEtherTransaction(
-            nonce,
+            nonce.orElse(nonce.orElseGet(sender::getNextNonce)),
             MINIMUM_GAS_PRICE,
             TRANSFER_GAS_COST,
             recipient.getAddress(),

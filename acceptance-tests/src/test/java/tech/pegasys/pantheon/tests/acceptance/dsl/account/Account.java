@@ -21,6 +21,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.account.ExpectAccoun
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
+import java.math.BigInteger;
+
 import org.web3j.crypto.Credentials;
 import org.web3j.utils.Convert.Unit;
 
@@ -29,6 +31,7 @@ public class Account {
   private final EthTransactions eth;
   private final String name;
   private final KeyPair keyPair;
+  private long nonce = 0;
 
   private Account(final EthTransactions eth, final String name, final KeyPair keyPair) {
     this.name = name;
@@ -49,6 +52,10 @@ public class Account {
   public Credentials web3jCredentials() {
     return Credentials.create(
         keyPair.getPrivateKey().toString(), keyPair.getPublicKey().toString());
+  }
+
+  public BigInteger getNextNonce() {
+    return BigInteger.valueOf(nonce++);
   }
 
   public String getAddress() {
