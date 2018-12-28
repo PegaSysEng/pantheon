@@ -130,7 +130,22 @@ public class JsonRpcMethodsFactory {
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> rpcApis) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
-    // @formatter:off
+    if (rpcApis.contains(RpcApis.ADMIN)) {
+      addMethods(enabledMethods, new AdminPeers(p2pNetwork));
+    }
+    if (rpcApis.contains(RpcApis.DEBUG)) {
+      final BlockReplay blockReplay =
+          new BlockReplay(
+              protocolSchedule,
+              blockchainQueries.getBlockchain(),
+              blockchainQueries.getWorldStateArchive());
+      addMethods(
+          enabledMethods,
+          new DebugTraceTransaction(
+              blockchainQueries, new TransactionTracer(blockReplay), parameter),
+          new DebugStorageRangeAt(parameter, blockchainQueries, blockReplay),
+          new DebugMetrics(metricsSystem));
+    }
     if (rpcApis.contains(RpcApis.ETH)) {
       addMethods(
           enabledMethods,
@@ -184,18 +199,17 @@ public class JsonRpcMethodsFactory {
           new EthGetWork(miningCoordinator),
           new EthChainId(protocolSchedule.getChainId()));
     }
-    if (rpcApis.contains(RpcApis.DEBUG)) {
-      final BlockReplay blockReplay =
-          new BlockReplay(
-              protocolSchedule,
-              blockchainQueries.getBlockchain(),
-              blockchainQueries.getWorldStateArchive());
+    if (rpcApis.contains(RpcApis.METRICS)) {
+      addMethods(enabledMethods, new DebugMetrics(metricsSystem));
+    }
+    if (rpcApis.contains(RpcApis.MINER)) {
+      final MinerSetCoinbase minerSetCoinbase = new MinerSetCoinbase(miningCoordinator, parameter);
       addMethods(
           enabledMethods,
-          new DebugTraceTransaction(
-              blockchainQueries, new TransactionTracer(blockReplay), parameter),
-          new DebugStorageRangeAt(parameter, blockchainQueries, blockReplay),
-          new DebugMetrics(metricsSystem));
+          new MinerStart(miningCoordinator),
+          new MinerStop(miningCoordinator),
+          minerSetCoinbase,
+          new MinerSetEtherbase(minerSetCoinbase));
     }
     if (rpcApis.contains(RpcApis.NET)) {
       addMethods(
@@ -207,19 +221,6 @@ public class JsonRpcMethodsFactory {
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());
     }
-    if (rpcApis.contains(RpcApis.MINER)) {
-      final MinerSetCoinbase minerSetCoinbase = new MinerSetCoinbase(miningCoordinator, parameter);
-      addMethods(
-          enabledMethods,
-          new MinerStart(miningCoordinator),
-          new MinerStop(miningCoordinator),
-          minerSetCoinbase,
-          new MinerSetEtherbase(minerSetCoinbase));
-    }
-    if (rpcApis.contains(RpcApis.ADMIN)) {
-      addMethods(enabledMethods, new AdminPeers(p2pNetwork));
-    }
-    // @formatter:off
     return enabledMethods;
   }
 

@@ -29,9 +29,13 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -140,6 +144,33 @@ public class JsonRpcHttpServiceRpcApisTest {
     }
   }
 
+  @Test
+  public void metricsHasPrometheusEndpoint() throws Exception {
+    service = createJsonRpcHttpServiceWithRpcApis(RpcApis.METRICS);
+    Request metricsRequest = new Request.Builder().url(baseUrl + "/metrics").build();
+    try (final Response resp = client.newCall(metricsRequest).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+      // Check general format of result, it maps to java.util.Properties
+      final Properties props = new Properties();
+      props.load(resp.body().byteStream());
+
+      // We should have JVM metrics already loaded, verify a simple key.
+      assertThat(props).containsKey("jvm_threads_deadlocked");
+    }
+  }
+
+  @Test
+  public void metricsEndpointNotPresentWithoutRpcApi() throws Exception {
+    service = createJsonRpcHttpServiceWithRpcApis();
+
+    Request metricsRequest = new Request.Builder().url(service.url() + "/metrics").build();
+    try (final Response resp = client.newCall(metricsRequest).execute()) {
+      assertThat(resp.code()).isEqualTo(404);
+    }
+  }
+
+
+
   private JsonRpcConfiguration createJsonRpcConfigurationWithRpcApis(final RpcApi... rpcApis) {
     final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
     config.setCorsAllowedDomains(singletonList("*"));
@@ -173,12 +204,12 @@ public class JsonRpcHttpServiceRpcApisTest {
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),
-                    new NoOpMetricsSystem(),
+                    PrometheusMetricsSystem.init(),
                     supportedCapabilities,
                     config.getRpcApis()));
     final JsonRpcHttpService jsonRpcHttpService =
         new JsonRpcHttpService(
-            vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
+            vertx, folder.newFolder().toPath(), config, PrometheusMetricsSystem.init(), rpcMethods);
     jsonRpcHttpService.start().join();
 
     baseUrl = jsonRpcHttpService.url();

@@ -40,6 +40,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -55,9 +56,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.base.Suppliers;
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import io.vertx.core.Vertx;
@@ -130,7 +133,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
-  private final MetricsSystem metricsSystem = PrometheusMetricsSystem.init();
+  private final Supplier<MetricsSystem> metricsSystem = Suppliers.memoize(this::supplyMetricSystem);
 
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
@@ -288,7 +291,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     arity = "1..*",
     converter = RpcApisConverter.class,
     description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}",
-    defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
+    defaultValue = "CLIQUE,ETH,IBFT,METRICS,NET,WEB3"
   )
   private final Collection<RpcApi> rpcApis = null;
 
@@ -490,7 +493,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
-    PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
+    final PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
     ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
 
     synchronize(
@@ -507,17 +510,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private void ensureAllBootnodesAreInWhitelist(
       final EthNetworkConfig ethNetworkConfig,
       final PermissioningConfiguration permissioningConfiguration) {
-    List<Peer> bootnodes =
+    final List<Peer> bootnodes =
         DiscoveryConfiguration.getBootstrapPeersFromGenericCollection(
             ethNetworkConfig.getBootNodes());
     if (permissioningConfiguration.isNodeWhitelistSet() && bootnodes != null) {
-      List<Peer> whitelist =
+      final List<Peer> whitelist =
           permissioningConfiguration
               .getNodeWhitelist()
               .stream()
               .map(DefaultPeer::fromURI)
               .collect(Collectors.toList());
-      for (Peer bootnode : bootnodes) {
+      for (final Peer bootnode : bootnodes) {
         if (!whitelist.contains(bootnode)) {
           throw new ParameterException(
               new CommandLine(this),
@@ -542,7 +545,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(isDevMode)
           .nodePrivateKeyFile(getNodePrivateKeyFile())
-          .metricsSystem(metricsSystem)
+          .metricsSystem(metricsSystem.get())
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(new CommandLine(this), e.getMessage());
@@ -606,7 +609,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     checkNotNull(runnerBuilder);
 
-    Runner runner =
+    final Runner runner =
         runnerBuilder
             .vertx(Vertx.vertx())
             .pantheonController(controller)
@@ -620,7 +623,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .webSocketConfiguration(webSocketConfiguration)
             .dataDir(dataDir())
             .bannedNodeIds(bannedNodeIds)
-            .metricsSystem(metricsSystem)
+            .metricsSystem(metricsSystem.get())
             .permissioningConfiguration(permissioningConfiguration)
             .build();
 
@@ -690,7 +693,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private String genesisConfig() {
     try {
       return Resources.toString(genesisFile().toURI().toURL(), UTF_8);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new ParameterException(
           new CommandLine(this),
           String.format("Unable to load genesis file %s.", genesisFile()),
@@ -708,5 +711,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private boolean isFullInstantiation() {
     return !isDocker;
+  }
+
+  private MetricsSystem supplyMetricSystem() {
+    if (rpcApis.contains(RpcApis.METRICS)) {
+      return PrometheusMetricsSystem.init();
+    } else {
+      return new NoOpMetricsSystem();
+    }
   }
 }

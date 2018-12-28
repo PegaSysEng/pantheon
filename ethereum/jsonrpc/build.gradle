@@ -35,6 +35,8 @@ dependencies {
   implementation project(':metrics')
 
   implementation 'com.google.guava:guava'
+  implementation 'io.prometheus:simpleclient'
+  implementation 'io.prometheus:simpleclient_common'
   implementation 'io.vertx:vertx-core'
   implementation 'io.vertx:vertx-web'
 

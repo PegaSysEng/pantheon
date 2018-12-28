@@ -24,6 +24,8 @@ import java.util.Map;
 
 public class DebugMetrics implements JsonRpcMethod {
 
+  public static final String METHOD_NAME = "debug_metrics";
+
   private final MetricsSystem metricsSystem;
 
   public DebugMetrics(final MetricsSystem metricsSystem) {
@@ -32,7 +34,7 @@ public class DebugMetrics implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return "debug_metrics";
+    return METHOD_NAME;
   }
 
   @Override

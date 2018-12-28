@@ -17,28 +17,31 @@ import java.util.Collection;
 import java.util.Optional;
 
 public class RpcApis {
-  public static final RpcApi ETH = new RpcApi("ETH");
+  public static final RpcApi ADMIN = new RpcApi("ADMIN");
   public static final RpcApi DEBUG = new RpcApi("DEBUG");
+  public static final RpcApi ETH = new RpcApi("ETH");
+  public static final RpcApi METRICS = new RpcApi("METRICS");
   public static final RpcApi MINER = new RpcApi("MINER");
   public static final RpcApi NET = new RpcApi("NET");
   public static final RpcApi WEB3 = new RpcApi("WEB3");
-  public static final RpcApi ADMIN = new RpcApi("ADMIN");
 
   public static final Collection<RpcApi> DEFAULT_JSON_RPC_APIS = Arrays.asList(ETH, NET, WEB3);
 
   public static Optional<RpcApi> valueOf(final String name) {
-    if (name.equals(ETH.getCliValue())) {
-      return Optional.of(ETH);
+    if (name.equals(ADMIN.getCliValue())) {
+      return Optional.of(ADMIN);
     } else if (name.equals(DEBUG.getCliValue())) {
       return Optional.of(DEBUG);
+    } else if (name.equals(ETH.getCliValue())) {
+      return Optional.of(ETH);
     } else if (name.equals(MINER.getCliValue())) {
       return Optional.of(MINER);
+    } else if (name.equals(METRICS.getCliValue())) {
+      return Optional.of(METRICS);
     } else if (name.equals(NET.getCliValue())) {
       return Optional.of(NET);
     } else if (name.equals(WEB3.getCliValue())) {
       return Optional.of(WEB3);
-    } else if (name.equals(ADMIN.getCliValue())) {
-      return Optional.of(ADMIN);
     } else {
       return Optional.empty();
     }

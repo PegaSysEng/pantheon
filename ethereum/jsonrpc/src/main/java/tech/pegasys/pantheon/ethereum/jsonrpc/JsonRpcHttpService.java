@@ -20,6 +20,7 @@ import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequestId;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugMetrics;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
@@ -31,22 +32,29 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.OperationTimer.TimingContext;
+import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.NetworkUtility;
 
-import java.net.BindException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.prometheus.client.exporter.common.TextFormat;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -80,6 +88,7 @@ public class JsonRpcHttpService {
   private final Map<String, JsonRpcMethod> jsonRpcMethods;
   private final Path dataDir;
   private final LabelledMetric<OperationTimer> requestTimer;
+  private final MetricsSystem metricsSystem;
 
   private HttpServer httpServer;
 
@@ -90,6 +99,7 @@ public class JsonRpcHttpService {
       final MetricsSystem metricsSystem,
       final Map<String, JsonRpcMethod> methods) {
     this.dataDir = dataDir;
+    this.metricsSystem = metricsSystem;
     requestTimer =
         metricsSystem.createLabelledTimer(
             MetricCategory.RPC,
@@ -134,6 +144,14 @@ public class JsonRpcHttpService {
             BodyHandler.create()
                 .setUploadsDirectory(dataDir.resolve("uploads").toString())
                 .setDeleteUploadedFilesOnEnd(true));
+    if (jsonRpcMethods.containsKey(DebugMetrics.METHOD_NAME)
+        && metricsSystem instanceof PrometheusMetricsSystem) {
+      router
+          .route("/metrics")
+          .method(HttpMethod.GET)
+          .produces(TextFormat.CONTENT_TYPE_004)
+          .handler(this::metricsRequest);
+    }
     router.route("/").method(HttpMethod.GET).handler(this::handleEmptyRequest);
     router
         .route("/")
@@ -156,7 +174,7 @@ public class JsonRpcHttpService {
               }
               httpServer = null;
               final Throwable cause = res.cause();
-              if (cause instanceof BindException || cause instanceof SocketException) {
+              if (cause instanceof SocketException) {
                 resultFuture.completeExceptionally(
                     new JsonRpcServiceException(
                         String.format(
@@ -170,9 +188,43 @@ public class JsonRpcHttpService {
     return resultFuture;
   }
 
+  private void metricsRequest(final RoutingContext routingContext) {
+    final Set<String> names = new TreeSet<>(routingContext.queryParam("name[]"));
+    final HttpServerResponse response = routingContext.response();
+    vertx.<String>executeBlocking(
+        future -> {
+          try {
+            final ByteArrayOutputStream metrics = new ByteArrayOutputStream(16 * 1024);
+            final OutputStreamWriter osw = new OutputStreamWriter(metrics, StandardCharsets.UTF_8);
+            TextFormat.write004(
+                osw,
+                ((PrometheusMetricsSystem) (metricsSystem))
+                    .getRegistry()
+                    .filteredMetricFamilySamples(names));
+            osw.flush();
+            osw.close();
+            metrics.flush();
+            metrics.close();
+            future.complete(metrics.toString(StandardCharsets.UTF_8.name()));
+          } catch (final IOException ioe) {
+            future.fail(ioe);
+          }
+        },
+        false,
+        (res) -> {
+          if (res.failed()) {
+            response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end();
+          } else {
+            response.setStatusCode(HttpResponseStatus.OK.code());
+            response.putHeader("Content-Type", TextFormat.CONTENT_TYPE_004);
+            response.end(res.result());
+          }
+        });
+  }
+
   private Handler<RoutingContext> checkWhitelistHostHeader() {
     return event -> {
-      Optional<String> hostHeader = getAndValidateHostHeader(event);
+      final Optional<String> hostHeader = getAndValidateHostHeader(event);
       if (config.getHostsWhitelist().contains("*")
           || (hostHeader.isPresent() && hostIsInWhitelist(hostHeader))) {
         event.next();
@@ -187,8 +239,8 @@ public class JsonRpcHttpService {
   }
 
   private Optional<String> getAndValidateHostHeader(final RoutingContext event) {
-    Iterable<String> splitHostHeader = Splitter.on(':').split(event.request().host());
-    long hostPieces = stream(splitHostHeader).count();
+    final Iterable<String> splitHostHeader = Splitter.on(':').split(event.request().host());
+    final long hostPieces = stream(splitHostHeader).count();
     if (hostPieces > 1) {
       // If the host contains a colon, verify the host is correctly formed - host [ ":" port ]
       if (hostPieces > 2 || !Iterables.get(splitHostHeader, 1).matches("\\d{1,5}+")) {
@@ -351,7 +403,7 @@ public class JsonRpcHttpService {
                       .list()
                       .stream()
                       .map(JsonRpcResponse.class::cast)
-                      .filter(r -> isNonEmptyResponses(r))
+                      .filter(this::isNonEmptyResponses)
                       .toArray(JsonRpcResponse[]::new);
 
               routingContext.response().end(Json.encode(completed));
@@ -385,7 +437,7 @@ public class JsonRpcHttpService {
     }
 
     // Generate response
-    try (final TimingContext context = requestTimer.labels(request.getMethod()).startTimer()) {
+    try (final TimingContext ignored = requestTimer.labels(request.getMethod()).startTimer()) {
       return method.response(request);
     } catch (final InvalidJsonRpcParameters e) {
       LOG.debug(e);
