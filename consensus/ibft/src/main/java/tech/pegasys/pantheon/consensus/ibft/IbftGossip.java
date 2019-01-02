@@ -54,6 +54,7 @@ public class IbftGossip {
 
   /**
    * Constructore that attaches gossip logic to a set of peers
+   *
    * @param peers The always up to date set of connected peers that understand IBFT
    */
   public IbftGossip(IbftNetworkPeers peers) {
