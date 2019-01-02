@@ -52,10 +52,23 @@ public class IbftGossip {
             }
           });
 
+  /**
+   * Constructore that attaches gossip logic to a set of peers
+   * @param peers The always up to date set of connected peers that understand IBFT
+   */
   public IbftGossip(IbftNetworkPeers peers) {
     this.peers = peers;
   }
 
+  /**
+   * Retransmit a given proposal payload to all IBFT nodes
+   *
+   * @param payload The signed payload to retransmit
+   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
+   *     include the payload signer, that is handled implicitly
+   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
+   *     broadcast in recent memory
+   */
   public boolean gossipProposalPayload(
       SignedData<ProposalPayload> payload, Address... excludeAddresses) {
     final ProposalMessageData messageData = ProposalMessageData.create(payload);
@@ -63,6 +76,15 @@ public class IbftGossip {
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
   }
 
+  /**
+   * Retransmit a given prepare payload to all IBFT nodes
+   *
+   * @param payload The signed payload to retransmit
+   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
+   *     include the payload signer, that is handled implicitly
+   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
+   *     broadcast in recent memory
+   */
   public boolean gossipPreparePayload(
       SignedData<PreparePayload> payload, Address... excludeAddresses) {
     final PrepareMessageData messageData = PrepareMessageData.create(payload);
@@ -70,6 +92,15 @@ public class IbftGossip {
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
   }
 
+  /**
+   * Retransmit a given commit payload to all IBFT nodes
+   *
+   * @param payload The signed payload to retransmit
+   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
+   *     include the payload signer, that is handled implicitly
+   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
+   *     broadcast in recent memory
+   */
   public boolean gossipCommitPayload(
       SignedData<CommitPayload> payload, Address... excludeAddresses) {
     final CommitMessageData messageData = CommitMessageData.create(payload);
@@ -77,6 +108,15 @@ public class IbftGossip {
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
   }
 
+  /**
+   * Retransmit a given round change payload to all IBFT nodes
+   *
+   * @param payload The signed payload to retransmit
+   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
+   *     include the payload signer, that is handled implicitly
+   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
+   *     broadcast in recent memory
+   */
   public boolean gossipRoundChangePayload(
       SignedData<RoundChangePayload> payload, Address... excludeAddresses) {
     final RoundChangeMessageData messageData = RoundChangeMessageData.create(payload);
@@ -84,6 +124,15 @@ public class IbftGossip {
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
   }
 
+  /**
+   * Retransmit a given new round payload to all IBFT nodes
+   *
+   * @param payload The signed payload to retransmit
+   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
+   *     include the payload signer, that is handled implicitly
+   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
+   *     broadcast in recent memory
+   */
   public boolean gossipNewRoundPayload(
       SignedData<NewRoundPayload> payload, Address... excludeAddresses) {
     final NewRoundMessageData messageData = NewRoundMessageData.create(payload);
@@ -91,6 +140,7 @@ public class IbftGossip {
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
   }
 
+  // Checks whether a payloads signature has been seen recently, if not it performs the retransmit
   private boolean gossipMessage(
       Signature signature,
       MessageData messageData,
