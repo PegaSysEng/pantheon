@@ -36,9 +36,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-/**
- * Class responsible for rebroadcasting IBFT messages to known validators
- */
+/** Class responsible for rebroadcasting IBFT messages to known validators */
 public class IbftGossip {
   private final IbftNetworkPeers peers;
 
