@@ -43,7 +43,7 @@ public class IbftGetValidatorsByBlockNumberTest {
   @Mock private IbftBlockInterface ibftBlockInterface;
   @Mock private JsonRpcRequest request;
 
-  private JsonRpcParameter parameters = new JsonRpcParameter();
+  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private IbftGetValidatorsByBlockNumber method;
 
   @Before
