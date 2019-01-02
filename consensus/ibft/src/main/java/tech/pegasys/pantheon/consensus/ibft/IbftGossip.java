@@ -36,10 +36,15 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Class responsible for rebroadcasting IBFT messages to known validators
+ */
 public class IbftGossip {
   private final IbftNetworkPeers peers;
 
+  // Size of the seenMessages cache, should end up utilising 65bytes * this number + some meta data
   private static final int SEEN_MESSAGES_SIZE = 10_000;
+
   // Set that starts evicting members when it hits capacity
   private final Set<Signature> seenMessages =
       Collections.newSetFromMap(
