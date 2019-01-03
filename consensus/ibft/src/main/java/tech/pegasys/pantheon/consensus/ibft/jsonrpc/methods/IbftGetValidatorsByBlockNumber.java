@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods;
 
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AbstractBlockParameterMethod;
@@ -27,16 +26,13 @@ import java.util.Optional;
 public class IbftGetValidatorsByBlockNumber extends AbstractBlockParameterMethod
     implements JsonRpcMethod {
 
-  private final Blockchain blockchain;
   private final IbftBlockInterface ibftBlockInterface;
 
   public IbftGetValidatorsByBlockNumber(
       final BlockchainQueries blockchainQueries,
-      final Blockchain blockchain,
       final IbftBlockInterface ibftBlockInterface,
       final JsonRpcParameter parameters) {
     super(blockchainQueries, parameters);
-    this.blockchain = blockchain;
     this.ibftBlockInterface = ibftBlockInterface;
   }
 
@@ -47,7 +43,7 @@ public class IbftGetValidatorsByBlockNumber extends AbstractBlockParameterMethod
 
   @Override
   protected Object resultByBlockNumber(final JsonRpcRequest request, final long blockNumber) {
-    Optional<BlockHeader> blockHeader = blockchain.getBlockHeader(blockNumber);
+    Optional<BlockHeader> blockHeader = blockchainQueries().getBlockHeaderByNumber(blockNumber);
     return blockHeader.map(header -> ibftBlockInterface.validatorsInBlock(header)).orElse(null);
   }
 

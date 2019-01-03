@@ -44,10 +44,7 @@ public class IbftJsonRpcMethodsFactory {
           new IbftProposeValidatorVote(
               context.getConsensusState().getVoteProposer(), jsonRpcParameter),
           new IbftGetValidatorsByBlockNumber(
-              blockchainQueries,
-              blockchainQueries.getBlockchain(),
-              new IbftBlockInterface(),
-              jsonRpcParameter),
+              blockchainQueries, new IbftBlockInterface(), jsonRpcParameter),
           new IbftDiscardValidatorVote(
               context.getConsensusState().getVoteProposer(), jsonRpcParameter));
     }

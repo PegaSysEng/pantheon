@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
@@ -38,7 +37,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class IbftGetValidatorsByBlockNumberTest {
 
   @Mock private BlockchainQueries blockchainQueries;
-  @Mock private Blockchain blockchain;
   @Mock private BlockHeader blockHeader;
   @Mock private IbftBlockInterface ibftBlockInterface;
   @Mock private JsonRpcRequest request;
@@ -48,9 +46,7 @@ public class IbftGetValidatorsByBlockNumberTest {
 
   @Before
   public void setUp() {
-    method =
-        new IbftGetValidatorsByBlockNumber(
-            blockchainQueries, blockchain, ibftBlockInterface, parameters);
+    method = new IbftGetValidatorsByBlockNumber(blockchainQueries, ibftBlockInterface, parameters);
   }
 
   @Test
@@ -67,7 +63,7 @@ public class IbftGetValidatorsByBlockNumberTest {
 
   @Test
   public void shouldReturnListOfValidatorsFromBlock() {
-    when(blockchain.getBlockHeader(12)).thenReturn(Optional.of(blockHeader));
+    when(blockchainQueries.getBlockHeaderByNumber(12)).thenReturn(Optional.of(blockHeader));
     final List<Address> addresses = Collections.singletonList(Address.ID);
     when(ibftBlockInterface.validatorsInBlock(blockHeader)).thenReturn(addresses);
     Object result = method.resultByBlockNumber(request, 12);
