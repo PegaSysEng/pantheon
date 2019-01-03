@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -111,7 +112,8 @@ public class IbftGossipTest {
       final Function<SignedData<P>, Boolean> gossiper) {
     final KeyPair keypair = KeyPair.generate();
     final SignedData<P> payload = createPayload.apply(keypair);
-    gossiper.apply(payload);
+    final boolean gossipResult = gossiper.apply(payload);
+    assertThat(gossipResult).isTrue();
     final MessageData messageData = createMessageData.apply(payload);
     verify(ibftNetworkPeers)
         .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
@@ -125,7 +127,8 @@ public class IbftGossipTest {
     final KeyPair keypair2 = KeyPair.generate();
     final Address key2Address = Util.publicKeyToAddress(keypair2.getPublicKey());
     final SignedData<P> payload = createPayload.apply(keypair);
-    gossiper.apply(payload, key2Address);
+    final boolean gossipResult = gossiper.apply(payload, key2Address);
+    assertThat(gossipResult).isTrue();
     final MessageData messageData = createMessageData.apply(payload);
     verify(ibftNetworkPeers)
         .multicastToValidatorsExcept(messageData, newArrayList(key2Address, payload.getSender()));
@@ -137,8 +140,10 @@ public class IbftGossipTest {
       final Function<SignedData<P>, Boolean> gossiper) {
     final KeyPair keypair = KeyPair.generate();
     final SignedData<P> payload = createPayload.apply(keypair);
-    gossiper.apply(payload);
-    gossiper.apply(payload);
+    final boolean gossip1Result = gossiper.apply(payload);
+    final boolean gossip2Result = gossiper.apply(payload);
+    assertThat(gossip1Result).isTrue();
+    assertThat(gossip2Result).isFalse();
     final MessageData messageData = createMessageData.apply(payload);
     verify(ibftNetworkPeers, times(1))
         .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
