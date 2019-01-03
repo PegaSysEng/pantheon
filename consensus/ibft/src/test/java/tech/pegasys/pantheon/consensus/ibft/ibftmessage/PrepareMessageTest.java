@@ -65,6 +65,6 @@ public class PrepareMessageTest {
     when(messageData.getCode()).thenReturn(42);
     assertThatThrownBy(() -> PrepareMessageData.fromMessageData(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Message has code 42 and thus is not a PrepareMessageData");
+        .hasMessageContaining("MessageData has code 42 and thus is not a PrepareMessageData");
   }
 }

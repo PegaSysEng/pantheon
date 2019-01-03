@@ -65,6 +65,6 @@ public class CommitMessageTest {
     when(messageData.getCode()).thenReturn(42);
     assertThatThrownBy(() -> CommitMessageData.fromMessageData(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Message has code 42 and thus is not a CommitMessageData");
+        .hasMessageContaining("MessageData has code 42 and thus is not a CommitMessageData");
   }
 }

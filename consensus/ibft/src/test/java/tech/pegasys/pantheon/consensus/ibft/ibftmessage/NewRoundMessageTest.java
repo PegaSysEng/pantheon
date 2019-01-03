@@ -65,6 +65,6 @@ public class NewRoundMessageTest {
     when(messageData.getCode()).thenReturn(42);
     assertThatThrownBy(() -> NewRoundMessageData.fromMessageData(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Message has code 42 and thus is not a NewRoundMessageData");
+        .hasMessageContaining("MessageData has code 42 and thus is not a NewRoundMessageData");
   }
 }
