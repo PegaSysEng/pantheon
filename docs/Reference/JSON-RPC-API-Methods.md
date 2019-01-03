@@ -1102,7 +1102,7 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 ### eth_newFilter
 
-Creates a log filter. To poll for logs, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a log filter. To poll for logs associated with the created filter, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
