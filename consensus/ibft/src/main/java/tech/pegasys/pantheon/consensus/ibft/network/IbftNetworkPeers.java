@@ -55,7 +55,7 @@ public class IbftNetworkPeers {
   }
 
   public void multicastToValidatorsExcept(
-      final MessageData message, Collection<Address> exceptAddresses) {
+      final MessageData message, final Collection<Address> exceptAddresses) {
     final Collection<Address> validators = validatorProvider.getValidators();
     validators.removeIf(exceptAddresses::contains);
     sendMessageToSpecificAddresses(validators, message);
