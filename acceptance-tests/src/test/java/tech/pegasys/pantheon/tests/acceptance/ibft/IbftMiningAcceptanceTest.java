@@ -23,7 +23,7 @@ import org.junit.Test;
 public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
-  public void shouldMineTransactionsOnSingleNode() throws IOException {
+  public void shouldMineOnSingleNode() throws IOException {
     final PantheonNode minerNode = pantheon.createIbftNode("miner1");
     cluster.start(minerNode);
 
@@ -41,7 +41,7 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldMineTransactionsOnMultipleNodes() throws IOException {
+  public void shouldMineOnMultipleNodes() throws IOException {
     final PantheonNode minerNode1 = pantheon.createIbftNode("miner1");
     final PantheonNode minerNode2 = pantheon.createIbftNode("miner2");
     final PantheonNode minerNode3 = pantheon.createIbftNode("miner3");
@@ -65,7 +65,7 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldStillMineTransactionsWhenANodeFailsAndHaveSufficientValidators() throws IOException {
+  public void shouldStillMineWhenANodeFailsAndHasSufficientValidators() throws IOException {
     final PantheonNode minerNode1 = pantheon.createIbftNode("miner1");
     final PantheonNode minerNode2 = pantheon.createIbftNode("miner2");
     final PantheonNode minerNode3 = pantheon.createIbftNode("miner3");
