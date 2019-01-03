@@ -35,7 +35,8 @@ The Enterprise Ethereum `restricted` privacy will be implemented.
 The 1.x series of EIPs that are currently under early development will be implemented as they are ready.  In addition, the team will work on helping the specification of the Ethereum roadmap.
 
 ## Future
-In addition to making incremental improvements to the above features, some of the bigger future improvements include:
+In addition to making incremental improvements to the above features, there will be some bigger pieces of work.  
+These are deliberately kept vague at this time, and will be elaborated upon when they move up to the now and next levels of work.
 * Ethereum 2.0
 * Advanced Privacy
 * Alternate Consensus Mechanisms
