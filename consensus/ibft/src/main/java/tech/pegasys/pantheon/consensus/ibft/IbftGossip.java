@@ -47,7 +47,8 @@ public class IbftGossip {
   private final Set<Signature> seenMessages =
       Collections.newSetFromMap(
           new LinkedHashMap<Signature, Boolean>() {
-            protected boolean removeEldestEntry(Map.Entry<Signature, Boolean> eldest) {
+            @Override
+            protected boolean removeEldestEntry(final Map.Entry<Signature, Boolean> eldest) {
               return size() > SEEN_MESSAGES_SIZE;
             }
           });
@@ -57,7 +58,7 @@ public class IbftGossip {
    *
    * @param peers The always up to date set of connected peers that understand IBFT
    */
-  public IbftGossip(IbftNetworkPeers peers) {
+  public IbftGossip(final IbftNetworkPeers peers) {
     this.peers = peers;
   }
 
@@ -71,7 +72,7 @@ public class IbftGossip {
    *     broadcast in recent memory
    */
   public boolean gossipProposalPayload(
-      SignedData<ProposalPayload> payload, Address... excludeAddresses) {
+      final SignedData<ProposalPayload> payload, final Address... excludeAddresses) {
     final ProposalMessageData messageData = ProposalMessageData.create(payload);
     return gossipMessage(
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
@@ -87,7 +88,7 @@ public class IbftGossip {
    *     broadcast in recent memory
    */
   public boolean gossipPreparePayload(
-      SignedData<PreparePayload> payload, Address... excludeAddresses) {
+      final SignedData<PreparePayload> payload, final Address... excludeAddresses) {
     final PrepareMessageData messageData = PrepareMessageData.create(payload);
     return gossipMessage(
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
@@ -103,7 +104,7 @@ public class IbftGossip {
    *     broadcast in recent memory
    */
   public boolean gossipCommitPayload(
-      SignedData<CommitPayload> payload, Address... excludeAddresses) {
+      final SignedData<CommitPayload> payload, final Address... excludeAddresses) {
     final CommitMessageData messageData = CommitMessageData.create(payload);
     return gossipMessage(
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
@@ -119,7 +120,7 @@ public class IbftGossip {
    *     broadcast in recent memory
    */
   public boolean gossipRoundChangePayload(
-      SignedData<RoundChangePayload> payload, Address... excludeAddresses) {
+      final SignedData<RoundChangePayload> payload, final Address... excludeAddresses) {
     final RoundChangeMessageData messageData = RoundChangeMessageData.create(payload);
     return gossipMessage(
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
@@ -135,7 +136,7 @@ public class IbftGossip {
    *     broadcast in recent memory
    */
   public boolean gossipNewRoundPayload(
-      SignedData<NewRoundPayload> payload, Address... excludeAddresses) {
+      final SignedData<NewRoundPayload> payload, final Address... excludeAddresses) {
     final NewRoundMessageData messageData = NewRoundMessageData.create(payload);
     return gossipMessage(
         payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
@@ -143,10 +144,10 @@ public class IbftGossip {
 
   // Checks whether a payloads signature has been seen recently, if not it performs the retransmit
   private boolean gossipMessage(
-      Signature signature,
-      MessageData messageData,
-      Address payloadSigner,
-      Address... excludeAddresses) {
+      final Signature signature,
+      final MessageData messageData,
+      final Address payloadSigner,
+      final Address... excludeAddresses) {
     if (seenMessages.contains(signature)) {
       return false;
     } else {
