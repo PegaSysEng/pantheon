@@ -779,17 +779,20 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 ### eth_estimateGas
 
-Returns an estimate of how much gas is needed for the transaction to complete. The estimate transaction is not added
-to the blockchain. The estimate can be greater than the amount of gas actually used by the transaction, for reasons
-including EVM mechanics and node performance.
+Returns an estimate of how much gas is needed for the transaction to complete. The estimate process does not use
+gas and is not added to the blockchain as a transaction. The estimate can be greater than the amount of gas that the
+transaction actually uses, for reasons including EVM mechanics and node performance.
+
+The `eth_estimateGas` call does not send a transaction. You must make a subsequent call to
+[eth_sendRawTransaction](#eth_sendRawTransaction) to execute the transaction.
 
 **Parameters**
 
 !!!note
-    The transaction call object parameters are the same as those for eth_call, except that in this method all the
-    fields are optional. If you do not specify a gas limit, Pantheon uses the gas limit from the block at the head
-    of the chain as an upper limit. If the amount of gas needed is higher than the estimated upper limit, the call
-    or transaction might not have enough gas to execute.
+    The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`
+    all fields are optional. If you do not specify a `gas` amount in the transaction call object, Pantheon uses the
+    `gasLimit` amount from the block at the head of the chain as the upper limit. If the amount of gas needed is higher
+    than the estimated upper limit, the transaction might not have enough gas to execute.
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
@@ -797,7 +800,7 @@ including EVM mechanics and node performance.
 
 `result` : `quantity` -  Amount of gas used.
 
-The following returns an estimate of 21000 wei (0x5208) for the transaction.
+The following example returns an estimate of 21000 wei (0x5208) for the transaction.
 
 !!! example
     ```bash tab="curl HTTP request"
