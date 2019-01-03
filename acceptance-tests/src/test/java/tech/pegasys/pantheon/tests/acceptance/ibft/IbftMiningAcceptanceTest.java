@@ -63,4 +63,23 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
     minerNode4.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
     cluster.verify(receiver.balanceEquals(6));
   }
+
+  @Test
+  public void shouldStillMineTransactionsWhenANodeFailsAndHaveSufficientValidators() throws IOException {
+    final PantheonNode minerNode1 = pantheon.createIbftNode("miner1");
+    final PantheonNode minerNode2 = pantheon.createIbftNode("miner2");
+    final PantheonNode minerNode3 = pantheon.createIbftNode("miner3");
+    final PantheonNode minerNode4 = pantheon.createIbftNode("miner4");
+    cluster.start(minerNode1, minerNode2, minerNode3, minerNode4);
+
+    final Account receiver = accounts.createAccount("account2");
+
+    cluster.stopNode(minerNode4);
+    minerNode1.verify(net.awaitPeerCount(2));
+
+    minerNode1.execute(transactions.createTransfer(receiver, 80));
+    minerNode1.verify(receiver.balanceEquals(80));
+    minerNode2.verify(receiver.balanceEquals(80));
+    minerNode3.verify(receiver.balanceEquals(80));
+  }
 }
