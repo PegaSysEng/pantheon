@@ -18,25 +18,28 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.util.Subscribers;
 
 public class IbftRoundFactory {
-
   private final IbftFinalState finalState;
-
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final ProtocolContext<IbftContext> protocolContext;
   private final ProtocolSchedule<IbftContext> protocolSchedule;
+  private final Subscribers<MinedBlockObserver> minedBlockObservers;
 
   public IbftRoundFactory(
       final IbftFinalState finalState,
       final ProtocolContext<IbftContext> protocolContext,
-      final ProtocolSchedule<IbftContext> protocolSchedule) {
+      final ProtocolSchedule<IbftContext> protocolSchedule,
+      final Subscribers<MinedBlockObserver> minedBlockObservers) {
     this.finalState = finalState;
     this.blockCreatorFactory = finalState.getBlockCreatorFactory();
     this.protocolContext = protocolContext;
     this.protocolSchedule = protocolSchedule;
+    this.minedBlockObservers = minedBlockObservers;
   }
 
   public IbftRound createNewRound(final BlockHeader parentHeader, final int round) {
@@ -70,7 +73,7 @@ public class IbftRoundFactory {
         blockCreator,
         protocolContext,
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockImporter(),
-        finalState.getMinedBlockObservers(),
+        minedBlockObservers,
         finalState.getNodeKeys(),
         finalState.getMessageFactory(),
         finalState.getTransmitter());

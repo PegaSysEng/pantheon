@@ -228,8 +228,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
             blockHeaderValidator,
-            Clock.systemUTC(),
-            minedBlockObservers);
+            Clock.systemUTC());
 
     final MessageValidatorFactory messageValidatorFactory =
         new MessageValidatorFactory(proposerSelector, blockHeaderValidator, protocolContext);
@@ -240,7 +239,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             finalState,
             new IbftBlockHeightManagerFactory(
                 finalState,
-                new IbftRoundFactory(finalState, protocolContext, protocolSchedule),
+                new IbftRoundFactory(
+                    finalState, protocolContext, protocolSchedule, minedBlockObservers),
                 messageValidatorFactory,
                 protocolContext));
 
