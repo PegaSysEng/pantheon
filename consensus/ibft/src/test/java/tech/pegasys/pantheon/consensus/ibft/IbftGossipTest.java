@@ -106,9 +106,9 @@ public class IbftGossipTest {
   }
 
   private <P extends Payload> void rebroadcastToAllExceptSigner(
-      Function<KeyPair, SignedData<P>> createPayload,
-      Function<SignedData<P>, MessageData> createMessageData,
-      Function<SignedData<P>, Boolean> gossiper) {
+      final Function<KeyPair, SignedData<P>> createPayload,
+      final Function<SignedData<P>, MessageData> createMessageData,
+      final Function<SignedData<P>, Boolean> gossiper) {
     final KeyPair keypair = KeyPair.generate();
     final SignedData<P> payload = createPayload.apply(keypair);
     gossiper.apply(payload);
@@ -118,9 +118,9 @@ public class IbftGossipTest {
   }
 
   private <P extends Payload> void rebroadcastToAllExceptSignerAndSuppliedExceptions(
-      Function<KeyPair, SignedData<P>> createPayload,
-      Function<SignedData<P>, MessageData> createMessageData,
-      BiFunction<SignedData<P>, Address, Boolean> gossiper) {
+      final Function<KeyPair, SignedData<P>> createPayload,
+      final Function<SignedData<P>, MessageData> createMessageData,
+      final BiFunction<SignedData<P>, Address, Boolean> gossiper) {
     final KeyPair keypair = KeyPair.generate();
     final KeyPair keypair2 = KeyPair.generate();
     final Address key2Address = Util.publicKeyToAddress(keypair2.getPublicKey());
@@ -132,9 +132,9 @@ public class IbftGossipTest {
   }
 
   private <P extends Payload> void rebroadcastOnlyOnce(
-      Function<KeyPair, SignedData<P>> createPayload,
-      Function<SignedData<P>, MessageData> createMessageData,
-      Function<SignedData<P>, Boolean> gossiper) {
+      final Function<KeyPair, SignedData<P>> createPayload,
+      final Function<SignedData<P>, MessageData> createMessageData,
+      final Function<SignedData<P>, Boolean> gossiper) {
     final KeyPair keypair = KeyPair.generate();
     final SignedData<P> payload = createPayload.apply(keypair);
     gossiper.apply(payload);
