@@ -40,7 +40,6 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -56,11 +55,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.base.Suppliers;
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import io.vertx.core.Vertx;
@@ -133,7 +130,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
-  private final Supplier<MetricsSystem> metricsSystem = Suppliers.memoize(this::supplyMetricSystem);
+  private final MetricsSystem metricsSystem = PrometheusMetricsSystem.init();
 
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
@@ -545,7 +542,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(isDevMode)
           .nodePrivateKeyFile(getNodePrivateKeyFile())
-          .metricsSystem(metricsSystem.get())
+          .metricsSystem(metricsSystem)
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(new CommandLine(this), e.getMessage());
@@ -623,7 +620,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .webSocketConfiguration(webSocketConfiguration)
             .dataDir(dataDir())
             .bannedNodeIds(bannedNodeIds)
-            .metricsSystem(metricsSystem.get())
+            .metricsSystem(metricsSystem)
             .permissioningConfiguration(permissioningConfiguration)
             .build();
 
@@ -711,13 +708,5 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private boolean isFullInstantiation() {
     return !isDocker;
-  }
-
-  private MetricsSystem supplyMetricSystem() {
-    if (rpcApis.contains(RpcApis.METRICS)) {
-      return PrometheusMetricsSystem.init();
-    } else {
-      return new NoOpMetricsSystem();
-    }
   }
 }
