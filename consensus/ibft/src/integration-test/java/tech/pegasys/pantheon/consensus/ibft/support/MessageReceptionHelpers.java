@@ -54,7 +54,7 @@ public class MessageReceptionHelpers {
   }
 
   public static boolean msgMatchesExpected(
-      final MessageData actual, SignedData<? extends Payload> expected) {
+      final MessageData actual, final SignedData<? extends Payload> expected) {
     final Payload expectedPayload = expected.getPayload();
     if (expectedPayload instanceof ProposalPayload) {
       final SignedData<ProposalPayload> actualPayload =

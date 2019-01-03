@@ -22,9 +22,9 @@ public class RoundSpecificNodeRoles {
   private final List<ValidatorPeer> nonProposingPeers;
 
   public RoundSpecificNodeRoles(
-      ValidatorPeer proposer,
-      Collection<ValidatorPeer> peers,
-      List<ValidatorPeer> nonProposingPeers) {
+      final ValidatorPeer proposer,
+      final Collection<ValidatorPeer> peers,
+      final List<ValidatorPeer> nonProposingPeers) {
     this.proposer = proposer;
     this.peers = peers;
     this.nonProposingPeers = nonProposingPeers;

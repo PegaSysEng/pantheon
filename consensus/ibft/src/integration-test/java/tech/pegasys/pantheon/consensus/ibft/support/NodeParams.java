@@ -19,7 +19,7 @@ public class NodeParams {
   private Address address;
   private KeyPair nodeKeys;
 
-  public NodeParams(Address address, KeyPair nodeKeys) {
+  public NodeParams(final Address address, final KeyPair nodeKeys) {
     this.address = address;
     this.nodeKeys = nodeKeys;
   }

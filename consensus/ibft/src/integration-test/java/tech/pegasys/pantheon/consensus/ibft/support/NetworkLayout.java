@@ -30,7 +30,8 @@ public class NetworkLayout {
   final TreeMap<Address, NodeParams> addressKeyMap;
   final List<NodeParams> remotePeers;
 
-  public NetworkLayout(NodeParams localNode, TreeMap<Address, NodeParams> addressKeyMap) {
+  public NetworkLayout(
+      final NodeParams localNode, final TreeMap<Address, NodeParams> addressKeyMap) {
     this.localNode = localNode;
     this.addressKeyMap = addressKeyMap;
     this.remotePeers = new ArrayList<>(addressKeyMap.values());

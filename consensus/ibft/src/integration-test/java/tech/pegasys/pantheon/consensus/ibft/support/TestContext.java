@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
@@ -119,7 +120,7 @@ public class TestContext {
     return finalState.getMessageFactory();
   }
 
-  public Block createBlockForProposal(int round, long timestamp) {
+  public Block createBlockForProposal(final int round, final long timestamp) {
     return finalState
         .getBlockCreatorFactory()
         .create(blockchain.getChainHeadHeader(), round)
@@ -162,7 +163,7 @@ public class TestContext {
         new MiningParameters(
             AddressHelpers.ofValue(1),
             Wei.ZERO,
-            BytesValue.wrap("Ibft Int tests".getBytes()),
+            BytesValue.wrap("Ibft Int tests".getBytes(UTF_8)),
             true);
 
     final StubGenesisConfigOptions genesisConfigOptions = new StubGenesisConfigOptions();
