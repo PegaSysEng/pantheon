@@ -41,7 +41,7 @@ public class IbftGossip {
   private final IbftNetworkPeers peers;
 
   // Size of the seenMessages cache, should end up utilising 65bytes * this number + some meta data
-  private static final int SEEN_MESSAGES_SIZE = 10_000;
+  private final int seenMessagesSize;
 
   // Set that starts evicting members when it hits capacity
   private final Set<Signature> seenMessages =
@@ -49,9 +49,14 @@ public class IbftGossip {
           new LinkedHashMap<Signature, Boolean>() {
             @Override
             protected boolean removeEldestEntry(final Map.Entry<Signature, Boolean> eldest) {
-              return size() > SEEN_MESSAGES_SIZE;
+              return size() > seenMessagesSize;
             }
           });
+
+  IbftGossip(final IbftNetworkPeers peers, final int seenMessagesSize) {
+    this.seenMessagesSize = seenMessagesSize;
+    this.peers = peers;
+  }
 
   /**
    * Constructor that attaches gossip logic to a set of peers
@@ -59,7 +64,7 @@ public class IbftGossip {
    * @param peers The always up to date set of connected peers that understand IBFT
    */
   public IbftGossip(final IbftNetworkPeers peers) {
-    this.peers = peers;
+    this(peers, 10_000);
   }
 
   /**

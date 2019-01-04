@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -46,7 +47,7 @@ public class IbftGossipTest {
 
   @Before
   public void setup() {
-    ibftGossip = new IbftGossip(ibftNetworkPeers);
+    ibftGossip = new IbftGossip(ibftNetworkPeers, 10);
   }
 
 
@@ -211,5 +212,46 @@ public class IbftGossipTest {
         TestHelpers::createSignedNewRoundPayload,
         NewRoundMessageData::create,
         ibftGossip::gossipNewRoundPayload);
+  }
+
+  @Test
+  public void evictMessageRecordAtCapacity() {
+    final KeyPair keypair = KeyPair.generate();
+    final SignedData<ProposalPayload> payload = TestHelpers.createSignedProposalPayloadWithRound(keypair, 0);
+    final boolean gossip1Result = ibftGossip.gossipProposalPayload(payload);
+    final boolean gossip2Result = ibftGossip.gossipProposalPayload(payload);
+    assertThat(gossip1Result).isTrue();
+    assertThat(gossip2Result).isFalse();
+    final MessageData messageData = ProposalMessageData.create(payload);
+    verify(ibftNetworkPeers, times(1))
+        .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
+
+    for (int i = 1; i <= 9; i++) {
+      final SignedData<ProposalPayload> nextPayload = TestHelpers.createSignedProposalPayloadWithRound(keypair, i);
+      final boolean nextGossipResult = ibftGossip.gossipProposalPayload(nextPayload);
+      assertThat(nextGossipResult).isTrue();
+    }
+
+    final boolean gossip3Result = ibftGossip.gossipProposalPayload(payload);
+    assertThat(gossip3Result).isFalse();
+    verify(ibftNetworkPeers, times(1))
+        .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
+
+    {
+      final SignedData<ProposalPayload> nextPayload =
+          TestHelpers.createSignedProposalPayloadWithRound(keypair, 10);
+      final boolean nextGossipResult = ibftGossip.gossipProposalPayload(nextPayload);
+      assertThat(nextGossipResult).isTrue();
+    }
+
+    final boolean gossip4Result = ibftGossip.gossipProposalPayload(payload);
+    assertThat(gossip4Result).isTrue();
+    verify(ibftNetworkPeers, times(2))
+        .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
+
+    final boolean gossip5Result = ibftGossip.gossipProposalPayload(payload);
+    assertThat(gossip5Result).isFalse();
+    verify(ibftNetworkPeers, times(2))
+        .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
   }
 }

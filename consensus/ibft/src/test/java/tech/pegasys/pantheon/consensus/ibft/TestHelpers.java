@@ -63,9 +63,13 @@ public class TestHelpers {
   }
 
   public static SignedData<ProposalPayload> createSignedProposalPayload(final KeyPair signerKeys) {
+    return createSignedProposalPayloadWithRound(signerKeys, 0xFEDCBA98);
+  }
+
+  public static SignedData<ProposalPayload> createSignedProposalPayloadWithRound(final KeyPair signerKeys, final int round) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
-        new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
+        new ConsensusRoundIdentifier(0x1234567890ABCDEFL, round);
     final Block block =
         TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
     return messageFactory.createSignedProposalPayload(roundIdentifier, block);
