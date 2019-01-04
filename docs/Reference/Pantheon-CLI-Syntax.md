@@ -54,32 +54,8 @@ a [private network](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnode
 --config=/home/me/me_node/config.toml
 ```
 
-The path to the TOML configuration file.
+The path to the [TOML configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
 The default is `none`.
-The TOML file is composed of key/value pairs.
-Each key is the same as the corresponding CLI option name without the leading dashes (`--`).
-The config option is not used in the config file.
-Values must be treated according to TOML specifications for string, numbers, arrays and Booleans.
-
-!!!example "Example TOML configuration file"
-    ```toml
-    # Valid TOML config file
-    datadir="~/pantheondata" # Path
-    
-    # Network
-    bootnodes=["enode://001@123:4567", "enode://002@123:4567", "enode://003@123:4567"]
-    p2p-listen="1.2.3.4:1234" # IP:port
-    max-peers=42
-    rpc-listen="5.6.7.8:5678" # IP:port
-    ws-listen="9.10.11.12:9101" # IP:port
-    
-    # Chain
-    genesis="~/genesis.json" # Path to the custom genesis file
-    
-    # Mining
-    miner-enabled=true
-    miner-coinbase="0x0000000000000000000000000000000000000002"
-    ```
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-configuration-file).
