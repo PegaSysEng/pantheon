@@ -40,9 +40,8 @@ List of node IDs with which this node will not peer. The node ID is the public k
   
 List of comma-separated enode URLs for P2P discovery bootstrap. 
   
-When connecting to mainnet and Rinkeby, the default is a predefined list of enode URLs. 
-Specify bootnodes when [connecting to Ropsten](../Getting-Started/Starting-Pantheon.md#run-a-node-on-ropsten-testnet) or
-a [private network](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes).
+When connecting to mainnet or public testnets, the default is a predefined list of enode URLs. 
+Specify bootnodes when connecting to a [private network](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes).
 
 ### config
 
@@ -401,7 +400,7 @@ The default is: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`.
 ```bash tab="Remix IDE domain example"
 # The following allows Remix to interact with your Pantheon node without using MetaMask.
 
---rpc-cors-origins "http://remix.ethereum.org"
+--rpc-cors-origins="http://remix.ethereum.org"
 ```
 
 Specifies domain URLs for CORS validation.
