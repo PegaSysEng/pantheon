@@ -50,7 +50,6 @@ public class IbftGossipTest {
     ibftGossip = new IbftGossip(ibftNetworkPeers, 10);
   }
 
-
   private <P extends Payload> void assertRebroadcastToAllExceptSigner(
       final Function<KeyPair, SignedData<P>> createPayload,
       final Function<SignedData<P>, MessageData> createMessageData,
@@ -217,7 +216,8 @@ public class IbftGossipTest {
   @Test
   public void evictMessageRecordAtCapacity() {
     final KeyPair keypair = KeyPair.generate();
-    final SignedData<ProposalPayload> payload = TestHelpers.createSignedProposalPayloadWithRound(keypair, 0);
+    final SignedData<ProposalPayload> payload =
+        TestHelpers.createSignedProposalPayloadWithRound(keypair, 0);
     final boolean gossip1Result = ibftGossip.gossipProposalPayload(payload);
     final boolean gossip2Result = ibftGossip.gossipProposalPayload(payload);
     assertThat(gossip1Result).isTrue();
@@ -227,7 +227,8 @@ public class IbftGossipTest {
         .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
 
     for (int i = 1; i <= 9; i++) {
-      final SignedData<ProposalPayload> nextPayload = TestHelpers.createSignedProposalPayloadWithRound(keypair, i);
+      final SignedData<ProposalPayload> nextPayload =
+          TestHelpers.createSignedProposalPayloadWithRound(keypair, i);
       final boolean nextGossipResult = ibftGossip.gossipProposalPayload(nextPayload);
       assertThat(nextGossipResult).isTrue();
     }
