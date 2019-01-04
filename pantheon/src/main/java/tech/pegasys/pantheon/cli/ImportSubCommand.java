@@ -56,7 +56,16 @@ class ImportSubCommand implements Runnable {
     checkNotNull(blockImporter);
 
     try {
-      blockImporter.importBlockchain(blocksImportPath, parentCommand.buildController());
+      final PantheonController<?> pantheonController = parentCommand.buildController();
+      final MetricsConfiguration metricsConfiguration = parentCommand.metricsConfiguration();
+      if (metricsConfiguration.isEnabled()) {
+        metricsHttpService =
+            Optional.of(
+                new MetricsHttpService(
+                    Vertx.vertx(), metricsConfiguration, parentCommand.getMetricsSystem()));
+        metricsHttpService.ifPresent(MetricsHttpService::start);
+      }
+      blockImporter.importBlockchain(blocksImportPath, pantheonController);
     } catch (final FileNotFoundException e) {
       throw new ExecutionException(
           new CommandLine(this), "Could not find file to import: " + blocksImportPath);
