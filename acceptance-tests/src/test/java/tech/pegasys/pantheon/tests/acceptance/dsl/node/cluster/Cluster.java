@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +109,12 @@ public class Cluster implements AutoCloseable {
 
   public void verify(final Condition expected) {
     for (final Node node : nodes.values()) {
+      expected.verify(node);
+    }
+  }
+
+  public void verify(final Condition expected, Collection<Node> nodes) {
+    for (final Node node : nodes) {
       expected.verify(node);
     }
   }
