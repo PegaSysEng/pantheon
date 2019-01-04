@@ -97,9 +97,9 @@ public class IbftController {
         final SignedData<ProposalPayload> signedProposalPayload =
             ProposalMessageData.fromMessageData(messageData).decode();
         if (processMessage(signedProposalPayload, message)) {
-          currentHeightManager.handleProposalMessage(signedProposalPayload);
           gossiper.gossipProposalPayload(
               signedProposalPayload, message.getConnection().getPeer().getAddress());
+          currentHeightManager.handleProposalMessage(signedProposalPayload);
         }
         break;
 
@@ -107,9 +107,9 @@ public class IbftController {
         final SignedData<PreparePayload> signedPreparePayload =
             PrepareMessageData.fromMessageData(messageData).decode();
         if (processMessage(signedPreparePayload, message)) {
-          currentHeightManager.handlePrepareMessage(signedPreparePayload);
           gossiper.gossipPreparePayload(
               signedPreparePayload, message.getConnection().getPeer().getAddress());
+          currentHeightManager.handlePrepareMessage(signedPreparePayload);
         }
         break;
 
@@ -117,9 +117,9 @@ public class IbftController {
         final SignedData<CommitPayload> signedCommitPayload =
             CommitMessageData.fromMessageData(messageData).decode();
         if (processMessage(signedCommitPayload, message)) {
-          currentHeightManager.handleCommitMessage(signedCommitPayload);
           gossiper.gossipCommitPayload(
               signedCommitPayload, message.getConnection().getPeer().getAddress());
+          currentHeightManager.handleCommitMessage(signedCommitPayload);
         }
         break;
 
@@ -127,9 +127,9 @@ public class IbftController {
         final SignedData<RoundChangePayload> signedRoundChangePayload =
             RoundChangeMessageData.fromMessageData(messageData).decode();
         if (processMessage(signedRoundChangePayload, message)) {
-          currentHeightManager.handleRoundChangeMessage(signedRoundChangePayload);
           gossiper.gossipRoundChangePayload(
               signedRoundChangePayload, message.getConnection().getPeer().getAddress());
+          currentHeightManager.handleRoundChangeMessage(signedRoundChangePayload);
         }
         break;
 
@@ -137,9 +137,9 @@ public class IbftController {
         final SignedData<NewRoundPayload> signedNewRoundPayload =
             NewRoundMessageData.fromMessageData(messageData).decode();
         if (processMessage(signedNewRoundPayload, message)) {
-          currentHeightManager.handleNewRoundMessage(signedNewRoundPayload);
           gossiper.gossipNewRoundPayload(
               signedNewRoundPayload, message.getConnection().getPeer().getAddress());
+          currentHeightManager.handleNewRoundMessage(signedNewRoundPayload);
         }
         break;
 

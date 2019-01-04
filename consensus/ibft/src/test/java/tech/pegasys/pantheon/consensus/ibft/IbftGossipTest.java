@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -23,27 +22,14 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
-import java.math.BigInteger;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -63,50 +49,8 @@ public class IbftGossipTest {
     ibftGossip = new IbftGossip(ibftNetworkPeers);
   }
 
-  private SignedData<ProposalPayload> createSignedProposalPayload(final KeyPair signerKeys) {
-    final MessageFactory messageFactory = new MessageFactory(signerKeys);
-    final ConsensusRoundIdentifier roundIdentifier =
-        new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    final Block block =
-        TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
-    return messageFactory.createSignedProposalPayload(roundIdentifier, block);
-  }
 
-  private SignedData<PreparePayload> createSignedPreparePayload(final KeyPair signerKeys) {
-    final MessageFactory messageFactory = new MessageFactory(signerKeys);
-    final ConsensusRoundIdentifier roundIdentifier =
-        new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    return messageFactory.createSignedPreparePayload(
-        roundIdentifier, Hash.fromHexStringLenient("0"));
-  }
-
-  private SignedData<CommitPayload> createSignedCommitPayload(final KeyPair signerKeys) {
-    final MessageFactory messageFactory = new MessageFactory(signerKeys);
-    final ConsensusRoundIdentifier roundIdentifier =
-        new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    return messageFactory.createSignedCommitPayload(
-        roundIdentifier,
-        Hash.fromHexStringLenient("0"),
-        Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0));
-  }
-
-  private SignedData<RoundChangePayload> createSignedRoundChangePayload(final KeyPair signerKeys) {
-    final MessageFactory messageFactory = new MessageFactory(signerKeys);
-    final ConsensusRoundIdentifier roundIdentifier =
-        new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    return messageFactory.createSignedRoundChangePayload(roundIdentifier, Optional.empty());
-  }
-
-  private SignedData<NewRoundPayload> createSignedNewRoundPayload(final KeyPair signerKeys) {
-    final MessageFactory messageFactory = new MessageFactory(signerKeys);
-    final ConsensusRoundIdentifier roundIdentifier =
-        new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    final SignedData<ProposalPayload> proposalPayload = createSignedProposalPayload(signerKeys);
-    return messageFactory.createSignedNewRoundPayload(
-        roundIdentifier, new RoundChangeCertificate(newArrayList()), proposalPayload);
-  }
-
-  private <P extends Payload> void rebroadcastToAllExceptSigner(
+  private <P extends Payload> void assertRebroadcastToAllExceptSigner(
       final Function<KeyPair, SignedData<P>> createPayload,
       final Function<SignedData<P>, MessageData> createMessageData,
       final Function<SignedData<P>, Boolean> gossiper) {
@@ -119,7 +63,7 @@ public class IbftGossipTest {
         .multicastToValidatorsExcept(messageData, newArrayList(payload.getSender()));
   }
 
-  private <P extends Payload> void rebroadcastToAllExceptSignerAndSuppliedExceptions(
+  private <P extends Payload> void assertRebroadcastToAllExceptSignerAndSuppliedExceptions(
       final Function<KeyPair, SignedData<P>> createPayload,
       final Function<SignedData<P>, MessageData> createMessageData,
       final BiFunction<SignedData<P>, Address, Boolean> gossiper) {
@@ -134,7 +78,7 @@ public class IbftGossipTest {
         .multicastToValidatorsExcept(messageData, newArrayList(key2Address, payload.getSender()));
   }
 
-  private <P extends Payload> void rebroadcastOnlyOnce(
+  private <P extends Payload> void assertRebroadcastOnlyOnce(
       final Function<KeyPair, SignedData<P>> createPayload,
       final Function<SignedData<P>, MessageData> createMessageData,
       final Function<SignedData<P>, Boolean> gossiper) {
@@ -150,121 +94,121 @@ public class IbftGossipTest {
   }
 
   @Test
-  public void rebroadcastsProposalToAllExceptSigner() {
-    rebroadcastToAllExceptSigner(
-        this::createSignedProposalPayload,
+  public void assertRebroadcastsProposalToAllExceptSigner() {
+    assertRebroadcastToAllExceptSigner(
+        TestHelpers::createSignedProposalPayload,
         ProposalMessageData::create,
         ibftGossip::gossipProposalPayload);
   }
 
   @Test
-  public void rebroadcastsProposalToAllExceptSignerAndSuppliedExceptions() {
-    rebroadcastToAllExceptSignerAndSuppliedExceptions(
-        this::createSignedProposalPayload,
+  public void assertRebroadcastsProposalToAllExceptSignerAndSuppliedExceptions() {
+    assertRebroadcastToAllExceptSignerAndSuppliedExceptions(
+        TestHelpers::createSignedProposalPayload,
         ProposalMessageData::create,
         ibftGossip::gossipProposalPayload);
   }
 
   @Test
-  public void rebroadcastsProposalOnlyOnce() {
-    rebroadcastOnlyOnce(
-        this::createSignedProposalPayload,
+  public void assertRebroadcastsProposalOnlyOnce() {
+    assertRebroadcastOnlyOnce(
+        TestHelpers::createSignedProposalPayload,
         ProposalMessageData::create,
         ibftGossip::gossipProposalPayload);
   }
 
   @Test
-  public void rebroadcastsPrepareToAllExceptSigner() {
-    rebroadcastToAllExceptSigner(
-        this::createSignedPreparePayload,
+  public void assertRebroadcastsPrepareToAllExceptSigner() {
+    assertRebroadcastToAllExceptSigner(
+        TestHelpers::createSignedPreparePayload,
         PrepareMessageData::create,
         ibftGossip::gossipPreparePayload);
   }
 
   @Test
-  public void rebroadcastsPrepareToAllExceptSignerAndSuppliedExceptions() {
-    rebroadcastToAllExceptSignerAndSuppliedExceptions(
-        this::createSignedPreparePayload,
+  public void assertRebroadcastsPrepareToAllExceptSignerAndSuppliedExceptions() {
+    assertRebroadcastToAllExceptSignerAndSuppliedExceptions(
+        TestHelpers::createSignedPreparePayload,
         PrepareMessageData::create,
         ibftGossip::gossipPreparePayload);
   }
 
   @Test
-  public void rebroadcastsPrepareOnlyOnce() {
-    rebroadcastOnlyOnce(
-        this::createSignedPreparePayload,
+  public void assertRebroadcastsPrepareOnlyOnce() {
+    assertRebroadcastOnlyOnce(
+        TestHelpers::createSignedPreparePayload,
         PrepareMessageData::create,
         ibftGossip::gossipPreparePayload);
   }
 
   @Test
-  public void rebroadcastsCommitToAllExceptSigner() {
-    rebroadcastToAllExceptSigner(
-        this::createSignedCommitPayload,
+  public void assertRebroadcastsCommitToAllExceptSigner() {
+    assertRebroadcastToAllExceptSigner(
+        TestHelpers::createSignedCommitPayload,
         CommitMessageData::create,
         ibftGossip::gossipCommitPayload);
   }
 
   @Test
-  public void rebroadcastsCommitToAllExceptSignerAndSuppliedExceptions() {
-    rebroadcastToAllExceptSignerAndSuppliedExceptions(
-        this::createSignedCommitPayload,
+  public void assertRebroadcastsCommitToAllExceptSignerAndSuppliedExceptions() {
+    assertRebroadcastToAllExceptSignerAndSuppliedExceptions(
+        TestHelpers::createSignedCommitPayload,
         CommitMessageData::create,
         ibftGossip::gossipCommitPayload);
   }
 
   @Test
-  public void rebroadcastsCommitOnlyOnce() {
-    rebroadcastOnlyOnce(
-        this::createSignedCommitPayload,
+  public void assertRebroadcastsCommitOnlyOnce() {
+    assertRebroadcastOnlyOnce(
+        TestHelpers::createSignedCommitPayload,
         CommitMessageData::create,
         ibftGossip::gossipCommitPayload);
   }
 
   @Test
-  public void rebroadcastsRoundChangeToAllExceptSigner() {
-    rebroadcastToAllExceptSigner(
-        this::createSignedRoundChangePayload,
+  public void assertRebroadcastsRoundChangeToAllExceptSigner() {
+    assertRebroadcastToAllExceptSigner(
+        TestHelpers::createSignedRoundChangePayload,
         RoundChangeMessageData::create,
         ibftGossip::gossipRoundChangePayload);
   }
 
   @Test
-  public void rebroadcastsRoundChangeToAllExceptSignerAndSuppliedExceptions() {
-    rebroadcastToAllExceptSignerAndSuppliedExceptions(
-        this::createSignedRoundChangePayload,
+  public void assertRebroadcastsRoundChangeToAllExceptSignerAndSuppliedExceptions() {
+    assertRebroadcastToAllExceptSignerAndSuppliedExceptions(
+        TestHelpers::createSignedRoundChangePayload,
         RoundChangeMessageData::create,
         ibftGossip::gossipRoundChangePayload);
   }
 
   @Test
-  public void rebroadcastsRoundChangeOnlyOnce() {
-    rebroadcastOnlyOnce(
-        this::createSignedRoundChangePayload,
+  public void assertRebroadcastsRoundChangeOnlyOnce() {
+    assertRebroadcastOnlyOnce(
+        TestHelpers::createSignedRoundChangePayload,
         RoundChangeMessageData::create,
         ibftGossip::gossipRoundChangePayload);
   }
 
   @Test
-  public void rebroadcastsNewRoundToAllExceptSigner() {
-    rebroadcastToAllExceptSigner(
-        this::createSignedNewRoundPayload,
+  public void assertRebroadcastsNewRoundToAllExceptSigner() {
+    assertRebroadcastToAllExceptSigner(
+        TestHelpers::createSignedNewRoundPayload,
         NewRoundMessageData::create,
         ibftGossip::gossipNewRoundPayload);
   }
 
   @Test
-  public void rebroadcastsNewRoundToAllExceptSignerAndSuppliedExceptions() {
-    rebroadcastToAllExceptSignerAndSuppliedExceptions(
-        this::createSignedNewRoundPayload,
+  public void assertRebroadcastsNewRoundToAllExceptSignerAndSuppliedExceptions() {
+    assertRebroadcastToAllExceptSignerAndSuppliedExceptions(
+        TestHelpers::createSignedNewRoundPayload,
         NewRoundMessageData::create,
         ibftGossip::gossipNewRoundPayload);
   }
 
   @Test
-  public void rebroadcastsNewRoundOnlyOnce() {
-    rebroadcastOnlyOnce(
-        this::createSignedNewRoundPayload,
+  public void assertRebroadcastsNewRoundOnlyOnce() {
+    assertRebroadcastOnlyOnce(
+        TestHelpers::createSignedNewRoundPayload,
         NewRoundMessageData::create,
         ibftGossip::gossipNewRoundPayload);
   }
