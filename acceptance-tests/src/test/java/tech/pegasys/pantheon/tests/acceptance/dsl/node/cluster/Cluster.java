@@ -113,7 +113,7 @@ public class Cluster implements AutoCloseable {
     }
   }
 
-  public void verify(final Condition expected, Collection<Node> nodes) {
+  public void verify(final Condition expected, final Collection<Node> nodes) {
     for (final Node node : nodes) {
       expected.verify(node);
     }
