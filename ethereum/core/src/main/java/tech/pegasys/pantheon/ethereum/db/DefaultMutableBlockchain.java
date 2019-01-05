@@ -32,9 +32,9 @@ import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
+import tech.pegasys.pantheon.util.bytes.BytesValues;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
         "difficulty_total",
         "Total difficulty of the chainhead",
         () ->
-            new BigInteger(this.getChainHead().getTotalDifficulty().getBytes().getArrayUnsafe())
+            BytesValues.asUnsignedBigInteger(this.getChainHead().getTotalDifficulty().getBytes())
                 .doubleValue());
   }
 
