@@ -1,0 +1,56 @@
+# Every possible CLI should be in this file.
+# If it is a multi-valued CLI make it a TOML array.
+
+# Node Information
+datadir="~/pantheondata" # Path
+logging="INFO"
+node-private-key="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+
+# P2P network
+no-discovery=true # true=no discovery of peers or false=discover peers please
+bootnodes=[
+  "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.1:4567",
+  "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.1:4567",
+  "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.1:4567"
+]
+banned-nodeids=["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"]
+p2p-listen="1.2.3.4:1234" # IP:port
+max-peers=42
+max-trailing-peers=5
+host-whitelist=["all"]
+
+# chain
+genesis="~/genesis.json" # Path
+#sync-mode="fast"# should be FAST or FULL (or fast or full)
+ottoman=false # true means using ottoman testnet if genesys file uses iBFT
+ropsten=false
+goerli=false
+network-id=303
+rinkeby=false
+dev-mode=false
+
+# JSON-RPC
+rpc-enabled=false
+rpc-listen="5.6.7.8:5678" # IP:port
+rpc-api=["DEBUG","ETH"]
+rpc-cors-origins=["none"]
+
+# WebSockets API
+ws-enabled=false
+ws-api=["DEBUG","ETH"]
+ws-listen="9.10.11.12:9101" # IP:port
+ws-refresh-delay=500
+
+# Prometheus Metrics Endpoint
+metrics-enabled=false
+metrics-listen="8.6.7.5:309" # IP:port
+
+# Mining
+miner-enabled=false
+miner-coinbase="0x0000000000000000000000000000000000000002"
+miner-extraData="Protocol Engineering Group And SYStems"
+miner-minTransactionGasPriceWei="1"
+
+# Permissioning
+accounts-whitelist=["0x0000000000000000000000000000000000000009"]
+nodes-whitelist=["all"]

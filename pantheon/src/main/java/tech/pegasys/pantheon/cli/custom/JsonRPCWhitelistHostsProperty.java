@@ -12,15 +12,17 @@
  */
 package tech.pegasys.pantheon.cli.custom;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nonnull;
 
-import picocli.CommandLine;
+import com.google.common.base.Splitter;
 
-public class JsonRPCWhitelistHostsProperty {
-  private List<String> hostnamesWhitelist = Collections.emptyList();
+public class JsonRPCWhitelistHostsProperty extends AbstractCollection<String> {
+  private List<String> hostnamesWhitelist = new ArrayList<>();
 
   private JsonRPCWhitelistHostsProperty(final List<String> hostnamesWhitelist) {
     this.hostnamesWhitelist = hostnamesWhitelist;
@@ -28,43 +30,39 @@ public class JsonRPCWhitelistHostsProperty {
 
   public JsonRPCWhitelistHostsProperty() {}
 
-  public List<String> hostnamesWhitelist() {
-    return hostnamesWhitelist;
+  @Override
+  @Nonnull
+  public Iterator<String> iterator() {
+    return hostnamesWhitelist.iterator();
   }
 
-  public static class JsonRPCWhitelistHostsConverter
-      implements CommandLine.ITypeConverter<JsonRPCWhitelistHostsProperty> {
+  @Override
+  public int size() {
+    return hostnamesWhitelist.size();
+  }
 
-    @Override
-    public JsonRPCWhitelistHostsProperty convert(final String value) {
-      final List<String> hostNames;
-      if (value != null && !value.isEmpty()) {
-        hostNames = new ArrayList<>(Arrays.asList(value.split("\\s*,\\s*")));
-      } else {
-        throw new IllegalArgumentException("Property can't be null/empty string");
-      }
-
-      if (hostNames.contains("all")) {
-        if (hostNames.size() > 1) {
-          throw new IllegalArgumentException("Value 'all' can't be used with other hostnames");
+  @Override
+  public boolean add(final String string) {
+    for (String s : Splitter.onPattern("\\s*,\\s*").split(string)) {
+      if (string.isEmpty()) {
+        throw new IllegalArgumentException("Hostname cannot be empty string");
+      } else if ("all".equals(s) || "*".equals(s)) {
+        if (!hostnamesWhitelist.isEmpty()) {
+          throw new IllegalArgumentException(
+              "Value '" + s + "' can't be used with other hostnames");
         } else {
-          return new JsonRPCWhitelistHostsProperty(Collections.singletonList("*"));
+          hostnamesWhitelist.add("*");
         }
-      }
-
-      if (hostNames.contains("*")) {
-        if (hostNames.size() > 1) {
-          throw new IllegalArgumentException("Value '*' can't be used with other hostnames");
-        } else {
-          return new JsonRPCWhitelistHostsProperty(Collections.singletonList("*"));
-        }
-      }
-
-      if (hostNames.size() > 0) {
-        return new JsonRPCWhitelistHostsProperty(hostNames);
       } else {
-        return new JsonRPCWhitelistHostsProperty();
+        hostnamesWhitelist.add(s);
       }
     }
+    return true;
+  }
+
+  @Override
+  public boolean addAll(final Collection<? extends String> collection) {
+    collection.forEach(this::add);
+    return true;
   }
 }
