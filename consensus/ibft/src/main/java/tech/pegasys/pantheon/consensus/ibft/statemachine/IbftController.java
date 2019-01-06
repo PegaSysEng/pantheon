@@ -36,7 +36,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -140,10 +140,10 @@ public class IbftController {
   private <P extends Payload> void processMessage(
       final Message message,
       final SignedData<P> signedPayload,
-      final BiFunction<SignedData<P>, Address, Boolean> gossipMessage,
+      final BiConsumer<SignedData<P>, Address> gossipMessage,
       final Consumer<SignedData<P>> handleMessage) {
     if (processMessage(signedPayload, message)) {
-      gossipMessage.apply(signedPayload, message.getConnection().getPeer().getAddress());
+      gossipMessage.accept(signedPayload, message.getConnection().getPeer().getAddress());
       handleMessage.accept(signedPayload);
     }
   }
