@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
@@ -56,9 +57,13 @@ public class IbftNetworkPeers {
 
   public void multicastToValidatorsExcept(
       final MessageData message, final Collection<Address> exceptAddresses) {
-    final Collection<Address> validators = validatorProvider.getValidators();
-    validators.removeIf(exceptAddresses::contains);
-    sendMessageToSpecificAddresses(validators, message);
+    final Collection<Address> includedValidators =
+        validatorProvider
+            .getValidators()
+            .stream()
+            .filter(exceptAddresses::contains)
+            .collect(Collectors.toSet());
+    sendMessageToSpecificAddresses(includedValidators, message);
   }
 
   private void sendMessageToSpecificAddresses(

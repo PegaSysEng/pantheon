@@ -14,28 +14,19 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessage.AbstractIbftMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -45,6 +36,8 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -103,8 +96,7 @@ public class IbftController {
             message,
             ProposalMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipProposalPayload,
-            currentHeightManager::handleProposalMessage
-        );
+            currentHeightManager::handleProposalMessage);
         break;
 
       case IbftV2.PREPARE:
@@ -112,8 +104,7 @@ public class IbftController {
             message,
             PrepareMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipPreparePayload,
-            currentHeightManager::handlePrepareMessage
-        );
+            currentHeightManager::handlePrepareMessage);
         break;
 
       case IbftV2.COMMIT:
@@ -121,8 +112,7 @@ public class IbftController {
             message,
             CommitMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipCommitPayload,
-            currentHeightManager::handleCommitMessage
-        );
+            currentHeightManager::handleCommitMessage);
         break;
 
       case IbftV2.ROUND_CHANGE:
@@ -130,8 +120,7 @@ public class IbftController {
             message,
             RoundChangeMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipRoundChangePayload,
-            currentHeightManager::handleRoundChangeMessage
-        );
+            currentHeightManager::handleRoundChangeMessage);
         break;
 
       case IbftV2.NEW_ROUND:
@@ -139,8 +128,7 @@ public class IbftController {
             message,
             NewRoundMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipNewRoundPayload,
-            currentHeightManager::handleNewRoundMessage
-        );
+            currentHeightManager::handleNewRoundMessage);
         break;
 
       default:
@@ -153,8 +141,7 @@ public class IbftController {
       final Message message,
       final SignedData<P> signedPayload,
       final BiFunction<SignedData<P>, Address, Boolean> gossipMessage,
-      final Consumer<SignedData<P>> handleMessage
-  ) {
+      final Consumer<SignedData<P>> handleMessage) {
     if (processMessage(signedPayload, message)) {
       gossipMessage.apply(signedPayload, message.getConnection().getPeer().getAddress());
       handleMessage.accept(signedPayload);

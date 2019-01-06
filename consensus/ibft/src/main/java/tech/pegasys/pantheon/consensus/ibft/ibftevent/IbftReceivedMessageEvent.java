@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.consensus.ibft.ibftevent;
 
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents.Type;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 public class IbftReceivedMessageEvent implements IbftEvent {
 
