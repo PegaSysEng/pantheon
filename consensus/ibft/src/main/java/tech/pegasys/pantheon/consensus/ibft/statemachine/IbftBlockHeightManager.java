@@ -146,24 +146,24 @@ public class IbftBlockHeightManager {
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
     // message - so it must be handled accordingly.
-    handleRoundChangeMessage(localRoundChange);
+    handleRoundChangePayload(localRoundChange);
   }
 
-  public void handleProposalMessage(final SignedData<ProposalPayload> msgData) {
-    LOG.info("Received a Proposal message.");
+  public void handleProposalPayload(final SignedData<ProposalPayload> signedPayload) {
+    LOG.info("Received a Proposal Payload.");
     actionOrBufferMessage(
-        msgData, currentRound::handleProposalMessage, RoundState::setProposedBlock);
+        signedPayload, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
-  public void handlePrepareMessage(final SignedData<PreparePayload> msgData) {
-    LOG.info("Received a prepare message.");
+  public void handlePreparePayload(final SignedData<PreparePayload> signedPayload) {
+    LOG.info("Received a prepare Payload.");
     actionOrBufferMessage(
-        msgData, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
+        signedPayload, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
-  public void handleCommitMessage(final SignedData<CommitPayload> msgData) {
-    LOG.info("Received a commit message.");
-    actionOrBufferMessage(msgData, currentRound::handleCommitMessage, RoundState::addCommitMessage);
+  public void handleCommitPayload(final SignedData<CommitPayload> payload) {
+    LOG.info("Received a commit Payload.");
+    actionOrBufferMessage(payload, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
   private <T extends Payload> void actionOrBufferMessage(
@@ -183,16 +183,16 @@ public class IbftBlockHeightManager {
     }
   }
 
-  public void handleRoundChangeMessage(final SignedData<RoundChangePayload> msgData) {
+  public void handleRoundChangePayload(final SignedData<RoundChangePayload> signedPayload) {
     final Optional<RoundChangeCertificate> result =
-        roundChangeManager.appendRoundChangeMessage(msgData);
-    final MessageAge messageAge = determineAgeOfPayload(msgData.getPayload());
+        roundChangeManager.appendRoundChangeMessage(signedPayload);
+    final MessageAge messageAge = determineAgeOfPayload(signedPayload.getPayload());
     if (messageAge == PRIOR_ROUND) {
-      LOG.info("Received RoundChange Message for a prior round.");
+      LOG.info("Received RoundChange Payload for a prior round.");
       return;
     }
-    ConsensusRoundIdentifier targetRound = msgData.getPayload().getRoundIdentifier();
-    LOG.info("Received a RoundChange message for {}", targetRound.toString());
+    final ConsensusRoundIdentifier targetRound = signedPayload.getPayload().getRoundIdentifier();
+    LOG.info("Received a RoundChange Payload for {}", targetRound.toString());
 
     if (result.isPresent()) {
       if (messageAge == FUTURE_ROUND) {
@@ -220,17 +220,17 @@ public class IbftBlockHeightManager {
     roundTimer.startTimer(currentRound.getRoundIdentifier());
   }
 
-  public void handleNewRoundMessage(final SignedData<NewRoundPayload> msgData) {
-    final NewRoundPayload payload = msgData.getPayload();
+  public void handleNewRoundPayload(final SignedData<NewRoundPayload> signedPayload) {
+    final NewRoundPayload payload = signedPayload.getPayload();
     final MessageAge messageAge = determineAgeOfPayload(payload);
 
     if (messageAge == PRIOR_ROUND) {
-      LOG.info("Received NewRound Message for a prior round.");
+      LOG.info("Received NewRound Payload for a prior round.");
       return;
     }
-    LOG.info("Received NewRound Message for {}", payload.getRoundIdentifier().toString());
+    LOG.info("Received NewRound Payload for {}", payload.getRoundIdentifier().toString());
 
-    if (newRoundMessageValidator.validateNewRoundMessage(msgData)) {
+    if (newRoundMessageValidator.validateNewRoundMessage(signedPayload)) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(payload.getRoundIdentifier().getRoundNumber());
       }
@@ -243,8 +243,8 @@ public class IbftBlockHeightManager {
   }
 
   private MessageAge determineAgeOfPayload(final Payload payload) {
-    int messageRoundNumber = payload.getRoundIdentifier().getRoundNumber();
-    int currentRoundNumber = currentRound.getRoundIdentifier().getRoundNumber();
+    final int messageRoundNumber = payload.getRoundIdentifier().getRoundNumber();
+    final int currentRoundNumber = currentRound.getRoundIdentifier().getRoundNumber();
     if (messageRoundNumber > currentRoundNumber) {
       return FUTURE_ROUND;
     } else if (messageRoundNumber == currentRoundNumber) {

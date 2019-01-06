@@ -96,7 +96,7 @@ public class IbftController {
             message,
             ProposalMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipProposalPayload,
-            currentHeightManager::handleProposalMessage);
+            currentHeightManager::handleProposalPayload);
         break;
 
       case IbftV2.PREPARE:
@@ -104,7 +104,7 @@ public class IbftController {
             message,
             PrepareMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipPreparePayload,
-            currentHeightManager::handlePrepareMessage);
+            currentHeightManager::handlePreparePayload);
         break;
 
       case IbftV2.COMMIT:
@@ -112,7 +112,7 @@ public class IbftController {
             message,
             CommitMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipCommitPayload,
-            currentHeightManager::handleCommitMessage);
+            currentHeightManager::handleCommitPayload);
         break;
 
       case IbftV2.ROUND_CHANGE:
@@ -120,7 +120,7 @@ public class IbftController {
             message,
             RoundChangeMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipRoundChangePayload,
-            currentHeightManager::handleRoundChangeMessage);
+            currentHeightManager::handleRoundChangePayload);
         break;
 
       case IbftV2.NEW_ROUND:
@@ -128,7 +128,7 @@ public class IbftController {
             message,
             NewRoundMessageData.fromMessageData(messageData).decode(),
             gossiper::gossipNewRoundPayload,
-            currentHeightManager::handleNewRoundMessage);
+            currentHeightManager::handleNewRoundPayload);
         break;
 
       default:
