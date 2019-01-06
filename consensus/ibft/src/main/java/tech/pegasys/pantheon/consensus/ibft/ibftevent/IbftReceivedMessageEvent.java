@@ -24,10 +24,6 @@ public class IbftReceivedMessageEvent implements IbftEvent {
     this.message = message;
   }
 
-  public MessageData getMessageData() {
-    return message.getData();
-  }
-
   public Message getMessage() {
     return message;
   }
