@@ -173,7 +173,7 @@ public class IbftController {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
-    List<Message> orDefault = futureMessages.getOrDefault(newChainHeight, emptyList());
+    final List<Message> orDefault = futureMessages.getOrDefault(newChainHeight, emptyList());
     orDefault.forEach(this::handleMessage);
     futureMessages.remove(newChainHeight);
   }
