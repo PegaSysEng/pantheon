@@ -61,7 +61,7 @@ public class IbftNetworkPeers {
         validatorProvider
             .getValidators()
             .stream()
-            .filter(exceptAddresses::contains)
+            .filter(a -> !exceptAddresses.contains(a))
             .collect(Collectors.toSet());
     sendMessageToSpecificAddresses(includedValidators, message);
   }

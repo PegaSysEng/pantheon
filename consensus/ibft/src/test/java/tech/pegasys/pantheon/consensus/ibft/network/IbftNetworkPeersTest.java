@@ -110,6 +110,7 @@ public class IbftNetworkPeersTest {
     // Only add the first Peer's address to the validators.
     final Address validatorAddress = Util.publicKeyToAddress(publicKeys.get(0));
     validators.add(validatorAddress);
+    validators.add(Util.publicKeyToAddress(publicKeys.get(1)));
     final ValidatorProvider validatorProvider = mock(ValidatorProvider.class);
     when(validatorProvider.getValidators()).thenReturn(validators);
 
@@ -122,7 +123,7 @@ public class IbftNetworkPeersTest {
     peers.multicastToValidatorsExcept(messageToSend, newArrayList(validatorAddress));
 
     verify(peerConnections.get(0), never()).sendForProtocol(any(), any());
-    verify(peerConnections.get(1), never()).sendForProtocol(any(), any());
+    verify(peerConnections.get(1), times(1)).sendForProtocol(any(), any());
     verify(peerConnections.get(2), never()).sendForProtocol(any(), any());
     verify(peerConnections.get(3), never()).sendForProtocol(any(), any());
   }
