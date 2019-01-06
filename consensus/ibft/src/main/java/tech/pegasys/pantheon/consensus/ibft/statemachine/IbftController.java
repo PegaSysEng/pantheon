@@ -14,12 +14,16 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.AbstractIbftMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
@@ -34,6 +38,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -94,58 +99,65 @@ public class IbftController {
     final MessageData messageData = message.getData();
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
-        final SignedData<ProposalPayload> signedProposalPayload =
-            ProposalMessageData.fromMessageData(messageData).decode();
-        if (processMessage(signedProposalPayload, message)) {
-          gossiper.gossipProposalPayload(
-              signedProposalPayload, message.getConnection().getPeer().getAddress());
-          currentHeightManager.handleProposalMessage(signedProposalPayload);
-        }
+        processMessage(
+            message,
+            ProposalMessageData.fromMessageData(messageData).decode(),
+            gossiper::gossipProposalPayload,
+            currentHeightManager::handleProposalMessage
+        );
         break;
 
       case IbftV2.PREPARE:
-        final SignedData<PreparePayload> signedPreparePayload =
-            PrepareMessageData.fromMessageData(messageData).decode();
-        if (processMessage(signedPreparePayload, message)) {
-          gossiper.gossipPreparePayload(
-              signedPreparePayload, message.getConnection().getPeer().getAddress());
-          currentHeightManager.handlePrepareMessage(signedPreparePayload);
-        }
+        processMessage(
+            message,
+            PrepareMessageData.fromMessageData(messageData).decode(),
+            gossiper::gossipPreparePayload,
+            currentHeightManager::handlePrepareMessage
+        );
         break;
 
       case IbftV2.COMMIT:
-        final SignedData<CommitPayload> signedCommitPayload =
-            CommitMessageData.fromMessageData(messageData).decode();
-        if (processMessage(signedCommitPayload, message)) {
-          gossiper.gossipCommitPayload(
-              signedCommitPayload, message.getConnection().getPeer().getAddress());
-          currentHeightManager.handleCommitMessage(signedCommitPayload);
-        }
+        processMessage(
+            message,
+            CommitMessageData.fromMessageData(messageData).decode(),
+            gossiper::gossipCommitPayload,
+            currentHeightManager::handleCommitMessage
+        );
         break;
 
       case IbftV2.ROUND_CHANGE:
-        final SignedData<RoundChangePayload> signedRoundChangePayload =
-            RoundChangeMessageData.fromMessageData(messageData).decode();
-        if (processMessage(signedRoundChangePayload, message)) {
-          gossiper.gossipRoundChangePayload(
-              signedRoundChangePayload, message.getConnection().getPeer().getAddress());
-          currentHeightManager.handleRoundChangeMessage(signedRoundChangePayload);
-        }
+        processMessage(
+            message,
+            RoundChangeMessageData.fromMessageData(messageData).decode(),
+            gossiper::gossipRoundChangePayload,
+            currentHeightManager::handleRoundChangeMessage
+        );
         break;
 
       case IbftV2.NEW_ROUND:
-        final SignedData<NewRoundPayload> signedNewRoundPayload =
-            NewRoundMessageData.fromMessageData(messageData).decode();
-        if (processMessage(signedNewRoundPayload, message)) {
-          gossiper.gossipNewRoundPayload(
-              signedNewRoundPayload, message.getConnection().getPeer().getAddress());
-          currentHeightManager.handleNewRoundMessage(signedNewRoundPayload);
-        }
+        processMessage(
+            message,
+            NewRoundMessageData.fromMessageData(messageData).decode(),
+            gossiper::gossipNewRoundPayload,
+            currentHeightManager::handleNewRoundMessage
+        );
         break;
 
       default:
         throw new IllegalArgumentException(
             "Received message does not conform to any recognised IBFT message structure.");
+    }
+  }
+
+  private <P extends Payload> void processMessage(
+      final Message message,
+      final SignedData<P> signedPayload,
+      final BiFunction<SignedData<P>, Address, Boolean> gossipMessage,
+      final Consumer<SignedData<P>> handleMessage
+  ) {
+    if (processMessage(signedPayload, message)) {
+      gossipMessage.apply(signedPayload, message.getConnection().getPeer().getAddress());
+      handleMessage.accept(signedPayload);
     }
   }
 
