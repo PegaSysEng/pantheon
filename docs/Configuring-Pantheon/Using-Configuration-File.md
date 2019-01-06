@@ -2,31 +2,25 @@
 
 To specify command line options in a file, use a TOML configuration file. 
 
-The configuration file can be saved and reused accross node startups. To specify the configuration file,
+The configuration file can be saved and reused across node startups. To specify the configuration file,
 use the [`--config` option](../Reference/Pantheon-CLI-Syntax.md#config). 
 
 To override an option specified in the configuration file, specify the same option on the command line. 
-Pantheon is started with the command line value when an option is specified in both places. 
-
-Each key is the same as the corresponding command line option name without the leading dashes (`--`).
-
-The `config` option is not used in the configuration file.
+When an option is specified in both places, Pantheon is started with the command line value.  
 
 ## TOML Specification
 
-The configuration file must be a valid TOML file and is composed of key/value pairs.
+The configuration file must be a valid TOML file and is composed of key/value pairs. Each key is the 
+same as the corresponding command line option name without the leading dashes (`--`).
 
 Values must be be specified according to TOML specifications for string, numbers, arrays, and booleans.
+Specific differences between the command line and the TOML file format are: 
 
-Specifically: 
+* Comma-separated lists on the command line are string arrays in the TOML file 
+* File paths, hexadecimal numbers, URLs, and &lt;host:port> values must be enclosed in quotes. 
 
-* Comma-separated lists are arrays. 
-<example command line> <example configuration file> 
-
-* File paths must be enclosed in quotes. 
-<example command line> <example configuration file> 
-
-* Anything else that's different? 
+!!!tip
+    The [command line reference](../Reference/Pantheon-CLI-Syntax.md) includes configuration file examples for each option.  
 
 !!!example "Example TOML configuration file"
     ```toml
