@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
+import com.google.common.collect.ImmutableList;
+import java.util.Collections;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -113,7 +115,7 @@ public class ValidatorPeer {
   }
 
   public List<MessageData> getReceivedMessages() {
-    return receivedMessages;
+    return Collections.unmodifiableList(receivedMessages);
   }
 
   public void clearReceivedMessages() {

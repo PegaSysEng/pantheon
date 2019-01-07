@@ -35,7 +35,8 @@ import org.junit.Test;
 
 public class LocalNodeNotProposerTest {
 
-  // This ensures the localNode (i.e. the UUT) will not create the first block
+  // By setting the indexOfFirstLocallyProposedBlock to 0 (and that the blockchain has only the
+  // genesis block) guarantees the local node is not responsible for proposing the first block).
   private final TestContext context = TestContext.createTestEnvWithUtcClock(4, 0);
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
@@ -76,7 +77,7 @@ public class LocalNodeNotProposerTest {
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxCommit);
 
     // Ensure the local blockchain has NOT incremented yet.
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // NO further messages should be transmitted when another Prepare is received.
     roles.getNonProposingPeers().get(1).injectPrepare(roundId, blockToPropose.getHash());
@@ -85,17 +86,17 @@ public class LocalNodeNotProposerTest {
     // Inject a commit, ensure blockChain is not updated, and no message are sent (not quorum yet)
     roles.getNonProposingPeers().get(0).injectCommit(roundId, blockToPropose.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // A second commit message means quorum is reached, and blockchain should be updated.
     roles.getNonProposingPeers().get(1).injectCommit(roundId, blockToPropose.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(1);
 
     // ensure any further commit messages do not affect the system
     roles.getProposer().injectCommit(roundId, blockToPropose.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
   @Test
@@ -106,7 +107,7 @@ public class LocalNodeNotProposerTest {
     // No commit message transmitted after receiving prepare from proposer
     roles.getProposer().injectPrepare(roundId, blockToPropose.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     roles.getNonProposingPeers().get(1).injectPrepare(roundId, blockToPropose.getHash());
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxCommit);
@@ -114,12 +115,12 @@ public class LocalNodeNotProposerTest {
     // Inject a commit, ensure blockChain is not updated, and no message are sent (not quorum yet)
     roles.getNonProposingPeers().get(0).injectCommit(roundId, blockToPropose.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // A second commit message means quorum is reached, and blockchain should be updated.
     roles.getNonProposingPeers().get(1).injectCommit(roundId, blockToPropose.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
   @Test
@@ -129,20 +130,20 @@ public class LocalNodeNotProposerTest {
     for (final ValidatorPeer peer : roles.getAllPeers()) {
       peer.injectCommit(roundId, blockToPropose.getHash());
       assertPeersReceivedNoMessages(roles.getAllPeers());
-      assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+      assertThat(context.getCurrentChainHeight()).isEqualTo(0);
     }
 
     for (final ValidatorPeer peer : roles.getNonProposingPeers()) {
       peer.injectPrepare(roundId, blockToPropose.getHash());
       assertPeersReceivedNoMessages(roles.getAllPeers());
-      assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+      assertThat(context.getCurrentChainHeight()).isEqualTo(0);
     }
 
     roles.getProposer().injectProposal(roundId, blockToPropose);
     // TODO(tmm): Unfortunatley, there are times that the Commit will go out BEFORE the prepare
     // This is one of them :( Maybe fix the testing to be ignorant of ordering?
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxCommit, expectedTxPrepare);
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
   @Test
@@ -151,15 +152,15 @@ public class LocalNodeNotProposerTest {
     for (final ValidatorPeer peer : roles.getAllPeers()) {
       peer.injectCommit(roundId, blockToPropose.getHash());
       assertPeersReceivedNoMessages(roles.getAllPeers());
-      assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+      assertThat(context.getCurrentChainHeight()).isEqualTo(0);
     }
 
     roles.getProposer().injectProposal(roundId, blockToPropose);
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxPrepare);
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(1);
 
     roles.getNonProposingPeers().get(0).injectPrepare(roundId, blockToPropose.getHash());
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxCommit);
-    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 }

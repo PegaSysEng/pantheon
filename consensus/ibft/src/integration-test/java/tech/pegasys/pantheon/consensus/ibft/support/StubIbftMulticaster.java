@@ -32,6 +32,6 @@ public class StubIbftMulticaster implements IbftMulticaster {
 
   @Override
   public void multicastToValidators(final MessageData message) {
-    validatorNodes.stream().forEach(v -> v.handleReceivedMessage(message));
+    validatorNodes.forEach(v -> v.handleReceivedMessage(message));
   }
 }

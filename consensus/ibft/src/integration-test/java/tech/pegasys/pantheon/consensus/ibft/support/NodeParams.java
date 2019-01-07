@@ -16,8 +16,8 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
 public class NodeParams {
-  private Address address;
-  private KeyPair nodeKeys;
+  private final Address address;
+  private final KeyPair nodeKeys;
 
   public NodeParams(final Address address, final KeyPair nodeKeys) {
     this.address = address;

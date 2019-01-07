@@ -26,9 +26,9 @@ import com.google.common.collect.Maps;
 
 public class NetworkLayout {
 
-  final NodeParams localNode;
-  final TreeMap<Address, NodeParams> addressKeyMap;
-  final List<NodeParams> remotePeers;
+  private final NodeParams localNode;
+  private final TreeMap<Address, NodeParams> addressKeyMap;
+  private final List<NodeParams> remotePeers;
 
   public NetworkLayout(
       final NodeParams localNode, final TreeMap<Address, NodeParams> addressKeyMap) {
@@ -49,7 +49,7 @@ public class NetworkLayout {
 
   private static TreeMap<Address, NodeParams> createValidators(final int validatorCount) {
     // Map is required to be sorted by address
-    final TreeMap<Address, NodeParams> addressKeyMap = Maps.newTreeMap();
+    final TreeMap<Address, NodeParams> addressKeyMap = new TreeMap<>();
 
     for (int i = 0; i < validatorCount; i++) {
       final KeyPair newKeyPair = KeyPair.generate();

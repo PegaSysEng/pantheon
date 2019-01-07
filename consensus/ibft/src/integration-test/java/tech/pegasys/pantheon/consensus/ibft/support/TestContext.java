@@ -78,9 +78,10 @@ import com.google.common.collect.Iterables;
 /*
 Responsible for creating an environment in which integration testing can be conducted.
 
-The test setup is a 'n' node network, the first of which can be considered the "local" node.
-All allValidators are in the genesis block's extraData. Validator
+The test setup is an 'n' node network, one of which is the local node (i.e. the Unit Under Test).
 
+There is some complexity with determining the which node is the proposer etc. THus necessitating
+NetworkLayout and RoundSpecificNodeRoles concepts.
  */
 public class TestContext {
 
@@ -140,6 +141,10 @@ public class TestContext {
 
   public NodeParams getLocalNodeParams() {
     return new NodeParams(finalState.getLocalAddress(), finalState.getNodeKeys());
+  }
+
+  public long getCurrentChainHeight() {
+    return blockchain.getChainHeadBlockNumber();
   }
 
   public static TestContext createTestEnvWithUtcClock(

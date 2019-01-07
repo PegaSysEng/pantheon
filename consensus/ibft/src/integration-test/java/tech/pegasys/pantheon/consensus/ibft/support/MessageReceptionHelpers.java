@@ -14,7 +14,9 @@ package tech.pegasys.pantheon.consensus.ibft.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessage;
@@ -42,40 +44,38 @@ public class MessageReceptionHelpers {
       final Collection<ValidatorPeer> allPeers, final SignedData<? extends Payload>... msgs) {
     allPeers.forEach(n -> assertThat(n.getReceivedMessages().size()).isEqualTo(msgs.length));
 
-    for (SignedData<? extends Payload> msg : msgs) {
+    List<SignedData<? extends Payload>> msgList = Arrays.asList(msgs);
+
+    for(int i = 0; i < msgList.size(); i++) {
+      final int index = i;
+      final SignedData<? extends Payload> msg = msgList.get(index);
       allPeers.forEach(
           n -> {
             final List<MessageData> rxMsgs = n.getReceivedMessages();
-            final MessageData rxMsgData = rxMsgs.get(0);
-            rxMsgs.remove(0);
+            final MessageData rxMsgData = rxMsgs.get(index);
             assertThat(msgMatchesExpected(rxMsgData, msg)).isTrue();
           });
     }
+    allPeers.forEach(p -> p.clearReceivedMessages());
   }
 
   public static boolean msgMatchesExpected(
       final MessageData actual, final SignedData<? extends Payload> expected) {
     final Payload expectedPayload = expected.getPayload();
-    if (expectedPayload instanceof ProposalPayload) {
-      final SignedData<ProposalPayload> actualPayload =
-          ProposalMessage.fromMessage(actual).decode();
-      return actualPayload.equals(expected);
-    } else if (expectedPayload instanceof PreparePayload) {
-      final SignedData<PreparePayload> actualPayload = PrepareMessage.fromMessage(actual).decode();
-      return actualPayload.equals(expected);
-    } else if (expectedPayload instanceof CommitPayload) {
-      final SignedData<CommitPayload> actualPayload = CommitMessage.fromMessage(actual).decode();
-      return actualPayload.equals(expected);
-    } else if (expectedPayload instanceof RoundChangePayload) {
-      final SignedData<RoundChangePayload> actualPayload =
-          RoundChangeMessage.fromMessage(actual).decode();
-      return actualPayload.equals(expected);
-    } else if (expectedPayload instanceof NewRoundPayload) {
-      final SignedData<NewRoundPayload> actualPayload =
-          NewRoundMessage.fromMessage(actual).decode();
-      return actualPayload.equals(expected);
-    } else {
-      return false;
+
+    switch (expectedPayload.getMessageType()) {
+      case IbftV2.PROPOSAL:
+        return ProposalMessage.fromMessage(actual).decode().equals(expected);
+      case IbftV2.PREPARE:
+        return PrepareMessage.fromMessage(actual).decode().equals(expected);
+      case IbftV2.COMMIT:
+        return CommitMessage.fromMessage(actual).decode().equals(expected);
+      case IbftV2.NEW_ROUND:
+        return NewRoundMessage.fromMessage(actual).decode().equals(expected);
+      case IbftV2.ROUND_CHANGE:
+        return RoundChangeMessage.fromMessage(actual).decode().equals(expected);
+      default:
+        return false;
     }
   }
 }
