@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPreparedCertificate;
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
@@ -127,7 +128,8 @@ public class NewRoundMessageValidator {
       // quorum)
       final RoundChangeMessageValidator roundChangeValidator =
           new RoundChangeMessageValidator(
-              messageValidatorFactory, validators, quorumSize - 1, chainHeight);
+              messageValidatorFactory, validators, prepareMessageCountForQuorum(quorumSize),
+              chainHeight);
 
       if (!roundChangeValidator.validateMessage(roundChangeMsg)) {
         LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");

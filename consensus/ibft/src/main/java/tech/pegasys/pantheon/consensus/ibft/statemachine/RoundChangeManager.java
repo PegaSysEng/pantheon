@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
+
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
@@ -42,6 +44,7 @@ import org.apache.logging.log4j.Logger;
 public class RoundChangeManager {
 
   public static class RoundChangeStatus {
+
     private final int quorumSize;
 
     // Store only 1 round change per round per validator
@@ -89,7 +92,8 @@ public class RoundChangeManager {
     this.quorumSize = IbftHelpers.calculateRequiredValidatorQuorum(validators.size());
     this.roundChangeMessageValidator =
         new RoundChangeMessageValidator(
-            messageValidityFactory, validators, quorumSize - 1, sequenceNumber);
+            messageValidityFactory, validators, prepareMessageCountForQuorum(quorumSize),
+            sequenceNumber);
   }
 
   /**
@@ -97,7 +101,7 @@ public class RoundChangeManager {
    *
    * @param msg The signed round change message to add
    * @return Empty if the round change threshold hasn't been hit, otherwise a round change
-   *     certificate
+   * certificate
    */
   public Optional<RoundChangeCertificate> appendRoundChangeMessage(
       final SignedData<RoundChangePayload> msg) {
