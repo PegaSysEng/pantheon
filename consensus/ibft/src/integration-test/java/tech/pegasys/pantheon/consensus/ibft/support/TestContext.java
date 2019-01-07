@@ -12,68 +12,18 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
-
-import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
-import tech.pegasys.pantheon.consensus.common.BlockInterface;
-import tech.pegasys.pantheon.consensus.common.EpochManager;
-import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteTally;
-import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
-import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderValidationRulesetFactory;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
-import tech.pegasys.pantheon.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
-import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
-import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
-import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
-import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
-import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftRoundFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
-import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Iterables;
 
 /*
 Responsible for creating an environment in which integration testing can be conducted.
@@ -84,10 +34,6 @@ There is some complexity with determining the which node is the proposer etc. TH
 NetworkLayout and RoundSpecificNodeRoles concepts.
  */
 public class TestContext {
-
-  public static final int EPOCH_LENGTH = 10_000;
-  public static final int BLOCK_TIMER_SEC = 3;
-  public static final int ROUND_TIMER_SEC = 12;
 
   private Map<Address, ValidatorPeer> remotePeers;
   private final MutableBlockchain blockchain;
@@ -145,151 +91,5 @@ public class TestContext {
 
   public long getCurrentChainHeight() {
     return blockchain.getChainHeadBlockNumber();
-  }
-
-  public static TestContext createTestEnvWithUtcClock(
-      final int validatorCount, final int indexOfFirstLocallyProposedBlock) {
-    return createTestEnvironment(
-        validatorCount, indexOfFirstLocallyProposedBlock, Clock.systemUTC());
-  }
-
-  public static TestContext createTestEnvironment(
-      final int validatorCount, final int indexOfFirstLocallyProposedBlock, final Clock clock) {
-
-    final NetworkLayout networkNodes =
-        NetworkLayout.createNetworkLayout(validatorCount, indexOfFirstLocallyProposedBlock);
-
-    final Block genesisBlock = createGenesisBlock(networkNodes.getValidatorAddresses());
-    final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
-    final MutableBlockchain blockChain =
-        createInMemoryBlockchain(genesisBlock, IbftBlockHashing::calculateHashOfIbftBlockOnChain);
-
-    final MiningParameters miningParams =
-        new MiningParameters(
-            AddressHelpers.ofValue(1),
-            Wei.ZERO,
-            BytesValue.wrap("Ibft Int tests".getBytes(UTF_8)),
-            true);
-
-    final StubGenesisConfigOptions genesisConfigOptions = new StubGenesisConfigOptions();
-    genesisConfigOptions.byzantiumBlock(0);
-
-    final ProtocolSchedule<IbftContext> protocolSchedule =
-        IbftProtocolSchedule.create(genesisConfigOptions);
-
-    final KeyPair nodeKeys = networkNodes.getLocalNode().getNodeKeys();
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    // From here down IS BASICALLY taken from IbftPantheonController (consts are tweaked)
-    final EpochManager epochManager = new EpochManager(EPOCH_LENGTH);
-
-    final BlockInterface blockInterface = new IbftBlockInterface();
-    final VoteTally voteTally =
-        new VoteTallyUpdater(epochManager, blockInterface).buildVoteTallyFromBlockchain(blockChain);
-
-    final VoteProposer voteProposer = new VoteProposer();
-
-    final ProtocolContext<IbftContext> protocolContext =
-        new ProtocolContext<>(
-            blockChain, worldStateArchive, new IbftContext(voteTally, voteProposer));
-
-    final IbftEventQueue ibftEventQueue = new IbftEventQueue();
-
-    final IbftBlockCreatorFactory blockCreatorFactory =
-        new IbftBlockCreatorFactory(
-            (gasLimit) -> gasLimit,
-            new PendingTransactions(1), // changed from IbftPantheonController
-            protocolContext,
-            protocolSchedule,
-            miningParams,
-            Util.publicKeyToAddress(nodeKeys.getPublicKey()));
-
-    final ProposerSelector proposerSelector =
-        new ProposerSelector(blockChain, voteTally, blockInterface, true);
-
-    // Use a stubbed version of the multicaster, to prevent creating PeerConnections etc.
-    final StubIbftMulticaster stubbedNetworkPeers = new StubIbftMulticaster();
-
-    final BlockHeaderValidator<IbftContext> blockHeaderValidator =
-        IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(BLOCK_TIMER_SEC);
-
-    final IbftFinalState finalState =
-        new IbftFinalState(
-            voteTally,
-            nodeKeys,
-            Util.publicKeyToAddress(nodeKeys.getPublicKey()),
-            proposerSelector,
-            stubbedNetworkPeers,
-            new RoundTimer(
-                ibftEventQueue, ROUND_TIMER_SEC * 1000, Executors.newScheduledThreadPool(1)),
-            new BlockTimer(
-                ibftEventQueue,
-                BLOCK_TIMER_SEC * 1000,
-                Executors.newScheduledThreadPool(1),
-                Clock.systemUTC()),
-            blockCreatorFactory,
-            new MessageFactory(nodeKeys),
-            blockHeaderValidator,
-            clock);
-
-    final MessageValidatorFactory messageValidatorFactory =
-        new MessageValidatorFactory(proposerSelector, blockHeaderValidator, protocolContext);
-
-    final IbftController ibftController =
-        new IbftController(
-            blockChain,
-            finalState,
-            new IbftBlockHeightManagerFactory(
-                finalState,
-                new IbftRoundFactory(finalState, protocolContext, protocolSchedule),
-                messageValidatorFactory,
-                protocolContext));
-    //////////////////////////// END IBFT PantheonController ////////////////////////////
-
-    // Add each networkNode to the Multicaster (such that each can receive msgs from local node).
-    // NOTE: the remotePeers needs to be ordered based on Address (as this is used to determine
-    // the proposer order which must be managed in test).
-    final Map<Address, ValidatorPeer> remotePeers =
-        networkNodes
-            .getRemotePeers()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    NodeParams::getAddress,
-                    np ->
-                        new ValidatorPeer(np, new MessageFactory(np.getNodeKeys()), ibftController),
-                    (u, v) -> {
-                      throw new IllegalStateException(String.format("Duplicate key %s", u));
-                    },
-                    LinkedHashMap::new));
-
-    stubbedNetworkPeers.addNetworkPeers(remotePeers.values());
-
-    return new TestContext(remotePeers, blockChain, ibftController, finalState);
-  }
-
-  private static Block createGenesisBlock(final Set<Address> validators) {
-    final Address coinbase = Iterables.get(validators, 0);
-    final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
-    final IbftExtraData extraData =
-        new IbftExtraData(
-            BytesValue.wrap(new byte[32]),
-            Collections.emptyList(),
-            Optional.empty(),
-            0,
-            validators);
-    headerTestFixture.extraData(extraData.encode());
-    headerTestFixture.mixHash(IbftHelpers.EXPECTED_MIX_HASH);
-    headerTestFixture.difficulty(UInt256.ONE);
-    headerTestFixture.ommersHash(Hash.EMPTY_LIST_HASH);
-    headerTestFixture.nonce(0);
-    headerTestFixture.timestamp(0);
-    headerTestFixture.parentHash(Hash.ZERO);
-    headerTestFixture.gasLimit(5000);
-    headerTestFixture.coinbase(coinbase);
-
-    final BlockHeader genesisHeader = headerTestFixture.buildHeader();
-    return new Block(
-        genesisHeader, new BlockBody(Collections.emptyList(), Collections.emptyList()));
   }
 }

@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
-import com.google.common.collect.ImmutableList;
-import java.util.Collections;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -41,6 +39,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

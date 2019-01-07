@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 public class NetworkLayout {
 

@@ -14,22 +14,17 @@ package tech.pegasys.pantheon.consensus.ibft.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessage;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,7 +41,7 @@ public class MessageReceptionHelpers {
 
     List<SignedData<? extends Payload>> msgList = Arrays.asList(msgs);
 
-    for(int i = 0; i < msgList.size(); i++) {
+    for (int i = 0; i < msgList.size(); i++) {
       final int index = i;
       final SignedData<? extends Payload> msg = msgList.get(index);
       allPeers.forEach(
