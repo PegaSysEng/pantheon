@@ -316,10 +316,10 @@ If you specify an empty list or [`--nodes-whitelist`](#nodes-whitelist) without 
 --ottoman
 ```
 
-Synchronize against the Ottoman test network. This is only useful if you are using an IBFT genesis file.  The default is `false`.
+Enables accepting of blocks in an IBFT 1.0 network.  The default is `false`.
 
 !!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
+    A Pantheon node cannot be a validator in an IBFT 1.0 network.
 
 ### p2p-listen
 
