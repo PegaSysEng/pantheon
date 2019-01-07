@@ -44,7 +44,6 @@ import org.apache.logging.log4j.Logger;
 public class RoundChangeManager {
 
   public static class RoundChangeStatus {
-
     private final int quorumSize;
 
     // Store only 1 round change per round per validator
@@ -92,7 +91,9 @@ public class RoundChangeManager {
     this.quorumSize = IbftHelpers.calculateRequiredValidatorQuorum(validators.size());
     this.roundChangeMessageValidator =
         new RoundChangeMessageValidator(
-            messageValidityFactory, validators, prepareMessageCountForQuorum(quorumSize),
+            messageValidityFactory,
+            validators,
+            prepareMessageCountForQuorum(quorumSize),
             sequenceNumber);
   }
 
@@ -101,7 +102,7 @@ public class RoundChangeManager {
    *
    * @param msg The signed round change message to add
    * @return Empty if the round change threshold hasn't been hit, otherwise a round change
-   * certificate
+   *     certificate
    */
   public Optional<RoundChangeCertificate> appendRoundChangeMessage(
       final SignedData<RoundChangePayload> msg) {

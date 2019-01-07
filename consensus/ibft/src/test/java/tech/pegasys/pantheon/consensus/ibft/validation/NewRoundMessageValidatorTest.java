@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidat
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
 
 import java.util.Collections;
@@ -56,14 +57,16 @@ public class NewRoundMessageValidatorTest {
       new ConsensusRoundIdentifier(chainHeight, 4);
   private NewRoundMessageValidator validator;
 
+  private final Block proposedBlock = mock(Block.class);
   private final ProposerSelector proposerSelector = mock(ProposerSelector.class);
   private final MessageValidatorForHeightFactory validatorFactory =
       mock(MessageValidatorForHeightFactory.class);
   private final MessageValidator messageValidator = mock(MessageValidator.class);
 
-  private Block proposedBlock;
-  private SignedData<NewRoundPayload> validMsg;
-  private NewRoundPayload.Builder msgBuilder;
+  private final SignedData<NewRoundPayload> validMsg =
+      createValidNewRoundMessageSignedBy(proposerKey);
+  private final NewRoundPayload.Builder msgBuilder =
+      NewRoundPayload.Builder.fromExisting(validMsg.getPayload());
 
   @Before
   public void setup() {
@@ -71,15 +74,13 @@ public class NewRoundMessageValidatorTest {
     validators.add(Util.publicKeyToAddress(validatorKey.getPublicKey()));
     validators.add(Util.publicKeyToAddress(otherValidatorKey.getPublicKey()));
 
-    proposedBlock = TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber());
-    validMsg = createValidNewRoundMessageSignedBy(proposerKey);
-    msgBuilder = NewRoundPayload.Builder.fromExisting(validMsg.getPayload());
-
     when(proposerSelector.selectProposerForRound(any())).thenReturn(proposerAddress);
 
     when(validatorFactory.createAt(any())).thenReturn(messageValidator);
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
     when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+
+    when(proposedBlock.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
 
     validator =
         new NewRoundMessageValidator(
@@ -180,11 +181,8 @@ public class NewRoundMessageValidatorTest {
   @Test
   public void newRoundWithProposalNotMatchingLatestRoundChangeFails() {
     final ConsensusRoundIdentifier preparedRound = TestHelpers.createFrom(roundIdentifier, 0, -1);
-    // The previous block has been constructed with less validators, so is thus not identical
-    // to the block in the new proposal (so should fail).
-    final Block prevProposedBlock =
-        TestHelpers.createProposalBlock(validators.subList(0, 1), roundIdentifier.getRoundNumber());
-
+    final Block prevProposedBlock = mock(Block.class);
+    when(prevProposedBlock.getHash()).thenReturn(Hash.fromHexStringLenient("2"));
     final PreparedCertificate misMatchedPreparedCertificate =
         new PreparedCertificate(
             proposerMessageFactory.createSignedProposalPayload(preparedRound, prevProposedBlock),
