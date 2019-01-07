@@ -23,15 +23,18 @@ import java.util.List;
 public class GetNodesWhitelistPopulated implements Condition {
 
   private final PermGetNodesWhitelistTransaction transaction;
+  private final int expectedNodeNum;
 
-  public GetNodesWhitelistPopulated(final PermGetNodesWhitelistTransaction transactions) {
-    this.transaction = transactions;
+  public GetNodesWhitelistPopulated(
+      final PermGetNodesWhitelistTransaction transaction, final int expectedNodeNum) {
+    this.transaction = transaction;
+    this.expectedNodeNum = expectedNodeNum;
   }
 
   @Override
   public void verify(final Node node) {
     final List<String> response = node.execute(transaction);
     assertThat(response).isInstanceOf(List.class);
-    assertThat(response).size().isEqualTo(3);
+    assertThat(response).size().isEqualTo(expectedNodeNum);
   }
 }

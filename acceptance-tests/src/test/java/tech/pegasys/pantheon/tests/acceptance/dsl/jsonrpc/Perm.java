@@ -64,7 +64,7 @@ public class Perm {
     return new RemoveNodeSuccess(transactions.removeNodesFromWhitelist(enodeList));
   }
 
-  public Condition getNodesWhitelist() {
-    return new GetNodesWhitelistPopulated(transactions.getNodesWhiteList());
+  public Condition getNodesWhitelist(final int expectedNodeNum) {
+    return new GetNodesWhitelistPopulated(transactions.getNodesWhiteList(), expectedNodeNum);
   }
 }
