@@ -346,7 +346,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeTrue(isFullInstantiation());
 
     // Load a TOML that configures literally everything
-    final URL configFile = Resources.getResource("kitchen_sink.toml");
+    final URL configFile = Resources.getResource("everything_config.toml");
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
 
