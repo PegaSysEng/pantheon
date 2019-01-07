@@ -11,7 +11,7 @@ Bootnodes are used to initially discover peers.
 
 ### Mainnet and Public Testnets
 
-For mainnet, Rinkeby, Ropsten, and Görli Pantheon predefines a list of enode URLs.  
+For mainnet, Rinkeby, Ropsten, and Görli, Pantheon predefines a list of enode URLs.  
 
 ### Private Networks
 

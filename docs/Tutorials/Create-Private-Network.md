@@ -3,7 +3,7 @@
 A private network provides a configurable network for testing. By configuring a low difficulty and enabling 
 mining, blocks are created quickly. 
 
-Multi-block and multi-user scenarios can be tested on a private network before moving to one of the public testnets. 
+You can test multi-block and multi-user scenarios on a private network before moving to one of the public testnets. 
 
 !!!important
     An Ethereum private network created as described here is isolated but not protected or secure. 
@@ -11,9 +11,9 @@ Multi-block and multi-user scenarios can be tested on a private network before m
 
 ## Prerequisites 
 
-[Pantheon Installed](../Installation/Install-Binaries.md) 
+[Pantheon](../Installation/Install-Binaries.md) 
 
-[Curl](https://curl.haxx.se/download.html) 
+[Curl (or similar web service client)](https://curl.haxx.se/download.html) 
 
 ## Steps
 
@@ -30,7 +30,7 @@ To create a private network:
 
 Each node requires a data directory for the blockchain data. When the node is started, the node key is saved in this directory. 
 
-Create directories for your private network, 3 nodes, and a data directory for each node: 
+Create directories for your private network, each of the three nodes, and a data directory for each node: 
 
 ```bash
 Private-Network/
@@ -50,7 +50,7 @@ accounts and balances.
 
 All nodes in a network must use the same genesis file. 
 
-Copy the following genesis definition to a file called `privateNetworkGenesis.json` and save it in the `Private-Network` directory. 
+Copy the following genesis definition to a file called `privateNetworkGenesis.json` and save it in the `Private-Network` directory: 
 
 ```json
 {
@@ -78,21 +78,7 @@ Copy the following genesis definition to a file called `privateNetworkGenesis.js
 
 !!! warning
     Do not use the accounts in the genesis file above on mainnet or any public network except for testing.
-    
     The private keys are displayed so the accounts are not secure. 
-
-Your private network directories and files are now: 
-
-```bash
-Private-Network/
-├── Node-1
-│   └── Node-1-Datadir
-├── Node-2
-│   └── Node-2-Datadir
-├── Node-3
-│   └── Node-3-Datadir
-└── privateNetworkGenesis.json
-```
    
 ### 3. Start First Node and Get Node Public Key 
 
@@ -100,7 +86,7 @@ To enable nodes to discover each other, a network requires one or more nodes to 
 For this private network, we will use Node-1 as the bootnode. This requires starting and stopping the 
 node and obtaining the node public key for the enode URL. 
 
-In the `Node-1` directory and start the node specifying the data directory created in step 1, 
+In the `Node-1` directory, start the node specifying the data directory created in step 1, 
 the genesis file created in step 2, and a network ID for your private network (`123` in this example):
 
 ```bash tab="MacOS"
@@ -111,7 +97,9 @@ pantheon --genesis=../privateNetworkGenesis.json --network-id 123 --datadir=Node
 pantheon --genesis=..\privateNetworkGenesis.json --network-id 123 --datadir=Node-1-DataDir
 ``` 
 
-A node private key for Node-1 is generated and written to the `key` file. The node public key is displayed: 
+A node private key for Node-1 is generated and written to the `key` file. 
+
+Wait until the node public key is displayed. For example:  
 
 `2019-01-01 05:03:27.430+10:00 | main | INFO  | KeyPairUtil | Generated new key 0x5ca7eca7a9b6b8128d8b9375fe2683c43023fd1504bca31f5123bd9b086155d81d0b05a08b63c7fa1027bbd9cfa338b6c54539c72b05a56c1f52f802c87ad09c and stored it to /Users/username/Private-Network/Node-3/Node-3-DataDir/key
 20`
@@ -129,7 +117,7 @@ pantheon --datadir=Node-1-Datadir --genesis=../privateNetworkGenesis.json export
 pantheon --datadir=Node-1-Datadir --genesis=..\privateNetworkGenesis.json export-pub-key Node-1-Datadir\publicKeyNode1
 ```
 
-Your node 1 directory is now: 
+Your node 1 directory now contains: 
 ```bash
 ├── Node-1
     ├── Node-1-Datadir
@@ -162,7 +150,7 @@ pantheon --datadir=Node-1-Datadir --genesis=..\privateNetworkGenesis.json --boot
 
 ### 5. Start Additional Nodes 
 
-The enode URL for Node-1 is required to specify Node-1 as the bootnode for Node-2 and Node-3. 
+You need the enode URL for Node-1 to specify Node-1 as the bootnode for Node-2 and Node-3. 
 
 The enode URL is `enode://<id>@<host:port>` where:
 
@@ -175,7 +163,7 @@ The enode URL is `enode://<id>@<host:port>` where:
     The enode URL is:
     `enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303` 
 
-In another terminal, change to the `Node-2` directory and start Node-2 specifying:
+Start another terminal, change to the `Node-2` directory and start Node-2 specifying:
  
 * Different port to Node-1 for P2P peer discovery using the [`--p2p-listen` option](../Reference/Pantheon-CLI-Syntax.md#p2p-listen).
 * Enode URL for Node-1 using the [`--bootnodes` option](../Reference/Pantheon-CLI-Syntax.md#bootnodes).
@@ -190,7 +178,7 @@ pantheon --datadir=Node-2-Datadir --genesis=../privateNetworkGenesis.json --boot
 pantheon --datadir=Node-2-Datadir --genesis=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-listen=127.0.0.1:30304      
 ```
 
-In another terminal, change to the `Node-3` directory and start Node-3 specifying: 
+Start another terminal, change to the `Node-3` directory and start Node-3 specifying: 
  
  * Different port to Node-1 and Node-2 for P2P peer discovery.
  * Data directory for Node-3 using the [`--datadir` option](../Reference/Pantheon-CLI-Syntax.md#datadir).
@@ -204,9 +192,9 @@ pantheon --datadir=Node-3-Datadir --genesis=../privateNetworkGenesis.json --boot
 pantheon --datadir=Node-3-Datadir --genesis=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-listen=127.0.0.1:30305      
 ```
 
-### 6. Confirm Private Network Working 
+### 6. Confirm Private Network is Working 
 
-In another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
+Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
 ```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' 127.0.0.1:8545
@@ -216,7 +204,7 @@ The result confirms Node-1 (the node running the JSON-RPC service) has two peers
 ```json
 {
   "jsonrpc" : "2.0",
-  "id" : 53,
+  "id" : 1,
   "result" : "0x2"
 }
 ```
@@ -233,3 +221,10 @@ Send transactions using `eth_sendRawTransaction` to [send ether or, deploy or in
 Use the [JSON-RPC API](../Reference/Using-JSON-RPC-API.md). 
 
 Start a node with the `--ws-enabled` option and use the [RPC Pub/Sub API](../Using-Pantheon/RPC-PubSub.md).       
+
+## Stop Nodes
+
+When finished using the private network, stop all nodes using ++ctrl+c++ in each terminal window. 
+
+!!!tip
+    To restart the private network in the future, start from [4. Restart First Node as Bootnode](#4-restart-first-node-as-bootnode). 
