@@ -16,7 +16,6 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -251,30 +250,34 @@ public class NewRoundMessageValidatorTest {
     final SignedData<ProposalPayload> proposal =
         proposerMessageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock);
 
-    final ConsensusRoundIdentifier preparedRound = new ConsensusRoundIdentifier(
-        roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 1);
+    final ConsensusRoundIdentifier preparedRound =
+        new ConsensusRoundIdentifier(
+            roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 1);
     final SignedData<ProposalPayload> differentProposal =
         proposerMessageFactory.createSignedProposalPayload(preparedRound, proposedBlock);
 
-    final Optional<PreparedCertificate> preparedCert = Optional.of(
-        new PreparedCertificate(
-            differentProposal,
-            Lists.newArrayList(
-                validatorMessageFactory.createSignedPreparePayload(
-                    roundIdentifier, proposedBlock.getHash()))));
+    final Optional<PreparedCertificate> preparedCert =
+        Optional.of(
+            new PreparedCertificate(
+                differentProposal,
+                Lists.newArrayList(
+                    validatorMessageFactory.createSignedPreparePayload(
+                        roundIdentifier, proposedBlock.getHash()))));
 
     // An earlier PrepareCert is added to ensure the path to find the latest PrepareCert
     // is correctly followed.
-    final ConsensusRoundIdentifier earlierPreparedRound = new ConsensusRoundIdentifier(
-        roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 2);
+    final ConsensusRoundIdentifier earlierPreparedRound =
+        new ConsensusRoundIdentifier(
+            roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 2);
     final SignedData<ProposalPayload> earlierProposal =
         proposerMessageFactory.createSignedProposalPayload(earlierPreparedRound, proposedBlock);
-    final Optional<PreparedCertificate> earlierPreparedCert = Optional.of(
-        new PreparedCertificate(
-            earlierProposal,
-            Lists.newArrayList(
-                validatorMessageFactory.createSignedPreparePayload(
-                    earlierPreparedRound, proposedBlock.getHash()))));
+    final Optional<PreparedCertificate> earlierPreparedCert =
+        Optional.of(
+            new PreparedCertificate(
+                earlierProposal,
+                Lists.newArrayList(
+                    validatorMessageFactory.createSignedPreparePayload(
+                        earlierPreparedRound, proposedBlock.getHash()))));
 
     final SignedData<NewRoundPayload> msg =
         proposerMessageFactory.createSignedNewRoundPayload(
