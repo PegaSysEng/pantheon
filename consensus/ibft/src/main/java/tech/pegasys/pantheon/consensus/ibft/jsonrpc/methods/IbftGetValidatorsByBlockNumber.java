@@ -43,7 +43,8 @@ public class IbftGetValidatorsByBlockNumber extends AbstractBlockParameterMethod
 
   @Override
   protected Object resultByBlockNumber(final JsonRpcRequest request, final long blockNumber) {
-    Optional<BlockHeader> blockHeader = blockchainQueries().getBlockHeaderByNumber(blockNumber);
+    final Optional<BlockHeader> blockHeader =
+        blockchainQueries().getBlockHeaderByNumber(blockNumber);
     return blockHeader.map(header -> ibftBlockInterface.validatorsInBlock(header)).orElse(null);
   }
 
