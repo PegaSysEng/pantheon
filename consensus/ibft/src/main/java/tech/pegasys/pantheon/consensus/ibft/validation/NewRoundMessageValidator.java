@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.validation;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPreparedCertificate;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
@@ -24,6 +25,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorForHeightFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -121,9 +123,11 @@ public class NewRoundMessageValidator {
 
     for (final SignedData<RoundChangePayload> roundChangeMsg :
         roundChangeCert.getRoundChangePayloads()) {
+      // RoundChangeValidator requires the "requisite Prepare Msg Count" (which is 1 less than
+      // quorum)
       final RoundChangeMessageValidator roundChangeValidator =
           new RoundChangeMessageValidator(
-              messageValidatorFactory, validators, quorumSize, chainHeight);
+              messageValidatorFactory, validators, quorumSize - 1, chainHeight);
 
       if (!roundChangeValidator.validateMessage(roundChangeMsg)) {
         LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");
@@ -148,13 +152,22 @@ public class NewRoundMessageValidator {
           "No round change messages have a preparedCertificate, any valid block may be proposed.");
       return true;
     }
-    if (!latestPreparedCertificate
-        .get()
-        .getProposalPayload()
-        .getPayload()
-        .getBlock()
-        .getHash()
-        .equals(payload.getProposalPayload().getPayload().getBlock().getHash())) {
+
+    // The block in the latest
+    final Hash roundAgnosticBlockHashPreparedCert =
+        IbftBlockHashing.calculateHashOfIbftBlockOnChain(
+            latestPreparedCertificate
+                .get()
+                .getProposalPayload()
+                .getPayload()
+                .getBlock()
+                .getHeader());
+
+    final Hash roundAgnosticBlockHashProposal =
+        IbftBlockHashing.calculateHashOfIbftBlockOnChain(
+            payload.getProposalPayload().getPayload().getBlock().getHeader());
+
+    if (!roundAgnosticBlockHashPreparedCert.equals(roundAgnosticBlockHashProposal)) {
       LOG.info(
           "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
       return false;

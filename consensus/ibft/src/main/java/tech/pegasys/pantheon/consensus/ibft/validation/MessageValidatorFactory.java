@@ -56,7 +56,7 @@ public class MessageValidatorFactory {
     return new RoundChangeMessageValidator(
         roundIdentifier -> createMessageValidator(roundIdentifier, parentHeader),
         validators,
-        IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
+        IbftHelpers.calculateRequiredValidatorQuorum(validators.size()) - 1,
         parentHeader.getNumber() + 1);
   }
 
