@@ -1,24 +1,28 @@
 # Accessing Logs Using JSON-RPC API Methods
 
-Access logs using:
+Access logs using JSON-RPC API methods:
  
 * [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges)
-* [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges)
+* [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs)
 * [`eth_getLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getlogs)
 
-Before using `eth_getFilterChanges` and `eth_getFilterLogs`, create the filter using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter).
+Before using [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges) and 
+[`eth_getFilterLogs`]((../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs)), create the filter 
+using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter).
 
-!!! note
-    The following examples are for the sample contract included in [Events and Logs](#Events-and-Logs.md). 
+!!! tip
+    The following examples are created using the sample contract included in [Events and Logs](Events-and-Logs.md). 
 
 ## Creating a Filter
 
 Create a filter using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter). 
 
 !!! example
-    If the [example contract](#example) was deployed to 0x42699a7612a82f1d9c36148af9c77354759b210b, the 
-    following body for `eth_newFilter` creates a filter to log when valueIndexed is set to 5. 
     
+    If the [example contract](Events-and-Logs.md#example) was deployed to 0x42699a7612a82f1d9c36148af9c77354759b210b, the 
+    following request for `eth_newFilter` creates a filter to log when `valueIndexed` is set to 5. 
+    
+    ```json
     {
      "jsonrpc":"2.0",
      "method":"eth_newFilter",
@@ -35,6 +39,7 @@ Create a filter using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth
       ],
       "id":1
     }
+    ```
         
 [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter) returns a filter ID hash (for example, `0x1ddf0c00989044e9b41cc0ae40272df3`). 
 
@@ -44,8 +49,10 @@ To poll the filter for changes that have occurred since the last poll, use [`eth
 with the filter ID hash returned by [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter). 
 
 !!! example
-    If the contract had been executed twice since the last poll, with valueIndexed set to 1 and 5, [`eth_getFilterChanges`] returns
-    only the log where the [topic](Events-and-Logs.md#event-parameters) for valueIndexed is 5: 
+    
+    If the contract had been executed twice since the last poll, with `valueIndexed` set to 1 and 5, 
+    [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges) returns
+    only the log where the [topic](Events-and-Logs.md#event-parameters) for `valueIndexed` is 5: 
     
     ```json
     {
@@ -72,10 +79,11 @@ with the filter ID hash returned by [`eth_newFilter`](../Reference/JSON-RPC-API-
 
 ### Getting All Logs for a Filter
 
-To get all logs matching a filter, use [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs). 
+To get all logs for a filter, use [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs). 
 
 !!! example
-    If the contract had been executed twice with valueIndexed set to 5 since the filter was created using `eth_newFilter`,
+    
+    If the contract had been executed twice with `valueIndexed` set to 5 since the filter was created using `eth_newFilter`,
     `eth_getFilterLogs` returns: 
     
     ```json
@@ -114,9 +122,11 @@ To get all logs matching a filter, use [`eth_getFilterLogs`](../Reference/JSON-R
         ]
     }
     ```
+    
 !!! tip 
     You can use [`eth_getLogs`](#getting-logs-using-a-filter-options-object) with a filter options object 
-    to get all the logs matching the filter options instead of using `eth_newFilter` followed by `eth_getFilterLogs`. 
+    to get all logs matching the filter options instead of using [`eth_newFilter`](../Reference/JSON-RPC-API-Objects.md#eth_newfilter)
+    followed by [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Objects.md#eth_getfilterlogs). 
     
 ## Uninstalling Filter
 
@@ -124,11 +134,14 @@ When you are finished using a filter, use [`eth_uninstallFilter`](../Reference/J
     
 ## Getting Logs Using a Filter Options Object 
 
-To get all the logs for a filter options object, use [`eth_getLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getlogs).   
+To get all logs for a filter options object, use [`eth_getLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getlogs).   
 
 !!! example 
-    The following body for `eth_getLogs` returns all the logs matching the filter object. 
+
+    The following request for `eth_getLogs` returns all the logs where the example contract has been 
+    deployed to 0x42699a7612a82f1d9c36148af9c77354759b210b and executed with `valueIndexed` set to 5.
     
+    ```json
     {
       "jsonrpc":"2.0",
       "method":"eth_getLogs",
@@ -144,9 +157,8 @@ To get all the logs for a filter options object, use [`eth_getLogs`](../Referenc
     	  }
       ], 
       "id":1
-    } 
+    }
+    ``` 
     
-    Calling `eth_getLogs` is equivalent to calling `eth_newFilter` followed by `eth_getFilterLogs`.
-    
-    This returns the same result as [calling eth_newFilter](#creating-a-fitler) followed by [eth_getFilterLogs](#getting-all-logs-for-a-filter). 
+    This returns the same result as calling [eth_newFilter](#creating-a-fitler) followed by [eth_getFilterLogs](#getting-all-logs-for-a-filter). 
 

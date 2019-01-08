@@ -2,11 +2,11 @@
 
 When a transaction is mined, smart contracts emit events and write logs to the blockchain.  
 
-Logs are associated with the contract address and are included in the blockchain but logs are not accessible 
+Logs are associated with the contract address and included in the blockchain but logs are not accessible 
 from within contracts. For example, logs can be used to display all transfers made using a specific contract 
 but not the current state of the contract. 
 
-A Dapp frontend can either poll for logs using the [JSON-RPC API filter methods](Accessing-Logs-Using-JSON-RPC.md) or subscribe to logs using the [RPC Pub/Sub API](RPC-PubSub.md#logs). 
+A Dapp frontend can either request logs using the [JSON-RPC API filter methods](Accessing-Logs-Using-JSON-RPC.md) or subscribe to logs using the [RPC Pub/Sub API](RPC-PubSub.md#logs). 
 
 ## Event Parameters
 
@@ -19,15 +19,15 @@ Non-indexed parameters are included in the logs `data` but cannot be easily sear
 
 ## Topic Filters
 
-[Filter options objects] have a `topics` key to filter log entries by topics. 
+[Filter options objects](../Reference/JSON-RPC-API-Objects.md#filter-options-object) have a `topics` key to filter logs by topics. 
 
 Topics are order-dependent. A transaction with a log containing topics `[A, B]` is matched with the following topic filters:
 
-    * [] - Match any topic
-    * [A] - Match A in first position 
-    * [[null], [B]] - Match any topic in first position AND B in second position
-    * [[A],[B]] - Match A in first position AND B in second position
-    * [[A, B], [C, D]] - Match (A OR B) in first position AND (C OR D) in second position 
+* `[]` - Match any topic
+* `[A]` - Match A in first position 
+* `[[null], [B]]` - Match any topic in first position AND B in second position
+* `[[A],[B]]` - Match A in first position AND B in second position
+* `[[A, B], [C, D]]` - Match (A OR B) in first position AND (C OR D) in second position 
 
 ### Example  
 
@@ -70,8 +70,8 @@ An example log entry created by invoking this contract with `valueIndexed` set t
 
 ### Topic Filters Example 
 
-The following filter option object returns log entries for the example contract where valueIndexed is set to 
-5 or 7. 
+The following filter option object returns log entries for the example contract where `valueIndexed` is set to 
+5 or 9: 
 
 ```json
 {
@@ -80,7 +80,7 @@ The following filter option object returns log entries for the example contract 
   "address":"0x43d1f9096674b5722d359b6402381816d5b22f28",
   "topics":[
     ["0xd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8"], 
-    ["0x0000000000000000000000000000000000000000000000000000000000000005", "0x0000000000000000000000000000000000000000000000000000000000000003"]
+    ["0x0000000000000000000000000000000000000000000000000000000000000005", "0x0000000000000000000000000000000000000000000000000000000000000009"]
   ]
 }
 ```
