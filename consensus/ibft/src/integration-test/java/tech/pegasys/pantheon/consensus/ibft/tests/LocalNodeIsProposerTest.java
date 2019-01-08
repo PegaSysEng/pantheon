@@ -1,0 +1,115 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package tech.pegasys.pantheon.consensus.ibft.tests;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
+import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
+
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
+import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
+import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
+import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
+import tech.pegasys.pantheon.ethereum.core.Block;
+
+import java.time.Clock;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class LocalNodeIsProposerTest {
+  // These tests assume the basic function of the Ibft Round State Machine has been proven
+  // via the LocalNodeIsNotProposerTest.
+
+  private final long blockTimeStamp = 100;
+  private final Clock mockBlockCreationTime = mock(Clock.class);
+
+  // Local node will propose the first block
+  private final TestContext context =
+      TestContext.createTestEnvironment(4, 1, mockBlockCreationTime);
+  private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
+  private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
+
+  private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
+
+  private Block expectedProposedBlock;
+  private SignedData<ProposalPayload> expectedTxProposal;
+  private SignedData<CommitPayload> expectedTxCommit;
+
+  @Before
+  public void setup() {
+    when(mockBlockCreationTime.millis()).thenReturn(blockTimeStamp * 1000);
+    expectedProposedBlock = context.createBlockForProposal(0, blockTimeStamp);
+    expectedTxProposal =
+        localNodeMessageFactory.createSignedProposalPayload(roundId, expectedProposedBlock);
+
+    final IbftExtraData extraData =
+        IbftExtraData.decode(expectedProposedBlock.getHeader().getExtraData());
+    final Signature commitSeal =
+        SECP256K1.sign(
+            IbftBlockHashing.calculateDataHashForCommittedSeal(
+                expectedProposedBlock.getHeader(), extraData),
+            context.getLocalNodeParams().getNodeKeys());
+
+    expectedTxCommit =
+        localNodeMessageFactory.createSignedCommitPayload(
+            roundId, expectedProposedBlock.getHash(), commitSeal);
+
+    // Start the Controller, and trigger "block timer" to send proposal.
+    context.getController().start();
+    context.getController().handleBlockTimerExpiry(new BlockTimerExpiry(roundId));
+  }
+
+  @Test
+  public void basicCase() {
+    assertPeersReceivedExactly(roles.getAllPeers(), expectedTxProposal);
+
+    // NOTE: In these test roles.getProposer() will return NULL.
+    roles.getNonProposingPeers().get(0).injectPrepare(roundId, expectedProposedBlock.getHash());
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+
+    roles.getNonProposingPeers().get(1).injectPrepare(roundId, expectedProposedBlock.getHash());
+    assertPeersReceivedExactly(roles.getAllPeers(), expectedTxCommit);
+
+    roles.getNonProposingPeers().get(1).injectCommit(roundId, expectedProposedBlock.getHash());
+    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+
+    roles.getNonProposingPeers().get(2).injectCommit(roundId, expectedProposedBlock.getHash());
+    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+  }
+
+  @Test
+  public void importsToChainWithoutReceivingPrepareMessages() {
+    assertPeersReceivedExactly(roles.getAllPeers(), expectedTxProposal);
+
+    roles.getNonProposingPeers().get(1).injectCommit(roundId, expectedProposedBlock.getHash());
+    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+
+    roles.getNonProposingPeers().get(2).injectCommit(roundId, expectedProposedBlock.getHash());
+    assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+  }
+}
