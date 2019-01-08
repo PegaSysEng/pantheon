@@ -18,6 +18,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResult;
+import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResultType;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -88,11 +90,13 @@ public class PermRemoveNodesFromWhitelistTest {
   }
 
   @Test
-  public void shouldRemoveSingleValidNode() throws Exception {
+  public void shouldRemoveSingleValidNode() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1));
     final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), SUCCESS_RESULT);
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(nodeWhitelistController.removeNodes(any()))
+        .thenReturn(new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS));
 
     final JsonRpcResponse actual = method.response(request);
 
@@ -103,11 +107,13 @@ public class PermRemoveNodesFromWhitelistTest {
   }
 
   @Test
-  public void shouldRemoveMultipleValidNodes() throws Exception {
+  public void shouldRemoveMultipleValidNodes() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1, enode2, enode3));
     final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), SUCCESS_RESULT);
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(nodeWhitelistController.removeNodes(any()))
+        .thenReturn(new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS));
 
     final JsonRpcResponse actual = method.response(request);
 

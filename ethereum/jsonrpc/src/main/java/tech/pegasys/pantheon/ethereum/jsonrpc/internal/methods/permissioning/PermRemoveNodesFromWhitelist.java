@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,12 +56,21 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
               .map(this::parsePeer)
               .collect(Collectors.toList());
 
-      p2pNetwork.getNodeWhitelistController().removeNodes(peers);
-      return new JsonRpcSuccessResponse(req.getId(), true);
+      NodeWhitelistController.NodesWhitelistResult nodesWhitelistResult =
+          p2pNetwork.getNodeWhitelistController().removeNodes(peers);
+
+      switch (nodesWhitelistResult.result()) {
+        case SUCCESS:
+          return new JsonRpcSuccessResponse(req.getId(), true);
+        case REMOVE_ERROR_ABSENT_ENTRY:
+          return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_MISSING_ENTRY);
+        default:
+          throw new Exception();
+      }
     } catch (IllegalArgumentException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_INVALID_ENTRY);
     } catch (Exception e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_MISSING_ENTRY);
+      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INTERNAL_ERROR);
     }
   }
 

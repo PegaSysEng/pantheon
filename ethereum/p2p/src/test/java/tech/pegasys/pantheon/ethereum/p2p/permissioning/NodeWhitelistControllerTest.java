@@ -13,13 +13,13 @@
 package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResult;
+import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResultType;
 
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import com.google.common.collect.Lists;
-import org.assertj.core.api.ThrowableAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,30 +44,23 @@ public class NodeWhitelistControllerTest {
   public void shouldNotAddDuplicateNodes() {
     controller.addNode(DefaultPeer.fromURI(enode1));
 
-    ThrowableAssert.ThrowingCallable throwingCallable =
-        () ->
-            controller.addNodes(
-                Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode2)));
-    final Throwable thrown = catchThrowable(throwingCallable);
+    NodesWhitelistResult expected =
+        new NodesWhitelistResult(NodesWhitelistResultType.ADD_ERROR_DUPLICATED_ENTRY);
+    NodesWhitelistResult actualResult =
+        controller.addNodes(
+            Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode2)));
 
-    assertThat(thrown)
-        .isInstanceOf(Exception.class)
-        .hasNoCause()
-        .hasMessageEndingWith("already exists in whitelist.");
+    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
 
   @Test
   public void shouldNotRemoveNodesThatDoNotExist() {
-    ThrowableAssert.ThrowingCallable throwingCallable =
-        () ->
-            controller.removeNodes(
-                Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode2)));
-    ;
-    final Throwable thrown = catchThrowable(throwingCallable);
+    NodesWhitelistResult expected =
+        new NodesWhitelistResult(NodesWhitelistResultType.REMOVE_ERROR_ABSENT_ENTRY);
+    NodesWhitelistResult actualResult =
+        controller.removeNodes(
+            Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode2)));
 
-    assertThat(thrown)
-        .isInstanceOf(Exception.class)
-        .hasNoCause()
-        .hasMessageEndingWith("does not exist in whitelist.");
+    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
 }

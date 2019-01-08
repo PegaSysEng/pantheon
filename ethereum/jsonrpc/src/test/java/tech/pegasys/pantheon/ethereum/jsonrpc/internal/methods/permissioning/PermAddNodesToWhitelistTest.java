@@ -18,6 +18,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResult;
+import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResultType;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -98,11 +100,13 @@ public class PermAddNodesToWhitelistTest {
   }
 
   @Test
-  public void shouldAddSingleValidNode() throws Exception {
+  public void shouldAddSingleValidNode() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1));
     final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), JSON_SUCCESS);
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(nodeWhitelistController.addNodes(any()))
+        .thenReturn(new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS));
 
     final JsonRpcResponse actual = method.response(request);
 
@@ -113,11 +117,13 @@ public class PermAddNodesToWhitelistTest {
   }
 
   @Test
-  public void shouldAddMultipleValidNodes() throws Exception {
+  public void shouldAddMultipleValidNodes() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1, enode2, enode3));
     final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), JSON_SUCCESS);
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(nodeWhitelistController.addNodes(any()))
+        .thenReturn(new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS));
 
     final JsonRpcResponse actual = method.response(request);
 
