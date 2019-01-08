@@ -1108,16 +1108,9 @@ Creates a logs filter to log state changes. To poll for state changes, use [eth_
 
 `Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object). 
 
-Topics are order-dependent. A transaction with a log containing topics `[A, B]` would be matched with the following topic filters:
-
-    * [] - Match any topic
-    * [A] - Match A in first position (and any topic thereafter)
-    * [null, B] - Match any topic in first position AND B in second position (and any topic thereafter)
-    * [A, B] - Match A in first position AND B in second position (and any topic thereafter)
-    * [[A, B], [A, B]] - Match (A OR B) in first position AND (A OR B) in second position (and any topic thereafter)
-
 !!!note
-    `fromBlock` and `toBlock` in the filter options object default to `latest`. To obtain logs using `eth_getFilterLogs`, set `fromBlock` and `toBlock` appropriately.
+    `fromBlock` and `toBlock` in the filter options object default to `latest`. To obtain logs using
+     `eth_getFilterLogs`, set `fromBlock` and `toBlock` appropriately.
     
 **Returns**
 

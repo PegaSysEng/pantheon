@@ -6,16 +6,28 @@ Logs are associated with the contract address and are included in the blockchain
 from within contracts. For example, logs can be used to display all transfers made using a specific contract 
 but not the current state of the contract. 
 
-A Dapp frontend can either poll for logs using the JSON-RPC API filter methods over HTTP or subscribe to logs using the RPC Pub/Sub API. 
+A Dapp frontend can either poll for logs using the [JSON-RPC API filter methods](Accessing-Logs-Using-JSON-RPC.md) or subscribe to logs using the [RPC Pub/Sub API](RPC-PubSub.md#logs). 
 
 ## Event Parameters
 
 Up to three event parameters can have the `indexed` attribute. Indexed parameters are stored as `topics` 
-in the logs. Indexed parameters can be easily searched and filtered.
+in the logs. Indexed parameters can be searched and filtered.
 
 The first topic is the event signature hash. 
 
 Non-indexed parameters are included in the logs `data` but cannot be easily searched or filtered. 
+
+## Topic Filters
+
+[Filter options objects] have a `topics` key to filter log entries by topics. 
+
+Topics are order-dependent. A transaction with a log containing topics `[A, B]` is matched with the following topic filters:
+
+    * [] - Match any topic
+    * [A] - Match A in first position 
+    * [[null], [B]] - Match any topic in first position AND B in second position
+    * [[A],[B]] - Match A in first position AND B in second position
+    * [[A, B], [C, D]] - Match (A OR B) in first position AND (C OR D) in second position 
 
 ### Example  
 
@@ -56,43 +68,20 @@ An example log entry created by invoking this contract with `valueIndexed` set t
 }
 ```
 
-## Polling for Logs
+### Topic Filters Example 
 
-To poll for logs using the JSON-RPC API, create a filter using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter). 
+The following filter option object returns log entries for the example contract where valueIndexed is set to 
+5 or 7. 
 
-!!! example
-    If the [example contract](#example) was deployed to 0x42699a7612a82f1d9c36148af9c77354759b210b, the 
-    following body for `eth_newFilter` creates a filter to log when valueIndexed is set to 5. 
-    
-    {
-     "jsonrpc":"2.0",
-     "method":"eth_newFilter",
-     "params":[
-        {
-          "fromBlock":"earliest", 
-          "toBlock":"latest", 
-          "address":"0x42699a7612a82f1d9c36148af9c77354759b210b", 
-          "topics":[
-            ["0xd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8", 
-             "0x0000000000000000000000000000000000000000000000000000000000000005"]
-           ]
-         }
-      ],
-      "id":1
-    }
-        
+```json
+{
+  "fromBlock":"earliest", 
+  "toBlock":"latest", 
+  "address":"0x43d1f9096674b5722d359b6402381816d5b22f28",
+  "topics":[
+    ["0xd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8"], 
+    ["0x0000000000000000000000000000000000000000000000000000000000000005", "0x0000000000000000000000000000000000000000000000000000000000000003"]
+  ]
+}
+```
 
-
-
-Create filter. 
-
-Poll filter (eth_getFilterChanges) and get logs (eth_getFilterLogs)
-
-Uninstall 
-
-
-## Listening for Logs  
-
-Subscribe to logs for contract. 
-
-Unsubscribe 
