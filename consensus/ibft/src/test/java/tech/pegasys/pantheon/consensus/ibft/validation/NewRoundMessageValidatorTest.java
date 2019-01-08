@@ -48,7 +48,6 @@ public class NewRoundMessageValidatorTest {
   private final KeyPair otherValidatorKey = KeyPair.generate();
   private final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
   private final MessageFactory validatorMessageFactory = new MessageFactory(validatorKey);
-  private final MessageFactory otherValidatorMessageFactory = new MessageFactory(otherValidatorKey);
   private final Address proposerAddress = Util.publicKeyToAddress(proposerKey.getPublicKey());
   private final List<Address> validators = Lists.newArrayList();
   private final long chainHeight = 2;
@@ -290,5 +289,28 @@ public class NewRoundMessageValidatorTest {
     proposerMessageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(msg)).isTrue();
+  }
+
+  @Test
+  public void roundNumberInBlockMisMatchesProposalMessageContent() {
+    when(messageValidator.addSignedProposalPayload(any())).thenReturn(false, true);
+    final Block wrongRoundblock =
+        TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber() + 1);
+
+    final SignedData<ProposalPayload> proposal =
+        proposerMessageFactory.createSignedProposalPayload(roundIdentifier, wrongRoundblock);
+
+    final SignedData<NewRoundPayload> msg =
+        proposerMessageFactory.createSignedNewRoundPayload(
+            roundIdentifier,
+            new RoundChangeCertificate(Lists.newArrayList(
+                proposerMessageFactory
+                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty()),
+                validatorMessageFactory
+                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty()))),
+                proposal);
+
+    assertThat(validator.validateNewRoundMessage(msg)).isFalse();
+
   }
 }
