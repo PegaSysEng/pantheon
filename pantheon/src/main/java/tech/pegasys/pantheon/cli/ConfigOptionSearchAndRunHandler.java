@@ -24,7 +24,7 @@ import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.ParseResult;
 
 class ConfigOptionSearchAndRunHandler extends AbstractParseResultHandler<List<Object>> {
-  private final static String DOCKER_CONFIG_LOCATION = "/etc/pantheon/pantheon.conf";
+  private static final String DOCKER_CONFIG_LOCATION = "/etc/pantheon/pantheon.conf";
 
   private final AbstractParseResultHandler<List<Object>> resultHandler;
   private final DefaultExceptionHandler<List<Object>> exceptionHandler;
