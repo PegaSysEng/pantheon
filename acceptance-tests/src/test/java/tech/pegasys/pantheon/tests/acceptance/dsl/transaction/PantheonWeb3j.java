@@ -110,9 +110,6 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
 
   public static class GetAccountsWhitelistResponse extends Response<List<String>> {}
 
-  public Request<?, AddNodeResponse> addNodesToWhitelist(final List<String> enodes) {
-    return new Request<>("perm_addNodesToWhitelist", enodes, web3jService, AddNodeResponse.class);
-  public Request<?, AddNodeResponse> addNodesToWhitelist(final String enodes) {
   public Request<?, AddNodeResponse> addNodesToWhitelist(final List<String> enodeList) {
     return new Request<>(
         "perm_addNodesToWhitelist",

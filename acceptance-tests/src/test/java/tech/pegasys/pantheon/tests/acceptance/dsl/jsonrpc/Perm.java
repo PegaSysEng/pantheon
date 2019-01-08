@@ -14,17 +14,14 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddAccountsToWhitelistSuccessfully;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetExpectedAccountsWhitelist;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveAccountsFromWhitelistSuccessfully;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.AddNodeSuccess;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetExpectedAccountsWhitelist;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.GetNodesWhitelistPopulated;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveAccountsFromWhitelistSuccessfully;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm.RemoveNodeSuccess;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 
-import java.util.List;
 import java.util.Arrays;
-
 import java.util.List;
 
 public class Perm {
@@ -47,14 +44,7 @@ public class Perm {
   public Condition expectAccountsWhitelist(final String... expectedAccounts) {
     return new GetExpectedAccountsWhitelist(
         transactions.getAccountsWhiteList(), Arrays.asList(expectedAccounts));
-}
-
-  public Perm(final PermTransaction transactions) {
-  public Perm(final PermTransactions transactions) {
-    this.transactions = transactions;
   }
-
-  private final PermTransactions transactions;
 
   public Condition addNodesToWhitelist(final List<String> enodeList) {
     return new AddNodeSuccess(transactions.addNodesToWhitelist(enodeList));

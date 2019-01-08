@@ -24,7 +24,6 @@ public class RpcApis {
   public static final RpcApi PERM = new RpcApi("PERM");
   public static final RpcApi WEB3 = new RpcApi("WEB3");
   public static final RpcApi ADMIN = new RpcApi("ADMIN");
-  public static final RpcApi PERM = new RpcApi("PERM");
 
   public static final Collection<RpcApi> DEFAULT_JSON_RPC_APIS = Arrays.asList(ETH, NET, WEB3);
 
