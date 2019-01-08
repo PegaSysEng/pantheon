@@ -146,30 +146,8 @@ public class NewRoundMessageValidatorTest {
   }
 
   @Test
-  public void newRoundContainingProposalFromDifferentValidatorFails() {
-    msgBuilder.setProposalPayload(
-        validatorMessageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock));
-
-    final SignedData<NewRoundPayload> inValidMsg = signPayload(msgBuilder.build(), proposerKey);
-
-    assertThat(validator.validateNewRoundMessage(inValidMsg)).isFalse();
-  }
-
-  @Test
   public void newRoundWithEmptyRoundChangeCertificateFails() {
     msgBuilder.setRoundChangeCertificate(new RoundChangeCertificate(Collections.emptyList()));
-
-    final SignedData<NewRoundPayload> inValidMsg = signPayload(msgBuilder.build(), proposerKey);
-
-    assertThat(validator.validateNewRoundMessage(inValidMsg)).isFalse();
-  }
-
-  @Test
-  public void newRoundWithMismatchOfRoundIdentifierToProposalMessageFails() {
-    final ConsensusRoundIdentifier mismatchedRound = TestHelpers.createFrom(roundIdentifier, 0, -1);
-
-    msgBuilder.setProposalPayload(
-        proposerMessageFactory.createSignedProposalPayload(mismatchedRound, proposedBlock));
 
     final SignedData<NewRoundPayload> inValidMsg = signPayload(msgBuilder.build(), proposerKey);
 
@@ -292,13 +270,11 @@ public class NewRoundMessageValidatorTest {
   }
 
   @Test
-  public void roundNumberInBlockMisMatchesProposalMessageContent() {
+  public void embeddedProposalFailsValidation() {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(false, true);
-    final Block wrongRoundblock =
-        TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber() + 1);
 
     final SignedData<ProposalPayload> proposal =
-        proposerMessageFactory.createSignedProposalPayload(roundIdentifier, wrongRoundblock);
+        proposerMessageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock);
 
     final SignedData<NewRoundPayload> msg =
         proposerMessageFactory.createSignedNewRoundPayload(
