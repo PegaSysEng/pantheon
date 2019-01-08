@@ -1,17 +1,17 @@
-description: Pantheon Clique Proof-of-Authority (PoA) consensus protocol implementation
-path: blob/master/config/src/main/resources/
-source: rinkeby.json
+description: Pantheon IBFT 2.0 Proof-of-Authority (PoA) consensus protocol implementation
 <!--- END of page meta data -->
 
 # Proof of Authority
 
-Pantheon implements the Clique Proof-of-Authority (PoA) consensus protocol. Clique is used by the Rinkeby testnet and can be used for private networks. 
+Pantheon implements the IBFT 2.0 Proof-of-Authority (PoA) consensus protocol. IBFT 2.0 can be used for private networks. 
 
-In PoA networks, transactions and blocks are validated by approved accounts, known as signers. Signers take turns to create the next block. Existing signers propose and vote to add or remove signers. 
+In IBFT 2.0 networks, transactions and blocks are validated by approved accounts, known as signers. Signers take turns to create the next block. Existing signers propose and vote to add or remove signers. 
+
+## Configuration File
 
 ## Genesis File
 
-To use Clique in a private network, Pantheon requires a PoA genesis file. When connecting to Rinkeby, Pantheon uses the [`rinkeby.json`](https://github.com/PegaSysEng/pantheon/blob/master/config/src/main/resources/rinkeby.json) genesis file in the `/pantheon/config/src/main/resources` directory.
+To use IBFT 2.0 requires an IBFT 2.0 genesis file. When connecting to Rinkeby, Pantheon uses the [`rinkeby.json`](https://github.com/PegaSysEng/pantheon/blob/master/config/src/main/resources/rinkeby.json) genesis file in the `/pantheon/config/src/main/resources` directory.
 
 A PoA genesis file defines properties specific to Clique:
 
@@ -39,15 +39,15 @@ The properties specific to Clique are:
 
 To connect to the Rinkeby testnet, start Pantheon with the [`--rinkeby`](../Reference/Pantheon-CLI-Syntax.md#rinkeby) command line option. To start a node on a PoA private network, use the [`--network-id`](../Reference/Pantheon-CLI-Syntax.md#network-id) command line option and [`--genesis`](../Reference/Pantheon-CLI-Syntax.md#genesis`) option. 
 
-### Adding and Removing Signers
+### Adding and Removing Validators
 
-To propose adding or removing signers using the JSON-RPC methods, you must enable the RPC interface using the [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) option. If also using the [`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) option, include `CLIQUE`.
+To propose adding or removing validators using the JSON-RPC methods, you must enable the RPC interface using the [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) option. If also using the [`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) option, include `IBFT`.
 
-The JSON-RPC methods to add or remove signers are:
+The JSON-RPC methods to add or remove validators are:
 
-* [clique_propose](../Reference/JSON-RPC-API-Methods.md#clique_propose)
-* [clique_getSigners](../Reference/JSON-RPC-API-Methods.md#clique_getsigners)
-* [clique_discard](../Reference/JSON-RPC-API-Methods.md#clique_discard)
+* [ibft_](../Reference/JSON-RPC-API-Methods.md#)
+* [ibft_proposeValidatorVote](../Reference/JSON-RPC-API-Methods.md#ibft_proposeValidatorVote)
+* [ibft_discardValidatorVote](../Reference/JSON-RPC-API-Methods.md#clique_discard)
 
 To propose adding a signer, call `clique_propose` specifying the address of the proposed signer and `true`.
 !!! example "JSON-RPC clique_propose Request Example"
@@ -58,6 +58,10 @@ To propose adding a signer, call `clique_propose` specifying the address of the 
 When the next block is created by the signer, a vote is added to the block for the proposed signer.  
 
 When more than half of the existing signers propose adding the signer and their votes have been distributed in blocks, the signer is added and can begin signing blocks. 
+
+The JSON-RPC methods to list validators are: 
+* [ibft_getValidatorsByBlockNumber](../Reference/JSON-RPC-API-Methods.md#ibft_getValidatorsByBlockNumber)
+* [ibft_getValidatorsByBlockHash](../Reference/JSON-RPC-API-Methods.md#ibft_getValidatorsByBlockHash)
 
 Use `clique_getSigners` to return a list of the signers and to confirm that your proposed signer has been added. 
 !!! example "JSON-RPC clique_getSigners Request Example"
