@@ -105,6 +105,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private static final long DEFAULT_MAX_REFRESH_DELAY = 3600000;
   private static final long DEFAULT_MIN_REFRESH_DELAY = 1;
 
+  private static final String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
+  private static final String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
+
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
     public RpcApi convert(final String name) throws RpcApisConversionException {
@@ -730,7 +733,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isFullInstantiation()) {
       return standaloneCommands.genesisFile;
     } else if (isDocker) {
-      final File genesisFile = new File("/etc/pantheon/genesis.json");
+      final File genesisFile = new File(DOCKER_GENESIS_LOCATION);
       if (genesisFile.exists()) {
         return genesisFile;
       } else {
@@ -745,7 +748,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isFullInstantiation()) {
       return standaloneCommands.dataDir;
     } else if (isDocker) {
-      return Paths.get("/var/lib/pantheon");
+      return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {
       return getDefaultPantheonDataDir(this);
     }

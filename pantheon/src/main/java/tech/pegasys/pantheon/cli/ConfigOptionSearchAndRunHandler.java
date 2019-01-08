@@ -24,6 +24,7 @@ import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.ParseResult;
 
 class ConfigOptionSearchAndRunHandler extends AbstractParseResultHandler<List<Object>> {
+  private final static String DOCKER_CONFIG_LOCATION = "/etc/pantheon/pantheon.conf";
 
   private final AbstractParseResultHandler<List<Object>> resultHandler;
   private final DefaultExceptionHandler<List<Object>> exceptionHandler;
@@ -59,7 +60,7 @@ class ConfigOptionSearchAndRunHandler extends AbstractParseResultHandler<List<Ob
           new TomlConfigFileDefaultProvider(commandLine, configFile);
       commandLine.setDefaultValueProvider(tomlConfigFileDefaultProvider);
     } else if (isDocker) {
-      final File configFile = new File("/etc/pantheon/pantheon.conf");
+      final File configFile = new File(DOCKER_CONFIG_LOCATION);
       if (configFile.exists()) {
         final TomlConfigFileDefaultProvider tomlConfigFileDefaultProvider =
             new TomlConfigFileDefaultProvider(commandLine, configFile);
