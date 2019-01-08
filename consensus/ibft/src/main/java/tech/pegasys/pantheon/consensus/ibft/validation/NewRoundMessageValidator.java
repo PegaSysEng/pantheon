@@ -80,8 +80,9 @@ public class NewRoundMessageValidator {
     }
 
     final SignedData<ProposalPayload> proposalPayload = payload.getProposalPayload();
-    final MessageValidator proposalValidator = messageValidatorFactory.createAt(rootRoundIdentifier);
-    if(!proposalValidator.addSignedProposalPayload(proposalPayload)) {
+    final MessageValidator proposalValidator =
+        messageValidatorFactory.createAt(rootRoundIdentifier);
+    if (!proposalValidator.addSignedProposalPayload(proposalPayload)) {
       LOG.info("Invalid NewRound message, embedded proposal failed validation");
       return false;
     }

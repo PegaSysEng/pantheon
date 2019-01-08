@@ -303,14 +303,14 @@ public class NewRoundMessageValidatorTest {
     final SignedData<NewRoundPayload> msg =
         proposerMessageFactory.createSignedNewRoundPayload(
             roundIdentifier,
-            new RoundChangeCertificate(Lists.newArrayList(
-                proposerMessageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty()),
-                validatorMessageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty()))),
-                proposal);
+            new RoundChangeCertificate(
+                Lists.newArrayList(
+                    proposerMessageFactory.createSignedRoundChangePayload(
+                        roundIdentifier, Optional.empty()),
+                    validatorMessageFactory.createSignedRoundChangePayload(
+                        roundIdentifier, Optional.empty()))),
+            proposal);
 
     assertThat(validator.validateNewRoundMessage(msg)).isFalse();
-
   }
 }
