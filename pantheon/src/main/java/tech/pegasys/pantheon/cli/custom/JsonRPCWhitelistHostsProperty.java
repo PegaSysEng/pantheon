@@ -15,25 +15,28 @@ package tech.pegasys.pantheon.cli.custom;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 
 public class JsonRPCWhitelistHostsProperty extends AbstractCollection<String> {
-  private List<String> hostnamesWhitelist = new ArrayList<>();
 
-  private JsonRPCWhitelistHostsProperty(final List<String> hostnamesWhitelist) {
-    this.hostnamesWhitelist = hostnamesWhitelist;
-  }
+  private final List<String> hostnamesWhitelist = new ArrayList<>();
 
   public JsonRPCWhitelistHostsProperty() {}
 
   @Override
   @Nonnull
   public Iterator<String> iterator() {
-    return hostnamesWhitelist.iterator();
+    if (hostnamesWhitelist.size() == 1 && hostnamesWhitelist.get(0).equals("none")) {
+      return Collections.emptyIterator();
+    } else {
+      return hostnamesWhitelist.iterator();
+    }
   }
 
   @Override
@@ -43,26 +46,36 @@ public class JsonRPCWhitelistHostsProperty extends AbstractCollection<String> {
 
   @Override
   public boolean add(final String string) {
-    for (String s : Splitter.onPattern("\\s*,\\s*").split(string)) {
-      if (string.isEmpty()) {
-        throw new IllegalArgumentException("Hostname cannot be empty string");
-      } else if ("all".equals(s) || "*".equals(s)) {
-        if (!hostnamesWhitelist.isEmpty()) {
-          throw new IllegalArgumentException(
-              "Value '" + s + "' can't be used with other hostnames");
-        } else {
-          hostnamesWhitelist.add("*");
-        }
-      } else {
-        hostnamesWhitelist.add(s);
-      }
-    }
-    return true;
+    return addAll(Collections.singleton(string));
   }
 
   @Override
   public boolean addAll(final Collection<? extends String> collection) {
-    collection.forEach(this::add);
-    return true;
+    final int initialSize = hostnamesWhitelist.size();
+    for (final String string : collection) {
+      if (Strings.isNullOrEmpty(string)) {
+        throw new IllegalArgumentException("Hostname cannot be empty string or null string.");
+      }
+      for (final String s : Splitter.onPattern("\\s*,+\\s*").split(string)) {
+        if ("all".equals(s)) {
+          hostnamesWhitelist.add("*");
+        } else {
+          hostnamesWhitelist.add(s);
+        }
+      }
+    }
+
+    if (hostnamesWhitelist.contains("none")) {
+      if (hostnamesWhitelist.size() > 1) {
+        throw new IllegalArgumentException("Value 'none' can't be used with other hostnames");
+      }
+    } else if (hostnamesWhitelist.contains("*")) {
+      if (hostnamesWhitelist.size() > 1) {
+        throw new IllegalArgumentException(
+            "Values '*' or 'all' can't be used with other hostnames");
+      }
+    }
+
+    return hostnamesWhitelist.size() != initialSize;
   }
 }

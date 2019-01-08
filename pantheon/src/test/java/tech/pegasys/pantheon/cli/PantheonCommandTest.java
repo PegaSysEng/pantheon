@@ -867,6 +867,21 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void jsonRpcCorsOriginsDoubleCommaFilteredOut() {
+    final String[] origins = {"http://domain1.com", "https://domain2.com"};
+    parseCommand("--rpc-cors-origins", String.join(",,", origins));
+
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getCorsAllowedDomains().toArray())
+        .isEqualTo(origins);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void jsonRpcCorsOriginsWithWildcardMustBuildListWithWildcard() {
     final String[] origins = {"*"};
     parseCommand("--rpc-cors-origins", String.join(",", origins));
@@ -921,6 +936,18 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void jsonRpcCorsOriginsNoneWithAnotherDomainMustFailNoneFirst() {
+    final String[] origins = {"none", "http://domain1.com"};
+    parseCommand("--rpc-cors-origins", String.join(",", origins));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Value 'none' can't be used with other domains");
+  }
+
+  @Test
   public void jsonRpcCorsOriginsAllWithAnotherDomainMustFail() {
     parseCommand("--rpc-cors-origins=http://domain1.com,all");
 
@@ -928,7 +955,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Value 'all' can't be used with other domains");
+        .contains("Values '*' or 'all' can't be used with other domains");
   }
 
   @Test
@@ -939,7 +966,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Value 'all' can't be used with other domains");
+        .contains("Values '*' or 'all' can't be used with other domains");
   }
 
   @Test
@@ -950,7 +977,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Value '*' can't be used with other domains");
+        .contains("Values '*' or 'all' can't be used with other domains");
   }
 
   @Test
@@ -961,7 +988,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Value '*' can't be used with other domains");
+        .contains("Values '*' or 'all' can't be used with other domains");
   }
 
   @Test
@@ -974,6 +1001,17 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains("Domain values result in invalid regex pattern");
+  }
+
+  @Test
+  public void jsonRpcCorsOriginsEmtyValueFails() {
+    parseCommand("--rpc-cors-origins=");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Domain cannot be empty string or null string.");
   }
 
   @Test
@@ -995,6 +1033,22 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcHostWhitelistAcceptsMultipleArguments() {
     parseCommand("--host-whitelist", "a,b");
+
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist().size()).isEqualTo(2);
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist()).contains("a", "b");
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist())
+        .doesNotContain("*", "localhost");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistAcceptsDoubleComma() {
+    parseCommand("--host-whitelist", "a,,b");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1033,7 +1087,19 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Value '*' can't be used with other hostnames");
+        .contains("Values '*' or 'all' can't be used with other hostnames");
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistStarWithAnotherHostnameMustFailStarFirst() {
+    final String[] origins = {"*", "friend"};
+    parseCommand("--host-whitelist", String.join(",", origins));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Values '*' or 'all' can't be used with other hostnames");
   }
 
   @Test
@@ -1045,7 +1111,56 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Value 'all' can't be used with other hostnames");
+        .contains("Values '*' or 'all' can't be used with other hostnames");
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistWithNoneMustBuildEmptyList() {
+    final String[] origins = {"none"};
+    parseCommand("--host-whitelist", String.join(",", origins));
+
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getHostsWhitelist()).isEmpty();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistNoneWithAnotherDomainMustFail() {
+    final String[] origins = {"http://domain1.com", "none"};
+    parseCommand("--host-whitelist", String.join(",", origins));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Value 'none' can't be used with other hostnames");
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistNoneWithAnotherDomainMustFailNoneFirst() {
+    final String[] origins = {"none", "http://domain1.com"};
+    parseCommand("--host-whitelist", String.join(",", origins));
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Value 'none' can't be used with other hostnames");
+  }
+
+  @Test
+  public void jsonRpcHostWhitelistEmptyValueFails() {
+    parseCommand("--host-whitelist=");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Hostname cannot be empty string or null string.");
   }
 
   @Test
