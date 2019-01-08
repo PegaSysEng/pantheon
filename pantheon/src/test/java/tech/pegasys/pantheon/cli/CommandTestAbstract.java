@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.BlockImporter;
 
 import java.io.ByteArrayOutputStream;
@@ -43,6 +44,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import picocli.CommandLine;
 import picocli.CommandLine.DefaultExceptionHandler;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.RunLast;
@@ -73,6 +75,7 @@ public abstract class CommandTestAbstract {
   @Captor ArgumentCaptor<Integer> intArgumentCaptor;
   @Captor ArgumentCaptor<JsonRpcConfiguration> jsonRpcConfigArgumentCaptor;
   @Captor ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
+  @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
   @Captor ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
   @Captor ArgumentCaptor<Collection<URI>> uriListArgumentCaptor;
 
@@ -99,10 +102,10 @@ public abstract class CommandTestAbstract {
     LOG.info("Standard error {}", commandErrorOutput.toString());
   }
 
-  void parseCommand(final String... args) {
+  CommandLine.Model.CommandSpec parseCommand(final String... args) {
 
-    final PantheonCommand pantheonCommand =
-        new PantheonCommand(
+    final TestPantheonCommand pantheonCommand =
+        new TestPantheonCommand(
             mockBlockImporter, mockRunnerBuilder, mockControllerBuilder, mockSyncConfBuilder);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
@@ -110,5 +113,19 @@ public abstract class CommandTestAbstract {
         new RunLast().useOut(outPrintStream).useAnsi(Ansi.OFF),
         new DefaultExceptionHandler<List<Object>>().useErr(errPrintStream).useAnsi(Ansi.OFF),
         args);
+    return pantheonCommand.spec;
+  }
+
+  @CommandLine.Command
+  static class TestPantheonCommand extends PantheonCommand {
+    @CommandLine.Spec CommandLine.Model.CommandSpec spec;
+
+    TestPantheonCommand(
+        final BlockImporter mockBlockImporter,
+        final RunnerBuilder mockRunnerBuilder,
+        final PantheonControllerBuilder mockControllerBuilder,
+        final SynchronizerConfiguration.Builder mockSyncConfBuilder) {
+      super(mockBlockImporter, mockRunnerBuilder, mockControllerBuilder, mockSyncConfBuilder);
+    }
   }
 }

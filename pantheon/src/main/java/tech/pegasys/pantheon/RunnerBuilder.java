@@ -54,6 +54,8 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsHttpService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.nio.file.Path;
@@ -80,6 +82,7 @@ public class RunnerBuilder {
   private WebSocketConfiguration webSocketConfiguration;
   private Path dataDir;
   private Collection<String> bannedNodeIds;
+  private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
   private PermissioningConfiguration permissioningConfiguration;
 
@@ -141,6 +144,11 @@ public class RunnerBuilder {
 
   public RunnerBuilder bannedNodeIds(final Collection<String> bannedNodeIds) {
     this.bannedNodeIds = bannedNodeIds;
+    return this;
+  }
+
+  public RunnerBuilder metricsConfiguration(final MetricsConfiguration metricsConfiguration) {
+    this.metricsConfiguration = metricsConfiguration;
     return this;
   }
 
@@ -222,9 +230,9 @@ public class RunnerBuilder {
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
 
+    final AccountWhitelistController accountWhitelistController =
+        new AccountWhitelistController(permissioningConfiguration);
     if (permissioningConfiguration.isAccountWhitelistSet()) {
-      AccountWhitelistController accountWhitelistController =
-          new AccountWhitelistController(permissioningConfiguration);
       transactionPool.setAccountWhitelist(accountWhitelistController);
     }
 
@@ -244,7 +252,8 @@ public class RunnerBuilder {
               metricsSystem,
               supportedCapabilities,
               jsonRpcConfiguration.getRpcApis(),
-              filterManager);
+              filterManager,
+              accountWhitelistController);
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
@@ -265,7 +274,8 @@ public class RunnerBuilder {
               metricsSystem,
               supportedCapabilities,
               webSocketConfiguration.getRpcApis(),
-              filterManager);
+              filterManager,
+              accountWhitelistController);
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(
@@ -285,8 +295,19 @@ public class RunnerBuilder {
                   vertx, webSocketConfiguration, subscriptionManager, webSocketsJsonRpcMethods));
     }
 
+    Optional<MetricsHttpService> metricsService = Optional.empty();
+    if (metricsConfiguration.isEnabled()) {
+      metricsService = Optional.of(createMetricsService(vertx, metricsConfiguration));
+    }
+
     return new Runner(
-        vertx, networkRunner, jsonRpcHttpService, webSocketService, pantheonController, dataDir);
+        vertx,
+        networkRunner,
+        jsonRpcHttpService,
+        webSocketService,
+        metricsService,
+        pantheonController,
+        dataDir);
   }
 
   private FilterManager createFilterManager(
@@ -312,7 +333,8 @@ public class RunnerBuilder {
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> jsonRpcApis,
-      final FilterManager filterManager) {
+      final FilterManager filterManager,
+      final AccountWhitelistController accountWhitelistController) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -327,7 +349,8 @@ public class RunnerBuilder {
                 metricsSystem,
                 supportedCapabilities,
                 jsonRpcApis,
-                filterManager);
+                filterManager,
+                accountWhitelistController);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
   }
@@ -381,5 +404,10 @@ public class RunnerBuilder {
         new WebSocketRequestHandler(vertx, websocketMethodsFactory.methods());
 
     return new WebSocketService(vertx, configuration, websocketRequestHandler);
+  }
+
+  private MetricsHttpService createMetricsService(
+      final Vertx vertx, final MetricsConfiguration configuration) {
+    return new MetricsHttpService(vertx, configuration, metricsSystem);
   }
 }
