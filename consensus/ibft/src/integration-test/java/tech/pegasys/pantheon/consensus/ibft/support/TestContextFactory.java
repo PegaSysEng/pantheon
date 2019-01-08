@@ -103,7 +103,7 @@ public class TestContextFactory {
     return createTestEnvironment(
         validatorCount,
         indexOfFirstLocallyProposedBlock,
-        Clock.fixed(Instant.now(), ZoneId.of("UTC")));
+        Clock.fixed(Instant.MIN, ZoneId.of("UTC")));
   }
 
   public static TestContext createTestEnvironment(
