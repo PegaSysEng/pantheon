@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -479,7 +480,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     // and eventually it will run regular parsing of the remaining options.
     final ConfigOptionSearchAndRunHandler configParsingHandler =
         new ConfigOptionSearchAndRunHandler(
-            resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME);
+            resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME, isDocker);
     commandLine.parseWithHandlers(configParsingHandler, exceptionHandler, args);
   }
 
@@ -726,11 +727,28 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private File genesisFile() {
-    return isFullInstantiation() ? standaloneCommands.genesisFile : null;
+    if (isFullInstantiation()) {
+      return standaloneCommands.genesisFile;
+    } else if (isDocker) {
+      final File genesisFile = new File("/etc/pantheon/genesis.json");
+      if (genesisFile.exists()) {
+        return genesisFile;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   private Path dataDir() {
-    return isFullInstantiation() ? standaloneCommands.dataDir : getDefaultPantheonDataDir(this);
+    if (isFullInstantiation()) {
+      return standaloneCommands.dataDir;
+    } else if (isDocker) {
+      return Paths.get("/var/lib/pantheon");
+    } else {
+      return getDefaultPantheonDataDir(this);
+    }
   }
 
   private boolean isFullInstantiation() {
