@@ -59,7 +59,7 @@ public class ValidatorPeer {
       final NodeParams nodeParams,
       final MessageFactory messageFactory,
       final IbftController localNodeController) {
-    this.nodeKeys = nodeParams.getNodeKeys();
+    this.nodeKeys = nodeParams.getNodeKeyPair();
     this.nodeAddress = nodeParams.getAddress();
     this.messageFactory = messageFactory;
     this.localNodeController = localNodeController;

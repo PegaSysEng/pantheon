@@ -38,7 +38,7 @@ public class LocalNodeNotProposerTest {
 
   // By setting the indexOfFirstLocallyProposedBlock to 0 (and that the blockchain has only the
   // genesis block) guarantees the local node is not responsible for proposing the first block).
-  private final TestContext context = TestContextFactory.createTestEnvWithUtcClock(4, 0);
+  private final TestContext context = TestContextFactory.createTestEnvWithArbitraryClock(4, 0);
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
 
@@ -59,7 +59,7 @@ public class LocalNodeNotProposerTest {
         SECP256K1.sign(
             IbftBlockHashing.calculateDataHashForCommittedSeal(
                 blockToPropose.getHeader(), extraData),
-            context.getLocalNodeParams().getNodeKeys());
+            context.getLocalNodeParams().getNodeKeyPair());
 
     expectedTxCommit =
         localNodeMessageFactory.createSignedCommitPayload(

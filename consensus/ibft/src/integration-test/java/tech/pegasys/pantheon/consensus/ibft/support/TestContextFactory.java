@@ -16,6 +16,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
@@ -96,10 +98,11 @@ public class TestContextFactory {
   public static final int BLOCK_TIMER_SEC = 3;
   public static final int ROUND_TIMER_SEC = 12;
 
-  public static TestContext createTestEnvWithUtcClock(
+  public static TestContext createTestEnvWithArbitraryClock(
       final int validatorCount, final int indexOfFirstLocallyProposedBlock) {
     return createTestEnvironment(
-        validatorCount, indexOfFirstLocallyProposedBlock, Clock.systemUTC());
+        validatorCount, indexOfFirstLocallyProposedBlock,
+        Clock.fixed(Instant.now(), ZoneId.of("UTC")));
   }
 
   public static TestContext createTestEnvironment(
@@ -112,7 +115,7 @@ public class TestContextFactory {
     final MutableBlockchain blockChain =
         createInMemoryBlockchain(genesisBlock, IbftBlockHashing::calculateHashOfIbftBlockOnChain);
 
-    final KeyPair nodeKeys = networkNodes.getLocalNode().getNodeKeys();
+    final KeyPair nodeKeys = networkNodes.getLocalNode().getNodeKeyPair();
 
     // Use a stubbed version of the multicaster, to prevent creating PeerConnections etc.
     final StubIbftMulticaster stubbedNetworkPeers = new StubIbftMulticaster();
@@ -130,10 +133,10 @@ public class TestContextFactory {
             .collect(
                 Collectors.toMap(
                     NodeParams::getAddress,
-                    np ->
+                    nodeParams ->
                         new ValidatorPeer(
-                            np,
-                            new MessageFactory(np.getNodeKeys()),
+                            nodeParams,
+                            new MessageFactory(nodeParams.getNodeKeyPair()),
                             controllerAndState.getController()),
                     (u, v) -> {
                       throw new IllegalStateException(String.format("Duplicate key %s", u));

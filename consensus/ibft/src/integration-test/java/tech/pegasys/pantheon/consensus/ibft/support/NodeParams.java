@@ -28,7 +28,7 @@ public class NodeParams {
     return address;
   }
 
-  public KeyPair getNodeKeys() {
+  public KeyPair getNodeKeyPair() {
     return nodeKeys;
   }
 }
