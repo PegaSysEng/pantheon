@@ -79,17 +79,9 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    final SignedData<ProposalPayload> proposalMessage = payload.getProposalPayload();
-
-    if (!msg.getSender().equals(proposalMessage.getSender())) {
-      LOG.info("Invalid NewRound message, embedded Proposal message not signed by sender.");
-      return false;
-    }
-
-    if (!proposalMessage.getPayload().getRoundIdentifier().equals(rootRoundIdentifier)) {
-      LOG.info("Invalid NewRound message, embedded Proposal has mismatched round.");
-      return false;
-    }
+    final SignedData<ProposalPayload> proposalPayload = payload.getProposalPayload();
+    final MessageValidator proposalValidator = messageValidatorFactory.createAt(rootRoundIdentifier);
+    proposalValidator.addSignedProposalPayload(proposalPayload);
 
     if (!validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
         rootRoundIdentifier, roundChangeCert)) {
