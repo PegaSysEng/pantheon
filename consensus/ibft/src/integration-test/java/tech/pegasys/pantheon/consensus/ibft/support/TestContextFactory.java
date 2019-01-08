@@ -16,8 +16,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
@@ -63,6 +61,8 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -101,7 +101,8 @@ public class TestContextFactory {
   public static TestContext createTestEnvWithArbitraryClock(
       final int validatorCount, final int indexOfFirstLocallyProposedBlock) {
     return createTestEnvironment(
-        validatorCount, indexOfFirstLocallyProposedBlock,
+        validatorCount,
+        indexOfFirstLocallyProposedBlock,
         Clock.fixed(Instant.now(), ZoneId.of("UTC")));
   }
 
