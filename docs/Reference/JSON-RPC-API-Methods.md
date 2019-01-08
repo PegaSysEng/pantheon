@@ -377,6 +377,35 @@ None
     }
     ```
 
+### eth_hashrate
+
+Returns the number of hashes per second with which the node is mining. 
+
+**Parameters**
+
+None
+
+**Returns**
+
+`result` : `quantity` - Number of hashes per second
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_hashrate","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"eth_hashrate","params":[],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x12b"
+    }
+    ```
+
 ### eth_gasPrice
 
 Returns the current gas unit price in wei.
@@ -786,37 +815,77 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 ### eth_estimateGas
 
-Generates and returns an estimate of how much gas is necessary to allow the transaction to complete. (Per Etherscan: gas price * gas used.) The transaction is added to the blockchain. The estimate may be significantly more than the amount of gas actually used by the transaction for reasons including EVM mechanics and node performance.
+Returns an estimate of how much gas is needed for the transaction to complete. The estimate process does not use
+gas and is not added to the blockchain as a transaction. The estimate can be greater than the amount of gas that the
+transaction actually uses, for reasons including EVM mechanics and node performance.
+
+The `eth_estimateGas` call does not send a transaction. You must make a subsequent call to
+[eth_sendRawTransaction](#eth_sendRawTransaction) to execute the transaction.
 
 **Parameters**
 
 !!!note
-    Parameters are the same as the eth_call parameters, except that all properties are optional. If you do not specify a `gas` limit, Pantheon uses the gas limit from the pending block as an upper bound. As a result, the returned estimate might not be enough to execute the call or transaction when the amount of gas is higher than the pending block's gas limit.
+    The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`
+    all fields are optional. If you do not specify a `gas` amount in the transaction call object, Pantheon uses the
+    `gasLimit` amount from the block at the head of the chain as the upper limit. If the amount of gas needed is higher
+    than the estimated upper limit, the transaction might not have enough gas to execute.
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
-*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
-
 **Returns**
 
-`result` (*QUANTITY*) -  Amount of gas used.
+`result` : `quantity` -  Amount of gas used.
+
+The following example returns an estimate of 21000 wei (0x5208) for the transaction.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0x687422eea2cb73b5d3e242ba5456b782919afc85","to":"0xdd37f65db31c107f773e82a4f85c693058fef7a9","value":"0x1"}],"id":53}' <JSON-RPC-http-endpoint:port>
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73","to":"0x44Aa93095D6749A706051658B970b941c72c1D53","value":"0x1"}],"id":53}' <JSON-RPC-endpoint:port>
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0x687422eea2cb73b5d3e242ba5456b782919afc85","to":"0xdd37f65db31c107f773e82a4f85c693058fef7a9","value":"0x1"}],"id":53}
+    {"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73","to":"0x44Aa93095D6749A706051658B970b941c72c1D53","value":"0x1"}],"id":53}
     ```
     
     ```json tab="JSON result"
     {
       "jsonrpc" : "2.0",
-      "id" : 54,
+      "id" : 53,
       "result" : "0x5208"
     }
     ```
+
+The following example request estimates the cost of deploying a simple storage smart contract to the network. The data field
+contains the hash of the compiled contract to be deployed. (You can obtain the compiled contract hash from your IDE;
+for example, **Remix > Compile tab > details > WEB3DEPLOY**.) The result is 113355 wei.
+
+**Returns**
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST \
+        http://localhost:8545 \
+        -H 'Content-Type: application/json' \
+        -d '{
+          "jsonrpc": "2.0",
+          "method": "eth_estimateGas",
+          "params": [{
+            "from": "0x8bad598904ec5d93d07e204a366d084a80c7694e",
+            "data": "0x608060405234801561001057600080fd5b5060e38061001f6000396000f3fe6080604052600436106043576000357c0100000000000000000000000000000000000000000000000000000000900480633fa4f24514604857806355241077146070575b600080fd5b348015605357600080fd5b50605a60a7565b6040518082815260200191505060405180910390f35b348015607b57600080fd5b5060a560048036036020811015609057600080fd5b810190808035906020019092919050505060ad565b005b60005481565b806000819055505056fea165627a7a7230582020d7ad478b98b85ca751c924ef66bcebbbd8072b93031073ef35270a4c42f0080029"
+          }],
+          "id": 1
+        }'
+    ```
+
+!!! example
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x1bacb"
+    }
+    ```
+
 
 ### eth_getBlockByHash
 
@@ -1105,19 +1174,19 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 ### eth_newFilter
 
-Creates a logs filter to log state changes. To poll for state changes, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a log filter. To poll for logs associated with the created filter, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
 `Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object). 
 
-Topics are order-dependent. A transaction with a log containing topics `[A, B]` would be matched with the following topic filters:
+Topics are order-dependent. A transaction with a log containing topics `[A, B]` is matched with the following topic filters:
 
-    * [] - Match any topic
-    * [A] - Match A in first position (and any topic thereafter)
-    * [null, B] - Match any topic in first position AND B in second position (and any topic thereafter)
-    * [A, B] - Match A in first position AND B in second position (and any topic thereafter)
-    * [[A, B], [A, B]] - Match (A OR B) in first position AND (A OR B) in second position (and any topic thereafter)
+* `[]` - Match any topic
+* `[A]` - Match A in first position (and any topic thereafter)
+* `[null, B]` - Match any topic in first position AND B in second position (and any topic thereafter)
+* `[A, B]` - Match A in first position AND B in second position (and any topic thereafter)
+* `[[A, B], [A, B]]` - Match (A OR B) in first position AND (A OR B) in second position (and any topic thereafter)
 
 !!!note
     `fromBlock` and `toBlock` in the filter options object default to `latest`. To obtain logs using `eth_getFilterLogs`, set `fromBlock` and `toBlock` appropriately.
@@ -1145,7 +1214,7 @@ Topics are order-dependent. A transaction with a log containing topics `[A, B]` 
     
 ### eth_newBlockFilter
 
-Creates a filter to log when a new block arrives. To poll for new blocks, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a filter to retrieve new block hashes. To poll for new blocks, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
@@ -1174,7 +1243,7 @@ None
 
 ### eth_newPendingTransactionFilter
 
-Creates a filter to log when new pending transactions arrive. To poll for new pending transactions, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a filter to retrieve new pending transactions hashes. To poll for new pending transactions, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
@@ -1205,7 +1274,7 @@ None
 
 Uninstalls a filter with the specified ID. When a filter is no longer required, call this method.
 
-Filters time out when they are not requested by [eth_getFilterChanges](#eth_getfilterchanges) for a period of time.
+Filters time out when not requested by [eth_getFilterChanges](#eth_getfilterchanges) for 10 minutes.
 
 **Parameters**
 
@@ -1244,7 +1313,7 @@ Polls the specified filter and returns an array of changes that have occurred si
 
 **Returns**
 
-`result` : `Array of Object` - If nothing has changed since the last poll, an empty list. Otherwise:
+`result` : `Array of Object` - If nothing changed since the last poll, an empty list. Otherwise:
 
 * For filters created with `eth_newBlockFilter`, returns block hashes.
 * For filters created with `eth_newPendingTransactionFilter`, returns transaction hashes.
@@ -1328,7 +1397,7 @@ Returns an array of logs for the specified filter.
 !!!note
      `eth_getFilterLogs` is only used for filters created with `eth_newFilter`. 
       
-      You can use `eth_getLogs` to specify a filter object and get logs without without creating a filter.
+      You can use `eth_getLogs` to specify a filter object and get logs without creating a filter.
 
 **Parameters**
 
