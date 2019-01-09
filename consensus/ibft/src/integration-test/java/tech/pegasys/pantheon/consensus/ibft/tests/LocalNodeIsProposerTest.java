@@ -38,9 +38,12 @@ import java.time.Clock;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * These tests assume the basic function of the Ibft Round State Machine has been proven
+ * via the LocalNodeIsNotProposerTest.
+ */
 public class LocalNodeIsProposerTest {
-  // These tests assume the basic function of the Ibft Round State Machine has been proven
-  // via the LocalNodeIsNotProposerTest.
+
 
   private final long blockTimeStamp = 100;
   private final Clock mockBlockCreationTime = mock(Clock.class);
@@ -86,17 +89,17 @@ public class LocalNodeIsProposerTest {
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxProposal);
 
     // NOTE: In these test roles.getProposer() will return NULL.
-    roles.getNonProposingPeers().get(0).injectPrepare(roundId, expectedProposedBlock.getHash());
+    roles.getNonProposingPeer(0).injectPrepare(roundId, expectedProposedBlock.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
 
-    roles.getNonProposingPeers().get(1).injectPrepare(roundId, expectedProposedBlock.getHash());
+    roles.getNonProposingPeer(1).injectPrepare(roundId, expectedProposedBlock.getHash());
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxCommit);
 
-    roles.getNonProposingPeers().get(1).injectCommit(roundId, expectedProposedBlock.getHash());
+    roles.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
     assertPeersReceivedNoMessages(roles.getAllPeers());
 
-    roles.getNonProposingPeers().get(2).injectCommit(roundId, expectedProposedBlock.getHash());
+    roles.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
@@ -105,11 +108,11 @@ public class LocalNodeIsProposerTest {
   public void importsToChainWithoutReceivingPrepareMessages() {
     assertPeersReceivedExactly(roles.getAllPeers(), expectedTxProposal);
 
-    roles.getNonProposingPeers().get(1).injectCommit(roundId, expectedProposedBlock.getHash());
+    roles.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
     assertPeersReceivedNoMessages(roles.getAllPeers());
 
-    roles.getNonProposingPeers().get(2).injectCommit(roundId, expectedProposedBlock.getHash());
+    roles.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
