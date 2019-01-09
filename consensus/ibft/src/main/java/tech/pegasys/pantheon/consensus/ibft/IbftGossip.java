@@ -13,19 +13,16 @@
 package tech.pegasys.pantheon.consensus.ibft;
 
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMulticaster;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.Collections;
@@ -68,96 +65,41 @@ public class IbftGossip {
   }
 
   /**
-   * Retransmit a given proposal payload to all IBFT nodes
+   * Retransmit a given IBFT message to other known validators nodes
    *
-   * @param payload The signed payload to retransmit
-   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
-   *     include the payload signer, that is handled implicitly
-   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
-   *     broadcast in recent memory
+   * @param message The raw message to be gossiped
+   * @return Whether the message was rebroadcast or has been ignored as a repeat
    */
-  public boolean gossipProposalPayload(
-      final SignedData<ProposalPayload> payload, final Address... excludeAddresses) {
-    final ProposalMessageData messageData = ProposalMessageData.create(payload);
-    return gossipMessage(
-        payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
-  }
-
-  /**
-   * Retransmit a given prepare payload to all IBFT nodes
-   *
-   * @param payload The signed payload to retransmit
-   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
-   *     include the payload signer, that is handled implicitly
-   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
-   *     broadcast in recent memory
-   */
-  public boolean gossipPreparePayload(
-      final SignedData<PreparePayload> payload, final Address... excludeAddresses) {
-    final PrepareMessageData messageData = PrepareMessageData.create(payload);
-    return gossipMessage(
-        payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
-  }
-
-  /**
-   * Retransmit a given commit payload to all IBFT nodes
-   *
-   * @param payload The signed payload to retransmit
-   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
-   *     include the payload signer, that is handled implicitly
-   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
-   *     broadcast in recent memory
-   */
-  public boolean gossipCommitPayload(
-      final SignedData<CommitPayload> payload, final Address... excludeAddresses) {
-    final CommitMessageData messageData = CommitMessageData.create(payload);
-    return gossipMessage(
-        payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
-  }
-
-  /**
-   * Retransmit a given round change payload to all IBFT nodes
-   *
-   * @param payload The signed payload to retransmit
-   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
-   *     include the payload signer, that is handled implicitly
-   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
-   *     broadcast in recent memory
-   */
-  public boolean gossipRoundChangePayload(
-      final SignedData<RoundChangePayload> payload, final Address... excludeAddresses) {
-    final RoundChangeMessageData messageData = RoundChangeMessageData.create(payload);
-    return gossipMessage(
-        payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
-  }
-
-  /**
-   * Retransmit a given new round payload to all IBFT nodes
-   *
-   * @param payload The signed payload to retransmit
-   * @param excludeAddresses A list of addresses to not communicate this to. Does not need to
-   *     include the payload signer, that is handled implicitly
-   * @return Boolean of whether the message was rebroadcast or ignored as it's already been
-   *     broadcast in recent memory
-   */
-  public boolean gossipNewRoundPayload(
-      final SignedData<NewRoundPayload> payload, final Address... excludeAddresses) {
-    final NewRoundMessageData messageData = NewRoundMessageData.create(payload);
-    return gossipMessage(
-        payload.getSignature(), messageData, payload.getSender(), excludeAddresses);
-  }
-
-  // Checks whether a payloads signature has been seen recently, if not it performs the retransmit
-  private boolean gossipMessage(
-      final Signature signature,
-      final MessageData messageData,
-      final Address payloadSigner,
-      final Address... excludeAddresses) {
+  public boolean gossipMessage(final Message message) {
+    final MessageData messageData = message.getData();
+    final SignedData<?> signedData;
+    switch (messageData.getCode()) {
+      case IbftV2.PROPOSAL:
+        signedData = ProposalMessageData.fromMessageData(messageData).decode();
+        break;
+      case IbftV2.PREPARE:
+        signedData = PrepareMessageData.fromMessageData(messageData).decode();
+        break;
+      case IbftV2.COMMIT:
+        signedData = CommitMessageData.fromMessageData(messageData).decode();
+        break;
+      case IbftV2.ROUND_CHANGE:
+        signedData = RoundChangeMessageData.fromMessageData(messageData).decode();
+        break;
+      case IbftV2.NEW_ROUND:
+        signedData = NewRoundMessageData.fromMessageData(messageData).decode();
+        break;
+      default:
+        throw new IllegalArgumentException(
+            "Received message does not conform to any recognised IBFT message structure.");
+    }
+    final Signature signature = signedData.getSignature();
     if (seenMessages.contains(signature)) {
       return false;
     } else {
-      final List<Address> excludeAddressesList = Lists.newArrayList(excludeAddresses);
-      excludeAddressesList.add(payloadSigner);
+      final List<Address> excludeAddressesList =
+          Lists.newArrayList(
+              message.getConnection().getPeer().getAddress(), signedData.getSender());
       peers.multicastToValidatorsExcept(messageData, excludeAddressesList);
       seenMessages.add(signature);
       return true;

@@ -15,20 +15,26 @@ package tech.pegasys.pantheon.consensus.ibft.network;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 
 public class MockPeerFactory {
   public static PeerConnection create() {
-    PeerConnection peerConnection = mock(PeerConnection.class);
-    PeerInfo peerInfo = createPeerInfo();
+    return create(AddressHelpers.ofValue(9));
+  }
+
+  public static PeerConnection create(final Address address) {
+    final PeerConnection peerConnection = mock(PeerConnection.class);
+    final PeerInfo peerInfo = createPeerInfo(address);
     when(peerConnection.getPeer()).thenReturn(peerInfo);
     return peerConnection;
   }
 
-  public static PeerInfo createPeerInfo() {
-    PeerInfo peerInfo = mock(PeerInfo.class);
-    when(peerInfo.getAddress()).thenReturn(null);
+  public static PeerInfo createPeerInfo(final Address address) {
+    final PeerInfo peerInfo = mock(PeerInfo.class);
+    when(peerInfo.getAddress()).thenReturn(address);
     return peerInfo;
   }
 }

@@ -26,7 +26,6 @@ import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderValidationRulesetFact
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
-import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -78,7 +77,6 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import java.io.IOException;
 import java.time.Clock;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -238,9 +236,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 finalState,
                 new IbftRoundFactory(finalState, protocolContext, protocolSchedule),
                 messageValidatorFactory,
-                protocolContext),
-            new HashMap<>(),
-            new IbftGossip(peers));
+                protocolContext));
 
     final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, ibftController);
     final ExecutorService processorExecutor = Executors.newSingleThreadExecutor();

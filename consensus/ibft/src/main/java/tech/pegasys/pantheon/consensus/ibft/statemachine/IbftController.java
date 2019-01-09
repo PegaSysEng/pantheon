@@ -29,14 +29,12 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -92,42 +90,37 @@ public class IbftController {
     final MessageData messageData = message.getData();
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
-        processMessage(
+        consumeMessage(
             message,
             ProposalMessageData.fromMessageData(messageData).decode(),
-            gossiper::gossipProposalPayload,
             currentHeightManager::handleProposalPayload);
         break;
 
       case IbftV2.PREPARE:
-        processMessage(
+        consumeMessage(
             message,
             PrepareMessageData.fromMessageData(messageData).decode(),
-            gossiper::gossipPreparePayload,
             currentHeightManager::handlePreparePayload);
         break;
 
       case IbftV2.COMMIT:
-        processMessage(
+        consumeMessage(
             message,
             CommitMessageData.fromMessageData(messageData).decode(),
-            gossiper::gossipCommitPayload,
             currentHeightManager::handleCommitPayload);
         break;
 
       case IbftV2.ROUND_CHANGE:
-        processMessage(
+        consumeMessage(
             message,
             RoundChangeMessageData.fromMessageData(messageData).decode(),
-            gossiper::gossipRoundChangePayload,
             currentHeightManager::handleRoundChangePayload);
         break;
 
       case IbftV2.NEW_ROUND:
-        processMessage(
+        consumeMessage(
             message,
             NewRoundMessageData.fromMessageData(messageData).decode(),
-            gossiper::gossipNewRoundPayload,
             currentHeightManager::handleNewRoundPayload);
         break;
 
@@ -137,13 +130,12 @@ public class IbftController {
     }
   }
 
-  private <P extends Payload> void processMessage(
+  private <P extends Payload> void consumeMessage(
       final Message message,
       final SignedData<P> signedPayload,
-      final BiConsumer<SignedData<P>, Address> gossipMessage,
       final Consumer<SignedData<P>> handleMessage) {
     if (processMessage(signedPayload, message)) {
-      gossipMessage.accept(signedPayload, message.getConnection().getPeer().getAddress());
+      gossiper.gossipMessage(message);
       handleMessage.accept(signedPayload);
     }
   }
