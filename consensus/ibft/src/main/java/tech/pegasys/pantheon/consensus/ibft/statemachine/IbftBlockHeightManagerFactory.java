@@ -17,8 +17,6 @@ import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
-import java.time.Clock;
-
 public class IbftBlockHeightManagerFactory {
 
   private final IbftRoundFactory roundFactory;
