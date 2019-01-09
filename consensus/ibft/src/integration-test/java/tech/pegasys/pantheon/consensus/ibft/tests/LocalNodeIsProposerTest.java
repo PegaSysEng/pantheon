@@ -39,11 +39,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * These tests assume the basic function of the Ibft Round State Machine has been proven
- * via the LocalNodeIsNotProposerTest.
+ * These tests assume the basic function of the Ibft Round State Machine has been proven via the
+ * LocalNodeIsNotProposerTest.
  */
 public class LocalNodeIsProposerTest {
-
 
   private final long blockTimeStamp = 100;
   private final Clock mockBlockCreationTime = mock(Clock.class);
