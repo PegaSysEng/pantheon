@@ -82,11 +82,11 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
               MetricCategory.ROCKSDB, "write_latency_seconds", "Latency for write to RocksDB.");
       commitLatency =
           metricsSystem.createTimer(
-              MetricCategory.ROCKSDB, "commit_latency_seconds", "Latency for write to RocksDB.");
+              MetricCategory.ROCKSDB, "commit_latency_seconds", "Latency for commits to RocksDB.");
 
       rollbackCount =
           metricsSystem.createCounter(
-              MetricCategory.ROCKSDB, "rollback_count", "Number of transactions rolled back.");
+              MetricCategory.ROCKSDB, "rollback_count", "Number of RocksDB transactions rolled back.");
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
