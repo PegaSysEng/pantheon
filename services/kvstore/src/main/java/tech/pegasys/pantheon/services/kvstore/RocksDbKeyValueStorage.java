@@ -86,7 +86,9 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
 
       rollbackCount =
           metricsSystem.createCounter(
-              MetricCategory.ROCKSDB, "rollback_count", "Number of RocksDB transactions rolled back.");
+              MetricCategory.ROCKSDB,
+              "rollback_count",
+              "Number of RocksDB transactions rolled back.");
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
