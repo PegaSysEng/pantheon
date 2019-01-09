@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -50,6 +51,7 @@ public class PantheonNodeFactory {
             config.getMiningParameters(),
             config.getJsonRpcConfiguration(),
             config.getWebSocketConfiguration(),
+            config.getMetricsConfiguration(),
             config.getPermissioningConfiguration(),
             config.isDevMode(),
             config.getGenesisConfigProvider(),
@@ -134,7 +136,43 @@ public class PantheonNodeFactory {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
-            .jsonRpcEnabled()
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
+            .setPermissioningConfiguration(permissioningConfiguration)
+            .build());
+  }
+
+  public PantheonNode createNodeWithAccountsWhitelist(
+      final String name, final List<String> accountsWhitelist) throws IOException {
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
+            .setPermissioningConfiguration(permissioningConfiguration)
+            .build());
+  }
+
+  public PantheonNode createNodeWithNodesWhitelistAndPermRPC(
+      final String name, final List<URI> nodesWhitelist) throws IOException {
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+
+    JsonRpcConfiguration rpcConfig = JsonRpcConfiguration.createDefault();
+
+    rpcConfig.setEnabled(true);
+    rpcConfig.setPort(0);
+    rpcConfig.setHostsWhitelist(singletonList("*"));
+    rpcConfig.addRpcApi(RpcApis.PERM);
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(rpcConfig)
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
   }
@@ -238,5 +276,13 @@ public class PantheonNodeFactory {
     config.setEnabled(true);
     config.setPort(0);
     return config;
+  }
+
+  private JsonRpcConfiguration jsonRpcConfigWithPermissioning() {
+    final JsonRpcConfiguration jsonRpcConfig = createJsonRpcEnabledConfig();
+    final List<RpcApi> rpcApis = new ArrayList<>(jsonRpcConfig.getRpcApis());
+    rpcApis.add(RpcApis.PERM);
+    jsonRpcConfig.setRpcApis(rpcApis);
+    return jsonRpcConfig;
   }
 }
