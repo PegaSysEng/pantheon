@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -30,12 +31,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Cluster implements AutoCloseable {
   public static final int NETWORK_ID = 10;
 
-  private final Map<String, RunnableNode> nodes = new HashMap<>();
+  private final Map<String, NodeInfo> nodes = new HashMap<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
   private final Net net;
   private final ClusterConfiguration clusterConfiguration;
@@ -57,7 +57,7 @@ public class Cluster implements AutoCloseable {
                   assertThat(n instanceof RunnableNode).isTrue();
                   return (RunnableNode) n;
                 })
-            .collect(Collectors.toList()));
+            .collect(toList()));
   }
 
   public void start(final List<RunnableNode> nodes) {
@@ -66,7 +66,7 @@ public class Cluster implements AutoCloseable {
     final List<String> bootNodes = new ArrayList<>();
 
     for (final RunnableNode node : nodes) {
-      this.nodes.put(node.getName(), node);
+      this.nodes.put(node.getName(), new NodeInfo(true, node));
       bootNodes.add(node.getConfiguration().enodeUrl());
     }
 
@@ -89,28 +89,35 @@ public class Cluster implements AutoCloseable {
   }
 
   public void stop() {
-    for (final RunnableNode node : nodes.values()) {
-      node.stop();
+    for (final NodeInfo nodeInfo : nodes.values()) {
+      nodeInfo.getRunnableNode().stop();
+      nodeInfo.setRunning(false);
     }
     pantheonNodeRunner.shutdown();
   }
 
   public void stopNode(final PantheonNode node) {
+    nodes.get(node.getName()).setRunning(false);
     pantheonNodeRunner.stopNode(node);
   }
 
   @Override
   public void close() {
-    for (final RunnableNode node : nodes.values()) {
-      node.close();
+    for (final NodeInfo nodeInfo : nodes.values()) {
+      nodeInfo.getRunnableNode().close();
+      nodeInfo.setRunning(false);
     }
     pantheonNodeRunner.shutdown();
   }
 
   public void verify(final Condition expected) {
-    for (final Node node : nodes.values()) {
-      expected.verify(node);
+    for (final NodeInfo nodeInfo : nodes.values()) {
+      expected.verify(nodeInfo.getRunnableNode());
     }
+  }
+
+  public void verifyRunningNodes(final Condition expected) {
+    getRunningNodes().forEach(expected::verify);
   }
 
   public void verify(final Condition expected, final Collection<Node> nodes) {
@@ -120,8 +127,47 @@ public class Cluster implements AutoCloseable {
   }
 
   public void waitUntil(final WaitCondition condition) {
-    for (final Node node : nodes.values()) {
-      node.waitUntil(condition);
+    for (final NodeInfo nodeInfo : nodes.values()) {
+      nodeInfo.getRunnableNode().waitUntil(condition);
+    }
+  }
+
+  public List<RunnableNode> getRunningNodes() {
+    return nodes
+        .values()
+        .stream()
+        .filter(nodeInfo -> nodeInfo.isRunning)
+        .map(NodeInfo::getRunnableNode)
+        .collect(toList());
+  }
+
+  public RunnableNode getFirstRunningNode() {
+    return getRunningNodes().get(0);
+  }
+
+  private static class NodeInfo {
+    private boolean isRunning;
+    private RunnableNode runnableNode;
+
+    public NodeInfo(final boolean isRunning, final RunnableNode runnableNode) {
+      this.isRunning = isRunning;
+      this.runnableNode = runnableNode;
+    }
+
+    public boolean isRunning() {
+      return isRunning;
+    }
+
+    public void setRunning(final boolean running) {
+      isRunning = running;
+    }
+
+    public RunnableNode getRunnableNode() {
+      return runnableNode;
+    }
+
+    public void setRunnableNode(final RunnableNode runnableNode) {
+      this.runnableNode = runnableNode;
     }
   }
 }

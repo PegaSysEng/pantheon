@@ -14,13 +14,10 @@ package tech.pegasys.pantheon.tests.acceptance.ibft;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
 public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
@@ -78,13 +75,9 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
 
     final Account receiver = accounts.createAccount("account2");
 
-    final PantheonNode stoppedNode = ibft.lastValidator(nodes);
-    ArrayList<Node> activeNodes = Lists.newArrayList(nodes);
-    activeNodes.remove(stoppedNode);
+    cluster.stopNode(ibft.lastValidator(nodes));
+    cluster.getFirstRunningNode().execute(transactions.createTransfer(receiver, 80));
 
-    cluster.stopNode(stoppedNode);
-    activeNodes.get(0).execute(transactions.createTransfer(receiver, 80));
-
-    cluster.verify(receiver.balanceEquals(80), activeNodes);
+    cluster.verifyRunningNodes(receiver.balanceEquals(80));
   }
 }
