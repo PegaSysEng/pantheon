@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 
+import java.util.concurrent.TimeUnit;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -44,7 +45,7 @@ import org.junit.Test;
  */
 public class LocalNodeIsProposerTest {
 
-  private final long blockTimeStamp = 100;
+
   private final Clock mockBlockCreationTime = mock(Clock.class);
 
   // Local node will propose the first block
@@ -61,7 +62,8 @@ public class LocalNodeIsProposerTest {
 
   @Before
   public void setup() {
-    when(mockBlockCreationTime.millis()).thenReturn(blockTimeStamp * 1000);
+    final long blockTimeStamp = 100;
+    when(mockBlockCreationTime.millis()).thenReturn(TimeUnit.SECONDS.toMillis(blockTimeStamp));
     expectedProposedBlock = context.createBlockForProposal(0, blockTimeStamp);
     expectedTxProposal =
         localNodeMessageFactory.createSignedProposalPayload(roundId, expectedProposedBlock);
