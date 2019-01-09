@@ -48,7 +48,7 @@ public class IbftBlockHeightManagerFactory {
             (roundIdentifier) ->
                 messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader)),
         roundFactory,
-        Clock.systemUTC(),
+        finalState.getClock(),
         messageValidatorFactory);
   }
 }
