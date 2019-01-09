@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
+import tech.pegasys.pantheon.consensus.ibft.support.TestContextFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -46,7 +47,7 @@ public class LocalNodeIsProposerTest {
 
   // Local node will propose the first block
   private final TestContext context =
-      TestContext.createTestEnvironment(4, 1, mockBlockCreationTime);
+      TestContextFactory.createTestEnvironment(4, 1, mockBlockCreationTime);
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
 
@@ -69,7 +70,7 @@ public class LocalNodeIsProposerTest {
         SECP256K1.sign(
             IbftBlockHashing.calculateDataHashForCommittedSeal(
                 expectedProposedBlock.getHeader(), extraData),
-            context.getLocalNodeParams().getNodeKeys());
+            context.getLocalNodeParams().getNodeKeyPair());
 
     expectedTxCommit =
         localNodeMessageFactory.createSignedCommitPayload(
