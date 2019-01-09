@@ -67,7 +67,7 @@ public class IbftController {
   }
 
   @VisibleForTesting
-  IbftController(
+  public IbftController(
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
