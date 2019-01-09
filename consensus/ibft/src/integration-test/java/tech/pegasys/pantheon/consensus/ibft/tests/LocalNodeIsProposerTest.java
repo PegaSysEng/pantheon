@@ -13,12 +13,15 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
+import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommentPayload;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import org.junit.Before;
+import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -31,13 +34,10 @@ import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
-
-import java.time.Clock;
-
-import org.junit.Before;
-import org.junit.Test;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 
 /**
  * These tests assume the basic function of the Ibft Round State Machine has been proven via the
@@ -45,12 +45,13 @@ import org.junit.Test;
  */
 public class LocalNodeIsProposerTest {
 
-
-  private final Clock mockBlockCreationTime = mock(Clock.class);
+  final long blockTimeStamp = 100;
+  private final Clock fixedClock = Clock.fixed(Instant.ofEpochSecond(blockTimeStamp),
+      ZoneId.systemDefault());
 
   // Local node will propose the first block
   private final TestContext context =
-      TestContextFactory.createTestEnvironment(4, 1, mockBlockCreationTime);
+      TestContextFactory.createTestEnvironment(4, 1, fixedClock);
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
 
@@ -62,23 +63,12 @@ public class LocalNodeIsProposerTest {
 
   @Before
   public void setup() {
-    final long blockTimeStamp = 100;
-    when(mockBlockCreationTime.millis()).thenReturn(TimeUnit.SECONDS.toMillis(blockTimeStamp));
     expectedProposedBlock = context.createBlockForProposal(0, blockTimeStamp);
     expectedTxProposal =
         localNodeMessageFactory.createSignedProposalPayload(roundId, expectedProposedBlock);
 
-    final IbftExtraData extraData =
-        IbftExtraData.decode(expectedProposedBlock.getHeader().getExtraData());
-    final Signature commitSeal =
-        SECP256K1.sign(
-            IbftBlockHashing.calculateDataHashForCommittedSeal(
-                expectedProposedBlock.getHeader(), extraData),
-            context.getLocalNodeParams().getNodeKeyPair());
-
-    expectedTxCommit =
-        localNodeMessageFactory.createSignedCommitPayload(
-            roundId, expectedProposedBlock.getHash(), commitSeal);
+    expectedTxCommit = createSignedCommentPayload(expectedProposedBlock,
+        context.getLocalNodeParams().getNodeKeyPair(), roundId);
 
     // Start the Controller, and trigger "block timer" to send proposal.
     context.getController().start();
