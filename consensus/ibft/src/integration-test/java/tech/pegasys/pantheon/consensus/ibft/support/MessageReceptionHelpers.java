@@ -48,29 +48,46 @@ public class MessageReceptionHelpers {
           n -> {
             final List<MessageData> rxMsgs = n.getReceivedMessages();
             final MessageData rxMsgData = rxMsgs.get(index);
-            assertThat(msgMatchesExpected(rxMsgData, msg)).isTrue();
+            msgMatchesExpected(rxMsgData, msg);
           });
     }
     allPeers.forEach(p -> p.clearReceivedMessages());
   }
 
-  public static boolean msgMatchesExpected(
+  public static void msgMatchesExpected(
       final MessageData actual, final SignedData<? extends Payload> expected) {
     final Payload expectedPayload = expected.getPayload();
+    SignedData<?> actualMessage = null;
 
     switch (expectedPayload.getMessageType()) {
       case IbftV2.PROPOSAL:
-        return ProposalMessageData.fromMessageData(actual).decode().equals(expected);
+        actualMessage = ProposalMessageData.fromMessageData(actual).decode();
+        break;
       case IbftV2.PREPARE:
-        return PrepareMessageData.fromMessageData(actual).decode().equals(expected);
+        actualMessage = PrepareMessageData.fromMessageData(actual).decode();
+        break;
       case IbftV2.COMMIT:
-        return CommitMessageData.fromMessageData(actual).decode().equals(expected);
+        actualMessage = CommitMessageData.fromMessageData(actual).decode();
+        break;
+        // final SignedData<CommitPayload> actualCommit =
+        // CommitMessageData.fromMessageData(actual).decode();
+        // assertThat(expectedPayload).isEqualToComparingFieldByField(actualCommit.getPayload());
       case IbftV2.NEW_ROUND:
-        return NewRoundMessageData.fromMessageData(actual).decode().equals(expected);
+        actualMessage = NewRoundMessageData.fromMessageData(actual).decode();
+        break;
+        // final SignedData<NewRoundPayload> actualNewRound =
+        // NewRoundMessageData.fromMessageData(actual).decode();
+        // assertThat(expectedPayload).isEqualToComparingFieldByField(actualNewRound.getPayload());
       case IbftV2.ROUND_CHANGE:
-        return RoundChangeMessageData.fromMessageData(actual).decode().equals(expected);
+        actualMessage = RoundChangeMessageData.fromMessageData(actual).decode();
+        break;
+        // final SignedData<RoundChangePayload> actualRoundChange =
+        // RoundChangeMessageData.fromMessageData(actual).decode();
+        // assertThat(expectedPayload).isEqualToComparingFieldByField(actualRoundChange.getPayload());
       default:
-        return false;
+        assertThat(true).isFalse(); // fail
+        break;
     }
+    assertThat(expectedPayload.equals(actualMessage.getPayload())).isTrue();
   }
 }
