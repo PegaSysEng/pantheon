@@ -46,7 +46,7 @@ import org.junit.Test;
 
 public class RoundChangeTest {
 
-  final long blockTimeStamp = 100;
+  private final long blockTimeStamp = 100;
   private final Clock fixedClock =
       Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
