@@ -13,7 +13,11 @@
 package tech.pegasys.pantheon.consensus.ibft.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
@@ -23,10 +27,6 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class MessageReceptionHelpers {
 
@@ -48,46 +48,38 @@ public class MessageReceptionHelpers {
           n -> {
             final List<MessageData> rxMsgs = n.getReceivedMessages();
             final MessageData rxMsgData = rxMsgs.get(index);
-            msgMatchesExpected(rxMsgData, msg);
+            messageMatchesExpected(rxMsgData, msg);
           });
     }
     allPeers.forEach(p -> p.clearReceivedMessages());
   }
 
-  public static void msgMatchesExpected(
-      final MessageData actual, final SignedData<? extends Payload> expected) {
-    final Payload expectedPayload = expected.getPayload();
-    SignedData<?> actualMessage = null;
+  public static void messageMatchesExpected(
+      final MessageData actual, final SignedData<? extends Payload> signedExpectedPayload) {
+    final Payload expectedPayload = signedExpectedPayload.getPayload();
+    SignedData<?> actualSignedPayload = null;
 
     switch (expectedPayload.getMessageType()) {
       case IbftV2.PROPOSAL:
-        actualMessage = ProposalMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = ProposalMessageData.fromMessageData(actual).decode();
         break;
       case IbftV2.PREPARE:
-        actualMessage = PrepareMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = PrepareMessageData.fromMessageData(actual).decode();
         break;
       case IbftV2.COMMIT:
-        actualMessage = CommitMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = CommitMessageData.fromMessageData(actual).decode();
         break;
-        // final SignedData<CommitPayload> actualCommit =
-        // CommitMessageData.fromMessageData(actual).decode();
-        // assertThat(expectedPayload).isEqualToComparingFieldByField(actualCommit.getPayload());
       case IbftV2.NEW_ROUND:
-        actualMessage = NewRoundMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = NewRoundMessageData.fromMessageData(actual).decode();
         break;
-        // final SignedData<NewRoundPayload> actualNewRound =
-        // NewRoundMessageData.fromMessageData(actual).decode();
-        // assertThat(expectedPayload).isEqualToComparingFieldByField(actualNewRound.getPayload());
       case IbftV2.ROUND_CHANGE:
-        actualMessage = RoundChangeMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = RoundChangeMessageData.fromMessageData(actual).decode();
         break;
-        // final SignedData<RoundChangePayload> actualRoundChange =
-        // RoundChangeMessageData.fromMessageData(actual).decode();
-        // assertThat(expectedPayload).isEqualToComparingFieldByField(actualRoundChange.getPayload());
       default:
-        assertThat(true).isFalse(); // fail
+        fail("Illegal IBFTV2 message type.");
         break;
     }
-    assertThat(expectedPayload.equals(actualMessage.getPayload())).isTrue();
+    assertThat(signedExpectedPayload)
+        .isEqualToComparingFieldByFieldRecursively(actualSignedPayload);
   }
 }
