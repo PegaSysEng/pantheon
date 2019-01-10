@@ -40,6 +40,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -49,6 +50,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -102,6 +104,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private static final BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
   private static final long DEFAULT_MAX_REFRESH_DELAY = 3600000;
   private static final long DEFAULT_MIN_REFRESH_DELAY = 1;
+
+  private static final String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
+  private static final String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
@@ -276,8 +281,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // A list of origins URLs that are accepted by the JsonRpcHttpServer (CORS)
   @Option(
     names = {"--rpc-cors-origins"},
-    description = "Comma separated origin domain URLs for CORS validation (default: none)",
-    converter = CorsAllowedOriginsProperty.CorsAllowedOriginsPropertyConverter.class
+    description = "Comma separated origin domain URLs for CORS validation (default: none)"
   )
   private final CorsAllowedOriginsProperty rpcCorsAllowedOrigins = new CorsAllowedOriginsProperty();
 
@@ -330,7 +334,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + "default: ${DEFAULT-VALUE}",
     defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
   )
-  private void setRefreshDelay(final Long refreshDelay) {
+  private Long configureRefreshDelay(final Long refreshDelay) {
     if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
       throw new ParameterException(
           new CommandLine(this),
@@ -340,15 +344,30 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               String.valueOf(DEFAULT_MAX_REFRESH_DELAY)));
     }
     this.refreshDelay = refreshDelay;
+    return refreshDelay;
   }
+
+  @Option(
+    names = {"--metrics-enabled"},
+    description = "Set if the metrics exporter should be started (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean isMetricsEnabled = false;
+
+  @Option(
+    names = {"--metrics-listen"},
+    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
+    description = "Host and port for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final HostAndPort metricsHostAndPort =
+      getDefaultHostAndPort(MetricsConfiguration.DEFAULT_METRICS_PORT);
 
   @Option(
     names = {"--host-whitelist"},
     paramLabel = "<hostname>",
     description =
         "Comma separated list of hostnames to whitelist for RPC access.  default: ${DEFAULT-VALUE}",
-    defaultValue = "localhost",
-    converter = JsonRPCWhitelistHostsProperty.JsonRPCWhitelistHostsConverter.class
+    defaultValue = "localhost"
   )
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
@@ -464,7 +483,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     // and eventually it will run regular parsing of the remaining options.
     final ConfigOptionSearchAndRunHandler configParsingHandler =
         new ConfigOptionSearchAndRunHandler(
-            resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME);
+            resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME, isDocker);
     commandLine.parseWithHandlers(configParsingHandler, exceptionHandler, args);
   }
 
@@ -501,6 +520,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         p2pHostAndPort,
         jsonRpcConfiguration(),
         webSocketConfiguration(),
+        metricsConfiguration(),
         permissioningConfiguration);
   }
 
@@ -562,9 +582,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setEnabled(isJsonRpcEnabled);
     jsonRpcConfiguration.setHost(rpcHostAndPort.getHost());
     jsonRpcConfiguration.setPort(rpcHostAndPort.getPort());
-    jsonRpcConfiguration.setCorsAllowedDomains(rpcCorsAllowedOrigins.getDomains());
+    jsonRpcConfiguration.setCorsAllowedDomains(rpcCorsAllowedOrigins);
     jsonRpcConfiguration.setRpcApis(rpcApis);
-    jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist.hostnamesWhitelist());
+    jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     return jsonRpcConfiguration;
   }
 
@@ -576,6 +596,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setRpcApis(wsApis);
     webSocketConfiguration.setRefreshDelay(refreshDelay);
     return webSocketConfiguration;
+  }
+
+  MetricsConfiguration metricsConfiguration() {
+    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    metricsConfiguration.setEnabled(isMetricsEnabled);
+    metricsConfiguration.setHost(metricsHostAndPort.getHost());
+    metricsConfiguration.setPort(metricsHostAndPort.getPort());
+    metricsConfiguration.setHostsWhitelist(hostsWhitelist);
+    return metricsConfiguration;
   }
 
   private PermissioningConfiguration permissioningConfiguration() {
@@ -602,6 +631,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final HostAndPort discoveryHostAndPort,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
+      final MetricsConfiguration metricsConfiguration,
       final PermissioningConfiguration permissioningConfiguration) {
 
     checkNotNull(runnerBuilder);
@@ -621,6 +651,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .dataDir(dataDir())
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem)
+            .metricsConfiguration(metricsConfiguration)
             .permissioningConfiguration(permissioningConfiguration)
             .build();
 
@@ -699,14 +730,35 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private File genesisFile() {
-    return isFullInstantiation() ? standaloneCommands.genesisFile : null;
+    if (isFullInstantiation()) {
+      return standaloneCommands.genesisFile;
+    } else if (isDocker) {
+      final File genesisFile = new File(DOCKER_GENESIS_LOCATION);
+      if (genesisFile.exists()) {
+        return genesisFile;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   private Path dataDir() {
-    return isFullInstantiation() ? standaloneCommands.dataDir : getDefaultPantheonDataDir(this);
+    if (isFullInstantiation()) {
+      return standaloneCommands.dataDir;
+    } else if (isDocker) {
+      return Paths.get(DOCKER_DATADIR_LOCATION);
+    } else {
+      return getDefaultPantheonDataDir(this);
+    }
   }
 
   private boolean isFullInstantiation() {
     return !isDocker;
+  }
+
+  public MetricsSystem getMetricsSystem() {
+    return metricsSystem;
   }
 }
