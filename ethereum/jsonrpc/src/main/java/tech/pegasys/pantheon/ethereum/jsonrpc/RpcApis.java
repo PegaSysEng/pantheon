@@ -22,6 +22,7 @@ public class RpcApis {
   public static final RpcApi DEBUG = new RpcApi("DEBUG");
   public static final RpcApi MINER = new RpcApi("MINER");
   public static final RpcApi NET = new RpcApi("NET");
+  public static final RpcApi PERM = new RpcApi("PERM");
   public static final RpcApi WEB3 = new RpcApi("WEB3");
   public static final RpcApi ADMIN = new RpcApi("ADMIN");
   public static final RpcApi PERM = new RpcApi("PERM");
@@ -38,6 +39,8 @@ public class RpcApis {
       return Optional.of(MINER);
     } else if (name.equals(NET.getCliValue())) {
       return Optional.of(NET);
+    } else if (name.equals(PERM.getCliValue())) {
+      return Optional.of(PERM);
     } else if (name.equals(WEB3.getCliValue())) {
       return Optional.of(WEB3);
     } else if (name.equals(ADMIN.getCliValue())) {
