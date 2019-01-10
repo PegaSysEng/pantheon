@@ -216,13 +216,15 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  private Optional<String> createCliqueGenesisConfig(final Collection<? extends RunnableNode> validators) {
+  private Optional<String> createCliqueGenesisConfig(
+      final Collection<? extends RunnableNode> validators) {
     final String template = genesisTemplateConfig("clique/clique.json");
     return updateGenesisExtraData(
         validators, template, CliqueExtraData::createGenesisExtraDataString);
   }
 
-  private Optional<String> createIbftGenesisConfig(final Collection<? extends RunnableNode> validators) {
+  private Optional<String> createIbftGenesisConfig(
+      final Collection<? extends RunnableNode> validators) {
     final String template = genesisTemplateConfig("ibft/ibft.json");
     return updateGenesisExtraData(
         validators, template, IbftExtraData::createGenesisExtraDataString);

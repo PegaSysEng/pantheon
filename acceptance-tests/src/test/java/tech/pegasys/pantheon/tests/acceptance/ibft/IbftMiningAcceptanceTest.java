@@ -12,12 +12,14 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.ibft;
 
-import java.io.IOException;
-import java.util.List;
-import org.junit.Test;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.junit.Test;
 
 public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
 
@@ -64,20 +66,22 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldStillMineWhenANodeFailsAndHasSufficientValidators() throws IOException {
+  public void shouldStillMineWhenANonProposerNodeFailsAndHasSufficientValidators()
+      throws IOException {
     final PantheonNode minerNode1 = pantheon.createIbftNode("miner1");
     final PantheonNode minerNode2 = pantheon.createIbftNode("miner2");
     final PantheonNode minerNode3 = pantheon.createIbftNode("miner3");
     final PantheonNode minerNode4 = pantheon.createIbftNode("miner4");
-    final List<PantheonNode> validators = ibft.validators(
-        new PantheonNode[]{minerNode1, minerNode2, minerNode3, minerNode4});
+    final List<PantheonNode> validators =
+        ibft.validators(new PantheonNode[] {minerNode1, minerNode2, minerNode3, minerNode4});
+    final PantheonNode nonProposerNode = validators.get(validators.size() - 1);
     cluster.start(validators);
 
     final Account receiver = accounts.createAccount("account2");
 
-    cluster.stopNode(validators.get(validators.size() - 1));
+    cluster.stopNode(nonProposerNode);
     validators.get(0).execute(transactions.createTransfer(receiver, 80));
 
-    cluster.verifyRunningNodes(receiver.balanceEquals(80));
+    cluster.verifyOnActiveNodes(receiver.balanceEquals(80));
   }
 }

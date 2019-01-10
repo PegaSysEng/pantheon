@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -26,16 +25,16 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Cluster implements AutoCloseable {
   public static final int NETWORK_ID = 10;
 
-  private final Map<String, NodeInfo> nodes = new HashMap<>();
+  private final Map<String, RunnableNode> nodes = new HashMap<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
   private final Net net;
   private final ClusterConfiguration clusterConfiguration;
@@ -57,16 +56,16 @@ public class Cluster implements AutoCloseable {
                   assertThat(n instanceof RunnableNode).isTrue();
                   return (RunnableNode) n;
                 })
-            .collect(toList()));
+            .collect(Collectors.toList()));
   }
 
-  public void start(final Collection<? extends RunnableNode> nodes) {
+  public void start(final List<? extends RunnableNode> nodes) {
     this.nodes.clear();
 
     final List<String> bootNodes = new ArrayList<>();
 
     for (final RunnableNode node : nodes) {
-      this.nodes.put(node.getName(), new NodeInfo(true, node));
+      this.nodes.put(node.getName(), node);
       bootNodes.add(node.getConfiguration().enodeUrl());
     }
 
@@ -89,75 +88,41 @@ public class Cluster implements AutoCloseable {
   }
 
   public void stop() {
-    for (final NodeInfo nodeInfo : nodes.values()) {
-      nodeInfo.getRunnableNode().stop();
-      nodeInfo.setRunning(false);
+    for (final RunnableNode node : nodes.values()) {
+      node.stop();
     }
     pantheonNodeRunner.shutdown();
   }
 
   public void stopNode(final PantheonNode node) {
-    nodes.get(node.getName()).setRunning(false);
     pantheonNodeRunner.stopNode(node);
   }
 
   @Override
   public void close() {
-    for (final NodeInfo nodeInfo : nodes.values()) {
-      nodeInfo.getRunnableNode().close();
-      nodeInfo.setRunning(false);
+    for (final RunnableNode node : nodes.values()) {
+      node.close();
     }
     pantheonNodeRunner.shutdown();
   }
 
   public void verify(final Condition expected) {
-    for (final NodeInfo nodeInfo : nodes.values()) {
-      expected.verify(nodeInfo.getRunnableNode());
-    }
-  }
-
-  public void verifyRunningNodes(final Condition expected) {
-    nodes.values().stream()
-        .filter(nodeInfo -> nodeInfo.isRunning)
-        .map(NodeInfo::getRunnableNode)
-        .collect(toList()).forEach(expected::verify);
-  }
-
-  public void verify(final Condition expected, final Collection<Node> nodes) {
-    for (final Node node : nodes) {
+    for (final Node node : nodes.values()) {
       expected.verify(node);
     }
   }
 
   public void waitUntil(final WaitCondition condition) {
-    for (final NodeInfo nodeInfo : nodes.values()) {
-      nodeInfo.getRunnableNode().waitUntil(condition);
+    for (final Node node : nodes.values()) {
+      node.waitUntil(condition);
     }
   }
 
-  private static class NodeInfo {
-    private boolean isRunning;
-    private RunnableNode runnableNode;
-
-    public NodeInfo(final boolean isRunning, final RunnableNode runnableNode) {
-      this.isRunning = isRunning;
-      this.runnableNode = runnableNode;
-    }
-
-    public boolean isRunning() {
-      return isRunning;
-    }
-
-    public void setRunning(final boolean running) {
-      isRunning = running;
-    }
-
-    public RunnableNode getRunnableNode() {
-      return runnableNode;
-    }
-
-    public void setRunnableNode(final RunnableNode runnableNode) {
-      this.runnableNode = runnableNode;
-    }
+  public void verifyOnActiveNodes(final Condition condition) {
+    nodes
+        .values()
+        .stream()
+        .filter(node -> pantheonNodeRunner.isActive(node.getName()))
+        .forEach(condition::verify);
   }
 }

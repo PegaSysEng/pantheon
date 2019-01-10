@@ -12,11 +12,11 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 public class Ibft {
 
@@ -27,5 +27,4 @@ public class Ibft {
     pantheonNodes.sort(compareByAddress);
     return pantheonNodes;
   }
-
 }

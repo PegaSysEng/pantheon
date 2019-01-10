@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static tech.pegasys.pantheon.cli.EthNetworkConfig.mainnet;
 
+import java.util.HashSet;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -35,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.assertj.core.util.Sets;
 
 public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
@@ -105,7 +107,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public void shutdown() {
-    pantheonRunners.keySet().forEach(this::killRunner);
+    // iterate over a copy of the set so that pantheonRunner can be updated when a runner is killed
+    new HashSet<>(pantheonRunners.keySet()).forEach(this::killRunner);
     try {
       nodeExecutor.shutdownNow();
       if (!nodeExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -116,12 +119,18 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
   }
 
+  @Override
+  public boolean isActive(final String nodeName) {
+    return pantheonRunners.containsKey(nodeName);
+  }
+
   private void killRunner(final String name) {
     LOG.info("Killing " + name + " runner");
 
     if (pantheonRunners.containsKey(name)) {
       try {
         pantheonRunners.get(name).close();
+        pantheonRunners.remove(name);
       } catch (final Exception e) {
         throw new RuntimeException("Error shutting down node " + name, e);
       }
