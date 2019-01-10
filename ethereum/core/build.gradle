@@ -30,6 +30,7 @@ dependencies {
   implementation project(':crypto')
   implementation project(':ethereum:rlp')
   implementation project(':ethereum:trie')
+  implementation project(':ethereum:permissioning')
   implementation project(':metrics')
   implementation project(':services:kvstore')
 
@@ -66,6 +67,7 @@ dependencies {
   jmhImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
   jmhImplementation project(':ethereum:rlp')
   jmhImplementation project(':ethereum:trie')
+  jmhImplementation project(':metrics')
   jmhImplementation project(':services:kvstore')
   jmhImplementation project(':util')
 

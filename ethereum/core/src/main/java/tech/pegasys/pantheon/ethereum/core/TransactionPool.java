@@ -24,12 +24,14 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
@@ -47,6 +49,7 @@ public class TransactionPool implements BlockAddedObserver {
   private final ProtocolSchedule<?> protocolSchedule;
   private final ProtocolContext<?> protocolContext;
   private final TransactionBatchAddedListener transactionBatchAddedListener;
+  private Optional<AccountWhitelistController> accountWhitelistController = Optional.empty();
 
   public TransactionPool(
       final PendingTransactions pendingTransactions,
@@ -131,6 +134,13 @@ public class TransactionPool implements BlockAddedObserver {
       return basicValidationResult;
     }
 
+    final String sender = transaction.getSender().toString();
+    if (accountIsNotWhitelisted(sender)) {
+      return ValidationResult.invalid(
+          TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED,
+          String.format("Sender %s is not on the Account Whitelist", sender));
+    }
+
     final BlockHeader chainHeadBlockHeader = getChainHeadBlockHeader();
     if (transaction.getGasLimit() > chainHeadBlockHeader.getGasLimit()) {
       return ValidationResult.invalid(
@@ -145,6 +155,10 @@ public class TransactionPool implements BlockAddedObserver {
             transaction,
             getSenderAccount(transaction, chainHeadBlockHeader),
             pendingTransactions.getNextNonceForSender(transaction.getSender()));
+  }
+
+  private boolean accountIsNotWhitelisted(final String account) {
+    return accountWhitelistController.map(c -> !c.contains(account)).orElse(false);
   }
 
   private Account getSenderAccount(
@@ -162,5 +176,9 @@ public class TransactionPool implements BlockAddedObserver {
   public interface TransactionBatchAddedListener {
 
     void onTransactionsAdded(Iterable<Transaction> transactions);
+  }
+
+  public void setAccountWhitelist(AccountWhitelistController accountWhitelist) {
+    accountWhitelistController = Optional.of(accountWhitelist);
   }
 }

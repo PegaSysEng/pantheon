@@ -17,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.p2p.config.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,6 +75,10 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     if (permissioningConfiguration.isNodeWhitelistSet()) {
       params.add("--nodes-whitelist");
       params.add(String.join(",", permissioningConfiguration.getNodeWhitelist().toString()));
+    }
+    if (permissioningConfiguration.isAccountWhitelistSet()) {
+      params.add("--accounts-whitelist");
+      params.add(String.join(",", permissioningConfiguration.getAccountWhitelist().toString()));
     }
 
     if (node.jsonRpcEnabled()) {
