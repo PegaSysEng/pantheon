@@ -12,13 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.ibft;
 
+import java.io.IOException;
+import java.util.List;
+import org.junit.Test;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-
-import java.io.IOException;
-
-import org.junit.Test;
 
 public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
 
@@ -70,13 +69,14 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
     final PantheonNode minerNode2 = pantheon.createIbftNode("miner2");
     final PantheonNode minerNode3 = pantheon.createIbftNode("miner3");
     final PantheonNode minerNode4 = pantheon.createIbftNode("miner4");
-    final PantheonNode[] nodes = {minerNode1, minerNode2, minerNode3, minerNode4};
-    cluster.start(nodes);
+    final List<PantheonNode> validators = ibft.validators(
+        new PantheonNode[]{minerNode1, minerNode2, minerNode3, minerNode4});
+    cluster.start(validators);
 
     final Account receiver = accounts.createAccount("account2");
 
-    cluster.stopNode(ibft.lastValidator(nodes));
-    cluster.getFirstRunningNode().execute(transactions.createTransfer(receiver, 80));
+    cluster.stopNode(validators.get(validators.size() - 1));
+    validators.get(0).execute(transactions.createTransfer(receiver, 80));
 
     cluster.verifyRunningNodes(receiver.balanceEquals(80));
   }

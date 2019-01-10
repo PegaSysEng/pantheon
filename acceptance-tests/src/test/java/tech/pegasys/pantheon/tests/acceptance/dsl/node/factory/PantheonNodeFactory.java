@@ -216,20 +216,20 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  private Optional<String> createCliqueGenesisConfig(final Collection<RunnableNode> validators) {
+  private Optional<String> createCliqueGenesisConfig(final Collection<? extends RunnableNode> validators) {
     final String template = genesisTemplateConfig("clique/clique.json");
     return updateGenesisExtraData(
         validators, template, CliqueExtraData::createGenesisExtraDataString);
   }
 
-  private Optional<String> createIbftGenesisConfig(final Collection<RunnableNode> validators) {
+  private Optional<String> createIbftGenesisConfig(final Collection<? extends RunnableNode> validators) {
     final String template = genesisTemplateConfig("ibft/ibft.json");
     return updateGenesisExtraData(
         validators, template, IbftExtraData::createGenesisExtraDataString);
   }
 
   private Optional<String> updateGenesisExtraData(
-      final Collection<RunnableNode> validators,
+      final Collection<? extends RunnableNode> validators,
       final String genesisTemplate,
       final Function<List<Address>, String> extraDataCreator) {
     final List<Address> addresses =
@@ -249,7 +249,7 @@ public class PantheonNodeFactory {
   }
 
   private Optional<String> createCliqueGenesisConfigForValidators(
-      final Collection<String> validators, final Collection<RunnableNode> pantheonNodes) {
+      final Collection<String> validators, final Collection<? extends RunnableNode> pantheonNodes) {
     List<RunnableNode> collect =
         pantheonNodes.stream().filter(n -> validators.contains(n.getName())).collect(toList());
     return createCliqueGenesisConfig(collect);

@@ -60,7 +60,7 @@ public class Cluster implements AutoCloseable {
             .collect(toList()));
   }
 
-  public void start(final List<RunnableNode> nodes) {
+  public void start(final Collection<? extends RunnableNode> nodes) {
     this.nodes.clear();
 
     final List<String> bootNodes = new ArrayList<>();
@@ -117,7 +117,10 @@ public class Cluster implements AutoCloseable {
   }
 
   public void verifyRunningNodes(final Condition expected) {
-    getRunningNodes().forEach(expected::verify);
+    nodes.values().stream()
+        .filter(nodeInfo -> nodeInfo.isRunning)
+        .map(NodeInfo::getRunnableNode)
+        .collect(toList()).forEach(expected::verify);
   }
 
   public void verify(final Condition expected, final Collection<Node> nodes) {
@@ -130,19 +133,6 @@ public class Cluster implements AutoCloseable {
     for (final NodeInfo nodeInfo : nodes.values()) {
       nodeInfo.getRunnableNode().waitUntil(condition);
     }
-  }
-
-  public List<RunnableNode> getRunningNodes() {
-    return nodes
-        .values()
-        .stream()
-        .filter(nodeInfo -> nodeInfo.isRunning)
-        .map(NodeInfo::getRunnableNode)
-        .collect(toList());
-  }
-
-  public RunnableNode getFirstRunningNode() {
-    return getRunningNodes().get(0);
   }
 
   private static class NodeInfo {

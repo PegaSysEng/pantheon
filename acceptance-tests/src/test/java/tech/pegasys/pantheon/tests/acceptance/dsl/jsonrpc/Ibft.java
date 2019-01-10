@@ -12,19 +12,20 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 public class Ibft {
 
-  public PantheonNode lastValidator(final PantheonNode[] nodes) {
+  public List<PantheonNode> validators(final PantheonNode[] nodes) {
     final Comparator<PantheonNode> compareByAddress =
         Comparator.comparing(PantheonNode::getAddress);
     List<PantheonNode> pantheonNodes = Arrays.asList(nodes);
     pantheonNodes.sort(compareByAddress);
-    return pantheonNodes.get(pantheonNodes.size() - 1);
+    return pantheonNodes;
   }
+
 }
