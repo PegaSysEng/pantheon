@@ -107,7 +107,7 @@ public class RoundChangeTest {
   }
 
   @Test
-  public void roundChangeHasPopulatedCertificateIfQuorumPrepareMessagesAreReceived() {
+  public void roundChangeHasPopulatedCertificateIfQuorumPrepareMessagesAndProposalAreReceived() {
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 1);
     final SignedData<PreparePayload> localPrepareMessage =
         localNodeMessageFactory.createSignedPreparePayload(roundId, blockToPropose.getHash());
