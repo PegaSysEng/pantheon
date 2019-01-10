@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static tech.pegasys.pantheon.cli.EthNetworkConfig.mainnet;
 
-import java.util.HashSet;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -28,6 +27,7 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +36,6 @@ import java.util.concurrent.TimeUnit;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.assertj.core.util.Sets;
 
 public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
