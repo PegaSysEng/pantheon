@@ -26,7 +26,7 @@ Runs the Pantheon Ethereum full node client.
 Comma separated account public keys for permissioned transactions. You can specify an empty list.
 
 !!!note
-    :construction: Permissioning is not currently supported. Support for permissioning is in active development.
+    Permissioning is under development and will be available in v1.0.
 
 ### banned-nodeids
 
