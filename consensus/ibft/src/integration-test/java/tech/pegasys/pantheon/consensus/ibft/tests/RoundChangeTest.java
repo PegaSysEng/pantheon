@@ -16,16 +16,8 @@ import static java.util.Optional.empty;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 
-import com.google.common.collect.Lists;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
@@ -41,13 +33,27 @@ import tech.pegasys.pantheon.consensus.ibft.support.TestContextFactory;
 import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
+import org.junit.Before;
+import org.junit.Test;
+
 public class RoundChangeTest {
 
   private final long blockTimeStamp = 100;
   private final Clock fixedClock =
       Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
-  private final TestContext context = TestContextFactory.createTestEnvironment(5, 0, fixedClock);
+  private final int NETWORK_SIZE = 5;
+
+  private final TestContext context =
+      TestContextFactory.createTestEnvironment(NETWORK_SIZE, 0, fixedClock);
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
 
@@ -130,7 +136,7 @@ public class RoundChangeTest {
 
   @Test
   public void whenSufficientRoundChangeMessagesAreReceivedForNewRoundLocalNodeCreatesNewRoundMsg() {
-    // Note: Round-3 is the next round for which the local node is Proposer
+    // Note: Round-4 is the next round for which the local node is Proposer
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
     final Block locallyProposedBlock =
         context.createBlockForProposal(targetRound.getRoundNumber(), blockTimeStamp);
@@ -157,13 +163,15 @@ public class RoundChangeTest {
   public void newRoundMessageContainsBlockOnWhichPeerPrepared() {
     final long ARBITRARY_BLOCKTIME = 1500;
 
-    final PreparedCertificate earlierPrepCert = createValidPrepCert(
-        new ConsensusRoundIdentifier(1, 1),
-        context.createBlockForProposal(1, ARBITRARY_BLOCKTIME / 2));
+    final PreparedCertificate earlierPrepCert =
+        createValidPrepCert(
+            new ConsensusRoundIdentifier(1, 1),
+            context.createBlockForProposal(1, ARBITRARY_BLOCKTIME / 2));
 
-    final PreparedCertificate bestPrepCert = createValidPrepCert(
-        new ConsensusRoundIdentifier(1, 2),
-        context.createBlockForProposal(2, ARBITRARY_BLOCKTIME));
+    final PreparedCertificate bestPrepCert =
+        createValidPrepCert(
+            new ConsensusRoundIdentifier(1, 2),
+            context.createBlockForProposal(2, ARBITRARY_BLOCKTIME));
 
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
 
@@ -231,9 +239,9 @@ public class RoundChangeTest {
 
     final ValidatorPeer transmitter = roles.getNonProposingPeer(0);
 
-    final SignedData<RoundChangePayload> rc1 = transmitter.injectRoundChange(targetRound, empty());
-    final SignedData<RoundChangePayload> rc2 = transmitter.injectRoundChange(targetRound, empty());
-    final SignedData<RoundChangePayload> rc3 = transmitter.injectRoundChange(targetRound, empty());
+    for (int i = 0; i < IbftHelpers.calculateRequiredValidatorQuorum(NETWORK_SIZE); i++) {
+      transmitter.injectRoundChange(targetRound, empty());
+    }
 
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
@@ -244,22 +252,25 @@ public class RoundChangeTest {
 
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
 
-    final PreparedCertificate prepCert = createValidPrepCert(new ConsensusRoundIdentifier(1, 2),
-        context.createBlockForProposal(2, ARBITRARY_BLOCKTIME));
+    final PreparedCertificate prepCert =
+        createValidPrepCert(
+            new ConsensusRoundIdentifier(1, 2),
+            context.createBlockForProposal(2, ARBITRARY_BLOCKTIME));
 
+    List<SignedData<RoundChangePayload>> roundChangeMessages = Lists.newArrayList();
     // Create a roundChange containing a PreparedCertificate
-    final SignedData<RoundChangePayload> rc1 =
-        roles.getProposer().injectRoundChange(targetRound,Optional.of(prepCert));
+    roundChangeMessages.add(
+        roles.getProposer().injectRoundChange(targetRound, Optional.of(prepCert)));
 
     // Attempt to override the previously received RoundChange (but now without a payload).
     roles.getProposer().injectRoundChange(targetRound, empty());
 
-    final SignedData<RoundChangePayload> rc2 =
-        roles.getNonProposingPeer(0).injectRoundChange(targetRound, empty());
-    final SignedData<RoundChangePayload> rc3 =
-        roles.getNonProposingPeer(1).injectRoundChange(targetRound, empty());
-    final SignedData<RoundChangePayload> rc4 =
-        roles.getNonProposingPeer(2).injectRoundChange(targetRound, empty());
+    roundChangeMessages.addAll(
+        roles
+            .getNonProposingPeers()
+            .stream()
+            .map(peer -> peer.injectRoundChange(targetRound, empty()))
+            .collect(Collectors.toList()));
 
     final Block expectedBlockToPropose =
         context.createBlockForProposal(targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
@@ -267,7 +278,7 @@ public class RoundChangeTest {
     final SignedData<NewRoundPayload> expectedNewRound =
         localNodeMessageFactory.createSignedNewRoundPayload(
             targetRound,
-            new RoundChangeCertificate(Lists.newArrayList(rc1, rc2, rc3, rc4)),
+            new RoundChangeCertificate(Lists.newArrayList(roundChangeMessages)),
             localNodeMessageFactory.createSignedProposalPayload(
                 targetRound, expectedBlockToPropose));
 
@@ -276,18 +287,35 @@ public class RoundChangeTest {
 
   @Test
   public void messagesFromPreviousRoundAreDiscardedOnTransitionToFutureRound() {
+    roles.getProposer().injectProposal(roundId, blockToPropose);
+
+    // timeout into next round
+    context.getController().handleRoundExpiry(new RoundExpiry(roundId));
+
+    // Clear prior Prepare msg and RoundChange message
+    roles.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+
+    // inject enough prepares from prior round to trigger a commit
+    roles
+        .getNonProposingPeers()
+        .forEach(peer -> peer.injectPrepare(roundId, blockToPropose.getHash()));
+
+    assertPeersReceivedNoMessages(roles.getAllPeers());
   }
 
-  private PreparedCertificate createValidPrepCert(final ConsensusRoundIdentifier preparedRound,
-      final Block block) {
+  private PreparedCertificate createValidPrepCert(
+      final ConsensusRoundIdentifier preparedRound, final Block block) {
     final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(preparedRound);
 
     return new PreparedCertificate(
         roles.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
-        roles.getNonProposingPeers().stream().map(
-            role -> role.getMessageFactory()
-                .createSignedPreparePayload(preparedRound, block.getHash()))
+        roles
+            .getNonProposingPeers()
+            .stream()
+            .map(
+                role ->
+                    role.getMessageFactory()
+                        .createSignedPreparePayload(preparedRound, block.getHash()))
             .collect(Collectors.toList()));
   }
-
 }

@@ -15,9 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft.support;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
@@ -27,6 +24,10 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.Payload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class MessageReceptionHelpers {
 
