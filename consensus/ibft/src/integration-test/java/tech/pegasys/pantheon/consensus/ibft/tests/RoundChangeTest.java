@@ -137,14 +137,14 @@ public class RoundChangeTest {
 
   @Test
   public void newRoundMessageContainsBlockOnWhichPeerPrepared() {
-    final long ARBITRATY_BLOCKTIME = 1500;
+    final long ARBITRARY_BLOCKTIME = 1500;
 
     final ConsensusRoundIdentifier earlierPreparedRound = new ConsensusRoundIdentifier(1, 1);
     final ConsensusRoundIdentifier bestPreparedRound = new ConsensusRoundIdentifier(1, 2);
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 3);
 
-    final Block earlierPreparedBlock = context.createBlockForProposal(1, ARBITRATY_BLOCKTIME / 2);
-    final Block bestPreparedBlock = context.createBlockForProposal(2, ARBITRATY_BLOCKTIME);
+    final Block earlierPreparedBlock = context.createBlockForProposal(1, ARBITRARY_BLOCKTIME / 2);
+    final Block bestPreparedBlock = context.createBlockForProposal(2, ARBITRARY_BLOCKTIME);
 
     final SignedData<RoundChangePayload> rc1 =
         roles.getNonProposingPeer(0).injectRoundChange(targetRound, empty());
@@ -206,7 +206,7 @@ public class RoundChangeTest {
     // Expected to use the block with "ARBITRARY_BLOCKTIME" (i.e. latter block) but with the target
     // round number.
     final Block expectedBlockToPropose =
-        context.createBlockForProposal(targetRound.getRoundNumber(), ARBITRATY_BLOCKTIME);
+        context.createBlockForProposal(targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
 
     final SignedData<NewRoundPayload> expectedNewRound =
         localNodeMessageFactory.createSignedNewRoundPayload(
@@ -261,11 +261,11 @@ public class RoundChangeTest {
 
   @Test
   public void subsequentRoundChangeMessagesFromPeerDoNotOverwritePriorMessage() {
-    final long ARBITRATY_BLOCKTIME = 1500;
+    final long ARBITRARY_BLOCKTIME = 1500;
 
     final ConsensusRoundIdentifier bestPreparedRound = new ConsensusRoundIdentifier(1, 2);
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 3);
-    final Block bestPreparedBlock = context.createBlockForProposal(2, ARBITRATY_BLOCKTIME);
+    final Block bestPreparedBlock = context.createBlockForProposal(2, ARBITRARY_BLOCKTIME);
 
     // Create a roundChange containing a PreparedCertificate
     final SignedData<RoundChangePayload> rc1 =
@@ -302,7 +302,7 @@ public class RoundChangeTest {
         roles.getNonProposingPeer(1).injectRoundChange(targetRound, empty());
 
     final Block expectedBlockToPropose =
-        context.createBlockForProposal(targetRound.getRoundNumber(), ARBITRATY_BLOCKTIME);
+        context.createBlockForProposal(targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
 
     final SignedData<NewRoundPayload> expectedNewRound =
         localNodeMessageFactory.createSignedNewRoundPayload(
