@@ -18,6 +18,8 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
@@ -44,12 +46,11 @@ import org.junit.Test;
 
 public class RoundChangeTest {
 
-  private final long blockTimeStamp = 100;
-  private final Clock mockBlockCreationTime = mock(Clock.class);
+  final long blockTimeStamp = 100;
+  private final Clock fixedClock =
+      Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
-  // This ensures the localNode (i.e. the UUT) will not create the first block
-  private final TestContext context =
-      TestContextFactory.createTestEnvironment(4, 0, mockBlockCreationTime);
+  private final TestContext context = TestContextFactory.createTestEnvironment(4, 0, fixedClock);
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
 
@@ -97,7 +98,7 @@ public class RoundChangeTest {
     roles.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
 
     final SignedData<PreparePayload> prepare =
-        roles.getNonProposingPeers().get(0).injectPrepare(roundId, blockToPropose.getHash());
+        roles.getNonProposingPeer(0).injectPrepare(roundId, blockToPropose.getHash());
     roles.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
 
     final SignedData<RoundChangePayload> expectedTxRoundChange =
@@ -115,14 +116,13 @@ public class RoundChangeTest {
   public void whenSufficientRoundChangeMessagesAreReceivedForNewRoundLocalNodeCreatesNewRoundMsg() {
     // Note: Round-3 is the next round for which the local node is Proposer
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 3);
-    when(mockBlockCreationTime.millis()).thenReturn(blockTimeStamp * 1000);
     final Block locallyProposedBlock =
         context.createBlockForProposal(targetRound.getRoundNumber(), blockTimeStamp);
 
     final SignedData<RoundChangePayload> rc1 =
-        roles.getNonProposingPeers().get(0).injectRoundChange(targetRound, empty());
+        roles.getNonProposingPeer(0).injectRoundChange(targetRound, empty());
     final SignedData<RoundChangePayload> rc2 =
-        roles.getNonProposingPeers().get(1).injectRoundChange(targetRound, empty());
+        roles.getNonProposingPeer(1).injectRoundChange(targetRound, empty());
     final SignedData<RoundChangePayload> rc3 =
         roles.getProposer().injectRoundChange(targetRound, empty());
 
@@ -147,7 +147,7 @@ public class RoundChangeTest {
     final Block bestPreparedBlock = context.createBlockForProposal(2, ARBITRATY_BLOCKTIME);
 
     final SignedData<RoundChangePayload> rc1 =
-        roles.getNonProposingPeers().get(0).injectRoundChange(targetRound, empty());
+        roles.getNonProposingPeer(0).injectRoundChange(targetRound, empty());
 
     // Create a roundChange with a PreparedCertificate from an earlier Round (should not be used
     final SignedData<RoundChangePayload> rc2 =
@@ -221,7 +221,6 @@ public class RoundChangeTest {
   @Test
   public void cannotRoundChangeToAnEarlierRound() {
     // Controller always starts at 1:0. This test moves to 1:7, then attempts to move back to 1:3.
-    when(mockBlockCreationTime.millis()).thenReturn(blockTimeStamp * 1000);
 
     final ConsensusRoundIdentifier futureRound = new ConsensusRoundIdentifier(1, 7);
     final List<SignedData<RoundChangePayload>> roundChangeMessages = Lists.newArrayList();
@@ -250,9 +249,8 @@ public class RoundChangeTest {
   public void multipleRoundChangeMessagesFromSamePeerDoesNotTriggerRoundChange() {
     // Note: Round-3 is the next round for which the local node is Proposer
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 3);
-    when(mockBlockCreationTime.millis()).thenReturn(blockTimeStamp * 1000);
 
-    final ValidatorPeer transmitter = roles.getNonProposingPeers().get(0);
+    final ValidatorPeer transmitter = roles.getNonProposingPeer(0);
 
     final SignedData<RoundChangePayload> rc1 = transmitter.injectRoundChange(targetRound, empty());
     final SignedData<RoundChangePayload> rc2 = transmitter.injectRoundChange(targetRound, empty());
@@ -299,9 +297,9 @@ public class RoundChangeTest {
     roles.getProposer().injectRoundChange(targetRound, empty());
 
     final SignedData<RoundChangePayload> rc2 =
-        roles.getNonProposingPeers().get(0).injectRoundChange(targetRound, empty());
+        roles.getNonProposingPeer(0).injectRoundChange(targetRound, empty());
     final SignedData<RoundChangePayload> rc3 =
-        roles.getNonProposingPeers().get(1).injectRoundChange(targetRound, empty());
+        roles.getNonProposingPeer(1).injectRoundChange(targetRound, empty());
 
     final Block expectedBlockToPropose =
         context.createBlockForProposal(targetRound.getRoundNumber(), ARBITRATY_BLOCKTIME);
