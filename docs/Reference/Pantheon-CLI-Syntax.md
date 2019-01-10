@@ -13,6 +13,21 @@ Runs the Pantheon Ethereum full node client.
 
 ## Options
 
+### accounts-whitelist
+
+```bash tab="Syntax"
+--accounts-whitelist[=<hex string of account public key>[,<hex string of account public key>...]...
+```
+
+```bash tab="Example"
+ --accounts-whitelist=[0xfe3b557e8fb62b89f4916b721be55ceb828dbd73, 0x627306090abaB3A6e1400e9345bC60c78a8BEf57]
+```
+
+Comma separated account public keys for permissioned transactions. You can specify an empty list.
+
+!!!note
+    Permissioning is under development and will be available in v1.0.
+
 ### banned-nodeids
 
 ```bash tab="Syntax"
@@ -301,14 +316,14 @@ otherwise, the existing key file specifies the node private key.
 ```
 
 Comma-separated enode URLs for permissioned networks.
-If you specify an empty list or [`--nodes-whitelist`](#nodes-whitelist) without a list, your node will not connect to any other nodes.
+Not intended for use with mainnet or public testnets. 
 
 
 !!!note
     This option is only available from v0.8.3. 
 
 !!!note
-    :construction: Permissioning is not currently supported. Support for permissioning is in active development.
+    Permissioning is under development and will be available in v1.0.
 
 ### ottoman
 
