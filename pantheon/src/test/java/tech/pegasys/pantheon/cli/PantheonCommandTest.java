@@ -142,7 +142,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void callingHelpDisplaysDefaultRpcApisCorrectly() {
     parseCommand("--help");
-    assertThat(commandOutput.toString()).contains("default: ETH,NET,WEB3,CLIQUE,IBFT");
+    assertThat(commandOutput.toString()).contains("default: ETH,NET,WEB3,EEA,CLIQUE,IBFT");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 

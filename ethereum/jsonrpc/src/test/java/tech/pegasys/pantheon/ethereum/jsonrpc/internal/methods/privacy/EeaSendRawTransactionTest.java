@@ -39,12 +39,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class EeaSendRawTransactionTest {
 
   private static final String VALID_TRANSACTION =
-      "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675";
-  @Mock
-  private TransactionPool transactionPool;
+      "0xf86d0485174876e800830222e0945aae326516b4f8fe08074b7e972e40a713048d62880de0b6b3a7640000801ba05d4e7998757264daab67df2ce6f7e7a0ae36910778a406ca73898c9899a32b9ea0674700d5c3d1d27f2e6b4469957dfd1a1c49bf92383d80717afc84eb05695d5b";
+  @Mock private TransactionPool transactionPool;
 
-  @Mock
-  private JsonRpcParameter parameter;
+  @Mock private JsonRpcParameter parameter;
 
   private EeaSendRawTransaction method;
 
@@ -56,7 +54,7 @@ public class EeaSendRawTransactionTest {
   @Test
   public void requestIsMissingParameter() {
     final JsonRpcRequest request =
-        new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[]{});
+        new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[] {});
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
@@ -72,7 +70,7 @@ public class EeaSendRawTransactionTest {
     when(parameter.required(any(Object[].class), anyInt(), any())).thenReturn(rawTransaction);
 
     final JsonRpcRequest request =
-        new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[]{rawTransaction});
+        new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[] {rawTransaction});
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
@@ -89,8 +87,7 @@ public class EeaSendRawTransactionTest {
         .thenReturn(ValidationResult.valid());
 
     final JsonRpcRequest request =
-        new JsonRpcRequest(
-            "2.0", "eea_sendRawTransaction", new String[]{VALID_TRANSACTION});
+        new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[] {VALID_TRANSACTION});
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcSuccessResponse(
@@ -153,8 +150,7 @@ public class EeaSendRawTransactionTest {
         .thenReturn(ValidationResult.invalid(transactionInvalidReason));
 
     final JsonRpcRequest request =
-        new JsonRpcRequest(
-            "2.0", "eea_sendRawTransaction", new String[]{VALID_TRANSACTION});
+        new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[] {VALID_TRANSACTION});
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(request.getId(), expectedError);

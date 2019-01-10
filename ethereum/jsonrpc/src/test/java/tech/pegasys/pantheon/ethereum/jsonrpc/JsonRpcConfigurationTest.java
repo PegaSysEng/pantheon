@@ -28,7 +28,7 @@ public class JsonRpcConfigurationTest {
     assertThat(configuration.getPort()).isEqualTo(8545);
     assertThat(configuration.getCorsAllowedDomains()).isEmpty();
     assertThat(configuration.getRpcApis())
-        .containsExactlyInAnyOrder(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
+        .containsExactlyInAnyOrder(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.EEA);
   }
 
   @Test
@@ -40,7 +40,8 @@ public class JsonRpcConfigurationTest {
   @Test
   public void rpcApiDefaultShouldBePredefinedList() {
     final JsonRpcConfiguration configuration = JsonRpcConfiguration.createDefault();
-    assertThat(configuration.getRpcApis()).containsExactly(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
+    assertThat(configuration.getRpcApis())
+        .containsExactly(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.EEA);
   }
 
   @Test
