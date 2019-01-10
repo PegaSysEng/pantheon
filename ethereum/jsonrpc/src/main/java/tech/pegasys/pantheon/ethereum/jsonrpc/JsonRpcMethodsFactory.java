@@ -71,6 +71,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerStop;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermAddAccountsToWhitelist;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermGetAccountsWhitelist;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveAccountsFromWhitelist;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaSendRawTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockReplay;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTracer;
@@ -234,6 +235,11 @@ public class JsonRpcMethodsFactory {
           new PermGetAccountsWhitelist(accountsWhitelistController),
           new PermAddAccountsToWhitelist(accountsWhitelistController, parameter),
           new PermRemoveAccountsFromWhitelist(accountsWhitelistController, parameter));
+    }
+    if (rpcApis.contains(RpcApis.EEA)) {
+      addMethods(
+          enabledMethods,
+          new EeaSendRawTransaction(transactionPool, parameter));
     }
     // @formatter:off
     return enabledMethods;
