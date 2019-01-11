@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -24,6 +23,8 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
+
+import java.util.stream.Collectors;
 
 public class TestHelpers {
 
@@ -42,8 +43,8 @@ public class TestHelpers {
     return messageFactory.createSignedCommitPayload(roundId, block.getHash(), commitSeal);
   }
 
-  public static PreparedCertificate createValidPreparedCertificate(final TestContext context,
-      final ConsensusRoundIdentifier preparedRound, final Block block) {
+  public static PreparedCertificate createValidPreparedCertificate(
+      final TestContext context, final ConsensusRoundIdentifier preparedRound, final Block block) {
     final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(preparedRound);
 
     return new PreparedCertificate(

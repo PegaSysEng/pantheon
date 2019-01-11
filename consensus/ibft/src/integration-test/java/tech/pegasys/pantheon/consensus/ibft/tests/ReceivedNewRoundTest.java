@@ -17,11 +17,8 @@ import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpe
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createValidPreparedCertificate;
 
-import org.assertj.core.util.Lists;
-import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
@@ -38,12 +35,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Ensure the Ibft component responds appropriately when a NewRound message is received.
- */
+/** Ensure the Ibft component responds appropriately when a NewRound message is received. */
 public class ReceivedNewRoundTest {
 
   private final TestContext context = TestContextFactory.createTestEnvWithArbitraryClock(4, 0);
@@ -75,8 +71,7 @@ public class ReceivedNewRoundTest {
     nextProposer.injectNewRound(
         targetRound,
         new RoundChangeCertificate(roundChanges),
-        nextProposer.getMessageFactory()
-            .createSignedProposalPayload(targetRound, blockToPropose));
+        nextProposer.getMessageFactory().createSignedProposalPayload(targetRound, blockToPropose));
 
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(targetRound, blockToPropose.getHash());
@@ -115,10 +110,8 @@ public class ReceivedNewRoundTest {
     final Block reproposedBlock = context.createBlockForProposal(1, 15);
     final ConsensusRoundIdentifier nextRoundId = new ConsensusRoundIdentifier(1, 1);
 
-    final PreparedCertificate preparedCertificate = createValidPreparedCertificate(
-        context,
-        roundId,
-        initialBlock);
+    final PreparedCertificate preparedCertificate =
+        createValidPreparedCertificate(context, roundId, initialBlock);
 
     final List<SignedData<RoundChangePayload>> roundChanges =
         roles
@@ -133,14 +126,13 @@ public class ReceivedNewRoundTest {
 
     final ValidatorPeer nextProposer = context.getRoundSpecificRoles(nextRoundId).getProposer();
 
-    nextProposer
-        .injectNewRound(
-            nextRoundId,
-            new RoundChangeCertificate(roundChanges),
-            roles
-                .getNonProposingPeer(0)
-                .getMessageFactory()
-                .createSignedProposalPayload(nextRoundId, reproposedBlock));
+    nextProposer.injectNewRound(
+        nextRoundId,
+        new RoundChangeCertificate(roundChanges),
+        roles
+            .getNonProposingPeer(0)
+            .getMessageFactory()
+            .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
     assertPeersReceivedExactly(
         roles.getAllPeers(),
@@ -167,11 +159,12 @@ public class ReceivedNewRoundTest {
         context.getRoundSpecificRoles(interimRound).getProposer();
 
     final SignedData<ProposalPayload> proposal =
-        interimRoundProposer.getMessageFactory()
+        interimRoundProposer
+            .getMessageFactory()
             .createSignedProposalPayload(interimRound, context.createBlockForProposal(1, 30));
 
-    interimRoundProposer
-        .injectNewRound(interimRound, new RoundChangeCertificate(roundChangePayloads), proposal);
+    interimRoundProposer.injectNewRound(
+        interimRound, new RoundChangeCertificate(roundChangePayloads), proposal);
 
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }

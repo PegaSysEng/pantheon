@@ -313,6 +313,4 @@ public class RoundChangeTest {
     context.getController().handleRoundExpiry(new RoundExpiry(new ConsensusRoundIdentifier(1, 1)));
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
-
-
 }

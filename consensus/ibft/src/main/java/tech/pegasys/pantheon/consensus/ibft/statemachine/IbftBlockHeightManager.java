@@ -16,7 +16,6 @@ import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightM
 import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.FUTURE_ROUND;
 import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.PRIOR_ROUND;
 
-import java.util.concurrent.TimeUnit;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -38,6 +37,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import java.time.Clock;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
