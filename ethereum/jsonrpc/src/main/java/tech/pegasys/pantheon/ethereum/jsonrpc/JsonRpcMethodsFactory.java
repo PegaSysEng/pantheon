@@ -68,6 +68,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerSetCoi
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerSetEtherbase;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerStart;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerStop;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermAddAccountsToWhitelist;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermAddNodesToWhitelist;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermGetAccountsWhitelist;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermGetNodesWhitelist;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveAccountsFromWhitelist;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveNodesFromWhitelist;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockReplay;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTracer;
@@ -77,6 +83,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.BlockResultFactor
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.Collection;
@@ -101,7 +108,8 @@ public class JsonRpcMethodsFactory {
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> rpcApis,
-      final FilterManager filterManager) {
+      final FilterManager filterManager,
+      final AccountWhitelistController accountsWhitelistController) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
     return methods(
@@ -115,6 +123,7 @@ public class JsonRpcMethodsFactory {
         miningCoordinator,
         metricsSystem,
         supportedCapabilities,
+        accountsWhitelistController,
         rpcApis);
   }
 
@@ -129,6 +138,7 @@ public class JsonRpcMethodsFactory {
       final MiningCoordinator miningCoordinator,
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
+      final AccountWhitelistController accountsWhitelistController,
       final Collection<RpcApi> rpcApis) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
     // @formatter:off
@@ -218,8 +228,22 @@ public class JsonRpcMethodsFactory {
           minerSetCoinbase,
           new MinerSetEtherbase(minerSetCoinbase));
     }
+    if (rpcApis.contains(RpcApis.PERM)) {
+      addMethods(
+          enabledMethods,
+          new PermAddNodesToWhitelist(p2pNetwork, parameter),
+          new PermRemoveNodesFromWhitelist(p2pNetwork, parameter),
+          new PermGetNodesWhitelist(p2pNetwork));
+    }
     if (rpcApis.contains(RpcApis.ADMIN)) {
       addMethods(enabledMethods, new AdminPeers(p2pNetwork));
+    }
+    if (rpcApis.contains(RpcApis.PERM)) {
+      addMethods(
+          enabledMethods,
+          new PermGetAccountsWhitelist(accountsWhitelistController),
+          new PermAddAccountsToWhitelist(accountsWhitelistController, parameter),
+          new PermRemoveAccountsFromWhitelist(accountsWhitelistController, parameter));
     }
     // @formatter:off
     return enabledMethods;

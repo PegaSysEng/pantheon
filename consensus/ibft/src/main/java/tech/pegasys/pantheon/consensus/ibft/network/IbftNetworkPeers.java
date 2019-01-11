@@ -13,23 +13,21 @@
 package tech.pegasys.pantheon.consensus.ibft.network;
 
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
-import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class IbftNetworkPeers {
+public class IbftNetworkPeers implements IbftMulticaster {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -43,18 +41,31 @@ public class IbftNetworkPeers {
   }
 
   public void peerAdded(final PeerConnection newConnection) {
-    final Address peerAddress = getAddressFrom(newConnection);
+    final Address peerAddress = newConnection.getPeer().getAddress();
     peerConnections.put(peerAddress, newConnection);
   }
 
   public void peerRemoved(final PeerConnection removedConnection) {
-    final Address peerAddress = getAddressFrom(removedConnection);
+    final Address peerAddress = removedConnection.getPeer().getAddress();
     peerConnections.remove(peerAddress);
   }
 
+  @Override
   public void multicastToValidators(final MessageData message) {
     final Collection<Address> validators = validatorProvider.getValidators();
     sendMessageToSpecificAddresses(validators, message);
+  }
+
+  @Override
+  public void multicastToValidatorsExcept(
+      final MessageData message, final Collection<Address> exceptAddresses) {
+    final Collection<Address> includedValidators =
+        validatorProvider
+            .getValidators()
+            .stream()
+            .filter(a -> !exceptAddresses.contains(a))
+            .collect(Collectors.toSet());
+    sendMessageToSpecificAddresses(includedValidators, message);
   }
 
   private void sendMessageToSpecificAddresses(
@@ -71,11 +82,5 @@ public class IbftNetworkPeers {
                 LOG.trace("Lost connection to a validator.");
               }
             });
-  }
-
-  private Address getAddressFrom(final PeerConnection connection) {
-    final BytesValue peerNodeId = connection.getPeer().getNodeId();
-    final PublicKey remotePublicKey = PublicKey.create(peerNodeId);
-    return Util.publicKeyToAddress(remotePublicKey);
   }
 }
