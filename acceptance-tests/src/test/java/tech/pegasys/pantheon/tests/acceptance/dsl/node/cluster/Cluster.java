@@ -125,5 +125,4 @@ public class Cluster implements AutoCloseable {
       node.waitUntil(condition);
     }
   }
-
 }

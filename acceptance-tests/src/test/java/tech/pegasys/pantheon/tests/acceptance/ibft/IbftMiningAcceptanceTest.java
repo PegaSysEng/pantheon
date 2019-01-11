@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
@@ -66,12 +67,14 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
+  @Ignore("Temporarily disabled until ibft new block events are being sent")
   public void shouldMineOnMultipleNodesEvenWhenClusterContainsNonValidator() throws IOException {
     final String[] validators = {"validator1", "validator2", "validator3"};
     final PantheonNode validator1 = pantheon.createIbftNodeWithValidators("validator1", validators);
     final PantheonNode validator2 = pantheon.createIbftNodeWithValidators("validator2", validators);
     final PantheonNode validator3 = pantheon.createIbftNodeWithValidators("validator3", validators);
-    final PantheonNode nonValidatorNode = pantheon.createIbftNodeWithValidators("non-validator", validators);
+    final PantheonNode nonValidatorNode =
+        pantheon.createIbftNodeWithValidators("non-validator", validators);
     cluster.start(validator1, validator2, validator3, nonValidatorNode);
 
     final Account sender = accounts.createAccount("account1");
@@ -83,11 +86,8 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
     validator2.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
     cluster.verify(receiver.balanceEquals(1));
 
-    validator3.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
+    nonValidatorNode.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
     cluster.verify(receiver.balanceEquals(3));
-
-    nonValidatorNode.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
-    cluster.verify(receiver.balanceEquals(6));
   }
 
   @Test
