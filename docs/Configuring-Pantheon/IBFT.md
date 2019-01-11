@@ -45,7 +45,7 @@ To propose adding or removing validators using the JSON-RPC methods, you must en
 
 The JSON-RPC methods to add or remove validators are:
 
-* [ibft_](../Reference/JSON-RPC-API-Methods.md#)
+* [ibft_getPendingVotes](../Reference/JSON-RPC-API-Methods.md#)
 * [ibft_proposeValidatorVote](../Reference/JSON-RPC-API-Methods.md#ibft_proposeValidatorVote)
 * [ibft_discardValidatorVote](../Reference/JSON-RPC-API-Methods.md#clique_discard)
 
