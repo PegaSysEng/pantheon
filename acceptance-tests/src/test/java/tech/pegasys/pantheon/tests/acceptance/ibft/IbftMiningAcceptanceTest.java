@@ -43,25 +43,50 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineOnMultipleNodes() throws IOException {
-    final PantheonNode minerNode1 = pantheon.createIbftNode("miner1");
-    final PantheonNode minerNode2 = pantheon.createIbftNode("miner2");
-    final PantheonNode minerNode3 = pantheon.createIbftNode("miner3");
-    final PantheonNode minerNode4 = pantheon.createIbftNode("miner4");
-    cluster.start(minerNode1, minerNode2, minerNode3, minerNode4);
+    final PantheonNode validator1 = pantheon.createIbftNode("miner1");
+    final PantheonNode validator2 = pantheon.createIbftNode("miner2");
+    final PantheonNode validator3 = pantheon.createIbftNode("miner3");
+    final PantheonNode nonValidatorNode = pantheon.createIbftNode("miner4");
+    cluster.start(validator1, validator2, validator3, nonValidatorNode);
 
     final Account sender = accounts.createAccount("account1");
     final Account receiver = accounts.createAccount("account2");
 
-    minerNode1.execute(transactions.createTransfer(sender, 50));
+    validator1.execute(transactions.createTransfer(sender, 50));
     cluster.verify(sender.balanceEquals(50));
 
-    minerNode2.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
+    validator2.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
     cluster.verify(receiver.balanceEquals(1));
 
-    minerNode3.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
+    validator3.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
     cluster.verify(receiver.balanceEquals(3));
 
-    minerNode4.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
+    nonValidatorNode.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
+    cluster.verify(receiver.balanceEquals(6));
+  }
+
+  @Test
+  public void shouldMineOnMultipleNodesEvenWhenClusterContainsNonValidator() throws IOException {
+    final String[] validators = {"validator1", "validator2", "validator3"};
+    final PantheonNode validator1 = pantheon.createIbftNodeWithValidators("validator1", validators);
+    final PantheonNode validator2 = pantheon.createIbftNodeWithValidators("validator2", validators);
+    final PantheonNode validator3 = pantheon.createIbftNodeWithValidators("validator3", validators);
+    final PantheonNode nonValidatorNode = pantheon.createIbftNodeWithValidators("non-validator", validators);
+    cluster.start(validator1, validator2, validator3, nonValidatorNode);
+
+    final Account sender = accounts.createAccount("account1");
+    final Account receiver = accounts.createAccount("account2");
+
+    validator1.execute(transactions.createTransfer(sender, 50));
+    cluster.verify(sender.balanceEquals(50));
+
+    validator2.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
+    cluster.verify(receiver.balanceEquals(1));
+
+    validator3.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
+    cluster.verify(receiver.balanceEquals(3));
+
+    nonValidatorNode.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
     cluster.verify(receiver.balanceEquals(6));
   }
 

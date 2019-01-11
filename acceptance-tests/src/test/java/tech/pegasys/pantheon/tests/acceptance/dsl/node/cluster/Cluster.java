@@ -112,12 +112,6 @@ public class Cluster implements AutoCloseable {
     }
   }
 
-  public void waitUntil(final WaitCondition condition) {
-    for (final Node node : nodes.values()) {
-      node.waitUntil(condition);
-    }
-  }
-
   public void verifyOnActiveNodes(final Condition condition) {
     nodes
         .values()
@@ -125,4 +119,11 @@ public class Cluster implements AutoCloseable {
         .filter(node -> pantheonNodeRunner.isActive(node.getName()))
         .forEach(condition::verify);
   }
+
+  public void waitUntil(final WaitCondition condition) {
+    for (final Node node : nodes.values()) {
+      node.waitUntil(condition);
+    }
+  }
+
 }

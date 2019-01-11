@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
@@ -213,7 +214,26 @@ public class PantheonNodeFactory {
             .setWebSocketConfiguration(createWebSocketEnabledConfig())
             .setDevMode(false)
             .setGenesisConfigProvider(
-                nodes -> createCliqueGenesisConfigForValidators(asList(validators), nodes))
+                nodes ->
+                    createGenesisConfigForValidators(
+                        asList(validators), nodes, this::createCliqueGenesisConfig))
+            .build());
+  }
+
+  public PantheonNode createIbftNodeWithValidators(final String name, final String... validators)
+      throws IOException {
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .setJsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .setWebSocketConfiguration(createWebSocketEnabledConfig())
+            .setDevMode(false)
+            .setGenesisConfigProvider(
+                nodes ->
+                    createGenesisConfigForValidators(
+                        asList(validators), nodes, this::createIbftGenesisConfig))
             .build());
   }
 
@@ -251,11 +271,13 @@ public class PantheonNodeFactory {
     }
   }
 
-  private Optional<String> createCliqueGenesisConfigForValidators(
-      final Collection<String> validators, final Collection<? extends RunnableNode> pantheonNodes) {
-    List<RunnableNode> collect =
+  private Optional<String> createGenesisConfigForValidators(
+      final Collection<String> validators,
+      final Collection<? extends RunnableNode> pantheonNodes,
+      final GenesisConfigProvider genesisConfigProvider) {
+    final List<RunnableNode> nodes =
         pantheonNodes.stream().filter(n -> validators.contains(n.getName())).collect(toList());
-    return createCliqueGenesisConfig(collect);
+    return genesisConfigProvider.createGenesisConfig(nodes);
   }
 
   private JsonRpcConfiguration createJsonRpcConfigWithClique() {
