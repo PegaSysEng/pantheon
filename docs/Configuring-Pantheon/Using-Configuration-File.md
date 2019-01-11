@@ -39,10 +39,10 @@ Specific differences between the command line and the TOML file format are:
     
     # Mining
     miner-enabled=true
-    miner-coinbase="0x0000000000000000000000000000000000000002"
+    miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
     ```
     
 !!!example "Starting Pantheon with a Configuration File"
     ```bash
-    pantheon --config=/Users/user/node/config.toml
+    pantheon --config=/home/me/me_node/config.toml
     ```
