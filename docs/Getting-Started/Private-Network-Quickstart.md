@@ -236,8 +236,8 @@ did manually, connecting to the rpc node using http JSON-RPC, but displays infor
 
 Now we'll use [MetaMask](https://metamask.io/) to send transactions. 
 
-To send transactions, you first need to create an account or use one of the 3 accounts created during
-the genesis of this test network, see: 
+To send transactions, you first need to create an account or use one of the 3 accounts below created during
+the genesis of this test network. 
 
 {!global/test_accounts.md!}
 
