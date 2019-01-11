@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -38,5 +40,21 @@ public class TestHelpers {
     final MessageFactory messageFactory = new MessageFactory(signingKeyPair);
 
     return messageFactory.createSignedCommitPayload(roundId, block.getHash(), commitSeal);
+  }
+
+  public static PreparedCertificate createValidPreparedCertificate(final TestContext context,
+      final ConsensusRoundIdentifier preparedRound, final Block block) {
+    final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(preparedRound);
+
+    return new PreparedCertificate(
+        roles.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
+        roles
+            .getNonProposingPeers()
+            .stream()
+            .map(
+                role ->
+                    role.getMessageFactory()
+                        .createSignedPreparePayload(preparedRound, block.getHash()))
+            .collect(Collectors.toList()));
   }
 }

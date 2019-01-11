@@ -16,6 +16,7 @@ import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightM
 import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.FUTURE_ROUND;
 import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.PRIOR_ROUND;
 
+import java.util.concurrent.TimeUnit;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -125,7 +126,7 @@ public class IbftBlockHeightManager {
 
   public void roundExpired(final RoundExpiry expire) {
     if (!expire.getView().equals(currentRound.getRoundIdentifier())) {
-      LOG.debug("Ignoring Round timer expired which does not match current round.");
+      LOG.info("Ignoring Round timer expired which does not match current round.");
       return;
     }
 
@@ -200,7 +201,7 @@ public class IbftBlockHeightManager {
       }
 
       if (finalState.isLocalNodeProposerForRound(targetRound)) {
-        currentRound.startRoundWith(result.get(), clock.millis() / 1000);
+        currentRound.startRoundWith(result.get(), TimeUnit.MILLISECONDS.toSeconds(clock.millis()));
       }
     }
   }
