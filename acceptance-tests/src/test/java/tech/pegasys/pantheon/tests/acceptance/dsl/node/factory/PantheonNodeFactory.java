@@ -16,6 +16,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE;
+import static tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis.IBFT;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -182,7 +183,7 @@ public class PantheonNodeFactory {
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(jsonRpcConfigWithClique())
+            .setJsonRpcConfiguration(createJsonRpcConfigWithClique())
             .setWebSocketConfiguration(createWebSocketEnabledConfig())
             .setDevMode(false)
             .setGenesisConfigProvider(this::createCliqueGenesisConfig)
@@ -194,7 +195,7 @@ public class PantheonNodeFactory {
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(jsonRpcConfigWithClique())
+            .setJsonRpcConfiguration(createJsonRpcConfigWithIbft())
             .setWebSocketConfiguration(createWebSocketEnabledConfig())
             .setDevMode(false)
             .setGenesisConfigProvider(this::createIbftGenesisConfig)
@@ -208,7 +209,7 @@ public class PantheonNodeFactory {
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(jsonRpcConfigWithClique())
+            .setJsonRpcConfiguration(createJsonRpcConfigWithClique())
             .setWebSocketConfiguration(createWebSocketEnabledConfig())
             .setDevMode(false)
             .setGenesisConfigProvider(
@@ -257,12 +258,12 @@ public class PantheonNodeFactory {
     return createCliqueGenesisConfig(collect);
   }
 
-  private JsonRpcConfiguration jsonRpcConfigWithClique() {
-    final JsonRpcConfiguration jsonRpcConfig = createJsonRpcEnabledConfig();
-    final List<RpcApi> rpcApis = new ArrayList<>(jsonRpcConfig.getRpcApis());
-    rpcApis.add(CLIQUE);
-    jsonRpcConfig.setRpcApis(rpcApis);
-    return jsonRpcConfig;
+  private JsonRpcConfiguration createJsonRpcConfigWithClique() {
+    return createJsonRpcConfigWithRpcApiEnabled(CLIQUE);
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfigWithIbft() {
+    return createJsonRpcConfigWithRpcApiEnabled(IBFT);
   }
 
   private JsonRpcConfiguration createJsonRpcEnabledConfig() {
@@ -281,9 +282,13 @@ public class PantheonNodeFactory {
   }
 
   private JsonRpcConfiguration jsonRpcConfigWithPermissioning() {
+    return createJsonRpcConfigWithRpcApiEnabled(RpcApis.PERM);
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfigWithRpcApiEnabled(final RpcApi rpcApi) {
     final JsonRpcConfiguration jsonRpcConfig = createJsonRpcEnabledConfig();
     final List<RpcApi> rpcApis = new ArrayList<>(jsonRpcConfig.getRpcApis());
-    rpcApis.add(RpcApis.PERM);
+    rpcApis.add(rpcApi);
     jsonRpcConfig.setRpcApis(rpcApis);
     return jsonRpcConfig;
   }
