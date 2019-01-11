@@ -315,7 +315,6 @@ public class RoundChangeTest {
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
 
-
   @Test
   public void illegallyConstructedRoundChangeMessageIsDiscarded() {
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
@@ -327,17 +326,20 @@ public class RoundChangeTest {
     final SignedData<RoundChangePayload> rc3 =
         roles.getNonProposingPeer(2).injectRoundChange(targetRound, empty());
 
-    //create illegal RoundChangeMessage
-    final PreparedCertificate illegalPreparedCertificate = new PreparedCertificate(
-        roles.getNonProposingPeer(0).getMessageFactory()
-            .createSignedProposalPayload(roundId, blockToPropose),
-        emptyList());
+    // create illegal RoundChangeMessage
+    final PreparedCertificate illegalPreparedCertificate =
+        new PreparedCertificate(
+            roles
+                .getNonProposingPeer(0)
+                .getMessageFactory()
+                .createSignedProposalPayload(roundId, blockToPropose),
+            emptyList());
 
-    roles.getNonProposingPeer(2)
+    roles
+        .getNonProposingPeer(2)
         .injectRoundChange(targetRound, Optional.of(illegalPreparedCertificate));
 
     // Ensure no NewRound message is sent.
     assertPeersReceivedNoMessages(roles.getAllPeers());
-
   }
 }

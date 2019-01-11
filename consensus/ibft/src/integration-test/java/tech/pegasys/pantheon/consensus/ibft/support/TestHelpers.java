@@ -14,10 +14,6 @@ package tech.pegasys.pantheon.consensus.ibft.support;
 
 import static java.util.Optional.empty;
 
-import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -33,6 +29,12 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
 
 public class TestHelpers {
 
@@ -69,7 +71,8 @@ public class TestHelpers {
 
   public static SignedData<NewRoundPayload> injectEmptyNewRound(
       final ConsensusRoundIdentifier targetRoundId,
-      final ValidatorPeer proposer, final Collection<ValidatorPeer> peers,
+      final ValidatorPeer proposer,
+      final Collection<ValidatorPeer> peers,
       final Block blockToPropose) {
 
     final List<SignedData<RoundChangePayload>> roundChangePayloads = Lists.newArrayList();
@@ -78,10 +81,10 @@ public class TestHelpers {
           peer.getMessageFactory().createSignedRoundChangePayload(targetRoundId, empty()));
     }
 
-    final SignedData<ProposalPayload> proposal = proposer.getMessageFactory()
-        .createSignedProposalPayload(targetRoundId, blockToPropose);
+    final SignedData<ProposalPayload> proposal =
+        proposer.getMessageFactory().createSignedProposalPayload(targetRoundId, blockToPropose);
 
-    return proposer.injectNewRound(targetRoundId, new RoundChangeCertificate(roundChangePayloads),
-        proposal);
+    return proposer.injectNewRound(
+        targetRoundId, new RoundChangeCertificate(roundChangePayloads), proposal);
   }
 }

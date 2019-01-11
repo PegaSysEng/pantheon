@@ -13,16 +13,10 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.injectEmptyNewRound;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
@@ -35,6 +29,13 @@ import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+
+import org.junit.Before;
+import org.junit.Test;
+
 public class FutureRoundTest {
 
   final long blockTimeStamp = 100;
@@ -42,8 +43,7 @@ public class FutureRoundTest {
       Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
   // Local node will propose the first block
-  private final TestContext context =
-      TestContextFactory.createTestEnvironment(4, 0, fixedClock);
+  private final TestContext context = TestContextFactory.createTestEnvironment(4, 0, fixedClock);
 
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
@@ -70,13 +70,15 @@ public class FutureRoundTest {
 
     // inject a newRound to move to 'futureRoundId', and ensure localnode sends prepare, commit
     // and updates blockchain
-    injectEmptyNewRound(futureRoundId, futureRoles.getProposer(), futureRoles.getAllPeers(),
-        futureBlock);
+    injectEmptyNewRound(
+        futureRoundId, futureRoles.getProposer(), futureRoles.getAllPeers(), futureBlock);
 
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
     final SignedData<CommitPayload> expectedCommit =
-        localNodeMessageFactory.createSignedCommitPayload(futureRoundId, futureBlock.getHash(),
+        localNodeMessageFactory.createSignedCommitPayload(
+            futureRoundId,
+            futureBlock.getHash(),
             SECP256K1.sign(futureBlock.getHash(), context.getLocalNodeParams().getNodeKeyPair()));
     assertPeersReceivedExactly(futureRoles.getAllPeers(), expectedCommit, expectedPrepare);
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
@@ -92,25 +94,23 @@ public class FutureRoundTest {
       peer.injectPrepare(roundId, initialBlock.getHash());
     }
     roles.getProposer().injectCommit(roundId, initialBlock.getHash());
-    //At this stage, the local node has 2 commit msgs (proposer and local) so has not committed
+    // At this stage, the local node has 2 commit msgs (proposer and local) so has not committed
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
 
     for (final ValidatorPeer peer : roles.getAllPeers()) {
       peer.clearReceivedMessages();
     }
 
-    injectEmptyNewRound(futureRoundId, futureRoles.getProposer(), futureRoles.getAllPeers(),
-        futureBlock);
+    injectEmptyNewRound(
+        futureRoundId, futureRoles.getProposer(), futureRoles.getAllPeers(), futureBlock);
 
     final SignedData<PreparePayload> expectedFuturePrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
     assertPeersReceivedExactly(roles.getAllPeers(), expectedFuturePrepare);
 
-
     // attempt to complete the previous round
-    roles.getNonProposingPeers().get(0).injectCommit(roundId,  initialBlock.getHash());
+    roles.getNonProposingPeers().get(0).injectCommit(roundId, initialBlock.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
-
   }
 }
