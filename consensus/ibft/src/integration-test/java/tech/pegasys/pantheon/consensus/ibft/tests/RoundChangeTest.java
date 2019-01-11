@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
@@ -312,5 +313,31 @@ public class RoundChangeTest {
     // Manually timeout a future round, and ensure no messages are sent
     context.getController().handleRoundExpiry(new RoundExpiry(new ConsensusRoundIdentifier(1, 1)));
     assertPeersReceivedNoMessages(roles.getAllPeers());
+  }
+
+
+  @Test
+  public void illegallyConstructedRoundChangeMessageIsDiscarded() {
+    final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
+
+    final SignedData<RoundChangePayload> rc1 =
+        roles.getNonProposingPeer(0).injectRoundChange(targetRound, empty());
+    final SignedData<RoundChangePayload> rc2 =
+        roles.getNonProposingPeer(1).injectRoundChange(targetRound, empty());
+    final SignedData<RoundChangePayload> rc3 =
+        roles.getNonProposingPeer(2).injectRoundChange(targetRound, empty());
+
+    //create illegal RoundChangeMessage
+    final PreparedCertificate illegalPreparedCertificate = new PreparedCertificate(
+        roles.getNonProposingPeer(0).getMessageFactory()
+            .createSignedProposalPayload(roundId, blockToPropose),
+        emptyList());
+
+    roles.getNonProposingPeer(2)
+        .injectRoundChange(targetRound, Optional.of(illegalPreparedCertificate));
+
+    // Ensure no NewRound message is sent.
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+
   }
 }
