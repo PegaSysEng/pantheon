@@ -17,14 +17,11 @@ import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
-
-import java.util.stream.Collectors;
 
 public class TestHelpers {
 
@@ -57,5 +54,23 @@ public class TestHelpers {
                     role.getMessageFactory()
                         .createSignedPreparePayload(preparedRound, block.getHash()))
             .collect(Collectors.toList()));
+  }
+
+  public static SignedData<NewRoundPayload> injectEmptyNewRound(
+      final ConsensusRoundIdentifier targetRoundId,
+      final ValidatorPeer proposer, final Collection<ValidatorPeer> peers,
+      final Block blockToPropose) {
+
+    final List<SignedData<RoundChangePayload>> roundChangePayloads = Lists.newArrayList();
+    for (final ValidatorPeer peer : peers) {
+      roundChangePayloads.add(
+          peer.getMessageFactory().createSignedRoundChangePayload(targetRoundId, empty()));
+    }
+
+    final SignedData<ProposalPayload> proposal = proposer.getMessageFactory()
+        .createSignedProposalPayload(targetRoundId, blockToPropose);
+
+    return proposer.injectNewRound(targetRoundId, new RoundChangeCertificate(roundChangePayloads),
+        proposal);
   }
 }
