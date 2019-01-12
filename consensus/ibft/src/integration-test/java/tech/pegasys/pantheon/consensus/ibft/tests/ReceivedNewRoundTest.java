@@ -18,7 +18,9 @@ import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpe
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createValidPreparedCertificate;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
@@ -28,6 +30,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextFactory;
+import tech.pegasys.pantheon.consensus.ibft.support.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -39,10 +42,12 @@ import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
-/** Ensure the Ibft component responds appropriately when a NewRound message is received. */
+/**
+ * Ensure the Ibft component responds appropriately when a NewRound message is received.
+ */
 public class ReceivedNewRoundTest {
 
-  private final TestContext context = TestContextFactory.createTestEnvWithArbitraryClock(4, 0);
+  private final TestContext context = TestContextFactory.createTestEnvWithArbitraryClock(5, 0);
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
 
@@ -167,5 +172,63 @@ public class ReceivedNewRoundTest {
         interimRound, new RoundChangeCertificate(roundChangePayloads), proposal);
 
     assertPeersReceivedNoMessages(roles.getAllPeers());
+  }
+
+  @Test
+  public void receiveRoundStateIsNotLostIfASecondNewRoundMessageIsReceivedForCurrentRound() {
+    final Block initialBlock = context.createBlockForProposal(0, 15);
+    final Block reproposedBlock = context.createBlockForProposal(1, 15);
+    final ConsensusRoundIdentifier nextRoundId = new ConsensusRoundIdentifier(1, 1);
+
+    final PreparedCertificate preparedCertificate =
+        createValidPreparedCertificate(context, roundId, initialBlock);
+
+    final List<SignedData<RoundChangePayload>> roundChanges =
+        roles
+            .getAllPeers()
+            .stream()
+            .map(
+                p ->
+                    p.getMessageFactory()
+                        .createSignedRoundChangePayload(
+                            nextRoundId, Optional.of(preparedCertificate)))
+            .collect(Collectors.toList());
+
+    final RoundSpecificNodeRoles nextRoles = context.getRoundSpecificRoles(nextRoundId);
+    final ValidatorPeer nextProposer = nextRoles.getProposer();
+
+    nextProposer.injectNewRound(
+        nextRoundId,
+        new RoundChangeCertificate(roundChanges),
+        roles
+            .getNonProposingPeer(0)
+            .getMessageFactory()
+            .createSignedProposalPayload(nextRoundId, reproposedBlock));
+
+    assertPeersReceivedExactly(
+        roles.getAllPeers(),
+        localNodeMessageFactory.createSignedPreparePayload(nextRoundId, reproposedBlock.getHash()));
+
+    // Inject a prepare, then re-inject the newRound - then ensure only a single prepare is enough
+    // to trigger a Commit transmission from the local node
+    nextRoles.getNonProposingPeer(0).injectPrepare(nextRoundId, reproposedBlock.getHash());
+
+    nextProposer.injectNewRound(
+        nextRoundId,
+        new RoundChangeCertificate(roundChanges),
+        roles
+            .getNonProposingPeer(0)
+            .getMessageFactory()
+            .createSignedProposalPayload(nextRoundId, reproposedBlock));
+
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+
+    nextRoles.getNonProposingPeer(1).injectPrepare(nextRoundId, reproposedBlock.getHash());
+
+    final SignedData<CommitPayload> expectedCommit = TestHelpers
+        .createSignedCommentPayload(reproposedBlock,
+            context.getLocalNodeParams().getNodeKeyPair(), nextRoundId);
+
+    assertPeersReceivedExactly(nextRoles.getAllPeers(), expectedCommit);
   }
 }

@@ -38,11 +38,11 @@ import org.junit.Test;
 
 public class FutureRoundTest {
 
-  final long blockTimeStamp = 100;
+  private final long blockTimeStamp = 100;
   private final Clock fixedClock =
       Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
-  // Local node will propose the first block
+  // Local node is not the first proposer for the current round.
   private final TestContext context = TestContextFactory.createTestEnvironment(4, 0, fixedClock);
 
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
