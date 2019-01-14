@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.4
+
+Docker Bug 
+
+Upcoming changes in 0.9: 
+Removal of existing quickstart 
+Breaking command line changes 
+
 ## 0.8.3 
 
 ### Breaking Change to JSON RPC-API 
