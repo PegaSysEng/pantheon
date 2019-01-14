@@ -27,7 +27,7 @@ public class RpcApis {
   public static final RpcApi ADMIN = new RpcApi("ADMIN");
   public static final RpcApi EEA = new RpcApi("EEA");
 
-  public static final Collection<RpcApi> DEFAULT_JSON_RPC_APIS = Arrays.asList(ETH, NET, WEB3, EEA);
+  public static final Collection<RpcApi> DEFAULT_JSON_RPC_APIS = Arrays.asList(ETH, NET, WEB3);
 
   public static Optional<RpcApi> valueOf(final String name) {
     if (name.equals(ETH.getCliValue())) {

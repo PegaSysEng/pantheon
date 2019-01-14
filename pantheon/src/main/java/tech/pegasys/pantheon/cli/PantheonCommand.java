@@ -294,7 +294,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     arity = "1..*",
     converter = RpcApisConverter.class,
     description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}",
-    defaultValue = "ETH,NET,WEB3,EEA,CLIQUE,IBFT"
+    defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
   private final Collection<RpcApi> rpcApis = null;
 
