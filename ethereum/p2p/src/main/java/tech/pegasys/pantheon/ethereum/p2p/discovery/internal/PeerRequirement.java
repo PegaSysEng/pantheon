@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
 import java.util.Collection;
 
+@FunctionalInterface
 public interface PeerRequirement {
 
   boolean hasSufficientPeers();

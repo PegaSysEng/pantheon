@@ -93,7 +93,7 @@ public final class NettyP2PNetworkTest {
                 new NoOpMetricsSystem(),
                 new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
 
-      final int listenPort = listener.getSelf().getPort();
+      final int listenPort = listener.getLocalPeerInfo().getPort();
       listener.run();
       connector.run();
       final BytesValue listenId = listenKp.getPublicKey().getEncodedBytes();
@@ -146,7 +146,7 @@ public final class NettyP2PNetworkTest {
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
-      final int listenPort = listener.getSelf().getPort();
+      final int listenPort = listener.getLocalPeerInfo().getPort();
       listener.run();
       connector.run();
       final BytesValue listenId = listenKp.getPublicKey().getEncodedBytes();
@@ -229,7 +229,7 @@ public final class NettyP2PNetworkTest {
                 new NoOpMetricsSystem(),
                 new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
 
-      final int listenPort = listener.getSelf().getPort();
+      final int listenPort = listener.getLocalPeerInfo().getPort();
       // Setup listener and first connection
       listener.run();
       connector1.run();
@@ -296,7 +296,7 @@ public final class NettyP2PNetworkTest {
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
-      final int listenPort = listener.getSelf().getPort();
+      final int listenPort = listener.getLocalPeerInfo().getPort();
       listener.run();
       connector.run();
       final BytesValue listenId = listenKp.getPublicKey().getEncodedBytes();
@@ -351,8 +351,8 @@ public final class NettyP2PNetworkTest {
                 remoteBlacklist,
                 new NoOpMetricsSystem(),
                 new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
-      final int localListenPort = localNetwork.getSelf().getPort();
-      final int remoteListenPort = remoteNetwork.getSelf().getPort();
+      final int localListenPort = localNetwork.getLocalPeerInfo().getPort();
+      final int remoteListenPort = remoteNetwork.getLocalPeerInfo().getPort();
       final Peer localPeer =
           new DefaultPeer(
               localId,
@@ -371,6 +371,80 @@ public final class NettyP2PNetworkTest {
 
       // Blacklist the remote peer
       localBlacklist.add(remotePeer);
+
+      localNetwork.run();
+      remoteNetwork.run();
+
+      // Setup disconnect listener
+      final CompletableFuture<PeerConnection> peerFuture = new CompletableFuture<>();
+      final CompletableFuture<DisconnectReason> reasonFuture = new CompletableFuture<>();
+      remoteNetwork.subscribeDisconnect(
+          (peerConnection, reason, initiatedByPeer) -> {
+            peerFuture.complete(peerConnection);
+            reasonFuture.complete(reason);
+          });
+
+      // Remote connect to local
+      final CompletableFuture<PeerConnection> connectFuture = remoteNetwork.connect(localPeer);
+
+      // Check connection is made, and then a disconnect is registered at remote
+      assertThat(connectFuture.get(5L, TimeUnit.SECONDS).getPeer().getNodeId()).isEqualTo(localId);
+      assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeer().getNodeId()).isEqualTo(localId);
+      assertThat(reasonFuture.get(5L, TimeUnit.SECONDS))
+          .isEqualByComparingTo(DisconnectReason.UNKNOWN);
+    }
+  }
+
+  @Test
+  public void rejectIncomingConnectionFromNonWhitelistedPeer() throws Exception {
+    final DiscoveryConfiguration noDiscovery = DiscoveryConfiguration.create().setActive(false);
+    final SECP256K1.KeyPair localKp = SECP256K1.KeyPair.generate();
+    final SECP256K1.KeyPair remoteKp = SECP256K1.KeyPair.generate();
+    final BytesValue localId = localKp.getPublicKey().getEncodedBytes();
+    final BytesValue remoteId = remoteKp.getPublicKey().getEncodedBytes();
+    final PeerBlacklist localBlacklist = new PeerBlacklist();
+    final PeerBlacklist remoteBlacklist = new PeerBlacklist();
+    final PermissioningConfiguration config = PermissioningConfiguration.createDefault();
+    NodeWhitelistController localWhitelist = new NodeWhitelistController(config);
+    // turn on whitelisting by adding a different node NOT remote node
+    localWhitelist.addNode(mockPeer());
+
+    final SubProtocol subprotocol = subProtocol();
+    final Capability cap = Capability.create(subprotocol.getName(), 63);
+    try (final P2PNetwork localNetwork =
+            new NettyP2PNetwork(
+                vertx,
+                localKp,
+                NetworkingConfiguration.create()
+                    .setDiscovery(noDiscovery)
+                    .setSupportedProtocols(subprotocol)
+                    .setRlpx(RlpxConfiguration.create().setBindPort(0)),
+                singletonList(cap),
+                () -> false,
+                localBlacklist,
+                new NoOpMetricsSystem(),
+                localWhitelist);
+        final P2PNetwork remoteNetwork =
+            new NettyP2PNetwork(
+                vertx,
+                remoteKp,
+                NetworkingConfiguration.create()
+                    .setSupportedProtocols(subprotocol)
+                    .setRlpx(RlpxConfiguration.create().setBindPort(0))
+                    .setDiscovery(noDiscovery),
+                singletonList(cap),
+                () -> false,
+                remoteBlacklist,
+                new NoOpMetricsSystem(),
+                new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
+      final int localListenPort = localNetwork.getLocalPeerInfo().getPort();
+      final Peer localPeer =
+          new DefaultPeer(
+              localId,
+              new Endpoint(
+                  InetAddress.getLoopbackAddress().getHostAddress(),
+                  localListenPort,
+                  OptionalInt.of(localListenPort)));
 
       localNetwork.run();
       remoteNetwork.run();
