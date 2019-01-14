@@ -5,7 +5,7 @@ description: Pantheon private network quickstart tutorial
 
 !!! important "Upcoming Change in v0.9" 
     In v0.9, the Private Network Quickstart will be moved to a separate repository and the existing Private Network Quickstart will be 
-    removed from the Pantheon repository. This tutorial will be updated to use the updated Private Network Quickstart in the separate 
+    removed from the Pantheon repository. This tutorial will be updated and use the Private Network Quickstart in the separate 
     repository. 
 
 This tutorial describes how to use Pantheon to run a private network of Pantheon nodes in a Docker container.
