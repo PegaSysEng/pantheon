@@ -173,6 +173,17 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
                 previousBalance,
                 sender.getBalance());
 
+
+        final Gas intrinsicGas = Gas.of(0);
+        final Gas gasAvailable = Gas.of(transaction.getGasLimit());
+        LOG.trace(
+                "Gas available for execution {} = {} - {} (limit - intrinsic)",
+                gasAvailable,
+                transaction.getGasLimit(),
+                intrinsicGas);
+
+
+        /* old code
         final Gas intrinsicGas = gasCalculator.transactionIntrinsicGasCost(transaction);
         final Gas gasAvailable = Gas.of(transaction.getGasLimit()).minus(intrinsicGas);
         LOG.trace(
@@ -180,7 +191,7 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
                 gasAvailable,
                 transaction.getGasLimit(),
                 intrinsicGas);
-
+        */
         final WorldUpdater worldUpdater = worldState.updater();
         final MessageFrame initialFrame;
         final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
@@ -349,30 +360,6 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
         messageFrameStack.add(postHook);
         // ============================================================================================== end post hook
 
-       /* Integer lifeCycleFrames = 0;
-        while (!messageFrameStack.isEmpty()) {
-            // process frame
-            process(messageFrameStack.peekFirst(), operationTracer);
-            // get data for each lifeCycleFrame
-            switch (lifeCycleFrames) {
-                case 0:
-                    System.out.println("Executing pre check");
-                    BytesValue getOutputPreCheckFrame = preCheckFrame.getOutputData();
-                    List<Type> utf8Strings = FunctionReturnDecoder.decode(getOutputPreCheckFrame.toString(), getGasPriceFunctionCall.getOutputParameters());
-                    LOG.trace("Executing pre check: {}, outputs: {}.", () -> getOutputPreCheckFrame, () -> utf8Strings.toString());
-                    break;
-                case 1:
-                    System.out.println("Executing user call");
-                    break;
-                case 2:
-                    System.out.println("Executing post hook");
-                    break;
-            }
-            // set next cycle
-            lifeCycleFrames += 1;
-        }*/
-
-
         LifeCycleHookType nextLifeCycle = LifeCycleHookType.PRE_CHECK;
 
         while (!messageFrameStack.isEmpty()) {
@@ -387,8 +374,17 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
                     nextLifeCycle = LifeCycleHookType.USER_CALL;
 
                     BytesValue getOutputPreCheckFrame = preCheckFrame.getOutputData();
-                    List<Type> utf8Strings = FunctionReturnDecoder.decode(getOutputPreCheckFrame.toString(), getGasPriceFunctionCall.getOutputParameters());
-                    LOG.trace("Executing pre check: {}, outputs: {}.", () -> getOutputPreCheckFrame, () -> utf8Strings.toString());
+                    List<Type> decodedOutput = FunctionReturnDecoder.decode(getOutputPreCheckFrame.toString(), getGasPriceFunctionCall.getOutputParameters());
+                    LOG.trace("Executing pre check: {}, outputs: {}.", () -> getOutputPreCheckFrame, () -> decodedOutput.toString());
+
+
+//                    List<Type> decodedOutput = decodedFunctionReturnDecoder.decode(getOutputPreCheckFrame.toString(), getGasPriceFunctionCall.getOutputParameters());
+//
+//
+//                    Wei test = Wei.of( decodedOutput.get(0).getValue());
+
+                    // change gas tx price
+                   // Wei test = Wei.of( <decodedOutput.get(0).getTypeAsString()> decodedOutput.get(0));
                 }
             }
             // 2º user call loop
@@ -404,9 +400,9 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
             if (nextLifeCycle == LifeCycleHookType.POST_HOOK && frame.getLifeCycleHookFrame() == LifeCycleHookType.POST_HOOK) {
                 process(frame, operationTracer);
 
-                if (!anyFrameOflifeCycleType(LifeCycleHookType.POST_HOOK, messageFrameStack)) {
-                    nextLifeCycle = LifeCycleHookType.USER_CALL;
-                }
+//                if (!anyFrameOflifeCycleType(LifeCycleHookType.POST_HOOK, messageFrameStack)) {
+//                    nextLifeCycle = LifeCycleHookType.USER_CALL;
+//                }
             }
 
             // TODO: fallback to execute after long loop of iterations

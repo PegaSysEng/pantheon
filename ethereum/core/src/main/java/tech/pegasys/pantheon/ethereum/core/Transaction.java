@@ -12,9 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
-import static com.google.common.base.Preconditions.checkState;
-import static tech.pegasys.pantheon.crypto.Hash.keccak256;
-
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
@@ -29,6 +26,9 @@ import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+
+import static com.google.common.base.Preconditions.checkState;
+import static tech.pegasys.pantheon.crypto.Hash.keccak256;
 
 /** An operation submitted by an external actor to be applied to the system. */
 public class Transaction {
@@ -45,7 +45,7 @@ public class Transaction {
 
   private final long nonce;
 
-  private final Wei gasPrice;
+  private Wei gasPrice;
 
   private final long gasLimit;
 
@@ -162,6 +162,15 @@ public class Transaction {
    */
   public Wei getGasPrice() {
     return gasPrice;
+  }
+
+  /**
+   * Return the transaction gas price.
+   *
+   * @return the transaction gas price
+   */
+  public void setGasPrice(Wei newGasPrice) {
+    this.gasPrice = newGasPrice;
   }
 
   /**
