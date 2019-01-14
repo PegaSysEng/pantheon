@@ -16,14 +16,17 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.CommitMessageData;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessage.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
@@ -91,6 +94,17 @@ public class ValidatorPeer {
     final SignedData<CommitPayload> payload =
         messageFactory.createSignedCommitPayload(rId, digest, commitSeal);
     injectMessage(CommitMessageData.create(payload));
+    return payload;
+  }
+
+  public SignedData<NewRoundPayload> injectNewRound(
+      final ConsensusRoundIdentifier rId,
+      final RoundChangeCertificate roundChangeCertificate,
+      final SignedData<ProposalPayload> proposalPayload) {
+
+    final SignedData<NewRoundPayload> payload =
+        messageFactory.createSignedNewRoundPayload(rId, roundChangeCertificate, proposalPayload);
+    injectMessage(NewRoundMessageData.create(payload));
     return payload;
   }
 
