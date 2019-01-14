@@ -18,14 +18,14 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import java.util.OptionalLong;
 import java.util.function.Function;
 
-public class ProtocolScheduleBuilder<C> {
+public class ProtocolScheduleFactory<C> {
 
   private final MetricsSystem metricsSystem;
   private final GenesisConfigOptions config;
   private final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter;
   private final int defaultChainId;
 
-  public ProtocolScheduleBuilder(
+  public ProtocolScheduleFactory(
       final MetricsSystem metricsSystem,
       final GenesisConfigOptions config,
       final int defaultChainId,

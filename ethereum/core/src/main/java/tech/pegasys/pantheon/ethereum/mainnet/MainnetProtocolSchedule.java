@@ -37,7 +37,7 @@ public class MainnetProtocolSchedule {
    */
   public static ProtocolSchedule<Void> fromConfig(
       final GenesisConfigOptions config, final MetricsSystem metricsSystem) {
-    return new ProtocolScheduleBuilder<>(
+    return new ProtocolScheduleFactory<>(
             metricsSystem, config, DEFAULT_CHAIN_ID, Function.identity())
         .createProtocolSchedule();
   }

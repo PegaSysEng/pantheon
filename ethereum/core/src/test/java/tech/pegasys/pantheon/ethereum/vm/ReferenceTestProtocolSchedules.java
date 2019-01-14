@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.vm;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleFactory;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.Map;
@@ -61,7 +61,7 @@ public class ReferenceTestProtocolSchedules {
   }
 
   private static ProtocolSchedule<Void> createSchedule(final GenesisConfigOptions options) {
-    return new ProtocolScheduleBuilder<>(
+    return new ProtocolScheduleFactory<>(
             new NoOpMetricsSystem(), options, CHAIN_ID, Function.identity())
         .createProtocolSchedule();
   }

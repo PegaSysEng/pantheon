@@ -16,7 +16,7 @@ import static tech.pegasys.pantheon.ethereum.mainnet.MainnetTransactionValidator
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleFactory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 /** A ProtocolSchedule which behaves similarly to MainNet, but with a much reduced difficulty. */
@@ -24,7 +24,7 @@ public class DevelopmentProtocolSchedule {
 
   public static ProtocolSchedule<Void> create(
       final GenesisConfigOptions config, final MetricsSystem metricsSystem) {
-    return new ProtocolScheduleBuilder<>(
+    return new ProtocolScheduleFactory<>(
             metricsSystem,
             config,
             NO_CHAIN_ID,

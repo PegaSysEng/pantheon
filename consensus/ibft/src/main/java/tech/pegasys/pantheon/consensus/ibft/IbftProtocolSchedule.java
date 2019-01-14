@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpecBuilder;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -40,7 +40,7 @@ public class IbftProtocolSchedule {
     final long blockPeriod = ibftConfig.getBlockPeriodSeconds();
     final EpochManager epochManager = new EpochManager(epochLength);
 
-    return new ProtocolScheduleBuilder<>(
+    return new ProtocolScheduleFactory<>(
             metricsSystem,
             config,
             DEFAULT_CHAIN_ID,
