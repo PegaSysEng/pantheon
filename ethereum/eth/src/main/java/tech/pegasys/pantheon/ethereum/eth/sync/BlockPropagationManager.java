@@ -257,6 +257,12 @@ public class BlockPropagationManager<C> {
       return CompletableFuture.completedFuture(block);
     }
 
+    if (protocolContext.getBlockchain().contains(block.getHash())) {
+      // We've already imported this block.
+      importingBlocks.remove(block.getHash());
+      return CompletableFuture.completedFuture(block);
+    }
+
     // Import block
     final PersistBlockTask<C> importTask =
         PersistBlockTask.create(
