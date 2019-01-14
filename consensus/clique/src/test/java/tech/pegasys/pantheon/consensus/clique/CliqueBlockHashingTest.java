@@ -33,19 +33,13 @@ public class CliqueBlockHashingTest {
 
   public static class LoadedBlockHeader {
     private final BlockHeader header;
-    private final Hash parsedBlockHash;
 
-    public LoadedBlockHeader(final BlockHeader header, final Hash parsedBlockHash) {
+    public LoadedBlockHeader(final BlockHeader header) {
       this.header = header;
-      this.parsedBlockHash = parsedBlockHash;
     }
 
     public BlockHeader getHeader() {
       return header;
-    }
-
-    public Hash getParsedBlockHash() {
-      return parsedBlockHash;
     }
   }
 
@@ -118,11 +112,8 @@ public class CliqueBlockHashingTest {
     builder.transactionsRoot(
         Hash.fromHexString("0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"));
 
-    final Hash parsedHash =
-        Hash.fromHexString("0x8b27a29300811af926039b90288d3d384dcb55931049c17c4f762e45c116776e");
-
     builder.blockHashFunction(MainnetBlockHashFunction::createHash);
 
-    return new LoadedBlockHeader(builder.buildBlockHeader(), parsedHash);
+    return new LoadedBlockHeader(builder.buildBlockHeader());
   }
 }
