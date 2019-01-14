@@ -53,7 +53,7 @@ List of node IDs with which this node will not peer. The node ID is the public k
 ### bootnodes
 
 ```bash tab="Syntax"
---bootnodes=<enode://id@host:port>[,<enode://id@host:port>...]...
+--bootnodes[=<enode://id@host:port>[,<enode://id@host:port>...]...]
 ```
 
 ```bash tab="Example Command Line"
@@ -63,6 +63,10 @@ List of node IDs with which this node will not peer. The node ID is the public k
 ```bash tab="Example Configuration File"
 bootnodes=["enode://c35c3...d615f@1.2.3.4:30303","enode://f42c13...fc456@1.2.3.5:30303"]
 ```
+  
+```bash tab="Example Bootnode Command Line"
+--bootnodes
+```  
   
 List of comma-separated enode URLs for P2P discovery bootstrap. 
   
