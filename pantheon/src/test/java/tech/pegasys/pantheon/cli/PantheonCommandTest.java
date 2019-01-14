@@ -426,7 +426,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void nodekeyOptionMustBeUsed() throws Exception {
     final File file = new File("./specific/key");
 
-    parseCommand("--node-private-key", file.getPath());
+    parseCommand("--node-private-key-file", file.getPath());
 
     verify(mockControllerBuilder).homePath(isNotNull());
     verify(mockControllerBuilder).syncWithOttoman(eq(false));
@@ -509,10 +509,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithBannedNodeidsOptionButNoValueMustDisplayErrorAndUsage() {
-    parseCommand("--banned-nodeids");
+    parseCommand("--banned-node-ids");
     assertThat(commandOutput.toString()).isEmpty();
     final String expectedErrorOutputStart =
-        "Missing required parameter for option '--banned-nodeids' at index 0 (<bannedNodeIds>)";
+        "Missing required parameter for option '--banned-node-ids' at index 0 (<bannedNodeIds>)";
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
   }
 
@@ -532,7 +532,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithRefreshDelayWithValueMustUseValue() {
-    parseCommand("--ws-refresh-delay", "2000");
+    parseCommand("--rpc-ws-refresh-delay", "2000");
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -545,7 +545,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingWithRefreshDelayWithNegativeValueMustError() {
-    parseCommand("--ws-refresh-delay", "-2000");
+    parseCommand("--rpc-ws-refresh-delay", "-2000");
 
     assertThat(commandOutput.toString()).isEmpty();
     final String expectedErrorMsg = "refreshDelay must be a positive integer between";
@@ -717,7 +717,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void bannedNodeIdsOptionMustBeUsed() {
     final String[] nodes = {"0001", "0002", "0003"};
-    parseCommand("--banned-nodeids", String.join(",", nodes));
+    parseCommand("--banned-node-ids", String.join(",", nodes));
 
     verify(mockRunnerBuilder).bannedNodeIds(stringListArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -799,7 +799,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void jsonRpcEnabledPropertyMustBeUsed() {
-    parseCommand("--rpc-enabled");
+    parseCommand("--rpc-http-enabled");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -812,7 +812,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void rpcApisPropertyMustBeUsed() {
-    parseCommand("--rpc-api", "ETH,NET");
+    parseCommand("--rpc-http-api", "ETH,NET");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -826,12 +826,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void rpcApisPropertyWithInvalidEntryMustDisplayError() {
-    parseCommand("--rpc-api", "BOB");
+    parseCommand("--rpc-http-api", "BOB");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).contains("Invalid value for option '--rpc-api'");
+    // PicoCLI uses longest option name for message when option has multiple names, so here plural.
+    assertThat(commandErrorOutput.toString()).contains("Invalid value for option '--rpc-http-apis'");
   }
 
   @Test
@@ -839,7 +840,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--rpc-listen", String.format("%1$s:%2$s", host, port));
+    parseCommand("--rpc-http-listen", String.format("%1$s:%2$s", host, port));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -854,7 +855,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcCorsOriginsTwoDomainsMustBuildListWithBothDomains() {
     final String[] origins = {"http://domain1.com", "https://domain2.com"};
-    parseCommand("--rpc-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -869,7 +870,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcCorsOriginsDoubleCommaFilteredOut() {
     final String[] origins = {"http://domain1.com", "https://domain2.com"};
-    parseCommand("--rpc-cors-origins", String.join(",,", origins));
+    parseCommand("--rpc-http-cors-origins", String.join(",,", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -884,7 +885,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcCorsOriginsWithWildcardMustBuildListWithWildcard() {
     final String[] origins = {"*"};
-    parseCommand("--rpc-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -898,7 +899,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void jsonRpcCorsOriginsWithAllMustBuildListWithWildcard() {
-    parseCommand("--rpc-cors-origins", "all");
+    parseCommand("--rpc-http-cors-origins", "all");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -912,7 +913,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcCorsOriginsWithNoneMustBuildEmptyList() {
     final String[] origins = {"none"};
-    parseCommand("--rpc-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -926,7 +927,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcCorsOriginsNoneWithAnotherDomainMustFail() {
     final String[] origins = {"http://domain1.com", "none"};
-    parseCommand("--rpc-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -938,7 +939,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcCorsOriginsNoneWithAnotherDomainMustFailNoneFirst() {
     final String[] origins = {"none", "http://domain1.com"};
-    parseCommand("--rpc-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -949,7 +950,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void jsonRpcCorsOriginsAllWithAnotherDomainMustFail() {
-    parseCommand("--rpc-cors-origins=http://domain1.com,all");
+    parseCommand("--rpc-http-cors-origins=http://domain1.com,all");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -960,7 +961,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void jsonRpcCorsOriginsAllWithAnotherDomainMustFailAsFlags() {
-    parseCommand("--rpc-cors-origins=http://domain1.com", "--rpc-cors-origins=all");
+    parseCommand("--rpc-http-cors-origins=http://domain1.com", "--rpc-http-cors-origins=all");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -971,7 +972,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void jsonRpcCorsOriginsWildcardWithAnotherDomainMustFail() {
-    parseCommand("--rpc-cors-origins=http://domain1.com,*");
+    parseCommand("--rpc-http-cors-origins=http://domain1.com,*");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -982,7 +983,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void jsonRpcCorsOriginsWildcardWithAnotherDomainMustFailAsFlags() {
-    parseCommand("--rpc-cors-origins=http://domain1.com", "--rpc-cors-origins=*");
+    parseCommand("--rpc-http-cors-origins=http://domain1.com", "--rpc-http-cors-origins=*");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -994,7 +995,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void jsonRpcCorsOriginsInvalidRegexShouldFail() {
     final String[] origins = {"**"};
-    parseCommand("--rpc-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -1005,7 +1006,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void jsonRpcCorsOriginsEmtyValueFails() {
-    parseCommand("--rpc-cors-origins=");
+    parseCommand("--rpc-http-cors-origins=");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -1178,7 +1179,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void wsRpcEnabledPropertyMustBeUsed() {
-    parseCommand("--ws-enabled");
+    parseCommand("--rpc-ws-enabled");
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1191,7 +1192,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void wsApiPropertyMustBeUsed() {
-    parseCommand("--ws-api", "ETH, NET");
+    parseCommand("--rpc-ws-api", "ETH, NET");
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1207,7 +1208,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void wsRpcHostAndPortOptionMustBeUsed() {
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--ws-listen", String.format("%1$s:%2$s", host, port));
+    parseCommand("--rpc-ws-listen", String.format("%1$s:%2$s", host, port));
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();

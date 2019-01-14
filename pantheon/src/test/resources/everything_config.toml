@@ -11,7 +11,7 @@
 # Node Information
 datadir="~/pantheondata"
 logging="INFO"
-node-private-key="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+node-private-key-file="~/my_key_file"
 
 # P2P network
 no-discovery=true
@@ -20,13 +20,14 @@ bootnodes=[
   "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.1:4567",
   "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.1:4567"
 ]
-banned-nodeids=["0x6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0"]
+banned-node-ids=["0x6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0"]
 p2p-listen="1.2.3.4:1234"
 max-peers=42
 max-trailing-peers=5
 host-whitelist=["all"]
 
 # chain
+chain="MAINNET"
 genesis="~/genesis.json"
 #sync-mode="fast"
 ottoman=false
@@ -37,16 +38,17 @@ rinkeby=false
 dev-mode=false
 
 # JSON-RPC
-rpc-enabled=false
-rpc-listen="5.6.7.8:5678"
-rpc-api=["DEBUG","ETH"]
-rpc-cors-origins=["none"]
+rpc-http-enabled=false
+rpc-http-listen="5.6.7.8:5678"
+rpc-http-api=["DEBUG","ETH"]
+rpc-http-apis=["DEBUG","ETH"]
+rpc-http-cors-origins=["none"]
 
 # WebSockets API
-ws-enabled=false
-ws-api=["DEBUG","ETH"]
-ws-listen="9.10.11.12:9101"
-ws-refresh-delay=500
+rpc-ws-enabled=false
+rpc-ws-api=["DEBUG","ETH"]
+rpc-ws-listen="9.10.11.12:9101"
+rpc-ws-refresh-delay=500
 
 # Prometheus Metrics Endpoint
 metrics-enabled=false

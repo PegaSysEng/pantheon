@@ -42,7 +42,7 @@ class StandaloneCommand implements DefaultCommandValues {
   @CommandLine.Option(
     names = {"--genesis"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
-    description = "The path to genesis file (default: Pantheon embedded mainnet genesis file)"
+    description = "The path to genesis file. Only taken in account if --chain option is set to CUSTOM"
   )
   final File genesisFile = null;
 }

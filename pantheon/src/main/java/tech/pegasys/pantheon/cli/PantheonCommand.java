@@ -59,6 +59,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
@@ -99,6 +100,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private static final String MANDATORY_HOST_AND_PORT_FORMAT_HELP = "<HOST:PORT>";
   private static final String MANDATORY_INTEGER_FORMAT_HELP = "<INTEGER>";
   private static final String MANDATORY_MODE_FORMAT_HELP = "<MODE>";
+  private static final String MANDATORY_CHAIN_FORMAT_HELP = "<CHAIN>";
+
 
   private static final Wei DEFAULT_MIN_TRANSACTION_GAS_PRICE = Wei.of(1000);
   private static final BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
@@ -147,11 +150,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
   @Option(
-    names = {"--node-private-key"},
+    names = {"--node-private-key-file"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
     description =
         "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)"
   )
+  @Nullable
   private final File nodePrivateKeyFile = null;
 
   // Boolean option to indicate if peers should NOT be discovered, default to false indicates that
@@ -163,6 +167,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // This seems to be the only way it works with Picocli.
   // Also many other software use the same negative option scheme for false defaults
   // meaning that it's probably the right way to handle disabling options.
+  // TODO change naming and find a way to make it able to define true or false
   @Option(
     names = {"--no-discovery"},
     description = "Disable p2p peer discovery (default: ${DEFAULT-VALUE})"
@@ -191,7 +196,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
+  /**
+   * @deprecated This option is not exposed anymore even if still available as it's bounded by
+   *     max-peers value. It's not useful enough to figure in the help. Will probably completely
+   *     removed in next version.
+   */
+  @Deprecated
   @Option(
+    hidden = true,
     names = {"--max-trailing-peers"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description =
@@ -200,7 +212,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer maxTrailingPeers = Integer.MAX_VALUE;
 
   @Option(
-    names = {"--banned-nodeids"},
+    names = {"--banned-node-ids"},
     description = "A list of node IDs to ban from the p2p network.",
     split = ",",
     arity = "1..*"
@@ -217,6 +229,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   //  )
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
+  @Option(
+      names = {"--chain"},
+      paramLabel = MANDATORY_CHAIN_FORMAT_HELP,
+      description =
+          "Synchronize against the indicated chain, possible values are ${COMPLETION-CANDIDATES}."
+              + " (default: ${DEFAULT-VALUE})"
+  )
+  private final ChainName chain = ChainName.MAINNET;
+
+  /** @deprecated Deprecated in favour of --chain option */
+  @Deprecated
   // Boolean option to indicate if the client have to sync against the ottoman test network
   // (see https://github.com/ethereum/EIPs/issues/650).
   @Option(
@@ -227,6 +250,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Boolean syncWithOttoman = false;
 
+  /** @deprecated Deprecated in favour of --chain option */
+  @Deprecated
   @Option(
     names = {"--rinkeby"},
     description =
@@ -235,12 +260,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Boolean rinkeby = false;
 
+  /** @deprecated Deprecated in favour of --chain option */
+  @Deprecated
   @Option(
     names = {"--ropsten"},
     description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
   )
   private final Boolean ropsten = false;
 
+  /** @deprecated Deprecated in favour of --chain option */
+  @Deprecated
   @Option(
     names = {"--goerli"},
     description = "Use the Goerli test network (default: ${DEFAULT-VALUE})"
@@ -255,7 +284,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final HostAndPort p2pHostAndPort = getDefaultHostAndPort(DefaultPeer.DEFAULT_PORT);
 
+  /**
+   * @deprecated This is now included in the genesis configuration, see --chain option
+   */
+  @Deprecated
   @Option(
+    hidden = true,
     names = {"--network-id"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description = "P2P network identifier (default: ${DEFAULT-VALUE})",
@@ -264,13 +298,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer networkId = null;
 
   @Option(
-    names = {"--rpc-enabled"},
+    names = {"--rpc-http-enabled"},
     description = "Set if the JSON-RPC service should be started (default: ${DEFAULT-VALUE})"
   )
   private final Boolean isJsonRpcEnabled = false;
 
   @Option(
-    names = {"--rpc-listen"},
+    names = {"--rpc-http-listen"},
     paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
     description = "Host and port for JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
@@ -280,13 +314,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   // A list of origins URLs that are accepted by the JsonRpcHttpServer (CORS)
   @Option(
-    names = {"--rpc-cors-origins"},
+    names = {"--rpc-http-cors-origins"},
     description = "Comma separated origin domain URLs for CORS validation (default: none)"
   )
   private final CorsAllowedOriginsProperty rpcCorsAllowedOrigins = new CorsAllowedOriginsProperty();
 
   @Option(
-    names = {"--rpc-api"},
+    names = {"--rpc-http-api","--rpc-http-apis"},
     paramLabel = "<api name>",
     split = ",",
     arity = "1..*",
@@ -297,14 +331,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Collection<RpcApi> rpcApis = null;
 
   @Option(
-    names = {"--ws-enabled"},
+    names = {"--rpc-ws-enabled"},
     description =
         "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})"
   )
   private final Boolean isWsRpcEnabled = false;
 
   @Option(
-    names = {"--ws-listen"},
+    names = {"--rpc-ws-listen"},
     paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
     description = "Host and port for WS-RPC (WebSocket) to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
@@ -313,7 +347,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       getDefaultHostAndPort(WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT);
 
   @Option(
-    names = {"--ws-api"},
+    names = {"--rpc-ws-api","--rpc-ws-apis"},
     paramLabel = "<api name>",
     split = ",",
     arity = "1..*",
@@ -326,7 +360,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Long refreshDelay;
 
   @Option(
-    names = {"--ws-refresh-delay"},
+    names = {"--rpc-ws-refresh-delay"},
     paramLabel = "<refresh delay>",
     arity = "1",
     description =
@@ -561,7 +595,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(isDevMode)
-          .nodePrivateKeyFile(getNodePrivateKeyFile())
+          .nodePrivateKeyFile(getNodePrivateKeyFile(nodePrivateKeyFile))
           .metricsSystem(metricsSystem)
           .build();
     } catch (final InvalidConfigurationException e) {
@@ -571,7 +605,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private File getNodePrivateKeyFile() {
+  private File getNodePrivateKeyFile(@Nullable final File nodePrivateKeyFile) {
     return nodePrivateKeyFile != null
         ? nodePrivateKeyFile
         : KeyPairUtil.getDefaultKeyFile(dataDir());
@@ -701,10 +735,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } else {
       predefinedNetworkConfig = EthNetworkConfig.mainnet();
     }
-    return updateNetworkConfig(predefinedNetworkConfig);
+    return updateNetworkConfig(predefinedNetworkConfig, networkId, bootstrapNodes);
   }
 
-  private EthNetworkConfig updateNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
+  private EthNetworkConfig updateNetworkConfig(
+      final EthNetworkConfig ethNetworkConfig,
+      @Nullable final Integer networkId,
+      @Nullable final Collection<URI> bootstrapNodes) {
     final EthNetworkConfig.Builder builder = new EthNetworkConfig.Builder(ethNetworkConfig);
     if (genesisFile() != null) {
       builder.setGenesisConfig(genesisConfig());
