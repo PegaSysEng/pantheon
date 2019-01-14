@@ -1,5 +1,20 @@
 # Changelog
 
+## Upcoming Changes in v0.9
+
+### Breaking Changes to Command Line 
+
+In v0.9, changes will be made to the command line options to improve usability. These will be breaking changes; that is, 
+in many cases the v0.8 command line options will no longer work. The 
+[Pantheon documentation](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/) will be 
+updated to reflect these changes. Any further information required about the changes will be included in the v0.9 release notes. 
+
+### Private Network Quickstart 
+
+In v0.9, the Private Network Quickstart will be moved to a separate repository and the existing Private Network 
+Quickstart removed from the Pantheon repository. The [Private Network Quickstart tutorial](https://docs.pantheon.pegasys.tech/en/latest/Getting-Started/Private-Network-Quickstart/) 
+will be updated and use the Private Network Quickstart in the separate repository.
+
 ## 0.8.4
 
 ### Docker Image
@@ -23,21 +38,6 @@ When restarting your node with the v0.8.4 Docker image:
 * Save the node key in the [`key` file](https://docs.pantheon.pegasys.tech/en/latest/Configuring-Pantheon/Node-Keys/#node-private-key) in the data 
     directory or specify the location using the [`--node-private-key` option](https://docs.pantheon.pegasys.tech/en/latest/Configuring-Pantheon/Node-Keys/#specifying-a-custom-node-private-key-file).  
 * Specify the `<destination_directory` as a [volume for the data directory](https://docs.pantheon.pegasys.tech/en/latest/Getting-Started/Run-Docker-Image/#data-directory). 
-
-### Upcoming Changes in v0.9
-
-#### Breaking Changes to Command Line 
-
-In v0.9, changes will be made to the command line options to improve usability. These will be breaking changes; that is, 
-in many cases the v0.8 command line options will no longer work. The 
-[Pantheon documentation](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/) will be 
-updated to reflect these changes. Any further information required about the changes will be included in the v0.9 release notes. 
-
-#### Private Network Quickstart 
-
-In v0.9, the Private Network Quickstart will be moved to a separate repository and the existing Private Network 
-Quickstart removed from the Pantheon repository. The [Private Network Quickstart tutorial](https://docs.pantheon.pegasys.tech/en/latest/Getting-Started/Private-Network-Quickstart/) 
-will be updated and use the Private Network Quickstart in the separate repository.
 
 ### Bug Fixes
 - Fixing default resource locations inside docker [\#529](https://github.com/PegaSysEng/pantheon/pull/529)
