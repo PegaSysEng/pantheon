@@ -9,7 +9,7 @@
 # Please provide some sensible grouping.
 
 # Node Information
-datadir="~/pantheondata"
+data-path="~/pantheondata"
 logging="INFO"
 node-private-key-file="~/my_key_file"
 
@@ -28,7 +28,7 @@ host-whitelist=["all"]
 
 # chain
 chain="MAINNET"
-genesis="~/genesis.json"
+genesis-file="~/genesis.json"
 #sync-mode="fast"
 ottoman=false
 ropsten=false
@@ -57,8 +57,8 @@ metrics-listen="8.6.7.5:309"
 # Mining
 miner-enabled=false
 miner-coinbase="0x0000000000000000000000000000000000000002"
-miner-extraData="Protocol Engineering Group And SYStems"
-miner-minTransactionGasPriceWei="1"
+miner-extra-data="Protocol Engineering Group And SYStems"
+min-gas-price="1"
 
 # Permissioning
 accounts-whitelist=["0x0000000000000000000000000000000000000009"]

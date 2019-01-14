@@ -21,15 +21,26 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import picocli.CommandLine;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 interface DefaultCommandValues {
-  String CONFIG_FILE_OPTION_NAME = "--config";
+  String CONFIG_FILE_OPTION_NAME = "--config-file";
 
   String MANDATORY_PATH_FORMAT_HELP = "<PATH>";
   String PANTHEON_HOME_PROPERTY_NAME = "pantheon.home";
   String DEFAULT_DATA_DIR_PATH = "./build/data";
+  String MANDATORY_INTEGER_FORMAT_HELP = "<INTEGER>";
+  String MANDATORY_MODE_FORMAT_HELP = "<MODE>";
+  String MANDATORY_CHAIN_FORMAT_HELP = "<CHAIN>";
+  Wei DEFAULT_MIN_TRANSACTION_GAS_PRICE = Wei.of(1000);
+  BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
+  long DEFAULT_MAX_REFRESH_DELAY = 3600000;
+  long DEFAULT_MIN_REFRESH_DELAY = 1;
+  String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
+  String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
 
-  static Path getDefaultPantheonDataDir(final Object command) {
+  static Path getDefaultPantheonDataPath(final Object command) {
     // this property is retrieved from Gradle tasks or Pantheon running shell script.
     final String pantheonHomeProperty = System.getProperty(PANTHEON_HOME_PROPERTY_NAME);
     final Path pantheonHome;

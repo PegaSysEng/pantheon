@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataDir;
+import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
@@ -98,18 +98,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private static final SyncMode DEFAULT_SYNC_MODE = SyncMode.FULL;
 
   private static final String MANDATORY_HOST_AND_PORT_FORMAT_HELP = "<HOST:PORT>";
-  private static final String MANDATORY_INTEGER_FORMAT_HELP = "<INTEGER>";
-  private static final String MANDATORY_MODE_FORMAT_HELP = "<MODE>";
-  private static final String MANDATORY_CHAIN_FORMAT_HELP = "<CHAIN>";
 
-
-  private static final Wei DEFAULT_MIN_TRANSACTION_GAS_PRICE = Wei.of(1000);
-  private static final BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
-  private static final long DEFAULT_MAX_REFRESH_DELAY = 3600000;
-  private static final long DEFAULT_MIN_REFRESH_DELAY = 1;
-
-  private static final String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
-  private static final String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
@@ -191,7 +180,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--max-peers"},
-    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+    paramLabel = DefaultCommandValues.MANDATORY_INTEGER_FORMAT_HELP,
     description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
   )
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
@@ -205,7 +194,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
     hidden = true,
     names = {"--max-trailing-peers"},
-    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+    paramLabel = DefaultCommandValues.MANDATORY_INTEGER_FORMAT_HELP,
     description =
         "Maximum p2p peer connections for peers that are trailing behind our chain head (default: unlimited)"
   )
@@ -231,7 +220,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--chain"},
-      paramLabel = MANDATORY_CHAIN_FORMAT_HELP,
+      paramLabel = DefaultCommandValues.MANDATORY_CHAIN_FORMAT_HELP,
       description =
           "Synchronize against the indicated chain, possible values are ${COMPLETION-CANDIDATES}."
               + " (default: ${DEFAULT-VALUE})"
@@ -243,6 +232,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Boolean option to indicate if the client have to sync against the ottoman test network
   // (see https://github.com/ethereum/EIPs/issues/650).
   @Option(
+    hidden = true,
     names = {"--ottoman"},
     description =
         "Synchronize against the Ottoman test network, only useful if using an iBFT genesis file"
@@ -253,6 +243,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --chain option */
   @Deprecated
   @Option(
+    hidden = true,
     names = {"--rinkeby"},
     description =
         "Use the Rinkeby test network"
@@ -263,6 +254,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --chain option */
   @Deprecated
   @Option(
+    hidden = true,
     names = {"--ropsten"},
     description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
   )
@@ -271,6 +263,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --chain option */
   @Deprecated
   @Option(
+    hidden = true,
     names = {"--goerli"},
     description = "Use the Goerli test network (default: ${DEFAULT-VALUE})"
   )
@@ -284,14 +277,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final HostAndPort p2pHostAndPort = getDefaultHostAndPort(DefaultPeer.DEFAULT_PORT);
 
-  /**
-   * @deprecated This is now included in the genesis configuration, see --chain option
-   */
+  /** @deprecated Deprecated in favour of --chain option */
   @Deprecated
   @Option(
     hidden = true,
     names = {"--network-id"},
-    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+    paramLabel = DefaultCommandValues.MANDATORY_INTEGER_FORMAT_HELP,
     description = "P2P network identifier (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
@@ -369,13 +360,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
   )
   private Long configureRefreshDelay(final Long refreshDelay) {
-    if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
+    if (refreshDelay < DefaultCommandValues.DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DefaultCommandValues.DEFAULT_MAX_REFRESH_DELAY) {
       throw new ParameterException(
           new CommandLine(this),
           String.format(
               "refreshDelay must be a positive integer between %s and %s",
-              String.valueOf(DEFAULT_MIN_REFRESH_DELAY),
-              String.valueOf(DEFAULT_MAX_REFRESH_DELAY)));
+              String.valueOf(DefaultCommandValues.DEFAULT_MIN_REFRESH_DELAY),
+              String.valueOf(DefaultCommandValues.DEFAULT_MAX_REFRESH_DELAY)));
     }
     this.refreshDelay = refreshDelay;
     return refreshDelay;
@@ -398,14 +389,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--host-whitelist"},
-    paramLabel = "<hostname>",
+    paramLabel = "<hostname>[,<hostname>...]... or * or all",
     description =
-        "Comma separated list of hostnames to whitelist for RPC access.  default: ${DEFAULT-VALUE}",
+        "Comma separated list of hostnames to whitelist for RPC access or * or all to accept any host.  default: ${DEFAULT-VALUE}",
     defaultValue = "localhost"
   )
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
+  /** @deprecated Deprecated in favour of --chain option */
+  @Deprecated
   @Option(
+    hidden = true,
     names = {"--dev-mode"},
     description =
         "set during development to have a custom genesis with specific chain id "
@@ -415,7 +409,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--logging", "-l"},
-    description = "Logging verbosity: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
+    paramLabel = "<LOG VERBOSITY LEVEL>",
+    description = "Logging verbosity levels: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
   )
   private final Level logLevel = null;
 
@@ -428,34 +423,33 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
     names = {"--miner-coinbase"},
     description =
-        "the account to which mining rewards are to be paid, must be specified if "
-            + "mining is enabled.",
+        "account to which mining rewards are paid. You must specify a valid coinbase if "
+            + "mining is enabled using --miner-enabled option.",
     arity = "1"
   )
   private final Address coinbase = null;
 
   @Option(
-    names = {"--miner-minTransactionGasPriceWei"},
+    names = {"--min-gas-price"},
     description =
-        "the minimum price offered by a transaction for it to be included in a mined "
+        "the minimum price (in Wei) offered by a transaction for it to be included in a mined "
             + "block (default: ${DEFAULT-VALUE}).",
     arity = "1"
   )
-  private final Wei minTransactionGasPrice = DEFAULT_MIN_TRANSACTION_GAS_PRICE;
+  private final Wei minTransactionGasPrice = DefaultCommandValues.DEFAULT_MIN_TRANSACTION_GAS_PRICE;
 
   @Option(
-    names = {"--miner-extraData"},
+    names = {"--miner-extra-data"},
     description =
         "a hex string representing the (32) bytes to be included in the extra data "
             + "field of a mined block. (default: ${DEFAULT-VALUE}).",
     arity = "1"
   )
-  private final BytesValue extraData = DEFAULT_EXTRA_DATA;
+  private final BytesValue extraData = DefaultCommandValues.DEFAULT_EXTRA_DATA;
 
   // Permissioning: A list of whitelist nodes can be passed.
   @Option(
     names = {"--nodes-whitelist"},
-    paramLabel = "<enode://id@host:port>",
     description =
         "Comma separated enode URLs for permissioned networks. "
             + "Not intended to be used with mainnet or public testnets.",
@@ -770,7 +764,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isFullInstantiation()) {
       return standaloneCommands.genesisFile;
     } else if (isDocker) {
-      final File genesisFile = new File(DOCKER_GENESIS_LOCATION);
+      final File genesisFile = new File(DefaultCommandValues.DOCKER_GENESIS_LOCATION);
       if (genesisFile.exists()) {
         return genesisFile;
       } else {
@@ -783,11 +777,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private Path dataDir() {
     if (isFullInstantiation()) {
-      return standaloneCommands.dataDir;
+      return standaloneCommands.dataPath;
     } else if (isDocker) {
-      return Paths.get(DOCKER_DATADIR_LOCATION);
+      return Paths.get(DefaultCommandValues.DOCKER_DATADIR_LOCATION);
     } else {
-      return getDefaultPantheonDataDir(this);
+      return getDefaultPantheonDataPath(this);
     }
   }
 

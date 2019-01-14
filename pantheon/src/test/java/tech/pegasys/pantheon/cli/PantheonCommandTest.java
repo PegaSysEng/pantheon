@@ -196,9 +196,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void callingWithConfigOptionButNoConfigFileShouldDisplayHelp() {
     assumeTrue(isFullInstantiation());
 
-    parseCommand("--config");
+    parseCommand("--config-file");
 
-    final String expectedOutputStart = "Missing required parameter for option '--config' (<PATH>)";
+    final String expectedOutputStart = "Missing required parameter for option '--config-file' (<PATH>)";
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
     assertThat(commandOutput.toString()).isEmpty();
   }
@@ -208,7 +208,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeTrue(isFullInstantiation());
 
     final File tempConfigFile = temp.newFile("an-invalid-file-name-without-extension");
-    parseCommand("--config", tempConfigFile.getPath());
+    parseCommand("--config-file", tempConfigFile.getPath());
 
     final String expectedOutputStart = "Unable to read TOML configuration file " + tempConfigFile;
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
@@ -219,7 +219,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void callingWithConfigOptionButTomlFileNotFoundShouldDisplayHelp() {
     assumeTrue(isFullInstantiation());
 
-    parseCommand("--config", "./an-invalid-file-name-sdsd87sjhqoi34io23.toml");
+    parseCommand("--config-file", "./an-invalid-file-name-sdsd87sjhqoi34io23.toml");
 
     final String expectedOutputStart = "Unable to read TOML configuration, file not found.";
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
@@ -238,7 +238,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
       fileWriter.write("."); // an invalid toml content
       fileWriter.flush();
 
-      parseCommand("--config", tempConfigFile.getPath());
+      parseCommand("--config-file", tempConfigFile.getPath());
 
       final String expectedOutputStart =
           "Invalid TOML configuration : Unexpected '.', expected a-z, A-Z, 0-9, ', \", a table key, "
@@ -260,7 +260,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
       fileWriter.write("tester===========......."); // an invalid toml content
       fileWriter.flush();
 
-      parseCommand("--config", tempConfigFile.getPath());
+      parseCommand("--config-file", tempConfigFile.getPath());
 
       final String expectedOutputStart =
           "Invalid TOML configuration : Unexpected '=', expected ', \", ''', \"\"\", a number, "
@@ -304,7 +304,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     metricsConfiguration.setHost("8.6.7.5");
     metricsConfiguration.setPort(309);
 
-    parseCommand("--config", toml.toString());
+    parseCommand("--config-file", toml.toString());
 
     verify(mockRunnerBuilder).discovery(eq(false));
     verify(mockRunnerBuilder).bootstrapPeers(uriListArgumentCaptor.capture());
@@ -351,14 +351,14 @@ public class PantheonCommandTest extends CommandTestAbstract {
     Files.write(toml, Resources.toByteArray(configFile));
 
     // Parse it.
-    final CommandLine.Model.CommandSpec spec = parseCommand("--config", toml.toString());
+    final CommandLine.Model.CommandSpec spec = parseCommand("--config-file", toml.toString());
     final TomlParseResult tomlResult = Toml.parse(toml);
 
     // Verify we configured everything
     final HashSet<CommandLine.Model.OptionSpec> options = new HashSet<>(spec.options());
 
     // Except for meta-options
-    options.remove(spec.optionsMap().get("--config"));
+    options.remove(spec.optionsMap().get("--config-file"));
     options.remove(spec.optionsMap().get("--help"));
     options.remove(spec.optionsMap().get("--version"));
 
@@ -388,7 +388,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final String configFile = Resources.getResource("partial_config.toml").getFile();
 
-    parseCommand("--config", configFile);
+    parseCommand("--config-file", configFile);
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     jsonRpcConfiguration.addRpcApi(CliqueRpcApis.CLIQUE);
     jsonRpcConfiguration.addRpcApi(IbftRpcApis.IBFT);
@@ -445,7 +445,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final Path path = Paths.get(".");
 
-    parseCommand("--datadir", path.toString());
+    parseCommand("--data-path", path.toString());
 
     verify(mockControllerBuilder).homePath(pathArgumentCaptor.capture());
     verify(mockControllerBuilder).syncWithOttoman(eq(false));
@@ -466,7 +466,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    parseCommand("--genesis", genesisFile.toString());
+    parseCommand("--genesis-file", genesisFile.toString());
 
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
@@ -1294,8 +1294,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "0x1122334455667788990011223344556677889900112233445566778899001122";
     parseCommand(
         "--miner-coinbase=" + requestedCoinbase.toString(),
-        "--miner-minTransactionGasPriceWei=15",
-        "--miner-extraData=" + extraDataString);
+        "--min-gas-price=15",
+        "--miner-extra-data=" + extraDataString);
 
     final ArgumentCaptor<MiningParameters> miningArg =
         ArgumentCaptor.forClass(MiningParameters.class);
@@ -1395,7 +1395,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "1",
         "--bootnodes",
         String.join(",", validENodeStrings),
-        "--genesis",
+        "--genesis-file",
         genesisFile.toString());
 
     final ArgumentCaptor<EthNetworkConfig> networkArg =
@@ -1420,9 +1420,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verifyZeroInteractions(mockRunnerBuilder);
 
-    assertThat(commandOutput.toString()).doesNotContain("--config");
-    assertThat(commandOutput.toString()).doesNotContain("--datadir");
-    assertThat(commandOutput.toString()).doesNotContain("--genesis");
+    assertThat(commandOutput.toString()).doesNotContain("--config-file");
+    assertThat(commandOutput.toString()).doesNotContain("--data-path");
+    assertThat(commandOutput.toString()).doesNotContain("--genesis-file");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
@@ -1432,9 +1432,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verifyZeroInteractions(mockRunnerBuilder);
 
-    assertThat(commandOutput.toString()).contains("--config");
-    assertThat(commandOutput.toString()).contains("--datadir");
-    assertThat(commandOutput.toString()).contains("--genesis");
+    assertThat(commandOutput.toString()).contains("--config-file");
+    assertThat(commandOutput.toString()).contains("--data-path");
+    assertThat(commandOutput.toString()).contains("--genesis-file");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 

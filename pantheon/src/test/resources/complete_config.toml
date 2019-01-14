@@ -1,6 +1,6 @@
 # this is a valid TOML config file
 
-datadir="~/pantheondata" # Path
+data-path="~/pantheondata" # Path
 
 #invalid-option=true
 
@@ -18,7 +18,7 @@ rpc-ws-listen="9.10.11.12:9101" # IP:port
 metrics-listen="8.6.7.5:309" # IP:port
 
 # chain
-genesis="~/genesis.json" # Path
+genesis-file="~/genesis.json" # Path
 sync-mode="fast"# should be FAST or FULL (or fast or full)
 ottoman=false # true means using ottoman testnet if genesys file uses iBFT
 

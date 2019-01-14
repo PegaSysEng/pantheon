@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.cli;
 
-import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataDir;
+import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -29,20 +29,20 @@ class StandaloneCommand implements DefaultCommandValues {
   private final File configFile = null;
 
   @CommandLine.Option(
-    names = {"--datadir"},
+    names = {"--data-path"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
     description = "The path to Pantheon data directory (default: ${DEFAULT-VALUE})"
   )
-  final Path dataDir = getDefaultPantheonDataDir(this);
+  final Path dataPath = getDefaultPantheonDataPath(this);
 
   // Genesis file path with null default option if the option
   // is not defined on command line as this default is handled by Runner
   // to use mainnet json file from resources
   // NOTE: we have no control over default value here.
   @CommandLine.Option(
-    names = {"--genesis"},
+    names = {"--genesis-file"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
-    description = "The path to genesis file. Only taken in account if --chain option is set to CUSTOM"
+    description = "The path to genesis file. Setting this will also override --chain option to be CUSTOM"
   )
   final File genesisFile = null;
 }
