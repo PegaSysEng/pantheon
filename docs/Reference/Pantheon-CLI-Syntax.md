@@ -3,6 +3,11 @@ description: Pantheon commande line interface reference
 
 # Pantheon Command Line
 
+!!! important "Breaking Changes in v0.9"
+    In v0.9, changes will be made to the command line options to improve usability. These will be breaking changes; that is, 
+    in many cases the v0.8 command line options will no longer work. This reference and the rest of the documentation will be 
+    updated to reflect these changes. Any further information required about the changes will be included in the v0.9 release notes. 
+
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.
 
 ```bash
@@ -222,6 +227,36 @@ max-trailing-peers=2
 
 Specifies the maximum P2P peer connections for peers that are trailing behind the local chain head. 
 The default is unlimited but the number of trailing peers cannot exceed the value specified by [`--max-peers`](#max-peers).
+
+### metrics-enabled
+
+```bash tab="Syntax"
+--metrics-enabled
+```
+
+```bash tab="Example Configuration File"
+metrics-enabled=true
+```
+
+Set to `true` to enable the [Prometheus](https://prometheus.io/) monitoring service to access [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-third-party-clients).
+The default is `false`.
+
+### metrics-listen
+
+```bash tab="Syntax"
+--metrics-listen=<HOST:PORT>
+```
+
+```bash tab="Example Command Line"
+--metrics-listen=127.0.0.1:6174
+```
+
+```bash tab="Example Configuration File"
+metrics-listen="127.0.0.1:6174"
+```
+
+Specifies the host and port on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
+metrics. The default is `127.0.0.1:9545`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
 
 ### miner-coinbase
 
