@@ -17,12 +17,15 @@ import static tech.pegasys.pantheon.ethereum.mainnet.MainnetTransactionValidator
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 /** A ProtocolSchedule which behaves similarly to MainNet, but with a much reduced difficulty. */
 public class DevelopmentProtocolSchedule {
 
-  public static ProtocolSchedule<Void> create(final GenesisConfigOptions config) {
+  public static ProtocolSchedule<Void> create(
+      final GenesisConfigOptions config, final MetricsSystem metricsSystem) {
     return new ProtocolScheduleBuilder<>(
+            metricsSystem,
             config,
             NO_CHAIN_ID,
             builder -> builder.difficultyCalculator(DevelopmentDifficultyCalculators.DEVELOPER))

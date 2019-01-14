@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.metrics;
 
 public enum MetricCategory {
+  EVM("evm"),
   PEERS("peers"),
   RPC("rpc"),
   JVM("jvm", false),

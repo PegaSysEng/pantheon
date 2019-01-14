@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolver;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHasher.Light;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationTestUtils;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -47,7 +48,10 @@ public class EthHashBlockCreatorTest {
       ExecutionContextTestFixture.builder()
           .protocolSchedule(
               new ProtocolScheduleBuilder<>(
-                      GenesisConfigFile.DEFAULT.getConfigOptions(), 42, Function.identity())
+                      new NoOpMetricsSystem(),
+                      GenesisConfigFile.DEFAULT.getConfigOptions(),
+                      42,
+                      Function.identity())
                   .createProtocolSchedule())
           .build();
 
