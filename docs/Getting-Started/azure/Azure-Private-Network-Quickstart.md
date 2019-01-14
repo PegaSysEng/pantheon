@@ -9,19 +9,24 @@ machine hosted on Microsoft Azure.
 
 ## Requirements
 
-* Having an azure account. A [free trial account](https://azure.microsoft.com/en-us/free/) is enough.
+* An azure account. A [free trial account](https://azure.microsoft.com/en-us/free/) will work for this tutorial.
+* Be able to conne t to a remote console using SSH. If you use Linux or macOS, you already have one 
+integrated, otherwise you can try tools like [Putty](https://www.putty.org/) (free; open-source), 
+[mRemoteNG](https://mremoteng.org/) (free; open-source), 
+[Terminals](https://github.com/terminals-Origin/Terminals) (free; open-source)
+or [MobaXterm](https://mobaxterm.mobatek.net/) (free; paid Pro version available).
 
 ## Connect to Azure Portal
-Once you have created an account or if you already have one, login to [portal.azure.com](https://portal.azure.com/)
+Log in to [Azure portal](https://portal.azure.com/) using your account credentials.
 
 ## Creating resources
-Go on the home page and click on ![Create resource button](create-resource-button-screenshot.png)
+On the home page, click on ![Create resource button](create-resource-button-screenshot.png)
 at the top left hand corner.
 
-Search the Marketplace for **Ubuntu Server 18.04 LTS by Canonical** and click on it then click the 
-blue **Create** button at the bottom.
+Search the Marketplace for **Ubuntu Server 18.04 LTS** by Canonical and click on it. 
+An information page is displayed. Accept the default deployment model of Resource Manager and click **Create**.
 
-A form will display, fill it with the following values for each step, starting with the **Basics** one:
+In **Create a virtual machine**, set the following values for each tab as follows::
 
 ### Basics step
   * Subscription --> free trial
@@ -73,7 +78,7 @@ sh install_and_run.sh azure
     The username is included at the end of this command, **azure** in our case, but change
     to whatever you defined on the Basics step if you did not use the same as us.
     
-Then click on the **Review + create** blue button at the bottom.
+Then click **Ok** and then on the **Review + create** blue button at the bottom.
 
 Then once everything is ok (a green **Validation passed** message should show on the top of the screen), 
 press the blue **Create** button.
@@ -92,7 +97,7 @@ machine overview page.
 ## Accessing the Alethio EthStat-light explorer
 
 On the right part of the virtual machine page you can read the **Public IP address** of this machine. 
-Copy it and past it in your browser navigation bar.
+Copy it then open a new browser tab or window and past it in the navigation bar.
 
 You now should see the the EthStat-light explorer.
 Wait a few seconds and you should see 6 peers indicated and a few blocks mined.
@@ -131,8 +136,10 @@ Then simply navigate in the Azure portal to your resource group, the one we name
 then click on the virtual machine resource and click the **Delete** button.
 
 ### I want to keep the VM but remove the nodes network.
-Navigate to the VM in your Azure portal and click the **connect** button that will give you the
-information to connect using SSH.
+Navigate to the VM in your Azure portal (click on **All services** in the left pane, then on 
+**Virtual machines** and click on the one you named **quickstart**) and click the **connect** 
+button that will give you the information to connect with SSH (see [Requirements](#requirements)).
+
 Once connected to the machine, navigate to the pantheon-quickstart directory:
 ```bash
 cd pantheon-quickstart
@@ -141,6 +148,14 @@ then run the remove script
 ```bash
 ./remove.sh
 ```
+
+If you want to run the network again, then you can use the following script:
+```bash
+./run.sh -p 80
+```
+
+Where 80 is the port number to use for Block Explorer and RPC connections.
+ 
 ### I just want to stop the nodes network and be able to resume it.
 Connect to the VM using SSH like for "[I want to keep the VM but remove the nodes network.](#i-want-to-keep-the-vm-but-remove-the-nodes-network)"
 but instead of running the remove script, run the stop script.
