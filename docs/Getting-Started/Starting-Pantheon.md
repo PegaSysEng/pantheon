@@ -70,11 +70,10 @@ To run a node that mines blocks at a rate suitable for testing purposes:
 pantheon --dev-mode --network-id="2018" --bootnodes --miner-enabled --miner-coinbase=0xfe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-cors-origins="all" --ws-enabled --rpc-enabled --datadir=/tmp/tmpDatdir
 ```
 
-Alternatively, use the following [configuration file](../Configuring-Pantheon/) to start a node with the same options as the above command line: 
+Alternatively, use the following [configuration file](../Configuring-Pantheon/) and `--bootnodes` on the command line to start a node with the same options as above: 
 ```toml
 dev-mode=true
 network-id="2018"
-bootnodes=[]
 miner-enabled=true
 miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
 rpc-cors-origins="all"
