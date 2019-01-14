@@ -437,7 +437,7 @@ public final class NettyP2PNetworkTest {
                 remoteBlacklist,
                 new NoOpMetricsSystem(),
                 new NodeWhitelistController(PermissioningConfiguration.createDefault()))) {
-      final int localListenPort = localNetwork.getSelf().getPort();
+      final int localListenPort = localNetwork.getLocalPeerInfo().getPort();
       final Peer localPeer =
           new DefaultPeer(
               localId,

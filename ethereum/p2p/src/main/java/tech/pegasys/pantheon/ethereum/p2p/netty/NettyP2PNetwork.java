@@ -292,7 +292,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
   }
 
   private boolean isPeerWhitelisted(final PeerConnection connection, final SocketChannel ch) {
-    return !nodeWhitelistController.contains(
+    return nodeWhitelistController.contains(
         connection.getPeer().getNodeId(),
         ch.remoteAddress().getAddress().getHostAddress(),
         connection.getPeer().getPort(),
