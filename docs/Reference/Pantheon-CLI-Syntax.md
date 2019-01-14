@@ -64,7 +64,7 @@ List of node IDs with which this node will not peer. The node ID is the public k
 bootnodes=["enode://c35c3...d615f@1.2.3.4:30303","enode://f42c13...fc456@1.2.3.5:30303"]
 ```
   
-```bash tab="Example Bootnode Command Line"
+```bash tab="Example Node Acting as Bootnode"
 --bootnodes
 ```  
   
