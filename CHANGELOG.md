@@ -2,6 +2,13 @@
 
 ## 0.8.4
 
+### Docker Image Bug 
+
+
+
+
+
+
 Docker Bug 
 
 Upcoming changes in 0.9: 
