@@ -19,7 +19,9 @@ import tech.pegasys.pantheon.config.IbftConfigOptions;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockImporter;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.ethereum.MainnetBlockValidator;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
@@ -62,7 +64,8 @@ public class IbftProtocolSchedule {
             (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
                 new IbftBlockImporter(
                     new MainnetBlockImporter<>(
-                        blockHeaderValidator, blockBodyValidator, blockProcessor),
+                        new MainnetBlockValidator<>(
+                            blockHeaderValidator, blockBodyValidator, blockProcessor)),
                     new VoteTallyUpdater(epochManager, new IbftLegacyBlockInterface())),
             (time, parent, protocolContext) -> BigInteger.ONE)
         .blockReward(Wei.ZERO)

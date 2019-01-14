@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
+import tech.pegasys.pantheon.ethereum.MainnetBlockValidator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -87,7 +88,11 @@ public abstract class MainnetProtocolSpecs {
         .transactionReceiptFactory(MainnetProtocolSpecs::frontierTransactionReceiptFactory)
         .blockReward(FRONTIER_BLOCK_REWARD)
         .blockProcessorBuilder(MainnetBlockProcessor::new)
-        .blockImporterBuilder(MainnetBlockImporter::new)
+        .blockImporterBuilder(
+            (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
+                new MainnetBlockImporter<>(
+                    new MainnetBlockValidator<>(
+                        blockHeaderValidator, blockBodyValidator, blockProcessor)))
         .transactionReceiptType(TransactionReceiptType.ROOT)
         .blockHashFunction(MainnetBlockHashFunction::createHash)
         .miningBeneficiaryCalculator(BlockHeader::getCoinbase)

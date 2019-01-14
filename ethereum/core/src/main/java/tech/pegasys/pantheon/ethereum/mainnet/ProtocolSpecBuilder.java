@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ProtocolSpecBuilder<T> {
+
   private Supplier<GasCalculator> gasCalculatorBuilder;
   private Wei blockReward;
   private BlockHashFunction blockHashFunction;
@@ -264,6 +265,7 @@ public class ProtocolSpecBuilder<T> {
   }
 
   public interface TransactionProcessorBuilder {
+
     TransactionProcessor apply(
         GasCalculator gasCalculator,
         TransactionValidator transactionValidator,
@@ -272,6 +274,7 @@ public class ProtocolSpecBuilder<T> {
   }
 
   public interface BlockProcessorBuilder {
+
     BlockProcessor apply(
         TransactionProcessor transactionProcessor,
         TransactionReceiptFactory transactionReceiptFactory,

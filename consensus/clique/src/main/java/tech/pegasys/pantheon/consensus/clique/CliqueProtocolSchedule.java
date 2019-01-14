@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.config.CliqueConfigOptions;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.MainnetBlockValidator;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.core.Wei;
@@ -63,7 +64,10 @@ public class CliqueProtocolSchedule {
             difficultyCalculator -> cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
             difficultyCalculator -> cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
             MainnetBlockBodyValidator::new,
-            MainnetBlockImporter::new,
+            (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
+                new MainnetBlockImporter<>(
+                    new MainnetBlockValidator<>(
+                        blockHeaderValidator, blockBodyValidator, blockProcessor)),
             new CliqueDifficultyCalculator(localNodeAddress))
         .blockReward(Wei.ZERO)
         .miningBeneficiaryCalculator(CliqueHelpers::getProposerOfBlock);
