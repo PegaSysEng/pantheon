@@ -38,6 +38,7 @@ dependencies {
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
   implementation 'org.apache.logging.log4j:log4j-api'
+  implementation 'org.web3j:abi'
 
   runtime 'org.apache.logging.log4j:log4j-core'
 
