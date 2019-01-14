@@ -20,7 +20,6 @@ import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createVal
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
@@ -42,9 +41,7 @@ import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Ensure the Ibft component responds appropriately when a NewRound message is received.
- */
+/** Ensure the Ibft component responds appropriately when a NewRound message is received. */
 public class ReceivedNewRoundTest {
 
   private final TestContext context = TestContextFactory.createTestEnvWithArbitraryClock(5, 0);
@@ -225,9 +222,9 @@ public class ReceivedNewRoundTest {
 
     nextRoles.getNonProposingPeer(1).injectPrepare(nextRoundId, reproposedBlock.getHash());
 
-    final SignedData<CommitPayload> expectedCommit = TestHelpers
-        .createSignedCommentPayload(reproposedBlock,
-            context.getLocalNodeParams().getNodeKeyPair(), nextRoundId);
+    final SignedData<CommitPayload> expectedCommit =
+        TestHelpers.createSignedCommentPayload(
+            reproposedBlock, context.getLocalNodeParams().getNodeKeyPair(), nextRoundId);
 
     assertPeersReceivedExactly(nextRoles.getAllPeers(), expectedCommit);
   }

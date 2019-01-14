@@ -34,8 +34,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
-
 public class TestHelpers {
 
   public static SignedData<CommitPayload> createSignedCommentPayload(
@@ -75,11 +73,11 @@ public class TestHelpers {
       final Collection<ValidatorPeer> peers,
       final Block blockToPropose) {
 
-    final List<SignedData<RoundChangePayload>> roundChangePayloads = Lists.newArrayList();
-    for (final ValidatorPeer peer : peers) {
-      roundChangePayloads.add(
-          peer.getMessageFactory().createSignedRoundChangePayload(targetRoundId, empty()));
-    }
+    final List<SignedData<RoundChangePayload>> roundChangePayloads =
+        peers
+            .stream()
+            .map(p -> p.getMessageFactory().createSignedRoundChangePayload(targetRoundId, empty()))
+            .collect(Collectors.toList());
 
     final SignedData<ProposalPayload> proposal =
         proposer.getMessageFactory().createSignedProposalPayload(targetRoundId, blockToPropose);

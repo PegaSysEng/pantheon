@@ -18,6 +18,7 @@ import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpe
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.injectEmptyNewRound;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
@@ -42,13 +43,16 @@ public class FutureRoundTest {
   private final Clock fixedClock =
       Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
+  private final int NETWORK_SIZE = 5;
+
   // Local node is not the first proposer for the current round.
-  private final TestContext context = TestContextFactory.createTestEnvironment(4, 0, fixedClock);
+  private final TestContext context =
+      TestContextFactory.createTestEnvironment(NETWORK_SIZE, 0, fixedClock);
 
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
 
-  private final ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(1, 4);
+  private final ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(1, 5);
   private final RoundSpecificNodeRoles futureRoles = context.getRoundSpecificRoles(futureRoundId);
 
   private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
@@ -61,10 +65,27 @@ public class FutureRoundTest {
   @Test
   public void messagesForFutureRoundAreNotActionedUntilRoundIsActive() {
     final Block futureBlock = context.createBlockForProposal(futureRoundId.getRoundNumber(), 60);
-    for (final ValidatorPeer peer : futureRoles.getNonProposingPeers()) {
-      peer.injectPrepare(futureRoundId, futureBlock.getHash());
-      peer.injectCommit(futureRoundId, futureBlock.getHash());
+    final int quorum = IbftHelpers.calculateRequiredValidatorQuorum(NETWORK_SIZE);
+    final ConsensusRoundIdentifier subsequentRoundId = new ConsensusRoundIdentifier(1, 6);
+    final RoundSpecificNodeRoles subsequentRoles = context.getRoundSpecificRoles(subsequentRoundId);
+
+    // required remotely received Prepares = quorum-2
+    // required remote received commits = quorum-1
+
+    // Inject 1 too few Commit messages (but sufficient Prepare
+    for (int i = 0; i < quorum - 3; i++) {
+      futureRoles.getNonProposingPeer(i).injectPrepare(futureRoundId, futureBlock.getHash());
     }
+
+    for (int i = 0; i < quorum - 2; i++) {
+      futureRoles.getNonProposingPeer(i).injectCommit(futureRoundId, futureBlock.getHash());
+    }
+
+    // inject a prepare and a commit from a subsequent round, and ensure no transmissions are
+    // created
+    subsequentRoles.getNonProposingPeer(1).injectPrepare(subsequentRoundId, futureBlock.getHash());
+    subsequentRoles.getNonProposingPeer(1).injectCommit(subsequentRoundId, futureBlock.getHash());
+
     assertPeersReceivedNoMessages(roles.getAllPeers());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
 
@@ -75,12 +96,22 @@ public class FutureRoundTest {
 
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
+
+    assertPeersReceivedExactly(futureRoles.getAllPeers(), expectedPrepare);
+
+    // following 1 more prepare, a commit msg will be sent
+    futureRoles.getNonProposingPeer(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
+
     final SignedData<CommitPayload> expectedCommit =
         localNodeMessageFactory.createSignedCommitPayload(
             futureRoundId,
             futureBlock.getHash(),
             SECP256K1.sign(futureBlock.getHash(), context.getLocalNodeParams().getNodeKeyPair()));
-    assertPeersReceivedExactly(futureRoles.getAllPeers(), expectedCommit, expectedPrepare);
+    assertPeersReceivedExactly(futureRoles.getAllPeers(), expectedCommit);
+
+    // requires 1 more commit and the blockchain will progress
+    futureRoles.getNonProposingPeer(quorum - 2).injectCommit(futureRoundId, futureBlock.getHash());
+
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
   }
 
