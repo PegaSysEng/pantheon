@@ -64,7 +64,7 @@ will be updated and use the Private Network Quickstart in the separate repositor
   
 ## Technical Improvements
 
--  Updated `--bootnodes` command option to take zero arguments [\#548](https://github.com/PegaSysEng/pantheon/pull/527) 
+-  Updated `--bootnodes` command option to take zero arguments [\#548](https://github.com/PegaSysEng/pantheon/pull/548) 
 - IBFT Integration Testing - Local Node is proposer [\#527](https://github.com/PegaSysEng/pantheon/pull/527) 
 - Remove vertx from discovery tests [\#539](https://github.com/PegaSysEng/pantheon/pull/539)
 - IBFT Integration testing - Round Change [\#537](https://github.com/PegaSysEng/pantheon/pull/537) 
