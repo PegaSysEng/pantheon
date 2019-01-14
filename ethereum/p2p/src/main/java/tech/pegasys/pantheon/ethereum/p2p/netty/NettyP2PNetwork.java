@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryAgent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.VertxPeerDiscoveryAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
@@ -50,6 +51,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -174,7 +176,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
     this.peerBlacklist = peerBlacklist;
     this.nodeWhitelistController = nodeWhitelistController;
     peerDiscoveryAgent =
-        new PeerDiscoveryAgent(
+        new VertxPeerDiscoveryAgent(
             vertx,
             keyPair,
             config.getDiscovery(),
@@ -391,7 +393,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
   @Override
   public void run() {
     try {
-      peerDiscoveryAgent.start(ourPeerInfo.getPort()).join();
+      peerDiscoveryAgent.start().join();
       final long observerId =
           peerDiscoveryAgent.observePeerBondedEvents(
               peerBondedEvent -> {
@@ -436,6 +438,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
     stop();
   }
 
+  @VisibleForTesting
   public Collection<DiscoveryPeer> getDiscoveryPeers() {
     return peerDiscoveryAgent.getPeers();
   }
@@ -446,13 +449,18 @@ public final class NettyP2PNetwork implements P2PNetwork {
   }
 
   @Override
-  public PeerInfo getSelf() {
+  public PeerInfo getLocalPeerInfo() {
     return ourPeerInfo;
   }
 
   @Override
   public boolean isListening() {
     return peerDiscoveryAgent.isActive();
+  }
+
+  @Override
+  public NodeWhitelistController getNodeWhitelistController() {
+    return nodeWhitelistController;
   }
 
   private void onConnectionEstablished(final PeerConnection connection) {

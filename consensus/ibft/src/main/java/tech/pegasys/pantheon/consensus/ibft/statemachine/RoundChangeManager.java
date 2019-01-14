@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
+
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
@@ -46,7 +48,7 @@ public class RoundChangeManager {
 
     // Store only 1 round change per round per validator
     @VisibleForTesting
-    final Map<Address, SignedData<RoundChangePayload>> receivedMessages = Maps.newHashMap();
+    final Map<Address, SignedData<RoundChangePayload>> receivedMessages = Maps.newLinkedHashMap();
 
     private boolean actioned = false;
 
@@ -56,7 +58,7 @@ public class RoundChangeManager {
 
     public void addMessage(final SignedData<RoundChangePayload> msg) {
       if (!actioned) {
-        receivedMessages.put(msg.getSender(), msg);
+        receivedMessages.putIfAbsent(msg.getSender(), msg);
       }
     }
 
@@ -89,7 +91,10 @@ public class RoundChangeManager {
     this.quorumSize = IbftHelpers.calculateRequiredValidatorQuorum(validators.size());
     this.roundChangeMessageValidator =
         new RoundChangeMessageValidator(
-            messageValidityFactory, validators, quorumSize - 1, sequenceNumber);
+            messageValidityFactory,
+            validators,
+            prepareMessageCountForQuorum(quorumSize),
+            sequenceNumber);
   }
 
   /**
