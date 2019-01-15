@@ -227,11 +227,10 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 Clock.systemUTC()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
-            blockHeaderValidator,
             Clock.systemUTC());
 
     final MessageValidatorFactory messageValidatorFactory =
-        new MessageValidatorFactory(proposerSelector, blockHeaderValidator, protocolContext);
+        new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
 
     final IbftController ibftController =
         new IbftController(

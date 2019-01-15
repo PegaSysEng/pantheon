@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.ethereum.BlockValidator;
-import tech.pegasys.pantheon.ethereum.MainnetBlockValidator.BlockValidationOutputs;
+import tech.pegasys.pantheon.ethereum.BlockValidator.BlockValidationOutputs;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;

@@ -64,10 +64,8 @@ public class CliqueProtocolSchedule {
             difficultyCalculator -> cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
             difficultyCalculator -> cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
             MainnetBlockBodyValidator::new,
-            (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
-                new MainnetBlockImporter<>(
-                    new MainnetBlockValidator<>(
-                        blockHeaderValidator, blockBodyValidator, blockProcessor)),
+            MainnetBlockValidator::new,
+            MainnetBlockImporter::new,
             new CliqueDifficultyCalculator(localNodeAddress))
         .blockReward(Wei.ZERO)
         .miningBeneficiaryCalculator(CliqueHelpers::getProposerOfBlock);

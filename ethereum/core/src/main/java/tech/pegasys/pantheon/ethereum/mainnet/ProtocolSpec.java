@@ -12,13 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
+import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import tech.pegasys.pantheon.ethereum.vm.EVM;
 
-/** A protocol specification. */
+/**
+ * A protocol specification.
+ */
 public class ProtocolSpec<C> {
 
   private final String name;
@@ -35,6 +38,8 @@ public class ProtocolSpec<C> {
   private final BlockBodyValidator<C> blockBodyValidator;
 
   private final BlockImporter<C> blockImporter;
+
+  private final BlockValidator<C> blockValidator;
 
   private final BlockProcessor blockProcessor;
 
@@ -60,6 +65,7 @@ public class ProtocolSpec<C> {
    * @param blockBodyValidator the block body validator to use
    * @param blockProcessor the block processor to use
    * @param blockImporter the block importer to use
+   * @param blockValidator the block validator to use
    * @param blockHashFunction the block hash function to use
    * @param transactionReceiptFactory the transactionReceiptFactory to use
    * @param difficultyCalculator the difficultyCalculator to use
@@ -77,6 +83,7 @@ public class ProtocolSpec<C> {
       final BlockBodyValidator<C> blockBodyValidator,
       final BlockProcessor blockProcessor,
       final BlockImporter<C> blockImporter,
+      final BlockValidator<C> blockValidator,
       final BlockHashFunction blockHashFunction,
       final TransactionReceiptFactory transactionReceiptFactory,
       final DifficultyCalculator<C> difficultyCalculator,
@@ -92,6 +99,7 @@ public class ProtocolSpec<C> {
     this.blockBodyValidator = blockBodyValidator;
     this.blockProcessor = blockProcessor;
     this.blockImporter = blockImporter;
+    this.blockValidator = blockValidator;
     this.blockHashFunction = blockHashFunction;
     this.transactionReceiptFactory = transactionReceiptFactory;
     this.difficultyCalculator = difficultyCalculator;
@@ -142,6 +150,15 @@ public class ProtocolSpec<C> {
    */
   public BlockImporter<C> getBlockImporter() {
     return blockImporter;
+  }
+
+  /**
+   * Returns the block validator used in this specification.
+   *
+   * @return the block validator
+   */
+  public BlockValidator<C> getBlockValidator() {
+    return blockValidator;
   }
 
   /**

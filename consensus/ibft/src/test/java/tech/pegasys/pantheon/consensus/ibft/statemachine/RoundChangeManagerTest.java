@@ -29,6 +29,8 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.BlockValidator;
+import tech.pegasys.pantheon.ethereum.BlockValidator.BlockValidationOutputs;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -36,7 +38,6 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -74,9 +75,10 @@ public class RoundChangeManagerTest {
             mock(MutableBlockchain.class), mock(WorldStateArchive.class), mock(IbftContext.class));
 
     @SuppressWarnings("unchecked")
-    BlockHeaderValidator<IbftContext> headerValidator =
-        (BlockHeaderValidator<IbftContext>) mock(BlockHeaderValidator.class);
-    when(headerValidator.validateHeader(any(), any(), any(), any())).thenReturn(true);
+    BlockValidator<IbftContext> headerValidator =
+        (BlockValidator<IbftContext>) mock(BlockValidator.class);
+    when(headerValidator.validateAndProcessBlock(any(), any(), any(), any()))
+        .thenReturn(Optional.of(new BlockValidationOutputs(null, null)));
     BlockHeader parentHeader = mock(BlockHeader.class);
 
     RoundChangeMessageValidator.MessageValidatorForHeightFactory messageValidatorFactory =

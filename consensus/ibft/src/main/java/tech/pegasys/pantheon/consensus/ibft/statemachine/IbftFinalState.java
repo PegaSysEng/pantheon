@@ -41,7 +41,6 @@ public class IbftFinalState {
   private final BlockTimer blockTimer;
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final MessageFactory messageFactory;
-  private final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator;
   private final IbftMessageTransmitter messageTransmitter;
   private final Clock clock;
 
@@ -55,7 +54,6 @@ public class IbftFinalState {
       final BlockTimer blockTimer,
       final IbftBlockCreatorFactory blockCreatorFactory,
       final MessageFactory messageFactory,
-      final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator,
       final Clock clock) {
     this.validatorProvider = validatorProvider;
     this.nodeKeys = nodeKeys;
@@ -66,7 +64,6 @@ public class IbftFinalState {
     this.blockTimer = blockTimer;
     this.blockCreatorFactory = blockCreatorFactory;
     this.messageFactory = messageFactory;
-    this.ibftContextBlockHeaderValidator = ibftContextBlockHeaderValidator;
     this.clock = clock;
     this.messageTransmitter = new IbftMessageTransmitter(messageFactory, peers);
   }
@@ -117,10 +114,6 @@ public class IbftFinalState {
 
   public Address getProposerForRound(final ConsensusRoundIdentifier roundIdentifier) {
     return proposerSelector.selectProposerForRound(roundIdentifier);
-  }
-
-  public BlockHeaderValidator<IbftContext> getBlockHeaderValidator() {
-    return ibftContextBlockHeaderValidator;
   }
 
   public IbftMessageTransmitter getTransmitter() {

@@ -58,11 +58,10 @@ public class IbftProtocolSchedule {
             difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
             difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
             MainnetBlockBodyValidator::new,
-            (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
+            MainnetBlockValidator::new,
+            (blockValidator) ->
                 new IbftBlockImporter(
-                    new MainnetBlockImporter<>(
-                        new MainnetBlockValidator<>(
-                            blockHeaderValidator, blockBodyValidator, blockProcessor)),
+                    new MainnetBlockImporter<>(blockValidator),
                     new VoteTallyUpdater(epochManager, new IbftBlockInterface())),
             (time, parent, protocolContext) -> BigInteger.ONE)
         .blockReward(Wei.ZERO)

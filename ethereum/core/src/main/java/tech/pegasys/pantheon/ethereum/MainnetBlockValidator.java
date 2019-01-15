@@ -33,17 +33,6 @@ public class MainnetBlockValidator<C> implements BlockValidator<C> {
 
   private static final Logger LOG = getLogger();
 
-  public static class BlockValidationOutputs {
-    public final MutableWorldState worldState;
-    public final List<TransactionReceipt> receipts;
-
-    public BlockValidationOutputs(
-        final MutableWorldState worldState, final List<TransactionReceipt> receipts) {
-      this.worldState = worldState;
-      this.receipts = receipts;
-    }
-  }
-
   private final BlockHeaderValidator<C> blockHeaderValidator;
 
   private final BlockBodyValidator<C> blockBodyValidator;

@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum;
 
-import tech.pegasys.pantheon.ethereum.MainnetBlockValidator.BlockValidationOutputs;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 
@@ -22,11 +22,22 @@ import java.util.Optional;
 
 public interface BlockValidator<C> {
 
+  class BlockValidationOutputs {
+    public final MutableWorldState worldState;
+    public final List<TransactionReceipt> receipts;
+
+    public BlockValidationOutputs(
+        final MutableWorldState worldState, final List<TransactionReceipt> receipts) {
+      this.worldState = worldState;
+      this.receipts = receipts;
+    }
+  }
+
   Optional<BlockValidationOutputs> validateAndProcessBlock(
-      ProtocolContext<C> context,
-      Block block,
-      HeaderValidationMode headerValidationMode,
-      HeaderValidationMode ommerValidationMode);
+      final ProtocolContext<C> context,
+      final Block block,
+      final HeaderValidationMode headerValidationMode,
+      final HeaderValidationMode ommerValidationMode);
 
   boolean fastBlockValidation(
       final ProtocolContext<C> context,
