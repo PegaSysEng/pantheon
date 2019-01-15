@@ -32,9 +32,9 @@ import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftJsonRpcMethodsFactory;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
+import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
@@ -46,6 +46,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
+import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
@@ -73,6 +74,7 @@ import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.util.Subscribers;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -131,7 +133,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final KeyPair nodeKeys,
       final MetricsSystem metricsSystem) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
-        IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
+        IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), metricsSystem);
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final BlockchainStorage blockchainStorage =
         storageProvider.createBlockchainStorage(protocolSchedule);
@@ -204,6 +206,9 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(
             ibftConfig.getBlockPeriodSeconds());
 
+    final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
+    minedBlockObservers.subscribe(ethProtocolManager);
+
     final IbftFinalState finalState =
         new IbftFinalState(
             voteTally,
@@ -234,7 +239,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             finalState,
             new IbftBlockHeightManagerFactory(
                 finalState,
-                new IbftRoundFactory(finalState, protocolContext, protocolSchedule),
+                new IbftRoundFactory(
+                    finalState, protocolContext, protocolSchedule, minedBlockObservers),
                 messageValidatorFactory,
                 protocolContext));
 

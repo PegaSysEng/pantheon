@@ -11,7 +11,7 @@
     
 # Project information
 site_name: Pantheon
-site_url: https://doc.pantheon.pegasys.tech/
+site_url: https://docs.pantheon.pegasys.tech/
 site_description: Pantheon Java Ethereum client documentation.
 site_author: Pantheon community
 copyright: Pantheon and its documentation are licensed under Apache 2.0 license /
@@ -57,6 +57,7 @@ nav:
     - Tutorials:
         - Creating a Private Network: Tutorials/Create-Private-Network.md
     - Configuring Pantheon:
+        - Using a Configuration File: Configuring-Pantheon/Using-Configuration-File.md
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
         - Networking: Configuring-Pantheon/Networking.md

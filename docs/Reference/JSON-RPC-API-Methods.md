@@ -10,6 +10,9 @@ The following lists the Pantheon JSON-RPC API commands:
 
 ## Admin Methods
 
+!!! note
+    The `ADMIN` API is not enabled by default. Use the [`--rpc-api` option](Pantheon-CLI-Syntax.md#rpc-api) to enable the `ADMIN` API.
+
 ### admin_peers
 
 Returns networking information about connected remote nodes. 
@@ -1687,6 +1690,9 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
 
 ## Debug Methods
 
+!!! note
+    The `DEBUG` API is not enabled by default. Use the [`--rpc-api` option](Pantheon-CLI-Syntax.md#rpc-api) to enable the `DEBUG` API.
+
 ### debug_metrics
 
 !!!note
@@ -1870,6 +1876,9 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 ## Miner Methods
 
+!!! note
+    The `MINER` API is not enabled by default. Use the [`--rpc-api option`](Pantheon-CLI-Syntax.md#rpc-api) to enable the `MINER` API.
+
 ### miner_start
 
 Starts the CPU mining process. To start mining, a miner coinbase must have been previously specified using the [`--miner-coinbase`](../Reference/Pantheon-CLI-Syntax.md#miner-coinbase) command line option.  
@@ -1928,6 +1937,6 @@ None
     }
     ```
 
-## ibft Methods
+## IBFT 2.0 and Permissioning Methods
 
-:construction: IBFT is not currently supported. Support for IBFT is in active development. 
+IBFT 2.0 and permissioning are under development and will be available in v1.0. 
