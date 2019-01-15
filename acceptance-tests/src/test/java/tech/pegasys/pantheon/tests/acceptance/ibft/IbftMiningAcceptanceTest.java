@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
