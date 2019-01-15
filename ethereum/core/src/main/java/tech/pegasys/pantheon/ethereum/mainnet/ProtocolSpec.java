@@ -19,9 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import tech.pegasys.pantheon.ethereum.vm.EVM;
 
-/**
- * A protocol specification.
- */
+/** A protocol specification. */
 public class ProtocolSpec<C> {
 
   private final String name;

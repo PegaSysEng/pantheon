@@ -17,7 +17,6 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequired
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
@@ -25,7 +24,6 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMulticaster;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 
 import java.time.Clock;
 import java.util.Collection;
