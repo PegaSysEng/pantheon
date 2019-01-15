@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderValidationRulesetFactory;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
@@ -65,7 +64,6 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
@@ -201,10 +199,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
     final IbftNetworkPeers peers =
         new IbftNetworkPeers(protocolContext.getConsensusState().getVoteTally());
-
-    final BlockHeaderValidator<IbftContext> blockHeaderValidator =
-        IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(
-            ibftConfig.getBlockPeriodSeconds());
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
     minedBlockObservers.subscribe(ethProtocolManager);

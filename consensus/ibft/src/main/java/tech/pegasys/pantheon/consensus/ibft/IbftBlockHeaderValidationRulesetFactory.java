@@ -13,7 +13,8 @@
 package tech.pegasys.pantheon.consensus.ibft;
 
 import tech.pegasys.pantheon.consensus.ibft.headervalidationrules.IbftCoinbaseValidationRule;
-import tech.pegasys.pantheon.consensus.ibft.headervalidationrules.IbftExtraDataValidationRule;
+import tech.pegasys.pantheon.consensus.ibft.headervalidationrules.IbftCommitSealsValidationRule;
+import tech.pegasys.pantheon.consensus.ibft.headervalidationrules.IbftValidatorsValidationRule;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
@@ -36,23 +37,6 @@ public class IbftBlockHeaderValidationRulesetFactory {
    */
   public static BlockHeaderValidator<IbftContext> ibftBlockHeaderValidator(
       final long secondsBetweenBlocks) {
-    return createValidator(secondsBetweenBlocks, true);
-  }
-
-  /**
-   * Produces a BlockHeaderValidator configured for assessing IBFT proposed blocks (i.e. blocks
-   * which need to be vetted by the validators, and do not contain commit seals).
-   *
-   * @param secondsBetweenBlocks the minimum number of seconds which must elapse between blocks.
-   * @return BlockHeaderValidator configured for assessing ibft block headers
-   */
-  public static BlockHeaderValidator<IbftContext> ibftProposedBlockValidator(
-      final long secondsBetweenBlocks) {
-    return createValidator(secondsBetweenBlocks, false);
-  }
-
-  private static BlockHeaderValidator<IbftContext> createValidator(
-      final long secondsBetweenBlocks, final boolean validateCommitSeals) {
     return new BlockHeaderValidator.Builder<IbftContext>()
         .addRule(new AncestryValidationRule())
         .addRule(new GasUsageValidationRule())
@@ -69,8 +53,9 @@ public class IbftBlockHeaderValidationRulesetFactory {
             new ConstantFieldValidationRule<>(
                 "Difficulty", BlockHeader::getDifficulty, UInt256.ONE))
         .addRule(new ConstantFieldValidationRule<>("Nonce", BlockHeader::getNonce, 0L))
-        .addRule(new IbftExtraDataValidationRule(validateCommitSeals))
+        .addRule(new IbftValidatorsValidationRule())
         .addRule(new IbftCoinbaseValidationRule())
+        .addRule(new IbftCommitSealsValidationRule())
         .build();
   }
 }
