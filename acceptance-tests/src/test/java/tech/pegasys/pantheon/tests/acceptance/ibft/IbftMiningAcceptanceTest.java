@@ -67,7 +67,6 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  @Ignore("Temporarily disabled until ibft new block events are being sent")
   public void shouldMineOnMultipleNodesEvenWhenClusterContainsNonValidator() throws IOException {
     final String[] validators = {"validator1", "validator2", "validator3"};
     final PantheonNode validator1 = pantheon.createIbftNodeWithValidators("validator1", validators);
