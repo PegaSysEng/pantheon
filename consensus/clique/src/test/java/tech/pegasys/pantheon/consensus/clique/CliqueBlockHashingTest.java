@@ -14,10 +14,6 @@ package tech.pegasys.pantheon.consensus.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
-import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
@@ -26,6 +22,12 @@ import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class CliqueBlockHashingTest {
 
@@ -47,8 +49,7 @@ public class CliqueBlockHashingTest {
 
   @Test
   public void recoverProposerAddressFromSeal() {
-    final CliqueExtraData cliqueExtraData =
-        CliqueExtraData.decode(expectedHeader.getExtraData());
+    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(expectedHeader.getExtraData());
     final Address proposerAddress =
         CliqueBlockHashing.recoverProposerAddress(expectedHeader, cliqueExtraData);
 
@@ -57,8 +58,7 @@ public class CliqueBlockHashingTest {
 
   @Test
   public void readValidatorListFromExtraData() {
-    final CliqueExtraData cliqueExtraData =
-        CliqueExtraData.decode(expectedHeader.getExtraData());
+    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(expectedHeader.getExtraData());
     assertThat(cliqueExtraData.getValidators()).isEqualTo(VALIDATORS_IN_HEADER);
   }
 

@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
-import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.AbstractMessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
