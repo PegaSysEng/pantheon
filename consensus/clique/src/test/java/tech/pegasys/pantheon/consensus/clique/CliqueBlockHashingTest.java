@@ -14,6 +14,10 @@ package tech.pegasys.pantheon.consensus.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
@@ -23,27 +27,9 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-
 public class CliqueBlockHashingTest {
 
-  public static class LoadedBlockHeader {
-    private final BlockHeader header;
-
-    public LoadedBlockHeader(final BlockHeader header) {
-      this.header = header;
-    }
-
-    public BlockHeader getHeader() {
-      return header;
-    }
-  }
-
-  private LoadedBlockHeader expectedHeader = null;
+  private BlockHeader expectedHeader = null;
 
   // clique.getSignersAtHash("0x8b27a29300811af926039b90288d3d384dcb55931049c17c4f762e45c116776e")
   private static final List<Address> VALIDATORS_IN_HEADER =
@@ -62,9 +48,9 @@ public class CliqueBlockHashingTest {
   @Test
   public void recoverProposerAddressFromSeal() {
     final CliqueExtraData cliqueExtraData =
-        CliqueExtraData.decode(expectedHeader.getHeader().getExtraData());
+        CliqueExtraData.decode(expectedHeader.getExtraData());
     final Address proposerAddress =
-        CliqueBlockHashing.recoverProposerAddress(expectedHeader.getHeader(), cliqueExtraData);
+        CliqueBlockHashing.recoverProposerAddress(expectedHeader, cliqueExtraData);
 
     assertThat(VALIDATORS_IN_HEADER.contains(proposerAddress)).isTrue();
   }
@@ -72,16 +58,16 @@ public class CliqueBlockHashingTest {
   @Test
   public void readValidatorListFromExtraData() {
     final CliqueExtraData cliqueExtraData =
-        CliqueExtraData.decode(expectedHeader.getHeader().getExtraData());
+        CliqueExtraData.decode(expectedHeader.getExtraData());
     assertThat(cliqueExtraData.getValidators()).isEqualTo(VALIDATORS_IN_HEADER);
   }
 
   @Test
   public void calculateBlockHash() {
-    assertThat(expectedHeader.getHeader().getHash()).isEqualTo(KNOWN_BLOCK_HASH);
+    assertThat(expectedHeader.getHash()).isEqualTo(KNOWN_BLOCK_HASH);
   }
 
-  private LoadedBlockHeader createKnownHeaderFromCapturedData() {
+  private BlockHeader createKnownHeaderFromCapturedData() {
     // The following text was a dump from the geth console of the 30_000 block on Rinkeby.
     // eth.getBlock(30000)
     final BlockHeaderBuilder builder = new BlockHeaderBuilder();
@@ -114,6 +100,6 @@ public class CliqueBlockHashingTest {
 
     builder.blockHashFunction(MainnetBlockHashFunction::createHash);
 
-    return new LoadedBlockHeader(builder.buildBlockHeader());
+    return builder.buildBlockHeader();
   }
 }
