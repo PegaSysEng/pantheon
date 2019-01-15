@@ -10,14 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
+package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -28,43 +28,43 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PrepareMessageTest {
-  @Mock private SignedData<PreparePayload> preparePayload;
+public class NewRoundMessageTest {
+  @Mock private SignedData<NewRoundPayload> newRoundPayload;
   @Mock private BytesValue messageBytes;
   @Mock private MessageData messageData;
-  @Mock private PrepareMessageData prepareMessage;
+  @Mock private NewRoundMessageData newRoundMessage;
 
   @Test
-  public void createMessageFromPrepareMessageData() {
-    when(preparePayload.encode()).thenReturn(messageBytes);
-    PrepareMessageData prepareMessage = PrepareMessageData.create(preparePayload);
+  public void createMessageFromNewRoundChangeMessageData() {
+    when(newRoundPayload.encode()).thenReturn(messageBytes);
+    NewRoundMessageData prepareMessage = NewRoundMessageData.create(newRoundPayload);
 
     assertThat(prepareMessage.getData()).isEqualTo(messageBytes);
-    assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.PREPARE);
-    verify(preparePayload).encode();
+    assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.NEW_ROUND);
+    verify(newRoundPayload).encode();
   }
 
   @Test
-  public void createMessageFromPrepareMessage() {
-    PrepareMessageData message = PrepareMessageData.fromMessageData(prepareMessage);
-    assertThat(message).isSameAs(prepareMessage);
+  public void createMessageFromNewRoundMessage() {
+    NewRoundMessageData message = NewRoundMessageData.fromMessageData(newRoundMessage);
+    assertThat(message).isSameAs(newRoundMessage);
   }
 
   @Test
   public void createMessageFromGenericMessageData() {
     when(messageData.getData()).thenReturn(messageBytes);
-    when(messageData.getCode()).thenReturn(IbftV2.PREPARE);
-    PrepareMessageData prepareMessage = PrepareMessageData.fromMessageData(messageData);
+    when(messageData.getCode()).thenReturn(IbftV2.NEW_ROUND);
+    NewRoundMessageData newRoundMessage = NewRoundMessageData.fromMessageData(messageData);
 
-    assertThat(prepareMessage.getData()).isEqualTo(messageData.getData());
-    assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.PREPARE);
+    assertThat(newRoundMessage.getData()).isEqualTo(messageData.getData());
+    assertThat(newRoundMessage.getCode()).isEqualTo(IbftV2.NEW_ROUND);
   }
 
   @Test
   public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
-    assertThatThrownBy(() -> PrepareMessageData.fromMessageData(messageData))
+    assertThatThrownBy(() -> NewRoundMessageData.fromMessageData(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("MessageData has code 42 and thus is not a PrepareMessageData");
+        .hasMessageContaining("MessageData has code 42 and thus is not a NewRoundMessageData");
   }
 }

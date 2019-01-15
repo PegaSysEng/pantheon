@@ -10,35 +10,35 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
+package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public class NewRoundMessageData extends AbstractIbftMessageData {
+public class PrepareMessageData extends AbstractIbftMessageData {
 
-  private static final int MESSAGE_CODE = IbftV2.NEW_ROUND;
+  private static final int MESSAGE_CODE = IbftV2.PREPARE;
 
-  private NewRoundMessageData(final BytesValue data) {
+  private PrepareMessageData(final BytesValue data) {
     super(data);
   }
 
-  public static NewRoundMessageData fromMessageData(final MessageData messageData) {
+  public static PrepareMessageData fromMessageData(final MessageData messageData) {
     return fromMessageData(
-        messageData, MESSAGE_CODE, NewRoundMessageData.class, NewRoundMessageData::new);
+        messageData, MESSAGE_CODE, PrepareMessageData.class, PrepareMessageData::new);
   }
 
   @Override
-  public SignedData<NewRoundPayload> decode() {
-    return SignedData.readSignedNewRoundPayloadFrom(RLP.input(data));
+  public SignedData<PreparePayload> decode() {
+    return SignedData.readSignedPreparePayloadFrom(RLP.input(data));
   }
 
-  public static NewRoundMessageData create(final SignedData<NewRoundPayload> signedPayload) {
+  public static PrepareMessageData create(final SignedData<PreparePayload> signedPayload) {
 
-    return new NewRoundMessageData(signedPayload.encode());
+    return new PrepareMessageData(signedPayload.encode());
   }
 
   @Override

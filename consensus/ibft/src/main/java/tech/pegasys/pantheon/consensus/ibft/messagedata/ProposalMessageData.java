@@ -10,35 +10,35 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
+package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public class PrepareMessageData extends AbstractIbftMessageData {
+public class ProposalMessageData extends AbstractIbftMessageData {
 
-  private static final int MESSAGE_CODE = IbftV2.PREPARE;
+  private static final int MESSAGE_CODE = IbftV2.PROPOSAL;
 
-  private PrepareMessageData(final BytesValue data) {
+  private ProposalMessageData(final BytesValue data) {
     super(data);
   }
 
-  public static PrepareMessageData fromMessageData(final MessageData messageData) {
+  public static ProposalMessageData fromMessageData(final MessageData messageData) {
     return fromMessageData(
-        messageData, MESSAGE_CODE, PrepareMessageData.class, PrepareMessageData::new);
+        messageData, MESSAGE_CODE, ProposalMessageData.class, ProposalMessageData::new);
   }
 
   @Override
-  public SignedData<PreparePayload> decode() {
-    return SignedData.readSignedPreparePayloadFrom(RLP.input(data));
+  public SignedData<ProposalPayload> decode() {
+    return SignedData.readSignedProposalPayloadFrom(RLP.input(data));
   }
 
-  public static PrepareMessageData create(final SignedData<PreparePayload> signedPayload) {
+  public static ProposalMessageData create(final SignedData<ProposalPayload> signedPayload) {
 
-    return new PrepareMessageData(signedPayload.encode());
+    return new ProposalMessageData(signedPayload.encode());
   }
 
   @Override

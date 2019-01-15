@@ -10,14 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft.ibftmessage;
+package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -28,43 +28,43 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProposalMessageTest {
-  @Mock private SignedData<ProposalPayload> proposalMessageData;
+public class CommitMessageTest {
+  @Mock private SignedData<CommitPayload> commitPayload;
   @Mock private BytesValue messageBytes;
   @Mock private MessageData messageData;
-  @Mock private ProposalMessageData proposalMessage;
+  @Mock private CommitMessageData commitMessage;
 
   @Test
-  public void createMessageFromPrePrepareMessageData() {
-    when(proposalMessageData.encode()).thenReturn(messageBytes);
-    final ProposalMessageData proposalMessage = ProposalMessageData.create(proposalMessageData);
+  public void createMessageFromCommitMessageData() {
+    when(commitPayload.encode()).thenReturn(messageBytes);
+    CommitMessageData commitMessage = CommitMessageData.create(commitPayload);
 
-    assertThat(proposalMessage.getData()).isEqualTo(messageBytes);
-    assertThat(proposalMessage.getCode()).isEqualTo(IbftV2.PROPOSAL);
-    verify(proposalMessageData).encode();
+    assertThat(commitMessage.getData()).isEqualTo(messageBytes);
+    assertThat(commitMessage.getCode()).isEqualTo(IbftV2.COMMIT);
+    verify(commitPayload).encode();
   }
 
   @Test
-  public void createMessageFromPrePrepareMessage() {
-    final ProposalMessageData message = ProposalMessageData.fromMessageData(proposalMessage);
-    assertThat(message).isSameAs(proposalMessage);
+  public void createMessageFromCommitMessage() {
+    CommitMessageData message = CommitMessageData.fromMessageData(commitMessage);
+    assertThat(message).isSameAs(commitMessage);
   }
 
   @Test
   public void createMessageFromGenericMessageData() {
-    when(messageData.getCode()).thenReturn(IbftV2.PROPOSAL);
     when(messageData.getData()).thenReturn(messageBytes);
-    final ProposalMessageData proposalMessage = ProposalMessageData.fromMessageData(messageData);
+    when(messageData.getCode()).thenReturn(IbftV2.COMMIT);
+    CommitMessageData commitMessage = CommitMessageData.fromMessageData(messageData);
 
-    assertThat(proposalMessage.getData()).isEqualTo(messageData.getData());
-    assertThat(proposalMessage.getCode()).isEqualTo(IbftV2.PROPOSAL);
+    assertThat(commitMessage.getData()).isEqualTo(messageData.getData());
+    assertThat(commitMessage.getCode()).isEqualTo(IbftV2.COMMIT);
   }
 
   @Test
   public void createMessageFailsWhenIncorrectMessageCode() {
     when(messageData.getCode()).thenReturn(42);
-    assertThatThrownBy(() -> ProposalMessageData.fromMessageData(messageData))
+    assertThatThrownBy(() -> CommitMessageData.fromMessageData(messageData))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("MessageData has code 42 and thus is not a ProposalMessageData");
+        .hasMessageContaining("MessageData has code 42 and thus is not a CommitMessageData");
   }
 }
