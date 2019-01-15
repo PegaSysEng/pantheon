@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.cli;
 
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -21,8 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import picocli.CommandLine;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 interface DefaultCommandValues {
   String CONFIG_FILE_OPTION_NAME = "--config-file";

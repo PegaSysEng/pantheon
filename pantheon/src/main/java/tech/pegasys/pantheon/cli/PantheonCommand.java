@@ -99,7 +99,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private static final String MANDATORY_HOST_AND_PORT_FORMAT_HELP = "<HOST:PORT>";
 
-
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
     @Override
     public RpcApi convert(final String name) throws RpcApisConversionException {
@@ -219,11 +218,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
   @Option(
-      names = {"--chain"},
-      paramLabel = DefaultCommandValues.MANDATORY_CHAIN_FORMAT_HELP,
-      description =
-          "Synchronize against the indicated chain, possible values are ${COMPLETION-CANDIDATES}."
-              + " (default: ${DEFAULT-VALUE})"
+    names = {"--chain"},
+    paramLabel = DefaultCommandValues.MANDATORY_CHAIN_FORMAT_HELP,
+    description =
+        "Synchronize against the indicated chain, possible values are ${COMPLETION-CANDIDATES}."
+            + " (default: ${DEFAULT-VALUE})"
   )
   private final ChainName chain = ChainName.MAINNET;
 
@@ -311,7 +310,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final CorsAllowedOriginsProperty rpcCorsAllowedOrigins = new CorsAllowedOriginsProperty();
 
   @Option(
-    names = {"--rpc-http-api","--rpc-http-apis"},
+    names = {"--rpc-http-api", "--rpc-http-apis"},
     paramLabel = "<api name>",
     split = ",",
     arity = "1..*",
@@ -338,7 +337,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       getDefaultHostAndPort(WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT);
 
   @Option(
-    names = {"--rpc-ws-api","--rpc-ws-apis"},
+    names = {"--rpc-ws-api", "--rpc-ws-apis"},
     paramLabel = "<api name>",
     split = ",",
     arity = "1..*",
@@ -360,7 +359,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
   )
   private Long configureRefreshDelay(final Long refreshDelay) {
-    if (refreshDelay < DefaultCommandValues.DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DefaultCommandValues.DEFAULT_MAX_REFRESH_DELAY) {
+    if (refreshDelay < DefaultCommandValues.DEFAULT_MIN_REFRESH_DELAY
+        || refreshDelay > DefaultCommandValues.DEFAULT_MAX_REFRESH_DELAY) {
       throw new ParameterException(
           new CommandLine(this),
           String.format(
@@ -410,7 +410,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
     names = {"--logging", "-l"},
     paramLabel = "<LOG VERBOSITY LEVEL>",
-    description = "Logging verbosity levels: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
+    description =
+        "Logging verbosity levels: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)."
   )
   private final Level logLevel = null;
 

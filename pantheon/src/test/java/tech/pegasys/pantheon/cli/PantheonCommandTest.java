@@ -198,7 +198,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand("--config-file");
 
-    final String expectedOutputStart = "Missing required parameter for option '--config-file' (<PATH>)";
+    final String expectedOutputStart =
+        "Missing required parameter for option '--config-file' (<PATH>)";
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
     assertThat(commandOutput.toString()).isEmpty();
   }
@@ -832,7 +833,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     // PicoCLI uses longest option name for message when option has multiple names, so here plural.
-    assertThat(commandErrorOutput.toString()).contains("Invalid value for option '--rpc-http-apis'");
+    assertThat(commandErrorOutput.toString())
+        .contains("Invalid value for option '--rpc-http-apis'");
   }
 
   @Test

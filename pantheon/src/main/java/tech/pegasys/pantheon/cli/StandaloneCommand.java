@@ -42,7 +42,8 @@ class StandaloneCommand implements DefaultCommandValues {
   @CommandLine.Option(
     names = {"--genesis-file"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
-    description = "The path to genesis file. Setting this will also override --chain option to be CUSTOM"
+    description =
+        "The path to genesis file. Setting this will also override --chain option to be CUSTOM"
   )
   final File genesisFile = null;
 }
