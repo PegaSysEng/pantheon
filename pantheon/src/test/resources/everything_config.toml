@@ -11,7 +11,7 @@
 # Node Information
 data-path="~/pantheondata"
 logging="INFO"
-node-private-key="./path/to/privateKey"
+node-private-key-file="./path/to/privateKey"
 
 # P2P network
 no-discovery=true
