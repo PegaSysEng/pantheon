@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 /*
 Responsible for creating an environment in which integration testing can be conducted.
@@ -62,11 +63,16 @@ public class TestContext {
     return finalState.getMessageFactory();
   }
 
-  public Block createBlockForProposal(final int round, final long timestamp) {
+  public Block createBlockForProposal(final BlockHeader parent, final int round,
+      final long timestamp) {
     return finalState
         .getBlockCreatorFactory()
-        .create(blockchain.getChainHeadHeader(), round)
+        .create(parent, round)
         .createBlock(timestamp);
+  }
+
+  public Block createBlockForProposalFromChainHead(final int round, final long timestamp) {
+    return createBlockForProposal(blockchain.getChainHeadHeader(), round, timestamp);
   }
 
   public RoundSpecificNodeRoles getRoundSpecificRoles(final ConsensusRoundIdentifier roundId) {
