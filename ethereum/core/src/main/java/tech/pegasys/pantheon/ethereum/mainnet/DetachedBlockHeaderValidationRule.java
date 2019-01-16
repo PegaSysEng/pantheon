@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
-public interface DetachedBlockHeaderValidationRule {
+public interface DetachedBlockHeaderValidationRule extends BlockHeaderValidationRule {
 
   /**
    * Validates a block header against its parent.
@@ -24,8 +24,4 @@ public interface DetachedBlockHeaderValidationRule {
    * @return {@code true} if valid; otherwise {@code false}
    */
   boolean validate(BlockHeader header, BlockHeader parent);
-
-  default boolean includeInLightValidation() {
-    return true;
-  }
 }

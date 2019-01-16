@@ -73,7 +73,11 @@ public class BlockHeaderValidator<C> {
     return rules
         .stream()
         .filter(filter)
-        .allMatch(rule -> rule.validate(header, parent, protocolContext));
+        .allMatch(
+            rule -> {
+              final boolean result = rule.validate(header, parent, protocolContext);
+              return result;
+            });
   }
 
   private Optional<BlockHeader> getParent(
@@ -120,7 +124,7 @@ public class BlockHeaderValidator<C> {
     private final List<Rule<C>> rules = new ArrayList<>();
 
     public Builder<C> addRule(final AttachedBlockHeaderValidationRule<C> rule) {
-      this.rules.add(new Rule<>(false, rule, true));
+      this.rules.add(new Rule<>(false, rule, rule.includeInLightValidation()));
       return this;
     }
 

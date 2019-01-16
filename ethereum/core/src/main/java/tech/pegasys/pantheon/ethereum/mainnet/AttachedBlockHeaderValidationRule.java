@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
-public interface AttachedBlockHeaderValidationRule<C> {
+public interface AttachedBlockHeaderValidationRule<C> extends BlockHeaderValidationRule {
 
   /**
    * Validates a block header against its ancestors.
