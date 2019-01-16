@@ -73,11 +73,7 @@ public class BlockHeaderValidator<C> {
     return rules
         .stream()
         .filter(filter)
-        .allMatch(
-            rule -> {
-              final boolean result = rule.validate(header, parent, protocolContext);
-              return result;
-            });
+        .allMatch(rule -> rule.validate(header, parent, protocolContext));
   }
 
   private Optional<BlockHeader> getParent(
