@@ -83,7 +83,7 @@ import org.apache.logging.log4j.Logger;
  * distance from us is equal to the index of the bucket. The value <i>x</i> in the distance function
  * corresponds to our node ID (public key).
  *
- * <p>Upper layers in the stack subscribe to events from the peer discocvery layer and initiate/drop
+ * <p>Upper layers in the stack subscribe to events from the peer discovery layer and initiate/drop
  * connections accordingly.
  *
  * <h2>RLPx Wire Protocol</h2>
