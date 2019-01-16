@@ -467,7 +467,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    parseCommand("--genesis-file", genesisFile.toString());
+    parseCommand("--private-genesis-file", genesisFile.toString());
 
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
@@ -786,7 +786,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
-  @Ignore
+  @Ignore("Ignored as we only have one mode available for now. See NC-1057/NC-1681")
   @Test
   public void syncModeOptionMustBeUsed() {
 
@@ -1421,7 +1421,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "1",
         "--bootnodes",
         String.join(",", validENodeStrings),
-        "--genesis-file",
+        "--private-genesis-file",
         genesisFile.toString());
 
     final ArgumentCaptor<EthNetworkConfig> networkArg =
@@ -1448,7 +1448,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).doesNotContain("--config-file");
     assertThat(commandOutput.toString()).doesNotContain("--data-path");
-    assertThat(commandOutput.toString()).doesNotContain("--genesis-file");
+    assertThat(commandOutput.toString()).doesNotContain("--private-genesis-file");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
@@ -1460,7 +1460,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).contains("--config-file");
     assertThat(commandOutput.toString()).contains("--data-path");
-    assertThat(commandOutput.toString()).contains("--genesis-file");
+    assertThat(commandOutput.toString()).contains("--private-genesis-file");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 

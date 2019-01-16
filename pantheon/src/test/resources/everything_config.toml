@@ -28,7 +28,7 @@ host-whitelist=["all"]
 
 # chain
 chain="MAINNET"
-genesis-file="~/genesis.json"
+private-genesis-file="~/genesis.json"
 #sync-mode="fast"
 ottoman=false
 ropsten=false

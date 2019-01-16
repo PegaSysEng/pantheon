@@ -40,7 +40,7 @@ class StandaloneCommand implements DefaultCommandValues {
   // to use mainnet json file from resources
   // NOTE: we have no control over default value here.
   @CommandLine.Option(
-    names = {"--genesis-file"},
+    names = {"--private-genesis-file"},
     paramLabel = MANDATORY_PATH_FORMAT_HELP,
     description =
         "The path to genesis file. Setting this will also override --chain option to be CUSTOM"
