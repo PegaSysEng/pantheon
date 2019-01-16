@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
@@ -132,7 +133,7 @@ public class IbftBlockHeightManagerTest {
     when(finalState.getTransmitter()).thenReturn(messageTransmitter);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
     when(finalState.getRoundTimer()).thenReturn(roundTimer);
-    when(finalState.getQuorumSize()).thenReturn(3);
+    when(finalState.getQuorum()).thenReturn(3);
     when(finalState.getMessageFactory()).thenReturn(messageFactory);
     when(blockCreator.createBlock(anyLong())).thenReturn(createdBlock);
     when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
@@ -150,7 +151,7 @@ public class IbftBlockHeightManagerTest {
               final int round = (int) invocation.getArgument(1);
               final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, round);
               final RoundState createdRoundState =
-                  new RoundState(roundId, finalState.getQuorumSize(), messageValidator);
+                  new RoundState(roundId, finalState.getQuorum(), messageValidator);
               return new IbftRound(
                   createdRoundState,
                   blockCreator,

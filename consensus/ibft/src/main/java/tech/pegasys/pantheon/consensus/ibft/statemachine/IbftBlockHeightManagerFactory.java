@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
@@ -31,15 +32,12 @@ public class IbftBlockHeightManagerFactory {
   }
 
   public IbftBlockHeightManager create(final BlockHeader parentHeader) {
-    long nextChainHeight = parentHeader.getNumber() + 1;
     return new IbftBlockHeightManager(
         parentHeader,
         finalState,
         new RoundChangeManager(
-            nextChainHeight,
-            finalState.getValidators(),
-            (roundIdentifier) ->
-                messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader)),
+            IbftHelpers.calculateRequiredValidatorQuorum(finalState.getValidators().size()),
+            messageValidatorFactory.createRoundChangeMessageValidator(parentHeader)),
         roundFactory,
         finalState.getClock(),
         messageValidatorFactory);
