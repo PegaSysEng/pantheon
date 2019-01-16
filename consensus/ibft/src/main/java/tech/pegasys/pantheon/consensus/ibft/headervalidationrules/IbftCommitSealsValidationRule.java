@@ -50,11 +50,8 @@ public class IbftCommitSealsValidationRule
 
     final List<Address> committers =
         IbftBlockHashing.recoverCommitterAddresses(header, ibftExtraData);
-    if (!validateCommitters(committers, validatorProvider.getValidators())) {
-      return false;
-    }
 
-    return true;
+    return validateCommitters(committers, validatorProvider.getValidators());
   }
 
   private boolean validateCommitters(
