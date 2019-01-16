@@ -820,15 +820,13 @@ gas and is not added to the blockchain as a transaction. The estimate can be gre
 transaction actually uses, for reasons including EVM mechanics and node performance.
 
 The `eth_estimateGas` call does not send a transaction. You must make a subsequent call to
-[eth_sendRawTransaction](#eth_sendRawTransaction) to execute the transaction.
+[eth_sendRawTransaction](#eth_sendrawtransaction) to execute the transaction.
 
 **Parameters**
 
-!!!note
-    The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`
-    all fields are optional. If you do not specify a `gas` amount in the transaction call object, Pantheon uses the
-    `gasLimit` amount from the block at the head of the chain as the upper limit. If the amount of gas needed is higher
-    than the estimated upper limit, the transaction might not have enough gas to execute.
+The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`,
+all fields are optional. Pantheon uses the `gasLimit` amount from the block at the head of the chain as the upper limit.
+If the amount of gas needed is higher than the estimated upper limit, the transaction might not have enough gas to execute.
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
