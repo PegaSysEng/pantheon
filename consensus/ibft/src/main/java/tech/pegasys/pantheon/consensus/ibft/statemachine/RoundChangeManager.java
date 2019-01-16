@@ -40,7 +40,7 @@ public class RoundChangeManager {
 
   public static class RoundChangeStatus {
 
-    private final long quorumSize;
+    private final long quorum;
 
     // Store only 1 round change per round per validator
     @VisibleForTesting
@@ -48,8 +48,8 @@ public class RoundChangeManager {
 
     private boolean actioned = false;
 
-    public RoundChangeStatus(final long quorumSize) {
-      this.quorumSize = quorumSize;
+    public RoundChangeStatus(final long quorum) {
+      this.quorum = quorum;
     }
 
     public void addMessage(final SignedData<RoundChangePayload> msg) {
@@ -59,7 +59,7 @@ public class RoundChangeManager {
     }
 
     public boolean roundChangeReady() {
-      return receivedMessages.size() >= quorumSize && !actioned;
+      return receivedMessages.size() >= quorum && !actioned;
     }
 
     public RoundChangeCertificate createRoundChangeCertificate() {
