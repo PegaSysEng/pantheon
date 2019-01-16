@@ -14,7 +14,11 @@ package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static tech.pegasys.pantheon.cli.ChainName.MAINNET;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
+import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
@@ -63,6 +67,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
+import com.google.common.net.HostSpecifier;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -90,14 +95,6 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements DefaultCommandValues, Runnable {
-
-  private static final int DEFAULT_MAX_PEERS = 25;
-
-  // Default should be FAST for the next release
-  // but we use FULL for the moment as Fast is still in progress
-  private static final SyncMode DEFAULT_SYNC_MODE = SyncMode.FULL;
-
-  private static final String MANDATORY_HOST_AND_PORT_FORMAT_HELP = "<HOST:PORT>";
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
 
@@ -181,10 +178,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--max-peers"},
-    paramLabel = DefaultCommandValues.MANDATORY_INTEGER_FORMAT_HELP,
+    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
   )
-  private final Integer maxPeers = DEFAULT_MAX_PEERS;
+  private final Integer maxPeers = DefaultCommandValues.DEFAULT_MAX_PEERS;
 
   /**
    * @deprecated This option is not exposed anymore even if still available as it's bounded by
@@ -195,7 +192,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
     hidden = true,
     names = {"--max-trailing-peers"},
-    paramLabel = DefaultCommandValues.MANDATORY_INTEGER_FORMAT_HELP,
+    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description =
         "Maximum p2p peer connections for peers that are trailing behind our chain head (default: unlimited)"
   )
@@ -221,12 +218,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--chain"},
-    paramLabel = DefaultCommandValues.MANDATORY_CHAIN_FORMAT_HELP,
+    paramLabel = MANDATORY_CHAIN_FORMAT_HELP,
     description =
         "Synchronize against the indicated chain, possible values are ${COMPLETION-CANDIDATES}."
             + " (default: ${DEFAULT-VALUE})"
   )
-  private final ChainName chain = ChainName.MAINNET;
+  private final ChainName chain = MAINNET;
 
   /** @deprecated Deprecated in favour of --chain option */
   @Deprecated
@@ -276,14 +273,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Host and port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final HostAndPort p2pHostAndPort = getDefaultHostAndPort(DefaultPeer.DEFAULT_PORT);
+  private final HostAndPort p2pHostAndPort = getDefaultHostAndPort(DEFAULT_PORT);
 
   /** @deprecated Deprecated in favour of --chain option */
   @Deprecated
   @Option(
     hidden = true,
     names = {"--network-id"},
-    paramLabel = DefaultCommandValues.MANDATORY_INTEGER_FORMAT_HELP,
+    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description = "P2P network identifier (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
@@ -293,23 +290,32 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     names = {"--rpc-http-enabled"},
     description = "Set if the JSON-RPC service should be started (default: ${DEFAULT-VALUE})"
   )
-  private final Boolean isJsonRpcEnabled = false;
+  private final Boolean isHttpRpcEnabled = false;
 
   @Option(
-    names = {"--rpc-http-listen"},
-    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
-    description = "Host and port for JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+    names = {"--rpc-http-host"},
+    paramLabel = MANDATORY_HOST_FORMAT_HELP,
+    description = "Host for HTTP JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final HostAndPort rpcHostAndPort =
-      getDefaultHostAndPort(JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT);
+  private final HostSpecifier rpcHttpHost =
+      HostSpecifier.fromValid(autoDiscoverDefaultIP().getHostAddress());
+
+  @Option(
+    names = {"--rpc-http-port"},
+    paramLabel = MANDATORY_PORT_FORMAT_HELP,
+    description = "Port for HTTP JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final Integer rpcHttpPort = DEFAULT_JSON_RPC_PORT;
 
   // A list of origins URLs that are accepted by the JsonRpcHttpServer (CORS)
   @Option(
     names = {"--rpc-http-cors-origins"},
     description = "Comma separated origin domain URLs for CORS validation (default: none)"
   )
-  private final CorsAllowedOriginsProperty rpcCorsAllowedOrigins = new CorsAllowedOriginsProperty();
+  private final CorsAllowedOriginsProperty rpcHttpCorsAllowedOrigins =
+      new CorsAllowedOriginsProperty();
 
   @Option(
     names = {"--rpc-http-api", "--rpc-http-apis"},
@@ -320,23 +326,31 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}",
     defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
-  private final Collection<RpcApi> rpcApis = null;
+  private final Collection<RpcApi> rpcHttpApis = null;
 
   @Option(
     names = {"--rpc-ws-enabled"},
     description =
         "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})"
   )
-  private final Boolean isWsRpcEnabled = false;
+  private final Boolean isRpcWsEnabled = false;
 
   @Option(
-    names = {"--rpc-ws-listen"},
-    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
-    description = "Host and port for WS-RPC (WebSocket) to listen on (default: ${DEFAULT-VALUE})",
+    names = {"--rpc-ws-host"},
+    paramLabel = MANDATORY_HOST_FORMAT_HELP,
+    description = "Host for WebSocket JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final HostAndPort wsHostAndPort =
-      getDefaultHostAndPort(WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT);
+  private final HostSpecifier rpcWsHost =
+      HostSpecifier.fromValid(autoDiscoverDefaultIP().getHostAddress());
+
+  @Option(
+    names = {"--rpc-ws-port"},
+    paramLabel = MANDATORY_PORT_FORMAT_HELP,
+    description = "Port for WebSocket JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final Integer rpcWsPort = DEFAULT_WEBSOCKET_PORT;
 
   @Option(
     names = {"--rpc-ws-api", "--rpc-ws-apis"},
@@ -347,9 +361,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}",
     defaultValue = "ETH,NET,WEB3,CLIQUE,IBFT"
   )
-  private final Collection<RpcApi> wsApis = null;
+  private final Collection<RpcApi> rpcWsApis = null;
 
-  private Long refreshDelay;
+  private Long rpcWsRefreshDelay;
 
   @Option(
     names = {"--rpc-ws-refresh-delay"},
@@ -366,11 +380,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       throw new ParameterException(
           new CommandLine(this),
           String.format(
-              "refreshDelay must be a positive integer between %s and %s",
+              "Refresh delay must be a positive integer between %s and %s",
               String.valueOf(DefaultCommandValues.DEFAULT_MIN_REFRESH_DELAY),
               String.valueOf(DefaultCommandValues.DEFAULT_MAX_REFRESH_DELAY)));
     }
-    this.refreshDelay = refreshDelay;
+    this.rpcWsRefreshDelay = refreshDelay;
     return refreshDelay;
   }
 
@@ -506,6 +520,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(Address.class, Address::fromHexString);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(HostAndPort.class, HostAndPort::fromString);
+    commandLine.registerConverter(HostSpecifier.class, HostSpecifier::from);
     commandLine.registerConverter(Level.class, Level::valueOf);
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
@@ -610,22 +625,22 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
-    jsonRpcConfiguration.setEnabled(isJsonRpcEnabled);
-    jsonRpcConfiguration.setHost(rpcHostAndPort.getHost());
-    jsonRpcConfiguration.setPort(rpcHostAndPort.getPort());
-    jsonRpcConfiguration.setCorsAllowedDomains(rpcCorsAllowedOrigins);
-    jsonRpcConfiguration.setRpcApis(rpcApis);
+    jsonRpcConfiguration.setEnabled(isHttpRpcEnabled);
+    jsonRpcConfiguration.setHost(rpcHttpHost.toString());
+    jsonRpcConfiguration.setPort(rpcHttpPort);
+    jsonRpcConfiguration.setCorsAllowedDomains(rpcHttpCorsAllowedOrigins);
+    jsonRpcConfiguration.setRpcApis(rpcHttpApis);
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     return jsonRpcConfiguration;
   }
 
   private WebSocketConfiguration webSocketConfiguration() {
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
-    webSocketConfiguration.setEnabled(isWsRpcEnabled);
-    webSocketConfiguration.setHost(wsHostAndPort.getHost());
-    webSocketConfiguration.setPort(wsHostAndPort.getPort());
-    webSocketConfiguration.setRpcApis(wsApis);
-    webSocketConfiguration.setRefreshDelay(refreshDelay);
+    webSocketConfiguration.setEnabled(isRpcWsEnabled);
+    webSocketConfiguration.setHost(rpcWsHost.toString());
+    webSocketConfiguration.setPort(rpcWsPort);
+    webSocketConfiguration.setRpcApis(rpcWsApis);
+    webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     return webSocketConfiguration;
   }
 

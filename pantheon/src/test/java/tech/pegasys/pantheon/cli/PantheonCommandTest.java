@@ -573,7 +573,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--rpc-ws-refresh-delay", "-2000");
 
     assertThat(commandOutput.toString()).isEmpty();
-    final String expectedErrorMsg = "refreshDelay must be a positive integer between";
+    final String expectedErrorMsg = "Refresh delay must be a positive integer between";
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorMsg);
   }
 
@@ -862,11 +862,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostAndPortOptionMustBeUsed() {
+  public void jsonRpcHostAndPortOptionsMustBeUsed() {
 
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--rpc-http-listen", String.format("%1$s:%2$s", host, port));
+    parseCommand("--rpc-http-host", host, "--rpc-http-port", String.valueOf(port));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1234,7 +1234,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void wsRpcHostAndPortOptionMustBeUsed() {
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--rpc-ws-listen", String.format("%1$s:%2$s", host, port));
+    parseCommand("--rpc-ws-host", host, "--rpc-ws-port", String.valueOf(port));
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();

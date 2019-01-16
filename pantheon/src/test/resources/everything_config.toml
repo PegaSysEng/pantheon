@@ -39,7 +39,8 @@ dev-mode=false
 
 # JSON-RPC
 rpc-http-enabled=false
-rpc-http-listen="5.6.7.8:5678"
+rpc-http-host="5.6.7.8"
+rpc-http-port=5678
 rpc-http-api=["DEBUG","ETH"]
 rpc-http-apis=["DEBUG","ETH"]
 rpc-http-cors-origins=["none"]
@@ -47,7 +48,8 @@ rpc-http-cors-origins=["none"]
 # WebSockets API
 rpc-ws-enabled=false
 rpc-ws-api=["DEBUG","ETH"]
-rpc-ws-listen="9.10.11.12:9101"
+rpc-ws-host="9.10.11.12"
+rpc-ws-port=9101
 rpc-ws-refresh-delay=500
 
 # Prometheus Metrics Endpoint

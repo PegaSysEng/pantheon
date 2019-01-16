@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.cli;
 
 import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
@@ -40,6 +41,13 @@ interface DefaultCommandValues {
   long DEFAULT_MIN_REFRESH_DELAY = 1;
   String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
   String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
+  String MANDATORY_HOST_FORMAT_HELP = "<HOST>";
+  String MANDATORY_PORT_FORMAT_HELP = "<PORT>";
+  String MANDATORY_HOST_AND_PORT_FORMAT_HELP = "<HOST:PORT>";
+  // Default should be FAST for the next release
+  // but we use FULL for the moment as Fast is still in progress
+  SyncMode DEFAULT_SYNC_MODE = SyncMode.FULL;
+  int DEFAULT_MAX_PEERS = 25;
 
   static Path getDefaultPantheonDataPath(final Object command) {
     // this property is retrieved from Gradle tasks or Pantheon running shell script.
