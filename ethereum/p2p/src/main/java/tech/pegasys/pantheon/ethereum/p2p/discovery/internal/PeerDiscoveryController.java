@@ -223,6 +223,7 @@ public class PeerDiscoveryController {
 
         break;
       case PONG:
+        notifyPeerBonded(peer, System.currentTimeMillis());
         {
           matchInteraction(packet)
               .ifPresent(
@@ -288,10 +289,10 @@ public class PeerDiscoveryController {
     }
     peer.setLastSeen(now);
 
-    if (peer.getStatus() != PeerDiscoveryStatus.BONDED) {
-      peer.setStatus(PeerDiscoveryStatus.BONDED);
-      notifyPeerBonded(peer, now);
-    }
+    //    if (peer.getStatus() != PeerDiscoveryStatus.BONDED) {
+    //      peer.setStatus(PeerDiscoveryStatus.BONDED);
+    //      notifyPeerBonded(peer, now);
+    //    }
 
     if (result.getOutcome() == Outcome.ALREADY_EXISTED) {
       // Bump peer.
@@ -429,6 +430,7 @@ public class PeerDiscoveryController {
       final PingPacketData packetData, final BytesValue pingHash, final DiscoveryPeer sender) {
     final PongPacketData data = PongPacketData.create(packetData.getFrom(), pingHash);
     sendPacket(sender, PacketType.PONG, data);
+    notifyPeerBonded(sender, System.currentTimeMillis());
   }
 
   private void respondToFindNeighbors(
