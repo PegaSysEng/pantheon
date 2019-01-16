@@ -22,18 +22,18 @@ import java.util.Optional;
 
 public interface BlockValidator<C> {
 
-  class BlockValidationOutputs {
+  class BlockProcessingOutputs {
     public final MutableWorldState worldState;
     public final List<TransactionReceipt> receipts;
 
-    public BlockValidationOutputs(
+    public BlockProcessingOutputs(
         final MutableWorldState worldState, final List<TransactionReceipt> receipts) {
       this.worldState = worldState;
       this.receipts = receipts;
     }
   }
 
-  Optional<BlockValidationOutputs> validateAndProcessBlock(
+  Optional<BlockProcessingOutputs> validateAndProcessBlock(
       final ProtocolContext<C> context,
       final Block block,
       final HeaderValidationMode headerValidationMode,

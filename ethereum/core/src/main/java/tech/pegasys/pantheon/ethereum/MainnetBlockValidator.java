@@ -49,7 +49,7 @@ public class MainnetBlockValidator<C> implements BlockValidator<C> {
   }
 
   @Override
-  public Optional<BlockValidationOutputs> validateAndProcessBlock(
+  public Optional<BlockProcessingOutputs> validateAndProcessBlock(
       final ProtocolContext<C> context,
       final Block block,
       final HeaderValidationMode headerValidationMode,
@@ -86,7 +86,7 @@ public class MainnetBlockValidator<C> implements BlockValidator<C> {
       return Optional.empty();
     }
 
-    return Optional.of(new BlockValidationOutputs(worldState, receipts));
+    return Optional.of(new BlockProcessingOutputs(worldState, receipts));
   }
 
   @Override

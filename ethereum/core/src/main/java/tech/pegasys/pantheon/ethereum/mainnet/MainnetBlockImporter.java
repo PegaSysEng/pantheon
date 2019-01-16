@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.ethereum.BlockValidator;
-import tech.pegasys.pantheon.ethereum.BlockValidator.BlockValidationOutputs;
+import tech.pegasys.pantheon.ethereum.BlockValidator.BlockProcessingOutputs;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -44,22 +44,22 @@ public class MainnetBlockImporter<C> implements BlockImporter<C> {
       final HeaderValidationMode headerValidationMode,
       final HeaderValidationMode ommerValidationMode) {
 
-    final Optional<BlockValidationOutputs> outputs =
+    final Optional<BlockProcessingOutputs> outputs =
         blockValidator.validateAndProcessBlock(
             context, block, headerValidationMode, ommerValidationMode);
 
-    outputs.ifPresent(o -> persistState(o, block, context));
+    outputs.ifPresent(processingOutputs -> persistState(processingOutputs, block, context));
 
     return outputs.isPresent();
   }
 
   private void persistState(
-      final BlockValidationOutputs importOutputs,
+      final BlockProcessingOutputs processingOutputs,
       final Block block,
       final ProtocolContext<C> context) {
-    importOutputs.worldState.persist();
+    processingOutputs.worldState.persist();
     final MutableBlockchain blockchain = context.getBlockchain();
-    blockchain.appendBlock(block, importOutputs.receipts);
+    blockchain.appendBlock(block, processingOutputs.receipts);
   }
 
   @Override
