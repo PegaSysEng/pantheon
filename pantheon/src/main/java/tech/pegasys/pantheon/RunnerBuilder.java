@@ -73,6 +73,7 @@ public class RunnerBuilder {
 
   private Vertx vertx;
   private PantheonController<?> pantheonController;
+  private boolean p2pDisabled;
   private boolean discovery;
   private Collection<?> bootstrapPeers;
   private String discoveryHost;
@@ -93,6 +94,11 @@ public class RunnerBuilder {
 
   public RunnerBuilder pantheonController(final PantheonController<?> pantheonController) {
     this.pantheonController = pantheonController;
+    return this;
+  }
+
+  public RunnerBuilder p2pDisabled(final boolean p2pDisabled) {
+    this.p2pDisabled = p2pDisabled;
     return this;
   }
 

@@ -156,6 +156,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final File nodePrivateKeyFile = null;
 
+  // Completely disables p2p within Pantheon.
+  @Option(
+    names = {"--no-p2p"},
+    description = "Disables all p2p functionality (default: {DEFAULT-VALUE})"
+  )
+  private boolean p2pDisabled = false;
+
   // Boolean option to indicate if peers should NOT be discovered, default to false indicates that
   // the peers should be discovered by default.
   //
@@ -497,6 +504,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
+    if (p2pDisabled && !bootstrapNodes.isEmpty()) {
+      throw new ParameterException(
+          new CommandLine(this), "Unable to specify bootnodes if p2p is disabled.");
+    }
+
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
       throw new ParameterException(
@@ -516,6 +528,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     synchronize(
         buildController(),
+        p2pDisabled,
         noPeerDiscovery,
         ethNetworkConfig.getBootNodes(),
         maxPeers,
@@ -627,6 +640,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Blockchain synchronisation from peers.
   private void synchronize(
       final PantheonController<?> controller,
+      final boolean p2pDisabled,
       final boolean noPeerDiscovery,
       final Collection<?> bootstrapNodes,
       final int maxPeers,
@@ -642,6 +656,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         runnerBuilder
             .vertx(Vertx.vertx())
             .pantheonController(controller)
+            .p2pDisabled(p2pDisabled)
             // BEWARE: Peer discovery boolean must be inverted as it's negated in the options !
             .discovery(!noPeerDiscovery)
             .bootstrapPeers(bootstrapNodes)
