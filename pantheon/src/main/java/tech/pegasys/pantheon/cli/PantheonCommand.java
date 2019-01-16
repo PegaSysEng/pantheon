@@ -199,7 +199,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer maxTrailingPeers = Integer.MAX_VALUE;
 
   @Option(
-    names = {"--banned-node-ids"},
+    names = {"--banned-node-ids", "--banned-node-id"},
+      paramLabel = MANDATORY_NODE_ID_FORMAT_HELP,
     description = "A list of node IDs to ban from the p2p network.",
     split = ",",
     arity = "1..*"

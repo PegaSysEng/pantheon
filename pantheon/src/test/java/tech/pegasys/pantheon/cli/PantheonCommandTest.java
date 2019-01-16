@@ -537,7 +537,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--banned-node-ids");
     assertThat(commandOutput.toString()).isEmpty();
     final String expectedErrorOutputStart =
-        "Missing required parameter for option '--banned-node-ids' at index 0 (<bannedNodeIds>)";
+        "Missing required parameter for option '--banned-node-ids' at index 0 (<NODEID>)";
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
   }
 
