@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.cli;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -423,6 +424,18 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void configOptionDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final Path path = Paths.get(".");
+    parseCommand("--config", path.toString());
+    assertThat(commandErrorOutput.toString()).startsWith("Unknown options: --config, .");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void nodekeyOptionMustBeUsed() throws Exception {
     final File file = new File("./specific/key");
 
@@ -459,6 +472,31 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void dataDirDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final Path path = Paths.get(".");
+
+    parseCommand("--datadir", path.toString());
+    assertThat(commandErrorOutput.toString()).startsWith("Unknown options: --datadir, .");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void dataDirDefaultedUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    parseCommand();
+
+    verify(mockControllerBuilder).homePath(pathArgumentCaptor.capture());
+    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(Paths.get("/var/lib/pantheon"));
+  }
+
+  @Test
   public void genesisPathOptionMustBeUsed() throws Exception {
     assumeTrue(isFullInstantiation());
 
@@ -478,6 +516,19 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void genesisPathDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final Path path = Paths.get(".");
+
+    parseCommand("--genesis", path.toString());
+    assertThat(commandErrorOutput.toString()).startsWith("Unknown options: --genesis, .");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void discoveryOptionMustBeUsed() {
     parseCommand("--no-discovery");
     // Discovery stored in runner is the negative of the option passed to CLI
@@ -489,6 +540,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
+  @Ignore("NC-2015 - Temporarily enabling zero-arg --bootnodes to permit 'bootnode' configuration")
   @Test
   public void callingWithBootnodesOptionButNoValueMustDisplayErrorAndUsage() {
     parseCommand("--bootnodes");
@@ -499,11 +551,34 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void callingWithBootnodesOptionButNoValueMustPassEmptyBootnodeList() {
+    parseCommand("--bootnodes");
+
+    verify(mockRunnerBuilder).bootstrapPeers(uriListArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(uriListArgumentCaptor.getValue()).isEmpty();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Ignore(
+      "NC-2015 - Temporarily enabling zero-arg --bootnodes to permit 'bootnode' configuration, which changes the error.")
+  @Test
   public void callingWithInvalidBootnodesMustDisplayErrorAndUsage() {
     parseCommand("--bootnodes", "invalid_enode_url");
     assertThat(commandOutput.toString()).isEmpty();
     final String expectedErrorOutputStart =
         "Invalid value for option '--bootnodes' at index 0 (<enode://id@host:port>)";
+    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
+  }
+
+  @Test
+  public void callingWithInvalidBootnodesAndZeroArityMustDisplayAlternateErrorAndUsage() {
+    parseCommand("--bootnodes", "invalid_enode_url");
+    assertThat(commandOutput.toString()).isEmpty();
+    final String expectedErrorOutputStart = "Unmatched argument: invalid_enode_url";
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
   }
 

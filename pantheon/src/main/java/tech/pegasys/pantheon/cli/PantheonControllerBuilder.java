@@ -88,13 +88,13 @@ public class PantheonControllerBuilder {
     final KeyPair nodeKeys = loadKeyPair(nodePrivateKeyFile);
 
     final StorageProvider storageProvider =
-        RocksDbStorageProvider.create(homePath.resolve(DATABASE_PATH));
+        RocksDbStorageProvider.create(homePath.resolve(DATABASE_PATH), metricsSystem);
     if (devMode) {
       final GenesisConfigFile genesisConfig = GenesisConfigFile.development();
       return MainnetPantheonController.init(
           storageProvider,
           genesisConfig,
-          DevelopmentProtocolSchedule.create(genesisConfig.getConfigOptions()),
+          DevelopmentProtocolSchedule.create(genesisConfig.getConfigOptions(), metricsSystem),
           synchronizerConfiguration,
           miningParameters,
           nodeKeys,

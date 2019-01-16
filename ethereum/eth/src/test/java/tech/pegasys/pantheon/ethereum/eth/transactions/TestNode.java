@@ -91,7 +91,8 @@ public class TestNode implements Closeable {
 
     final GenesisConfigFile genesisConfigFile = GenesisConfigFile.development();
     final ProtocolSchedule<Void> protocolSchedule =
-        DevelopmentProtocolSchedule.create(genesisConfigFile.getConfigOptions());
+        DevelopmentProtocolSchedule.create(
+            genesisConfigFile.getConfigOptions(), new NoOpMetricsSystem());
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfigFile, protocolSchedule);
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
@@ -122,7 +123,7 @@ public class TestNode implements Closeable {
             .metricsSystem(new NoOpMetricsSystem())
             .build();
     network = networkRunner.getNetwork();
-    this.port = network.getSelf().getPort();
+    this.port = network.getLocalPeerInfo().getPort();
     network.subscribeDisconnect(
         (connection, reason, initiatedByPeer) -> disconnections.put(connection, reason));
 

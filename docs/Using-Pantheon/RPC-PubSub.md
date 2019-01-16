@@ -58,7 +58,7 @@ Use `eth_subscribe` to create subscriptions for the following event types:
 * [New headers](#new-headers)
 * [Logs](#logs)
 * [Pending transactions](#pending-transactions)
-* [Sychronizng](#synchronizing) 
+* [Synchronizng](#synchronizing) 
 
 ### New Headers
 
@@ -147,7 +147,7 @@ are included in the notifications. Otherwise, the transaction hashes are include
         }
         ```
 
-#### Logs
+### Logs
 
 Use the `logs` parameter with `eth_subscribe` to be notified of [logs](Events-and-Logs.md) included in new blocks. You can 
 specify a filter object to receive notifications only for logs matching your filter.   
@@ -199,7 +199,7 @@ The logs subscription returns [log objects](../Reference/JSON-RPC-API-Objects.md
     }
     ```
 
-#### Pending Transactions
+### Pending Transactions
 
 Use the `newPendingTransactions` parameter with `eth_subscribe` to be notified of pending transactions 
 added to the transaction pool for the node. 
@@ -234,11 +234,14 @@ This means the subscription can publish notifications for the same pending trans
     }
     ```
 
-#### Synchronizing
+### Synchronizing
 
 Use the `syncing` parameter with `eth_subscribe` to be notified about synchronization progress.
 
-The sychronizing subscription returns an object indicating the synchronization progress.
+The synchronizing subscription returns an object indicating the synchronization progress. 
+
+Use the [`--ws-refresh-delay` option](../Reference/Pantheon-CLI-Syntax.md#ws-refresh-delay) to configure how 
+often the synchronizing subscription returns an object. The default is 5000 milliseconds. 
 
 !!!example
     To subscribe to synchronizing notifications:
