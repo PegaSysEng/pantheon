@@ -74,6 +74,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final PermissioningConfiguration permissioningConfiguration;
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
+  private final boolean noDiscovery;
 
   private List<String> bootnodes = new ArrayList<>();
   private PantheonWeb3j pantheonWeb3j;
@@ -88,7 +89,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final PermissioningConfiguration permissioningConfiguration,
       final boolean devMode,
       final GenesisConfigProvider genesisConfigProvider,
-      final int p2pPort)
+      final int p2pPort,
+      final boolean noDiscovery)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
@@ -101,6 +103,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.permissioningConfiguration = permissioningConfiguration;
     this.genesisConfigProvider = genesisConfigProvider;
     this.devMode = devMode;
+    this.noDiscovery = noDiscovery;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -324,6 +327,10 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   public boolean isDevMode() {
     return devMode;
+  }
+
+  public boolean isNoDiscovery() {
+    return noDiscovery;
   }
 
   PermissioningConfiguration getPermissioningConfiguration() {

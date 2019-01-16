@@ -58,6 +58,10 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add("--dev-mode");
     }
 
+    if (node.isNoDiscovery()) {
+      params.add("--no-discovery");
+    }
+
     params.add("--p2p-listen");
     params.add(node.p2pListenAddress());
 

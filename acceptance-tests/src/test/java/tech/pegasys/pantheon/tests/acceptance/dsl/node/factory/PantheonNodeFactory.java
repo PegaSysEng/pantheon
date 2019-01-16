@@ -57,7 +57,8 @@ public class PantheonNodeFactory {
             config.getPermissioningConfiguration(),
             config.isDevMode(),
             config.getGenesisConfigProvider(),
-            serverSocket.getLocalPort());
+            serverSocket.getLocalPort(),
+            config.isNoDiscovery());
     serverSocket.close();
 
     return node;
@@ -177,6 +178,10 @@ public class PantheonNodeFactory {
             .setJsonRpcConfiguration(rpcConfig)
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
+  }
+
+  public PantheonNode createNodeWithNoDiscovery(final String name) throws IOException {
+    return create(new PantheonFactoryConfigurationBuilder().setName(name).setNoDiscovery().build());
   }
 
   public PantheonNode createCliqueNode(final String name) throws IOException {

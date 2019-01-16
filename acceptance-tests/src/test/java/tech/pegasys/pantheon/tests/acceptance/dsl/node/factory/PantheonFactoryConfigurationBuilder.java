@@ -35,6 +35,7 @@ public class PantheonFactoryConfigurationBuilder {
   private PermissioningConfiguration permissioningConfiguration =
       PermissioningConfiguration.createDefault();
   private boolean devMode = true;
+  private boolean noDiscovery = false;
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
@@ -107,6 +108,11 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder setNoDiscovery() {
+    this.noDiscovery = true;
+    return this;
+  }
+
   public PantheonFactoryConfiguration build() {
     return new PantheonFactoryConfiguration(
         name,
@@ -116,6 +122,7 @@ public class PantheonFactoryConfigurationBuilder {
         metricsConfiguration,
         permissioningConfiguration,
         devMode,
-        genesisConfigProvider);
+        genesisConfigProvider,
+        noDiscovery);
   }
 }
