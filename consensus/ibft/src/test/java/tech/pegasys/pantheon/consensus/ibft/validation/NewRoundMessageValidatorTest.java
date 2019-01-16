@@ -227,6 +227,20 @@ public class NewRoundMessageValidatorTest {
     final SignedData<ProposalPayload> proposal =
         proposerMessageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock);
 
+    final ConsensusRoundIdentifier preparedRound =
+        new ConsensusRoundIdentifier(
+            roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 1);
+    final SignedData<ProposalPayload> differentProposal =
+        proposerMessageFactory.createSignedProposalPayload(preparedRound, proposedBlock);
+
+    final Optional<PreparedCertificate> preparedCert =
+        Optional.of(
+            new PreparedCertificate(
+                differentProposal,
+                Lists.newArrayList(
+                    validatorMessageFactory.createSignedPreparePayload(
+                        roundIdentifier, proposedBlock.getHash()))));
+
     // An earlier PrepareCert is added to ensure the path to find the latest PrepareCert
     // is correctly followed.
     final ConsensusRoundIdentifier earlierPreparedRound =
