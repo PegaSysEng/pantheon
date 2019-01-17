@@ -91,8 +91,7 @@ public class TestNode implements Closeable {
 
     final GenesisConfigFile genesisConfigFile = GenesisConfigFile.development();
     final ProtocolSchedule<Void> protocolSchedule =
-        DevelopmentProtocolSchedule.create(
-            genesisConfigFile.getConfigOptions(), new NoOpMetricsSystem());
+        DevelopmentProtocolSchedule.create(genesisConfigFile.getConfigOptions());
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfigFile, protocolSchedule);
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
@@ -103,7 +102,7 @@ public class TestNode implements Closeable {
     final ProtocolContext<Void> protocolContext =
         new ProtocolContext<>(blockchain, worldStateArchive, null);
     final EthProtocolManager ethProtocolManager =
-        new EthProtocolManager(blockchain, 1, false, 1, 1);
+        new EthProtocolManager(blockchain, worldStateArchive, 1, false, 1, 1);
 
     final NetworkRunner networkRunner =
         NetworkRunner.builder()

@@ -109,7 +109,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
       final KeyPair nodeKeys,
       final MetricsSystem metricsSystem) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
-        IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), metricsSystem);
+        IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final BlockchainStorage blockchainStorage =
         storageProvider.createBlockchainStorage(protocolSchedule);
@@ -143,6 +143,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
       ethProtocolManager =
           new Istanbul64ProtocolManager(
               protocolContext.getBlockchain(),
+              protocolContext.getWorldStateArchive(),
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
@@ -152,6 +153,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
       ethProtocolManager =
           new EthProtocolManager(
               protocolContext.getBlockchain(),
+              protocolContext.getWorldStateArchive(),
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
