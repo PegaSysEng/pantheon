@@ -15,11 +15,11 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -36,24 +36,24 @@ public class RoundState {
 
   private final ConsensusRoundIdentifier roundIdentifier;
   private final MessageValidator validator;
-  private final long quorumSize;
+  private final long quorum;
 
   private Optional<SignedData<ProposalPayload>> proposalMessage = Optional.empty();
 
   // Must track the actual Prepare message, not just the sender, as these may need to be reused
   // to send out in a PrepareCertificate.
-  private final Set<SignedData<PreparePayload>> preparePayloads = Sets.newHashSet();
-  private final Set<SignedData<CommitPayload>> commitPayloads = Sets.newHashSet();
+  private final Set<SignedData<PreparePayload>> preparePayloads = Sets.newLinkedHashSet();
+  private final Set<SignedData<CommitPayload>> commitPayloads = Sets.newLinkedHashSet();
 
   private boolean prepared = false;
   private boolean committed = false;
 
   public RoundState(
       final ConsensusRoundIdentifier roundIdentifier,
-      final int quorumSize,
+      final int quorum,
       final MessageValidator validator) {
     this.roundIdentifier = roundIdentifier;
-    this.quorumSize = quorumSize;
+    this.quorum = quorum;
     this.validator = validator;
   }
 
@@ -92,12 +92,12 @@ public class RoundState {
   }
 
   private void updateState() {
-    // NOTE: The quorumSize for Prepare messages is 1 less than the quorum size as the proposer
+    // NOTE: The quorum for Prepare messages is 1 less than the quorum size as the proposer
     // does not supply a prepare message
     prepared =
-        (preparePayloads.size() >= prepareMessageCountForQuorum(quorumSize))
+        (preparePayloads.size() >= prepareMessageCountForQuorum(quorum))
             && proposalMessage.isPresent();
-    committed = (commitPayloads.size() >= quorumSize) && proposalMessage.isPresent();
+    committed = (commitPayloads.size() >= quorum) && proposalMessage.isPresent();
   }
 
   public Optional<Block> getProposedBlock() {

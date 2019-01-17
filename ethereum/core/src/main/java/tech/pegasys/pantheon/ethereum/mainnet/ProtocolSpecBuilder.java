@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Wei;
@@ -42,6 +43,7 @@ public class ProtocolSpecBuilder<T> {
       messageCallProcessorBuilder;
   private TransactionProcessorBuilder transactionProcessorBuilder;
   private BlockProcessorBuilder blockProcessorBuilder;
+  private BlockValidatorBuilder<T> blockValidatorBuilder;
   private BlockImporterBuilder<T> blockImporterBuilder;
   private TransactionReceiptType transactionReceiptType;
   private String name;
@@ -143,6 +145,12 @@ public class ProtocolSpecBuilder<T> {
     return this;
   }
 
+  public ProtocolSpecBuilder<T> blockValidatorBuilder(
+      final BlockValidatorBuilder<T> blockValidatorBuilder) {
+    this.blockValidatorBuilder = blockValidatorBuilder;
+    return this;
+  }
+
   public ProtocolSpecBuilder<T> transactionReceiptType(
       final TransactionReceiptType transactionReceiptType) {
     this.transactionReceiptType = transactionReceiptType;
@@ -164,6 +172,7 @@ public class ProtocolSpecBuilder<T> {
       final Function<DifficultyCalculator<R>, BlockHeaderValidator<R>> blockHeaderValidatorBuilder,
       final Function<DifficultyCalculator<R>, BlockHeaderValidator<R>> ommerHeaderValidatorBuilder,
       final Function<ProtocolSchedule<R>, BlockBodyValidator<R>> blockBodyValidatorBuilder,
+      final BlockValidatorBuilder<R> blockValidatorBuilder,
       final BlockImporterBuilder<R> blockImporterBuilder,
       final DifficultyCalculator<R> difficultyCalculator) {
     return new ProtocolSpecBuilder<R>()
@@ -178,6 +187,7 @@ public class ProtocolSpecBuilder<T> {
         .ommerHeaderValidatorBuilder(ommerHeaderValidatorBuilder)
         .blockBodyValidatorBuilder(blockBodyValidatorBuilder)
         .blockProcessorBuilder(blockProcessorBuilder)
+        .blockValidatorBuilder(blockValidatorBuilder)
         .blockImporterBuilder(blockImporterBuilder)
         .blockHashFunction(blockHashFunction)
         .blockReward(blockReward)
@@ -200,6 +210,7 @@ public class ProtocolSpecBuilder<T> {
     checkNotNull(blockBodyValidatorBuilder, "Missing block body validator");
     checkNotNull(blockProcessorBuilder, "Missing block processor");
     checkNotNull(blockImporterBuilder, "Missing block importer");
+    checkNotNull(blockValidatorBuilder, "Missing block validator");
     checkNotNull(blockHashFunction, "Missing block hash function");
     checkNotNull(blockReward, "Missing block reward");
     checkNotNull(difficultyCalculator, "Missing difficulty calculator");
@@ -234,8 +245,9 @@ public class ProtocolSpecBuilder<T> {
             transactionReceiptFactory,
             blockReward,
             miningBeneficiaryCalculator);
-    final BlockImporter<T> blockImporter =
-        blockImporterBuilder.apply(blockHeaderValidator, blockBodyValidator, blockProcessor);
+    final BlockValidator<T> blockValidator =
+        blockValidatorBuilder.apply(blockHeaderValidator, blockBodyValidator, blockProcessor);
+    final BlockImporter<T> blockImporter = blockImporterBuilder.apply(blockValidator);
     return new ProtocolSpec<>(
         name,
         evm,
@@ -246,6 +258,7 @@ public class ProtocolSpecBuilder<T> {
         blockBodyValidator,
         blockProcessor,
         blockImporter,
+        blockValidator,
         blockHashFunction,
         transactionReceiptFactory,
         difficultyCalculator,
@@ -270,10 +283,14 @@ public class ProtocolSpecBuilder<T> {
         MiningBeneficiaryCalculator miningBeneficiaryCalculator);
   }
 
-  public interface BlockImporterBuilder<T> {
-    BlockImporter<T> apply(
+  public interface BlockValidatorBuilder<T> {
+    BlockValidator<T> apply(
         BlockHeaderValidator<T> blockHeaderValidator,
         BlockBodyValidator<T> blockBodyValidator,
         BlockProcessor blockProcessor);
+  }
+
+  public interface BlockImporterBuilder<T> {
+    BlockImporter<T> apply(BlockValidator<T> blockValidator);
   }
 }
