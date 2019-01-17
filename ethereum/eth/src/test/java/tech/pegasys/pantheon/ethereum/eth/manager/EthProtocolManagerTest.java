@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol.EthVersion;
 import tech.pegasys.pantheon.ethereum.eth.manager.MockPeerConnection.PeerSendHandler;
@@ -41,8 +42,10 @@ import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockBodiesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockHeadersMessage;
+import tech.pegasys.pantheon.ethereum.eth.messages.GetNodeDataMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
+import tech.pegasys.pantheon.ethereum.eth.messages.NodeDataMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.ReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
@@ -54,6 +57,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 import tech.pegasys.pantheon.ethereum.p2p.wire.RawMessage;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayList;
@@ -660,6 +664,51 @@ public final class EthProtocolManagerTest {
                 Lists.newArrayList(receiptsMessage.receipts());
             assertThat(receipts.size()).isEqualTo(1);
             assertThat(expectedReceipts).isEqualTo(receipts.get(0));
+            done.complete(null);
+          };
+
+      // Run test
+      final PeerConnection peer = setupPeer(ethManager, onSend);
+      ethManager.processMessage(EthProtocol.ETH63, new DefaultMessage(peer, messageData));
+      done.get();
+    }
+  }
+
+  @Test
+  public void respondToGetNodeData() throws Exception {
+    final CompletableFuture<Void> done = new CompletableFuture<>();
+    final WorldStateArchive worldStateArchive = protocolContext.getWorldStateArchive();
+
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, worldStateArchive, 1, true, 1, 1)) {
+      // Setup node data query
+
+      final List<BytesValue> expectedResults = new ArrayList<>();
+      final List<Hash> requestedHashes = new ArrayList<>();
+
+      final long startBlock = blockchain.getChainHeadBlockNumber() - 5;
+      final int blockCount = 2;
+      for (int i = 0; i < blockCount; i++) {
+        final BlockHeader header = blockchain.getBlockHeader(startBlock + i).get();
+        requestedHashes.add(header.getStateRoot());
+        expectedResults.add(worldStateArchive.getNodeData(header.getStateRoot()).get());
+      }
+      final MessageData messageData = GetNodeDataMessage.create(requestedHashes);
+
+      // Define handler to validate response
+      final PeerSendHandler onSend =
+          (cap, message, conn) -> {
+            if (message.getCode() == EthPV62.STATUS) {
+              // Ignore status message
+              return;
+            }
+            assertThat(message.getCode()).isEqualTo(EthPV63.NODE_DATA);
+            final NodeDataMessage receiptsMessage = NodeDataMessage.readFrom(message);
+            final List<BytesValue> nodeData = receiptsMessage.nodeData();
+            assertThat(nodeData.size()).isEqualTo(blockCount);
+            for (int i = 0; i < blockCount; i++) {
+              assertThat(expectedResults.get(i)).isEqualTo(nodeData.get(i));
+            }
             done.complete(null);
           };
 
