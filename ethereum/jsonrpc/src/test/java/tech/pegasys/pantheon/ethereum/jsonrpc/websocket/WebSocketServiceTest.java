@@ -135,6 +135,7 @@ public class WebSocketServiceTest {
     async.awaitSuccess(VERTX_AWAIT_TIMEOUT_MILLIS);
   }
 
+  @SuppressWarnings("deprecation") // No alternative available in vertx 3.
   @Test
   public void websocketServiceMustReturnErrorOnHttpRequest(final TestContext context) {
     final Async async = context.async();
