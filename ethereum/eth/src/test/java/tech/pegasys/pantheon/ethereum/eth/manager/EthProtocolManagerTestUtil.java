@@ -26,7 +26,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 public class EthProtocolManagerTestUtil {
@@ -52,8 +51,7 @@ public class EthProtocolManagerTestUtil {
   }
 
   public static EthProtocolManager create() {
-    final ProtocolSchedule<Void> protocolSchedule =
-        MainnetProtocolSchedule.create(new NoOpMetricsSystem());
+    final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
     final GenesisConfigFile config = GenesisConfigFile.mainnet();
     final GenesisState genesisState = GenesisState.fromConfig(config, protocolSchedule);
     final Blockchain blockchain = createInMemoryBlockchain(genesisState.getBlock());
