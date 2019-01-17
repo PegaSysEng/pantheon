@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +58,15 @@ public class EthServerTest {
   }
 
   @Test
+  public void shouldHandleDataBeingUnavailableWhenRespondingToNodeDataRequests() throws Exception {
+    when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
+    when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.empty());
+    ethMessages.dispatch(new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2))));
+
+    verify(ethPeer).send(NodeDataMessage.create(singletonList(VALUE1)));
+  }
+
+  @Test
   public void shouldLimitNumberOfResponsesToNodeDataRequests() throws Exception {
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.of(VALUE2));
@@ -64,5 +74,17 @@ public class EthServerTest {
         new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2, HASH3))));
 
     verify(ethPeer).send(NodeDataMessage.create(asList(VALUE1, VALUE2)));
+  }
+
+  @Test
+  public void shouldLimitTheNumberOfNodeDataResponsesLookedUpNotTheNumberReturned()
+      throws Exception {
+    when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
+    when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.empty());
+    when(worldStateArchive.getNodeData(HASH3)).thenReturn(Optional.of(VALUE3));
+    ethMessages.dispatch(
+        new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2, HASH3))));
+
+    verify(ethPeer).send(NodeDataMessage.create(singletonList(VALUE1)));
   }
 }
