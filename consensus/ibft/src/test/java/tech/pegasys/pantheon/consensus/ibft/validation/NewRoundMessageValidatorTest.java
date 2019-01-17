@@ -224,12 +224,11 @@ public class NewRoundMessageValidatorTest {
 
   @Test
   public void lastestPreparedCertificateMatchesNewRoundProposalIsSuccessful() {
-    final ConsensusRoundIdentifier preparedRound =
+    final ConsensusRoundIdentifier latterPrepareRound =
         new ConsensusRoundIdentifier(
             roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 1);
-
     final SignedData<ProposalPayload> latterProposal =
-        proposerMessageFactory.createSignedProposalPayload(preparedRound, proposedBlock);
+        proposerMessageFactory.createSignedProposalPayload(latterPrepareRound, proposedBlock);
     final Optional<PreparedCertificate> preparedCert =
         Optional.of(
             new PreparedCertificate(
@@ -255,31 +254,22 @@ public class NewRoundMessageValidatorTest {
                     validatorMessageFactory.createSignedPreparePayload(
                         earlierPreparedRound, earlierBlock.getHash()))));
 
+    final RoundChangeCertificate roundChangeCert = new RoundChangeCertificate(
+        Lists.newArrayList(
+            proposerMessageFactory.createSignedRoundChangePayload(
+                roundIdentifier, earlierPreparedCert),
+            validatorMessageFactory.createSignedRoundChangePayload(
+                roundIdentifier, preparedCert)));
+
     // Ensure a message containing the earlier proposal fails
     final SignedData<NewRoundPayload> newRoundWithEarlierProposal =
         proposerMessageFactory.createSignedNewRoundPayload(
-            roundIdentifier,
-            new RoundChangeCertificate(
-                Lists.newArrayList(
-                    proposerMessageFactory.createSignedRoundChangePayload(
-                        roundIdentifier, earlierPreparedCert),
-                    validatorMessageFactory.createSignedRoundChangePayload(
-                        roundIdentifier, preparedCert))),
-            earlierProposal);
-
+            roundIdentifier, roundChangeCert, earlierProposal);
     assertThat(validator.validateNewRoundMessage(newRoundWithEarlierProposal)).isFalse();
 
     final SignedData<NewRoundPayload> newRoundWithLatterProposal =
         proposerMessageFactory.createSignedNewRoundPayload(
-            roundIdentifier,
-            new RoundChangeCertificate(
-                Lists.newArrayList(
-                    proposerMessageFactory.createSignedRoundChangePayload(
-                        roundIdentifier, earlierPreparedCert),
-                    validatorMessageFactory.createSignedRoundChangePayload(
-                        roundIdentifier, preparedCert))),
-            latterProposal);
-
+            roundIdentifier, roundChangeCert, latterProposal);
     assertThat(validator.validateNewRoundMessage(newRoundWithLatterProposal)).isTrue();
   }
 
