@@ -17,10 +17,9 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.Collection;
 
-public interface IbftMulticaster {
+public interface ValidatorMulticaster {
 
-  void multicastToValidators(final MessageData message);
+  void send(final MessageData message);
 
-  void multicastToValidatorsExcept(
-      final MessageData message, final Collection<Address> exceptAddresses);
+  void send(final MessageData message, final Collection<Address> blackList);
 }
