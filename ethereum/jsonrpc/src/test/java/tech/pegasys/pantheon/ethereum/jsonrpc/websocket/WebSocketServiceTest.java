@@ -65,7 +65,7 @@ public class WebSocketServiceTest {
 
     websocketConfiguration.setPort(websocketService.socketAddress().getPort());
 
-    HttpClientOptions httpClientOptions =
+    final HttpClientOptions httpClientOptions =
         new HttpClientOptions()
             .setDefaultHost(websocketConfiguration.getHost())
             .setDefaultPort(websocketConfiguration.getPort());
