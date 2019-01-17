@@ -83,7 +83,7 @@ import org.apache.logging.log4j.Logger;
  * distance from us is equal to the index of the bucket. The value <i>x</i> in the distance function
  * corresponds to our node ID (public key).
  *
- * <p>Upper layers in the stack subscribe to events from the peer discocvery layer and initiate/drop
+ * <p>Upper layers in the stack subscribe to events from the peer discovery layer and initiate/drop
  * connections accordingly.
  *
  * <h2>RLPx Wire Protocol</h2>
@@ -127,7 +127,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
 
   private final PeerConnectionRegistry connections;
 
-  private final AtomicInteger pendingConnections = new AtomicInteger(0);
+  private final Map<Peer, CompletableFuture<PeerConnection>> pendingConnections = new ConcurrentHashMap<>();
 
   private final EventLoopGroup boss = new NioEventLoopGroup(1);
 
@@ -275,8 +275,8 @@ public final class NettyP2PNetwork implements P2PNetwork {
                 return;
               }
 
-              boolean isPeerBlacklisted = peerBlacklist.contains(connection);
-              boolean isPeerNotWhitelisted = !isPeerWhitelisted(connection, ch);
+              final boolean isPeerBlacklisted = peerBlacklist.contains(connection);
+              final boolean isPeerNotWhitelisted = !isPeerWhitelisted(connection, ch);
 
               if (isPeerBlacklisted || isPeerNotWhitelisted) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
@@ -302,7 +302,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
   }
 
   private int connectionCount() {
-    return pendingConnections.get() + connections.size();
+    return pendingConnections.size() + connections.size();
   }
 
   @Override
@@ -315,7 +315,11 @@ public final class NettyP2PNetwork implements P2PNetwork {
     LOG.trace("Initiating connection to peer: {}", peer.getId());
     final CompletableFuture<PeerConnection> connectionFuture = new CompletableFuture<>();
     final Endpoint endpoint = peer.getEndpoint();
-    pendingConnections.incrementAndGet();
+    final CompletableFuture<PeerConnection> existingPendingConnection = pendingConnections.putIfAbsent(peer, connectionFuture);
+    if (existingPendingConnection != null) {
+      LOG.debug("Attempted to connect to peer with pending connection: {}", peer.getId());
+      return existingPendingConnection;
+    }
 
     new Bootstrap()
         .group(workers)
@@ -358,7 +362,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
 
     connectionFuture.whenComplete(
         (connection, t) -> {
-          pendingConnections.decrementAndGet();
+          pendingConnections.remove(peer);
           if (t == null) {
             onConnectionEstablished(connection);
             LOG.debug("Connection established to peer: {}", peer.getId());
@@ -373,7 +377,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
   private void logConnections() {
     LOG.debug(
         "Connections: {} pending, {} active connections.",
-        pendingConnections.get(),
+        pendingConnections.size(),
         connections.size());
   }
 
@@ -406,6 +410,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
                 }
               });
       peerBondedObserverId = OptionalLong.of(observerId);
+
     } catch (final Exception ex) {
       throw new IllegalStateException(ex);
     }
