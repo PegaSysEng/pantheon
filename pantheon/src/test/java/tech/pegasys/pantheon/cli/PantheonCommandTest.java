@@ -758,7 +758,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--p2p-listen", String.format("%1$s:%2$s", host, port));
+    parseCommand("--p2p-host", host, "--p2p-port", String.valueOf(port));
 
     verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
     verify(mockRunnerBuilder).discoveryPort(intArgumentCaptor.capture());
@@ -1276,7 +1276,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void metricsHostAndPortOptionMustBeUsed() {
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--metrics-listen", String.format("%1$s:%2$s", host, port));
+    parseCommand("--metrics-host", host, "--metrics-port", String.valueOf(port));
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();

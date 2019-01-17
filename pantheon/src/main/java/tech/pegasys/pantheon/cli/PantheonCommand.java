@@ -200,7 +200,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--banned-node-ids", "--banned-node-id"},
-      paramLabel = MANDATORY_NODE_ID_FORMAT_HELP,
+    paramLabel = MANDATORY_NODE_ID_FORMAT_HELP,
     description = "A list of node IDs to ban from the p2p network.",
     split = ",",
     arity = "1..*"
@@ -269,12 +269,21 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean goerli = false;
 
   @Option(
-    names = {"--p2p-listen"},
-    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
-    description = "Host and port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
+    names = {"--p2p-host"},
+    paramLabel = MANDATORY_HOST_FORMAT_HELP,
+    description = "Host for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final HostAndPort p2pHostAndPort = getDefaultHostAndPort(DEFAULT_PORT);
+  private final HostSpecifier p2pHost =
+      HostSpecifier.fromValid(autoDiscoverDefaultIP().getHostAddress());
+
+  @Option(
+    names = {"--p2p-port"},
+    paramLabel = MANDATORY_PORT_FORMAT_HELP,
+    description = "Port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final Integer p2pPort = DEFAULT_PORT;
 
   /** @deprecated Deprecated in favour of --chain option */
   @Deprecated
@@ -396,13 +405,21 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isMetricsEnabled = false;
 
   @Option(
-    names = {"--metrics-listen"},
-    paramLabel = MANDATORY_HOST_AND_PORT_FORMAT_HELP,
-    description = "Host and port for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
+    names = {"--metrics-host"},
+    paramLabel = MANDATORY_HOST_FORMAT_HELP,
+    description = "Host for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final HostAndPort metricsHostAndPort =
-      getDefaultHostAndPort(MetricsConfiguration.DEFAULT_METRICS_PORT);
+  private final HostSpecifier metricsHost =
+      HostSpecifier.fromValid(autoDiscoverDefaultIP().getHostAddress());
+
+  @Option(
+    names = {"--metrics-port"},
+    paramLabel = MANDATORY_PORT_FORMAT_HELP,
+    description = "Port for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final Integer metricsPort = MetricsConfiguration.DEFAULT_METRICS_PORT;
 
   @Option(
     names = {"--host-whitelist"},
@@ -564,7 +581,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         noPeerDiscovery,
         ethNetworkConfig.getBootNodes(),
         maxPeers,
-        p2pHostAndPort,
+        HostAndPort.fromParts(p2pHost.toString(), p2pPort),
         jsonRpcConfiguration(),
         webSocketConfiguration(),
         metricsConfiguration(),
@@ -648,8 +665,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   MetricsConfiguration metricsConfiguration() {
     final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);
-    metricsConfiguration.setHost(metricsHostAndPort.getHost());
-    metricsConfiguration.setPort(metricsHostAndPort.getPort());
+    metricsConfiguration.setHost(metricsHost.toString());
+    metricsConfiguration.setPort(metricsPort);
     metricsConfiguration.setHostsWhitelist(hostsWhitelist);
     return metricsConfiguration;
   }
