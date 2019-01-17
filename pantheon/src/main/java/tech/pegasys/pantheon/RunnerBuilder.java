@@ -215,23 +215,26 @@ public class RunnerBuilder {
     NodeWhitelistController nodeWhitelistController =
         new NodeWhitelistController(permissioningConfiguration);
 
-    final NetworkRunner networkRunner =
-        NetworkRunner.builder()
-            .protocolManagers(protocolManagers)
-            .subProtocols(subProtocols)
-            .network(
-                caps ->
-                    new NettyP2PNetwork(
-                        vertx,
-                        keyPair,
-                        networkConfig,
-                        caps,
-                        PeerRequirement.aggregateOf(protocolManagers),
-                        peerBlacklist,
-                        metricsSystem,
-                        nodeWhitelistController))
-            .metricsSystem(metricsSystem)
-            .build();
+    final Optional<NetworkRunner> networkRunner =
+        p2pDisabled
+            ? Optional.empty()
+            : Optional.of(
+                NetworkRunner.builder()
+                    .protocolManagers(protocolManagers)
+                    .subProtocols(subProtocols)
+                    .network(
+                        caps ->
+                            new NettyP2PNetwork(
+                                vertx,
+                                keyPair,
+                                networkConfig,
+                                caps,
+                                PeerRequirement.aggregateOf(protocolManagers),
+                                peerBlacklist,
+                                metricsSystem,
+                                nodeWhitelistController))
+                    .metricsSystem(metricsSystem)
+                    .build());
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
@@ -418,7 +421,7 @@ public class RunnerBuilder {
     return new MetricsHttpService(vertx, configuration, metricsSystem);
   }
 
-  private Optional<P2PNetwork> hasP2p(final NetworkRunner networkRunner) {
-    return p2pDisabled ? Optional.empty() : Optional.of(networkRunner.getNetwork());
+  private Optional<P2PNetwork> hasP2p(final Optional<NetworkRunner> networkRunner) {
+    return p2pDisabled ? Optional.empty() : Optional.of(networkRunner.get().getNetwork());
   }
 }
