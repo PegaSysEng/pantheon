@@ -163,7 +163,7 @@ This means the subscription can publish notifications for multiple logs for the 
 
 The logs subscription returns [log objects](../Reference/JSON-RPC-API-Objects.md#log-object). 
 
-!!!exemple
+!!!example
     To subscribe to all logs notifications:
     ```json
      {"id": 1, "method": "eth_subscribe", "params": ["logs",{}]}

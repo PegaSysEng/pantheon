@@ -6,11 +6,10 @@ Access logs using JSON-RPC API methods:
 * [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs)
 * [`eth_getLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getlogs)
 
-Before using [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges) and 
-[`eth_getFilterLogs`]((../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs)), create the filter 
-using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter).
+Use [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter) to create the filter before
+using [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges) and [`eth_getFilterLogs`]((../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs)). 
 
-!!! tip
+!!! note
     The following examples are created using the sample contract included in [Events and Logs](Events-and-Logs.md). 
 
 ## Creating a Filter
@@ -20,7 +19,7 @@ Create a filter using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth
 !!! example
     
     If the [example contract](Events-and-Logs.md#example) was deployed to 0x42699a7612a82f1d9c36148af9c77354759b210b, the 
-    following request for `eth_newFilter` creates a filter to log when `valueIndexed` is set to 5. 
+    following request for `eth_newFilter` creates a filter to log when `valueIndexed` is set to 5: 
     
     ```json
     {
@@ -48,7 +47,7 @@ Create a filter using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth
 To poll the filter for changes that have occurred since the last poll, use [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges)
 with the filter ID hash returned by [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter). 
 
-!!! example
+!!! example 
     
     If the contract had been executed twice since the last poll, with `valueIndexed` set to 1 and 5, 
     [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges) returns
