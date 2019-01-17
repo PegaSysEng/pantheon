@@ -127,7 +127,7 @@ To get all logs for a filter, use [`eth_getFilterLogs`](../Reference/JSON-RPC-AP
     to get all logs matching the filter options instead of using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter)
     followed by [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs). 
     
-## Uninstalling Filter
+## Uninstalling a Filter
 
 When you are finished using a filter, use [`eth_uninstallFilter`](../Reference/JSON-RPC-API-Methods.md#eth_uninstallfilter) to remove the filter.     
     

@@ -89,7 +89,7 @@ Non-indexed parameters are included in the logs `data` but cannot be easily sear
 
 The first topic in a log entry is always the the event signature hash. The event signature hash is a keccak-256
 hash of the event name and input argument types. Argument names are ignored. For example, the event `Hello(uint256 worldId)` 
-has the signature hash `keccak('Hello(uint256)'`. The signature identifies to which event log topics belong. 
+has the signature hash `keccak('Hello(uint256)')`. The signature identifies to which event log topics belong. 
 
 !!! example
     
@@ -116,15 +116,15 @@ has the signature hash `keccak('Hello(uint256)'`. The signature identifies to wh
        } 
     ```
 
-The event signature hash for event 1 is `keccak('Event1(uint256))` and the event signature hash for event 
-2 is `keccak('Event2(uint256))`. The hashes are: 
+The event signature hash for event 1 is `keccak('Event1(uint256)')` and the event signature hash for event 
+2 is `keccak('Event2(uint256)')`. The hashes are: 
 
 * `04474795f5b996ff80cb47c148d4c5ccdbe09ef27551820caa9c2f8ed149cce3` for event 1  
 * `06df6fb2d6d0b17a870decb858cc46bf7b69142ab7b9318f7603ed3fd4ad240e` for event 2
 
 !!! tip
-    You can use an online tool such as https://emn178.github.io/online-tools/keccak_256.html to generate 
-    event signature hashes. 
+    You can use a library keccak (sha3) hash function such as provided in [Web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API#web3sha3)
+    or an an online tool such as https://emn178.github.io/online-tools/keccak_256.html to generate event signature hashes. 
 
 !!! example
     Log entries from invoking the Solidity contract above:  
