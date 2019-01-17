@@ -1,3 +1,15 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -6,13 +18,6 @@ import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpe
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommentPayload;
 
-import com.google.common.collect.Lists;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -24,7 +29,14 @@ import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextFactory;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.stream.Collectors;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class FutureHeightTest {
 
@@ -50,15 +62,17 @@ public class FutureHeightTest {
     context.getController().start();
   }
 
-
   @Test
   public void messagesForFutureHeightAreBufferedUntilChainHeightCatchesUp() {
     final Block currentHeightBlock = context.createBlockForProposalFromChainHead(0, 30);
-    final Block signedCurrentHeightBlock = IbftHelpers.createSealedBlock(
-        currentHeightBlock,
-        roles.getAllPeers().stream()
-            .map(peer -> peer.getBlockSignature(currentHeightBlock.getHash())).collect(
-            Collectors.toList()));
+    final Block signedCurrentHeightBlock =
+        IbftHelpers.createSealedBlock(
+            currentHeightBlock,
+            roles
+                .getAllPeers()
+                .stream()
+                .map(peer -> peer.getBlockSignature(currentHeightBlock.getHash()))
+                .collect(Collectors.toList()));
 
     final Block futureHeightBlock =
         context.createBlockForProposal(signedCurrentHeightBlock.getHeader(), 0, 60);
@@ -67,22 +81,26 @@ public class FutureHeightTest {
     assertPeersReceivedNoMessages(roles.getAllPeers());
 
     // Inject prepares and commits from all peers
-    roles.getNonProposingPeers()
-        .forEach(p -> {
-          p.injectPrepare(futureHeightRoundId, futureHeightBlock.getHash());
-          p.injectCommit(futureHeightRoundId, futureHeightBlock.getHash());
-        });
+    roles
+        .getNonProposingPeers()
+        .forEach(
+            p -> {
+              p.injectPrepare(futureHeightRoundId, futureHeightBlock.getHash());
+              p.injectCommit(futureHeightRoundId, futureHeightBlock.getHash());
+            });
     assertPeersReceivedNoMessages(roles.getAllPeers());
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // Add block to chain, and notify system of its arrival.
     context.getBlockchain().appendBlock(signedCurrentHeightBlock, emptyList());
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
-    context.getController()
+    context
+        .getController()
         .handleNewBlockEvent(new NewChainHead(signedCurrentHeightBlock.getHeader()));
 
-    final SignedData<PreparePayload> expectedPrepareMessage = localNodeMessageFactory
-        .createSignedPreparePayload(futureHeightRoundId, futureHeightBlock.getHash());
+    final SignedData<PreparePayload> expectedPrepareMessage =
+        localNodeMessageFactory.createSignedPreparePayload(
+            futureHeightRoundId, futureHeightBlock.getHash());
 
     final SignedData<CommitPayload> expectedCommitMessage =
         createSignedCommentPayload(
@@ -95,33 +113,39 @@ public class FutureHeightTest {
   @Test
   public void messagesFromPreviousHeightAreDiscarded() {
     final Block currentHeightBlock = context.createBlockForProposalFromChainHead(0, 30);
-    final Block signedCurrentHeightBlock = IbftHelpers.createSealedBlock(
-        currentHeightBlock,
-        roles.getAllPeers().stream()
-            .map(peer -> peer.getBlockSignature(currentHeightBlock.getHash())).collect(
-            Collectors.toList()));
+    final Block signedCurrentHeightBlock =
+        IbftHelpers.createSealedBlock(
+            currentHeightBlock,
+            roles
+                .getAllPeers()
+                .stream()
+                .map(peer -> peer.getBlockSignature(currentHeightBlock.getHash()))
+                .collect(Collectors.toList()));
 
     roles.getProposer().injectProposal(roundId, currentHeightBlock);
     roles.getNonProposingPeer(0).injectPrepare(roundId, currentHeightBlock.getHash());
 
-    final SignedData<PreparePayload> expectedPrepareMessage = localNodeMessageFactory
-        .createSignedPreparePayload(roundId, currentHeightBlock.getHash());
+    final SignedData<PreparePayload> expectedPrepareMessage =
+        localNodeMessageFactory.createSignedPreparePayload(roundId, currentHeightBlock.getHash());
 
     assertPeersReceivedExactly(roles.getAllPeers(), expectedPrepareMessage);
 
     // Add block to chain, and notify system of its arrival.
     context.getBlockchain().appendBlock(signedCurrentHeightBlock, emptyList());
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
-    context.getController()
+    context
+        .getController()
         .handleNewBlockEvent(new NewChainHead(signedCurrentHeightBlock.getHeader()));
 
     // Inject prepares and commits from all peers for the 'previous' round (i.e. the height
     // from before the block arrived).
-    roles.getNonProposingPeers()
-        .forEach(p -> {
-          p.injectPrepare(roundId, currentHeightBlock.getHash());
-          p.injectCommit(roundId, currentHeightBlock.getHash());
-        });
+    roles
+        .getNonProposingPeers()
+        .forEach(
+            p -> {
+              p.injectPrepare(roundId, currentHeightBlock.getHash());
+              p.injectCommit(roundId, currentHeightBlock.getHash());
+            });
     assertPeersReceivedNoMessages(roles.getAllPeers());
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
@@ -135,8 +159,9 @@ public class FutureHeightTest {
 
     roles.getAllPeers().forEach(peer -> peer.clearReceivedMessages());
 
-    //inject a NewHeight FOR THE CURRENT HEIGHT
-    context.getController()
+    // inject a NewHeight FOR THE CURRENT HEIGHT
+    context
+        .getController()
         .handleNewBlockEvent(new NewChainHead(context.getBlockchain().getChainHeadHeader()));
 
     // Should only require 1 more prepare to close it out

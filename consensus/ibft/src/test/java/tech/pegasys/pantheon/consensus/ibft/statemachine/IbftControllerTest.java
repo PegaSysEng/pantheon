@@ -17,6 +17,7 @@ import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -62,7 +63,8 @@ public class IbftControllerTest {
   @Mock private Blockchain blockChain;
   @Mock private IbftFinalState ibftFinalState;
   @Mock private IbftBlockHeightManagerFactory blockHeightManagerFactory;
-  @Mock private BlockHeader blockHeader;
+  @Mock private BlockHeader chainHeadBlockHeader;
+  @Mock private BlockHeader nextBlock;
   @Mock private IbftBlockHeightManager blockHeightManager;
 
   @Mock private SignedData<ProposalPayload> signedProposal;
@@ -100,19 +102,25 @@ public class IbftControllerTest {
 
   @Before
   public void setup() {
-    when(blockChain.getChainHeadHeader()).thenReturn(blockHeader);
-    when(blockHeightManagerFactory.create(blockHeader)).thenReturn(blockHeightManager);
+    when(blockChain.getChainHeadHeader()).thenReturn(chainHeadBlockHeader);
+    when(blockHeightManagerFactory.create(any())).thenReturn(blockHeightManager);
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
     ibftController =
         new IbftController(
             blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages, ibftGossip);
+
+    when(chainHeadBlockHeader.getNumber()).thenReturn(1L);
+
+    when(blockHeightManager.getParentBlockHeader()).thenReturn(chainHeadBlockHeader);
+
+    when(nextBlock.getNumber()).thenReturn(2L);
   }
 
   @Test
   public void createsNewBlockHeightManagerWhenStarted() {
     ibftController.start();
     assertThat(futureMessages).isEmpty();
-    verify(blockHeightManagerFactory).create(blockHeader);
+    verify(blockHeightManagerFactory).create(chainHeadBlockHeader);
   }
 
   @Test
@@ -134,7 +142,7 @@ public class IbftControllerTest {
     ibftController.start();
     assertThat(futureMessages.keySet()).hasSize(1);
     assertThat(futureMessages.get(3L)).isEqualTo(height3Msgs);
-    verify(blockHeightManagerFactory).create(blockHeader);
+    verify(blockHeightManagerFactory).create(chainHeadBlockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
     verify(blockHeightManager, never()).handleProposalPayload(signedProposal);
@@ -161,12 +169,13 @@ public class IbftControllerTest {
             prepareMessage, proposalMessage, commitMessage, roundChangeMessage, newRoundMessage));
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
 
-    final NewChainHead newChainHead = new NewChainHead(blockHeader);
+    ibftController.start();
+    final NewChainHead newChainHead = new NewChainHead(nextBlock);
     ibftController.handleNewBlockEvent(newChainHead);
 
-    verify(blockHeightManagerFactory).create(blockHeader);
+    verify(blockHeightManagerFactory).create(chainHeadBlockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
-    verify(blockHeightManager).start();
+    verify(blockHeightManager, times(2)).start(); // once at beginning, and again on newChainHead.
     verify(blockHeightManager).handleProposalPayload(signedProposal);
     verify(ibftGossip).gossipMessage(proposalMessage);
     verify(blockHeightManager).handlePreparePayload(signedPrepare);

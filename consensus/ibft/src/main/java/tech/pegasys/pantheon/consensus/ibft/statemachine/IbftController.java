@@ -144,16 +144,15 @@ public class IbftController {
   public void handleNewBlockEvent(final NewChainHead newChainHead) {
     final BlockHeader newBlockHeader = newChainHead.getNewChainHeadHeader();
     final BlockHeader currentMiningParent = currentHeightManager.getParentBlockHeader();
-    if(newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
+    if (newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
       LOG.info("Discarding NewChainHead event, was for previous block height.");
       return;
     }
 
-    if(newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
-      if(newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
+    if (newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
+      if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
         LOG.info("Discarding duplicate NewChainHead event.");
-      }
-      else {
+      } else {
         LOG.error("Subsequent NewChainHead event at same block height indicates chain fork.");
       }
       return;

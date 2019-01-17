@@ -197,7 +197,8 @@ public class RoundChangeTest {
     // Expected to use the block with "ARBITRARY_BLOCKTIME" (i.e. latter block) but with the target
     // round number.
     final Block expectedBlockToPropose =
-        context.createBlockForProposalFromChainHead(targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
+        context.createBlockForProposalFromChainHead(
+            targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
 
     final SignedData<NewRoundPayload> expectedNewRound =
         localNodeMessageFactory.createSignedNewRoundPayload(
@@ -278,7 +279,8 @@ public class RoundChangeTest {
             .collect(Collectors.toList()));
 
     final Block expectedBlockToPropose =
-        context.createBlockForProposalFromChainHead(targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
+        context.createBlockForProposalFromChainHead(
+            targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
 
     final SignedData<NewRoundPayload> expectedNewRound =
         localNodeMessageFactory.createSignedNewRoundPayload(
