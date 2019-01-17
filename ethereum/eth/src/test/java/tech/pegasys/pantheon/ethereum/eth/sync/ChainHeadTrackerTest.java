@@ -36,7 +36,7 @@ public class ChainHeadTrackerTest {
   private final BlockchainSetupUtil<Void> blockchainSetupUtil = BlockchainSetupUtil.forTesting();
   private final MutableBlockchain blockchain = blockchainSetupUtil.getBlockchain();
   private final EthProtocolManager ethProtocolManager =
-      EthProtocolManagerTestUtil.create(blockchain);
+      EthProtocolManagerTestUtil.create(blockchain, blockchainSetupUtil.getWorldArchive());
   private final RespondingEthPeer respondingPeer =
       RespondingEthPeer.create(
           ethProtocolManager,
@@ -57,7 +57,8 @@ public class ChainHeadTrackerTest {
   @Test
   public void shouldRequestHeaderChainHeadWhenNewPeerConnects() {
     final Responder responder =
-        RespondingEthPeer.blockchainResponder(blockchainSetupUtil.getBlockchain());
+        RespondingEthPeer.blockchainResponder(
+            blockchainSetupUtil.getBlockchain(), blockchainSetupUtil.getWorldArchive());
     chainHeadTracker.onPeerConnected(respondingPeer.getEthPeer());
 
     assertThat(chainHeadState().getEstimatedHeight()).isZero();
@@ -71,7 +72,8 @@ public class ChainHeadTrackerTest {
   @Test
   public void shouldIgnoreHeadersIfChainHeadHasAlreadyBeenUpdatedWhileWaiting() {
     final Responder responder =
-        RespondingEthPeer.blockchainResponder(blockchainSetupUtil.getBlockchain());
+        RespondingEthPeer.blockchainResponder(
+            blockchainSetupUtil.getBlockchain(), blockchainSetupUtil.getWorldArchive());
     chainHeadTracker.onPeerConnected(respondingPeer.getEthPeer());
 
     // Change the hash of the current known head
@@ -85,7 +87,8 @@ public class ChainHeadTrackerTest {
   @Test
   public void shouldCheckTrialingPeerLimits() {
     final Responder responder =
-        RespondingEthPeer.blockchainResponder(blockchainSetupUtil.getBlockchain());
+        RespondingEthPeer.blockchainResponder(
+            blockchainSetupUtil.getBlockchain(), blockchainSetupUtil.getWorldArchive());
     chainHeadTracker.onPeerConnected(respondingPeer.getEthPeer());
 
     assertThat(chainHeadState().getEstimatedHeight()).isZero();

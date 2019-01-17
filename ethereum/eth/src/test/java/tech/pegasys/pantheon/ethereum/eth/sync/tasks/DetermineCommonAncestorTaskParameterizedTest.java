@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -138,8 +139,9 @@ public class DetermineCommonAncestorTaskParameterizedTest {
       remoteBlockchain.appendBlock(remoteBlock, remoteReceipts);
     }
 
+    final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
     final EthProtocolManager ethProtocolManager =
-        EthProtocolManagerTestUtil.create(localBlockchain);
+        EthProtocolManagerTestUtil.create(localBlockchain, worldStateArchive);
 
     final RespondingEthPeer.Responder responder =
         RespondingEthPeer.blockchainResponder(remoteBlockchain);
@@ -152,7 +154,7 @@ public class DetermineCommonAncestorTaskParameterizedTest {
 
     final EthContext ethContext = ethProtocolManager.ethContext();
     final ProtocolContext<Void> protocolContext =
-        new ProtocolContext<>(localBlockchain, createInMemoryWorldStateArchive(), null);
+        new ProtocolContext<>(localBlockchain, worldStateArchive, null);
 
     final EthTask<BlockHeader> task =
         DetermineCommonAncestorTask.create(
