@@ -39,6 +39,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.pending.Pen
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscriptionService;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
+import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
@@ -251,7 +252,7 @@ public class RunnerBuilder {
               context,
               protocolSchedule,
               pantheonController,
-              networkRunner,
+              hasP2p(networkRunner),
               synchronizer,
               transactionPool,
               miningCoordinator,
@@ -273,7 +274,7 @@ public class RunnerBuilder {
               context,
               protocolSchedule,
               pantheonController,
-              networkRunner,
+              hasP2p(networkRunner),
               synchronizer,
               transactionPool,
               miningCoordinator,
@@ -332,7 +333,7 @@ public class RunnerBuilder {
       final ProtocolContext<?> context,
       final ProtocolSchedule<?> protocolSchedule,
       final PantheonController<?> pantheonController,
-      final NetworkRunner networkRunner,
+      final Optional<P2PNetwork> network,
       final Synchronizer synchronizer,
       final TransactionPool transactionPool,
       final MiningCoordinator miningCoordinator,
@@ -345,7 +346,7 @@ public class RunnerBuilder {
         new JsonRpcMethodsFactory()
             .methods(
                 PantheonInfo.version(),
-                networkRunner.getNetwork(),
+                network,
                 context.getBlockchain(),
                 context.getWorldStateArchive(),
                 synchronizer,
@@ -415,5 +416,9 @@ public class RunnerBuilder {
   private MetricsHttpService createMetricsService(
       final Vertx vertx, final MetricsConfiguration configuration) {
     return new MetricsHttpService(vertx, configuration, metricsSystem);
+  }
+
+  private Optional<P2PNetwork> hasP2p(final NetworkRunner networkRunner) {
+    return p2pDisabled ? Optional.empty() : Optional.of(networkRunner.getNetwork());
   }
 }
