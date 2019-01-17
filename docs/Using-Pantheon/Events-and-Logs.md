@@ -3,8 +3,9 @@
 When a transaction is mined, smart contracts emit events and write logs to the blockchain.  
 
 Logs are associated with the contract address and included in the blockchain but logs are not accessible 
-from within contracts. For example, you can use logs to display all transfers made using a specific contract 
-but not the current state of the contract. 
+from within contracts. Log storage is cheaper than contract storage (that is, it costs less gas) so if the required data can 
+be stored in and accessed from logs, the cost is reduced. For example, you can use logs to display all 
+transfers made using a specific contract but not the current state of the contract. 
 
 A Dapp front end can either request logs using the [JSON-RPC API filter methods](Accessing-Logs-Using-JSON-RPC.md) 
 or subscribe to logs using the [RPC Pub/Sub API](RPC-PubSub.md#logs). 
@@ -171,7 +172,7 @@ Topics are order-dependent. A transaction with a log containing topics `[A, B]` 
 * `[A]` - Match A in first position 
 * `[[null], [B]]` - Match any topic in first position AND B in second position
 * `[[A],[B]]` - Match A in first position AND B in second position
-* `[[A, B], [C, D]]` - Match (A OR B) in first position AND (C OR D) in second position 
+* `[[A, C], [B, D]]` - Match (A OR C) in first position AND (B OR D) in second position 
 
 
 
