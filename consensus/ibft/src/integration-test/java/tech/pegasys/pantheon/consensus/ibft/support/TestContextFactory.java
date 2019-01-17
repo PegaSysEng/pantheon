@@ -25,7 +25,6 @@ import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderValidationRulesetFactory;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
@@ -58,9 +57,7 @@ import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -203,7 +200,7 @@ public class TestContextFactory {
     genesisConfigOptions.byzantiumBlock(0);
 
     final ProtocolSchedule<IbftContext> protocolSchedule =
-        IbftProtocolSchedule.create(genesisConfigOptions, new NoOpMetricsSystem());
+        IbftProtocolSchedule.create(genesisConfigOptions);
 
     /////////////////////////////////////////////////////////////////////////////////////
     // From here down is BASICALLY taken from IbftPantheonController
@@ -233,9 +230,6 @@ public class TestContextFactory {
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockChain, voteTally, blockInterface, true);
 
-    final BlockHeaderValidator<IbftContext> blockHeaderValidator =
-        IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(BLOCK_TIMER_SEC);
-
     final IbftFinalState finalState =
         new IbftFinalState(
             voteTally,
@@ -252,11 +246,10 @@ public class TestContextFactory {
                 Clock.systemUTC()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
-            blockHeaderValidator,
             clock);
 
     final MessageValidatorFactory messageValidatorFactory =
-        new MessageValidatorFactory(proposerSelector, blockHeaderValidator, protocolContext);
+        new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
 
     // Disable Gossiping for integration tests.
     final IbftGossip gossiper = mock(IbftGossip.class);
