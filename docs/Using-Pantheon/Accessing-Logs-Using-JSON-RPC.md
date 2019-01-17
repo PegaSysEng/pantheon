@@ -7,7 +7,7 @@ Access logs using JSON-RPC API methods:
 * [`eth_getLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getlogs)
 
 Use [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter) to create the filter before
-using [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges) and [`eth_getFilterLogs`]((../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs)). 
+using [`eth_getFilterChanges`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterchanges) and [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs)). 
 
 !!! note
     The following examples are created using the sample contract included in [Events and Logs](Events-and-Logs.md). 
@@ -124,8 +124,8 @@ To get all logs for a filter, use [`eth_getFilterLogs`](../Reference/JSON-RPC-AP
     
 !!! tip 
     You can use [`eth_getLogs`](#getting-logs-using-a-filter-options-object) with a filter options object 
-    to get all logs matching the filter options instead of using [`eth_newFilter`](../Reference/JSON-RPC-API-Objects.md#eth_newfilter)
-    followed by [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Objects.md#eth_getfilterlogs). 
+    to get all logs matching the filter options instead of using [`eth_newFilter`](../Reference/JSON-RPC-API-Methods.md#eth_newfilter)
+    followed by [`eth_getFilterLogs`](../Reference/JSON-RPC-API-Methods.md#eth_getfilterlogs). 
     
 ## Uninstalling Filter
 
