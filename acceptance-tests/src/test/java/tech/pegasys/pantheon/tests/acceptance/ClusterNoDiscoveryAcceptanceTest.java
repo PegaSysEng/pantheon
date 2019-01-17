@@ -33,8 +33,7 @@ public class ClusterNoDiscoveryAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldConnectToOtherPeer() {
     // this doesn't work because we can't connect to the noDiscoveryNode
-    // anyway I think it would be 1 because of the bootnodes
-    // noDiscoveryNode.verify(net.awaitPeerCount(0));
+    // noDiscoveryNode.verify(net.awaitPeerCount(1));
     fullNode.verify(net.awaitPeerCount(1));
   }
 }
