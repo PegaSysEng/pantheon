@@ -46,7 +46,7 @@ public class FutureHeightTest {
 
   private final int NETWORK_SIZE = 5;
 
-  // Local node is not the first proposer for the current round.
+  // Context is configured such that a remote peer is responsible for proposing all block
   private final TestContext context =
       TestContextFactory.createTestEnvironment(NETWORK_SIZE, 0, fixedClock);
 

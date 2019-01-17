@@ -43,6 +43,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 
@@ -110,6 +111,7 @@ public class IbftControllerTest {
             blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages, ibftGossip);
 
     when(chainHeadBlockHeader.getNumber()).thenReturn(1L);
+    when(chainHeadBlockHeader.getHash()).thenReturn(Hash.ZERO);
 
     when(blockHeightManager.getParentBlockHeader()).thenReturn(chainHeadBlockHeader);
 
@@ -173,7 +175,7 @@ public class IbftControllerTest {
     final NewChainHead newChainHead = new NewChainHead(nextBlock);
     ibftController.handleNewBlockEvent(newChainHead);
 
-    verify(blockHeightManagerFactory).create(chainHeadBlockHeader);
+    verify(blockHeightManagerFactory).create(nextBlock);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager, times(2)).start(); // once at beginning, and again on newChainHead.
     verify(blockHeightManager).handleProposalPayload(signedProposal);
@@ -186,6 +188,25 @@ public class IbftControllerTest {
     verify(ibftGossip).gossipMessage(roundChangeMessage);
     verify(blockHeightManager).handleNewRoundPayload(signedNewRound);
     verify(ibftGossip).gossipMessage(newRoundMessage);
+  }
+
+  @Test
+  public void newBlockForCurrentOrPreviousHeightTriggersNoChange() {
+    ibftController.start();
+
+    long chainHeadHeight = chainHeadBlockHeader.getNumber();
+    when(nextBlock.getNumber()).thenReturn(chainHeadHeight);
+    when(nextBlock.getHash()).thenReturn(Hash.ZERO);
+    final NewChainHead sameHeightBlock = new NewChainHead(nextBlock);
+    ibftController.handleNewBlockEvent(sameHeightBlock);
+    verify(blockHeightManagerFactory, times(1)).create(any()); // initial creation
+    verify(blockHeightManager, times(1)).start(); // the initial call at start of test.
+
+    when(nextBlock.getNumber()).thenReturn(chainHeadHeight - 1);
+    final NewChainHead priorBlock = new NewChainHead(nextBlock);
+    ibftController.handleNewBlockEvent(priorBlock);
+    verify(blockHeightManagerFactory, times(1)).create(any());
+    verify(blockHeightManager, times(1)).start();
   }
 
   @Test
