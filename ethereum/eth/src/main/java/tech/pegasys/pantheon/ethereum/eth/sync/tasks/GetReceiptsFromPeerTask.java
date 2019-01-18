@@ -71,7 +71,15 @@ public class GetReceiptsFromPeerTask
   @Override
   protected ResponseStream sendRequest(final EthPeer peer) throws PeerNotConnected {
     LOG.debug("Requesting {} receipts from peer {}.", blockHeaders.size(), peer);
-    return peer.getReceipts(blockHeaders.stream().map(BlockHeader::getHash).collect(toList()));
+    // Since we have to match up the data by receipt root, we only need to request receipts
+    // for one of the headers with each unique receipt root.
+    final List<Hash> blockHashes =
+        headersByReceiptsRoot
+            .values()
+            .stream()
+            .map(headers -> headers.get(0).getHash())
+            .collect(toList());
+    return peer.getReceipts(blockHashes);
   }
 
   @Override
