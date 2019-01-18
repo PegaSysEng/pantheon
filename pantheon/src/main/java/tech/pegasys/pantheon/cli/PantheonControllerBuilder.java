@@ -117,7 +117,8 @@ public class PantheonControllerBuilder {
           ethNetworkConfig.getNetworkId(),
           miningParameters,
           nodeKeys,
-          metricsSystem);
+          metricsSystem,
+          privacyParameters);
     }
   }
 }
