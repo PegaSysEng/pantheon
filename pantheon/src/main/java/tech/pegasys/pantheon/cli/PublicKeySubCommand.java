@@ -17,7 +17,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.PublicKeySubCommand.COMMAND_NAME;
 
-import picocli.CommandLine.Option;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.ExportSubCommand;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -33,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Parameters;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
 
@@ -83,11 +82,11 @@ class PublicKeySubCommand implements Runnable {
   static class ExportSubCommand implements Runnable {
 
     @Option(
-        names = "--from",
-        required = true,
-        paramLabel = MANDATORY_FILE_FORMAT_HELP,
-        description = "File to write public key to",
-        arity = "1..1"
+      names = "--from",
+      required = true,
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description = "File to write public key to",
+      arity = "1..1"
     )
     private final File publicKeyExportFile = null;
 

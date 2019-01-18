@@ -96,7 +96,8 @@ public class BlockSubCommandTest extends CommandTestAbstract {
   @Test
   public void callingBlockImportSubCommandWithPathMustImportBlocksWithThisPath() throws Exception {
     File fileToImport = temp.newFile("blocks.file");
-    parseCommand(BLOCK_SUBCOMMAND_NAME, BLOCK_IMPORT_SUBCOMMAND_NAME, "--from", fileToImport.getPath());
+    parseCommand(
+        BLOCK_SUBCOMMAND_NAME, BLOCK_IMPORT_SUBCOMMAND_NAME, "--from", fileToImport.getPath());
 
     verify(mockBlockImporter).importBlockchain(pathArgumentCaptor.capture(), any());
 

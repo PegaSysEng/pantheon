@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.pegasys.pantheon.cli.BlocksSubCommand.COMMAND_NAME;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 
-import picocli.CommandLine.Option;
 import tech.pegasys.pantheon.cli.BlocksSubCommand.ImportSubCommand;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsHttpService;
@@ -36,6 +35,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExecutionException;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
 
