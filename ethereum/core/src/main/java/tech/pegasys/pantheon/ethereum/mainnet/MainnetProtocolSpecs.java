@@ -195,7 +195,7 @@ public abstract class MainnetProtocolSpecs {
 
   public static ProtocolSpecBuilder<Void> petersburgDefinition(final int chainId) {
     return constantinopleDefinition(chainId)
-        .gasCalculator(TangerineWhistleGasCalculator::new)
+        .gasCalculator(PetersburgGasCalculator::new)
         .name("Petersburg");
   }
 
