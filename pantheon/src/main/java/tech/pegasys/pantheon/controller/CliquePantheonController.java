@@ -118,7 +118,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
 
     final EpochManager epochManger = new EpochManager(blocksPerEpoch);
     final ProtocolSchedule<CliqueContext> protocolSchedule =
-        CliqueProtocolSchedule.create(genesisConfig.getConfigOptions(), nodeKeys, metricsSystem);
+        CliqueProtocolSchedule.create(genesisConfig.getConfigOptions(), nodeKeys);
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final BlockchainStorage blockchainStorage =
         storageProvider.createBlockchainStorage(protocolSchedule);
@@ -146,6 +146,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
+            protocolContext.getWorldStateArchive(),
             networkId,
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),

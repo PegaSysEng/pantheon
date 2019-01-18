@@ -38,7 +38,6 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.time.Instant;
@@ -74,8 +73,7 @@ public class IbftBlockCreatorTest {
     final ProtocolSchedule<IbftContext> protocolSchedule =
         IbftProtocolSchedule.create(
             GenesisConfigFile.fromConfig("{\"config\": {\"spuriousDragonBlock\":0}}")
-                .getConfigOptions(),
-            new NoOpMetricsSystem());
+                .getConfigOptions());
     final ProtocolContext<IbftContext> protContext =
         new ProtocolContext<>(
             blockchain,
@@ -103,11 +101,12 @@ public class IbftBlockCreatorTest {
     final Block block = blockCreator.createBlock(Instant.now().getEpochSecond());
 
     final BlockHeaderValidator<IbftContext> rules =
-        IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(0);
+        IbftBlockHeaderValidationRulesetFactory.ibftBlockHeaderValidator(0);
 
+    // NOTE: The header will not contain commit seals, so can only do light validation on header.
     final boolean validationResult =
         rules.validateHeader(
-            block.getHeader(), parentHeader, protContext, HeaderValidationMode.FULL);
+            block.getHeader(), parentHeader, protContext, HeaderValidationMode.LIGHT);
 
     assertThat(validationResult).isTrue();
 
