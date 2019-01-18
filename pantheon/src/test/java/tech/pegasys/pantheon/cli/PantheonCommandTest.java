@@ -16,15 +16,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
 import tech.pegasys.pantheon.PantheonInfo;
@@ -60,11 +55,8 @@ import com.google.common.io.Resources;
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
 import org.apache.commons.text.StringEscapeUtils;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import picocli.CommandLine;
@@ -73,7 +65,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
 
-  @Rule public final TemporaryFolder temp = new TemporaryFolder();
   private static final JsonRpcConfiguration defaultJsonRpcConfiguration;
   private static final WebSocketConfiguration defaultWebSocketConfiguration;
   private static final MetricsConfiguration defaultMetricsConfiguration;
@@ -102,33 +93,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     defaultWebSocketConfiguration = websocketConf;
 
     defaultMetricsConfiguration = MetricsConfiguration.createDefault();
-  }
-
-  @Before
-  public void resetSystemProps() {
-    System.setProperty("pantheon.docker", "false");
-  }
-
-  @Override
-  @Before
-  public void initMocks() throws Exception {
-    super.initMocks();
-
-    when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.discovery(anyBoolean())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.bootstrapPeers(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.discoveryHost(anyString())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.discoveryPort(anyInt())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.maxPeers(anyInt())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.jsonRpcConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.webSocketConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.permissioningConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.dataDir(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.bannedNodeIds(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.metricsSystem(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.metricsConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.build()).thenReturn(mockRunner);
   }
 
   @Test
@@ -199,7 +163,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--config-file");
 
     final String expectedOutputStart =
-        "Missing required parameter for option '--config-file' (<PATH>)";
+        "Missing required parameter for option '--config-file' (<FILE>)";
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
     assertThat(commandOutput.toString()).isEmpty();
   }

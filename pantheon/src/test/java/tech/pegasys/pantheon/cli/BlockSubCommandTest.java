@@ -14,51 +14,16 @@ package tech.pegasys.pantheon.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import picocli.CommandLine.Model.CommandSpec;
 
 public class BlockSubCommandTest extends CommandTestAbstract {
-  @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
-  @Before
-  public void resetSystemProps() {
-    System.setProperty("pantheon.docker", "false");
-  }
-
-  @Override
-  @Before
-  public void initMocks() throws Exception {
-    super.initMocks();
-
-    when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.discovery(anyBoolean())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.bootstrapPeers(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.discoveryHost(anyString())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.discoveryPort(anyInt())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.maxPeers(anyInt())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.jsonRpcConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.webSocketConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.permissioningConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.dataDir(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.bannedNodeIds(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.metricsSystem(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.metricsConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.build()).thenReturn(mockRunner);
-  }
-
-  private final String EXPECTED_BLOCK_USAGE =
+  private static final String EXPECTED_BLOCK_USAGE =
       "Usage: pantheon blocks [-hV] [COMMAND]"
           + System.lineSeparator()
           + "This command provides blocks related actions."
@@ -72,38 +37,42 @@ public class BlockSubCommandTest extends CommandTestAbstract {
           + "  import  This command imports blocks from a file into the database."
           + System.lineSeparator();
 
-  private final String EXPECTED_BLOCK_IMPORT_USAGE =
-      "Usage: pantheon blocks import [-hV] <FILE>"
+  private static final String EXPECTED_BLOCK_IMPORT_USAGE =
+      "Usage: pantheon blocks import [-hV] --from=<FILE>"
           + System.lineSeparator()
           + "This command imports blocks from a file into the database."
           + System.lineSeparator()
-          + "      <FILE>      File containing blocks to import"
+          + "      --from=<FILE>   File containing blocks to import"
           + System.lineSeparator()
-          + "  -h, --help      Show this help message and exit."
+          + "  -h, --help          Show this help message and exit."
           + System.lineSeparator()
-          + "  -V, --version   Print version information and exit."
+          + "  -V, --version       Print version information and exit."
           + System.lineSeparator();
+
+  private static final String BLOCK_SUBCOMMAND_NAME = "blocks";
+  private static final String BLOCK_IMPORT_SUBCOMMAND_NAME = "import";
 
   // Block sub-command
   @Test
-  public void blockSubCommandExistAnbHaveImportSubCommand() {
+  public void blockSubCommandExistAnbHaveSubCommands() {
     CommandSpec spec = parseCommand();
-    assertThat(spec.subcommands()).containsKeys("blocks");
-    assertThat(spec.subcommands().get("blocks").getSubcommands()).containsKeys("import");
+    assertThat(spec.subcommands()).containsKeys(BLOCK_SUBCOMMAND_NAME);
+    assertThat(spec.subcommands().get(BLOCK_SUBCOMMAND_NAME).getSubcommands())
+        .containsKeys(BLOCK_IMPORT_SUBCOMMAND_NAME);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
   public void callingBlockSubCommandWithoutSubSubcommandMustDisplayUsage() {
-    parseCommand("blocks");
+    parseCommand(BLOCK_SUBCOMMAND_NAME);
     assertThat(commandOutput.toString()).startsWith(EXPECTED_BLOCK_USAGE);
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
   public void callingBlockSubCommandHelpMustDisplayUsage() {
-    parseCommand("blocks", "--help");
+    parseCommand(BLOCK_SUBCOMMAND_NAME, "--help");
     assertThat(commandOutput.toString()).startsWith(EXPECTED_BLOCK_USAGE);
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -111,15 +80,15 @@ public class BlockSubCommandTest extends CommandTestAbstract {
   // Import sub-sub-command
   @Test
   public void callingBlockImportSubCommandWithoutPathMustDisplayErrorAndUsage() {
-    parseCommand("blocks", "import");
-    final String expectedErrorOutputStart = "Missing required parameter: <FILE>";
+    parseCommand(BLOCK_SUBCOMMAND_NAME, BLOCK_IMPORT_SUBCOMMAND_NAME);
+    final String expectedErrorOutputStart = "Missing required option '--from=<FILE>'";
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
   }
 
   @Test
-  public void callingBlockImportSubCommandHelpMustDisplayImportUsage() {
-    parseCommand("blocks", "import", "--help");
+  public void callingBlockImportSubCommandHelpMustDisplayUsage() {
+    parseCommand(BLOCK_SUBCOMMAND_NAME, BLOCK_IMPORT_SUBCOMMAND_NAME, "--help");
     assertThat(commandOutput.toString()).startsWith(EXPECTED_BLOCK_IMPORT_USAGE);
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -127,7 +96,7 @@ public class BlockSubCommandTest extends CommandTestAbstract {
   @Test
   public void callingBlockImportSubCommandWithPathMustImportBlocksWithThisPath() throws Exception {
     File fileToImport = temp.newFile("blocks.file");
-    parseCommand("blocks", "import", fileToImport.getPath());
+    parseCommand(BLOCK_SUBCOMMAND_NAME, BLOCK_IMPORT_SUBCOMMAND_NAME, "--from", fileToImport.getPath());
 
     verify(mockBlockImporter).importBlockchain(pathArgumentCaptor.capture(), any());
 

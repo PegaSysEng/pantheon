@@ -13,8 +13,11 @@
 package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static tech.pegasys.pantheon.cli.BlocksSubCommand.COMMAND_NAME;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 
+import picocli.CommandLine.Option;
+import tech.pegasys.pantheon.cli.BlocksSubCommand.ImportSubCommand;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsHttpService;
 import tech.pegasys.pantheon.util.BlockImporter;
@@ -23,6 +26,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import io.vertx.core.Vertx;
@@ -32,12 +36,12 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExecutionException;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
 
+/** Blocks related sub-command */
 @Command(
-  name = "blocks",
+  name = COMMAND_NAME,
   description = "This command provides blocks related actions.",
   mixinStandardHelpOptions = true,
   subcommands = {ImportSubCommand.class}
@@ -45,14 +49,20 @@ import picocli.CommandLine.Spec;
 class BlocksSubCommand implements Runnable {
   private static final Logger LOG = LogManager.getLogger();
 
-  @ParentCommand PantheonCommand parentCommand; // Picocli injects reference to parent command
+  static final String COMMAND_NAME = "blocks";
 
-  @Spec private CommandSpec spec; // Picocli injects reference to command spec
+  @SuppressWarnings("unused")
+  @ParentCommand
+  private PantheonCommand parentCommand; // Picocli injects reference to parent command
 
-  final BlockImporter blockImporter;
-  final PrintStream out;
+  @SuppressWarnings("unused")
+  @Spec
+  private CommandSpec spec; // Picocli injects reference to command spec
 
-  BlocksSubCommand(final BlockImporter blockImporter, PrintStream out) {
+  private final BlockImporter blockImporter;
+  private final PrintStream out;
+
+  BlocksSubCommand(final BlockImporter blockImporter, final PrintStream out) {
     this.blockImporter = blockImporter;
     this.out = out;
   }
@@ -61,64 +71,70 @@ class BlocksSubCommand implements Runnable {
   public void run() {
     spec.commandLine().usage(out);
   }
-}
 
-@Command(
-  name = "import",
-  description = "This command imports blocks from a file into the database.",
-  mixinStandardHelpOptions = true
-)
-class ImportSubCommand implements Runnable {
-  private static final Logger LOG = LogManager.getLogger();
-
-  @ParentCommand
-  private BlocksSubCommand parentCommand; // Picocli injects reference to parent command
-
-  /*  @Option(
-    names = "--from",
-    paramLabel = MANDATORY_PATH_FORMAT_HELP,
-    description = "File containing blocks to import",
-    arity = "1..1"
+  /**
+   * blocks import sub-command
+   *
+   * <p>Imports blocks from a file into the database
+   */
+  @Command(
+    name = "import",
+    description = "This command imports blocks from a file into the database.",
+    mixinStandardHelpOptions = true
   )
-  private final File blocksImportFile = null;*/
+  static class ImportSubCommand implements Runnable {
+    @SuppressWarnings("unused")
+    @ParentCommand
+    private BlocksSubCommand parentCommand; // Picocli injects reference to parent command
 
-  @Parameters(
-    arity = "1..1",
-    paramLabel = MANDATORY_FILE_FORMAT_HELP,
-    description = "File containing blocks to import"
-  )
-  private final File blocksImportFile = null;
+    @Option(
+      names = "--from",
+      required = true,
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description = "File containing blocks to import",
+      arity = "1..1"
+    )
+    private final File blocksImportFile = null;
 
-  @Override
-  public void run() {
-    LOG.info("Runs import sub command with blocksImportFile : {}", blocksImportFile);
+    @Override
+    public void run() {
+      LOG.info("Runs import sub command with blocksImportFile : {}", blocksImportFile);
 
-    checkNotNull(parentCommand);
-    checkNotNull(parentCommand.blockImporter);
+      checkNotNull(parentCommand);
+      checkNotNull(parentCommand.parentCommand);
+      checkNotNull(parentCommand.blockImporter);
 
-    Optional<MetricsHttpService> metricsHttpService = Optional.empty();
-    try {
-      final MetricsConfiguration metricsConfiguration =
-          parentCommand.parentCommand.metricsConfiguration();
-      if (metricsConfiguration.isEnabled()) {
-        metricsHttpService =
-            Optional.of(
-                new MetricsHttpService(
-                    Vertx.vertx(),
-                    metricsConfiguration,
-                    parentCommand.parentCommand.getMetricsSystem()));
-        metricsHttpService.ifPresent(MetricsHttpService::start);
+      Optional<MetricsHttpService> metricsHttpService = Optional.empty();
+      try {
+        final MetricsConfiguration metricsConfiguration =
+            parentCommand.parentCommand.metricsConfiguration();
+        if (metricsConfiguration.isEnabled()) {
+          metricsHttpService =
+              Optional.of(
+                  new MetricsHttpService(
+                      Vertx.vertx(),
+                      metricsConfiguration,
+                      parentCommand.parentCommand.getMetricsSystem()));
+          metricsHttpService.ifPresent(MetricsHttpService::start);
+        }
+
+        // As blocksImportFile even if initialized as null is injected by PicoCLI and param is
+        // mandatory
+        // So we are sure it's always not null, we can remove the warning
+        //noinspection ConstantConditions
+        Path path = blocksImportFile.toPath();
+
+        parentCommand.blockImporter.importBlockchain(
+            path, parentCommand.parentCommand.buildController());
+      } catch (final FileNotFoundException e) {
+        throw new ExecutionException(
+            new CommandLine(this), "Could not find file to import: " + blocksImportFile);
+      } catch (final IOException e) {
+        throw new ExecutionException(
+            new CommandLine(this), "Unable to import blocks from " + blocksImportFile, e);
+      } finally {
+        metricsHttpService.ifPresent(MetricsHttpService::stop);
       }
-      parentCommand.blockImporter.importBlockchain(
-          blocksImportFile.toPath(), parentCommand.parentCommand.buildController());
-    } catch (final FileNotFoundException e) {
-      throw new ExecutionException(
-          new CommandLine(this), "Could not find file to import: " + blocksImportFile);
-    } catch (final IOException e) {
-      throw new ExecutionException(
-          new CommandLine(this), "Unable to import blocks from " + blocksImportFile, e);
-    } finally {
-      metricsHttpService.ifPresent(MetricsHttpService::stop);
     }
   }
 }
