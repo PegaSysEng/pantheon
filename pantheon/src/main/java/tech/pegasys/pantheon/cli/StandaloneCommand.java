@@ -23,7 +23,7 @@ class StandaloneCommand implements DefaultCommandValues {
 
   @CommandLine.Option(
     names = {CONFIG_FILE_OPTION_NAME},
-    paramLabel = MANDATORY_PATH_FORMAT_HELP,
+    paramLabel = MANDATORY_FILE_FORMAT_HELP,
     description = "TOML config file (default: none)"
   )
   private final File configFile = null;
@@ -41,7 +41,7 @@ class StandaloneCommand implements DefaultCommandValues {
   // NOTE: we have no control over default value here.
   @CommandLine.Option(
     names = {"--private-genesis-file"},
-    paramLabel = MANDATORY_PATH_FORMAT_HELP,
+    paramLabel = MANDATORY_FILE_FORMAT_HELP,
     description =
         "The path to genesis file. Setting this will also override --chain option to be CUSTOM"
   )

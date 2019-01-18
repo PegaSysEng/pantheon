@@ -531,8 +531,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       commandLine.addMixin("standaloneCommands", standaloneCommands);
     }
 
-    final ImportSubCommand importSubCommand = new ImportSubCommand(blockImporter);
-    commandLine.addSubcommand("import", importSubCommand);
+    commandLine.addSubcommand("blocks", new BlocksSubCommand(blockImporter, resultHandler.out()));
     commandLine.addSubcommand("export-pub-key", new ExportPublicKeySubCommand());
 
     commandLine.registerConverter(Address.class, Address::fromHexString);
