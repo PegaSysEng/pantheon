@@ -65,6 +65,10 @@ public interface P2PNetwork extends Closeable, Runnable {
    */
   void subscribeDisconnect(DisconnectCallback consumer);
 
+  boolean addMaintainConnectionPeer(final Peer peer);
+
+  void checkMaintainedConnectionPeers();
+
   /** Stops the P2P network layer. */
   void stop();
 

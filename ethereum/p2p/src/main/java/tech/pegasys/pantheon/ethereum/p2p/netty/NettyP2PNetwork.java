@@ -41,6 +41,7 @@ import tech.pegasys.pantheon.util.Subscribers;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
@@ -49,7 +50,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -125,9 +125,12 @@ public final class NettyP2PNetwork implements P2PNetwork {
   private final PeerBlacklist peerBlacklist;
   private OptionalLong peerBondedObserverId = OptionalLong.empty();
 
+  private final Collection<Peer> peerMaintainConnectionList;
+
   private final PeerConnectionRegistry connections;
 
-  private final Map<Peer, CompletableFuture<PeerConnection>> pendingConnections = new ConcurrentHashMap<>();
+  private final Map<Peer, CompletableFuture<PeerConnection>> pendingConnections =
+      new ConcurrentHashMap<>();
 
   private final EventLoopGroup boss = new NioEventLoopGroup(1);
 
@@ -176,6 +179,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
     this.nodeWhitelistController = nodeWhitelistController;
+    this.peerMaintainConnectionList = new HashSet<>();
     peerDiscoveryAgent =
         new VertxPeerDiscoveryAgent(
             vertx,
@@ -301,6 +305,26 @@ public final class NettyP2PNetwork implements P2PNetwork {
             connection.getPeer().getPort()));
   }
 
+  @Override
+  public boolean addMaintainConnectionPeer(final Peer peer) {
+    final boolean added = peerMaintainConnectionList.add(peer);
+    if (added) {
+      connect(peer);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public void checkMaintainedConnectionPeers() {
+    for (final Peer peer : peerMaintainConnectionList) {
+      if (!(isConnecting(peer) || isConnected(peer))) {
+        connect(peer);
+      }
+    }
+  }
+
   private int connectionCount() {
     return pendingConnections.size() + connections.size();
   }
@@ -315,7 +339,8 @@ public final class NettyP2PNetwork implements P2PNetwork {
     LOG.trace("Initiating connection to peer: {}", peer.getId());
     final CompletableFuture<PeerConnection> connectionFuture = new CompletableFuture<>();
     final Endpoint endpoint = peer.getEndpoint();
-    final CompletableFuture<PeerConnection> existingPendingConnection = pendingConnections.putIfAbsent(peer, connectionFuture);
+    final CompletableFuture<PeerConnection> existingPendingConnection =
+        pendingConnections.putIfAbsent(peer, connectionFuture);
     if (existingPendingConnection != null) {
       LOG.debug("Attempted to connect to peer with pending connection: {}", peer.getId());
       return existingPendingConnection;
@@ -403,17 +428,26 @@ public final class NettyP2PNetwork implements P2PNetwork {
       final long observerId =
           peerDiscoveryAgent.observePeerBondedEvents(
               peerBondedEvent -> {
+                final Peer peer = peerBondedEvent.getPeer();
                 if (connectionCount() < maxPeers
-                    && peerBondedEvent.getPeer().getEndpoint().getTcpPort().isPresent()
-                    && !connections.isAlreadyConnected(peerBondedEvent.getPeer().getId())) {
-                  connect(peerBondedEvent.getPeer());
+                    && peer.getEndpoint().getTcpPort().isPresent()
+                    && !isConnecting(peer)
+                    && !isConnected(peer)) {
+                  connect(peer);
                 }
               });
       peerBondedObserverId = OptionalLong.of(observerId);
-
     } catch (final Exception ex) {
       throw new IllegalStateException(ex);
     }
+  }
+
+  private boolean isConnecting(final Peer peer) {
+    return pendingConnections.containsKey(peer);
+  }
+
+  private boolean isConnected(final Peer peer) {
+    return connections.isAlreadyConnected(peer.getId());
   }
 
   @Override
