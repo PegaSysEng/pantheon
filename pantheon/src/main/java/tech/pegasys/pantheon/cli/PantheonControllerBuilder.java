@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.development.DevelopmentProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
@@ -40,6 +41,7 @@ public class PantheonControllerBuilder {
   private boolean devMode;
   private File nodePrivateKeyFile;
   private MetricsSystem metricsSystem;
+  private PrivacyParameters privacyParameters;
 
   public PantheonControllerBuilder synchronizerConfiguration(
       final SynchronizerConfiguration synchronizerConfiguration) {
@@ -79,6 +81,11 @@ public class PantheonControllerBuilder {
 
   public PantheonControllerBuilder metricsSystem(final MetricsSystem metricsSystem) {
     this.metricsSystem = metricsSystem;
+    return this;
+  }
+
+  public PantheonControllerBuilder privacyParameters(final PrivacyParameters privacyParameters) {
+    this.privacyParameters = privacyParameters;
     return this;
   }
 
