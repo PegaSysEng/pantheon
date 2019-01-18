@@ -1,84 +1,92 @@
 description: Pantheon IBFT 2.0 Proof-of-Authority (PoA) consensus protocol implementation
 <!--- END of page meta data -->
 
-# Proof of Authority
+# IBFT 2.0
 
 Pantheon implements the IBFT 2.0 Proof-of-Authority (PoA) consensus protocol. IBFT 2.0 can be used for private networks. 
 
-In IBFT 2.0 networks, transactions and blocks are validated by approved accounts, known as signers. Signers take turns to create the next block. Existing signers propose and vote to add or remove signers. 
+In IBFT 2.0 networks, transactions and blocks are validated by approved accounts, known as validators. 
+Validators take turns to create the next block. Existing validators propose and vote to add or remove validators. 
 
 ## Configuration File
 
 ## Genesis File
 
-To use IBFT 2.0 requires an IBFT 2.0 genesis file. When connecting to Rinkeby, Pantheon uses the [`rinkeby.json`](https://github.com/PegaSysEng/pantheon/blob/master/config/src/main/resources/rinkeby.json) genesis file in the `/pantheon/config/src/main/resources` directory.
+To use IBFT 2.0 requires an IBFT 2.0 genesis file. The genesis file defines properties specific to IBFT 2.0:
 
-A PoA genesis file defines properties specific to Clique:
-
-!!! example "Genesis JSON file (stripped)"
+!!! example "IBFT 2.0 Genesis File (stripped)"
     ```json
-    {
-      "config": {
-        ....
-        "clique": {
-          "period": 15,
-          "epoch": 30000
-        }
-      },
-      ...
-      "extraData": "0x0000000000000000000000000000000000000000000000000000000000000000dd37f65db31c107f773e82a4f85c693058fef7a90000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      ...
-    }
+      {
+        "config": {
+          ...
+          "revisedibft": {
+            "blockperiodseconds": 2,
+            "epochlength": 30000,
+            "requesttimeoutseconds": 10
+          }
+        },
+        "nonce": "0x0",
+        "extraData": "0xf853a00000000000000000000000000000000000000000000000000000000000000000ea94be068f726a13c8d46c44be6ce9d275600e1735a4945ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193808400000000c0",
+        "difficulty": "0x1",
+        "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+        ...
+      }
     ```
     
-The properties specific to Clique are:
+Properties specific to IBFT 2.0 are:
 
-* `period` - Block time in seconds. 
-* `epoch` - Number of blocks after which to reset all votes.
-* `extraData` - Initial signers are specified after the 32 bytes reserved for vanity data. 
+* `blockperiodseconds` - Minimum block time in seconds. 
+* `epochlength` - Number of blocks after which to reset all votes.
+* `requesttimeoutseconds` - Timeout for each consensus round before a round change. 
+* `extraData` - 32 bytes of vanity data followed by initial validators. <question with Trent> 
 
-To connect to the Rinkeby testnet, start Pantheon with the [`--rinkeby`](../Reference/Pantheon-CLI-Syntax.md#rinkeby) command line option. To start a node on a PoA private network, use the [`--network-id`](../Reference/Pantheon-CLI-Syntax.md#network-id) command line option and [`--genesis`](../Reference/Pantheon-CLI-Syntax.md#genesis`) option. 
+Properties that always have specific values in IBFT 2.0 genesis files are: 
+
+* `nonce` - `0x0`
+* `difficulty` - `0x1`
+* `mixHash` - `0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365` for Istanbul block identification
 
 ### Adding and Removing Validators
 
-To propose adding or removing validators using the JSON-RPC methods, you must enable the RPC interface using the [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) option. If also using the [`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) option, include `IBFT`.
+To propose adding or removing validators using the JSON-RPC methods, enable the RPC interface 
+using the [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) option. If also using the 
+[`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) option, include `IBFT`.
 
 The JSON-RPC methods to add or remove validators are:
 
-* [ibft_getPendingVotes](../Reference/JSON-RPC-API-Methods.md#)
+* [ibft_getPendingVotes](../Reference/JSON-RPC-API-Methods.md#ibft_getPendingVotes)
 * [ibft_proposeValidatorVote](../Reference/JSON-RPC-API-Methods.md#ibft_proposeValidatorVote)
-* [ibft_discardValidatorVote](../Reference/JSON-RPC-API-Methods.md#clique_discard)
+* [ibft_discardValidatorVote](../Reference/JSON-RPC-API-Methods.md#ibft_discardValidatorVote)
 
-To propose adding a signer, call `clique_propose` specifying the address of the proposed signer and `true`.
-!!! example "JSON-RPC clique_propose Request Example"
+To propose adding a validator, call `ibft_proposeValidatorVote` specifying the address of the proposed signer and `true`.
+!!! example "JSON-RPC ibft_proposeValidatorVote Request Example"
     ```bash
-    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-endpoint:port>
     ``` 
 
-When the next block is created by the signer, a vote is added to the block for the proposed signer.  
+When the next block is created by the validator, a vote is added to the block for the proposed validator.  
 
-When more than half of the existing signers propose adding the signer and their votes have been distributed in blocks, the signer is added and can begin signing blocks. 
+When more than half of the existing validators propose adding the validators and their votes have been 
+distributed in blocks, the validator is added and can begin validating blocks. 
 
-The JSON-RPC methods to list validators are: 
-* [ibft_getValidatorsByBlockNumber](../Reference/JSON-RPC-API-Methods.md#ibft_getValidatorsByBlockNumber)
-* [ibft_getValidatorsByBlockHash](../Reference/JSON-RPC-API-Methods.md#ibft_getValidatorsByBlockHash)
+Use `ibft_getValidatorsByBlockNumber` to return a list of the signers and to confirm that your proposed signer has been added. 
 
-Use `clique_getSigners` to return a list of the signers and to confirm that your proposed signer has been added. 
-!!! example "JSON-RPC clique_getSigners Request Example"
+!!! example "JSON-RPC ibft_getValidatorsByBlockNumber Request Example"
     ```bash
-    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}' <JSON-RPC-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}' <JSON-RPC-endpoint:port>
     ```  
  
-To discard your proposal after confirming the signer was added, call `clique_discard` specifying the address of the proposed signer.
-!!! example "JSON-RPC clique_discard Request Example"
+To discard your proposal after confirming the validator was added, call `ibft_discardValidatorVote` specifying the address of the proposed validator.
+!!! example "JSON-RPC ibft_discardValidatorVote Request Example"
     ```bash
-    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-endpoint:port>
     ```
 
-The process for removing a signer is the same as adding a signer except you specify `false` as the second parameter of `clique_propose`. 
+The process for removing a validator is the same as adding a validator except you specify `true` as the second parameter of `ibft_discardValidatorVote`. 
 
 #### Epoch Transition
 
-At each epoch transition, all pending votes collected from received blocks are discarded. Existing proposals remain in effect and signers re-add their vote the next time they create a block. 
+At each epoch transition, all pending votes collected from received blocks are discarded. Existing proposals remain 
+in effect and validators re-add their vote the next time they create a block. 
 
 Define the number of blocks between epoch transitions in the genesis file. 
