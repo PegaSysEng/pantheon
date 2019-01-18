@@ -42,6 +42,7 @@ public class BlockHashOperationBenchmark {
   @Setup
   public void prepare() throws Exception {
     operationBenchmarkHelper = OperationBenchmarkHelper.create();
+    // ?? do we create another benchmark ??
     operation = new BlockHashOperation(new ConstantinopleGasCalculator());
     frame = operationBenchmarkHelper.createMessageFrame();
   }

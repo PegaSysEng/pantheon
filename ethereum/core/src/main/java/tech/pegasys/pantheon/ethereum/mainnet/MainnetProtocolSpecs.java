@@ -193,6 +193,12 @@ public abstract class MainnetProtocolSpecs {
         .name("Constantinople");
   }
 
+  public static ProtocolSpecBuilder<Void> petersburgDefinition(final int chainId) {
+    return constantinopleDefinition(chainId)
+        .gasCalculator(TangerineWhistleGasCalculator::new)
+        .name("Petersburg");
+  }
+
   private static TransactionReceipt frontierTransactionReceiptFactory(
       final TransactionProcessor.Result result, final WorldState worldState, final long gasUsed) {
     return new TransactionReceipt(worldState.rootHash(), gasUsed, result.getLogs());

@@ -80,6 +80,10 @@ public class ProtocolScheduleBuilder<C> {
         protocolSchedule,
         config.getConstantinopleBlockNumber(),
         MainnetProtocolSpecs.constantinopleDefinition(chainId));
+    addProtocolSpec(
+        protocolSchedule,
+        config.getPetersburgBlockNumber(),
+        MainnetProtocolSpecs.petersburgDefinition(chainId));
 
     return protocolSchedule;
   }
