@@ -8,8 +8,6 @@ Pantheon implements the IBFT 2.0 Proof-of-Authority (PoA) consensus protocol. IB
 In IBFT 2.0 networks, transactions and blocks are validated by approved accounts, known as validators. 
 Validators take turns to create the next block. Existing validators propose and vote to add or remove validators. 
 
-## Configuration File
-
 ## Genesis File
 
 To use IBFT 2.0 requires an IBFT 2.0 genesis file. The genesis file defines properties specific to IBFT 2.0:
@@ -38,15 +36,20 @@ Properties specific to IBFT 2.0 are:
 * `blockperiodseconds` - Minimum block time in seconds. 
 * `epochlength` - Number of blocks after which to reset all votes.
 * `requesttimeoutseconds` - Timeout for each consensus round before a round change. 
-* `extraData` - 32 bytes of vanity data followed by initial validators. <question with Trent> 
+* `extraData` - `[32 Bytes Vanity][RLP --> 0Seals; Round=Int(0); List<Validators>] `
 
-Properties that always have specific values in IBFT 2.0 genesis files are: 
+!!! note
+    The Recursive Length Prefix (RLP) encoding scheme is a space efficient object serialization scheme used in Ethereum.
+
+Properties that have specific values in IBFT 2.0 genesis files are: 
 
 * `nonce` - `0x0`
 * `difficulty` - `0x1`
-* `mixHash` - `0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365` for Istanbul block identification
+* `mixHash` - `0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365` for Istanbul block identification.
 
-### Adding and Removing Validators
+To start a node on an IBFT 2.0 private network, use the [`--genesis`](../Reference/Pantheon-CLI-Syntax.md#genesis`) option to specify the custom genesis file. 
+
+## Adding and Removing Validators
 
 To propose adding or removing validators using the JSON-RPC methods, enable the RPC interface 
 using the [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) option. If also using the 
@@ -69,7 +72,7 @@ When the next block is created by the validator, a vote is added to the block fo
 When more than half of the existing validators propose adding the validators and their votes have been 
 distributed in blocks, the validator is added and can begin validating blocks. 
 
-Use `ibft_getValidatorsByBlockNumber` to return a list of the signers and to confirm that your proposed signer has been added. 
+Use `ibft_getValidatorsByBlockNumber` to return a list of the validators and confirm your proposed validator has been added. 
 
 !!! example "JSON-RPC ibft_getValidatorsByBlockNumber Request Example"
     ```bash
@@ -77,14 +80,15 @@ Use `ibft_getValidatorsByBlockNumber` to return a list of the signers and to con
     ```  
  
 To discard your proposal after confirming the validator was added, call `ibft_discardValidatorVote` specifying the address of the proposed validator.
+
 !!! example "JSON-RPC ibft_discardValidatorVote Request Example"
     ```bash
     curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-endpoint:port>
     ```
 
-The process for removing a validator is the same as adding a validator except you specify `true` as the second parameter of `ibft_discardValidatorVote`. 
+The process for removing a validator is the same as adding a validator except you specify `false` as the second parameter of `ibft_proposeValidatorVote`. 
 
-#### Epoch Transition
+### Epoch Transition
 
 At each epoch transition, all pending votes collected from received blocks are discarded. Existing proposals remain 
 in effect and validators re-add their vote the next time they create a block. 

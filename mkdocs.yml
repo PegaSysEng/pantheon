@@ -53,6 +53,10 @@ nav:
         - Private Network Quickstart Tutorial: Getting-Started/Private-Network-Quickstart.md
     - Tutorials:
         - Creating a Private Network: Tutorials/Create-Private-Network.md
+    - Consensus Protocols:
+        - Pantheon Consensus Protocols: Consensus-Protocols/Overview-Consensus.md
+        - Clique: Consensus-Protocols/Clique.md
+        - IBFT 2.0: Consensus-Protocols/IBFT.md
     - Configuring Pantheon:
         - Using a Configuration File: Configuring-Pantheon/Using-Configuration-File.md
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
@@ -61,8 +65,6 @@ nav:
         - Accounts for Testing: Configuring-Pantheon/Accounts-for-Testing.md
         - Logging: Configuring-Pantheon/Logging.md
         - Testing and Developing Nodes: Configuring-Pantheon/Testing-Developing-Nodes.md
-        - Clique: Configuring-Pantheon/Clique.md
-        - IBFT: Configuring-Pantheon/IBFT.md
         - Passing JVM Options: Configuring-Pantheon/Passing-JVM-Options.md
     - Using Pantheon:
         - Creating and Sending Transactions: Using-Pantheon/Transactions.md

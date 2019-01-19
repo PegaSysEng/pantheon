@@ -285,7 +285,7 @@ You must specify a valid coinbase when you enable mining using the [`--miner-ena
 option or the [`miner_start`](JSON-RPC-API-Methods.md#miner_start) JSON RPC-API method.
 
 !!!note
-    This option is ignored in networks using the [Clique Proof-of-Authority (PoA) consensus protocol](../Configuring-Pantheon/Clique.md). 
+    This option is ignored in networks using the [Clique Proof-of-Authority (PoA) consensus protocol](../Consensus-Protocols/Clique.md). 
 
 ### miner-enabled
 
