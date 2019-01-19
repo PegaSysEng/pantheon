@@ -815,9 +815,10 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 ### eth_estimateGas
 
-Returns an estimate of how much gas is needed for the transaction to complete. The estimate process does not use
-gas and is not added to the blockchain as a transaction. The estimate can be greater than the amount of gas that the
-transaction actually uses, for reasons including EVM mechanics and node performance.
+Returns an estimate of how much gas is needed for a future transaction to complete. The estimation process does not use
+gas and is not added to the blockchain as a transaction. Setting a gas limit is irrelevant to the estimation process
+(unlike transactions, in which gas limits apply). The resulting estimate can be greater than the amount of gas that the
+transaction actually uses, for various reasons including EVM mechanics and node performance.
 
 The `eth_estimateGas` call does not send a transaction. You must make a subsequent call to
 [eth_sendRawTransaction](#eth_sendrawtransaction) to execute the transaction.
@@ -825,8 +826,7 @@ The `eth_estimateGas` call does not send a transaction. You must make a subseque
 **Parameters**
 
 The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`,
-all fields are optional. Pantheon uses the `gasLimit` amount from the block at the head of the chain as the upper limit.
-If the amount of gas needed is higher than the estimated upper limit, the transaction might not have enough gas to execute.
+all fields are optional.
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
