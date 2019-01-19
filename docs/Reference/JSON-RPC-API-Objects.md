@@ -34,7 +34,7 @@ Returned by [eth_getBlockByHash](JSON-RPC-API-Methods.md#eth_getblockbyhash) and
 
 ## Filter Options Object
 
-Parameter for [eth_newFilter](JSON-RPC-API-Methods.md#eth_newfilter) and [eth_getLogs](JSON-RPC-API-Methods.md#eth_getlogs).  
+Parameter for [eth_newFilter](JSON-RPC-API-Methods.md#eth_newfilter) and [eth_getLogs](JSON-RPC-API-Methods.md#eth_getlogs). Used to [filter logs](../Using-Pantheon/Accessing-Logs-Using-JSON-RPC.md). 
 
 | Key           | Type                              | Required/Optional | Value                                                                                                                                       |
 |---------------|:---------------------------------:|:-----------------:|---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -63,7 +63,7 @@ Returned by [eth_getFilterChanges](JSON-RPC-API-Methods.md#eth_getfilterchanges)
 | **blockNumber**      | Quantity                          | Number of block in which log included. `null` when log is pending.                                                                                                                                                  |
 | **address**          | Data, 20&nbsp;bytes               | Address from which log originated.                                                                                                                                                                                  |
 | **data**             | Data                              | Non-indexed arguments of log.                                                                                                                                                                                       |
-| **topics**           | Array of Data, 32&nbsp;bytes each | Event signature hash and 0 to 3 [indexed log arguments](../Using-Pantheon/Events-and-Logs.md#event-parameters).  |
+| **topics**           | Array of Data, 32&nbsp;bytes each | [Event signature hash](../Using-Pantheon/Events-and-Logs.md#event-signature-hash) and 0 to 3 [indexed log arguments](../Using-Pantheon/Events-and-Logs.md#event-parameters).  |
 
 ## Trace Object
 
