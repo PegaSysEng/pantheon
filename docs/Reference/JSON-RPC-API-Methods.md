@@ -754,14 +754,16 @@ To avoid exposing your private key, create signed transactions offline and send 
 
 **Parameters**
 
-`DATA` -  Signed transaction serialized to hexadecimal format. For example:
+`data` -  Signed transaction serialized to hexadecimal format. For example:
 
 `params: ["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"]`
 
+!!! note
+    [Creating and Sending Transactions](../Using-Pantheon/Transactions.md) includes examples of creating signed transactions using the [web3.js](https://github.com/ethereum/web3.js/) library.
 
 **Returns**
 
-`result` : `DATA` - 32-byte transaction hash, or zero hash if the transaction is not yet available.
+`result` : `data` - 32-byte transaction hash
 
 !!! example
     ```bash tab="curl HTTP request"
