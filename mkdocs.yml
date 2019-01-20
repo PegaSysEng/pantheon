@@ -55,7 +55,7 @@ nav:
         - Running Pantheon from Docker Image: Getting-Started/Run-Docker-Image.md
         - Private Network Quickstart Tutorial: Getting-Started/Private-Network-Quickstart.md
     - Configuring Pantheon:
-        - Consensus Mechanisms: Configuring-Panetheon/Consensus-Mechanisms.md
+        - Consensus Mechanisms: Configuring-Pantheon/Consensus-Mechanisms.md
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
         - Networking: Configuring-Pantheon/Networking.md

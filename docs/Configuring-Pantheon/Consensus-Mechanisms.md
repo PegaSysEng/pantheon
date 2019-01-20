@@ -11,7 +11,7 @@ In Clique and IBFT 2.0, a group of nodes in the network act as signers(Clique) o
 and add blocks to the blockchain. Nodes are added to or removed from the signer/validator pool by the existing group of nodes voting. 
 
 !!! note
-    The term validator is used to refer to signers and validators for the rest of this page. 
+     For the rest of this page, the term validator is used to refer to signers and validators. 
 
 ## Properties 
    
