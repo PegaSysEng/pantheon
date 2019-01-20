@@ -90,7 +90,6 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public class JsonRpcMethodsFactory {
@@ -100,7 +99,7 @@ public class JsonRpcMethodsFactory {
 
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
-      final Optional<P2PNetwork> peerNetworkingService,
+      final P2PNetwork peerNetworkingService,
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final Synchronizer synchronizer,
@@ -131,7 +130,7 @@ public class JsonRpcMethodsFactory {
 
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
-      final Optional<P2PNetwork> p2pNetwork,
+      final P2PNetwork p2pNetwork,
       final BlockchainQueries blockchainQueries,
       final Synchronizer synchronizer,
       final ProtocolSchedule<?> protocolSchedule,
@@ -212,10 +211,11 @@ public class JsonRpcMethodsFactory {
           new DebugMetrics(metricsSystem));
     }
     if (rpcApis.contains(RpcApis.NET)) {
-      addMethods(enabledMethods, new NetVersion(protocolSchedule.getChainId()));
-      p2pNetwork.ifPresent(
-          network ->
-              addMethods(enabledMethods, new NetListening(network), new NetPeerCount(network)));
+      addMethods(
+          enabledMethods,
+          new NetVersion(protocolSchedule.getChainId()),
+          new NetListening(p2pNetwork),
+          new NetPeerCount(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());
@@ -230,16 +230,14 @@ public class JsonRpcMethodsFactory {
           new MinerSetEtherbase(minerSetCoinbase));
     }
     if (rpcApis.contains(RpcApis.PERM)) {
-      p2pNetwork.ifPresent(
-          network ->
-              addMethods(
-                  enabledMethods,
-                  new PermAddNodesToWhitelist(network, parameter),
-                  new PermRemoveNodesFromWhitelist(network, parameter),
-                  new PermGetNodesWhitelist(network)));
+      addMethods(
+          enabledMethods,
+          new PermAddNodesToWhitelist(p2pNetwork, parameter),
+          new PermRemoveNodesFromWhitelist(p2pNetwork, parameter),
+          new PermGetNodesWhitelist(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.ADMIN)) {
-      p2pNetwork.ifPresent(network -> addMethods(enabledMethods, new AdminPeers(network)));
+      addMethods(enabledMethods, new AdminPeers(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.PERM)) {
       addMethods(

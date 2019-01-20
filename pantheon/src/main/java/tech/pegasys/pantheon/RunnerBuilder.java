@@ -39,6 +39,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.pending.Pen
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscriptionService;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
+import tech.pegasys.pantheon.ethereum.p2p.NoopP2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
@@ -215,26 +216,25 @@ public class RunnerBuilder {
     NodeWhitelistController nodeWhitelistController =
         new NodeWhitelistController(permissioningConfiguration);
 
-    final Optional<NetworkRunner> networkRunner =
-        p2pDisabled
-            ? Optional.empty()
-            : Optional.of(
-                NetworkRunner.builder()
-                    .protocolManagers(protocolManagers)
-                    .subProtocols(subProtocols)
-                    .network(
-                        caps ->
-                            new NettyP2PNetwork(
-                                vertx,
-                                keyPair,
-                                networkConfig,
-                                caps,
-                                PeerRequirement.aggregateOf(protocolManagers),
-                                peerBlacklist,
-                                metricsSystem,
-                                nodeWhitelistController))
-                    .metricsSystem(metricsSystem)
-                    .build());
+    final NetworkRunner networkRunner =
+        NetworkRunner.builder()
+            .protocolManagers(protocolManagers)
+            .subProtocols(subProtocols)
+            .network(
+                p2pDisabled
+                    ? caps -> new NoopP2PNetwork()
+                    : caps ->
+                        new NettyP2PNetwork(
+                            vertx,
+                            keyPair,
+                            networkConfig,
+                            caps,
+                            PeerRequirement.aggregateOf(protocolManagers),
+                            peerBlacklist,
+                            metricsSystem,
+                            nodeWhitelistController))
+            .metricsSystem(metricsSystem)
+            .build();
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
@@ -255,7 +255,7 @@ public class RunnerBuilder {
               context,
               protocolSchedule,
               pantheonController,
-              hasP2p(networkRunner),
+              networkRunner.getNetwork(),
               synchronizer,
               transactionPool,
               miningCoordinator,
@@ -277,7 +277,7 @@ public class RunnerBuilder {
               context,
               protocolSchedule,
               pantheonController,
-              hasP2p(networkRunner),
+              networkRunner.getNetwork(),
               synchronizer,
               transactionPool,
               miningCoordinator,
@@ -336,7 +336,7 @@ public class RunnerBuilder {
       final ProtocolContext<?> context,
       final ProtocolSchedule<?> protocolSchedule,
       final PantheonController<?> pantheonController,
-      final Optional<P2PNetwork> network,
+      final P2PNetwork network,
       final Synchronizer synchronizer,
       final TransactionPool transactionPool,
       final MiningCoordinator miningCoordinator,
@@ -419,9 +419,5 @@ public class RunnerBuilder {
   private MetricsHttpService createMetricsService(
       final Vertx vertx, final MetricsConfiguration configuration) {
     return new MetricsHttpService(vertx, configuration, metricsSystem);
-  }
-
-  private Optional<P2PNetwork> hasP2p(final Optional<NetworkRunner> networkRunner) {
-    return p2pDisabled ? Optional.empty() : Optional.of(networkRunner.get().getNetwork());
   }
 }

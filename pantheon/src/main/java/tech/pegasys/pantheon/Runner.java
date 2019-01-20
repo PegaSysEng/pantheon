@@ -39,7 +39,7 @@ public class Runner implements AutoCloseable {
 
   private final ExecutorService exec = Executors.newCachedThreadPool();
 
-  private final Optional<NetworkRunner> networkRunner;
+  private final NetworkRunner networkRunner;
   private final Optional<JsonRpcHttpService> jsonRpc;
   private final Optional<WebSocketService> websocketRpc;
   private final Optional<MetricsHttpService> metrics;
@@ -49,7 +49,7 @@ public class Runner implements AutoCloseable {
 
   Runner(
       final Vertx vertx,
-      final Optional<NetworkRunner> networkRunner,
+      final NetworkRunner networkRunner,
       final Optional<JsonRpcHttpService> jsonRpc,
       final Optional<WebSocketService> websocketRpc,
       final Optional<MetricsHttpService> metrics,
@@ -67,16 +67,14 @@ public class Runner implements AutoCloseable {
   public void execute() {
     try {
       LOG.info("Starting Ethereum main loop ... ");
-      networkRunner.ifPresent(NetworkRunner::start);
+      networkRunner.start();
       pantheonController.getSynchronizer().start();
       jsonRpc.ifPresent(service -> service.start().join());
       websocketRpc.ifPresent(service -> service.start().join());
       metrics.ifPresent(service -> service.start().join());
       LOG.info("Ethereum main loop is up.");
       writePantheonPortsToFile();
-      if (networkRunner.isPresent()) {
-        networkRunner.get().awaitStop();
-      }
+      networkRunner.awaitStop();
     } catch (final InterruptedException e) {
       LOG.debug("Interrupted, exiting", e);
       Thread.currentThread().interrupt();
@@ -88,11 +86,8 @@ public class Runner implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    if (networkRunner.isPresent()) {
-      NetworkRunner networkRunner = this.networkRunner.get();
-      networkRunner.stop();
-      networkRunner.awaitStop();
-    }
+    networkRunner.stop();
+    networkRunner.awaitStop();
 
     exec.shutdown();
     try {
@@ -114,13 +109,12 @@ public class Runner implements AutoCloseable {
 
   private void writePantheonPortsToFile() {
     final Properties properties = new Properties();
-    networkRunner.ifPresent(
-        nRunner -> {
-          if (nRunner.getNetwork().isListening()) {
-            properties.setProperty("discovery", String.valueOf(getP2pUdpPort()));
-            properties.setProperty("p2p", String.valueOf(getP2pTcpPort()));
-          }
-        });
+
+    if (networkRunner.getNetwork().isListening()) {
+      properties.setProperty("discovery", String.valueOf(getP2pUdpPort()));
+      properties.setProperty("p2p", String.valueOf(getP2pTcpPort()));
+    }
+
     if (getJsonRpcPort().isPresent()) {
       properties.setProperty("json-rpc", String.valueOf(getJsonRpcPort().get()));
     }
@@ -156,10 +150,10 @@ public class Runner implements AutoCloseable {
   }
 
   public int getP2pUdpPort() {
-    return networkRunner.get().getNetwork().getDiscoverySocketAddress().getPort();
+    return networkRunner.getNetwork().getDiscoverySocketAddress().getPort();
   }
 
   public int getP2pTcpPort() {
-    return networkRunner.get().getNetwork().getLocalPeerInfo().getPort();
+    return networkRunner.getNetwork().getLocalPeerInfo().getPort();
   }
 }
