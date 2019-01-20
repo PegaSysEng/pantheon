@@ -75,7 +75,7 @@ public class RunnerBuilder {
 
   private Vertx vertx;
   private PantheonController<?> pantheonController;
-  private boolean p2pDisabled;
+  private boolean p2pEnabled;
   private boolean discovery;
   private Collection<?> bootstrapPeers;
   private String discoveryHost;
@@ -99,8 +99,8 @@ public class RunnerBuilder {
     return this;
   }
 
-  public RunnerBuilder p2pDisabled(final boolean p2pDisabled) {
-    this.p2pDisabled = p2pDisabled;
+  public RunnerBuilder p2pEnabled(final boolean p2pEnabled) {
+    this.p2pEnabled = p2pEnabled;
     return this;
   }
 
@@ -221,9 +221,8 @@ public class RunnerBuilder {
             .protocolManagers(protocolManagers)
             .subProtocols(subProtocols)
             .network(
-                p2pDisabled
-                    ? caps -> new NoopP2PNetwork()
-                    : caps ->
+                p2pEnabled
+                    ? caps ->
                         new NettyP2PNetwork(
                             vertx,
                             keyPair,
@@ -232,7 +231,8 @@ public class RunnerBuilder {
                             PeerRequirement.aggregateOf(protocolManagers),
                             peerBlacklist,
                             metricsSystem,
-                            nodeWhitelistController))
+                            nodeWhitelistController)
+                    : caps -> new NoopP2PNetwork())
             .metricsSystem(metricsSystem)
             .build();
 

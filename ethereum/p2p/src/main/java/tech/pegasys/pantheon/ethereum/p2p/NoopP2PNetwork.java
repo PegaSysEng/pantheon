@@ -34,18 +34,18 @@ public class NoopP2PNetwork implements P2PNetwork {
   }
 
   @Override
-  public CompletableFuture<PeerConnection> connect(Peer peer) {
+  public CompletableFuture<PeerConnection> connect(final Peer peer) {
     return null;
   }
 
   @Override
-  public void subscribe(Capability capability, Consumer<Message> consumer) {}
+  public void subscribe(final Capability capability, final Consumer<Message> consumer) {}
 
   @Override
-  public void subscribeConnect(Consumer<PeerConnection> consumer) {}
+  public void subscribeConnect(final Consumer<PeerConnection> consumer) {}
 
   @Override
-  public void subscribeDisconnect(DisconnectCallback consumer) {}
+  public void subscribeDisconnect(final DisconnectCallback consumer) {}
 
   @Override
   public void stop() {}

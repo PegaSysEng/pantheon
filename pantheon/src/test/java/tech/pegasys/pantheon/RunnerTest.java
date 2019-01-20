@@ -87,6 +87,7 @@ public final class RunnerTest {
   private void syncFromGenesis(final SyncMode mode) throws Exception {
     final Path dbAhead = temp.newFolder().toPath();
     final int blockCount = 500;
+    final boolean p2pEnabled = true;
     final KeyPair aheadDbNodeKeys = loadKeyPair(dbAhead);
     final SynchronizerConfiguration fastSyncConfig =
         SynchronizerConfiguration.builder()
@@ -130,6 +131,7 @@ public final class RunnerTest {
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
+            .p2pEnabled(p2pEnabled)
             .discovery(true)
             .discoveryHost(listenHost)
             .discoveryPort(0)
