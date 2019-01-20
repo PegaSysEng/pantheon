@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.consensus.common.jsonrpc.AbstractVoteProposerMethod
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 
 public class CliqueProposals extends AbstractVoteProposerMethod implements JsonRpcMethod {
-  public static final String CLIQUE_PROPOSALS = "clique_proposals";
 
   public CliqueProposals(final VoteProposer voteProposer) {
     super(voteProposer);
@@ -25,6 +24,6 @@ public class CliqueProposals extends AbstractVoteProposerMethod implements JsonR
 
   @Override
   public String getName() {
-    return CLIQUE_PROPOSALS;
+    return "clique_proposals";
   }
 }

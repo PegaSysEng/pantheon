@@ -40,3 +40,13 @@ dependencies {
   testImplementation "org.assertj:assertj-core"
   testImplementation 'org.mockito:mockito-core'
 }
+configurations { testArtifacts }
+task testJar (type: Jar) {
+  baseName = "${project.name}-test"
+  from sourceSets.test.output
+}
+
+artifacts {
+  testArtifacts testJar
+  testSupportArtifacts testSupportJar
+}

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class AbstractVoteProposerMethod {
 
-  protected final VoteProposer voteProposer;
+  private final VoteProposer voteProposer;
 
   public AbstractVoteProposerMethod(final VoteProposer voteProposer) {
     this.voteProposer = voteProposer;

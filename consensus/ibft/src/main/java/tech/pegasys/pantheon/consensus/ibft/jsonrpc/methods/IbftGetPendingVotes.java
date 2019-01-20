@@ -18,14 +18,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 
 public class IbftGetPendingVotes extends AbstractVoteProposerMethod implements JsonRpcMethod {
 
-  public static final String PENDING_VOTES = "ibft_getPendingVotes";
-
   public IbftGetPendingVotes(final VoteProposer voteProposer) {
     super(voteProposer);
   }
 
   @Override
   public String getName() {
-    return PENDING_VOTES;
+    return "ibft_getPendingVotes";
   }
 }
