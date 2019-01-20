@@ -61,16 +61,16 @@ The JSON-RPC methods to add or remove validators are:
 * [ibft_proposeValidatorVote](../Reference/JSON-RPC-API-Methods.md#ibft_proposeValidatorVote)
 * [ibft_discardValidatorVote](../Reference/JSON-RPC-API-Methods.md#ibft_discardValidatorVote)
 
-To propose adding a validator, call `ibft_proposeValidatorVote` specifying the address of the proposed signer and `true`.
+To propose adding a validator, call `ibft_proposeValidatorVote` specifying the address of the node to be added and `true`.
 !!! example "JSON-RPC ibft_proposeValidatorVote Request Example"
     ```bash
     curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-endpoint:port>
     ``` 
 
-When the next block is created by the validator, a vote is added to the block for the proposed validator.  
+When the next block is proposed by the validator, one proposal received from `ibft_proposeValidatorVote` is inserted in the block.  
+If all proposals have been included in blocks, subsequent blocks proposed by the validator will not contain a vote.
 
-When more than half of the existing validators propose adding the validators and their votes have been 
-distributed in blocks, the validator is added and can begin validating blocks. 
+When more than half of the existing validators have published a matching proposal, the proposed validator is added to the validator pool and can begin validating blocks. 
 
 Use `ibft_getValidatorsByBlockNumber` to return a list of the validators and confirm your proposed validator has been added. 
 
@@ -93,4 +93,4 @@ The process for removing a validator is the same as adding a validator except yo
 At each epoch transition, all pending votes collected from received blocks are discarded. Existing proposals remain 
 in effect and validators re-add their vote the next time they create a block. 
 
-Define the number of blocks between epoch transitions in the genesis file. 
+An epoch transition occurs every `epochLength` blocks where `epochlength` is defined in the IBFT genesis file.
