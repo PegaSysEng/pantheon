@@ -13,8 +13,12 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
@@ -39,12 +43,15 @@ public class AdminAddPeer implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
-
-    final String enodeString = parameters.required(req.getParams(), 0, String.class);
-    final Peer peer = DefaultPeer.fromURI(enodeString);
-
     try {
-      return null;
+      final String enodeString = parameters.required(req.getParams(), 0, String.class);
+      final Peer peer = DefaultPeer.fromURI(enodeString);
+      final boolean added = peerNetwork.addMaintainConnectionPeer(peer);
+      return new JsonRpcSuccessResponse(req.getId(), added);
+    } catch (final InvalidJsonRpcParameters e) {
+      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
+    } catch (final IllegalArgumentException e) {
+      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.PARSE_ERROR);
     } catch (final Exception e) {
       LOG.error("Error processing request: " + req, e);
       throw e;
