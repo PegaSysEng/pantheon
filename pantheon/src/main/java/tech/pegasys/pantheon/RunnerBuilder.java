@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -53,6 +52,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsHttpService;
@@ -230,9 +230,9 @@ public class RunnerBuilder {
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
 
+    final AccountWhitelistController accountWhitelistController =
+        new AccountWhitelistController(permissioningConfiguration);
     if (permissioningConfiguration.isAccountWhitelistSet()) {
-      AccountWhitelistController accountWhitelistController =
-          new AccountWhitelistController(permissioningConfiguration);
       transactionPool.setAccountWhitelist(accountWhitelistController);
     }
 
@@ -252,7 +252,8 @@ public class RunnerBuilder {
               metricsSystem,
               supportedCapabilities,
               jsonRpcConfiguration.getRpcApis(),
-              filterManager);
+              filterManager,
+              accountWhitelistController);
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
@@ -273,7 +274,8 @@ public class RunnerBuilder {
               metricsSystem,
               supportedCapabilities,
               webSocketConfiguration.getRpcApis(),
-              filterManager);
+              filterManager,
+              accountWhitelistController);
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(
@@ -331,7 +333,8 @@ public class RunnerBuilder {
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> jsonRpcApis,
-      final FilterManager filterManager) {
+      final FilterManager filterManager,
+      final AccountWhitelistController accountWhitelistController) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -346,7 +349,8 @@ public class RunnerBuilder {
                 metricsSystem,
                 supportedCapabilities,
                 jsonRpcApis,
-                filterManager);
+                filterManager,
+                accountWhitelistController);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
   }

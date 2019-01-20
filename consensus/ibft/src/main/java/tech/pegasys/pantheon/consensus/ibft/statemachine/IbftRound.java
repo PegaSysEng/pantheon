@@ -20,13 +20,15 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -135,8 +137,26 @@ public class IbftRound {
 
   public void handleProposalMessage(final SignedData<ProposalPayload> msg) {
     LOG.info("Handling a Proposal message.");
+
+    if (getRoundIdentifier().getRoundNumber() != 0) {
+      LOG.info("Illegally received a Proposal message when not in Round 0.");
+      return;
+    }
+    actionReceivedProposal(msg);
+  }
+
+  public void handleProposalFromNewRound(final SignedData<NewRoundPayload> msg) {
+    LOG.info("Handling a New Round Proposal.");
+
+    if (getRoundIdentifier().getRoundNumber() == 0) {
+      LOG.info("Illegally received a NewRound message when in Round 0.");
+      return;
+    }
+    actionReceivedProposal(msg.getPayload().getProposalPayload());
+  }
+
+  private void actionReceivedProposal(final SignedData<ProposalPayload> msg) {
     final Block block = msg.getPayload().getBlock();
-    final boolean wasCommitted = roundState.isCommitted();
 
     if (updateStateWithProposedBlock(msg)) {
       LOG.info("Sending prepare message.");
@@ -145,10 +165,6 @@ public class IbftRound {
           messageFactory.createSignedPreparePayload(
               roundState.getRoundIdentifier(), block.getHash());
       peerIsPrepared(localPrepareMessage);
-    }
-
-    if (wasCommitted != roundState.isCommitted()) {
-      importBlockToChain();
     }
   }
 
@@ -168,6 +184,7 @@ public class IbftRound {
 
   private boolean updateStateWithProposedBlock(final SignedData<ProposalPayload> msg) {
     final boolean wasPrepared = roundState.isPrepared();
+    final boolean wasCommitted = roundState.isCommitted();
     final boolean blockAccepted = roundState.setProposedBlock(msg);
     if (blockAccepted) {
       // There are times handling a proposed block is enough to enter prepared.
@@ -176,6 +193,10 @@ public class IbftRound {
         final Block block = roundState.getProposedBlock().get();
         transmitter.multicastCommit(getRoundIdentifier(), block.getHash(), createCommitSeal(block));
       }
+      if (wasCommitted != roundState.isCommitted()) {
+        importBlockToChain();
+      }
+
       final SignedData<CommitPayload> localCommitMessage =
           messageFactory.createSignedCommitPayload(
               roundState.getRoundIdentifier(),
