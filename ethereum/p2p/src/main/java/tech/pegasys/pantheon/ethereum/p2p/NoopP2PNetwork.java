@@ -30,12 +30,12 @@ import java.util.function.Consumer;
 public class NoopP2PNetwork implements P2PNetwork {
   @Override
   public Collection<PeerConnection> getPeers() {
-    return null;
+    throw new P2pDisabledException("P2P networking disabled.  Peers list unavailable.");
   }
 
   @Override
   public CompletableFuture<PeerConnection> connect(final Peer peer) {
-    return null;
+    throw new P2pDisabledException("P2P networking disabled.  Unable to connect to network.");
   }
 
   @Override
@@ -55,43 +55,23 @@ public class NoopP2PNetwork implements P2PNetwork {
 
   @Override
   public InetSocketAddress getDiscoverySocketAddress() {
-    try {
-      throw new P2pDisabledException(
-          "P2P networking disabled.  Discovery socket address unavailable.");
-    } catch (P2pDisabledException ignored) {
-
-    }
-    return null;
+    throw new P2pDisabledException(
+        "P2P networking disabled.  Discovery socket address unavailable.");
   }
 
   @Override
   public PeerInfo getLocalPeerInfo() {
-    try {
-      throw new P2pDisabledException("P2P networking disabled.  Local peer info unavailable.");
-    } catch (P2pDisabledException ignored) {
-
-    }
-    return null;
+    throw new P2pDisabledException("P2P networking disabled.  Local peer info unavailable.");
   }
 
   @Override
   public boolean isListening() {
-    try {
-      throw new P2pDisabledException("P2P networking disabled.  Node is not listening on network.");
-    } catch (P2pDisabledException ignored) {
-
-    }
     return false;
   }
 
   @Override
   public NodeWhitelistController getNodeWhitelistController() {
-    try {
-      throw new P2pDisabledException("P2P networking disabled.  Node whitelist unavailable.");
-    } catch (P2pDisabledException ignored) {
-
-    }
-    return null;
+    throw new P2pDisabledException("P2P networking disabled.  Node whitelist unavailable.");
   }
 
   @Override
