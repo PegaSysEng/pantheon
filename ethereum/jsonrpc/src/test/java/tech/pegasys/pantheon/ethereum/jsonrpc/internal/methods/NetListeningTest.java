@@ -63,7 +63,7 @@ public class NetListeningTest {
 
   @Test
   public void shouldFailWhenP2pDisabled() {
-    when(p2PNetwork.isListening()).thenThrow(new P2pDisabledException("P2p disabled."));
+    when(p2PNetwork.isListening()).thenThrow(new P2pDisabledException("P2P disabled."));
 
     final JsonRpcRequest request = netListeningRequest();
     final JsonRpcResponse expectedResponse =
