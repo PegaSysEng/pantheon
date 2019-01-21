@@ -41,8 +41,10 @@ import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockBodiesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockHeadersMessage;
+import tech.pegasys.pantheon.ethereum.eth.messages.GetNodeDataMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
+import tech.pegasys.pantheon.ethereum.eth.messages.NodeDataMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.ReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
@@ -54,7 +56,8 @@ import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 import tech.pegasys.pantheon.ethereum.p2p.wire.RawMessage;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayList;
@@ -97,7 +100,8 @@ public final class EthProtocolManagerTest {
 
   @Test
   public void disconnectOnUnsolicitedMessage() {
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer = setupPeer(ethManager, (cap, msg, conn) -> {});
@@ -108,7 +112,8 @@ public final class EthProtocolManagerTest {
 
   @Test
   public void disconnectOnFailureToSendStatusMessage() {
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer =
@@ -120,7 +125,8 @@ public final class EthProtocolManagerTest {
 
   @Test
   public void disconnectOnWrongChainId() {
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer =
@@ -143,7 +149,8 @@ public final class EthProtocolManagerTest {
 
   @Test
   public void disconnectOnWrongGenesisHash() {
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer =
@@ -166,7 +173,8 @@ public final class EthProtocolManagerTest {
 
   @Test(expected = ConditionTimeoutException.class)
   public void doNotDisconnectOnValidMessage() {
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final MessageData messageData =
           GetBlockBodiesMessage.create(Collections.singletonList(gen.hash()));
       final MockPeerConnection peer = setupPeer(ethManager, (cap, msg, conn) -> {});
@@ -181,7 +189,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetHeaders() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final long startBlock = 5L;
       final int blockCount = 5;
       final MessageData messageData =
@@ -213,7 +222,8 @@ public final class EthProtocolManagerTest {
     final CompletableFuture<Void> done = new CompletableFuture<>();
     final int limit = 5;
     try (final EthProtocolManager ethManager =
-        new EthProtocolManager(blockchain, 1, true, 1, 1, limit)) {
+        new EthProtocolManager(
+            blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1, limit)) {
       final long startBlock = 5L;
       final int blockCount = 10;
       final MessageData messageData =
@@ -243,7 +253,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetHeadersReversed() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final long endBlock = 10L;
       final int blockCount = 5;
       final MessageData messageData = GetBlockHeadersMessage.create(endBlock, blockCount, 0, true);
@@ -272,7 +283,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetHeadersWithSkip() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final long startBlock = 5L;
       final int blockCount = 5;
       final int skip = 1;
@@ -304,7 +316,8 @@ public final class EthProtocolManagerTest {
   public void respondToGetHeadersReversedWithSkip()
       throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final long endBlock = 10L;
       final int blockCount = 5;
       final int skip = 1;
@@ -357,7 +370,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetHeadersPartial() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final long startBlock = blockchain.getChainHeadBlockNumber() - 1L;
       final int blockCount = 5;
       final MessageData messageData =
@@ -387,7 +401,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetHeadersEmpty() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final long startBlock = blockchain.getChainHeadBlockNumber() + 1;
       final int blockCount = 5;
       final MessageData messageData =
@@ -414,7 +429,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetBodies() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       // Setup blocks query
       final long startBlock = blockchain.getChainHeadBlockNumber() - 5;
       final int blockCount = 2;
@@ -458,7 +474,8 @@ public final class EthProtocolManagerTest {
     final CompletableFuture<Void> done = new CompletableFuture<>();
     final int limit = 5;
     try (final EthProtocolManager ethManager =
-        new EthProtocolManager(blockchain, 1, true, 1, 1, limit)) {
+        new EthProtocolManager(
+            blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1, limit)) {
       // Setup blocks query
       final int blockCount = 10;
       final long startBlock = blockchain.getChainHeadBlockNumber() - blockCount;
@@ -500,7 +517,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetBodiesPartial() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       // Setup blocks query
       final long expectedBlockNumber = blockchain.getChainHeadBlockNumber() - 1;
       final BlockHeader header = blockchain.getBlockHeader(expectedBlockNumber).get();
@@ -536,7 +554,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetReceipts() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       // Setup blocks query
       final long startBlock = blockchain.getChainHeadBlockNumber() - 5;
       final int blockCount = 2;
@@ -579,7 +598,8 @@ public final class EthProtocolManagerTest {
     final CompletableFuture<Void> done = new CompletableFuture<>();
     final int limit = 5;
     try (final EthProtocolManager ethManager =
-        new EthProtocolManager(blockchain, 1, true, 1, 1, limit)) {
+        new EthProtocolManager(
+            blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1, limit)) {
       // Setup blocks query
       final int blockCount = 10;
       final long startBlock = blockchain.getChainHeadBlockNumber() - blockCount;
@@ -620,7 +640,8 @@ public final class EthProtocolManagerTest {
   @Test
   public void respondToGetReceiptsPartial() throws ExecutionException, InterruptedException {
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       // Setup blocks query
       final long blockNumber = blockchain.getChainHeadBlockNumber() - 5;
       final BlockHeader header = blockchain.getBlockHeader(blockNumber).get();
@@ -654,8 +675,54 @@ public final class EthProtocolManagerTest {
   }
 
   @Test
+  public void respondToGetNodeData() throws Exception {
+    final CompletableFuture<Void> done = new CompletableFuture<>();
+    final WorldStateArchive worldStateArchive = protocolContext.getWorldStateArchive();
+
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, worldStateArchive, 1, true, 1, 1)) {
+      // Setup node data query
+
+      final List<BytesValue> expectedResults = new ArrayList<>();
+      final List<Hash> requestedHashes = new ArrayList<>();
+
+      final long startBlock = blockchain.getChainHeadBlockNumber() - 5;
+      final int blockCount = 2;
+      for (int i = 0; i < blockCount; i++) {
+        final BlockHeader header = blockchain.getBlockHeader(startBlock + i).get();
+        requestedHashes.add(header.getStateRoot());
+        expectedResults.add(worldStateArchive.getNodeData(header.getStateRoot()).get());
+      }
+      final MessageData messageData = GetNodeDataMessage.create(requestedHashes);
+
+      // Define handler to validate response
+      final PeerSendHandler onSend =
+          (cap, message, conn) -> {
+            if (message.getCode() == EthPV62.STATUS) {
+              // Ignore status message
+              return;
+            }
+            assertThat(message.getCode()).isEqualTo(EthPV63.NODE_DATA);
+            final NodeDataMessage receiptsMessage = NodeDataMessage.readFrom(message);
+            final List<BytesValue> nodeData = receiptsMessage.nodeData();
+            assertThat(nodeData.size()).isEqualTo(blockCount);
+            for (int i = 0; i < blockCount; i++) {
+              assertThat(expectedResults.get(i)).isEqualTo(nodeData.get(i));
+            }
+            done.complete(null);
+          };
+
+      // Run test
+      final PeerConnection peer = setupPeer(ethManager, onSend);
+      ethManager.processMessage(EthProtocol.ETH63, new DefaultMessage(peer, messageData));
+      done.get();
+    }
+  }
+
+  @Test
   public void newBlockMinedSendsNewBlockMessageToAllPeers() {
-    final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1);
+    final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1);
 
     // Define handler to validate response
     final PeerSendHandler onSend = mock(PeerSendHandler.class);
@@ -693,8 +760,7 @@ public final class EthProtocolManagerTest {
         .isEqualTo(Collections.singletonList(EthProtocol.ETH63));
 
     // assert that all messages transmitted contain the expected block & total difficulty.
-    final ProtocolSchedule<Void> protocolSchdeule =
-        MainnetProtocolSchedule.create(new NoOpMetricsSystem());
+    final ProtocolSchedule<Void> protocolSchdeule = MainnetProtocolSchedule.create();
     for (final NewBlockMessage msg : messageSentCaptor.getAllValues()) {
       assertThat(msg.block(protocolSchdeule)).isEqualTo(minedBlock);
       assertThat(msg.totalDifficulty(protocolSchdeule)).isEqualTo(expectedTotalDifficulty);
@@ -718,7 +784,8 @@ public final class EthProtocolManagerTest {
     blockchain.appendBlock(block, receipts);
 
     final CompletableFuture<Void> done = new CompletableFuture<>();
-    try (final EthProtocolManager ethManager = new EthProtocolManager(blockchain, 1, true, 1, 1)) {
+    try (final EthProtocolManager ethManager =
+        new EthProtocolManager(blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, 1)) {
       final long startBlock = 1L;
       final int requestedBlockCount = 13;
       final int receivedBlockCount = 2;
@@ -774,7 +841,8 @@ public final class EthProtocolManagerTest {
     final TransactionsMessage transactionMessage = TransactionsMessage.readFrom(raw);
 
     try (final EthProtocolManager ethManager =
-        new EthProtocolManager(blockchain, 1, true, 1, ethScheduler)) {
+        new EthProtocolManager(
+            blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, ethScheduler)) {
 
       // Create a transaction pool.  This has a side effect of registring a listener for the
       // transactions message.
