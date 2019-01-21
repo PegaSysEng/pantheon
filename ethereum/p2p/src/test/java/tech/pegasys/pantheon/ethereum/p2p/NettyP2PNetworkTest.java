@@ -23,9 +23,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.AbstractMap.SimpleEntry;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
@@ -48,6 +45,7 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.InetAddress;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
@@ -56,6 +54,8 @@ import java.util.concurrent.TimeUnit;
 import io.vertx.core.Vertx;
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /** Tests for {@link NettyP2PNetwork}. */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -553,9 +553,7 @@ public final class NettyP2PNetworkTest {
       network.checkMaintainedConnectionPeers();
       verify(network, times(1)).connect(peer);
     }
-
   }
-
 
   private SubProtocol subProtocol() {
     return new SubProtocol() {
@@ -662,8 +660,7 @@ public final class NettyP2PNetworkTest {
   private Peer mockPeer() {
     final Peer peer = mock(Peer.class);
     final BytesValue id = SECP256K1.KeyPair.generate().getPublicKey().getEncodedBytes();
-    when(peer.getId())
-        .thenReturn(id);
+    when(peer.getId()).thenReturn(id);
     when(peer.getEndpoint()).thenReturn(new Endpoint("127.0.0.1", 30303, OptionalInt.of(30303)));
     return peer;
   }
