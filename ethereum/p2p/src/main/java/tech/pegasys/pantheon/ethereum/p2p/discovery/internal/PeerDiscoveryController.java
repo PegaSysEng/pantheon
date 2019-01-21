@@ -156,14 +156,16 @@ public class PeerDiscoveryController {
     bootstrapNodes
         .stream()
         .filter(node -> peerTable.tryAdd(node).getOutcome() == Outcome.ADDED)
-        .filter(node -> nodeWhitelist.isPermitted(node))
+        .filter(nodeWhitelist::isPermitted)
         .forEach(node -> bond(node, true));
 
     final long timerId =
         timerUtil.setPeriodic(
             Math.min(REFRESH_CHECK_INTERVAL_MILLIS, tableRefreshIntervalMs),
-            () -> refreshTableIfRequired());
+            this::refreshTableIfRequired);
     tableRefreshTimerId = OptionalLong.of(timerId);
+
+    refreshTableIfRequired();
 
     return CompletableFuture.completedFuture(null);
   }
@@ -378,7 +380,7 @@ public class PeerDiscoveryController {
   }
 
   private void sendPacket(final DiscoveryPeer peer, final PacketType type, final PacketData data) {
-    Packet packet = createPacket(type, data);
+    final Packet packet = createPacket(type, data);
     outboundMessageHandler.send(peer, packet);
   }
 
