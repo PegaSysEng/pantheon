@@ -41,7 +41,10 @@ To connect to the Rinkeby testnet, start Pantheon with the [`--rinkeby`](../Refe
 
 ## Adding and Removing Signers
 
-To propose adding or removing signers using the JSON-RPC methods, you must enable the RPC interface using the [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) option. If also using the [`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) option, include `CLIQUE`.
+To propose adding or removing signers using the JSON-RPC methods, enable the HTTP interface 
+using [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) or WebSockets interface using 
+[`--ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#ws-enabled). If also using the [`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) 
+ or [`--ws-api`](../Reference/Pantheon-CLI-Syntax.md#ws-api) options, include `CLIQUE`.
 
 The JSON-RPC methods to add or remove signers are:
 
@@ -78,3 +81,5 @@ The process for removing a signer is the same as adding a signer except you spec
 At each epoch transition, all pending votes collected from received blocks are discarded. Existing proposals remain in effect and signers re-add their vote the next time they create a block. 
 
 Define the number of blocks between epoch transitions in the genesis file. 
+
+*[vanity data]: Signers can include anything they like as vanity data.

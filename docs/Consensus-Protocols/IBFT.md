@@ -36,9 +36,9 @@ Properties specific to IBFT 2.0 are:
 * `blockperiodseconds` - Minimum block time in seconds. 
 * `epochlength` - Number of blocks after which to reset all votes.
 * `requesttimeoutseconds` - Timeout for each consensus round before a round change. 
-* `extraData` - `RLP([32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals])`
+* `extraData` - RLP([32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals])
 
-The `extraData` property is RLP (Recursive Length Prefix) encoded. RLP encoding is a space efficient object 
+The `extraData` property is RLP encoded. RLP encoding is a space efficient object 
 serialization scheme used in Ethereum. You can use a library such as [EthereumJS RLP](https://github.com/ethereumjs/rlp)
 to encode and decode RLP strings. 
 
@@ -72,9 +72,10 @@ To start a node on an IBFT 2.0 private network, use the [`--genesis`](../Referen
 
 ## Adding and Removing Validators
 
-To propose adding or removing validators using the JSON-RPC methods, enable the RPC interface 
-using the [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) option. If also using the 
-[`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) option, include `IBFT`.
+To propose adding or removing validators using the JSON-RPC methods, enable the HTTP interface 
+using [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) or WebSockets interface using 
+[`--ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#ws-enabled). If also using the [`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) 
+ or [`--ws-api`](../Reference/Pantheon-CLI-Syntax.md#ws-api) options, include `IBFT`.
 
 The JSON-RPC methods to add or remove validators are:
 
@@ -115,3 +116,6 @@ At each epoch transition, all pending votes collected from received blocks are d
 in effect and validators re-add their vote the next time they create a block. 
 
 An epoch transition occurs every `epochLength` blocks where `epochlength` is defined in the IBFT genesis file.
+
+*[Vanity]: Validators can include anything they like as vanity data. 
+*[RLP]: Recursive Length Prefix
