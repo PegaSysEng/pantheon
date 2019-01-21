@@ -13,40 +13,17 @@
 package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteType;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
+import tech.pegasys.pantheon.consensus.common.jsonrpc.AbstractVoteProposerMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
-public class CliqueProposals implements JsonRpcMethod {
-  public static final String CLIQUE_PROPOSALS = "clique_proposals";
-  private final VoteProposer voteProposer;
+public class CliqueProposals extends AbstractVoteProposerMethod implements JsonRpcMethod {
 
   public CliqueProposals(final VoteProposer voteProposer) {
-    this.voteProposer = voteProposer;
+    super(voteProposer);
   }
 
   @Override
   public String getName() {
-    return CLIQUE_PROPOSALS;
-  }
-
-  @Override
-  public JsonRpcResponse response(final JsonRpcRequest request) {
-    final Map<String, Boolean> proposals =
-        voteProposer
-            .getProposals()
-            .entrySet()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    proposal -> proposal.getKey().toString(),
-                    proposal -> proposal.getValue() == VoteType.ADD));
-
-    return new JsonRpcSuccessResponse(request.getId(), proposals);
+    return "clique_proposals";
   }
 }
