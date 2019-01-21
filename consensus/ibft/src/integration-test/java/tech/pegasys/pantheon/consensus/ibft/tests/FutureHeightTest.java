@@ -18,12 +18,6 @@ import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpe
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommentPayload;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -35,6 +29,14 @@ import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
 import tech.pegasys.pantheon.ethereum.core.Block;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.stream.Collectors;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class FutureHeightTest {
 
