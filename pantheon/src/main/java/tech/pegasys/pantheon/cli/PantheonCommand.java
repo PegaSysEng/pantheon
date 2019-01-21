@@ -505,7 +505,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
-    if (!p2pEnabled && !bootstrapNodes.isEmpty()) {
+    if (!p2pEnabled && (bootstrapNodes != null && !bootstrapNodes.isEmpty())) {
       throw new ParameterException(
           new CommandLine(this), "Unable to specify bootnodes if p2p is disabled.");
     }
