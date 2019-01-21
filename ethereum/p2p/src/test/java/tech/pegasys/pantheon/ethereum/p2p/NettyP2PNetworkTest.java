@@ -45,7 +45,6 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.InetAddress;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
@@ -496,40 +495,23 @@ public final class NettyP2PNetworkTest {
 
   @Test
   public void checkMaintainedConnectionPeersTriesToConnect() {
-    final NettyP2PNetwork network = mockNettyP2PNetwork();
+    final NettyP2PNetwork network = spy(mockNettyP2PNetwork());
     final Peer peer = mockPeer();
-    assertThat(network.addMaintainConnectionPeer(peer)).isTrue();
-
-    final CompletableFuture<PeerConnection> connection;
-    connection = network.pendingConnections.remove(peer);
-    assertThat(connection).isNotNull();
-    assertThat(connection.cancel(true)).isTrue();
+    network.peerMaintainConnectionList.add(peer);
 
     network.checkMaintainedConnectionPeers();
-    assertThat(network.pendingConnections).containsKey(peer);
+    verify(network, times(1)).connect(peer);
   }
 
   @Test
   public void checkMaintainedConnectionPeersDoesntReconnectPendingPeers() {
-    final NettyP2PNetwork network = mockNettyP2PNetwork();
+    final NettyP2PNetwork network = spy(mockNettyP2PNetwork());
     final Peer peer = mockPeer();
-    assertThat(network.addMaintainConnectionPeer(peer)).isTrue();
 
-    {
-      final CompletableFuture<PeerConnection> connection;
-      connection = network.pendingConnections.remove(peer);
-      assertThat(connection).isNotNull();
-      assertThat(connection.cancel(true)).isTrue();
-    }
+    network.pendingConnections.put(peer, new CompletableFuture<>());
 
-    {
-      network.checkMaintainedConnectionPeers();
-      final CompletableFuture<PeerConnection> connection;
-      connection = network.pendingConnections.get(peer);
-      assertThat(connection).isNotNull();
-      network.checkMaintainedConnectionPeers();
-      assertThat(network.pendingConnections).contains(new SimpleEntry<>(peer, connection));
-    }
+    network.checkMaintainedConnectionPeers();
+    verify(network, times(0)).connect(peer);
   }
 
   @Test

@@ -107,7 +107,7 @@ import org.apache.logging.log4j.Logger;
  *     Selection</a>
  * @see <a href="https://github.com/ethereum/devp2p/blob/master/rlpx.md">devp2p RLPx</a>
  */
-public final class NettyP2PNetwork implements P2PNetwork {
+public class NettyP2PNetwork implements P2PNetwork {
 
   private static final Logger LOG = LogManager.getLogger();
   private static final int TIMEOUT_SECONDS = 30;
