@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayList;
@@ -47,11 +48,17 @@ class EthServer {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Blockchain blockchain;
+  private final WorldStateArchive worldStateArchive;
   private final EthMessages ethMessages;
   private final int requestLimit;
 
-  EthServer(final Blockchain blockchain, final EthMessages ethMessages, final int requestLimit) {
+  EthServer(
+      final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
+      final EthMessages ethMessages,
+      final int requestLimit) {
     this.blockchain = blockchain;
+    this.worldStateArchive = worldStateArchive;
     this.ethMessages = ethMessages;
     this.requestLimit = requestLimit;
     this.setupListeners();
@@ -106,7 +113,8 @@ class EthServer {
   private void handleGetNodeData(final EthMessage message) {
     LOG.trace("Responding to GET_NODE_DATA request");
     try {
-      final MessageData response = constructGetNodeDataResponse(message.getData(), requestLimit);
+      final MessageData response =
+          constructGetNodeDataResponse(worldStateArchive, message.getData(), requestLimit);
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
@@ -195,7 +203,9 @@ class EthServer {
   }
 
   static MessageData constructGetNodeDataResponse(
-      final MessageData message, final int requestLimit) {
+      final WorldStateArchive worldStateArchive,
+      final MessageData message,
+      final int requestLimit) {
     final GetNodeDataMessage getNodeDataMessage = GetNodeDataMessage.readFrom(message);
     final Iterable<Hash> hashes = getNodeDataMessage.hashes();
 
@@ -206,7 +216,8 @@ class EthServer {
         break;
       }
       count++;
-      // TODO: Lookup node data and add it to the list
+
+      worldStateArchive.getNodeData(hash).ifPresent(nodeData::add);
     }
     return NodeDataMessage.create(nodeData);
   }

@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
 import java.util.List;
 
@@ -27,11 +28,12 @@ public class Istanbul64ProtocolManager extends EthProtocolManager {
 
   public Istanbul64ProtocolManager(
       final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
       final int syncWorkers,
       final int txWorkers) {
-    super(blockchain, networkId, fastSyncEnabled, syncWorkers, txWorkers);
+    super(blockchain, worldStateArchive, networkId, fastSyncEnabled, syncWorkers, txWorkers);
   }
 
   @Override
