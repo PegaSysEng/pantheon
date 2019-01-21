@@ -57,7 +57,8 @@ public class PantheonNodeFactory {
             config.getPermissioningConfiguration(),
             config.isDevMode(),
             config.getGenesisConfigProvider(),
-            serverSocket.getLocalPort());
+            serverSocket.getLocalPort(),
+            config.getP2pEnabled());
     serverSocket.close();
 
     return node;
