@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static tech.pegasys.pantheon.cli.ChainName.MAINNET;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
+import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
@@ -154,7 +154,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // This seems to be the only way it works with Picocli.
   // Also many other software use the same negative option scheme for false defaults
   // meaning that it's probably the right way to handle disabling options.
-  // TODO change naming and find a way to make it able to define true or false
   @Option(
     names = {"--no-discovery"},
     description = "Disable p2p peer discovery (default: ${DEFAULT-VALUE})"
@@ -207,26 +206,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Collection<String> bannedNodeIds = new ArrayList<>();
 
-  // TODO: Re-enable as per NC-1057/NC-1681
-  //  @Option(
-  //    names = {"--sync-mode"},
-  //    paramLabel = MANDATORY_MODE_FORMAT_HELP,
-  //    description =
-  //        "Synchronization mode (Value can be one of ${COMPLETION-CANDIDATES}, default:
-  // ${DEFAULT-VALUE})"
-  //  )
-  private final SyncMode syncMode = DEFAULT_SYNC_MODE;
-
   @Option(
-    names = {"--chain"},
-    paramLabel = MANDATORY_CHAIN_FORMAT_HELP,
+    names = {"--network"},
+    paramLabel = MANDATORY_NETWORK_FORMAT_HELP,
     description =
-        "Synchronize against the indicated chain, possible values are ${COMPLETION-CANDIDATES}."
+        "Synchronize against the indicated network, possible values are ${COMPLETION-CANDIDATES}."
             + " (default: ${DEFAULT-VALUE})"
   )
-  private final ChainName chain = MAINNET;
+  private final NetworkName network = MAINNET;
 
-  /** @deprecated Deprecated in favour of --chain option */
+  /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   // Boolean option to indicate if the client have to sync against the ottoman test network
   // (see https://github.com/ethereum/EIPs/issues/650).
@@ -239,7 +228,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Boolean syncWithOttoman = false;
 
-  /** @deprecated Deprecated in favour of --chain option */
+  /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
     hidden = true,
@@ -250,7 +239,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Boolean rinkeby = false;
 
-  /** @deprecated Deprecated in favour of --chain option */
+  /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
     hidden = true,
@@ -259,7 +248,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Boolean ropsten = false;
 
-  /** @deprecated Deprecated in favour of --chain option */
+  /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
     hidden = true,
@@ -285,7 +274,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Integer p2pPort = DEFAULT_PORT;
 
-  /** @deprecated Deprecated in favour of --chain option */
+  /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
     hidden = true,
@@ -430,7 +419,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
-  /** @deprecated Deprecated in favour of --chain option */
+  /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
     hidden = true,
@@ -619,7 +608,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   PantheonController<?> buildController() {
     try {
       return controllerBuilder
-          .synchronizerConfiguration(buildSyncConfig(syncMode))
+          .synchronizerConfiguration(buildSyncConfig())
           .homePath(dataDir())
           .ethNetworkConfig(ethNetworkConfig())
           .syncWithOttoman(syncWithOttoman)
@@ -680,9 +669,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return permissioningConfiguration;
   }
 
-  private SynchronizerConfiguration buildSyncConfig(final SyncMode syncMode) {
-    checkNotNull(syncMode);
-    synchronizerConfigurationBuilder.syncMode(syncMode);
+  private SynchronizerConfiguration buildSyncConfig() {
+    synchronizerConfigurationBuilder.syncMode(DEFAULT_SYNC_MODE);
     synchronizerConfigurationBuilder.maxTrailingPeers(maxTrailingPeers);
     return synchronizerConfigurationBuilder.build();
   }
@@ -749,10 +737,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     autoDiscoveredDefaultIP = InetAddress.getLoopbackAddress();
 
     return autoDiscoveredDefaultIP;
-  }
-
-  private HostAndPort getDefaultHostAndPort(final int port) {
-    return HostAndPort.fromParts(autoDiscoverDefaultIP().getHostAddress(), port);
   }
 
   private EthNetworkConfig ethNetworkConfig() {

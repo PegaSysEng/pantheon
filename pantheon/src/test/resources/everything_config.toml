@@ -29,7 +29,7 @@ max-trailing-peers=5
 host-whitelist=["all"]
 
 # chain
-chain="MAINNET"
+network="MAINNET"
 private-genesis-file="~/genesis.json"
 #sync-mode="fast"
 ottoman=false

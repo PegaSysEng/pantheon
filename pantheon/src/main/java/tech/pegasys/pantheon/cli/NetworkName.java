@@ -12,11 +12,10 @@
  */
 package tech.pegasys.pantheon.cli;
 
-public enum ChainName {
+public enum NetworkName {
   MAINNET,
   OTTOMAN,
   RINKEBY,
   ROPSTEN,
-  GOERLI,
-  CUSTOM;
+  GOERLI
 }
