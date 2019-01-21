@@ -14,13 +14,13 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import tech.pegasys.pantheon.ethereum.vm.EVM;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -32,7 +32,7 @@ public class ProtocolSpecBuilder<T> {
   private BlockHashFunction blockHashFunction;
   private TransactionReceiptFactory transactionReceiptFactory;
   private DifficultyCalculator<T> difficultyCalculator;
-  private BiFunction<GasCalculator, MetricsSystem, EVM> evmBuilder;
+  private Function<GasCalculator, EVM> evmBuilder;
   private Function<GasCalculator, TransactionValidator> transactionValidatorBuilder;
   private Function<DifficultyCalculator<T>, BlockHeaderValidator<T>> blockHeaderValidatorBuilder;
   private Function<DifficultyCalculator<T>, BlockHeaderValidator<T>> ommerHeaderValidatorBuilder;
@@ -43,11 +43,11 @@ public class ProtocolSpecBuilder<T> {
       messageCallProcessorBuilder;
   private TransactionProcessorBuilder transactionProcessorBuilder;
   private BlockProcessorBuilder blockProcessorBuilder;
+  private BlockValidatorBuilder<T> blockValidatorBuilder;
   private BlockImporterBuilder<T> blockImporterBuilder;
   private TransactionReceiptType transactionReceiptType;
   private String name;
   private MiningBeneficiaryCalculator miningBeneficiaryCalculator;
-  private MetricsSystem metricsSystem;
 
   public ProtocolSpecBuilder<T> gasCalculator(final Supplier<GasCalculator> gasCalculatorBuilder) {
     this.gasCalculatorBuilder = gasCalculatorBuilder;
@@ -76,8 +76,7 @@ public class ProtocolSpecBuilder<T> {
     return this;
   }
 
-  public ProtocolSpecBuilder<T> evmBuilder(
-      final BiFunction<GasCalculator, MetricsSystem, EVM> evmBuilder) {
+  public ProtocolSpecBuilder<T> evmBuilder(final Function<GasCalculator, EVM> evmBuilder) {
     this.evmBuilder = evmBuilder;
     return this;
   }
@@ -146,6 +145,12 @@ public class ProtocolSpecBuilder<T> {
     return this;
   }
 
+  public ProtocolSpecBuilder<T> blockValidatorBuilder(
+      final BlockValidatorBuilder<T> blockValidatorBuilder) {
+    this.blockValidatorBuilder = blockValidatorBuilder;
+    return this;
+  }
+
   public ProtocolSpecBuilder<T> transactionReceiptType(
       final TransactionReceiptType transactionReceiptType) {
     this.transactionReceiptType = transactionReceiptType;
@@ -163,15 +168,11 @@ public class ProtocolSpecBuilder<T> {
     return this;
   }
 
-  public ProtocolSpecBuilder<T> metricsSystem(final MetricsSystem metricsSystem) {
-    this.metricsSystem = metricsSystem;
-    return this;
-  }
-
   public <R> ProtocolSpecBuilder<R> changeConsensusContextType(
       final Function<DifficultyCalculator<R>, BlockHeaderValidator<R>> blockHeaderValidatorBuilder,
       final Function<DifficultyCalculator<R>, BlockHeaderValidator<R>> ommerHeaderValidatorBuilder,
       final Function<ProtocolSchedule<R>, BlockBodyValidator<R>> blockBodyValidatorBuilder,
+      final BlockValidatorBuilder<R> blockValidatorBuilder,
       final BlockImporterBuilder<R> blockImporterBuilder,
       final DifficultyCalculator<R> difficultyCalculator) {
     return new ProtocolSpecBuilder<R>()
@@ -186,6 +187,7 @@ public class ProtocolSpecBuilder<T> {
         .ommerHeaderValidatorBuilder(ommerHeaderValidatorBuilder)
         .blockBodyValidatorBuilder(blockBodyValidatorBuilder)
         .blockProcessorBuilder(blockProcessorBuilder)
+        .blockValidatorBuilder(blockValidatorBuilder)
         .blockImporterBuilder(blockImporterBuilder)
         .blockHashFunction(blockHashFunction)
         .blockReward(blockReward)
@@ -208,6 +210,7 @@ public class ProtocolSpecBuilder<T> {
     checkNotNull(blockBodyValidatorBuilder, "Missing block body validator");
     checkNotNull(blockProcessorBuilder, "Missing block processor");
     checkNotNull(blockImporterBuilder, "Missing block importer");
+    checkNotNull(blockValidatorBuilder, "Missing block validator");
     checkNotNull(blockHashFunction, "Missing block hash function");
     checkNotNull(blockReward, "Missing block reward");
     checkNotNull(difficultyCalculator, "Missing difficulty calculator");
@@ -216,10 +219,9 @@ public class ProtocolSpecBuilder<T> {
     checkNotNull(name, "Missing name");
     checkNotNull(miningBeneficiaryCalculator, "Missing Mining Beneficiary Calculator");
     checkNotNull(protocolSchedule, "Missing protocol schedule");
-    checkNotNull(metricsSystem, "Missing metrics system");
 
     final GasCalculator gasCalculator = gasCalculatorBuilder.get();
-    final EVM evm = evmBuilder.apply(gasCalculator, metricsSystem);
+    final EVM evm = evmBuilder.apply(gasCalculator);
     final TransactionValidator transactionValidator =
         transactionValidatorBuilder.apply(gasCalculator);
     final AbstractMessageProcessor contractCreationProcessor =
@@ -243,8 +245,9 @@ public class ProtocolSpecBuilder<T> {
             transactionReceiptFactory,
             blockReward,
             miningBeneficiaryCalculator);
-    final BlockImporter<T> blockImporter =
-        blockImporterBuilder.apply(blockHeaderValidator, blockBodyValidator, blockProcessor);
+    final BlockValidator<T> blockValidator =
+        blockValidatorBuilder.apply(blockHeaderValidator, blockBodyValidator, blockProcessor);
+    final BlockImporter<T> blockImporter = blockImporterBuilder.apply(blockValidator);
     return new ProtocolSpec<>(
         name,
         evm,
@@ -255,6 +258,7 @@ public class ProtocolSpecBuilder<T> {
         blockBodyValidator,
         blockProcessor,
         blockImporter,
+        blockValidator,
         blockHashFunction,
         transactionReceiptFactory,
         difficultyCalculator,
@@ -279,10 +283,14 @@ public class ProtocolSpecBuilder<T> {
         MiningBeneficiaryCalculator miningBeneficiaryCalculator);
   }
 
-  public interface BlockImporterBuilder<T> {
-    BlockImporter<T> apply(
+  public interface BlockValidatorBuilder<T> {
+    BlockValidator<T> apply(
         BlockHeaderValidator<T> blockHeaderValidator,
         BlockBodyValidator<T> blockBodyValidator,
         BlockProcessor blockProcessor);
+  }
+
+  public interface BlockImporterBuilder<T> {
+    BlockImporter<T> apply(BlockValidator<T> blockValidator);
   }
 }

@@ -20,13 +20,13 @@ import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockImporter;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.ethereum.MainnetBlockValidator;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleFactory;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpecBuilder;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.math.BigInteger;
 
@@ -35,15 +35,13 @@ public class IbftProtocolSchedule {
 
   private static final int DEFAULT_CHAIN_ID = 1;
 
-  public static ProtocolSchedule<IbftContext> create(
-      final GenesisConfigOptions config, final MetricsSystem metricsSystem) {
+  public static ProtocolSchedule<IbftContext> create(final GenesisConfigOptions config) {
     final IbftConfigOptions ibftConfig = config.getIbftConfigOptions();
     final long epochLength = ibftConfig.getEpochLength();
     final long blockPeriod = ibftConfig.getBlockPeriodSeconds();
     final EpochManager epochManager = new EpochManager(epochLength);
 
-    return new ProtocolScheduleFactory<>(
-            metricsSystem,
+    return new ProtocolScheduleBuilder<>(
             config,
             DEFAULT_CHAIN_ID,
             builder -> applyIbftChanges(blockPeriod, epochManager, builder))
@@ -59,10 +57,10 @@ public class IbftProtocolSchedule {
             difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
             difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
             MainnetBlockBodyValidator::new,
-            (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
+            MainnetBlockValidator::new,
+            (blockValidator) ->
                 new IbftBlockImporter(
-                    new MainnetBlockImporter<>(
-                        blockHeaderValidator, blockBodyValidator, blockProcessor),
+                    new MainnetBlockImporter<>(blockValidator),
                     new VoteTallyUpdater(epochManager, new IbftLegacyBlockInterface())),
             (time, parent, protocolContext) -> BigInteger.ONE)
         .blockReward(Wei.ZERO)

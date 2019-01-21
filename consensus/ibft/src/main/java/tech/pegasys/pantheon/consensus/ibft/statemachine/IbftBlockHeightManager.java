@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
@@ -102,7 +103,7 @@ public class IbftBlockHeightManager {
         (roundIdentifier) ->
             new RoundState(
                 roundIdentifier,
-                finalState.getQuorumSize(),
+                finalState.getQuorum(),
                 messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
   }
 
@@ -235,12 +236,16 @@ public class IbftBlockHeightManager {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(payload.getRoundIdentifier().getRoundNumber());
       }
-      currentRound.handleProposalMessage(payload.getProposalPayload());
+      currentRound.handleProposalFromNewRound(signedPayload);
     }
   }
 
   public long getChainHeight() {
     return currentRound.getRoundIdentifier().getSequenceNumber();
+  }
+
+  public BlockHeader getParentBlockHeader() {
+    return parentHeader;
   }
 
   private MessageAge determineAgeOfPayload(final Payload payload) {

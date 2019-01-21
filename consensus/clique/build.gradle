@@ -39,13 +39,13 @@ dependencies {
   implementation project(':ethereum:p2p')
   implementation project(':services:kvstore')
   implementation project(':consensus:common')
-  implementation project(':metrics')
   implementation project(':util')
 
   implementation 'io.vertx:vertx-core'
   implementation 'com.google.guava:guava'
 
   testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
+  testImplementation project(path: ':consensus:common', configuration: 'testArtifacts')
 
   testImplementation 'junit:junit'
   testImplementation 'org.assertj:assertj-core'

@@ -17,15 +17,14 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequired
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
-import tech.pegasys.pantheon.consensus.ibft.network.IbftMulticaster;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
+import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 
 import java.time.Clock;
 import java.util.Collection;
@@ -36,12 +35,11 @@ public class IbftFinalState {
   private final KeyPair nodeKeys;
   private final Address localAddress;
   private final ProposerSelector proposerSelector;
-  private final IbftMulticaster peers;
+  private final ValidatorMulticaster validatorMulticaster;
   private final RoundTimer roundTimer;
   private final BlockTimer blockTimer;
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final MessageFactory messageFactory;
-  private final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator;
   private final IbftMessageTransmitter messageTransmitter;
   private final Clock clock;
 
@@ -50,28 +48,26 @@ public class IbftFinalState {
       final KeyPair nodeKeys,
       final Address localAddress,
       final ProposerSelector proposerSelector,
-      final IbftMulticaster peers,
+      final ValidatorMulticaster validatorMulticaster,
       final RoundTimer roundTimer,
       final BlockTimer blockTimer,
       final IbftBlockCreatorFactory blockCreatorFactory,
       final MessageFactory messageFactory,
-      final BlockHeaderValidator<IbftContext> ibftContextBlockHeaderValidator,
       final Clock clock) {
     this.validatorProvider = validatorProvider;
     this.nodeKeys = nodeKeys;
     this.localAddress = localAddress;
     this.proposerSelector = proposerSelector;
-    this.peers = peers;
+    this.validatorMulticaster = validatorMulticaster;
     this.roundTimer = roundTimer;
     this.blockTimer = blockTimer;
     this.blockCreatorFactory = blockCreatorFactory;
     this.messageFactory = messageFactory;
-    this.ibftContextBlockHeaderValidator = ibftContextBlockHeaderValidator;
     this.clock = clock;
-    this.messageTransmitter = new IbftMessageTransmitter(messageFactory, peers);
+    this.messageTransmitter = new IbftMessageTransmitter(messageFactory, validatorMulticaster);
   }
 
-  public int getQuorumSize() {
+  public int getQuorum() {
     return calculateRequiredValidatorQuorum(validatorProvider.getValidators().size());
   }
 
@@ -87,16 +83,12 @@ public class IbftFinalState {
     return localAddress;
   }
 
-  public ProposerSelector getProposerSelector() {
-    return proposerSelector;
-  }
-
   public boolean isLocalNodeProposerForRound(final ConsensusRoundIdentifier roundIdentifier) {
     return getProposerForRound(roundIdentifier).equals(localAddress);
   }
 
-  public IbftMulticaster getPeers() {
-    return peers;
+  public ValidatorMulticaster getValidatorMulticaster() {
+    return validatorMulticaster;
   }
 
   public RoundTimer getRoundTimer() {
@@ -117,10 +109,6 @@ public class IbftFinalState {
 
   public Address getProposerForRound(final ConsensusRoundIdentifier roundIdentifier) {
     return proposerSelector.selectProposerForRound(roundIdentifier);
-  }
-
-  public BlockHeaderValidator<IbftContext> getBlockHeaderValidator() {
-    return ibftContextBlockHeaderValidator;
   }
 
   public IbftMessageTransmitter getTransmitter() {
