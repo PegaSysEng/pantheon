@@ -13,61 +13,34 @@
 package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteType;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.consensus.common.jsonrpc.AbstractVoteProposerMethod;
+import tech.pegasys.pantheon.consensus.common.jsonrpc.AbstractVoteProposerMethodTest;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CliqueProposalsTest {
+public class CliqueProposalsTest extends AbstractVoteProposerMethodTest {
 
-  private final VoteProposer voteProposer = mock(VoteProposer.class);
-  private final String METHOD_NAME = "clique_proposals";
-  private final String JSON_RPC_VERSION = "2.0";
   private CliqueProposals method;
+
+  @Override
+  protected AbstractVoteProposerMethod getMethod() {
+    return method;
+  }
+
+  @Override
+  protected String getMethodName() {
+    return "clique_proposals";
+  }
 
   @Before
   public void setup() {
-    method = new CliqueProposals(voteProposer);
+    method = new CliqueProposals(getVoteProposer());
   }
 
   @Test
   public void returnsCorrectMethodName() {
-    assertThat(method.getName()).isEqualTo(METHOD_NAME);
-  }
-
-  @Test
-  public void testConversionFromVoteTypeToBoolean() {
-    final JsonRpcRequest request =
-        new JsonRpcRequest(JSON_RPC_VERSION, METHOD_NAME, new Object[] {});
-
-    when(voteProposer.getProposals())
-        .thenReturn(
-            ImmutableMap.of(
-                Address.fromHexString("1"),
-                VoteType.ADD,
-                Address.fromHexString("2"),
-                VoteType.DROP));
-
-    final JsonRpcResponse expectedResponse =
-        new JsonRpcSuccessResponse(
-            request.getId(),
-            ImmutableMap.of(
-                "0x0000000000000000000000000000000000000001",
-                true,
-                "0x0000000000000000000000000000000000000002",
-                false));
-
-    final JsonRpcResponse response = method.response(request);
-
-    assertThat(response).isEqualToComparingFieldByField(expectedResponse);
+    assertThat(method.getName()).isEqualTo(getMethodName());
   }
 }
