@@ -144,6 +144,10 @@ public class PrivateTransaction {
    *     otherwise it should contain an address.
    *     <p>The {@code chainId} must be greater than 0 to be applied to a specific chain; otherwise
    *     it will default to any chain.
+   * @param privateFrom The public key of the sender of this private transaction
+   * @param privateFor An array of the public keys of the intended recipients of this private
+   *     transaction
+   * @param restriction the restriction of this private transaction
    */
   protected PrivateTransaction(
       final long nonce,
