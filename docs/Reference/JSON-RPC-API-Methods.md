@@ -1929,6 +1929,165 @@ None
     }
     ```
 
-## IBFT 2.0 and Permissioning Methods
+## IBFT 2.0 Methods 
 
-IBFT 2.0 and permissioning are under development and will be available in v1.0. 
+[ibft_getPendingVotes](../Reference/JSON-RPC-API-Methods.md#ibft_getPendingVotes)
+* [ibft_proposeValidatorVote](../Reference/JSON-RPC-API-Methods.md#ibft_proposeValidatorVote)
+* [ibft_discardValidatorVote](
+ibft_getValidatorsByBlockNumber`
+
+### ibft_discardValidatorVote
+
+Discards a proposal to add or remove a validator with the specified address. 
+
+**Parameters** 
+
+`data` - 20-byte address of proposed validator 
+
+**Returns** 
+
+`result: boolean` - `true`
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : true
+    }
+    ```
+
+### ibft_getPendingVotes
+
+Returns current votes. 
+
+**Parameters**
+
+None
+
+**Returns** 
+
+`result`: `object` - Map of account addresses to corresponding boolean values indicating the vote for each account. 
+
+If the boolean value is `true`, the vote is to add a validator. If `false`, the proposal is to remove a validator. 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "0x42eb768f2244c8811c63729a21a3569731535f07": false,
+            "0x12eb759f2222d7711c63729a45c3585731521d01": true
+        }
+    }
+    ```
+
+### ibft_getValidatorsByBlockNumber
+
+Lists validators for the specified block. 
+
+**Parameters** 
+
+`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter). 
+
+**Returns**
+
+`result: array of data` - List of validator addresses 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : [ "0x42eb768f2244c8811c63729a21a3569731535f06", "0x7ffc57839b00206d1ad20c69a1981b489f772031", "0xb279182d99e65703f0076e4812653aab85fca0f0" ]
+    }
+    ```
+    
+### ibft_getValidatorsByBlockHash
+
+Lists validators for the specified block.
+
+**Parameters**
+
+`data` - 32-byte block hash 
+
+**Returns** 
+
+`result: array of data` - List of validator addresses
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0x98b2ddb5106b03649d2d337d42154702796438b3c74fd25a5782940e84237a48"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0x98b2ddb5106b03649d2d337d42154702796438b3c74fd25a5782940e84237a48"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : [ "0x42eb768f2244c8811c63729a21a3569731535f06", "0x7ffc57839b00206d1ad20c69a1981b489f772031", "0xb279182d99e65703f0076e4812653aab85fca0f0" ]
+    }
+    ```
+    
+### ibft_proposeValidatorVote
+
+Proposes adding or removing a validator with the specified address. 
+
+**Parameters**
+
+`data` - Account address
+ 
+`boolean` -  `true` to propose adding validator or `false` to propose removing validator. 
+
+**Returns** 
+
+`result: boolean` - `true`
+   
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+     "jsonrpc" : "2.0",
+     "id" : 1,
+     "result" : true
+    }
+    ```
+
+## Permissioning Methods
+
+Permissioning is under development and will be available in v1.0. 
