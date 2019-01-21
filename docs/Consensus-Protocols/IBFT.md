@@ -36,10 +36,31 @@ Properties specific to IBFT 2.0 are:
 * `blockperiodseconds` - Minimum block time in seconds. 
 * `epochlength` - Number of blocks after which to reset all votes.
 * `requesttimeoutseconds` - Timeout for each consensus round before a round change. 
-* `extraData` - `[32 Bytes Vanity][RLP --> 0Seals; Round=Int(0); List<Validators>] `
+* `extraData` - `RLP([32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals])`
 
-!!! note
-    The Recursive Length Prefix (RLP) encoding scheme is a space efficient object serialization scheme used in Ethereum.
+The `extraData` property is RLP (Recursive Length Prefix) encoded. RLP encoding is a space efficient object 
+serialization scheme used in Ethereum. You can use a library such as [EthereumJS RLP](https://github.com/ethereumjs/rlp)
+to encode and decode RLP strings. 
+
+!!! example "Decoding Extra Data Example"
+    
+    Using the [EthereumJS RLP](https://github.com/ethereumjs/rlp) library: 
+    ```bash
+    rlp decode "0xf853a00000000000000000000000000000000000000000000000000000000000000000ea94be068f726a13c8d46c44be6ce9d275600e1735a4945ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193808400000000c0"
+    ```
+    
+    The decoded result is: 
+    ```
+    [ '0000000000000000000000000000000000000000000000000000000000000000',
+      [ 'be068f726a13c8d46c44be6ce9d275600e1735a4',
+        '5ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193' ],
+      '',
+      '00000000',
+      [] 
+    ]
+    ```
+    
+    
 
 Properties that have specific values in IBFT 2.0 genesis files are: 
 
