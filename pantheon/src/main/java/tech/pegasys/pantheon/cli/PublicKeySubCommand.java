@@ -71,8 +71,8 @@ class PublicKeySubCommand implements Runnable {
    * Public key export sub-command
    *
    * <p>Export of the public key takes a file as parameter to export directly by writing the key in
-   * the file. A direct output of the key to sdt out is not done because we don't want the key value
-   * to be polluted by other information like logs that are in KeyPairUtil that is inevitable.
+   * the file. A direct output of the key to standard out is not done because we don't want the key
+   * value to be polluted by other information like logs that are in KeyPairUtil that is inevitable.
    */
   @Command(
     name = "export",

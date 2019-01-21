@@ -18,7 +18,10 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonD
 import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
+import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
+import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
@@ -63,7 +66,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
@@ -142,7 +144,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description =
         "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)"
   )
-  @Nullable
   private final File nodePrivateKeyFile = null;
 
   // Boolean option to indicate if peers should NOT be discovered, default to false indicates that
@@ -180,7 +181,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
   )
-  private final Integer maxPeers = DefaultCommandValues.DEFAULT_MAX_PEERS;
+  private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
   /**
    * @deprecated This option is not exposed anymore even if still available as it's bounded by
@@ -189,7 +190,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
    */
   @Deprecated
   @Option(
-    hidden = true,
     names = {"--max-trailing-peers"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description =
@@ -206,6 +206,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Collection<String> bannedNodeIds = new ArrayList<>();
 
+  // TODO: Re-enable as per NC-1057/NC-1681
+  //  @Option(
+  //    names = {"--sync-mode"},
+  //    paramLabel = MANDATORY_MODE_FORMAT_HELP,
+  //    description =
+  //        "Synchronization mode (Value can be one of ${COMPLETION-CANDIDATES}, default:
+  // ${DEFAULT-VALUE})"
+  //  )
+  private final SyncMode syncMode = DEFAULT_SYNC_MODE;
+
   @Option(
     names = {"--network"},
     paramLabel = MANDATORY_NETWORK_FORMAT_HELP,
@@ -220,7 +230,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Boolean option to indicate if the client have to sync against the ottoman test network
   // (see https://github.com/ethereum/EIPs/issues/650).
   @Option(
-    hidden = true,
     names = {"--ottoman"},
     description =
         "Synchronize against the Ottoman test network, only useful if using an iBFT genesis file"
@@ -231,7 +240,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
-    hidden = true,
     names = {"--rinkeby"},
     description =
         "Use the Rinkeby test network"
@@ -242,7 +250,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
-    hidden = true,
     names = {"--ropsten"},
     description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
   )
@@ -251,7 +258,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
-    hidden = true,
     names = {"--goerli"},
     description = "Use the Goerli test network (default: ${DEFAULT-VALUE})"
   )
@@ -277,7 +283,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
-    hidden = true,
     names = {"--network-id"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description = "P2P network identifier (default: ${DEFAULT-VALUE})",
@@ -371,17 +376,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description =
         "Refresh delay of websocket subscription sync in milliseconds. "
             + "default: ${DEFAULT-VALUE}",
-    defaultValue = "" + WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY
+    defaultValue = "" + DEFAULT_WEBSOCKET_REFRESH_DELAY
   )
   private Long configureRefreshDelay(final Long refreshDelay) {
-    if (refreshDelay < DefaultCommandValues.DEFAULT_MIN_REFRESH_DELAY
-        || refreshDelay > DefaultCommandValues.DEFAULT_MAX_REFRESH_DELAY) {
+    if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
       throw new ParameterException(
           new CommandLine(this),
           String.format(
               "Refresh delay must be a positive integer between %s and %s",
-              String.valueOf(DefaultCommandValues.DEFAULT_MIN_REFRESH_DELAY),
-              String.valueOf(DefaultCommandValues.DEFAULT_MAX_REFRESH_DELAY)));
+              String.valueOf(DEFAULT_MIN_REFRESH_DELAY),
+              String.valueOf(DEFAULT_MAX_REFRESH_DELAY)));
     }
     this.rpcWsRefreshDelay = refreshDelay;
     return refreshDelay;
@@ -408,7 +412,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Port for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final Integer metricsPort = MetricsConfiguration.DEFAULT_METRICS_PORT;
+  private final Integer metricsPort = DEFAULT_METRICS_PORT;
 
   @Option(
     names = {"--host-whitelist"},
@@ -422,7 +426,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   /** @deprecated Deprecated in favour of --network option */
   @Deprecated
   @Option(
-    hidden = true,
     names = {"--dev-mode"},
     description =
         "set during development to have a custom genesis with specific chain id "
@@ -460,7 +463,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + "block (default: ${DEFAULT-VALUE}).",
     arity = "1"
   )
-  private final Wei minTransactionGasPrice = DefaultCommandValues.DEFAULT_MIN_TRANSACTION_GAS_PRICE;
+  private final Wei minTransactionGasPrice = DEFAULT_MIN_TRANSACTION_GAS_PRICE;
 
   @Option(
     names = {"--miner-extra-data"},
@@ -469,7 +472,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + "field of a mined block. (default: ${DEFAULT-VALUE}).",
     arity = "1"
   )
-  private final BytesValue extraData = DefaultCommandValues.DEFAULT_EXTRA_DATA;
+  private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   // Permissioning: A list of whitelist nodes can be passed.
   @Option(
@@ -615,7 +618,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(isDevMode)
-          .nodePrivateKeyFile(getNodePrivateKeyFile(nodePrivateKeyFile))
+          .nodePrivateKeyFile(getNodePrivateKeyFile())
           .metricsSystem(metricsSystem)
           .build();
     } catch (final InvalidConfigurationException e) {
@@ -625,7 +628,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private File getNodePrivateKeyFile(@Nullable final File nodePrivateKeyFile) {
+  private File getNodePrivateKeyFile() {
     return nodePrivateKeyFile != null
         ? nodePrivateKeyFile
         : KeyPairUtil.getDefaultKeyFile(dataDir());
@@ -653,7 +656,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   MetricsConfiguration metricsConfiguration() {
-    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    final MetricsConfiguration metricsConfiguration = createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);
     metricsConfiguration.setHost(metricsHost.toString());
     metricsConfiguration.setPort(metricsPort);
@@ -670,7 +673,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private SynchronizerConfiguration buildSyncConfig() {
-    synchronizerConfigurationBuilder.syncMode(DEFAULT_SYNC_MODE);
+    synchronizerConfigurationBuilder.syncMode(syncMode);
     synchronizerConfigurationBuilder.maxTrailingPeers(maxTrailingPeers);
     return synchronizerConfigurationBuilder.build();
   }
@@ -750,13 +753,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } else {
       predefinedNetworkConfig = EthNetworkConfig.mainnet();
     }
-    return updateNetworkConfig(predefinedNetworkConfig, networkId, bootstrapNodes);
+    return updateNetworkConfig(predefinedNetworkConfig);
   }
 
-  private EthNetworkConfig updateNetworkConfig(
-      final EthNetworkConfig ethNetworkConfig,
-      @Nullable final Integer networkId,
-      @Nullable final Collection<URI> bootstrapNodes) {
+  private EthNetworkConfig updateNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
     final EthNetworkConfig.Builder builder = new EthNetworkConfig.Builder(ethNetworkConfig);
     if (genesisFile() != null) {
       builder.setGenesisConfig(genesisConfig());
@@ -785,7 +785,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isFullInstantiation()) {
       return standaloneCommands.genesisFile;
     } else if (isDocker) {
-      final File genesisFile = new File(DefaultCommandValues.DOCKER_GENESIS_LOCATION);
+      final File genesisFile = new File(DOCKER_GENESIS_LOCATION);
       if (genesisFile.exists()) {
         return genesisFile;
       } else {
@@ -800,7 +800,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isFullInstantiation()) {
       return standaloneCommands.dataPath;
     } else if (isDocker) {
-      return Paths.get(DefaultCommandValues.DOCKER_DATADIR_LOCATION);
+      return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {
       return getDefaultPantheonDataPath(this);
     }

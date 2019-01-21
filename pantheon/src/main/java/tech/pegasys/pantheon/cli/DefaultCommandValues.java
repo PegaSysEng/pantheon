@@ -45,7 +45,6 @@ interface DefaultCommandValues {
   String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
   String MANDATORY_HOST_FORMAT_HELP = "<HOST>";
   String MANDATORY_PORT_FORMAT_HELP = "<PORT>";
-  String MANDATORY_HOST_AND_PORT_FORMAT_HELP = "<HOST:PORT>";
   // Default should be FAST for the next release
   // but we use FULL for the moment as Fast is still in progress
   SyncMode DEFAULT_SYNC_MODE = SyncMode.FULL;

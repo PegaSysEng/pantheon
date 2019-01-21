@@ -86,6 +86,7 @@ public abstract class CommandTestAbstract {
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   @Before
+  @After
   public void resetSystemProps() {
     System.setProperty("pantheon.docker", "false");
   }
