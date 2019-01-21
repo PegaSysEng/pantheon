@@ -68,7 +68,7 @@ public interface P2PNetwork extends Closeable, Runnable {
   /**
    * Adds a {@link Peer} to a list indicating efforts should be made to always stay connected to it
    *
-   * @param peer
+   * @param peer The peer that should be connected to
    * @return boolean representing whether or not the peer has been added to the list or was already
    *     on it
    */
