@@ -550,7 +550,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void enableP2pFalseOptionCannotAlsoHaveWhitelist() {
+  public void enableP2pFalseOptionCannotAlsoHaveBootnodesSpecified() {
     parseCommand("--p2p-enabled", "false", "--bootnodes", String.join(",", validENodeStrings));
 
     assertThat(commandOutput.toString()).isEmpty();
