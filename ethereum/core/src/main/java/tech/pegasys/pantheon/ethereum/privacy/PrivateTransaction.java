@@ -303,7 +303,16 @@ public class PrivateTransaction {
     if (hashNoSignature == null) {
       hashNoSignature =
           computeSenderRecoveryHash(
-              nonce, gasPrice, gasLimit, to.orElse(null), value, payload, chainId);
+              nonce,
+              gasPrice,
+              gasLimit,
+              to.orElse(null),
+              value,
+              payload,
+              chainId,
+              privateFrom,
+              privateFor,
+              restriction);
     }
     return hashNoSignature;
   }
@@ -405,7 +414,10 @@ public class PrivateTransaction {
       final Address to,
       final Wei value,
       final BytesValue payload,
-      final OptionalInt chainId) {
+      final OptionalInt chainId,
+      final BytesValue privateFrom,
+      final List<BytesValue> privateFor,
+      final BytesValue restriction) {
     return keccak256(
         RLP.encode(
             out -> {
@@ -421,6 +433,9 @@ public class PrivateTransaction {
                 out.writeUInt256Scalar(UInt256.ZERO);
                 out.writeUInt256Scalar(UInt256.ZERO);
               }
+              out.writeBytesValue(privateFrom);
+              out.writeList(privateFor, (bv, rlpO) -> rlpO.writeBytesValue(bv));
+              out.writeBytesValue(restriction);
               out.endList();
             }));
   }
@@ -599,7 +614,17 @@ public class PrivateTransaction {
       final OptionalInt optionalChainId =
           chainId > 0 ? OptionalInt.of(chainId) : OptionalInt.empty();
       final Bytes32 hash =
-          computeSenderRecoveryHash(nonce, gasPrice, gasLimit, to, value, payload, optionalChainId);
+          computeSenderRecoveryHash(
+              nonce,
+              gasPrice,
+              gasLimit,
+              to,
+              value,
+              payload,
+              optionalChainId,
+              privateFrom,
+              privateFor,
+              restriction);
       return SECP256K1.sign(hash, keys);
     }
   }
