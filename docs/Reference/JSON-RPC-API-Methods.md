@@ -1933,7 +1933,7 @@ None
 
 ### ibft_discardValidatorVote
 
-Discards a proposal to [add or remove a validator](../Consensus-Protocols/IBFT.md#) with the specified address. 
+Discards a proposal to [add or remove a validator](../Consensus-Protocols/IBFT.md#adding-and-removing-validators) with the specified address. 
 
 **Parameters** 
 
@@ -1962,7 +1962,7 @@ Discards a proposal to [add or remove a validator](../Consensus-Protocols/IBFT.m
 
 ### ibft_getPendingVotes
 
-Returns current votes. 
+Returns [current votes](../Consensus-Protocols/IBFT.md#adding-and-removing-validators). 
 
 **Parameters**
 
@@ -2062,7 +2062,7 @@ Lists validators for the specified block.
     
 ### ibft_proposeValidatorVote
 
-Proposes adding or removing a validator with the specified address. 
+Proposes [adding or removing a validator]((../Consensus-Protocols/IBFT.md#adding-and-removing-validators)) with the specified address. 
 
 **Parameters**
 
