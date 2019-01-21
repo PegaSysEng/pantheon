@@ -12,9 +12,18 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
+import static java.util.Optional.empty;
+
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.ethereum.core.Hash;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RoundSpecificNodeRoles {
 
@@ -39,11 +48,31 @@ public class RoundSpecificNodeRoles {
     return Collections.unmodifiableCollection(peers);
   }
 
-  public List<ValidatorPeer> getNonProposingPeers() {
-    return Collections.unmodifiableList(nonProposingPeers);
-  }
-
   public ValidatorPeer getNonProposingPeer(final int index) {
     return nonProposingPeers.get(index);
+  }
+
+  public List<SignedData<RoundChangePayload>> nonProposingPeersRoundChange(
+      final ConsensusRoundIdentifier targetRound) {
+    return nonProposingPeers
+        .stream()
+        .map(peer -> peer.injectRoundChange(targetRound, empty()))
+        .collect(Collectors.toList());
+  }
+
+  public void nonProposingPeersPrepare(final ConsensusRoundIdentifier roundId, final Hash hash) {
+    nonProposingPeers.forEach(peer -> peer.injectPrepare(roundId, hash));
+  }
+
+  public void nonProposingPeerCommit(final ConsensusRoundIdentifier roundId, final Hash hash) {
+    nonProposingPeers.forEach(peer -> peer.injectCommit(roundId, hash));
+  }
+
+  public Collection<SignedData<PreparePayload>> nonProposingPeersPreparePayload(
+      final ConsensusRoundIdentifier preparedRound, final Hash hash) {
+    return nonProposingPeers
+        .stream()
+        .map(role -> role.getMessageFactory().createSignedPreparePayload(preparedRound, hash))
+        .collect(Collectors.toList());
   }
 }

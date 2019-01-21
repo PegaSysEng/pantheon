@@ -81,13 +81,9 @@ public class FutureHeightTest {
     assertPeersReceivedNoMessages(roles.getAllPeers());
 
     // Inject prepares and commits from all peers
-    roles
-        .getNonProposingPeers()
-        .forEach(
-            p -> {
-              p.injectPrepare(futureHeightRoundId, futureHeightBlock.getHash());
-              p.injectCommit(futureHeightRoundId, futureHeightBlock.getHash());
-            });
+    roles.nonProposingPeersPrepare(futureHeightRoundId, futureHeightBlock.getHash());
+    roles.nonProposingPeerCommit(futureHeightRoundId, futureHeightBlock.getHash());
+
     assertPeersReceivedNoMessages(roles.getAllPeers());
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
@@ -139,13 +135,9 @@ public class FutureHeightTest {
 
     // Inject prepares and commits from all peers for the 'previous' round (i.e. the height
     // from before the block arrived).
-    roles
-        .getNonProposingPeers()
-        .forEach(
-            p -> {
-              p.injectPrepare(roundId, currentHeightBlock.getHash());
-              p.injectCommit(roundId, currentHeightBlock.getHash());
-            });
+    roles.nonProposingPeersPrepare(roundId, currentHeightBlock.getHash());
+    roles.nonProposingPeerCommit(roundId, currentHeightBlock.getHash());
+
     assertPeersReceivedNoMessages(roles.getAllPeers());
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
@@ -203,13 +195,8 @@ public class FutureHeightTest {
     final ConsensusRoundIdentifier futureHeightRoundId = new ConsensusRoundIdentifier(3, 0);
 
     // Inject prepares and commits from all peers into FutureHeight (2 height time)
-    roles
-        .getNonProposingPeers()
-        .forEach(
-            p -> {
-              p.injectPrepare(futureHeightRoundId, futureHeightBlock.getHash());
-              p.injectCommit(futureHeightRoundId, futureHeightBlock.getHash());
-            });
+    roles.nonProposingPeersPrepare(futureHeightRoundId, futureHeightBlock.getHash());
+    roles.nonProposingPeerCommit(futureHeightRoundId, futureHeightBlock.getHash());
 
     // Add the "interim" block to chain, and notify system of its arrival.
     context.getBlockchain().appendBlock(signedCurrentHeightBlock, emptyList());

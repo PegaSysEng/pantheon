@@ -40,7 +40,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -271,12 +270,7 @@ public class RoundChangeTest {
     // Attempt to override the previously received RoundChange (but now without a payload).
     roles.getProposer().injectRoundChange(targetRound, empty());
 
-    roundChangeMessages.addAll(
-        roles
-            .getNonProposingPeers()
-            .stream()
-            .map(peer -> peer.injectRoundChange(targetRound, empty()))
-            .collect(Collectors.toList()));
+    roundChangeMessages.addAll(roles.nonProposingPeersRoundChange(targetRound));
 
     final Block expectedBlockToPropose =
         context.createBlockForProposalFromChainHead(
@@ -303,9 +297,7 @@ public class RoundChangeTest {
     roles.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
 
     // inject enough prepares from prior round to trigger a commit
-    roles
-        .getNonProposingPeers()
-        .forEach(peer -> peer.injectPrepare(roundId, blockToPropose.getHash()));
+    roles.nonProposingPeersPrepare(roundId, blockToPropose.getHash());
 
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }

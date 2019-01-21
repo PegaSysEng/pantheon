@@ -57,14 +57,7 @@ public class TestHelpers {
 
     return new PreparedCertificate(
         roles.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
-        roles
-            .getNonProposingPeers()
-            .stream()
-            .map(
-                role ->
-                    role.getMessageFactory()
-                        .createSignedPreparePayload(preparedRound, block.getHash()))
-            .collect(Collectors.toList()));
+        roles.nonProposingPeersPreparePayload(preparedRound, block.getHash()));
   }
 
   public static SignedData<NewRoundPayload> injectEmptyNewRound(

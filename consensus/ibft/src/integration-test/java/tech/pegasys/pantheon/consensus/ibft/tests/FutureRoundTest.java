@@ -124,9 +124,9 @@ public class FutureRoundTest {
         context.createBlockForProposalFromChainHead(futureRoundId.getRoundNumber(), 60);
 
     roles.getProposer().injectProposal(roundId, initialBlock);
-    for (final ValidatorPeer peer : roles.getNonProposingPeers()) {
-      peer.injectPrepare(roundId, initialBlock.getHash());
-    }
+
+    roles.nonProposingPeersPrepare(roundId, initialBlock.getHash());
+
     roles.getProposer().injectCommit(roundId, initialBlock.getHash());
     // At this stage, the local node has 2 commit msgs (proposer and local) so has not committed
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
@@ -143,7 +143,7 @@ public class FutureRoundTest {
     assertPeersReceivedExactly(roles.getAllPeers(), expectedFuturePrepare);
 
     // attempt to complete the previous round
-    roles.getNonProposingPeers().get(0).injectCommit(roundId, initialBlock.getHash());
+    roles.getNonProposingPeer(0).injectCommit(roundId, initialBlock.getHash());
     assertPeersReceivedNoMessages(roles.getAllPeers());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
   }

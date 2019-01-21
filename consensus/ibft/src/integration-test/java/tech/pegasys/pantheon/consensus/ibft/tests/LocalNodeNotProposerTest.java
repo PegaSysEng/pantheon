@@ -124,11 +124,9 @@ public class LocalNodeNotProposerTest {
       assertThat(context.getCurrentChainHeight()).isEqualTo(0);
     }
 
-    for (final ValidatorPeer peer : roles.getNonProposingPeers()) {
-      peer.injectPrepare(roundId, blockToPropose.getHash());
-      assertPeersReceivedNoMessages(roles.getAllPeers());
-      assertThat(context.getCurrentChainHeight()).isEqualTo(0);
-    }
+    roles.nonProposingPeersPrepare(roundId, blockToPropose.getHash());
+    assertPeersReceivedNoMessages(roles.getAllPeers());
+    assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     roles.getProposer().injectProposal(roundId, blockToPropose);
     // TODO(tmm): Unfortunatley, there are times that the Commit will go out BEFORE the prepare
