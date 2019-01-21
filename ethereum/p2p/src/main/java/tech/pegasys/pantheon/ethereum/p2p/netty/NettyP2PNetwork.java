@@ -125,11 +125,14 @@ public final class NettyP2PNetwork implements P2PNetwork {
   private final PeerBlacklist peerBlacklist;
   private OptionalLong peerBondedObserverId = OptionalLong.empty();
 
-  private final Collection<Peer> peerMaintainConnectionList;
+  @VisibleForTesting
+  public final Collection<Peer> peerMaintainConnectionList;
 
-  private final PeerConnectionRegistry connections;
+  @VisibleForTesting
+  public final PeerConnectionRegistry connections;
 
-  private final Map<Peer, CompletableFuture<PeerConnection>> pendingConnections =
+  @VisibleForTesting
+  public final Map<Peer, CompletableFuture<PeerConnection>> pendingConnections =
       new ConcurrentHashMap<>();
 
   private final EventLoopGroup boss = new NioEventLoopGroup(1);
