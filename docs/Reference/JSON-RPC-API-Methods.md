@@ -743,33 +743,35 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 ### eth_sendRawTransaction
 
-Sends a signed transaction. A transaction can send ether, deploy a contract, or interact with a contract.  
+Sends a [signed transaction](../Using-Pantheon/Transactions.md). A transaction can send ether, deploy a contract, or interact with a contract.  
 
 You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
-To avoid exposing your private key, create signed transactions offline and send the signed transaction data using this method. For information on creating signed transactions and using `eth_sendRawTransaction`, refer to [Using Pantheon](../Using-Pantheon/Transactions.md).  
+To avoid exposing your private key, create signed transactions offline and send the signed transaction data using `eth_sendRawTransaction`. 
 
 !!!important
     Pantheon does not implement [eth_sendTransaction](Using-JSON-RPC-API.md#account-management).
 
 **Parameters**
 
-`DATA` - Hash of the signed raw transaction in hexadecimal format; for example:
+`data` -  Signed transaction serialized to hexadecimal format. For example:
 
-`params: ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]`
+`params: ["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"]`
 
+!!! note
+    [Creating and Sending Transactions](../Using-Pantheon/Transactions.md) includes examples of creating signed transactions using the [web3.js](https://github.com/ethereum/web3.js/) library.
 
 **Returns**
 
-`result` : `DATA` - 32-byte transaction hash, or zero hash if the transaction is not yet available.
+`result` : `data` - 32-byte transaction hash
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}' <JSON-RPC-http-endpoint:port>
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}' <JSON-RPC-http-endpoint:port>
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}
+    {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -1174,19 +1176,11 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 ### eth_newFilter
 
-Creates a log filter. To poll for logs associated with the created filter, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a [log filter](../Using-Pantheon/Events-and-Logs.md). To poll for logs associated with the created filter, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
 `Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object). 
-
-Topics are order-dependent. A transaction with a log containing topics `[A, B]` is matched with the following topic filters:
-
-* `[]` - Match any topic
-* `[A]` - Match A in first position (and any topic thereafter)
-* `[null, B]` - Match any topic in first position AND B in second position (and any topic thereafter)
-* `[A, B]` - Match A in first position AND B in second position (and any topic thereafter)
-* `[[A, B], [A, B]]` - Match (A OR B) in first position AND (A OR B) in second position (and any topic thereafter)
 
 !!!note
     `fromBlock` and `toBlock` in the filter options object default to `latest`. To obtain logs using `eth_getFilterLogs`, set `fromBlock` and `toBlock` appropriately.
@@ -1392,7 +1386,7 @@ Polls the specified filter and returns an array of changes that have occurred si
 
 ### eth_getFilterLogs
 
-Returns an array of logs for the specified filter.
+Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) for the specified filter.
 
 !!!note
      `eth_getFilterLogs` is only used for filters created with `eth_newFilter`. 
@@ -1447,7 +1441,7 @@ Returns an array of logs for the specified filter.
 
 ### eth_getLogs
 
-Returns an array of logs matching a specified filter object.
+Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) matching a specified filter object.
 
 **Parameters**
 

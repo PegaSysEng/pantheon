@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
+import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
@@ -44,6 +45,8 @@ import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
+import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -52,9 +55,6 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.db.BlockchainStorage;
-import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
@@ -69,6 +69,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -161,6 +162,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
+            protocolContext.getWorldStateArchive(),
             networkId,
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),
@@ -235,8 +237,10 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 new IbftRoundFactory(
                     finalState, protocolContext, protocolSchedule, minedBlockObservers),
                 messageValidatorFactory));
+    ibftController.start();
 
-    final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, ibftController);
+    final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
+    final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, eventMultiplexer);
     final ExecutorService processorExecutor = Executors.newSingleThreadExecutor();
     processorExecutor.submit(ibftProcessor);
 
