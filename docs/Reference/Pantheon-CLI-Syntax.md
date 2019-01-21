@@ -319,7 +319,7 @@ If you specify an empty list or [`--nodes-whitelist`](#nodes-whitelist) without 
 Enables accepting of blocks in an IBFT 1.0 network.  The default is `false`.
 
 !!!note
-    A Pantheon node cannot be a validator in an IBFT 1.0 network.
+    A Pantheon node cannot be a validator in an IBFT 1.0 network. Pantheon implements [IBFT 2.0](../Consensus-Protocols/IBFT.md).
 
 ### p2p-listen
 
