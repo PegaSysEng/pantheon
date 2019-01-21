@@ -16,8 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 
 import org.junit.Before;
@@ -54,6 +57,17 @@ public class NetListeningTest {
 
     final JsonRpcRequest request = netListeningRequest();
     final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, false);
+
+    assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
+  }
+
+  @Test
+  public void shouldFailWhenP2pDisabled() {
+    when(p2PNetwork.isListening()).thenThrow(new P2pDisabledException("P2p disabled."));
+
+    final JsonRpcRequest request = netListeningRequest();
+    final JsonRpcResponse expectedResponse =
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.P2P_DISABLED);
 
     assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
   }

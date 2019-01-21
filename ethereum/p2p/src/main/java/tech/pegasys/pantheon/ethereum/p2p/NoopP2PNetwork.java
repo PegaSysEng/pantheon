@@ -55,21 +55,42 @@ public class NoopP2PNetwork implements P2PNetwork {
 
   @Override
   public InetSocketAddress getDiscoverySocketAddress() {
+    try {
+      throw new P2pDisabledException(
+          "P2P networking disabled.  Discovery socket address unavailable.");
+    } catch (P2pDisabledException ignored) {
+
+    }
     return null;
   }
 
   @Override
   public PeerInfo getLocalPeerInfo() {
+    try {
+      throw new P2pDisabledException("P2P networking disabled.  Local peer info unavailable.");
+    } catch (P2pDisabledException ignored) {
+
+    }
     return null;
   }
 
   @Override
   public boolean isListening() {
+    try {
+      throw new P2pDisabledException("P2P networking disabled.  Node is not listening on network.");
+    } catch (P2pDisabledException ignored) {
+
+    }
     return false;
   }
 
   @Override
   public NodeWhitelistController getNodeWhitelistController() {
+    try {
+      throw new P2pDisabledException("P2P networking disabled.  Node whitelist unavailable.");
+    } catch (P2pDisabledException ignored) {
+
+    }
     return null;
   }
 
