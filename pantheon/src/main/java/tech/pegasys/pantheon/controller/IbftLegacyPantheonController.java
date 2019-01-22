@@ -40,7 +40,6 @@ import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
@@ -134,7 +133,6 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             blockchain, worldStateArchive, new IbftContext(voteTally, voteProposer));
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
-    final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager;
     final SubProtocol ethSubProtocol;
     if (ottomanTestnetOperation) {
@@ -145,9 +143,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               protocolContext.getBlockchain(),
               protocolContext.getWorldStateArchive(),
               networkId,
-              fastSyncEnabled,
-              syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig);
     } else {
       ethSubProtocol = EthProtocol.get();
       ethProtocolManager =
@@ -155,9 +151,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               protocolContext.getBlockchain(),
               protocolContext.getWorldStateArchive(),
               networkId,
-              fastSyncEnabled,
-              syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig);
     }
 
     final SyncState syncState =

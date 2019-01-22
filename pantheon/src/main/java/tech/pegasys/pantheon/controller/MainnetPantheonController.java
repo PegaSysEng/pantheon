@@ -30,7 +30,6 @@ import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
@@ -109,7 +108,6 @@ public class MainnetPantheonController implements PantheonController<Void> {
         new ProtocolContext<>(blockchain, worldStateArchive, null);
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
-    final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
@@ -118,9 +116,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
                 .getConfigOptions()
                 .getChainId()
                 .orElse(MainnetProtocolSchedule.DEFAULT_CHAIN_ID),
-            fastSyncEnabled,
-            syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism());
+            syncConfig);
     final SyncState syncState =
         new SyncState(
             protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());

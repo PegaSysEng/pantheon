@@ -58,7 +58,6 @@ import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
@@ -158,15 +157,12 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             blockchain, worldStateArchive, new IbftContext(voteTally, voteProposer));
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
-    final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
             protocolContext.getWorldStateArchive(),
             networkId,
-            fastSyncEnabled,
-            syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism());
+            syncConfig);
     final SubProtocol ethSubProtocol = EthProtocol.get();
 
     final SyncState syncState =
