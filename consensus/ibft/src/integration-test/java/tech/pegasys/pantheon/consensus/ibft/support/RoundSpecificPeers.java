@@ -25,13 +25,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RoundSpecificNodeRoles {
+public class RoundSpecificPeers {
 
   private final ValidatorPeer proposer;
   private final Collection<ValidatorPeer> peers;
   private final List<ValidatorPeer> nonProposingPeers;
 
-  public RoundSpecificNodeRoles(
+  public RoundSpecificPeers(
       final ValidatorPeer proposer,
       final Collection<ValidatorPeer> peers,
       final List<ValidatorPeer> nonProposingPeers) {
@@ -60,11 +60,11 @@ public class RoundSpecificNodeRoles {
         .collect(Collectors.toList());
   }
 
-  public void nonProposingPeersPrepare(final ConsensusRoundIdentifier roundId, final Hash hash) {
+  public void nonProposingPrepare(final ConsensusRoundIdentifier roundId, final Hash hash) {
     nonProposingPeers.forEach(peer -> peer.injectPrepare(roundId, hash));
   }
 
-  public void nonProposingPeerCommit(final ConsensusRoundIdentifier roundId, final Hash hash) {
+  public void nonProposingCommit(final ConsensusRoundIdentifier roundId, final Hash hash) {
     nonProposingPeers.forEach(peer -> peer.injectCommit(roundId, hash));
   }
 

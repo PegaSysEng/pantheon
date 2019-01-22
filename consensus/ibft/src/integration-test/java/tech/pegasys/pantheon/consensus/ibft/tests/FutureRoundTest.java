@@ -23,7 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
+import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
 import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
@@ -54,10 +54,10 @@ public class FutureRoundTest {
           .build();
 
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
-  private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
+  private final RoundSpecificPeers peers = context.roundSpecificPeers(roundId);
 
   private final ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(1, 5);
-  private final RoundSpecificNodeRoles futureRoles = context.getRoundSpecificRoles(futureRoundId);
+  private final RoundSpecificPeers futureRoles = context.roundSpecificPeers(futureRoundId);
 
   private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
 
@@ -72,7 +72,7 @@ public class FutureRoundTest {
         context.createBlockForProposalFromChainHead(futureRoundId.getRoundNumber(), 60);
     final int quorum = IbftHelpers.calculateRequiredValidatorQuorum(NETWORK_SIZE);
     final ConsensusRoundIdentifier subsequentRoundId = new ConsensusRoundIdentifier(1, 6);
-    final RoundSpecificNodeRoles subsequentRoles = context.getRoundSpecificRoles(subsequentRoundId);
+    final RoundSpecificPeers subsequentRoles = context.roundSpecificPeers(subsequentRoundId);
 
     // required remotely received Prepares = quorum-2
     // required remote received commits = quorum-1
@@ -91,7 +91,7 @@ public class FutureRoundTest {
     subsequentRoles.getNonProposingPeer(1).injectPrepare(subsequentRoundId, futureBlock.getHash());
     subsequentRoles.getNonProposingPeer(1).injectCommit(subsequentRoundId, futureBlock.getHash());
 
-    assertPeersReceivedNoMessages(roles.getAllPeers());
+    assertPeersReceivedNoMessages(peers.getAllPeers());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
 
     // inject a newRound to move to 'futureRoundId', and ensure localnode sends prepare, commit
@@ -127,15 +127,15 @@ public class FutureRoundTest {
     final Block futureBlock =
         context.createBlockForProposalFromChainHead(futureRoundId.getRoundNumber(), 60);
 
-    roles.getProposer().injectProposal(roundId, initialBlock);
+    peers.getProposer().injectProposal(roundId, initialBlock);
 
-    roles.nonProposingPeersPrepare(roundId, initialBlock.getHash());
+    peers.nonProposingPrepare(roundId, initialBlock.getHash());
 
-    roles.getProposer().injectCommit(roundId, initialBlock.getHash());
+    peers.getProposer().injectCommit(roundId, initialBlock.getHash());
     // At this stage, the local node has 2 commit msgs (proposer and local) so has not committed
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
 
-    for (final ValidatorPeer peer : roles.getAllPeers()) {
+    for (final ValidatorPeer peer : peers.getAllPeers()) {
       peer.clearReceivedMessages();
     }
 
@@ -144,11 +144,11 @@ public class FutureRoundTest {
 
     final SignedData<PreparePayload> expectedFuturePrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
-    assertPeersReceivedExactly(roles.getAllPeers(), expectedFuturePrepare);
+    assertPeersReceivedExactly(peers.getAllPeers(), expectedFuturePrepare);
 
     // attempt to complete the previous round
-    roles.getNonProposingPeer(0).injectCommit(roundId, initialBlock.getHash());
-    assertPeersReceivedNoMessages(roles.getAllPeers());
+    peers.getNonProposingPeer(0).injectCommit(roundId, initialBlock.getHash());
+    assertPeersReceivedNoMessages(peers.getAllPeers());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
   }
 }

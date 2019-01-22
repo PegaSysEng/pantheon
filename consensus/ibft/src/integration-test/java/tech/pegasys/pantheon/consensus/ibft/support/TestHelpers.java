@@ -53,11 +53,11 @@ public class TestHelpers {
 
   public static PreparedCertificate createValidPreparedCertificate(
       final TestContext context, final ConsensusRoundIdentifier preparedRound, final Block block) {
-    final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(preparedRound);
+    final RoundSpecificPeers peers = context.roundSpecificPeers(preparedRound);
 
     return new PreparedCertificate(
-        roles.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
-        roles.nonProposingPeersPreparePayload(preparedRound, block.getHash()));
+        peers.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
+        peers.nonProposingPeersPreparePayload(preparedRound, block.getHash()));
   }
 
   public static SignedData<NewRoundPayload> injectEmptyNewRound(

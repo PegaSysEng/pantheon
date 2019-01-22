@@ -23,7 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
+import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -55,7 +55,7 @@ public class LocalNodeIsProposerTest {
           .clock(fixedClock)
           .build();
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
-  private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
+  private final RoundSpecificPeers peers = context.roundSpecificPeers(roundId);
 
   private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
 
@@ -80,34 +80,34 @@ public class LocalNodeIsProposerTest {
 
   @Test
   public void basicCase() {
-    assertPeersReceivedExactly(roles.getAllPeers(), expectedTxProposal);
+    assertPeersReceivedExactly(peers.getAllPeers(), expectedTxProposal);
 
     // NOTE: In these test roles.getProposer() will return NULL.
-    roles.getNonProposingPeer(0).injectPrepare(roundId, expectedProposedBlock.getHash());
-    assertPeersReceivedNoMessages(roles.getAllPeers());
+    peers.getNonProposingPeer(0).injectPrepare(roundId, expectedProposedBlock.getHash());
+    assertPeersReceivedNoMessages(peers.getAllPeers());
 
-    roles.getNonProposingPeer(1).injectPrepare(roundId, expectedProposedBlock.getHash());
-    assertPeersReceivedExactly(roles.getAllPeers(), expectedTxCommit);
+    peers.getNonProposingPeer(1).injectPrepare(roundId, expectedProposedBlock.getHash());
+    assertPeersReceivedExactly(peers.getAllPeers(), expectedTxCommit);
 
-    roles.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
+    peers.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
-    assertPeersReceivedNoMessages(roles.getAllPeers());
+    assertPeersReceivedNoMessages(peers.getAllPeers());
 
-    roles.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
+    peers.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
-    assertPeersReceivedNoMessages(roles.getAllPeers());
+    assertPeersReceivedNoMessages(peers.getAllPeers());
   }
 
   @Test
   public void importsToChainWithoutReceivingPrepareMessages() {
-    assertPeersReceivedExactly(roles.getAllPeers(), expectedTxProposal);
+    assertPeersReceivedExactly(peers.getAllPeers(), expectedTxProposal);
 
-    roles.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
+    peers.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
-    assertPeersReceivedNoMessages(roles.getAllPeers());
+    assertPeersReceivedNoMessages(peers.getAllPeers());
 
-    roles.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
+    peers.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
-    assertPeersReceivedNoMessages(roles.getAllPeers());
+    assertPeersReceivedNoMessages(peers.getAllPeers());
   }
 }
