@@ -1996,7 +1996,7 @@ If the boolean value is `true`, the vote is to add a validator. If `false`, the 
     
 ### ibft_getValidatorsByBlockHash
 
-Lists validators for the specified block.
+Lists the validators defined in the specified block.
 
 **Parameters**
 
@@ -2029,7 +2029,7 @@ Lists validators for the specified block.
 
 ### ibft_getValidatorsByBlockNumber
 
-Lists validators for the specified block. 
+Lists the validators defined in the specified block. 
 
 **Parameters** 
 
