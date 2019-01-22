@@ -66,6 +66,20 @@ class ConfigOptionSearchAndRunHandler extends AbstractParseResultHandler<List<Ob
             new TomlConfigFileDefaultProvider(commandLine, configFile);
         commandLine.setDefaultValueProvider(tomlConfigFileDefaultProvider);
       }
+
+      if (parseResult.hasMatchedOption("--permissioning-config")) {
+        // TODO OR the --permissioning-config option is in the regular TOML
+        // OR the default file exists && --permissioning-enabled
+        // TODO we need a --permissioning-enabled flag
+
+        // parse the permissioning toml file using same logic as above
+
+        // or create directly the permissioningConfiguration object
+        // but how to pass it to the Runner?
+      }
+      commandLine.parseWithHandlers(
+          resultHandler, exceptionHandler, parseResult.originalArgs().toArray(new String[0]));
+      return new ArrayList<>();
     }
     commandLine.parseWithHandlers(
         resultHandler, exceptionHandler, parseResult.originalArgs().toArray(new String[0]));

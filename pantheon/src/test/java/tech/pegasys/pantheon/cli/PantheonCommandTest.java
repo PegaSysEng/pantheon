@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -310,10 +311,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void tomlThatConfiguresEverything() throws IOException {
+  public void tomlThatConfiguresEverythingExceptPermissioning() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    // Load a TOML that configures literally everything
+    // Load a TOML that configures literally everything (except permissioning)
     final URL configFile = Resources.getResource("everything_config.toml");
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
@@ -348,6 +349,24 @@ public class PantheonCommandTest extends CommandTestAbstract {
       options.remove(optionSpec);
     }
     assertThat(options.stream().map(CommandLine.Model.OptionSpec::longestName)).isEmpty();
+  }
+
+  @Test
+  public void permissioningToml() throws IOException {
+    final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
+
+    final URL configFile = Resources.getResource("permissioning_config.toml");
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+    final TomlParseResult tomlResult = Toml.parse(toml);
+
+    PermissioningConfiguration permissioningConfiguration =
+        PantheonCommand.permissioningConfiguration(tomlResult);
+
+    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getAccountWhitelist())
+        .containsExactly("0x0000000000000000000000000000000000000009");
+    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
   }
 
   @Test
