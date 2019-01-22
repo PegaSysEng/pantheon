@@ -58,6 +58,7 @@ nav:
         - Clique: Consensus-Protocols/Clique.md
         - IBFT 2.0: Consensus-Protocols/IBFT.md
     - Configuring Pantheon:
+        - Consensus Mechanisms: Configuring-Pantheon/Consensus-Mechanisms.md
         - Using a Configuration File: Configuring-Pantheon/Using-Configuration-File.md
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
