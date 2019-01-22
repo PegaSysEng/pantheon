@@ -32,19 +32,26 @@ public class IbftBlockHeightManagerFactory {
   }
 
   public BlockHeightManager create(final BlockHeader parentHeader) {
-
     if (finalState.isLocalNodeValidator()) {
-      return new IbftBlockHeightManager(
-          parentHeader,
-          finalState,
-          new RoundChangeManager(
-              IbftHelpers.calculateRequiredValidatorQuorum(finalState.getValidators().size()),
-              messageValidatorFactory.createRoundChangeMessageValidator(parentHeader)),
-          roundFactory,
-          finalState.getClock(),
-          messageValidatorFactory);
+      return createFullBlockHeightManager(parentHeader);
     } else {
-      return new NoOpBlockHeightManager(parentHeader);
+      return createNoOpBlockHeightManager(parentHeader);
     }
+  }
+
+  private BlockHeightManager createNoOpBlockHeightManager(final BlockHeader parentHeader) {
+    return new NoOpBlockHeightManager(parentHeader);
+  }
+
+  private BlockHeightManager createFullBlockHeightManager(final BlockHeader parentHeader) {
+    return new IbftBlockHeightManager(
+        parentHeader,
+        finalState,
+        new RoundChangeManager(
+            IbftHelpers.calculateRequiredValidatorQuorum(finalState.getValidators().size()),
+            messageValidatorFactory.createRoundChangeMessageValidator(parentHeader)),
+        roundFactory,
+        finalState.getClock(),
+        messageValidatorFactory);
   }
 }
