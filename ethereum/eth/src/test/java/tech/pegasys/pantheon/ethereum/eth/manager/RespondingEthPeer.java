@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockBodiesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
@@ -33,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -211,11 +211,12 @@ public class RespondingEthPeer {
    */
   public static <C> Responder partialResponder(
       final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
       final ProtocolSchedule<C> protocolSchedule,
       final float portion) {
     checkArgument(portion >= 0.0 && portion <= 1.0, "Portion is in the range [0.0..1.0]");
 
-    final Responder fullResponder = blockchainResponder(blockchain);
+    final Responder fullResponder = blockchainResponder(blockchain, worldStateArchive);
     return (cap, msg) -> {
       final Optional<MessageData> maybeResponse = fullResponder.respond(cap, msg);
       if (!maybeResponse.isPresent()) {
