@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,14 +39,14 @@ public class IbftExtraData {
   private final Collection<Signature> seals;
   private final Optional<Vote> vote;
   private final int round;
-  private final List<Address> validators;
+  private final Collection<Address> validators;
 
   public IbftExtraData(
       final BytesValue vanityData,
       final Collection<Signature> seals,
       final Optional<Vote> vote,
       final int round,
-      final List<Address> validators) {
+      final Collection<Address> validators) {
 
     checkNotNull(vanityData);
     checkNotNull(seals);
@@ -123,6 +124,17 @@ public class IbftExtraData {
     return encoder.encoded();
   }
 
+  public static String createGenesisExtraDataString(final List<Address> validators) {
+    final IbftExtraData extraData =
+        new IbftExtraData(
+            BytesValue.wrap(new byte[32]),
+            Collections.emptyList(),
+            Optional.empty(),
+            0,
+            validators);
+    return extraData.encode().toString();
+  }
+
   // Accessors
   public BytesValue getVanityData() {
     return vanityData;
@@ -132,7 +144,7 @@ public class IbftExtraData {
     return seals;
   }
 
-  public List<Address> getValidators() {
+  public Collection<Address> getValidators() {
     return validators;
   }
 

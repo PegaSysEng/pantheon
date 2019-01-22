@@ -22,7 +22,9 @@ import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryAgent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.VertxPeerDiscoveryAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
+import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
@@ -39,6 +41,7 @@ import tech.pegasys.pantheon.util.Subscribers;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
@@ -47,9 +50,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -80,7 +83,7 @@ import org.apache.logging.log4j.Logger;
  * distance from us is equal to the index of the bucket. The value <i>x</i> in the distance function
  * corresponds to our node ID (public key).
  *
- * <p>Upper layers in the stack subscribe to events from the peer discocvery layer and initiate/drop
+ * <p>Upper layers in the stack subscribe to events from the peer discovery layer and initiate/drop
  * connections accordingly.
  *
  * <h2>RLPx Wire Protocol</h2>
@@ -104,7 +107,7 @@ import org.apache.logging.log4j.Logger;
  *     Selection</a>
  * @see <a href="https://github.com/ethereum/devp2p/blob/master/rlpx.md">devp2p RLPx</a>
  */
-public final class NettyP2PNetwork implements P2PNetwork {
+public class NettyP2PNetwork implements P2PNetwork {
 
   private static final Logger LOG = LogManager.getLogger();
   private static final int TIMEOUT_SECONDS = 30;
@@ -122,9 +125,13 @@ public final class NettyP2PNetwork implements P2PNetwork {
   private final PeerBlacklist peerBlacklist;
   private OptionalLong peerBondedObserverId = OptionalLong.empty();
 
-  private final PeerConnectionRegistry connections;
+  @VisibleForTesting public final Collection<Peer> peerMaintainConnectionList;
 
-  private final AtomicInteger pendingConnections = new AtomicInteger(0);
+  @VisibleForTesting public final PeerConnectionRegistry connections;
+
+  @VisibleForTesting
+  public final Map<Peer, CompletableFuture<PeerConnection>> pendingConnections =
+      new ConcurrentHashMap<>();
 
   private final EventLoopGroup boss = new NioEventLoopGroup(1);
 
@@ -141,6 +148,8 @@ public final class NettyP2PNetwork implements P2PNetwork {
   private final List<SubProtocol> subProtocols;
 
   private final LabelledMetric<Counter> outboundMessagesCounter;
+
+  private final NodeWhitelistController nodeWhitelistController;
 
   /**
    * Creates a peer networking service for production purposes.
@@ -170,8 +179,10 @@ public final class NettyP2PNetwork implements P2PNetwork {
 
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
+    this.nodeWhitelistController = nodeWhitelistController;
+    this.peerMaintainConnectionList = new HashSet<>();
     peerDiscoveryAgent =
-        new PeerDiscoveryAgent(
+        new VertxPeerDiscoveryAgent(
             vertx,
             keyPair,
             config.getDiscovery(),
@@ -268,8 +279,11 @@ public final class NettyP2PNetwork implements P2PNetwork {
                 connection.disconnect(DisconnectReason.TOO_MANY_PEERS);
                 return;
               }
-              // Reject incoming connections that are blacklisted
-              if (peerBlacklist.contains(connection)) {
+
+              final boolean isPeerBlacklisted = peerBlacklist.contains(connection);
+              final boolean isPeerNotWhitelisted = !isPeerWhitelisted(connection, ch);
+
+              if (isPeerBlacklisted || isPeerNotWhitelisted) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
                 return;
               }
@@ -283,8 +297,37 @@ public final class NettyP2PNetwork implements P2PNetwork {
     };
   }
 
+  private boolean isPeerWhitelisted(final PeerConnection connection, final SocketChannel ch) {
+    return nodeWhitelistController.contains(
+        new DefaultPeer(
+            connection.getPeer().getNodeId(),
+            ch.remoteAddress().getAddress().getHostAddress(),
+            connection.getPeer().getPort(),
+            connection.getPeer().getPort()));
+  }
+
+  @Override
+  public boolean addMaintainConnectionPeer(final Peer peer) {
+    final boolean added = peerMaintainConnectionList.add(peer);
+    if (added) {
+      connect(peer);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public void checkMaintainedConnectionPeers() {
+    for (final Peer peer : peerMaintainConnectionList) {
+      if (!(isConnecting(peer) || isConnected(peer))) {
+        connect(peer);
+      }
+    }
+  }
+
   private int connectionCount() {
-    return pendingConnections.get() + connections.size();
+    return pendingConnections.size() + connections.size();
   }
 
   @Override
@@ -297,7 +340,12 @@ public final class NettyP2PNetwork implements P2PNetwork {
     LOG.trace("Initiating connection to peer: {}", peer.getId());
     final CompletableFuture<PeerConnection> connectionFuture = new CompletableFuture<>();
     final Endpoint endpoint = peer.getEndpoint();
-    pendingConnections.incrementAndGet();
+    final CompletableFuture<PeerConnection> existingPendingConnection =
+        pendingConnections.putIfAbsent(peer, connectionFuture);
+    if (existingPendingConnection != null) {
+      LOG.debug("Attempted to connect to peer with pending connection: {}", peer.getId());
+      return existingPendingConnection;
+    }
 
     new Bootstrap()
         .group(workers)
@@ -340,7 +388,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
 
     connectionFuture.whenComplete(
         (connection, t) -> {
-          pendingConnections.decrementAndGet();
+          pendingConnections.remove(peer);
           if (t == null) {
             onConnectionEstablished(connection);
             LOG.debug("Connection established to peer: {}", peer.getId());
@@ -355,7 +403,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
   private void logConnections() {
     LOG.debug(
         "Connections: {} pending, {} active connections.",
-        pendingConnections.get(),
+        pendingConnections.size(),
         connections.size());
   }
 
@@ -377,20 +425,30 @@ public final class NettyP2PNetwork implements P2PNetwork {
   @Override
   public void run() {
     try {
-      peerDiscoveryAgent.start(ourPeerInfo.getPort()).join();
+      peerDiscoveryAgent.start().join();
       final long observerId =
           peerDiscoveryAgent.observePeerBondedEvents(
               peerBondedEvent -> {
+                final Peer peer = peerBondedEvent.getPeer();
                 if (connectionCount() < maxPeers
-                    && peerBondedEvent.getPeer().getEndpoint().getTcpPort().isPresent()
-                    && !connections.isAlreadyConnected(peerBondedEvent.getPeer().getId())) {
-                  connect(peerBondedEvent.getPeer());
+                    && peer.getEndpoint().getTcpPort().isPresent()
+                    && !isConnecting(peer)
+                    && !isConnected(peer)) {
+                  connect(peer);
                 }
               });
       peerBondedObserverId = OptionalLong.of(observerId);
     } catch (final Exception ex) {
       throw new IllegalStateException(ex);
     }
+  }
+
+  private boolean isConnecting(final Peer peer) {
+    return pendingConnections.containsKey(peer);
+  }
+
+  private boolean isConnected(final Peer peer) {
+    return connections.isAlreadyConnected(peer.getId());
   }
 
   @Override
@@ -422,6 +480,7 @@ public final class NettyP2PNetwork implements P2PNetwork {
     stop();
   }
 
+  @VisibleForTesting
   public Collection<DiscoveryPeer> getDiscoveryPeers() {
     return peerDiscoveryAgent.getPeers();
   }
@@ -432,13 +491,18 @@ public final class NettyP2PNetwork implements P2PNetwork {
   }
 
   @Override
-  public PeerInfo getSelf() {
+  public PeerInfo getLocalPeerInfo() {
     return ourPeerInfo;
   }
 
   @Override
   public boolean isListening() {
     return peerDiscoveryAgent.isActive();
+  }
+
+  @Override
+  public NodeWhitelistController getNodeWhitelistController() {
+    return nodeWhitelistController;
   }
 
   private void onConnectionEstablished(final PeerConnection connection) {

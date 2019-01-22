@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -137,8 +138,9 @@ public class DetermineCommonAncestorTaskParameterizedTest {
       remoteBlockchain.appendBlock(remoteBlock, remoteReceipts);
     }
 
+    final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
     final EthProtocolManager ethProtocolManager =
-        EthProtocolManagerTestUtil.create(localBlockchain);
+        EthProtocolManagerTestUtil.create(localBlockchain, worldStateArchive);
 
     final RespondingEthPeer.Responder responder =
         RespondingEthPeer.blockchainResponder(remoteBlockchain);
@@ -151,7 +153,7 @@ public class DetermineCommonAncestorTaskParameterizedTest {
 
     final EthContext ethContext = ethProtocolManager.ethContext();
     final ProtocolContext<Void> protocolContext =
-        new ProtocolContext<>(localBlockchain, createInMemoryWorldStateArchive(), null);
+        new ProtocolContext<>(localBlockchain, worldStateArchive, null);
 
     final EthTask<BlockHeader> task =
         DetermineCommonAncestorTask.create(

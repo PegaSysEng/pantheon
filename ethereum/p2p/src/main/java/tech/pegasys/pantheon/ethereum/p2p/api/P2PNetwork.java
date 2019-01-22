@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.p2p.api;
 
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 
@@ -64,6 +65,21 @@ public interface P2PNetwork extends Closeable, Runnable {
    */
   void subscribeDisconnect(DisconnectCallback consumer);
 
+  /**
+   * Adds a {@link Peer} to a list indicating efforts should be made to always stay connected to it
+   *
+   * @param peer The peer that should be connected to
+   * @return boolean representing whether or not the peer has been added to the list or was already
+   *     on it
+   */
+  boolean addMaintainConnectionPeer(final Peer peer);
+
+  /**
+   * Trigger that an external clock can use to make the network attempt connections to maintained
+   * peers
+   */
+  void checkMaintainedConnectionPeers();
+
   /** Stops the P2P network layer. */
   void stop();
 
@@ -77,7 +93,7 @@ public interface P2PNetwork extends Closeable, Runnable {
    *
    * @return the PeerInfo for this node.
    */
-  PeerInfo getSelf();
+  PeerInfo getLocalPeerInfo();
 
   /**
    * Checks if the node is listening for network connections
@@ -85,4 +101,6 @@ public interface P2PNetwork extends Closeable, Runnable {
    * @return true if the node is listening for network connections, false, otherwise.
    */
   boolean isListening();
+
+  NodeWhitelistController getNodeWhitelistController();
 }

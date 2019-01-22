@@ -9,7 +9,7 @@ For example, in a permissioned consortium network.
 Proof of Authority consensus protocols allow faster block times and have a much greater throughput of transactions 
 than the Ethash Proof of Work consensus protocol used on the Ethereum MainNet. 
 
-In Clique and IBFT 2.0, a group of nodes in the network act as signers(Clique) or validators(IBFT 2.0). These nodes propose, validate, 
+In Clique and IBFT 2.0, a group of nodes in the network act as signers (Clique) or validators (IBFT 2.0). These nodes propose, validate, 
 and add blocks to the blockchain. Nodes are added to or removed from the signer/validator pool by the existing group of nodes voting. 
 
 !!! note

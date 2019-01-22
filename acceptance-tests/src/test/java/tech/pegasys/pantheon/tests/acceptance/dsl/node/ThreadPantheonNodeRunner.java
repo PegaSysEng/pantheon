@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -88,6 +89,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .metricsSystem(noOpMetricsSystem)
             .metricsConfiguration(node.metricsConfiguration())
             .permissioningConfiguration(node.getPermissioningConfiguration())
+            .p2pEnabled(node.p2pEnabled())
             .build();
 
     nodeExecutor.submit(runner::execute);
@@ -105,7 +107,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public void shutdown() {
-    pantheonRunners.keySet().forEach(this::killRunner);
+    // iterate over a copy of the set so that pantheonRunner can be updated when a runner is killed
+    new HashSet<>(pantheonRunners.keySet()).forEach(this::killRunner);
     try {
       nodeExecutor.shutdownNow();
       if (!nodeExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -116,12 +119,18 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
   }
 
+  @Override
+  public boolean isActive(final String nodeName) {
+    return pantheonRunners.containsKey(nodeName);
+  }
+
   private void killRunner(final String name) {
     LOG.info("Killing " + name + " runner");
 
     if (pantheonRunners.containsKey(name)) {
       try {
         pantheonRunners.get(name).close();
+        pantheonRunners.remove(name);
       } catch (final Exception e) {
         throw new RuntimeException("Error shutting down node " + name, e);
       }
