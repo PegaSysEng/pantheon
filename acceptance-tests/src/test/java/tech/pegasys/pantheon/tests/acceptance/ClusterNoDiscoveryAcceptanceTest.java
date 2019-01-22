@@ -38,7 +38,7 @@ public class ClusterNoDiscoveryAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldConnectToOtherPeer() {
+  public void shouldNotConnectToOtherPeer() {
     fullNode.verify(net.awaitPeerCount(0));
   }
 
