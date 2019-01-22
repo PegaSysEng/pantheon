@@ -101,8 +101,8 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public OptionalLong getPetersburgBlockNumber() {
-    return getOptionalLong("petersburgblock");
+  public OptionalLong getConstantinopleFixBlockNumber() {
+    return getOptionalLong("constantinopleFixblock");
   }
 
   @Override

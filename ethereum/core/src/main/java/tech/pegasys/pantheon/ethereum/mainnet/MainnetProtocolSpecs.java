@@ -193,10 +193,10 @@ public abstract class MainnetProtocolSpecs {
         .name("Constantinople");
   }
 
-  public static ProtocolSpecBuilder<Void> petersburgDefinition(final int chainId) {
+  public static ProtocolSpecBuilder<Void> constantinopleFixDefinition(final int chainId) {
     return constantinopleDefinition(chainId)
-        .gasCalculator(PetersburgGasCalculator::new)
-        .name("Petersburg");
+        .gasCalculator(ConstantinopleFixGasCalculator::new)
+        .name("ConstantinopleFix");
   }
 
   private static TransactionReceipt frontierTransactionReceiptFactory(

@@ -69,7 +69,7 @@ public class TransactionTestCaseSpec {
       @JsonProperty("EIP158") final Expectation EIP158Expectation,
       @JsonProperty("Byzantium") final Expectation byzantiumExpectation,
       @JsonProperty("Constantinople") final Expectation constantinopleExpectation,
-      @JsonProperty("Petersburg") final Expectation petersburgExpectation,
+      @JsonProperty("ConstantinopleFix") final Expectation constantinopleFixExpectation,
       @JsonProperty("rlp") final String rlp) {
     expectations = new HashMap<>();
     expectations.put("Frontier", frontierExpectation);
@@ -78,7 +78,7 @@ public class TransactionTestCaseSpec {
     expectations.put("EIP158", EIP158Expectation);
     expectations.put("Byzantium", byzantiumExpectation);
     expectations.put("Constantinople", constantinopleExpectation);
-    expectations.put("Petersburg", petersburgExpectation);
+    expectations.put("ConstantinopleFix", constantinopleFixExpectation);
 
     BytesValue parsedRlp = null;
     try {

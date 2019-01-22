@@ -30,11 +30,11 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class PetersburgSstoreGasTest {
+public class ConstantinopleFixSstoreGasTest {
 
   private static final UInt256 TWO = UInt256.of(2);
 
-  private final PetersburgGasCalculator gasCalculator = new PetersburgGasCalculator();
+  private final ConstantinopleFixGasCalculator gasCalculator = new ConstantinopleFixGasCalculator();
 
   @Parameters(name = "original: {0}, current: {1}, new: {2}")
   public static Object[][] scenarios() {

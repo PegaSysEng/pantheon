@@ -23,7 +23,7 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   private OptionalLong spuriousDragonBlockNumber = OptionalLong.empty();
   private OptionalLong byzantiumBlockNumber = OptionalLong.empty();
   private OptionalLong constantinopleBlockNumber = OptionalLong.empty();
-  private OptionalLong petersburgBlockNumber = OptionalLong.empty();
+  private OptionalLong constantinopleFixBlockNumber = OptionalLong.empty();
   private OptionalInt chainId = OptionalInt.empty();
 
   @Override
@@ -92,8 +92,8 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public OptionalLong getPetersburgBlockNumber() {
-    return petersburgBlockNumber;
+  public OptionalLong getConstantinopleFixBlockNumber() {
+    return constantinopleFixBlockNumber;
   }
 
   @Override
@@ -131,8 +131,8 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
     return this;
   }
 
-  public StubGenesisConfigOptions petersburgBlock(final long blockNumber) {
-    petersburgBlockNumber = OptionalLong.of(blockNumber);
+  public StubGenesisConfigOptions constantinopleFixBlock(final long blockNumber) {
+    constantinopleFixBlockNumber = OptionalLong.of(blockNumber);
     return this;
   }
 

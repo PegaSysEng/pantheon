@@ -43,7 +43,7 @@ public interface GenesisConfigOptions {
 
   OptionalLong getConstantinopleBlockNumber();
 
-  OptionalLong getPetersburgBlockNumber();
+  OptionalLong getConstantinopleFixBlockNumber();
 
   OptionalInt getChainId();
 }
