@@ -1,7 +1,9 @@
+*[byzantine fault tolerant]:Ability to function correctly and reach consensus despite nodes failing or propagating incorrect information to peers.
+
 # Comparing Proof of Authority Consensus Protocols  
 
 Pantheon implements the Clique and IBFT 2.0 Proof of Authority consensus protocols. Proof of Authority 
-consesus protocols are used when participants are known to each other and there is a level of trust between them. 
+consensus protocols are used when participants are known to each other and there is a level of trust between them. 
 For example, in a permissioned consortium network. 
 
 Proof of Authority consensus protocols allow faster block times and have a much greater throughput of transactions 
@@ -31,17 +33,22 @@ Clique does not have immediate finality. Implementations using Clique must be aw
 ### Liveness 
 
 Clique is more fault tolerant than IBFT 2.0. Clique tolerates up to half to the validators failing. IBFT 2.0 networks 
-tolerates up to 1/3 faulty nodes.  
+tolerate up to (n-1)/3 faulty nodes. For example, in an IBFT 2.0 network of:
+
+* 3, no bad node are tolerated
+* 4-6, 1 bad node is tolerated 
+* 7-9, 2 bad nodes are tolerated 
 
 ### Speed 
 
-Reaching consensus and adding blocks is faster in Clique networks. 
+Reaching consensus and adding blocks is faster in Clique networks. For Clique, the probability of a fork 
+increases number as the of validators increases. 
 
-For both Clique and IBFT 2.0, the time to add new blocks increases as the number of validators increases.   
+For IBFT 2.0, the time to add new blocks increases as the number of validators increases.   
 
 ### Minimum Number of Validators 
 
-IBFT 2.0 requires 3 nodes to be byzantine fault tolerant. 
+IBFT 2.0 requires 4 nodes to be Byzantine fault tolerant. 
 
 
 
