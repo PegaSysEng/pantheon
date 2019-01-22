@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import static tech.pegasys.pantheon.consensus.ibft.statemachine.AbstractBlockHeightManager.MessageAge.CURRENT_ROUND;
-import static tech.pegasys.pantheon.consensus.ibft.statemachine.AbstractBlockHeightManager.MessageAge.FUTURE_ROUND;
-import static tech.pegasys.pantheon.consensus.ibft.statemachine.AbstractBlockHeightManager.MessageAge.PRIOR_ROUND;
+import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.CURRENT_ROUND;
+import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.FUTURE_ROUND;
+import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.PRIOR_ROUND;
 
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -53,7 +53,7 @@ import org.apache.logging.log4j.Logger;
  * and sends a Proposal message. If the round times out prior to importing a block, this class is
  * responsible for creating a RoundChange message and transmitting it.
  */
-public class IbftBlockHeightManager implements AbstractBlockHeightManager {
+public class IbftBlockHeightManager implements BlockHeightManager {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -262,5 +262,11 @@ public class IbftBlockHeightManager implements AbstractBlockHeightManager {
       return CURRENT_ROUND;
     }
     return PRIOR_ROUND;
+  }
+
+  public enum MessageAge {
+    PRIOR_ROUND,
+    CURRENT_ROUND,
+    FUTURE_ROUND
   }
 }

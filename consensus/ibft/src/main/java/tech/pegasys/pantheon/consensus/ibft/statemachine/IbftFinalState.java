@@ -87,7 +87,7 @@ public class IbftFinalState {
     return getProposerForRound(roundIdentifier).equals(localAddress);
   }
 
-  public boolean localNodeIsValidator() {
+  public boolean isLocalNodeValidator() {
     return getValidators().contains(localAddress);
   }
 

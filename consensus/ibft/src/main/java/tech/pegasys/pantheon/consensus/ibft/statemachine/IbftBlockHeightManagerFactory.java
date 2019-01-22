@@ -31,9 +31,9 @@ public class IbftBlockHeightManagerFactory {
     this.messageValidatorFactory = messageValidatorFactory;
   }
 
-  public AbstractBlockHeightManager create(final BlockHeader parentHeader) {
+  public BlockHeightManager create(final BlockHeader parentHeader) {
 
-    if (finalState.localNodeIsValidator()) {
+    if (finalState.isLocalNodeValidator()) {
       return new IbftBlockHeightManager(
           parentHeader,
           finalState,
@@ -44,7 +44,7 @@ public class IbftBlockHeightManagerFactory {
           finalState.getClock(),
           messageValidatorFactory);
     } else {
-      return new NullBlockHeightManager(parentHeader);
+      return new NoOpBlockHeightManager(parentHeader);
     }
   }
 }

@@ -22,31 +22,45 @@ import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
-public interface AbstractBlockHeightManager {
+public class NoOpBlockHeightManager implements BlockHeightManager {
 
-  void start();
+  private final BlockHeader parentHeader;
 
-  void handleBlockTimerExpiry(ConsensusRoundIdentifier roundIdentifier);
+  public NoOpBlockHeightManager(final BlockHeader parentHeader) {
+    this.parentHeader = parentHeader;
+  }
 
-  void roundExpired(RoundExpiry expire);
+  @Override
+  public void start() {}
 
-  void handleProposalPayload(SignedData<ProposalPayload> signedPayload);
+  @Override
+  public void handleBlockTimerExpiry(final ConsensusRoundIdentifier roundIdentifier) {}
 
-  void handlePreparePayload(SignedData<PreparePayload> signedPayload);
+  @Override
+  public void roundExpired(final RoundExpiry expire) {}
 
-  void handleCommitPayload(SignedData<CommitPayload> payload);
+  @Override
+  public void handleProposalPayload(final SignedData<ProposalPayload> signedPayload) {}
 
-  void handleRoundChangePayload(SignedData<RoundChangePayload> signedPayload);
+  @Override
+  public void handlePreparePayload(final SignedData<PreparePayload> signedPayload) {}
 
-  void handleNewRoundPayload(SignedData<NewRoundPayload> signedPayload);
+  @Override
+  public void handleCommitPayload(final SignedData<CommitPayload> payload) {}
 
-  long getChainHeight();
+  @Override
+  public void handleRoundChangePayload(final SignedData<RoundChangePayload> signedPayload) {}
 
-  BlockHeader getParentBlockHeader();
+  @Override
+  public void handleNewRoundPayload(final SignedData<NewRoundPayload> signedPayload) {}
 
-  public enum MessageAge {
-    PRIOR_ROUND,
-    CURRENT_ROUND,
-    FUTURE_ROUND
+  @Override
+  public long getChainHeight() {
+    return parentHeader.getNumber() + 1;
+  }
+
+  @Override
+  public BlockHeader getParentBlockHeader() {
+    return parentHeader;
   }
 }
