@@ -690,7 +690,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   public static PermissioningConfiguration permissioningConfiguration(
-      final TomlParseResult permToml) throws IOException {
+      final TomlParseResult permToml) {
 
     TomlArray accountWhitelistTomlArray = permToml.getArray("accounts-whitelist");
     TomlArray nodeWhitelistTomlArray = permToml.getArray("nodes-whitelist");
