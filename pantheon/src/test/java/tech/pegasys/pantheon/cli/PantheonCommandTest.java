@@ -494,6 +494,35 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void p2pEnabledOptionFlagDefaultTrue() {
+    parseCommand("--p2p-enabled");
+
+    verify(mockRunnerBuilder.p2pEnabled(eq(true))).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void p2pEnabledOptionValueMustBeUsed() {
+    parseCommand("--p2p-enabled", "false");
+
+    verify(mockRunnerBuilder.p2pEnabled(eq(false))).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void p2pEnabledOptionFalseValueCannotAlsoHaveBootnodesSpecified() {
+    parseCommand("--p2p-enabled", "false", "--bootnodes", String.join(",", validENodeStrings));
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Unable to specify bootnodes if p2p is disabled.");
+  }
+
+  @Test
   public void discoveryOptionMustBeUsed() {
     parseCommand("--no-discovery");
     // Discovery stored in runner is the negative of the option passed to CLI
