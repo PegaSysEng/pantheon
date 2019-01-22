@@ -41,6 +41,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -57,8 +58,7 @@ import org.junit.Test;
 
 public class DetermineCommonAncestorTaskTest {
 
-  private final ProtocolSchedule<Void> protocolSchedule =
-      MainnetProtocolSchedule.create(new NoOpMetricsSystem());
+  private final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
   private final BlockDataGenerator blockDataGenerator = new BlockDataGenerator();
   private final LabelledMetric<OperationTimer> ethTasksTimer =
       NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
@@ -73,10 +73,10 @@ public class DetermineCommonAncestorTaskTest {
   public void setup() {
     genesisBlock = blockDataGenerator.genesisBlock();
     localBlockchain = createInMemoryBlockchain(genesisBlock);
-    ethProtocolManager = EthProtocolManagerTestUtil.create(localBlockchain);
+    final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
+    ethProtocolManager = EthProtocolManagerTestUtil.create(localBlockchain, worldStateArchive);
     ethContext = ethProtocolManager.ethContext();
-    protocolContext =
-        new ProtocolContext<>(localBlockchain, createInMemoryWorldStateArchive(), null);
+    protocolContext = new ProtocolContext<>(localBlockchain, worldStateArchive, null);
   }
 
   @Test

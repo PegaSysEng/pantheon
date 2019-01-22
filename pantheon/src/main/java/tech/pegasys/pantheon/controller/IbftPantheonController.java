@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderValidationRulesetFactory;
+import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
@@ -33,7 +33,7 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactor
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftJsonRpcMethodsFactory;
-import tech.pegasys.pantheon.consensus.ibft.network.IbftNetworkPeers;
+import tech.pegasys.pantheon.consensus.ibft.network.ValidatorPeers;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
@@ -45,6 +45,8 @@ import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
+import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -53,9 +55,6 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.db.BlockchainStorage;
-import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
@@ -65,12 +64,12 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -133,7 +132,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final KeyPair nodeKeys,
       final MetricsSystem metricsSystem) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
-        IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), metricsSystem);
+        IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final BlockchainStorage blockchainStorage =
         storageProvider.createBlockchainStorage(protocolSchedule);
@@ -163,6 +162,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
+            protocolContext.getWorldStateArchive(),
             networkId,
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),
@@ -199,12 +199,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
-    final IbftNetworkPeers peers =
-        new IbftNetworkPeers(protocolContext.getConsensusState().getVoteTally());
-
-    final BlockHeaderValidator<IbftContext> blockHeaderValidator =
-        IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(
-            ibftConfig.getBlockPeriodSeconds());
+    final ValidatorPeers peers =
+        new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
     minedBlockObservers.subscribe(ethProtocolManager);
@@ -227,11 +223,10 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 Clock.systemUTC()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
-            blockHeaderValidator,
             Clock.systemUTC());
 
     final MessageValidatorFactory messageValidatorFactory =
-        new MessageValidatorFactory(proposerSelector, blockHeaderValidator, protocolContext);
+        new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
 
     final IbftController ibftController =
         new IbftController(
@@ -241,10 +236,11 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 finalState,
                 new IbftRoundFactory(
                     finalState, protocolContext, protocolSchedule, minedBlockObservers),
-                messageValidatorFactory,
-                protocolContext));
+                messageValidatorFactory));
+    ibftController.start();
 
-    final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, ibftController);
+    final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
+    final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, eventMultiplexer);
     final ExecutorService processorExecutor = Executors.newSingleThreadExecutor();
     processorExecutor.submit(ibftProcessor);
 

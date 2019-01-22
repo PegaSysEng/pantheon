@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods;
 
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
+import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -23,19 +23,20 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class IbftGetValidatorsByBlockHash implements JsonRpcMethod {
 
   private final Blockchain blockchain;
-  private final IbftBlockInterface ibftBlockInterface;
+  private final BlockInterface blockInterface;
   private final JsonRpcParameter parameters;
 
   public IbftGetValidatorsByBlockHash(
       final Blockchain blockchain,
-      final IbftBlockInterface ibftBlockInterface,
+      final BlockInterface blockInterface,
       final JsonRpcParameter parameters) {
     this.blockchain = blockchain;
-    this.ibftBlockInterface = ibftBlockInterface;
+    this.blockInterface = blockInterface;
     this.parameters = parameters;
   }
 
@@ -52,6 +53,14 @@ public class IbftGetValidatorsByBlockHash implements JsonRpcMethod {
   private Object blockResult(final JsonRpcRequest request) {
     final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
     final Optional<BlockHeader> blockHeader = blockchain.getBlockHeader(hash);
-    return blockHeader.map(header -> ibftBlockInterface.validatorsInBlock(header)).orElse(null);
+    return blockHeader
+        .map(
+            header ->
+                blockInterface
+                    .validatorsInBlock(header)
+                    .stream()
+                    .map(validator -> validator.toString())
+                    .collect(Collectors.toList()))
+        .orElse(null);
   }
 }

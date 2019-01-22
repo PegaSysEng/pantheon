@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Arrays;
@@ -65,6 +66,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
 
   EthProtocolManager(
       final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
       final int requestLimit,
@@ -83,11 +85,12 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     ethContext = new EthContext(getSupportedProtocol(), ethPeers, ethMessages, scheduler);
 
     // Set up request handlers
-    new EthServer(blockchain, ethMessages, requestLimit);
+    new EthServer(blockchain, worldStateArchive, ethMessages, requestLimit);
   }
 
   EthProtocolManager(
       final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
       final int syncWorkers,
@@ -95,6 +98,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int requestLimit) {
     this(
         blockchain,
+        worldStateArchive,
         networkId,
         fastSyncEnabled,
         requestLimit,
@@ -103,11 +107,19 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
 
   public EthProtocolManager(
       final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
       final int syncWorkers,
       final int txWorkers) {
-    this(blockchain, networkId, fastSyncEnabled, syncWorkers, txWorkers, DEFAULT_REQUEST_LIMIT);
+    this(
+        blockchain,
+        worldStateArchive,
+        networkId,
+        fastSyncEnabled,
+        syncWorkers,
+        txWorkers,
+        DEFAULT_REQUEST_LIMIT);
   }
 
   public EthContext ethContext() {
