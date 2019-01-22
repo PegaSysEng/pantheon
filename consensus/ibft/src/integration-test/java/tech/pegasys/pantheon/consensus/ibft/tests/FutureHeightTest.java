@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.emptyList;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
 import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommentPayload;
+import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommitPayload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
@@ -27,7 +27,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificNodeRoles;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
-import tech.pegasys.pantheon.consensus.ibft.support.TestContextFactory;
+import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
 import java.time.Clock;
@@ -46,9 +46,13 @@ public class FutureHeightTest {
 
   private final int NETWORK_SIZE = 5;
 
-  // Context is configured such that a remote peer is responsible for proposing all block
+  // Configuration ensures remote peer will provide proposal for first block
   private final TestContext context =
-      TestContextFactory.createTestEnvironment(NETWORK_SIZE, 0, fixedClock);
+      new TestContextBuilder()
+          .validatorCount(NETWORK_SIZE)
+          .indexOfFirstLocallyProposedBlock(0)
+          .clock(fixedClock)
+          .build();
 
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
@@ -99,7 +103,7 @@ public class FutureHeightTest {
             futureHeightRoundId, futureHeightBlock.getHash());
 
     final SignedData<CommitPayload> expectedCommitMessage =
-        createSignedCommentPayload(
+        createSignedCommitPayload(
             futureHeightRoundId, futureHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
 
     assertPeersReceivedExactly(roles.getAllPeers(), expectedPrepareMessage, expectedCommitMessage);
@@ -160,7 +164,7 @@ public class FutureHeightTest {
     roles.getNonProposingPeer(1).injectPrepare(roundId, currentHeightBlock.getHash());
 
     final SignedData<CommitPayload> expectedCommitMessage =
-        createSignedCommentPayload(
+        createSignedCommitPayload(
             roundId, currentHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
     assertPeersReceivedExactly(roles.getAllPeers(), expectedCommitMessage);
   }
@@ -230,7 +234,7 @@ public class FutureHeightTest {
             futureHeightRoundId, futureHeightBlock.getHash());
 
     final SignedData<CommitPayload> expectedCommitMessage =
-        createSignedCommentPayload(
+        createSignedCommitPayload(
             futureHeightRoundId, futureHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
 
     // Assert ONLY a prepare message was received, not any commits (i.e. futureHeightRoundId
