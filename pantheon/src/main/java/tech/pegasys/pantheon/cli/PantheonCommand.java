@@ -717,8 +717,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return permissioningConfiguration;
   }
 
-  private SynchronizerConfiguration buildSyncConfig(final SyncMode syncMode) {
-    checkNotNull(syncMode);
+  private SynchronizerConfiguration buildSyncConfig() {
     synchronizerConfigurationBuilder.syncMode(syncMode);
     synchronizerConfigurationBuilder.maxTrailingPeers(maxTrailingPeers);
     return synchronizerConfigurationBuilder.build();
