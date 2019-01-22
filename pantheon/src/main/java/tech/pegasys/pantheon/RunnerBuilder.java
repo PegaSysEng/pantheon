@@ -75,7 +75,7 @@ public class RunnerBuilder {
 
   private Vertx vertx;
   private PantheonController<?> pantheonController;
-  private boolean p2pEnabled;
+  private boolean p2pEnabled = true;
   private boolean discovery;
   private Collection<?> bootstrapPeers;
   private String discoveryHost;
