@@ -1,6 +1,9 @@
 description: Pantheon IBFT 2.0 Proof-of-Authority (PoA) consensus protocol implementation
 <!--- END of page meta data -->
 
+*[Vanity]: Validators can include anything they like as vanity data. 
+*[RLP]: Recursive Length Prefix
+
 # IBFT 2.0
 
 Pantheon implements the IBFT 2.0 Proof-of-Authority (PoA) consensus protocol. IBFT 2.0 can be used for private networks. 
@@ -117,5 +120,4 @@ in effect and validators re-add their vote the next time they create a block.
 
 An epoch transition occurs every `epochLength` blocks where `epochlength` is defined in the IBFT genesis file.
 
-*[Vanity]: Validators can include anything they like as vanity data. 
-*[RLP]: Recursive Length Prefix
+
