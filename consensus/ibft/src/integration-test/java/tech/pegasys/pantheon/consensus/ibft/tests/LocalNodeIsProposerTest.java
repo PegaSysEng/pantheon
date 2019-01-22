@@ -13,8 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommitPayload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -41,11 +39,11 @@ import org.junit.Test;
  */
 public class LocalNodeIsProposerTest {
 
-  final long blockTimeStamp = 100;
+  private final long blockTimeStamp = 100;
   private final Clock fixedClock =
       Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
-  final int NETWORK_SIZE = 4;
+  private final int NETWORK_SIZE = 4;
 
   // Configuration ensures unit under test will be responsible for sending first proposal
   private final TestContext context =
@@ -80,34 +78,34 @@ public class LocalNodeIsProposerTest {
 
   @Test
   public void basicCase() {
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedTxProposal);
+    peers.assertPeersReceivedExactly(expectedTxProposal);
 
     // NOTE: In these test roles.getProposer() will return NULL.
     peers.getNonProposingPeer(0).injectPrepare(roundId, expectedProposedBlock.getHash());
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
 
     peers.getNonProposingPeer(1).injectPrepare(roundId, expectedProposedBlock.getHash());
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedTxCommit);
+    peers.assertPeersReceivedExactly(expectedTxCommit);
 
     peers.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
 
     peers.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
   }
 
   @Test
   public void importsToChainWithoutReceivingPrepareMessages() {
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedTxProposal);
+    peers.assertPeersReceivedExactly(expectedTxProposal);
 
     peers.getNonProposingPeer(1).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
 
     peers.getNonProposingPeer(2).injectCommit(roundId, expectedProposedBlock.getHash());
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
   }
 }

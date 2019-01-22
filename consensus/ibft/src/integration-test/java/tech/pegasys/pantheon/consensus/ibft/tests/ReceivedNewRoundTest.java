@@ -13,8 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static java.util.Optional.empty;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createValidPreparedCertificate;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -86,7 +84,7 @@ public class ReceivedNewRoundTest {
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(targetRound, blockToPropose.getHash());
 
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedPrepare);
+    peers.assertPeersReceivedExactly(expectedPrepare);
   }
 
   @Test
@@ -112,7 +110,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, blockToPropose));
 
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
   }
 
   @Test
@@ -145,8 +143,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
-    assertPeersReceivedExactly(
-        peers.getAllPeers(),
+    peers.assertPeersReceivedExactly(
         localNodeMessageFactory.createSignedPreparePayload(nextRoundId, reproposedBlock.getHash()));
   }
 
@@ -178,7 +175,7 @@ public class ReceivedNewRoundTest {
     interimRoundProposer.injectNewRound(
         interimRound, new RoundChangeCertificate(roundChangePayloads), proposal);
 
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
   }
 
   @Test
@@ -212,8 +209,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
-    assertPeersReceivedExactly(
-        peers.getAllPeers(),
+    peers.assertPeersReceivedExactly(
         localNodeMessageFactory.createSignedPreparePayload(nextRoundId, reproposedBlock.getHash()));
 
     // Inject a prepare, then re-inject the newRound - then ensure only a single prepare is enough
@@ -228,7 +224,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
 
     nextRoles.getNonProposingPeer(1).injectPrepare(nextRoundId, reproposedBlock.getHash());
 
@@ -236,6 +232,6 @@ public class ReceivedNewRoundTest {
         TestHelpers.createSignedCommitPayload(
             nextRoundId, reproposedBlock, context.getLocalNodeParams().getNodeKeyPair());
 
-    assertPeersReceivedExactly(nextRoles.getAllPeers(), expectedCommit);
+    peers.assertPeersReceivedExactly(expectedCommit);
   }
 }

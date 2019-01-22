@@ -13,8 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommitPayload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -47,7 +45,7 @@ import org.junit.Test;
 
 public class SpuriousBehaviourTest {
 
-  final long blockTimeStamp = 100;
+  private final long blockTimeStamp = 100;
   private final Clock fixedClock =
       Clock.fixed(Instant.ofEpochSecond(blockTimeStamp), ZoneId.systemDefault());
 
@@ -87,7 +85,7 @@ public class SpuriousBehaviourTest {
     peers.getNonProposingPeer(0).injectMessage(illegalCommitMsg);
 
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedPrepare);
+    peers.assertPeersReceivedExactly(expectedPrepare);
   }
 
   @Test
@@ -96,7 +94,7 @@ public class SpuriousBehaviourTest {
     peers.getNonProposingPeer(0).injectMessage(illegalCommitMsg);
 
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedPrepare);
+    peers.assertPeersReceivedExactly(expectedPrepare);
   }
 
   @Test
@@ -113,40 +111,33 @@ public class SpuriousBehaviourTest {
 
     nonvalidator.injectProposal(new ConsensusRoundIdentifier(1, 0), proposedBlock);
 
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
   }
 
   @Test
   public void preparesWithMisMatchedDigestAreNotRepondedTo() {
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedPrepare);
+    peers.assertPeersReceivedExactly(expectedPrepare);
 
-    peers.getNonProposingPeers().forEach(peer -> peer.injectPrepare(roundId, Hash.ZERO));
+    peers.nonProposingPrepare(roundId, Hash.ZERO);
+    peers.assertPeersReceivedNoMessages();
 
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.nonProposingPrepare(roundId, proposedBlock.getHash());
+    peers.assertPeersReceivedExactly(expectedCommit);
 
-    peers
-        .getNonProposingPeers()
-        .forEach(peer -> peer.injectPrepare(roundId, proposedBlock.getHash()));
-
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedCommit);
-
-    peers.getNonProposingPeers().forEach(peer -> peer.injectCommit(roundId, Hash.ZERO));
+    peers.nonProposingPrepare(roundId, Hash.ZERO);
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
-    peers
-        .getNonProposingPeers()
-        .forEach(peer -> peer.injectCommit(roundId, proposedBlock.getHash()));
+    peers.nonProposingPrepare(roundId, proposedBlock.getHash());
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
   @Test
   public void oneCommitSealIsIllegalPreventsImport() {
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedPrepare);
-    peers
-        .getNonProposingPeers()
-        .forEach(peer -> peer.injectPrepare(roundId, proposedBlock.getHash()));
+    peers.assertPeersReceivedExactly(expectedPrepare);
+
+    peers.nonProposingPrepare(roundId, proposedBlock.getHash());
 
     // for a network of 5, 4 seals are required (local + 3 remote)
     peers.getNonProposingPeer(0).injectCommit(roundId, proposedBlock.getHash());

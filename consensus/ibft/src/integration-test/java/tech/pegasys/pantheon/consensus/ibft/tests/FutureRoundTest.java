@@ -13,8 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedExactly;
-import static tech.pegasys.pantheon.consensus.ibft.support.MessageReceptionHelpers.assertPeersReceivedNoMessages;
 import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.injectEmptyNewRound;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
@@ -91,7 +89,7 @@ public class FutureRoundTest {
     subsequentRoles.getNonProposingPeer(1).injectPrepare(subsequentRoundId, futureBlock.getHash());
     subsequentRoles.getNonProposingPeer(1).injectCommit(subsequentRoundId, futureBlock.getHash());
 
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
 
     // inject a newRound to move to 'futureRoundId', and ensure localnode sends prepare, commit
@@ -102,7 +100,7 @@ public class FutureRoundTest {
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
 
-    assertPeersReceivedExactly(futureRoles.getAllPeers(), expectedPrepare);
+    peers.assertPeersReceivedExactly(expectedPrepare);
 
     // following 1 more prepare, a commit msg will be sent
     futureRoles.getNonProposingPeer(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
@@ -112,7 +110,7 @@ public class FutureRoundTest {
             futureRoundId,
             futureBlock.getHash(),
             SECP256K1.sign(futureBlock.getHash(), context.getLocalNodeParams().getNodeKeyPair()));
-    assertPeersReceivedExactly(futureRoles.getAllPeers(), expectedCommit);
+    peers.assertPeersReceivedExactly(expectedCommit);
 
     // requires 1 more commit and the blockchain will progress
     futureRoles.getNonProposingPeer(quorum - 2).injectCommit(futureRoundId, futureBlock.getHash());
@@ -144,11 +142,11 @@ public class FutureRoundTest {
 
     final SignedData<PreparePayload> expectedFuturePrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
-    assertPeersReceivedExactly(peers.getAllPeers(), expectedFuturePrepare);
+    peers.assertPeersReceivedExactly(expectedFuturePrepare);
 
     // attempt to complete the previous round
     peers.getNonProposingPeer(0).injectCommit(roundId, initialBlock.getHash());
-    assertPeersReceivedNoMessages(peers.getAllPeers());
+    peers.assertPeersReceivedNoMessages();
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
   }
 }
