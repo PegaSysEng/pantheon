@@ -182,7 +182,7 @@ public class IbftController {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
       LOG.info(
-          "Round expiry event discarded as it is not for current block height chain_height={}, event_height={}",
+          "Round expiry event discarded as it is not for current block height chain_height={} event_height={}",
           currentHeightManager.getChainHeight(),
           roundExpiry.getView().getSequenceNumber());
     }
@@ -204,7 +204,8 @@ public class IbftController {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
       LOG.info(
-          "IBFT message discarded as it is from a previous block height chain_height={}, event_height={}",
+          "IBFT message discarded as it is from a previous block height message_type={} chain_height={} event_height={}",
+          msg.getPayload().getMessageType(),
           currentHeightManager.getChainHeight(),
           msgRoundIdentifier.getSequenceNumber());
     }
