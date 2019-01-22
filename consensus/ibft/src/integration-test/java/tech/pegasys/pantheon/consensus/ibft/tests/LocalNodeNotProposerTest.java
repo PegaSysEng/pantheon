@@ -66,55 +66,55 @@ public class LocalNodeNotProposerTest {
   public void basicCase() {
     peers.getProposer().injectProposal(roundId, blockToPropose);
 
-    peers.assertPeersReceivedExactly(expectedTxPrepare);
+    peers.verifyMessagesReceived(expectedTxPrepare);
 
     peers.getNonProposingPeer(0).injectPrepare(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedExactly(expectedTxCommit);
+    peers.verifyMessagesReceived(expectedTxCommit);
 
     // Ensure the local blockchain has NOT incremented yet.
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // NO further messages should be transmitted when another Prepare is received.
     peers.getNonProposingPeer(1).injectPrepare(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
 
     // Inject a commit, ensure blockChain is not updated, and no message are sent (not quorum yet)
     peers.getNonProposingPeer(0).injectCommit(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // A second commit message means quorum is reached, and blockchain should be updated.
     peers.getNonProposingPeer(1).injectCommit(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
 
     // ensure any further commit messages do not affect the system
     peers.getProposer().injectCommit(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
   @Test
   public void prepareFromProposerIsIgnored() {
     peers.getProposer().injectProposal(roundId, blockToPropose);
-    peers.assertPeersReceivedExactly(expectedTxPrepare);
+    peers.verifyMessagesReceived(expectedTxPrepare);
 
     // No commit message transmitted after receiving prepare from proposer
     peers.getProposer().injectPrepare(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     peers.getNonProposingPeer(1).injectPrepare(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedExactly(expectedTxCommit);
+    peers.verifyMessagesReceived(expectedTxCommit);
 
     // Inject a commit, ensure blockChain is not updated, and no message are sent (not quorum yet)
     peers.getNonProposingPeer(0).injectCommit(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // A second commit message means quorum is reached, and blockchain should be updated.
     peers.getNonProposingPeer(1).injectCommit(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
@@ -124,18 +124,18 @@ public class LocalNodeNotProposerTest {
     // arrives last, the chain is updated, and a prepare and commit message are transmitted.
     for (final ValidatorPeer peer : peers.getAllPeers()) {
       peer.injectCommit(roundId, blockToPropose.getHash());
-      peers.assertPeersReceivedNoMessages();
+      peers.verifyNoMessagesReceived();
       assertThat(context.getCurrentChainHeight()).isEqualTo(0);
     }
 
     peers.nonProposingPrepare(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     peers.getProposer().injectProposal(roundId, blockToPropose);
     // TODO(tmm): Unfortunatley, there are times that the Commit will go out BEFORE the prepare
     // This is one of them :( Maybe fix the testing to be ignorant of ordering?
-    peers.assertPeersReceivedExactly(expectedTxCommit, expectedTxPrepare);
+    peers.verifyMessagesReceived(expectedTxCommit, expectedTxPrepare);
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
@@ -144,16 +144,16 @@ public class LocalNodeNotProposerTest {
       fullQuorumOfCommitMessagesReceivedThenProposalImportsBlockCommitSentAfterFinalPrepare() {
     for (final ValidatorPeer peer : peers.getAllPeers()) {
       peer.injectCommit(roundId, blockToPropose.getHash());
-      peers.assertPeersReceivedNoMessages();
+      peers.verifyNoMessagesReceived();
       assertThat(context.getCurrentChainHeight()).isEqualTo(0);
     }
 
     peers.getProposer().injectProposal(roundId, blockToPropose);
-    peers.assertPeersReceivedExactly(expectedTxPrepare);
+    peers.verifyMessagesReceived(expectedTxPrepare);
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
 
     peers.getNonProposingPeer(0).injectPrepare(roundId, blockToPropose.getHash());
-    peers.assertPeersReceivedExactly(expectedTxCommit);
+    peers.verifyMessagesReceived(expectedTxCommit);
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 }

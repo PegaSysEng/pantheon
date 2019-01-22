@@ -84,7 +84,7 @@ public class ReceivedNewRoundTest {
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(targetRound, blockToPropose.getHash());
 
-    peers.assertPeersReceivedExactly(expectedPrepare);
+    peers.verifyMessagesReceived(expectedPrepare);
   }
 
   @Test
@@ -110,7 +110,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, blockToPropose));
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
   }
 
   @Test
@@ -143,7 +143,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
-    peers.assertPeersReceivedExactly(
+    peers.verifyMessagesReceived(
         localNodeMessageFactory.createSignedPreparePayload(nextRoundId, reproposedBlock.getHash()));
   }
 
@@ -175,7 +175,7 @@ public class ReceivedNewRoundTest {
     interimRoundProposer.injectNewRound(
         interimRound, new RoundChangeCertificate(roundChangePayloads), proposal);
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
   }
 
   @Test
@@ -209,7 +209,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
-    peers.assertPeersReceivedExactly(
+    peers.verifyMessagesReceived(
         localNodeMessageFactory.createSignedPreparePayload(nextRoundId, reproposedBlock.getHash()));
 
     // Inject a prepare, then re-inject the newRound - then ensure only a single prepare is enough
@@ -224,7 +224,7 @@ public class ReceivedNewRoundTest {
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
 
     nextRoles.getNonProposingPeer(1).injectPrepare(nextRoundId, reproposedBlock.getHash());
 
@@ -232,6 +232,6 @@ public class ReceivedNewRoundTest {
         TestHelpers.createSignedCommitPayload(
             nextRoundId, reproposedBlock, context.getLocalNodeParams().getNodeKeyPair());
 
-    peers.assertPeersReceivedExactly(expectedCommit);
+    peers.verifyMessagesReceived(expectedCommit);
   }
 }

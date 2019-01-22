@@ -89,7 +89,7 @@ public class FutureRoundTest {
     subsequentRoles.getNonProposingPeer(1).injectPrepare(subsequentRoundId, futureBlock.getHash());
     subsequentRoles.getNonProposingPeer(1).injectCommit(subsequentRoundId, futureBlock.getHash());
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
 
     // inject a newRound to move to 'futureRoundId', and ensure localnode sends prepare, commit
@@ -100,7 +100,7 @@ public class FutureRoundTest {
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
 
-    peers.assertPeersReceivedExactly(expectedPrepare);
+    peers.verifyMessagesReceived(expectedPrepare);
 
     // following 1 more prepare, a commit msg will be sent
     futureRoles.getNonProposingPeer(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
@@ -110,7 +110,7 @@ public class FutureRoundTest {
             futureRoundId,
             futureBlock.getHash(),
             SECP256K1.sign(futureBlock.getHash(), context.getLocalNodeParams().getNodeKeyPair()));
-    peers.assertPeersReceivedExactly(expectedCommit);
+    peers.verifyMessagesReceived(expectedCommit);
 
     // requires 1 more commit and the blockchain will progress
     futureRoles.getNonProposingPeer(quorum - 2).injectCommit(futureRoundId, futureBlock.getHash());
@@ -142,11 +142,11 @@ public class FutureRoundTest {
 
     final SignedData<PreparePayload> expectedFuturePrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
-    peers.assertPeersReceivedExactly(expectedFuturePrepare);
+    peers.verifyMessagesReceived(expectedFuturePrepare);
 
     // attempt to complete the previous round
     peers.getNonProposingPeer(0).injectCommit(roundId, initialBlock.getHash());
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
   }
 }

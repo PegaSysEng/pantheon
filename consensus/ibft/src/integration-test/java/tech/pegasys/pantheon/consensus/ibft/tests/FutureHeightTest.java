@@ -81,13 +81,13 @@ public class FutureHeightTest {
         context.createBlockForProposal(signedCurrentHeightBlock.getHeader(), 0, 60);
 
     peers.getProposer().injectProposal(futureHeightRoundId, futureHeightBlock);
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
 
     // Inject prepares and commits from all peers
     peers.nonProposingPrepare(futureHeightRoundId, futureHeightBlock.getHash());
     peers.nonProposingCommit(futureHeightRoundId, futureHeightBlock.getHash());
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // Add block to chain, and notify system of its arrival.
@@ -105,7 +105,7 @@ public class FutureHeightTest {
         createSignedCommitPayload(
             futureHeightRoundId, futureHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
 
-    peers.assertPeersReceivedExactly(expectedPrepareMessage, expectedCommitMessage);
+    peers.verifyMessagesReceived(expectedPrepareMessage, expectedCommitMessage);
     assertThat(context.getCurrentChainHeight()).isEqualTo(2);
   }
 
@@ -127,7 +127,7 @@ public class FutureHeightTest {
     final SignedData<PreparePayload> expectedPrepareMessage =
         localNodeMessageFactory.createSignedPreparePayload(roundId, currentHeightBlock.getHash());
 
-    peers.assertPeersReceivedExactly(expectedPrepareMessage);
+    peers.verifyMessagesReceived(expectedPrepareMessage);
 
     // Add block to chain, and notify system of its arrival.
     context.getBlockchain().appendBlock(signedCurrentHeightBlock, emptyList());
@@ -141,7 +141,7 @@ public class FutureHeightTest {
     peers.nonProposingPrepare(roundId, currentHeightBlock.getHash());
     peers.nonProposingCommit(roundId, currentHeightBlock.getHash());
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
@@ -165,7 +165,7 @@ public class FutureHeightTest {
     final SignedData<CommitPayload> expectedCommitMessage =
         createSignedCommitPayload(
             roundId, currentHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
-    peers.assertPeersReceivedExactly(expectedCommitMessage);
+    peers.verifyMessagesReceived(expectedCommitMessage);
   }
 
   @Test
@@ -208,7 +208,7 @@ public class FutureHeightTest {
         .getController()
         .handleNewBlockEvent(new NewChainHead(signedCurrentHeightBlock.getHeader()));
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
     peers.getProposer().injectProposal(nextHeightRoundId, nextHeightBlock);
 
     final SignedData<PreparePayload> expectedPrepareMessage =
@@ -217,7 +217,7 @@ public class FutureHeightTest {
 
     // Assert ONLY a prepare message was received, not any commits (i.e. futureHeightRoundId
     // messages have not been used.
-    peers.assertPeersReceivedExactly(expectedPrepareMessage);
+    peers.verifyMessagesReceived(expectedPrepareMessage);
 
     peers.getProposer().injectProposal(futureHeightRoundId, futureHeightBlock);
 
@@ -238,6 +238,6 @@ public class FutureHeightTest {
 
     // Assert ONLY a prepare message was received, not any commits (i.e. futureHeightRoundId
     // messages have not been used.
-    peers.assertPeersReceivedExactly(expectedCommitMessage, expectedFuturePrepareMessage);
+    peers.verifyMessagesReceived(expectedCommitMessage, expectedFuturePrepareMessage);
   }
 }

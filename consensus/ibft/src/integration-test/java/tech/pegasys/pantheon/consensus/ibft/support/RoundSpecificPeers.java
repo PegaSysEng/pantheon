@@ -87,12 +87,12 @@ public class RoundSpecificPeers {
         .collect(Collectors.toList());
   }
 
-  public void assertPeersReceivedNoMessages() {
+  public void verifyNoMessagesReceived() {
     peers.forEach(n -> assertThat(n.getReceivedMessages()).isEmpty());
   }
 
   @SafeVarargs
-  public final void assertPeersReceivedExactly(final SignedData<? extends Payload>... msgs) {
+  public final void verifyMessagesReceived(final SignedData<? extends Payload>... msgs) {
     peers.forEach(n -> assertThat(n.getReceivedMessages().size()).isEqualTo(msgs.length));
 
     List<SignedData<? extends Payload>> msgList = Arrays.asList(msgs);

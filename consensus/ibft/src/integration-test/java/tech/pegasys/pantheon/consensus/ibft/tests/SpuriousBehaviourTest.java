@@ -85,7 +85,7 @@ public class SpuriousBehaviourTest {
     peers.getNonProposingPeer(0).injectMessage(illegalCommitMsg);
 
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    peers.assertPeersReceivedExactly(expectedPrepare);
+    peers.verifyMessagesReceived(expectedPrepare);
   }
 
   @Test
@@ -94,7 +94,7 @@ public class SpuriousBehaviourTest {
     peers.getNonProposingPeer(0).injectMessage(illegalCommitMsg);
 
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    peers.assertPeersReceivedExactly(expectedPrepare);
+    peers.verifyMessagesReceived(expectedPrepare);
   }
 
   @Test
@@ -111,19 +111,19 @@ public class SpuriousBehaviourTest {
 
     nonvalidator.injectProposal(new ConsensusRoundIdentifier(1, 0), proposedBlock);
 
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
   }
 
   @Test
   public void preparesWithMisMatchedDigestAreNotRepondedTo() {
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    peers.assertPeersReceivedExactly(expectedPrepare);
+    peers.verifyMessagesReceived(expectedPrepare);
 
     peers.nonProposingPrepare(roundId, Hash.ZERO);
-    peers.assertPeersReceivedNoMessages();
+    peers.verifyNoMessagesReceived();
 
     peers.nonProposingPrepare(roundId, proposedBlock.getHash());
-    peers.assertPeersReceivedExactly(expectedCommit);
+    peers.verifyMessagesReceived(expectedCommit);
 
     peers.nonProposingPrepare(roundId, Hash.ZERO);
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
@@ -135,7 +135,7 @@ public class SpuriousBehaviourTest {
   @Test
   public void oneCommitSealIsIllegalPreventsImport() {
     peers.getProposer().injectProposal(roundId, proposedBlock);
-    peers.assertPeersReceivedExactly(expectedPrepare);
+    peers.verifyMessagesReceived(expectedPrepare);
 
     peers.nonProposingPrepare(roundId, proposedBlock.getHash());
 
