@@ -14,6 +14,9 @@ package tech.pegasys.pantheon.tests.acceptance;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,12 +25,16 @@ public class ClusterNoDiscoveryAcceptanceTest extends AcceptanceTestBase {
 
   private Node fullNode;
   private Node noDiscoveryNode;
+  private Cluster noDiscoveryCluster;
 
   @Before
   public void setUp() throws Exception {
+    final ClusterConfiguration clusterConfiguration =
+        new ClusterConfigurationBuilder().setAwaitPeerDiscovery(false).build();
+    noDiscoveryCluster = new Cluster(clusterConfiguration, net);
     noDiscoveryNode = pantheon.createNodeWithNoDiscovery("noDiscovery");
     fullNode = pantheon.createArchiveNode("node2");
-    cluster.start(noDiscoveryNode, fullNode);
+    noDiscoveryCluster.start(noDiscoveryNode, fullNode);
   }
 
   @Test
