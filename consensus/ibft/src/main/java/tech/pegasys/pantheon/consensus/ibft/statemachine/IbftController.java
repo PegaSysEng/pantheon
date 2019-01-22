@@ -145,7 +145,10 @@ public class IbftController {
     final BlockHeader newBlockHeader = newChainHead.getNewChainHeadHeader();
     final BlockHeader currentMiningParent = currentHeightManager.getParentBlockHeader();
     if (newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
-      LOG.info("Discarding NewChainHead event, was for previous block height.");
+      LOG.info(
+          "Discarding NewChainHead event, was for previous block height. chain_height={} event_height={}",
+          currentMiningParent.getNumber(),
+          newBlockHeader.getNumber());
       return;
     }
 
@@ -153,7 +156,9 @@ public class IbftController {
       if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
         LOG.info("Discarding duplicate NewChainHead event.");
       } else {
-        LOG.error("Subsequent NewChainHead event at same block height indicates chain fork.");
+        LOG.error(
+            "Subsequent NewChainHead event at same block height indicates chain fork. chain_height={}",
+            currentMiningParent.getNumber());
       }
       return;
     }
@@ -161,10 +166,14 @@ public class IbftController {
   }
 
   public void handleBlockTimerExpiry(final BlockTimerExpiry blockTimerExpiry) {
-    if (isMsgForCurrentHeight(blockTimerExpiry.getRoundIndentifier())) {
-      currentHeightManager.handleBlockTimerExpiry(blockTimerExpiry.getRoundIndentifier());
+    final ConsensusRoundIdentifier roundIndentifier = blockTimerExpiry.getRoundIndentifier();
+    if (isMsgForCurrentHeight(roundIndentifier)) {
+      currentHeightManager.handleBlockTimerExpiry(roundIndentifier);
     } else {
-      LOG.info("Block timer event discarded as it is not for current block height");
+      LOG.info(
+          "Block timer event discarded as it is not for current block height chain_height={} event_height={}",
+          currentHeightManager.getChainHeight(),
+          roundIndentifier.getSequenceNumber());
     }
   }
 
@@ -172,7 +181,10 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundExpiry.getView())) {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
-      LOG.info("Round expiry event discarded as it is not for current block height");
+      LOG.info(
+          "Round expiry event discarded as it is not for current block height chain_height={}, event_height={}",
+          currentHeightManager.getChainHeight(),
+          roundExpiry.getView().getSequenceNumber());
     }
   }
 
@@ -180,8 +192,7 @@ public class IbftController {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
-    final List<Message> orDefault = futureMessages.getOrDefault(newChainHeight, emptyList());
-    orDefault.forEach(this::handleMessage);
+    futureMessages.getOrDefault(newChainHeight, emptyList()).forEach(this::handleMessage);
     futureMessages.remove(newChainHeight);
   }
 
@@ -192,7 +203,10 @@ public class IbftController {
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
-      LOG.info("IBFT message discarded as it is from a previous block height");
+      LOG.info(
+          "IBFT message discarded as it is from a previous block height chain_height={}, event_height={}",
+          currentHeightManager.getChainHeight(),
+          msgRoundIdentifier.getSequenceNumber());
     }
     return false;
   }
