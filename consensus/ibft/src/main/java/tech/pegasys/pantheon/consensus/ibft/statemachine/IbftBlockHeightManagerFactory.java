@@ -31,15 +31,20 @@ public class IbftBlockHeightManagerFactory {
     this.messageValidatorFactory = messageValidatorFactory;
   }
 
-  public IbftBlockHeightManager create(final BlockHeader parentHeader) {
-    return new IbftBlockHeightManager(
-        parentHeader,
-        finalState,
-        new RoundChangeManager(
-            IbftHelpers.calculateRequiredValidatorQuorum(finalState.getValidators().size()),
-            messageValidatorFactory.createRoundChangeMessageValidator(parentHeader)),
-        roundFactory,
-        finalState.getClock(),
-        messageValidatorFactory);
+  public AbstractBlockHeightManager create(final BlockHeader parentHeader) {
+
+    if (finalState.localNodeIsValidator()) {
+      return new IbftBlockHeightManager(
+          parentHeader,
+          finalState,
+          new RoundChangeManager(
+              IbftHelpers.calculateRequiredValidatorQuorum(finalState.getValidators().size()),
+              messageValidatorFactory.createRoundChangeMessageValidator(parentHeader)),
+          roundFactory,
+          finalState.getClock(),
+          messageValidatorFactory);
+    } else {
+      return new NullBlockHeightManager(parentHeader);
+    }
   }
 }
