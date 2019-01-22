@@ -63,6 +63,8 @@ import java.util.stream.Stream;
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import io.vertx.core.Vertx;
+import net.consensys.cava.toml.TomlArray;
+import net.consensys.cava.toml.TomlParseResult;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
@@ -614,6 +616,34 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
     permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+    return permissioningConfiguration;
+  }
+
+  public static PermissioningConfiguration permissioningConfiguration(
+      final TomlParseResult permToml) throws IOException {
+
+    TomlArray accountWhitelistTomlArray = permToml.getArray("accounts-whitelist");
+    TomlArray nodeWhitelistTomlArray = permToml.getArray("nodes-whitelist");
+
+    final PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    List<String> accountsWhitelistToml =
+        accountWhitelistTomlArray
+            .toList()
+            .stream()
+            .map(Object::toString)
+            .collect(Collectors.toList());
+    permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
+
+    List<URI> nodesWhitelistToml =
+        nodeWhitelistTomlArray
+            .toList()
+            .stream()
+            .map(Object::toString)
+            .map(URI::create)
+            .collect(Collectors.toList());
+    permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
+
     return permissioningConfiguration;
   }
 
