@@ -1,4 +1,4 @@
-*[byzantine fault tolerant]:Ability to function correctly and reach consensus despite nodes failing or propagating incorrect information to peers.
+*[Byzantine fault tolerant]: Ability to function correctly and reach consensus despite nodes failing or propagating incorrect information to peers.
 
 # Comparing Proof of Authority Consensus Protocols  
 
