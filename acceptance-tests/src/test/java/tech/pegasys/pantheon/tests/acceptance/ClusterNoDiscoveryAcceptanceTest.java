@@ -41,4 +41,10 @@ public class ClusterNoDiscoveryAcceptanceTest extends AcceptanceTestBase {
   public void shouldConnectToOtherPeer() {
     fullNode.verify(net.awaitPeerCount(0));
   }
+
+  @Override
+  public void tearDownAcceptanceTestBase() {
+    noDiscoveryCluster.stop();
+    super.tearDownAcceptanceTestBase();
+  }
 }
