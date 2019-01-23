@@ -127,13 +127,16 @@ public class IbftBlockHeightManager {
 
   public void roundExpired(final RoundExpiry expire) {
     if (!expire.getView().equals(currentRound.getRoundIdentifier())) {
-      LOG.info("Ignoring Round timer expired which does not match current round. round={}, timerRound={}",
+      LOG.info(
+          "Ignoring Round timer expired which does not match current round. round={}, timerRound={}",
           currentRound.getRoundIdentifier(),
           expire.getView());
       return;
     }
 
-    LOG.info("Round has expired, creating PreparedCertificate and notifying peers. round={}", currentRound.getRoundIdentifier());
+    LOG.info(
+        "Round has expired, creating PreparedCertificate and notifying peers. round={}",
+        currentRound.getRoundIdentifier());
     final Optional<PreparedCertificate> preparedCertificate =
         currentRound.createPrepareCertificate();
 

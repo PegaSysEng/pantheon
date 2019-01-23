@@ -156,7 +156,8 @@ public class IbftController {
 
     if (newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
       if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
-        LOG.info("Discarding duplicate NewChainHead event. chainHeight={} newBlockHash={} parentBlockHash",
+        LOG.info(
+            "Discarding duplicate NewChainHead event. chainHeight={} newBlockHash={} parentBlockHash",
             newBlockHeader.getNumber(),
             newBlockHeader.getHash(),
             currentMiningParent.getHash());

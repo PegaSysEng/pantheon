@@ -75,8 +75,11 @@ public class ValidatorPeers implements ValidatorMulticaster, PeerConnectionTrack
 
   private void sendMessageToSpecificAddresses(
       final Collection<Address> recipients, final MessageData message) {
-    LOG.trace("Sending message to peers messageCode={} messageData={} recipients={}",
-      message.getCode(), message.getData(), recipients);
+    LOG.trace(
+        "Sending message to peers messageCode={} messageData={} recipients={}",
+        message.getCode(),
+        message.getData(),
+        recipients);
     recipients
         .stream()
         .map(peerConnections::get)
@@ -86,7 +89,10 @@ public class ValidatorPeers implements ValidatorMulticaster, PeerConnectionTrack
               try {
                 connection.sendForProtocol(PROTOCOL_NAME, message);
               } catch (final PeerNotConnected peerNotConnected) {
-                LOG.trace("Lost connection to a validator. remoteAddress={} peerInfo={}", connection.getRemoteAddress(), connection.getPeer());
+                LOG.trace(
+                    "Lost connection to a validator. remoteAddress={} peerInfo={}",
+                    connection.getRemoteAddress(),
+                    connection.getPeer());
               }
             });
   }
