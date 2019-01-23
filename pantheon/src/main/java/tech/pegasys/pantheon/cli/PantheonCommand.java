@@ -149,11 +149,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Completely disables p2p within Pantheon.
   @Option(
     names = {"--p2p-enabled"},
-    description = "Enable/disable all p2p functionality (default: {DEFAULT-VALUE})",
-    arity = "0..1"
+    description = "Enable/disable all p2p functionality (default: ${DEFAULT-VALUE})",
+    arity = "1"
   )
-  @SuppressWarnings("FieldCanBeFinal")
-  private Boolean p2pEnabled = true;
+  private final Boolean p2pEnabled = true;
 
   // Boolean option to indicate if peers should NOT be discovered, default to false indicates that
   // the peers should be discovered by default.
@@ -166,7 +165,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // meaning that it's probably the right way to handle disabling options.
   @Option(
     names = {"--no-discovery"},
-    description = "Disable p2p peer discovery (default: ${DEFAULT-VALUE})"
+    description = "Disable p2p peer discovery (default: ${DEFAULT-VALUE})",
+    arity = "1"
   )
   private final Boolean noPeerDiscovery = false;
 
@@ -407,6 +407,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isMetricsEnabled = false;
 
   @Option(
+    names = {"--metrics-mode"},
+    description =
+        "Mode for the metrics service to run in, 'push' or 'pull' (default: ${DEFAULT-VALUE})"
+  )
+  private String metricsMode = MetricsConfiguration.MODE_SERVER_PULL;
+
+  @Option(
     names = {"--metrics-host"},
     paramLabel = MANDATORY_HOST_FORMAT_HELP,
     description = "Host for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
@@ -422,6 +429,22 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     arity = "1"
   )
   private final Integer metricsPort = DEFAULT_METRICS_PORT;
+
+  @Option(
+    names = {"--metrics-push-interval"},
+    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+    description =
+        "Interval in seconds to push metrics when in push mode (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final Integer metricsPushInterval = 15;
+
+  @Option(
+    names = {"--metrics-prometheus-job"},
+    description = "Job name to use when in push mode (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private String metricsPrometheusJob = "pantheon-client";
 
   @Option(
     names = {"--host-whitelist"},
@@ -673,8 +696,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   MetricsConfiguration metricsConfiguration() {
     final MetricsConfiguration metricsConfiguration = createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);
+    metricsConfiguration.setMode(metricsMode);
     metricsConfiguration.setHost(metricsHost.toString());
     metricsConfiguration.setPort(metricsPort);
+    metricsConfiguration.setPushInterval(metricsPushInterval);
+    metricsConfiguration.setPrometheusJob(metricsPrometheusJob);
     metricsConfiguration.setHostsWhitelist(hostsWhitelist);
     return metricsConfiguration;
   }
