@@ -33,7 +33,7 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class FastSyncActionsTest {
   private ProtocolContext<Void> protocolContext;
 
   private final LabelledMetric<OperationTimer> ethTasksTimer = NO_OP_LABELLED_TIMER;
-  private final AtomicBoolean timeout = new AtomicBoolean(false);
+  private final AtomicInteger timeoutCount = new AtomicInteger(0);
   private FastSyncActions<Void> fastSyncActions;
   private EthProtocolManager ethProtocolManager;
   private MutableBlockchain blockchain;
@@ -65,7 +65,9 @@ public class FastSyncActionsTest {
     protocolContext = blockchainSetupUtil.getProtocolContext();
     ethProtocolManager =
         EthProtocolManagerTestUtil.create(
-            blockchain, blockchainSetupUtil.getWorldArchive(), timeout::get);
+            blockchain,
+            blockchainSetupUtil.getWorldArchive(),
+            () -> timeoutCount.getAndDecrement() > 0);
     fastSyncActions =
         new FastSyncActions<>(
             syncConfig,
@@ -87,13 +89,13 @@ public class FastSyncActionsTest {
   @Test
   public void waitForPeersShouldReportSuccessWhenTimeLimitReachedAndAPeerIsAvailable() {
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
-    timeout.set(true);
+    timeoutCount.set(Integer.MAX_VALUE);
     assertThat(fastSyncActions.waitForSuitablePeers()).isCompleted();
   }
 
   @Test
   public void waitForPeersShouldContinueWaitingUntilAtLeastOnePeerIsAvailable() {
-    timeout.set(true);
+    timeoutCount.set(1);
     final CompletableFuture<Void> result = fastSyncActions.waitForSuitablePeers();
     assertThat(result).isNotCompleted();
 

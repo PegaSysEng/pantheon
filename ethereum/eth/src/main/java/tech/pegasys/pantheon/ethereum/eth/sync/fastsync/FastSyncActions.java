@@ -20,7 +20,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeersTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -96,7 +95,25 @@ public class FastSyncActions<C> {
   private CompletableFuture<Void> waitForAnyPeer() {
     LOG.warn(
         "Maximum wait time for fast sync reached but no peers available. Continuing to wait for any available peer.");
-    return WaitForPeerTask.create(ethContext, ethTasksTimer).run();
+    final CompletableFuture<Void> result = new CompletableFuture<>();
+    waitForAnyPeer(result);
+    return result;
+  }
+
+  private void waitForAnyPeer(final CompletableFuture<Void> result) {
+    ethContext
+        .getScheduler()
+        .timeout(WaitForPeersTask.create(ethContext, 1, ethTasksTimer))
+        .whenComplete(
+            (waitResult, throwable) -> {
+              if (ExceptionUtils.rootCause(throwable) instanceof TimeoutException) {
+                waitForAnyPeer(result);
+              } else if (throwable != null) {
+                result.completeExceptionally(throwable);
+              } else {
+                result.complete(waitResult);
+              }
+            });
   }
 
   public FastSyncState selectPivotBlock() {
