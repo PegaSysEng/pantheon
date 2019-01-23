@@ -494,8 +494,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void p2pEnabledOptionFlagDefaultTrue() {
-    parseCommand("--p2p-enabled");
+  public void p2pEnabledOptionValueTrueMustBeUsed() {
+    parseCommand("--p2p-enabled", "true");
 
     verify(mockRunnerBuilder.p2pEnabled(eq(true))).build();
 
@@ -504,7 +504,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void p2pEnabledOptionValueMustBeUsed() {
+  public void p2pEnabledOptionValueFalseMustBeUsed() {
     parseCommand("--p2p-enabled", "false");
 
     verify(mockRunnerBuilder.p2pEnabled(eq(false))).build();
@@ -523,12 +523,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void discoveryOptionMustBeUsed() {
-    parseCommand("--no-discovery");
+  public void discoveryOptionValueTrueMustBeUsed() {
+    parseCommand("--no-discovery", "true");
     // Discovery stored in runner is the negative of the option passed to CLI
-    // So as passing the option means noDiscovery will be true, then discovery is false in runner
-
     verify(mockRunnerBuilder.discovery(eq(false))).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void discoveryOptionValueFalseMustBeUsed() {
+    parseCommand("--no-discovery", "false");
+    // Discovery stored in runner is the negative of the option passed to CLI
+    verify(mockRunnerBuilder.discovery(eq(true))).build();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1327,6 +1335,46 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(metricsConfigArgumentCaptor.getValue().getHost()).isEqualTo(host);
     assertThat(metricsConfigArgumentCaptor.getValue().getPort()).isEqualTo(port);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void metricsModeOptionMustBeUsed() {
+    parseCommand("--metrics-mode", "pull");
+
+    verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(metricsConfigArgumentCaptor.getValue().getMode()).isEqualTo("pull");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void metricsPushIntervalMustBeUsed() {
+    parseCommand("--metrics-push-interval", "42");
+
+    verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(metricsConfigArgumentCaptor.getValue().getPushInterval()).isEqualTo(42);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void metricsPrometheusJobMustBeUsed() {
+    parseCommand("--metrics-prometheus-job", "pantheon-command-test");
+
+    verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(metricsConfigArgumentCaptor.getValue().getPrometheusJob())
+        .isEqualTo("pantheon-command-test");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
