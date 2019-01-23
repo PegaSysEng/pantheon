@@ -35,7 +35,7 @@ public class PantheonFactoryConfigurationBuilder {
   private PermissioningConfiguration permissioningConfiguration =
       PermissioningConfiguration.createDefault();
   private boolean devMode = true;
-  private boolean discovery = true;
+  private Boolean discovery = true;
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
   private Boolean p2pEnabled = true;
 
@@ -109,7 +109,7 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setDiscovery(final boolean discovery) {
+  public PantheonFactoryConfigurationBuilder setDiscovery(final Boolean discovery) {
     this.discovery = discovery;
     return this;
   }

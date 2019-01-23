@@ -60,6 +60,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
     if (!node.isDiscovery()) {
       params.add("--no-discovery");
+      params.add("true");
     }
 
     params.add("--p2p-listen");

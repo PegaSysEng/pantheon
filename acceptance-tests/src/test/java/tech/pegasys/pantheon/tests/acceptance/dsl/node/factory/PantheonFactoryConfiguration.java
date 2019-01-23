@@ -28,7 +28,7 @@ class PantheonFactoryConfiguration {
   private final MetricsConfiguration metricsConfiguration;
   private final PermissioningConfiguration permissioningConfiguration;
   private final boolean devMode;
-  private final boolean discovery;
+  private final Boolean discovery;
   private final GenesisConfigProvider genesisConfigProvider;
   private final Boolean p2pEnabled;
 
@@ -83,7 +83,7 @@ class PantheonFactoryConfiguration {
     return devMode;
   }
 
-  public boolean isDiscovery() {
+  public Boolean isDiscovery() {
     return discovery;
   }
 
