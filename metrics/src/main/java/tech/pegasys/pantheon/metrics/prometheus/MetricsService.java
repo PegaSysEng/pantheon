@@ -35,12 +35,24 @@ public interface MetricsService {
     }
   }
 
-  /** Starts the Metrics Service and all needed backend systems. */
+  /**
+   * Starts the Metrics Service and all needed backend systems.
+   *
+   * @return completion state
+   */
   CompletableFuture<?> start();
 
-  /** Stops the Metrics Service and performs needed cleanup. */
+  /**
+   * Stops the Metrics Service and performs needed cleanup.
+   *
+   * @return completion state
+   */
   CompletableFuture<?> stop();
 
-  /** If serving to a port on the client, what the port number is. */
+  /**
+   * If serving to a port on the client, what the port number is.
+   *
+   * @return Port number optional, serving if present.
+   */
   Optional<Integer> getPort();
 }
