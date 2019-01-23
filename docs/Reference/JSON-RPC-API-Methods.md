@@ -743,33 +743,35 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 ### eth_sendRawTransaction
 
-Sends a signed transaction. A transaction can send ether, deploy a contract, or interact with a contract.  
+Sends a [signed transaction](../Using-Pantheon/Transactions.md). A transaction can send ether, deploy a contract, or interact with a contract.  
 
 You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
-To avoid exposing your private key, create signed transactions offline and send the signed transaction data using this method. For information on creating signed transactions and using `eth_sendRawTransaction`, refer to [Using Pantheon](../Using-Pantheon/Transactions.md).  
+To avoid exposing your private key, create signed transactions offline and send the signed transaction data using `eth_sendRawTransaction`. 
 
 !!!important
     Pantheon does not implement [eth_sendTransaction](Using-JSON-RPC-API.md#account-management).
 
 **Parameters**
 
-`DATA` - Hash of the signed raw transaction in hexadecimal format; for example:
+`data` -  Signed transaction serialized to hexadecimal format. For example:
 
-`params: ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]`
+`params: ["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"]`
 
+!!! note
+    [Creating and Sending Transactions](../Using-Pantheon/Transactions.md) includes examples of creating signed transactions using the [web3.js](https://github.com/ethereum/web3.js/) library.
 
 **Returns**
 
-`result` : `DATA` - 32-byte transaction hash, or zero hash if the transaction is not yet available.
+`result` : `data` - 32-byte transaction hash
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}' <JSON-RPC-http-endpoint:port>
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}' <JSON-RPC-http-endpoint:port>
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}
+    {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -815,20 +817,18 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 ### eth_estimateGas
 
-Returns an estimate of how much gas is needed for the transaction to complete. The estimate process does not use
-gas and is not added to the blockchain as a transaction. The estimate can be greater than the amount of gas that the
-transaction actually uses, for reasons including EVM mechanics and node performance.
+Returns an estimate of how much gas is needed for a transaction to complete. The estimation process does not use
+gas and the transaction is not added to the blockchain. The resulting estimate can be greater than the amount of
+gas that the transaction actually uses, for various reasons including EVM mechanics and node performance.
 
 The `eth_estimateGas` call does not send a transaction. You must make a subsequent call to
-[eth_sendRawTransaction](#eth_sendRawTransaction) to execute the transaction.
+[eth_sendRawTransaction](#eth_sendrawtransaction) to execute the transaction.
 
 **Parameters**
 
-!!!note
-    The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`
-    all fields are optional. If you do not specify a `gas` amount in the transaction call object, Pantheon uses the
-    `gasLimit` amount from the block at the head of the chain as the upper limit. If the amount of gas needed is higher
-    than the estimated upper limit, the transaction might not have enough gas to execute.
+The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`,
+all fields are optional. Setting a gas limit is irrelevant to the estimation process (unlike transactions, in which gas
+limits apply).
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
@@ -1929,6 +1929,168 @@ None
     }
     ```
 
-## IBFT 2.0 and Permissioning Methods
+## IBFT 2.0 Methods 
 
-IBFT 2.0 and permissioning are under development and will be available in v1.0. 
+### ibft_discardValidatorVote
+
+Discards a proposal to [add or remove a validator](../Consensus-Protocols/IBFT.md#adding-and-removing-validators) with the specified address. 
+
+**Parameters** 
+
+`data` - 20-byte address of proposed validator 
+
+**Returns** 
+
+`result: boolean` - `true`
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xef1bfb6a12794615c9b0b5a21e6741f01e570185"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xef1bfb6a12794615c9b0b5a21e6741f01e570185"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : true
+    }
+    ```
+
+### ibft_getPendingVotes
+
+Returns [current votes](../Consensus-Protocols/IBFT.md#adding-and-removing-validators). 
+
+**Parameters**
+
+None
+
+**Returns** 
+
+`result`: `object` - Map of account addresses to corresponding boolean values indicating the vote for each account. 
+
+If the boolean value is `true`, the vote is to add a validator. If `false`, the proposal is to remove a validator. 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "0xef1bfb6a12794615c9b0b5a21e6741f01e570185": true,
+            "0x42d4287eac8078828cf5f3486cfe601a275a49a5": true
+        }
+    }
+    ```
+    
+### ibft_getValidatorsByBlockHash
+
+Lists the validators defined in the specified block.
+
+**Parameters**
+
+`data` - 32-byte block hash 
+
+**Returns** 
+
+`result: array of data` - List of validator addresses
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0xbae7d3feafd743343b9a4c578cab5e5d65eb735f6855fb845c00cab356331256"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0xbae7d3feafd743343b9a4c578cab5e5d65eb735f6855fb845c00cab356331256"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            "0x42d4287eac8078828cf5f3486cfe601a275a49a5",
+            "0xb1b2bc9582d2901afdc579f528a35ca41403fa85",
+            "0xef1bfb6a12794615c9b0b5a21e6741f01e570185"
+        ]
+    }
+    ```
+
+### ibft_getValidatorsByBlockNumber
+
+Lists the validators defined in the specified block. 
+
+**Parameters** 
+
+`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter). 
+
+**Returns**
+
+`result: array of data` - List of validator addresses 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            "0x42d4287eac8078828cf5f3486cfe601a275a49a5",
+            "0xb1b2bc9582d2901afdc579f528a35ca41403fa85",
+            "0xef1bfb6a12794615c9b0b5a21e6741f01e570185"
+        ]
+    }
+    ```
+    
+### ibft_proposeValidatorVote
+
+Proposes [adding or removing a validator]((../Consensus-Protocols/IBFT.md#adding-and-removing-validators)) with the specified address. 
+
+**Parameters**
+
+`data` - Account address
+ 
+`boolean` -  `true` to propose adding validator or `false` to propose removing validator. 
+
+**Returns** 
+
+`result: boolean` - `true`
+   
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["42d4287eac8078828cf5f3486cfe601a275a49a5",true], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["42d4287eac8078828cf5f3486cfe601a275a49a5",true], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+     "jsonrpc" : "2.0",
+     "id" : 1,
+     "result" : true
+    }
+    ```
+
+## Permissioning Methods
+
+Permissioning is under development and will be available in v1.0. 

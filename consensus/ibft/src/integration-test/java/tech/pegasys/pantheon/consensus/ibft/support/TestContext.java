@@ -13,12 +13,14 @@
 package tech.pegasys.pantheon.consensus.ibft.support;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,16 +40,19 @@ public class TestContext {
   private final MutableBlockchain blockchain;
   private final IbftController controller;
   private final IbftFinalState finalState;
+  private final EventMultiplexer eventMultiplexer;
 
   public TestContext(
       final Map<Address, ValidatorPeer> remotePeers,
       final MutableBlockchain blockchain,
       final IbftController controller,
-      final IbftFinalState finalState) {
+      final IbftFinalState finalState,
+      final EventMultiplexer eventMultiplexer) {
     this.remotePeers = remotePeers;
     this.blockchain = blockchain;
     this.controller = controller;
     this.finalState = finalState;
+    this.eventMultiplexer = eventMultiplexer;
   }
 
   public MutableBlockchain getBlockchain() {
@@ -58,15 +63,21 @@ public class TestContext {
     return controller;
   }
 
+  public EventMultiplexer getEventMultiplexer() {
+    return eventMultiplexer;
+  }
+
   public MessageFactory getLocalNodeMessageFactory() {
     return finalState.getMessageFactory();
   }
 
-  public Block createBlockForProposal(final int round, final long timestamp) {
-    return finalState
-        .getBlockCreatorFactory()
-        .create(blockchain.getChainHeadHeader(), round)
-        .createBlock(timestamp);
+  public Block createBlockForProposal(
+      final BlockHeader parent, final int round, final long timestamp) {
+    return finalState.getBlockCreatorFactory().create(parent, round).createBlock(timestamp);
+  }
+
+  public Block createBlockForProposalFromChainHead(final int round, final long timestamp) {
+    return createBlockForProposal(blockchain.getChainHeadHeader(), round, timestamp);
   }
 
   public RoundSpecificNodeRoles getRoundSpecificRoles(final ConsensusRoundIdentifier roundId) {

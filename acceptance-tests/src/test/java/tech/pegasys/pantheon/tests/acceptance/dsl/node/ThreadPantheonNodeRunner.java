@@ -77,7 +77,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         new RunnerBuilder()
             .vertx(Vertx.vertx())
             .pantheonController(pantheonController)
-            .discovery(true)
+            .discovery(node.isDiscoveryEnabled())
             .bootstrapPeers(node.bootnodes())
             .discoveryHost(node.hostName())
             .discoveryPort(node.p2pPort())
@@ -89,6 +89,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .metricsSystem(noOpMetricsSystem)
             .metricsConfiguration(node.metricsConfiguration())
             .permissioningConfiguration(node.getPermissioningConfiguration())
+            .p2pEnabled(node.p2pEnabled())
             .build();
 
     nodeExecutor.submit(runner::execute);

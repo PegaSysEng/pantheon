@@ -163,6 +163,14 @@ public final class MockNetwork {
     }
 
     @Override
+    public boolean addMaintainConnectionPeer(final Peer peer) {
+      return true;
+    }
+
+    @Override
+    public void checkMaintainedConnectionPeers() {}
+
+    @Override
     public void stop() {}
 
     @Override
@@ -187,6 +195,11 @@ public final class MockNetwork {
 
     @Override
     public boolean isListening() {
+      return true;
+    }
+
+    @Override
+    public boolean isP2pEnabled() {
       return true;
     }
 
