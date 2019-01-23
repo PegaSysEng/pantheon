@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -215,14 +216,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Collection<String> bannedNodeIds = new ArrayList<>();
 
-  // TODO: Re-enable as per NC-1057/NC-1681
-  //  @Option(
-  //    names = {"--sync-mode"},
-  //    paramLabel = MANDATORY_MODE_FORMAT_HELP,
-  //    description =
-  //        "Synchronization mode (Value can be one of ${COMPLETION-CANDIDATES}, default:
-  // ${DEFAULT-VALUE})"
-  //  )
+  @Option(
+    hidden = true,
+    names = {"--sync-mode"},
+    paramLabel = MANDATORY_MODE_FORMAT_HELP,
+    description =
+        "Synchronization mode (Value can be one of ${COMPLETION-CANDIDATES}, default: ${DEFAULT-VALUE})"
+  )
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
   @Option(
@@ -529,6 +529,24 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Collection<String> accountsWhitelist = null;
 
+  @Option(
+    names = {"--privacy-url"},
+    description = "The URL on which enclave is running "
+  )
+  private final URI privacyUrl = PrivacyParameters.DEFAULT_ORION_URL;
+
+  @Option(
+    names = {"--privacy-public-key-file"},
+    description = "the path to the enclave's public key "
+  )
+  private final File privacyPublicKeyFile = null;
+
+  @Option(
+    names = {"--privacy-enabled"},
+    description = "Set if private transaction should be enabled (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean privacyEnabled = false;
+
   public PantheonCommand(
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
@@ -603,7 +621,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
-    PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
+    final PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
     ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
 
     synchronize(
@@ -622,17 +640,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private void ensureAllBootnodesAreInWhitelist(
       final EthNetworkConfig ethNetworkConfig,
       final PermissioningConfiguration permissioningConfiguration) {
-    List<Peer> bootnodes =
+    final List<Peer> bootnodes =
         DiscoveryConfiguration.getBootstrapPeersFromGenericCollection(
             ethNetworkConfig.getBootNodes());
     if (permissioningConfiguration.isNodeWhitelistSet() && bootnodes != null) {
-      List<Peer> whitelist =
+      final List<Peer> whitelist =
           permissioningConfiguration
               .getNodeWhitelist()
               .stream()
               .map(DefaultPeer::fromURI)
               .collect(Collectors.toList());
-      for (Peer bootnode : bootnodes) {
+      for (final Peer bootnode : bootnodes) {
         if (!whitelist.contains(bootnode)) {
           throw new ParameterException(
               new CommandLine(this),
@@ -658,6 +676,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .devMode(isDevMode)
           .nodePrivateKeyFile(getNodePrivateKeyFile())
           .metricsSystem(metricsSystem)
+          .privacyParameters(orionConfiguration())
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(new CommandLine(this), e.getMessage());
@@ -713,6 +732,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return permissioningConfiguration;
   }
 
+  private PrivacyParameters orionConfiguration() {
+    final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
+    privacyParameters.setEnabled(privacyEnabled);
+    privacyParameters.setUrl(privacyUrl.toString());
+    privacyParameters.setPublicKey(privacyPublicKeyFile);
+    return privacyParameters;
+  }
+
   private SynchronizerConfiguration buildSyncConfig() {
     synchronizerConfigurationBuilder.syncMode(syncMode);
     synchronizerConfigurationBuilder.maxTrailingPeers(maxTrailingPeers);
@@ -734,7 +761,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     checkNotNull(runnerBuilder);
 
-    Runner runner =
+    final Runner runner =
         runnerBuilder
             .vertx(Vertx.vertx())
             .pantheonController(controller)
@@ -816,7 +843,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private String genesisConfig() {
     try {
       return Resources.toString(genesisFile().toURI().toURL(), UTF_8);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new ParameterException(
           new CommandLine(this),
           String.format("Unable to load genesis file %s.", genesisFile()),
