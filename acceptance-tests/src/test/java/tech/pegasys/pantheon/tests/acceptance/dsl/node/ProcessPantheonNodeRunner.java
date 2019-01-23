@@ -58,7 +58,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add("--dev-mode");
     }
 
-    if (!node.isDiscovery()) {
+    if (!node.isDiscoveryEnabled()) {
       params.add("--no-discovery");
       params.add("true");
     }

@@ -59,7 +59,7 @@ public class PantheonNodeFactory {
             config.getGenesisConfigProvider(),
             serverSocket.getLocalPort(),
             config.getP2pEnabled(),
-            config.isDiscovery());
+            config.isDiscoveryEnabled());
     serverSocket.close();
 
     return node;
@@ -193,7 +193,7 @@ public class PantheonNodeFactory {
 
   public PantheonNode createNodeWithNoDiscovery(final String name) throws IOException {
     return create(
-        new PantheonFactoryConfigurationBuilder().setName(name).setDiscovery(false).build());
+        new PantheonFactoryConfigurationBuilder().setName(name).setDiscoveryEnabled(false).build());
   }
 
   public PantheonNode createCliqueNode(final String name) throws IOException {

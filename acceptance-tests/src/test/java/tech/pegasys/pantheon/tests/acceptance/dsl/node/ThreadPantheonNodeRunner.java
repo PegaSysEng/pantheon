@@ -77,7 +77,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         new RunnerBuilder()
             .vertx(Vertx.vertx())
             .pantheonController(pantheonController)
-            .discovery(node.isDiscovery())
+            .discovery(node.isDiscoveryEnabled())
             .bootstrapPeers(node.bootnodes())
             .discoveryHost(node.hostName())
             .discoveryPort(node.p2pPort())
