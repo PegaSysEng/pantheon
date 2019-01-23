@@ -110,7 +110,7 @@ public class GossipTest {
   }
 
   @Test
-  public void messageIsOnlyGossipedOnce() {
+  public void onlyGossipOnce() {
     final SignedData<PreparePayload> prepare = gossiper.injectPrepare(roundId, block.getHash());
     assertPeersReceivedExactly(roles.getNonProposingPeers(), prepare);
 
