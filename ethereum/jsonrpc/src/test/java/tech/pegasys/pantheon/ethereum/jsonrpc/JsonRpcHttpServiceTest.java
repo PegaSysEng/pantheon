@@ -119,7 +119,7 @@ public class JsonRpcHttpServiceTest {
                     synchronizer,
                     MainnetProtocolSchedule.fromConfig(
                         new StubGenesisConfigOptions().constantinopleBlock(0).chainId(CHAIN_ID),
-                        PrivacyParameters.createDefault()),
+                        PrivacyParameters.noPrivacy()),
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),

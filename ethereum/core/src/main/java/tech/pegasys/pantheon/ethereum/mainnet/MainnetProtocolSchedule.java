@@ -25,7 +25,7 @@ public class MainnetProtocolSchedule {
 
   public static ProtocolSchedule<Void> create() {
     return fromConfig(
-        GenesisConfigFile.mainnet().getConfigOptions(), PrivacyParameters.createDefault());
+        GenesisConfigFile.mainnet().getConfigOptions(), PrivacyParameters.noPrivacy());
   }
 
   /**

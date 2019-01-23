@@ -42,7 +42,7 @@ public class BlockchainImporter {
     protocolSchedule =
         MainnetProtocolSchedule.fromConfig(
             GenesisConfigFile.fromConfig(genesisJson).getConfigOptions(),
-            PrivacyParameters.createDefault());
+            PrivacyParameters.noPrivacy());
 
     blocks = new ArrayList<>();
     try (final RawBlockIterator iterator =

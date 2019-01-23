@@ -48,7 +48,7 @@ public class CliqueProtocolSchedule {
             builder ->
                 applyCliqueSpecificModifications(
                     epochManager, cliqueConfig.getBlockPeriodSeconds(), localNodeAddress, builder),
-            PrivacyParameters.createDefault())
+            PrivacyParameters.noPrivacy())
         .createProtocolSchedule();
   }
 

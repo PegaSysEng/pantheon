@@ -57,7 +57,7 @@ public final class BlockImporterTest {
             new MiningParametersTestBuilder().enabled(false).build(),
             KeyPair.generate(),
             new NoOpMetricsSystem(),
-            PrivacyParameters.createDefault());
+            PrivacyParameters.noPrivacy());
     final BlockImporter.ImportResult result =
         blockImporter.importBlockchain(source, targetController);
     assertThat(result.count).isEqualTo(1000);
@@ -90,7 +90,7 @@ public final class BlockImporterTest {
             new MiningParametersTestBuilder().enabled(false).build(),
             KeyPair.generate(),
             new NoOpMetricsSystem(),
-            PrivacyParameters.createDefault());
+            PrivacyParameters.noPrivacy());
     final BlockImporter.ImportResult result = blockImporter.importBlockchain(source, controller);
 
     assertThat(result.count).isEqualTo(959);

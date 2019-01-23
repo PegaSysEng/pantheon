@@ -734,7 +734,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private PrivacyParameters orionConfiguration() {
-    final PrivacyParameters privacyParameters = PrivacyParameters.createDefault();
+    final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
     privacyParameters.setEnabled(privacyEnabled);
     privacyParameters.setUrl(privacyUrl.toString());
     privacyParameters.setPublicKey(privacyPublicKeyFile);

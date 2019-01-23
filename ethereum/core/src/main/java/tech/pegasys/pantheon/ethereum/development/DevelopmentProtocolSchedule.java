@@ -27,7 +27,7 @@ public class DevelopmentProtocolSchedule {
             config,
             NO_CHAIN_ID,
             builder -> builder.difficultyCalculator(DevelopmentDifficultyCalculators.DEVELOPER),
-            PrivacyParameters.createDefault())
+            PrivacyParameters.noPrivacy())
         .createProtocolSchedule();
   }
 }

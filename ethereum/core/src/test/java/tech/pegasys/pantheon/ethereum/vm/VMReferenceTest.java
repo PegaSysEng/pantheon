@@ -117,7 +117,7 @@ public class VMReferenceTest extends AbstractRetryingTest {
 
     final ProtocolSpec<Void> protocolSpec =
         MainnetProtocolSpecs.frontierDefinition()
-            .privacyParameters(PrivacyParameters.createDefault())
+            .privacyParameters(PrivacyParameters.noPrivacy())
             .build(new MutableProtocolSchedule<>(CHAIN_ID));
 
     final TestBlockchain blockchain = new TestBlockchain(execEnv.getBlockHeader().getNumber());

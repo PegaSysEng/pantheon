@@ -48,8 +48,7 @@ public class MainnetProtocolScheduleTest {
     final JsonObject json = new JsonObject("{}");
     final ProtocolSchedule<Void> sched =
         MainnetProtocolSchedule.fromConfig(
-            GenesisConfigFile.fromConfig(json).getConfigOptions(),
-            PrivacyParameters.createDefault());
+            GenesisConfigFile.fromConfig(json).getConfigOptions(), PrivacyParameters.noPrivacy());
     Assertions.assertThat(sched.getByBlockNumber(1L).getName()).isEqualTo("Frontier");
     Assertions.assertThat(sched.getByBlockNumber(Long.MAX_VALUE).getName()).isEqualTo("Frontier");
   }
@@ -61,8 +60,7 @@ public class MainnetProtocolScheduleTest {
             "{\"config\": {\"homesteadBlock\": 2, \"daoForkBlock\": 3, \"eip150Block\": 14, \"eip158Block\": 15, \"byzantiumBlock\": 16, \"constantinopleBlock\": 18, \"chainId\":1234}}");
     final ProtocolSchedule<Void> sched =
         MainnetProtocolSchedule.fromConfig(
-            GenesisConfigFile.fromConfig(json).getConfigOptions(),
-            PrivacyParameters.createDefault());
+            GenesisConfigFile.fromConfig(json).getConfigOptions(), PrivacyParameters.noPrivacy());
     Assertions.assertThat(sched.getByBlockNumber(1).getName()).isEqualTo("Frontier");
     Assertions.assertThat(sched.getByBlockNumber(2).getName()).isEqualTo("Homestead");
     Assertions.assertThat(sched.getByBlockNumber(3).getName()).isEqualTo("DaoRecoveryInit");
@@ -82,7 +80,7 @@ public class MainnetProtocolScheduleTest {
                     Resources.toString(
                         Resources.getResource("ropsten.json"), StandardCharsets.UTF_8))
                 .getConfigOptions(),
-            PrivacyParameters.createDefault());
+            PrivacyParameters.noPrivacy());
     Assertions.assertThat(sched.getByBlockNumber(0).getName()).isEqualTo("TangerineWhistle");
     Assertions.assertThat(sched.getByBlockNumber(1).getName()).isEqualTo("TangerineWhistle");
     Assertions.assertThat(sched.getByBlockNumber(10).getName()).isEqualTo("SpuriousDragon");

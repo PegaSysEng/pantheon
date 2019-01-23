@@ -32,7 +32,7 @@ public class PrivacyParameters {
     this.publicKey = publicKey;
   }
 
-  public static PrivacyParameters createDefault() {
+  public static PrivacyParameters noPrivacy() {
     final PrivacyParameters config = new PrivacyParameters();
     config.setEnabled(false);
     config.setUrl(ORION_URL);

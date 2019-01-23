@@ -36,7 +36,7 @@ public class ConstantinopleSStoreOperationGasCostTest {
 
   private static final ProtocolSchedule<Void> protocolSchedule =
       MainnetProtocolSchedule.fromConfig(
-          new StubGenesisConfigOptions().constantinopleBlock(0), PrivacyParameters.createDefault());
+          new StubGenesisConfigOptions().constantinopleBlock(0), PrivacyParameters.noPrivacy());
 
   @Parameters(name = "Code: {0}, Original: {1}")
   public static Object[][] scenarios() {

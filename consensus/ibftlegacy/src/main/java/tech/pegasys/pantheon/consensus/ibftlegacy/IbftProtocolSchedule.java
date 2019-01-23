@@ -46,7 +46,7 @@ public class IbftProtocolSchedule {
             config,
             DEFAULT_CHAIN_ID,
             builder -> applyIbftChanges(blockPeriod, epochManager, builder),
-            PrivacyParameters.createDefault())
+            PrivacyParameters.noPrivacy())
         .createProtocolSchedule();
   }
 
