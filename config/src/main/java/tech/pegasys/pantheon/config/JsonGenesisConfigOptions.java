@@ -102,7 +102,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
 
   @Override
   public OptionalLong getConstantinopleFixBlockNumber() {
-    return getOptionalLong("constantinopleFixblock");
+    return getOptionalLong("constantinoplefixblock");
   }
 
   @Override

@@ -69,7 +69,6 @@ public class TransactionTestCaseSpec {
       @JsonProperty("EIP158") final Expectation EIP158Expectation,
       @JsonProperty("Byzantium") final Expectation byzantiumExpectation,
       @JsonProperty("Constantinople") final Expectation constantinopleExpectation,
-      @JsonProperty("ConstantinopleFix") final Expectation constantinopleFixExpectation,
       @JsonProperty("rlp") final String rlp) {
     expectations = new HashMap<>();
     expectations.put("Frontier", frontierExpectation);
@@ -78,7 +77,6 @@ public class TransactionTestCaseSpec {
     expectations.put("EIP158", EIP158Expectation);
     expectations.put("Byzantium", byzantiumExpectation);
     expectations.put("Constantinople", constantinopleExpectation);
-    expectations.put("ConstantinopleFix", constantinopleFixExpectation);
 
     BytesValue parsedRlp = null;
     try {
@@ -98,7 +96,7 @@ public class TransactionTestCaseSpec {
     final Expectation expectation = expectations.get(milestone);
 
     if (expectation == null) {
-      throw new IllegalStateException("Expectation for milestone %s not found" + milestone);
+      throw new IllegalStateException("Expectation for milestone " + milestone + " not found");
     }
 
     return expectation;
