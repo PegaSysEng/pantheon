@@ -241,10 +241,6 @@ public class SynchronizerConfiguration {
     return fastSyncMaximumPeerWaitTime;
   }
 
-  public boolean isFastSyncEnabled() {
-    return syncMode() == SyncMode.FAST;
-  }
-
   public static class Builder {
     private int fastSyncPivotDistance = DEFAULT_PIVOT_DISTANCE_FROM_HEAD;
     private float fastSyncFullValidationRate = DEFAULT_FULL_VALIDATION_RATE;

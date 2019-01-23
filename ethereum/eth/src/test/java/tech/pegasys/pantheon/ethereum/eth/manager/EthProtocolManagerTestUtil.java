@@ -21,8 +21,6 @@ import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler.TimeoutPolicy;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -42,10 +40,7 @@ public class EthProtocolManagerTestUtil {
         blockchain,
         worldStateArchive,
         networkId,
-        new SynchronizerConfiguration.Builder()
-            .syncMode(SyncMode.FULL)
-            .build()
-            .validated(blockchain),
+        false,
         EthProtocolManager.DEFAULT_REQUEST_LIMIT,
         ethScheduler);
   }

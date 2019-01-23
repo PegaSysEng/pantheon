@@ -29,8 +29,6 @@ import tech.pegasys.pantheon.ethereum.development.DevelopmentProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
@@ -104,16 +102,7 @@ public class TestNode implements Closeable {
     final ProtocolContext<Void> protocolContext =
         new ProtocolContext<>(blockchain, worldStateArchive, null);
     final EthProtocolManager ethProtocolManager =
-        new EthProtocolManager(
-            blockchain,
-            worldStateArchive,
-            1,
-            new SynchronizerConfiguration.Builder()
-                .syncMode(SyncMode.FULL)
-                .downloaderParallelisim(1)
-                .transactionsParallelism(1)
-                .build()
-                .validated(blockchain));
+        new EthProtocolManager(blockchain, worldStateArchive, 1, false, 1, 1);
 
     final NetworkRunner networkRunner =
         NetworkRunner.builder()
@@ -126,7 +115,7 @@ public class TestNode implements Closeable {
                         this.kp,
                         networkingConfiguration,
                         capabilities,
-                        ethProtocolManager,
+                        () -> true,
                         new PeerBlacklist(),
                         new NoOpMetricsSystem(),
                         new NodeWhitelistController(PermissioningConfiguration.createDefault())))

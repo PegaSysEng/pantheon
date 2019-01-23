@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
@@ -62,7 +61,6 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
   private final EthMessages ethMessages;
   private final EthContext ethContext;
   private final boolean fastSyncEnabled;
-  private final int requiredPeers;
   private List<Capability> supportedCapabilities;
   private final Blockchain blockchain;
 
@@ -70,15 +68,14 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final int networkId,
-      final SynchronizerConfiguration syncConfig,
+      final boolean fastSyncEnabled,
       final int requestLimit,
       final EthScheduler scheduler) {
     this.networkId = networkId;
-    this.fastSyncEnabled = syncConfig.isFastSyncEnabled();
-    this.requiredPeers = fastSyncEnabled ? syncConfig.getFastSyncMinimumPeerCount() : 1;
 
     this.scheduler = scheduler;
     this.blockchain = blockchain;
+    this.fastSyncEnabled = fastSyncEnabled;
 
     this.shutdown = new CountDownLatch(1);
     genesisHash = blockchain.getBlockHashByNumber(0L).get();
@@ -95,23 +92,34 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final int networkId,
-      final SynchronizerConfiguration syncConfig,
+      final boolean fastSyncEnabled,
+      final int syncWorkers,
+      final int txWorkers,
       final int requestLimit) {
     this(
         blockchain,
         worldStateArchive,
         networkId,
-        syncConfig,
+        fastSyncEnabled,
         requestLimit,
-        new EthScheduler(syncConfig.downloaderParallelism(), syncConfig.transactionsParallelism()));
+        new EthScheduler(syncWorkers, txWorkers));
   }
 
   public EthProtocolManager(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final int networkId,
-      final SynchronizerConfiguration syncConfig) {
-    this(blockchain, worldStateArchive, networkId, syncConfig, DEFAULT_REQUEST_LIMIT);
+      final boolean fastSyncEnabled,
+      final int syncWorkers,
+      final int txWorkers) {
+    this(
+        blockchain,
+        worldStateArchive,
+        networkId,
+        fastSyncEnabled,
+        syncWorkers,
+        txWorkers,
+        DEFAULT_REQUEST_LIMIT);
   }
 
   public EthContext ethContext() {
@@ -227,11 +235,6 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
           ethPeers.peerCount(),
           ethPeers);
     }
-  }
-
-  @Override
-  public boolean hasSufficientPeers() {
-    return ethPeers.availablePeerCount() >= requiredPeers;
   }
 
   private void handleStatusMessage(final EthPeer peer, final MessageData data) {
