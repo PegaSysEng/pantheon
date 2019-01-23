@@ -16,8 +16,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.AbstractRetryingPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerBreachedProtocolException;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
@@ -25,51 +23,44 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeoutException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public class GetPivotBlockHeaderFromPeerTask extends AbstractRetryingPeerTask<List<BlockHeader>> {
-  private static final Logger LOG = LogManager.getLogger();
+public class RetryingGetHeaderFromPeerByNumberTask
+    extends AbstractRetryingPeerTask<List<BlockHeader>> {
   private final ProtocolSchedule<?> protocolSchedule;
   private final EthContext ethContext;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
-  private final Optional<EthPeer> peer;
   private final long pivotBlockNumber;
 
-  private GetPivotBlockHeaderFromPeerTask(
+  private RetryingGetHeaderFromPeerByNumberTask(
       final ProtocolSchedule<?> protocolSchedule,
       final EthContext ethContext,
       final LabelledMetric<OperationTimer> ethTasksTimer,
-      final Optional<EthPeer> peer,
       final long pivotBlockNumber,
       final int maxRetries) {
     super(ethContext, maxRetries, ethTasksTimer);
     this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
     this.ethTasksTimer = ethTasksTimer;
-    this.peer = peer;
     this.pivotBlockNumber = pivotBlockNumber;
   }
 
-  public static GetPivotBlockHeaderFromPeerTask forPivotBlock(
+  public static RetryingGetHeaderFromPeerByNumberTask forPivotBlock(
       final ProtocolSchedule<?> protocolSchedule,
       final EthContext ethContext,
       final LabelledMetric<OperationTimer> ethTasksTimer,
-      final Optional<EthPeer> peer,
       final long pivotBlockNumber,
       final int maxRetries) {
-    return new GetPivotBlockHeaderFromPeerTask(
-        protocolSchedule, ethContext, ethTasksTimer, peer, pivotBlockNumber, maxRetries);
+    return new RetryingGetHeaderFromPeerByNumberTask(
+        protocolSchedule, ethContext, ethTasksTimer, pivotBlockNumber, maxRetries);
   }
 
   @Override
-  protected CompletableFuture<List<BlockHeader>> executePeerTask() {
+  protected CompletableFuture<List<BlockHeader>> executePeerTask(
+      final Optional<EthPeer> assignedPeer) {
     final AbstractGetHeadersFromPeerTask getHeadersTask =
         GetHeadersFromPeerByNumberTask.forSingleNumber(
             protocolSchedule, ethContext, pivotBlockNumber, ethTasksTimer);
-    peer.ifPresent(getHeadersTask::assignPeer);
+    assignedPeer.ifPresent(getHeadersTask::assignPeer);
     return executeSubTask(getHeadersTask::run)
         .thenApply(
             peerResult -> {
@@ -80,14 +71,7 @@ public class GetPivotBlockHeaderFromPeerTask extends AbstractRetryingPeerTask<Li
             });
   }
 
-  public CompletableFuture<BlockHeader> getPivotBlockHeader() {
+  public CompletableFuture<BlockHeader> getHeader() {
     return run().thenApply(singletonList -> singletonList.get(0));
-  }
-
-  @Override
-  protected boolean isRetryableError(final Throwable error) {
-    return error instanceof NoAvailablePeersException
-        || error instanceof TimeoutException
-        || error instanceof PeerBreachedProtocolException;
   }
 }

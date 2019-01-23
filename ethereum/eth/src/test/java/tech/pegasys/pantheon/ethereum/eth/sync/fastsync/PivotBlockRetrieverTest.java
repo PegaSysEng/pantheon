@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.eth.sync.state;
+package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -26,11 +26,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.BlockchainSetupUtil;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError;
-import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncException;
-import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
@@ -48,13 +43,7 @@ import org.junit.Test;
 public class PivotBlockRetrieverTest {
 
   private static final long PIVOT_BLOCK_NUMBER = 10;
-  private final SynchronizerConfiguration syncConfig =
-      new SynchronizerConfiguration.Builder()
-          .syncMode(SyncMode.FAST)
-          .fastSyncPivotDistance(1000)
-          .build();
 
-  private ProtocolSchedule<Void> protocolSchedule;
   private ProtocolContext<Void> protocolContext;
 
   private final LabelledMetric<OperationTimer> ethTasksTimer = NO_OP_LABELLED_TIMER;
@@ -68,7 +57,7 @@ public class PivotBlockRetrieverTest {
     final BlockchainSetupUtil<Void> blockchainSetupUtil = BlockchainSetupUtil.forTesting();
     blockchainSetupUtil.importAllBlocks();
     blockchain = blockchainSetupUtil.getBlockchain();
-    protocolSchedule = blockchainSetupUtil.getProtocolSchedule();
+    final ProtocolSchedule<Void> protocolSchedule = blockchainSetupUtil.getProtocolSchedule();
     protocolContext = blockchainSetupUtil.getProtocolContext();
     ethProtocolManager =
         EthProtocolManagerTestUtil.create(

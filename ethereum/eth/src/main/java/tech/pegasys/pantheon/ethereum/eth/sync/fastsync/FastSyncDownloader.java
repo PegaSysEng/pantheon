@@ -13,11 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.FAST_SYNC_UNAVAILABLE;
-import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.UNEXPECTED_ERROR;
 
-import tech.pegasys.pantheon.util.ExceptionUtils;
-
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +27,7 @@ public class FastSyncDownloader<C> {
     this.fastSyncActions = fastSyncActions;
   }
 
-  public CompletableFuture<Optional<FastSyncError>> start() {
+  public CompletableFuture<FastSyncState> start() {
     LOG.info("Fast sync enabled");
     return fastSyncActions
         .waitForSuitablePeers()
@@ -41,17 +37,6 @@ public class FastSyncDownloader<C> {
             state -> {
               LOG.info("Reached end of current fast sync implementation with state {}", state);
               throw new FastSyncException(FAST_SYNC_UNAVAILABLE);
-            })
-        .thenApply(state -> Optional.<FastSyncError>empty())
-        .exceptionally(
-            error -> {
-              final Throwable rootCause = ExceptionUtils.rootCause(error);
-              if (rootCause instanceof FastSyncException) {
-                return Optional.of(((FastSyncException) rootCause).getError());
-              } else {
-                LOG.error("Fast sync encountered an unexpected error", error);
-                return Optional.of(UNEXPECTED_ERROR);
-              }
             });
   }
 }

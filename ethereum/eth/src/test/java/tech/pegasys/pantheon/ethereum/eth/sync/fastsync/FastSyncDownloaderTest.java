@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.CHAIN_TOO_SHORT;
+import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.FAST_SYNC_UNAVAILABLE;
 import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.UNEXPECTED_ERROR;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
@@ -48,13 +49,13 @@ public class FastSyncDownloaderTest {
     when(fastSyncActions.downloadPivotBlockHeader(selectPivotBlockState))
         .thenReturn(completedFuture(downloadPivotBlockHeaderState));
 
-    final CompletableFuture<Optional<FastSyncError>> result = downloader.start();
+    final CompletableFuture<FastSyncState> result = downloader.start();
 
     verify(fastSyncActions).waitForSuitablePeers();
     verify(fastSyncActions).selectPivotBlock();
     verify(fastSyncActions).downloadPivotBlockHeader(selectPivotBlockState);
     verifyNoMoreInteractions(fastSyncActions);
-    assertThat(result).isCompletedWithValue(Optional.of(FastSyncError.FAST_SYNC_UNAVAILABLE));
+    assertCompletedExceptionally(result, FAST_SYNC_UNAVAILABLE);
   }
 
   @Test
@@ -62,9 +63,9 @@ public class FastSyncDownloaderTest {
     when(fastSyncActions.waitForSuitablePeers())
         .thenReturn(completedExceptionally(new FastSyncException(UNEXPECTED_ERROR)));
 
-    final CompletableFuture<Optional<FastSyncError>> result = downloader.start();
+    final CompletableFuture<FastSyncState> result = downloader.start();
 
-    assertThat(result).isCompletedWithValue(Optional.of(UNEXPECTED_ERROR));
+    assertCompletedExceptionally(result, UNEXPECTED_ERROR);
 
     verify(fastSyncActions).waitForSuitablePeers();
     verifyNoMoreInteractions(fastSyncActions);
@@ -75,9 +76,9 @@ public class FastSyncDownloaderTest {
     when(fastSyncActions.waitForSuitablePeers()).thenReturn(completedFuture(null));
     when(fastSyncActions.selectPivotBlock()).thenThrow(new FastSyncException(CHAIN_TOO_SHORT));
 
-    final CompletableFuture<Optional<FastSyncError>> result = downloader.start();
+    final CompletableFuture<FastSyncState> result = downloader.start();
 
-    assertThat(result).isCompletedWithValue(Optional.of(CHAIN_TOO_SHORT));
+    assertCompletedExceptionally(result, CHAIN_TOO_SHORT);
 
     verify(fastSyncActions).waitForSuitablePeers();
     verify(fastSyncActions).selectPivotBlock();
@@ -88,5 +89,18 @@ public class FastSyncDownloaderTest {
     final CompletableFuture<T> result = new CompletableFuture<>();
     result.completeExceptionally(error);
     return result;
+  }
+
+  private <T> void assertCompletedExceptionally(
+      final CompletableFuture<T> future, final FastSyncError expectedError) {
+    assertThat(future).isCompletedExceptionally();
+    future.exceptionally(
+        actualError -> {
+          assertThat(actualError)
+              .isInstanceOf(FastSyncException.class)
+              .extracting(ex -> ((FastSyncException) ex).getError())
+              .isEqualTo(expectedError);
+          return null;
+        });
   }
 }

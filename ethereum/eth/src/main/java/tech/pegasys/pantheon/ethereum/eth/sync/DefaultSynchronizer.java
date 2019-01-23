@@ -18,12 +18,14 @@ import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncActions;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncDownloader;
-import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError;
+import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncException;
+import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,14 +91,19 @@ public class DefaultSynchronizer<C> implements Synchronizer {
     }
   }
 
-  private void handleFastSyncResult(final Optional<FastSyncError> result, final Throwable error) {
-    if (error != null) {
-      LOG.error("Fast sync failed. Switching to full sync.", error);
-    }
-    if (!result.isPresent()) {
-      LOG.info("Fast sync completed successfully.");
+  private void handleFastSyncResult(final FastSyncState result, final Throwable error) {
+
+    final Throwable rootCause = ExceptionUtils.rootCause(error);
+    if (rootCause instanceof FastSyncException) {
+      LOG.error(
+          "Fast sync failed ({}), switching to full sync.",
+          ((FastSyncException) rootCause).getError());
+    } else if (error != null) {
+      LOG.error("Fast sync failed, switching to full sync.", error);
     } else {
-      LOG.error("Fast sync failed: {}", result);
+      LOG.info(
+          "Fast sync completed successfully with pivot block {}",
+          result.getPivotBlockNumber().getAsLong());
     }
     startFullSync();
   }
