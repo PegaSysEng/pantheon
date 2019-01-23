@@ -494,10 +494,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void p2pEnabledOptionValueMustBeUsed() {
+  public void p2pEnabledOptionValueTrueMustBeUsed() {
     parseCommand("--p2p-enabled", "true");
 
     verify(mockRunnerBuilder.p2pEnabled(eq(true))).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void p2pEnabledOptionValueFalseMustBeUsed() {
+    parseCommand("--p2p-enabled", "false");
+
+    verify(mockRunnerBuilder.p2pEnabled(eq(false))).build();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
