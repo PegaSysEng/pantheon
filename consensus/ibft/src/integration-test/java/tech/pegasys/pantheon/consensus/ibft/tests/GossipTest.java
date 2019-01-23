@@ -66,15 +66,15 @@ public class GossipTest {
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificNodeRoles roles = context.getRoundSpecificRoles(roundId);
   private Block block;
-  private ValidatorPeer gossiper;
+  private ValidatorPeer sender;
   private MessageFactory msgFactory;
 
   @Before
   public void setup() {
     context.getController().start();
     block = context.createBlockForProposalFromChainHead(roundId.getRoundNumber(), 30);
-    gossiper = roles.getProposer();
-    msgFactory = gossiper.getMessageFactory();
+    sender = roles.getProposer();
+    msgFactory = sender.getMessageFactory();
   }
 
   @Test
@@ -82,42 +82,42 @@ public class GossipTest {
     SignedData<PreparePayload> localPrepare =
         context.getLocalNodeMessageFactory().createSignedPreparePayload(roundId, block.getHash());
     assertPeersReceivedNoMessages(roles.getNonProposingPeers());
-    final SignedData<ProposalPayload> proposal = gossiper.injectProposal(roundId, block);
-    // Gossiper node will have a prepare message as an effect of the proposal being sent
+    final SignedData<ProposalPayload> proposal = sender.injectProposal(roundId, block);
+    // sender node will have a prepare message as an effect of the proposal being sent
     assertPeersReceivedExactly(roles.getNonProposingPeers(), proposal, localPrepare);
-    assertPeersReceivedExactly(singleton(gossiper), localPrepare);
+    assertPeersReceivedExactly(singleton(sender), localPrepare);
 
-    final SignedData<PreparePayload> prepare = gossiper.injectPrepare(roundId, block.getHash());
+    final SignedData<PreparePayload> prepare = sender.injectPrepare(roundId, block.getHash());
     assertPeersReceivedExactly(roles.getNonProposingPeers(), prepare);
-    assertPeersReceivedNoMessages(singleton(gossiper));
+    assertPeersReceivedNoMessages(singleton(sender));
 
-    final SignedData<CommitPayload> commit = gossiper.injectCommit(roundId, block.getHash());
+    final SignedData<CommitPayload> commit = sender.injectCommit(roundId, block.getHash());
     assertPeersReceivedExactly(roles.getNonProposingPeers(), commit);
-    assertPeersReceivedNoMessages(singleton(gossiper));
+    assertPeersReceivedNoMessages(singleton(sender));
 
     final SignedData<RoundChangePayload> roundChange =
         msgFactory.createSignedRoundChangePayload(roundId, Optional.empty());
     final RoundChangeCertificate roundChangeCert =
         new RoundChangeCertificate(singleton(roundChange));
     SignedData<NewRoundPayload> newRound =
-        gossiper.injectNewRound(roundId, roundChangeCert, proposal);
+        sender.injectNewRound(roundId, roundChangeCert, proposal);
     assertPeersReceivedExactly(roles.getNonProposingPeers(), newRound);
-    assertPeersReceivedNoMessages(singleton(gossiper));
+    assertPeersReceivedNoMessages(singleton(sender));
 
-    gossiper.injectRoundChange(roundId, Optional.empty());
+    sender.injectRoundChange(roundId, Optional.empty());
     assertPeersReceivedExactly(roles.getNonProposingPeers(), roundChange);
-    assertPeersReceivedNoMessages(singleton(gossiper));
+    assertPeersReceivedNoMessages(singleton(sender));
   }
 
   @Test
   public void onlyGossipOnce() {
-    final SignedData<PreparePayload> prepare = gossiper.injectPrepare(roundId, block.getHash());
+    final SignedData<PreparePayload> prepare = sender.injectPrepare(roundId, block.getHash());
     assertPeersReceivedExactly(roles.getNonProposingPeers(), prepare);
 
-    gossiper.injectPrepare(roundId, block.getHash());
+    sender.injectPrepare(roundId, block.getHash());
     assertPeersReceivedNoMessages(roles.getNonProposingPeers());
 
-    gossiper.injectPrepare(roundId, block.getHash());
+    sender.injectPrepare(roundId, block.getHash());
     assertPeersReceivedNoMessages(roles.getNonProposingPeers());
   }
 
@@ -128,7 +128,7 @@ public class GossipTest {
     final SignedData<ProposalPayload> unknownProposal =
         unknownMsgFactory.createSignedProposalPayload(roundId, block);
 
-    gossiper.injectMessage(ProposalMessageData.create(unknownProposal));
+    sender.injectMessage(ProposalMessageData.create(unknownProposal));
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
 
@@ -139,7 +139,7 @@ public class GossipTest {
     final SignedData<ProposalPayload> proposalFromPeer =
         peerMsgFactory.createSignedProposalPayload(roundId, block);
 
-    gossiper.injectMessage(ProposalMessageData.create(proposalFromPeer));
+    sender.injectMessage(ProposalMessageData.create(proposalFromPeer));
 
     final List<ValidatorPeer> validators = new ArrayList<>(roles.getNonProposingPeers());
     validators.remove(msgCreator);
@@ -152,14 +152,14 @@ public class GossipTest {
     ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(2, 0);
     msgFactory.createSignedProposalPayload(futureRoundId, block);
 
-    gossiper.injectProposal(futureRoundId, block);
+    sender.injectProposal(futureRoundId, block);
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
 
   @Test
   public void previousHeightMessageIsNotGossiped() {
     final ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(0, 0);
-    gossiper.injectProposal(futureRoundId, block);
+    sender.injectProposal(futureRoundId, block);
     assertPeersReceivedNoMessages(roles.getAllPeers());
   }
 
@@ -176,7 +176,7 @@ public class GossipTest {
 
     ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(2, 0);
     SignedData<PreparePayload> futurePrepare =
-        gossiper.injectPrepare(futureRoundId, block.getHash());
+        sender.injectPrepare(futureRoundId, block.getHash());
     assertPeersReceivedNoMessages(roles.getNonProposingPeers());
 
     // add block to chain so we can move to next block height
