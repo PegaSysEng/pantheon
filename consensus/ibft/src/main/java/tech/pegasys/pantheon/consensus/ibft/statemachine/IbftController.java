@@ -127,7 +127,9 @@ public class IbftController {
 
       default:
         throw new IllegalArgumentException(
-            "Received message does not conform to any recognised IBFT message structure.");
+            String.format(
+                "Received message with messageCode=%d does not conform to any recognised IBFT message structure",
+                message.getData().getCode()));
     }
   }
 
@@ -146,7 +148,7 @@ public class IbftController {
     final BlockHeader currentMiningParent = currentHeightManager.getParentBlockHeader();
     if (newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
       LOG.info(
-          "Discarding NewChainHead event, was for previous block height. chain_height={} event_height={}",
+          "Discarding NewChainHead event, was for previous block height. chainHeight={} eventHeight={}",
           currentMiningParent.getNumber(),
           newBlockHeader.getNumber());
       return;
@@ -154,10 +156,13 @@ public class IbftController {
 
     if (newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
       if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
-        LOG.info("Discarding duplicate NewChainHead event.");
+        LOG.info("Discarding duplicate NewChainHead event. chainHeight={} newBlockHash={} parentBlockHash",
+            newBlockHeader.getNumber(),
+            newBlockHeader.getHash(),
+            currentMiningParent.getHash());
       } else {
         LOG.error(
-            "Subsequent NewChainHead event at same block height indicates chain fork. chain_height={}",
+            "Subsequent NewChainHead event at same block height indicates chain fork. chainHeight={}",
             currentMiningParent.getNumber());
       }
       return;
@@ -171,7 +176,7 @@ public class IbftController {
       currentHeightManager.handleBlockTimerExpiry(roundIndentifier);
     } else {
       LOG.info(
-          "Block timer event discarded as it is not for current block height chain_height={} event_height={}",
+          "Block timer event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundIndentifier.getSequenceNumber());
     }
@@ -182,7 +187,7 @@ public class IbftController {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
       LOG.info(
-          "Round expiry event discarded as it is not for current block height chain_height={} event_height={}",
+          "Round expiry event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundExpiry.getView().getSequenceNumber());
     }
@@ -204,7 +209,7 @@ public class IbftController {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
       LOG.info(
-          "IBFT message discarded as it is from a previous block height message_type={} chain_height={} event_height={}",
+          "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
           msg.getPayload().getMessageType(),
           currentHeightManager.getChainHeight(),
           msgRoundIdentifier.getSequenceNumber());

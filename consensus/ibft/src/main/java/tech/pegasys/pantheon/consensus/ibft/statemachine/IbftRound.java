@@ -84,7 +84,7 @@ public class IbftRound {
   }
 
   public void createAndSendProposalMessage(final long headerTimeStampSeconds) {
-    LOG.info("Creating proposed block.");
+    LOG.info("Creating proposed block. round={}", roundState.getRoundIdentifier());
     final Block block = blockCreator.createBlock(headerTimeStampSeconds);
     transmitter.multicastProposal(roundState.getRoundIdentifier(), block);
 
@@ -99,11 +99,13 @@ public class IbftRound {
 
     SignedData<ProposalPayload> proposal;
     if (!latestCertificate.isPresent()) {
-      LOG.info("Multicasting NewRound with new block.");
+      LOG.info("Multicasting NewRound with new block. round={}", roundState.getRoundIdentifier());
       final Block block = blockCreator.createBlock(headerTimestamp);
       proposal = messageFactory.createSignedProposalPayload(getRoundIdentifier(), block);
     } else {
-      LOG.info("Multicasting NewRound from PreparedCertificate.");
+      LOG.info(
+          "Multicasting NewRound from PreparedCertificate. round={}",
+          roundState.getRoundIdentifier());
       proposal = createProposalFromPreparedCertificate(latestCertificate.get());
     }
     transmitter.multicastNewRound(getRoundIdentifier(), roundChangeCertificate, proposal);
@@ -139,7 +141,7 @@ public class IbftRound {
     LOG.info("Handling a Proposal message.");
 
     if (getRoundIdentifier().getRoundNumber() != 0) {
-      LOG.info("Illegally received a Proposal message when not in Round 0.");
+      LOG.error("Illegally received a Proposal message when not in Round 0.");
       return;
     }
     actionReceivedProposal(msg);
@@ -149,7 +151,7 @@ public class IbftRound {
     LOG.info("Handling a New Round Proposal.");
 
     if (getRoundIdentifier().getRoundNumber() == 0) {
-      LOG.info("Illegally received a NewRound message when in Round 0.");
+      LOG.error("Illegally received a NewRound message when in Round 0.");
       return;
     }
     actionReceivedProposal(msg.getPayload().getProposalPayload());
@@ -169,12 +171,12 @@ public class IbftRound {
   }
 
   public void handlePrepareMessage(final SignedData<PreparePayload> msg) {
-    LOG.info("Received a prepare message.");
+    LOG.info("Received a prepare message. round={}", roundState.getRoundIdentifier());
     peerIsPrepared(msg);
   }
 
   public void handleCommitMessage(final SignedData<CommitPayload> msg) {
-    LOG.info("Received a commit message.");
+    LOG.info("Received a commit message. round={}", roundState.getRoundIdentifier());
     peerIsCommitted(msg);
   }
 
@@ -189,7 +191,7 @@ public class IbftRound {
     if (blockAccepted) {
       // There are times handling a proposed block is enough to enter prepared.
       if (wasPrepared != roundState.isPrepared()) {
-        LOG.info("Sending commit message.");
+        LOG.info("Sending commit message. round={}", roundState.getRoundIdentifier());
         final Block block = roundState.getProposedBlock().get();
         transmitter.multicastCommit(getRoundIdentifier(), block.getHash(), createCommitSeal(block));
       }
@@ -212,7 +214,7 @@ public class IbftRound {
     final boolean wasPrepared = roundState.isPrepared();
     roundState.addPrepareMessage(msg);
     if (wasPrepared != roundState.isPrepared()) {
-      LOG.info("Sending commit message.");
+      LOG.info("Sending commit message. round={}", roundState.getRoundIdentifier());
       final Block block = roundState.getProposedBlock().get();
       transmitter.multicastCommit(getRoundIdentifier(), block.getHash(), createCommitSeal(block));
     }
@@ -231,11 +233,12 @@ public class IbftRound {
         IbftHelpers.createSealedBlock(
             roundState.getProposedBlock().get(), roundState.getCommitSeals());
 
-    LOG.info("Importing block to chain.");
-    boolean result =
+    final long blockNumber = blockToImport.getHeader().getNumber();
+    LOG.info("Importing block to chain. block={}", blockNumber);
+    final boolean result =
         blockImporter.importBlock(protocolContext, blockToImport, HeaderValidationMode.FULL);
     if (!result) {
-      LOG.info("Failed to import block to chain.");
+      LOG.error("Failed to import block to chain. block={}", blockNumber);
     } else {
       notifyNewBlockListeners(blockToImport);
     }

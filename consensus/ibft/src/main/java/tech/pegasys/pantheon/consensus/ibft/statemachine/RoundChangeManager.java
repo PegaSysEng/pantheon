@@ -97,7 +97,7 @@ public class RoundChangeManager {
       final SignedData<RoundChangePayload> msg) {
 
     if (!isMessageValid(msg)) {
-      LOG.info("RoundChange message was invalid.");
+      LOG.error("RoundChange message was invalid.");
       return Optional.empty();
     }
 
