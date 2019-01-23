@@ -556,6 +556,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Override
   public void run() {
+    // TODO permToml = TomlConfigFileDefaultProvider.loadConfigurationFromFile
+    // but we don't have visibility to the TomlConfigFileDefaultProvider.
+    // see ConfigOptionSearchAndRunHandler
+    // TODO permissioningConfiguration(permToml)
+
     // set log level per CLI flags
     if (logLevel != null) {
       System.out.println("Setting logging level to " + logLevel.name());
@@ -709,7 +714,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .toList()
             .stream()
             .map(Object::toString)
-            .map(URI::create)
+            .map(EnodeToURIPropertyConverter::convertToURI)
             .collect(Collectors.toList());
     permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
 
