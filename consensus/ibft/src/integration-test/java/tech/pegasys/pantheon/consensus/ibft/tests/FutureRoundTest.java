@@ -54,7 +54,7 @@ public class FutureRoundTest {
   private final RoundSpecificPeers peers = context.roundSpecificPeers(roundId);
 
   private final ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(1, 5);
-  private final RoundSpecificPeers futureRoles = context.roundSpecificPeers(futureRoundId);
+  private final RoundSpecificPeers futurePeers = context.roundSpecificPeers(futureRoundId);
 
   private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
 
@@ -76,11 +76,11 @@ public class FutureRoundTest {
 
     // Inject 1 too few Commit messages (but sufficient Prepare
     for (int i = 0; i < quorum - 3; i++) {
-      futureRoles.getNonProposingPeer(i).injectPrepare(futureRoundId, futureBlock.getHash());
+      futurePeers.getNonProposingPeer(i).injectPrepare(futureRoundId, futureBlock.getHash());
     }
 
     for (int i = 0; i < quorum - 2; i++) {
-      futureRoles.getNonProposingPeer(i).injectCommit(futureRoundId, futureBlock.getHash());
+      futurePeers.getNonProposingPeer(i).injectCommit(futureRoundId, futureBlock.getHash());
     }
 
     // inject a prepare and a commit from a subsequent round, and ensure no transmissions are
@@ -94,7 +94,10 @@ public class FutureRoundTest {
     // inject a newRound to move to 'futureRoundId', and ensure localnode sends prepare, commit
     // and updates blockchain
     injectEmptyNewRound(
-        futureRoundId, futureRoles.getProposer(), futureRoles.getAllPeers(), futureBlock);
+        futureRoundId,
+        futurePeers.getProposer(),
+        futurePeers.createSignedRoundChangePayload(futureRoundId),
+        futureBlock);
 
     final SignedData<PreparePayload> expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
@@ -102,7 +105,7 @@ public class FutureRoundTest {
     peers.verifyMessagesReceived(expectedPrepare);
 
     // following 1 more prepare, a commit msg will be sent
-    futureRoles.getNonProposingPeer(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
+    futurePeers.getNonProposingPeer(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
 
     final SignedData<CommitPayload> expectedCommit =
         localNodeMessageFactory.createSignedCommitPayload(
@@ -112,7 +115,7 @@ public class FutureRoundTest {
     peers.verifyMessagesReceived(expectedCommit);
 
     // requires 1 more commit and the blockchain will progress
-    futureRoles.getNonProposingPeer(quorum - 2).injectCommit(futureRoundId, futureBlock.getHash());
+    futurePeers.getNonProposingPeer(quorum - 2).injectCommit(futureRoundId, futureBlock.getHash());
 
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
   }
@@ -135,7 +138,10 @@ public class FutureRoundTest {
     peers.clearReceivedMessages();
 
     injectEmptyNewRound(
-        futureRoundId, futureRoles.getProposer(), futureRoles.getAllPeers(), futureBlock);
+        futureRoundId,
+        futurePeers.getProposer(),
+        futurePeers.createSignedRoundChangePayload(futureRoundId),
+        futureBlock);
 
     final SignedData<PreparePayload> expectedFuturePrepare =
         localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());

@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -33,8 +34,8 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
@@ -56,10 +57,6 @@ public class RoundSpecificPeers {
 
   public ValidatorPeer getProposer() {
     return proposer;
-  }
-
-  public Collection<ValidatorPeer> getAllPeers() {
-    return Collections.unmodifiableCollection(peers);
   }
 
   public void clearReceivedMessages() {
@@ -94,6 +91,25 @@ public class RoundSpecificPeers {
     }
 
     return changes;
+  }
+
+  public List<SignedData<RoundChangePayload>> createSignedRoundChangePayload(
+      final ConsensusRoundIdentifier roundId) {
+    return peers
+        .stream()
+        .map(p -> p.getMessageFactory().createSignedRoundChangePayload(roundId, empty()))
+        .collect(Collectors.toList());
+  }
+
+  public List<SignedData<RoundChangePayload>> createSignedRoundChangePayload(
+      final ConsensusRoundIdentifier roundId, final PreparedCertificate preparedCertificate) {
+    return peers
+        .stream()
+        .map(
+            p ->
+                p.getMessageFactory()
+                    .createSignedRoundChangePayload(roundId, Optional.of(preparedCertificate)))
+        .collect(Collectors.toList());
   }
 
   public void nonProposingPrepare(final ConsensusRoundIdentifier roundId, final Hash hash) {

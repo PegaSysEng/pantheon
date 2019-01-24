@@ -128,7 +128,7 @@ public class SpuriousBehaviourTest {
     peers.nonProposingPrepare(roundId, Hash.ZERO);
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
-    peers.nonProposingPrepare(roundId, proposedBlock.getHash());
+    peers.nonProposingCommit(roundId, proposedBlock.getHash());
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
