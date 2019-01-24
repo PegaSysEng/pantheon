@@ -24,10 +24,9 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
 import tech.pegasys.pantheon.PantheonInfo;
-import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
-import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
@@ -63,6 +62,7 @@ import org.mockito.ArgumentMatchers;
 import picocli.CommandLine;
 
 public class PantheonCommandTest extends CommandTestAbstract {
+  private final String ORION_URI = "http://1.2.3.4:5555";
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
 
@@ -84,13 +84,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   static {
     final JsonRpcConfiguration rpcConf = JsonRpcConfiguration.createDefault();
-    rpcConf.addRpcApi(CliqueRpcApis.CLIQUE);
-    rpcConf.addRpcApi(IbftRpcApis.IBFT);
     defaultJsonRpcConfiguration = rpcConf;
 
     final WebSocketConfiguration websocketConf = WebSocketConfiguration.createDefault();
-    websocketConf.addRpcApi(CliqueRpcApis.CLIQUE);
-    websocketConf.addRpcApi(IbftRpcApis.IBFT);
     defaultWebSocketConfiguration = websocketConf;
 
     defaultMetricsConfiguration = MetricsConfiguration.createDefault();
@@ -107,7 +103,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void callingHelpDisplaysDefaultRpcApisCorrectly() {
     parseCommand("--help");
-    assertThat(commandOutput.toString()).contains("default: ETH,NET,WEB3,CLIQUE,IBFT");
+    assertThat(commandOutput.toString()).contains("default: [ETH, NET, WEB3]");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
@@ -254,16 +250,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
     jsonRpcConfiguration.setPort(5678);
     jsonRpcConfiguration.setCorsAllowedDomains(Collections.emptyList());
     jsonRpcConfiguration.setRpcApis(RpcApis.DEFAULT_JSON_RPC_APIS);
-    jsonRpcConfiguration.addRpcApi(CliqueRpcApis.CLIQUE);
-    jsonRpcConfiguration.addRpcApi(IbftRpcApis.IBFT);
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(false);
     webSocketConfiguration.setHost("9.10.11.12");
     webSocketConfiguration.setPort(9101);
     webSocketConfiguration.setRpcApis(WebSocketConfiguration.DEFAULT_WEBSOCKET_APIS);
-    webSocketConfiguration.addRpcApi(CliqueRpcApis.CLIQUE);
-    webSocketConfiguration.addRpcApi(IbftRpcApis.IBFT);
 
     final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
     metricsConfiguration.setEnabled(false);
@@ -356,12 +348,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand("--config-file", configFile);
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
-    jsonRpcConfiguration.addRpcApi(CliqueRpcApis.CLIQUE);
-    jsonRpcConfiguration.addRpcApi(IbftRpcApis.IBFT);
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
-    webSocketConfiguration.addRpcApi(CliqueRpcApis.CLIQUE);
-    webSocketConfiguration.addRpcApi(IbftRpcApis.IBFT);
 
     final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
 
@@ -1554,6 +1542,45 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).contains("--data-path");
     assertThat(commandOutput.toString()).contains("--private-genesis-file");
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void mustUseOrionUriAndOptions() throws IOException {
+    final File file = new File("./specific/public_key");
+
+    parseCommand(
+        "--privacy-enabled",
+        "--privacy-url",
+        ORION_URI,
+        "--privacy-public-key-file",
+        file.getPath());
+
+    final ArgumentCaptor<PrivacyParameters> orionArg =
+        ArgumentCaptor.forClass(PrivacyParameters.class);
+
+    verify(mockControllerBuilder).privacyParameters(orionArg.capture());
+    verify(mockControllerBuilder).build();
+
+    assertThat(orionArg.getValue().getUrl()).isEqualTo(ORION_URI);
+    assertThat(orionArg.getValue().getPublicKey()).isEqualTo(file);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void mustVerifyPrivacyIsDisabled() throws IOException {
+    parseCommand();
+
+    final ArgumentCaptor<PrivacyParameters> orionArg =
+        ArgumentCaptor.forClass(PrivacyParameters.class);
+
+    verify(mockControllerBuilder).privacyParameters(orionArg.capture());
+    verify(mockControllerBuilder).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(orionArg.getValue().isEnabled()).isEqualTo(false);
   }
 
   private Path createFakeGenesisFile() throws IOException {
