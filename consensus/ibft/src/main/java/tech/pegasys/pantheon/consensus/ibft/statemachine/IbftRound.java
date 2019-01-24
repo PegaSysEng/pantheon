@@ -84,8 +84,13 @@ public class IbftRound {
   }
 
   public void createAndSendProposalMessage(final long headerTimeStampSeconds) {
-    LOG.info("Creating proposed block. round={}", roundState.getRoundIdentifier());
     final Block block = blockCreator.createBlock(headerTimeStampSeconds);
+    final IbftExtraData extraData = IbftExtraData.decode(block.getHeader().getExtraData());
+    LOG.info(
+        "Creating proposed block. round={} extraData={} blockHeader={}",
+        roundState.getRoundIdentifier(),
+        extraData,
+        block.getHeader());
     transmitter.multicastProposal(roundState.getRoundIdentifier(), block);
 
     updateStateWithProposedBlock(
@@ -134,6 +139,11 @@ public class IbftRound {
                     blockHeader, extraDataToPublish));
     final BlockHeader newHeader = headerBuilder.buildBlockHeader();
     final Block newBlock = new Block(newHeader, block.getBody());
+    LOG.debug(
+        "Created proposal from prepared certificate blockHeader={} extraData={}",
+        block.getHeader().getNumber(),
+        block.getHeader(),
+        extraDataToPublish);
     return messageFactory.createSignedProposalPayload(getRoundIdentifier(), newBlock);
   }
 
@@ -234,11 +244,16 @@ public class IbftRound {
             roundState.getProposedBlock().get(), roundState.getCommitSeals());
 
     final long blockNumber = blockToImport.getHeader().getNumber();
-    LOG.info("Importing block to chain. block={}", blockNumber);
+    final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader().getExtraData());
+    LOG.info("Importing block to chain. block={} extraData={}", blockNumber, extraData);
     final boolean result =
         blockImporter.importBlock(protocolContext, blockToImport, HeaderValidationMode.FULL);
     if (!result) {
-      LOG.error("Failed to import block to chain. block={}", blockNumber);
+      LOG.error(
+          "Failed to import block to chain. block={} extraData={} blockHeader={}",
+          blockNumber,
+          extraData,
+          blockToImport.getHeader());
     } else {
       notifyNewBlockListeners(blockToImport);
     }
