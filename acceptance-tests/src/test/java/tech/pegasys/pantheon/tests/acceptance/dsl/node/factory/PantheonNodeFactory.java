@@ -103,7 +103,6 @@ public class PantheonNodeFactory {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
-            .jsonRpcEnabled()
             .setJsonRpcConfiguration(jsonRpcConfigWithAdmin())
             .webSocketEnabled()
             .setDiscoveryEnabled(false)
