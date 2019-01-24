@@ -169,7 +169,7 @@ public class IbftBlockHeightManager {
   }
 
   public void handleCommitPayload(final SignedData<CommitPayload> payload) {
-    LOG.debug("Received a cCmmit Payload.");
+    LOG.debug("Received a Commit Payload.");
     actionOrBufferMessage(payload, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
