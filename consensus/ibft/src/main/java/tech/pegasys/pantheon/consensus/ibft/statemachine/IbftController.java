@@ -191,7 +191,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundExpiry.getView())) {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
-      LOG.info(
+      LOG.debug(
           "Round expiry event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundExpiry.getView().getSequenceNumber());
