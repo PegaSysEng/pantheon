@@ -778,7 +778,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem)
             .metricsConfiguration(metricsConfiguration)
-            .permissioningConfiguration(permissioningConfiguration)
+            .permissioningConfigurationFromToml()
             .build();
 
     addShutdownHook(runner);
