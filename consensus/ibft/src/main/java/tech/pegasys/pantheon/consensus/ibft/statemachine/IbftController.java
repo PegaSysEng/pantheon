@@ -137,6 +137,10 @@ public class IbftController {
       final Message message,
       final SignedData<P> signedPayload,
       final Consumer<SignedData<P>> handleMessage) {
+    LOG.debug(
+        "Received IBFT message messageType={} payload={}",
+        signedPayload.getPayload().getMessageType(),
+        signedPayload);
     if (processMessage(signedPayload, message)) {
       gossiper.gossipMessage(message);
       handleMessage.accept(signedPayload);
