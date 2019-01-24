@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
@@ -111,20 +112,60 @@ public final class RunnerTest {
     assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist())
         .containsExactly("0x0000000000000000000000000000000000000009");
+    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
   }
 
   @Test
-  public void permissioningTomlFromDefaultFileLocation() throws IOException {
+  public void permissioningTomlFromResourceWithOnlyNodeWhitelistSet() throws IOException {
 
     final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
 
-    PermissioningConfiguration permissioningConfiguration = RunnerBuilder.p();
+    final URL configFile = Resources.getResource("permissioning_config_node_whitelist_only.toml");
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+    final TomlParseResult tomlResult = Toml.parse(toml);
 
+    PermissioningConfiguration permissioningConfiguration =
+        RunnerBuilder.permissioningConfig(tomlResult);
+
+    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isFalse();
+    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
+  }
+
+  @Test
+  public void permissioningTomlFromResourceWithOnlyAccountWhitelistSet() throws IOException {
+
+
+    final URL configFile = Resources.getResource("permissioning_config_account_whitelist_only.toml");
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+    final TomlParseResult tomlResult = Toml.parse(toml);
+
+    PermissioningConfiguration permissioningConfiguration =
+        RunnerBuilder.permissioningConfig(tomlResult);
+
+    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isFalse();
     assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist())
         .containsExactly("0x0000000000000000000000000000000000000009");
-    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
+  }
+
+  @Test
+  public void permissioningTomlWithInvalidEnode() throws IOException {
+
+    final URL configFile = Resources.getResource("permissioning_config_invalid_enode.toml");
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+    final TomlParseResult tomlResult = Toml.parse(toml);
+
+    try {
+      RunnerBuilder.permissioningConfig(tomlResult);
+      fail("Expecting IllegalArgumentException: Enode URL contains an invalid node ID");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage()).startsWith("Enode URL contains an invalid node ID");
+    }
   }
 
   private void syncFromGenesis(final SyncMode mode) throws Exception {
@@ -169,7 +210,7 @@ public final class RunnerTest {
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
-    final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
+
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
@@ -188,7 +229,7 @@ public final class RunnerTest {
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .metricsConfiguration(aheadMetricsConfiguration)
             .dataDir(dbAhead)
-            .permissioningConfiguration(aheadPermissioningConfiguration)
+            .permissioningConfigurationFromToml()
             .build();
     try {
 

@@ -159,8 +159,12 @@ public class RunnerBuilder {
 
   public RunnerBuilder permissioningConfigurationFromToml() {
     String permToml = permissioningConfig();
-    this.permissioningConfiguration =
-        permissioningConfig(TomlConfigFileParser.loadConfiguration(permToml));
+    if (permToml != null) {
+      this.permissioningConfiguration =
+          permissioningConfig(TomlConfigFileParser.loadConfiguration(permToml));
+    } else {
+      this.permissioningConfiguration = PermissioningConfiguration.createDefault();
+    }
     return this;
   }
 
@@ -177,31 +181,33 @@ public class RunnerBuilder {
 
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
-    List<String> accountsWhitelistToml =
-        accountWhitelistTomlArray
-            .toList()
-            .stream()
-            .map(Object::toString)
-            .collect(Collectors.toList());
-    permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
-
-    List<URI> nodesWhitelistToml =
-        nodeWhitelistTomlArray
-            .toList()
-            .stream()
-            .map(Object::toString)
-            .map(EnodeToURIPropertyConverter::convertToURI)
-            .collect(Collectors.toList());
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
-
+    if (accountWhitelistTomlArray != null) {
+      List<String> accountsWhitelistToml =
+          accountWhitelistTomlArray
+              .toList()
+              .stream()
+              .map(Object::toString)
+              .collect(Collectors.toList());
+      permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
+    }
+    if (nodeWhitelistTomlArray != null) {
+      List<URI> nodesWhitelistToml =
+          nodeWhitelistTomlArray
+              .toList()
+              .stream()
+              .map(Object::toString)
+              .map(EnodeToURIPropertyConverter::convertToURI)
+              .collect(Collectors.toList());
+      permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
+    }
     return permissioningConfiguration;
   }
 
   private static String permissioningConfig() {
     try {
       return Resources.toString(permissioningConfigFile().toURI().toURL(), UTF_8);
-    } catch (final IOException e) {
-      LOG.error("Unable to load permissioning config file %s.", permissioningConfigFile(), e);
+    } catch (final Exception e) {
+      LOG.error("Unable to load permissioning config {}.", permissioningConfigFile(), e);
       return null;
     }
   }
@@ -213,6 +219,7 @@ public class RunnerBuilder {
     if (permissioningConfigFile.exists()) {
       return permissioningConfigFile;
     } else {
+      LOG.error("Unable to load permissioning config file from location {}.", PERMISSIONING_CONFIG_LOCATION);
       return null;
     }
   }
