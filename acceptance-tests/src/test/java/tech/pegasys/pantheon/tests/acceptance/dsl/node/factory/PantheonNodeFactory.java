@@ -99,7 +99,8 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name) throws IOException {
+  public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)
+      throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
