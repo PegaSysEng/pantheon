@@ -466,6 +466,23 @@ Enables accepting of blocks in an IBFT 1.0 network.  The default is `false`.
 !!!note
     A Pantheon node cannot be a validator in an IBFT 1.0 network. Pantheon implements [IBFT 2.0](../Consensus-Protocols/IBFT.md).
 
+### p2p-enabled
+
+```bash tab="Syntax"
+--p2p-enabled=<true|false>
+```
+
+```bash tab="Command line"
+--p2p-enabled=false
+```
+
+```bash tab="Example Configuration File"
+p2p-enabled=false
+```
+
+Enables or disables all p2p communication.
+The default is true.
+
 ### p2p-host
 
 ```bash tab="Syntax"
