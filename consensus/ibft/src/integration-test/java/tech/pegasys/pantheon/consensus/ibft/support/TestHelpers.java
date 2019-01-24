@@ -53,7 +53,7 @@ public class TestHelpers {
 
     return new PreparedCertificate(
         peers.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
-        peers.nonProposingPeersPreparePayload(preparedRound, block.getHash()));
+        peers.createSignedPreparePayloadOfNonProposing(preparedRound, block.getHash()));
   }
 
   public static SignedData<NewRoundPayload> injectEmptyNewRound(

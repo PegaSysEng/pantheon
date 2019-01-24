@@ -89,7 +89,7 @@ public class ReceivedNewRoundTest {
         peers.createSignedRoundChangePayload(nextRoundId);
 
     final ValidatorPeer illegalProposer =
-        context.roundSpecificPeers(nextRoundId).getNonProposingPeer(0);
+        context.roundSpecificPeers(nextRoundId).getNonProposing(0);
 
     illegalProposer.injectNewRound(
         nextRoundId,
@@ -119,7 +119,7 @@ public class ReceivedNewRoundTest {
         nextRoundId,
         new RoundChangeCertificate(roundChanges),
         peers
-            .getNonProposingPeer(0)
+            .getNonProposing(0)
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
@@ -172,7 +172,7 @@ public class ReceivedNewRoundTest {
         nextRoundId,
         new RoundChangeCertificate(roundChanges),
         peers
-            .getNonProposingPeer(0)
+            .getNonProposing(0)
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
@@ -181,19 +181,19 @@ public class ReceivedNewRoundTest {
 
     // Inject a prepare, then re-inject the newRound - then ensure only a single prepare is enough
     // to trigger a Commit transmission from the local node
-    nextRoles.getNonProposingPeer(0).injectPrepare(nextRoundId, reproposedBlock.getHash());
+    nextRoles.getNonProposing(0).injectPrepare(nextRoundId, reproposedBlock.getHash());
 
     nextProposer.injectNewRound(
         nextRoundId,
         new RoundChangeCertificate(roundChanges),
         peers
-            .getNonProposingPeer(0)
+            .getNonProposing(0)
             .getMessageFactory()
             .createSignedProposalPayload(nextRoundId, reproposedBlock));
 
     peers.verifyNoMessagesReceived();
 
-    nextRoles.getNonProposingPeer(1).injectPrepare(nextRoundId, reproposedBlock.getHash());
+    nextRoles.getNonProposing(1).injectPrepare(nextRoundId, reproposedBlock.getHash());
 
     final SignedData<CommitPayload> expectedCommit =
         TestHelpers.createSignedCommitPayload(

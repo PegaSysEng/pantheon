@@ -76,17 +76,17 @@ public class FutureRoundTest {
 
     // Inject 1 too few Commit messages (but sufficient Prepare
     for (int i = 0; i < quorum - 3; i++) {
-      futurePeers.getNonProposingPeer(i).injectPrepare(futureRoundId, futureBlock.getHash());
+      futurePeers.getNonProposing(i).injectPrepare(futureRoundId, futureBlock.getHash());
     }
 
     for (int i = 0; i < quorum - 2; i++) {
-      futurePeers.getNonProposingPeer(i).injectCommit(futureRoundId, futureBlock.getHash());
+      futurePeers.getNonProposing(i).injectCommit(futureRoundId, futureBlock.getHash());
     }
 
     // inject a prepare and a commit from a subsequent round, and ensure no transmissions are
     // created
-    subsequentRoles.getNonProposingPeer(1).injectPrepare(subsequentRoundId, futureBlock.getHash());
-    subsequentRoles.getNonProposingPeer(1).injectCommit(subsequentRoundId, futureBlock.getHash());
+    subsequentRoles.getNonProposing(1).injectPrepare(subsequentRoundId, futureBlock.getHash());
+    subsequentRoles.getNonProposing(1).injectCommit(subsequentRoundId, futureBlock.getHash());
 
     peers.verifyNoMessagesReceived();
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
@@ -105,7 +105,7 @@ public class FutureRoundTest {
     peers.verifyMessagesReceived(expectedPrepare);
 
     // following 1 more prepare, a commit msg will be sent
-    futurePeers.getNonProposingPeer(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
+    futurePeers.getNonProposing(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
 
     final SignedData<CommitPayload> expectedCommit =
         localNodeMessageFactory.createSignedCommitPayload(
@@ -115,7 +115,7 @@ public class FutureRoundTest {
     peers.verifyMessagesReceived(expectedCommit);
 
     // requires 1 more commit and the blockchain will progress
-    futurePeers.getNonProposingPeer(quorum - 2).injectCommit(futureRoundId, futureBlock.getHash());
+    futurePeers.getNonProposing(quorum - 2).injectCommit(futureRoundId, futureBlock.getHash());
 
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(1);
   }
@@ -129,7 +129,7 @@ public class FutureRoundTest {
 
     peers.getProposer().injectProposal(roundId, initialBlock);
 
-    peers.nonProposingPrepare(roundId, initialBlock.getHash());
+    peers.prepareForNonProposing(roundId, initialBlock.getHash());
 
     peers.getProposer().injectCommit(roundId, initialBlock.getHash());
     // At this stage, the local node has 2 commit msgs (proposer and local) so has not committed
@@ -148,7 +148,7 @@ public class FutureRoundTest {
     peers.verifyMessagesReceived(expectedFuturePrepare);
 
     // attempt to complete the previous round
-    peers.getNonProposingPeer(0).injectCommit(roundId, initialBlock.getHash());
+    peers.getNonProposing(0).injectCommit(roundId, initialBlock.getHash());
     peers.verifyNoMessagesReceived();
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
   }

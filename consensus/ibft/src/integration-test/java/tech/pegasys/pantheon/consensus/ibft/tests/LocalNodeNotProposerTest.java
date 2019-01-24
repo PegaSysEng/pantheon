@@ -67,23 +67,23 @@ public class LocalNodeNotProposerTest {
 
     peers.verifyMessagesReceived(expectedTxPrepare);
 
-    peers.getNonProposingPeer(0).injectPrepare(roundId, blockToPropose.getHash());
+    peers.getNonProposing(0).injectPrepare(roundId, blockToPropose.getHash());
     peers.verifyMessagesReceived(expectedTxCommit);
 
     // Ensure the local blockchain has NOT incremented yet.
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // NO further messages should be transmitted when another Prepare is received.
-    peers.getNonProposingPeer(1).injectPrepare(roundId, blockToPropose.getHash());
+    peers.getNonProposing(1).injectPrepare(roundId, blockToPropose.getHash());
     peers.verifyNoMessagesReceived();
 
     // Inject a commit, ensure blockChain is not updated, and no message are sent (not quorum yet)
-    peers.getNonProposingPeer(0).injectCommit(roundId, blockToPropose.getHash());
+    peers.getNonProposing(0).injectCommit(roundId, blockToPropose.getHash());
     peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // A second commit message means quorum is reached, and blockchain should be updated.
-    peers.getNonProposingPeer(1).injectCommit(roundId, blockToPropose.getHash());
+    peers.getNonProposing(1).injectCommit(roundId, blockToPropose.getHash());
     peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
 
@@ -103,16 +103,16 @@ public class LocalNodeNotProposerTest {
     peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
-    peers.getNonProposingPeer(1).injectPrepare(roundId, blockToPropose.getHash());
+    peers.getNonProposing(1).injectPrepare(roundId, blockToPropose.getHash());
     peers.verifyMessagesReceived(expectedTxCommit);
 
     // Inject a commit, ensure blockChain is not updated, and no message are sent (not quorum yet)
-    peers.getNonProposingPeer(0).injectCommit(roundId, blockToPropose.getHash());
+    peers.getNonProposing(0).injectCommit(roundId, blockToPropose.getHash());
     peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     // A second commit message means quorum is reached, and blockchain should be updated.
-    peers.getNonProposingPeer(1).injectCommit(roundId, blockToPropose.getHash());
+    peers.getNonProposing(1).injectCommit(roundId, blockToPropose.getHash());
     peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
@@ -126,7 +126,7 @@ public class LocalNodeNotProposerTest {
     peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
-    peers.nonProposingPrepare(roundId, blockToPropose.getHash());
+    peers.prepareForNonProposing(roundId, blockToPropose.getHash());
     peers.verifyNoMessagesReceived();
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
@@ -148,7 +148,7 @@ public class LocalNodeNotProposerTest {
     peers.verifyMessagesReceived(expectedTxPrepare);
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
 
-    peers.getNonProposingPeer(0).injectPrepare(roundId, blockToPropose.getHash());
+    peers.getNonProposing(0).injectPrepare(roundId, blockToPropose.getHash());
     peers.verifyMessagesReceived(expectedTxCommit);
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }

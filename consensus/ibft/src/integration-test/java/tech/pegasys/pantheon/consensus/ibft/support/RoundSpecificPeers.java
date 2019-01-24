@@ -67,11 +67,11 @@ public class RoundSpecificPeers {
     return peers.stream().map(peer -> peer.getBlockSignature(digest)).collect(Collectors.toList());
   }
 
-  public ValidatorPeer getNonProposingPeer(final int index) {
+  public ValidatorPeer getNonProposing(final int index) {
     return nonProposingPeers.get(index);
   }
 
-  public List<SignedData<RoundChangePayload>> nonProposingPeersRoundChange(
+  public List<SignedData<RoundChangePayload>> roundChangeForNonProposing(
       final ConsensusRoundIdentifier targetRound) {
     return nonProposingPeers
         .stream()
@@ -112,15 +112,15 @@ public class RoundSpecificPeers {
         .collect(Collectors.toList());
   }
 
-  public void nonProposingPrepare(final ConsensusRoundIdentifier roundId, final Hash hash) {
+  public void prepareForNonProposing(final ConsensusRoundIdentifier roundId, final Hash hash) {
     nonProposingPeers.forEach(peer -> peer.injectPrepare(roundId, hash));
   }
 
-  public void nonProposingCommit(final ConsensusRoundIdentifier roundId, final Hash hash) {
+  public void commitForNonProposing(final ConsensusRoundIdentifier roundId, final Hash hash) {
     nonProposingPeers.forEach(peer -> peer.injectCommit(roundId, hash));
   }
 
-  public Collection<SignedData<PreparePayload>> nonProposingPeersPreparePayload(
+  public Collection<SignedData<PreparePayload>> createSignedPreparePayloadOfNonProposing(
       final ConsensusRoundIdentifier preparedRound, final Hash hash) {
     return nonProposingPeers
         .stream()
@@ -145,13 +145,13 @@ public class RoundSpecificPeers {
           n -> {
             final List<MessageData> rxMsgs = n.getReceivedMessages();
             final MessageData rxMsgData = rxMsgs.get(index);
-            messageMatchesExpected(rxMsgData, msg);
+            verifyMessage(rxMsgData, msg);
           });
     }
     peers.forEach(ValidatorPeer::clearReceivedMessages);
   }
 
-  private void messageMatchesExpected(
+  private void verifyMessage(
       final MessageData actual, final SignedData<? extends Payload> signedExpectedPayload) {
     final Payload expectedPayload = signedExpectedPayload.getPayload();
     SignedData<?> actualSignedPayload = null;

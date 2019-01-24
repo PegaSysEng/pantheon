@@ -82,7 +82,7 @@ public class SpuriousBehaviourTest {
   @Test
   public void badlyFormedRlpDoesNotPreventOngoingIbftOperation() {
     final MessageData illegalCommitMsg = new RawMessage(IbftV2.PREPARE, BytesValue.EMPTY);
-    peers.getNonProposingPeer(0).injectMessage(illegalCommitMsg);
+    peers.getNonProposing(0).injectMessage(illegalCommitMsg);
 
     peers.getProposer().injectProposal(roundId, proposedBlock);
     peers.verifyMessagesReceived(expectedPrepare);
@@ -91,7 +91,7 @@ public class SpuriousBehaviourTest {
   @Test
   public void messageWithIllegalMessageCodeAreDiscardedAndDoNotPreventOngoingIbftOperation() {
     final MessageData illegalCommitMsg = new RawMessage(IbftV2.MESSAGE_SPACE, BytesValue.EMPTY);
-    peers.getNonProposingPeer(0).injectMessage(illegalCommitMsg);
+    peers.getNonProposing(0).injectMessage(illegalCommitMsg);
 
     peers.getProposer().injectProposal(roundId, proposedBlock);
     peers.verifyMessagesReceived(expectedPrepare);
@@ -119,16 +119,16 @@ public class SpuriousBehaviourTest {
     peers.getProposer().injectProposal(roundId, proposedBlock);
     peers.verifyMessagesReceived(expectedPrepare);
 
-    peers.nonProposingPrepare(roundId, Hash.ZERO);
+    peers.prepareForNonProposing(roundId, Hash.ZERO);
     peers.verifyNoMessagesReceived();
 
-    peers.nonProposingPrepare(roundId, proposedBlock.getHash());
+    peers.prepareForNonProposing(roundId, proposedBlock.getHash());
     peers.verifyMessagesReceived(expectedCommit);
 
-    peers.nonProposingPrepare(roundId, Hash.ZERO);
+    peers.prepareForNonProposing(roundId, Hash.ZERO);
     assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
-    peers.nonProposingCommit(roundId, proposedBlock.getHash());
+    peers.commitForNonProposing(roundId, proposedBlock.getHash());
     assertThat(context.getCurrentChainHeight()).isEqualTo(1);
   }
 
@@ -137,14 +137,14 @@ public class SpuriousBehaviourTest {
     peers.getProposer().injectProposal(roundId, proposedBlock);
     peers.verifyMessagesReceived(expectedPrepare);
 
-    peers.nonProposingPrepare(roundId, proposedBlock.getHash());
+    peers.prepareForNonProposing(roundId, proposedBlock.getHash());
 
     // for a network of 5, 4 seals are required (local + 3 remote)
-    peers.getNonProposingPeer(0).injectCommit(roundId, proposedBlock.getHash());
-    peers.getNonProposingPeer(1).injectCommit(roundId, proposedBlock.getHash());
+    peers.getNonProposing(0).injectCommit(roundId, proposedBlock.getHash());
+    peers.getNonProposing(1).injectCommit(roundId, proposedBlock.getHash());
 
     // nonProposer-2 will generate an invalid seal
-    final ValidatorPeer badSealPeer = peers.getNonProposingPeer(2);
+    final ValidatorPeer badSealPeer = peers.getNonProposing(2);
     final Signature illegalSeal = SECP256K1.sign(Hash.ZERO, badSealPeer.getNodeKeys());
 
     badSealPeer.injectCommit(roundId, proposedBlock.getHash(), illegalSeal);
