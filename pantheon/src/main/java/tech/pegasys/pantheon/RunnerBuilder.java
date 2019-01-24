@@ -63,7 +63,6 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -219,7 +218,9 @@ public class RunnerBuilder {
     if (permissioningConfigFile.exists()) {
       return permissioningConfigFile;
     } else {
-      LOG.error("Unable to load permissioning config file from location {}.", PERMISSIONING_CONFIG_LOCATION);
+      LOG.error(
+          "Unable to load permissioning config file from location {}.",
+          PERMISSIONING_CONFIG_LOCATION);
       return null;
     }
   }

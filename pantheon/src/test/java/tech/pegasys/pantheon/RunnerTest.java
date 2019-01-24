@@ -137,8 +137,8 @@ public final class RunnerTest {
   @Test
   public void permissioningTomlFromResourceWithOnlyAccountWhitelistSet() throws IOException {
 
-
-    final URL configFile = Resources.getResource("permissioning_config_account_whitelist_only.toml");
+    final URL configFile =
+        Resources.getResource("permissioning_config_account_whitelist_only.toml");
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
     final TomlParseResult tomlResult = Toml.parse(toml);
