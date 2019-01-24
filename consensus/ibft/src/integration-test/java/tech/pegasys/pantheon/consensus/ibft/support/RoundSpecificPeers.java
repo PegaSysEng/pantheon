@@ -16,13 +16,6 @@ import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
@@ -38,6 +31,15 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class RoundSpecificPeers {
 
@@ -149,8 +151,8 @@ public class RoundSpecificPeers {
   }
 
   @SafeVarargs
-  public final void verifyMessagesReceivedNonPropsingExcluding(final ValidatorPeer exclude,
-      final SignedData<? extends Payload>... msgs) {
+  public final void verifyMessagesReceivedNonPropsingExcluding(
+      final ValidatorPeer exclude, final SignedData<? extends Payload>... msgs) {
     final Collection<ValidatorPeer> candidates = Lists.newArrayList(nonProposingPeers);
     candidates.remove(exclude);
     verifyMessagesReceived(candidates, msgs);
@@ -167,8 +169,8 @@ public class RoundSpecificPeers {
   }
 
   @SafeVarargs
-  private final void verifyMessagesReceived(final Collection<ValidatorPeer> candidates,
-      final SignedData<? extends Payload>... msgs) {
+  private final void verifyMessagesReceived(
+      final Collection<ValidatorPeer> candidates, final SignedData<? extends Payload>... msgs) {
     candidates.forEach(n -> assertThat(n.getReceivedMessages().size()).isEqualTo(msgs.length));
 
     List<SignedData<? extends Payload>> msgList = Arrays.asList(msgs);

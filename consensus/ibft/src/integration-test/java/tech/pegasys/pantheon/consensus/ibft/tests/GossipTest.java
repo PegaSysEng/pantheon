@@ -15,15 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft.tests;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
-import com.google.common.collect.ImmutableList;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -42,6 +33,14 @@ import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
 import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class GossipTest {
 
@@ -138,7 +137,7 @@ public class GossipTest {
 
     sender.injectMessage(ProposalMessageData.create(proposalFromPeer));
 
-    peers.verifyMessagesReceivedNonPropsingExcluding(msgCreator,proposalFromPeer);
+    peers.verifyMessagesReceivedNonPropsingExcluding(msgCreator, proposalFromPeer);
     peers.verifyNoMessagesReceivedProposer();
   }
 
