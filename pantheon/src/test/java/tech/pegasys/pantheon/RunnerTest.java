@@ -15,12 +15,6 @@ package tech.pegasys.pantheon;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
-import com.google.common.io.Resources;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Files;
-import net.consensys.cava.toml.Toml;
-import net.consensys.cava.toml.TomlParseResult;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -50,6 +44,9 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -57,12 +54,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.io.Resources;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import net.consensys.cava.toml.Toml;
+import net.consensys.cava.toml.TomlParseResult;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -119,8 +119,7 @@ public final class RunnerTest {
 
     final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
 
-    PermissioningConfiguration permissioningConfiguration =
-        RunnerBuilder.p();
+    PermissioningConfiguration permissioningConfiguration = RunnerBuilder.p();
 
     assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist())
