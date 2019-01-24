@@ -35,7 +35,9 @@ public class PantheonFactoryConfigurationBuilder {
   private PermissioningConfiguration permissioningConfiguration =
       PermissioningConfiguration.createDefault();
   private boolean devMode = true;
+  private Boolean discoveryEnabled = true;
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
+  private Boolean p2pEnabled = true;
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
     this.name = name;
@@ -107,6 +109,16 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder setDiscoveryEnabled(final Boolean discoveryEnabled) {
+    this.discoveryEnabled = discoveryEnabled;
+    return this;
+  }
+
+  public PantheonFactoryConfigurationBuilder setP2pEnabled(final Boolean p2pEnabled) {
+    this.p2pEnabled = p2pEnabled;
+    return this;
+  }
+
   public PantheonFactoryConfiguration build() {
     return new PantheonFactoryConfiguration(
         name,
@@ -116,6 +128,8 @@ public class PantheonFactoryConfigurationBuilder {
         metricsConfiguration,
         permissioningConfiguration,
         devMode,
-        genesisConfigProvider);
+        genesisConfigProvider,
+        p2pEnabled,
+        discoveryEnabled);
   }
 }
