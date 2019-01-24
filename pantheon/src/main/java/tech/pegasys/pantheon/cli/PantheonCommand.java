@@ -546,6 +546,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Boolean privacyEnabled = false;
 
+  @Option(
+    names = {"--privacy-precompiled-address"},
+    description =
+        "The address to which the privacy pre-compiled contract will be mapped to (default: ${DEFAULT-VALUE})"
+  )
+  private final Integer privacyPrecompiledAddress = Address.PRIVACY;
+
   public PantheonCommand(
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
@@ -736,6 +743,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     privacyParameters.setEnabled(privacyEnabled);
     privacyParameters.setUrl(privacyUrl.toString());
     privacyParameters.setPublicKey(privacyPublicKeyFile);
+    privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
     return privacyParameters;
   }
 
