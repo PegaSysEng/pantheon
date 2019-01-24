@@ -15,6 +15,12 @@ package tech.pegasys.pantheon;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
+import com.google.common.io.Resources;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import net.consensys.cava.toml.Toml;
+import net.consensys.cava.toml.TomlParseResult;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -73,6 +79,9 @@ import org.junit.rules.TemporaryFolder;
 /** Tests for {@link Runner}. */
 public final class RunnerTest {
 
+  private final String VALID_NODE_ID =
+      "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
+
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   @Test
@@ -84,6 +93,39 @@ public final class RunnerTest {
   @Ignore("Fast sync implementation in progress.")
   public void fastSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FAST);
+  }
+
+  @Test
+  public void permissioningTomlFromResource() throws IOException {
+
+    final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
+
+    final URL configFile = Resources.getResource("permissioning_config.toml");
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+    final TomlParseResult tomlResult = Toml.parse(toml);
+
+    PermissioningConfiguration permissioningConfiguration =
+        RunnerBuilder.permissioningConfig(tomlResult);
+
+    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getAccountWhitelist())
+        .containsExactly("0x0000000000000000000000000000000000000009");
+    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
+  }
+
+  @Test
+  public void permissioningTomlFromDefaultFileLocation() throws IOException {
+
+    final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
+
+    PermissioningConfiguration permissioningConfiguration =
+        RunnerBuilder.p();
+
+    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getAccountWhitelist())
+        .containsExactly("0x0000000000000000000000000000000000000009");
+    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
   }
 
   private void syncFromGenesis(final SyncMode mode) throws Exception {

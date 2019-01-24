@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -59,6 +62,9 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -68,10 +74,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
+import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
+import net.consensys.cava.toml.TomlArray;
+import net.consensys.cava.toml.TomlParseResult;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RunnerBuilder {
 
+  private static final Logger LOG = LogManager.getLogger();
   private Vertx vertx;
   private PantheonController<?> pantheonController;
   private boolean p2pEnabled = true;
@@ -138,10 +150,71 @@ public class RunnerBuilder {
     return this;
   }
 
+  // this one uses the CLI which will be deleted
   public RunnerBuilder permissioningConfiguration(
       final PermissioningConfiguration permissioningConfiguration) {
     this.permissioningConfiguration = permissioningConfiguration;
     return this;
+  }
+
+  public RunnerBuilder permissioningConfigurationFromToml() {
+    String permToml = permissioningConfig();
+    this.permissioningConfiguration =
+        permissioningConfig(TomlConfigFileParser.loadConfiguration(permToml));
+    return this;
+  }
+
+  // for testing
+  public static PermissioningConfiguration p() {
+    String permToml = permissioningConfig();
+    return permissioningConfig(TomlConfigFileParser.loadConfiguration(permToml));
+  }
+
+  public static PermissioningConfiguration permissioningConfig(final TomlParseResult permToml) {
+
+    TomlArray accountWhitelistTomlArray = permToml.getArray("accounts-whitelist");
+    TomlArray nodeWhitelistTomlArray = permToml.getArray("nodes-whitelist");
+
+    final PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    List<String> accountsWhitelistToml =
+        accountWhitelistTomlArray
+            .toList()
+            .stream()
+            .map(Object::toString)
+            .collect(Collectors.toList());
+    permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
+
+    List<URI> nodesWhitelistToml =
+        nodeWhitelistTomlArray
+            .toList()
+            .stream()
+            .map(Object::toString)
+            .map(EnodeToURIPropertyConverter::convertToURI)
+            .collect(Collectors.toList());
+    permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
+
+    return permissioningConfiguration;
+  }
+
+  private static String permissioningConfig() {
+    try {
+      return Resources.toString(permissioningConfigFile().toURI().toURL(), UTF_8);
+    } catch (final IOException e) {
+      LOG.error("Unable to load permissioning config file %s.", permissioningConfigFile(), e);
+      return null;
+    }
+  }
+
+  private static File permissioningConfigFile() {
+    String PERMISSIONING_CONFIG_LOCATION = "/Documents/workspace/permissioning_config.toml";
+
+    final File permissioningConfigFile = new File(PERMISSIONING_CONFIG_LOCATION);
+    if (permissioningConfigFile.exists()) {
+      return permissioningConfigFile;
+    } else {
+      return null;
+    }
   }
 
   public RunnerBuilder dataDir(final Path dataDir) {

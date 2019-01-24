@@ -72,8 +72,6 @@ import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import com.google.common.net.HostSpecifier;
 import io.vertx.core.Vertx;
-import net.consensys.cava.toml.TomlArray;
-import net.consensys.cava.toml.TomlParseResult;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
@@ -598,11 +596,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Override
   public void run() {
-    // TODO permToml = TomlConfigFileDefaultProvider.loadConfigurationFromFile
-    // but we don't have visibility to the TomlConfigFileDefaultProvider.
-    // see ConfigOptionSearchAndRunHandler
-    // TODO permissioningConfiguration(permToml)
-
     // set log level per CLI flags
     if (logLevel != null) {
       System.out.println("Setting logging level to " + logLevel.name());
@@ -745,34 +738,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     privacyParameters.setUrl(privacyUrl.toString());
     privacyParameters.setPublicKey(privacyPublicKeyFile);
     return privacyParameters;
-  }
-
-  public static PermissioningConfiguration permissioningConfiguration(
-      final TomlParseResult permToml) {
-
-    TomlArray accountWhitelistTomlArray = permToml.getArray("accounts-whitelist");
-    TomlArray nodeWhitelistTomlArray = permToml.getArray("nodes-whitelist");
-
-    final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    List<String> accountsWhitelistToml =
-        accountWhitelistTomlArray
-            .toList()
-            .stream()
-            .map(Object::toString)
-            .collect(Collectors.toList());
-    permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
-
-    List<URI> nodesWhitelistToml =
-        nodeWhitelistTomlArray
-            .toList()
-            .stream()
-            .map(Object::toString)
-            .map(EnodeToURIPropertyConverter::convertToURI)
-            .collect(Collectors.toList());
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
-
-    return permissioningConfiguration;
   }
 
   private SynchronizerConfiguration buildSyncConfig() {

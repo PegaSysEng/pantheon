@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.cli;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,7 +34,6 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -350,44 +348,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
       options.remove(optionSpec);
     }
     assertThat(options.stream().map(CommandLine.Model.OptionSpec::longestName)).isEmpty();
-  }
-
-  @Test
-  public void permissioningToml() throws IOException {
-
-    final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
-
-    final URL configFile = Resources.getResource("permissioning_config.toml");
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, Resources.toByteArray(configFile));
-    final TomlParseResult tomlResult = Toml.parse(toml);
-
-    PermissioningConfiguration permissioningConfiguration =
-        PantheonCommand.permissioningConfiguration(tomlResult);
-
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
-    assertThat(permissioningConfiguration.getAccountWhitelist())
-        .containsExactly("0x0000000000000000000000000000000000000009");
-    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
-  }
-
-  @Test
-  public void permissioningTomlWithInvalidEnode() throws IOException {
-
-    final URL configFile = Resources.getResource("permissioning_config_invalid_enode.toml");
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, Resources.toByteArray(configFile));
-    final TomlParseResult tomlResult = Toml.parse(toml);
-
-    try {
-      PantheonCommand.permissioningConfiguration(tomlResult);
-      fail("Enode URL contains an invalid node ID");
-    } catch (IllegalArgumentException e) {
-      assertThat(e.getMessage()).startsWith("Enode URL contains an invalid node ID");
-    }
-    //    assertThat(commandErrorOutput.toString()).startsWith("Enode URL contains an invalid node
-    // ID");
-    assertThat(commandOutput.toString()).isEmpty();
   }
 
   @Test
