@@ -203,10 +203,12 @@ public class RunnerBuilder {
   }
 
   private static String permissioningConfig() {
+    File file = null;
     try {
-      return Resources.toString(permissioningConfigFile().toURI().toURL(), UTF_8);
+      file = permissioningConfigFile();
+      return Resources.toString(file.toURI().toURL(), UTF_8);
     } catch (final Exception e) {
-      LOG.error("Unable to load permissioning config {}.", permissioningConfigFile(), e);
+      LOG.error("Unable to load permissioning config {}.", file, e);
       return null;
     }
   }
