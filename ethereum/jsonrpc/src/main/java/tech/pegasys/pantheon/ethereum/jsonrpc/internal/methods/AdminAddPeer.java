@@ -53,7 +53,7 @@ public class AdminAddPeer implements JsonRpcMethod {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
     } catch (final IllegalArgumentException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.PARSE_ERROR);
-    } catch ( final P2pDisabledException e) {
+    } catch (final P2pDisabledException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
     } catch (final Exception e) {
       LOG.error("Error processing request: " + req, e);
