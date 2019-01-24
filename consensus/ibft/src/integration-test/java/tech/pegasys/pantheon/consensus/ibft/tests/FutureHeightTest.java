@@ -26,13 +26,11 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
-import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,13 +67,7 @@ public class FutureHeightTest {
   public void messagesForFutureHeightAreBufferedUntilChainHeightCatchesUp() {
     final Block currentHeightBlock = context.createBlockForProposalFromChainHead(0, 30);
     final Block signedCurrentHeightBlock =
-        IbftHelpers.createSealedBlock(
-            currentHeightBlock,
-            peers
-                .getAllPeers()
-                .stream()
-                .map(peer -> peer.getBlockSignature(currentHeightBlock.getHash()))
-                .collect(Collectors.toList()));
+        IbftHelpers.createSealedBlock(currentHeightBlock, peers.sign(currentHeightBlock.getHash()));
 
     final Block futureHeightBlock =
         context.createBlockForProposal(signedCurrentHeightBlock.getHeader(), 0, 60);
@@ -113,13 +105,7 @@ public class FutureHeightTest {
   public void messagesFromPreviousHeightAreDiscarded() {
     final Block currentHeightBlock = context.createBlockForProposalFromChainHead(0, 30);
     final Block signedCurrentHeightBlock =
-        IbftHelpers.createSealedBlock(
-            currentHeightBlock,
-            peers
-                .getAllPeers()
-                .stream()
-                .map(peer -> peer.getBlockSignature(currentHeightBlock.getHash()))
-                .collect(Collectors.toList()));
+        IbftHelpers.createSealedBlock(currentHeightBlock, peers.sign(currentHeightBlock.getHash()));
 
     peers.getProposer().injectProposal(roundId, currentHeightBlock);
     peers.getNonProposingPeer(0).injectPrepare(roundId, currentHeightBlock.getHash());
@@ -152,7 +138,7 @@ public class FutureHeightTest {
     peers.getProposer().injectProposal(roundId, currentHeightBlock);
     peers.getNonProposingPeer(0).injectPrepare(roundId, currentHeightBlock.getHash());
 
-    peers.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+    peers.clearReceivedMessages();
 
     // inject a NewHeight FOR THE CURRENT HEIGHT
     context
@@ -172,24 +158,12 @@ public class FutureHeightTest {
   public void correctMessagesAreExtractedFromFutureHeightBuffer() {
     final Block currentHeightBlock = context.createBlockForProposalFromChainHead(0, 30);
     final Block signedCurrentHeightBlock =
-        IbftHelpers.createSealedBlock(
-            currentHeightBlock,
-            peers
-                .getAllPeers()
-                .stream()
-                .map(peer -> peer.getBlockSignature(currentHeightBlock.getHash()))
-                .collect(Collectors.toList()));
+        IbftHelpers.createSealedBlock(currentHeightBlock, peers.sign(currentHeightBlock.getHash()));
 
     final Block nextHeightBlock =
         context.createBlockForProposal(signedCurrentHeightBlock.getHeader(), 0, 60);
     final Block signedNextHeightBlock =
-        IbftHelpers.createSealedBlock(
-            nextHeightBlock,
-            peers
-                .getAllPeers()
-                .stream()
-                .map(peer -> peer.getBlockSignature(nextHeightBlock.getHash()))
-                .collect(Collectors.toList()));
+        IbftHelpers.createSealedBlock(nextHeightBlock, peers.sign(nextHeightBlock.getHash()));
 
     final Block futureHeightBlock =
         context.createBlockForProposal(signedNextHeightBlock.getHeader(), 0, 90);

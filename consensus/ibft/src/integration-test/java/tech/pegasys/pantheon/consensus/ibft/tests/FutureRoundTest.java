@@ -24,7 +24,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
-import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -133,9 +132,7 @@ public class FutureRoundTest {
     // At this stage, the local node has 2 commit msgs (proposer and local) so has not committed
     assertThat(context.getBlockchain().getChainHeadBlockNumber()).isEqualTo(0);
 
-    for (final ValidatorPeer peer : peers.getAllPeers()) {
-      peer.clearReceivedMessages();
-    }
+    peers.clearReceivedMessages();
 
     injectEmptyNewRound(
         futureRoundId, futureRoles.getProposer(), futureRoles.getAllPeers(), futureBlock);

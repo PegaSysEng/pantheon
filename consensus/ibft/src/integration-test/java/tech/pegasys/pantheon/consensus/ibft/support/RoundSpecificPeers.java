@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
@@ -35,6 +36,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
 
 public class RoundSpecificPeers {
 
@@ -59,6 +62,14 @@ public class RoundSpecificPeers {
     return Collections.unmodifiableCollection(peers);
   }
 
+  public void clearReceivedMessages() {
+    peers.forEach(ValidatorPeer::clearReceivedMessages);
+  }
+
+  public List<Signature> sign(final Hash digest) {
+    return peers.stream().map(peer -> peer.getBlockSignature(digest)).collect(Collectors.toList());
+  }
+
   public ValidatorPeer getNonProposingPeer(final int index) {
     return nonProposingPeers.get(index);
   }
@@ -69,6 +80,20 @@ public class RoundSpecificPeers {
         .stream()
         .map(peer -> peer.injectRoundChange(targetRound, empty()))
         .collect(Collectors.toList());
+  }
+
+  public void commit(final ConsensusRoundIdentifier roundId, final Hash hash) {
+    peers.forEach(peer -> peer.injectCommit(roundId, hash));
+  }
+
+  public List<SignedData<RoundChangePayload>> roundChange(final ConsensusRoundIdentifier roundId) {
+    final List<SignedData<RoundChangePayload>> changes = Lists.newArrayList();
+
+    for (final ValidatorPeer peer : peers) {
+      changes.add(peer.injectRoundChange(roundId, empty()));
+    }
+
+    return changes;
   }
 
   public void nonProposingPrepare(final ConsensusRoundIdentifier roundId, final Hash hash) {

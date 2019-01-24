@@ -152,9 +152,7 @@ public class ReceivedNewRoundTest {
     // first move to a future round, then inject a newRound for a prior round, local node
     // should send no messages.
     final ConsensusRoundIdentifier futureRound = new ConsensusRoundIdentifier(1, 2);
-    for (final ValidatorPeer peer : peers.getAllPeers()) {
-      peer.injectRoundChange(futureRound, empty());
-    }
+    peers.roundChange(futureRound);
 
     final ConsensusRoundIdentifier interimRound = new ConsensusRoundIdentifier(1, 1);
     final List<SignedData<RoundChangePayload>> roundChangePayloads = Lists.newArrayList();

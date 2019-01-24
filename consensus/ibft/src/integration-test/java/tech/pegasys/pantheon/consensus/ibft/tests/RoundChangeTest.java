@@ -88,7 +88,7 @@ public class RoundChangeTest {
         localNodeMessageFactory.createSignedRoundChangePayload(targetRound, empty());
 
     peers.getProposer().injectProposal(roundId, blockToPropose);
-    peers.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+    peers.clearReceivedMessages();
 
     context.getController().handleRoundExpiry(new RoundExpiry(roundId));
     peers.verifyMessagesReceived(expectedTxRoundChange);
@@ -104,7 +104,7 @@ public class RoundChangeTest {
 
     peers.getProposer().injectProposal(roundId, blockToPropose);
     peers.getNonProposingPeer(1).injectPrepare(roundId, blockToPropose.getHash());
-    peers.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+    peers.clearReceivedMessages();
 
     context.getController().handleRoundExpiry(new RoundExpiry(roundId));
     peers.verifyMessagesReceived(expectedTxRoundChange);
@@ -118,14 +118,15 @@ public class RoundChangeTest {
 
     final SignedData<ProposalPayload> proposal =
         peers.getProposer().injectProposal(roundId, blockToPropose);
-    peers.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+    peers.clearReceivedMessages();
 
     final SignedData<PreparePayload> p1 =
         peers.getNonProposingPeer(0).injectPrepare(roundId, blockToPropose.getHash());
-    peers.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+    peers.clearReceivedMessages();
+
     final SignedData<PreparePayload> p2 =
         peers.getNonProposingPeer(1).injectPrepare(roundId, blockToPropose.getHash());
-    peers.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+    peers.clearReceivedMessages();
 
     final SignedData<RoundChangePayload> expectedTxRoundChange =
         localNodeMessageFactory.createSignedRoundChangePayload(
@@ -217,15 +218,10 @@ public class RoundChangeTest {
     // Controller always starts at 1:0. This test moves to 1:7, then attempts to move back to 1:3.
 
     final ConsensusRoundIdentifier futureRound = new ConsensusRoundIdentifier(1, 9);
-    final List<SignedData<RoundChangePayload>> roundChangeMessages = Lists.newArrayList();
-    for (final ValidatorPeer peer : peers.getAllPeers()) {
-      roundChangeMessages.add(peer.injectRoundChange(futureRound, empty()));
-    }
+    final List<SignedData<RoundChangePayload>> roundChangeMessages = peers.roundChange(futureRound);
 
     final ConsensusRoundIdentifier priorRound = new ConsensusRoundIdentifier(1, 4);
-    for (final ValidatorPeer peer : peers.getAllPeers()) {
-      peer.injectRoundChange(priorRound, empty());
-    }
+    peers.roundChange(priorRound);
 
     final Block locallyProposedBlock =
         context.createBlockForProposalFromChainHead(futureRound.getRoundNumber(), blockTimeStamp);
@@ -297,7 +293,7 @@ public class RoundChangeTest {
     context.getController().handleRoundExpiry(new RoundExpiry(roundId));
 
     // Clear prior Prepare msg and RoundChange message
-    peers.getAllPeers().forEach(ValidatorPeer::clearReceivedMessages);
+    peers.clearReceivedMessages();
 
     // inject enough prepares from prior round to trigger a commit
     peers.nonProposingPrepare(roundId, blockToPropose.getHash());

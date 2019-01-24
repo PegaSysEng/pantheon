@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
-import tech.pegasys.pantheon.consensus.ibft.support.ValidatorPeer;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
 import org.junit.Before;
@@ -122,11 +121,10 @@ public class LocalNodeNotProposerTest {
   public void commitMessagesReceivedBeforePrepareCorrectlyImports() {
     // All peers send a commit, then all non-proposing peers send a prepare, when then Proposal
     // arrives last, the chain is updated, and a prepare and commit message are transmitted.
-    for (final ValidatorPeer peer : peers.getAllPeers()) {
-      peer.injectCommit(roundId, blockToPropose.getHash());
-      peers.verifyNoMessagesReceived();
-      assertThat(context.getCurrentChainHeight()).isEqualTo(0);
-    }
+    peers.clearReceivedMessages();
+    peers.commit(roundId, blockToPropose.getHash());
+    peers.verifyNoMessagesReceived();
+    assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     peers.nonProposingPrepare(roundId, blockToPropose.getHash());
     peers.verifyNoMessagesReceived();
@@ -142,11 +140,9 @@ public class LocalNodeNotProposerTest {
   @Test
   public void
       fullQuorumOfCommitMessagesReceivedThenProposalImportsBlockCommitSentAfterFinalPrepare() {
-    for (final ValidatorPeer peer : peers.getAllPeers()) {
-      peer.injectCommit(roundId, blockToPropose.getHash());
-      peers.verifyNoMessagesReceived();
-      assertThat(context.getCurrentChainHeight()).isEqualTo(0);
-    }
+    peers.commit(roundId, blockToPropose.getHash());
+    peers.verifyNoMessagesReceived();
+    assertThat(context.getCurrentChainHeight()).isEqualTo(0);
 
     peers.getProposer().injectProposal(roundId, blockToPropose);
     peers.verifyMessagesReceived(expectedTxPrepare);
