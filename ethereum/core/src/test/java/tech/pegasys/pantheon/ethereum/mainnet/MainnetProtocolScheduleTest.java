@@ -87,7 +87,8 @@ public class MainnetProtocolScheduleTest {
         .isThrownBy(
             () ->
                 MainnetProtocolSchedule.fromConfig(
-                    GenesisConfigFile.fromConfig(json).getConfigOptions()));
+                    GenesisConfigFile.fromConfig(json).getConfigOptions(),
+                    PrivacyParameters.noPrivacy()));
   }
 
   @Test
