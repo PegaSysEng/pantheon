@@ -175,8 +175,7 @@ public class GossipTest {
                 .collect(Collectors.toList()));
 
     ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(2, 0);
-    SignedData<PreparePayload> futurePrepare =
-        sender.injectPrepare(futureRoundId, block.getHash());
+    SignedData<PreparePayload> futurePrepare = sender.injectPrepare(futureRoundId, block.getHash());
     assertPeersReceivedNoMessages(roles.getNonProposingPeers());
 
     // add block to chain so we can move to next block height
