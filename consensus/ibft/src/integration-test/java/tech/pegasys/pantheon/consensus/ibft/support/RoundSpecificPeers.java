@@ -16,6 +16,13 @@ import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
@@ -31,14 +38,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
 
 public class RoundSpecificPeers {
 
@@ -57,6 +56,10 @@ public class RoundSpecificPeers {
 
   public ValidatorPeer getProposer() {
     return proposer;
+  }
+
+  public ValidatorPeer getFirstNonProposer() {
+    return nonProposingPeers.get(0);
   }
 
   public void clearReceivedMessages() {
@@ -120,7 +123,7 @@ public class RoundSpecificPeers {
     nonProposingPeers.forEach(peer -> peer.injectCommit(roundId, hash));
   }
 
-  public Collection<SignedData<PreparePayload>> createSignedPreparePayloadOfNonProposing(
+  Collection<SignedData<PreparePayload>> createSignedPreparePayloadOfNonProposing(
       final ConsensusRoundIdentifier preparedRound, final Hash hash) {
     return nonProposingPeers
         .stream()
@@ -132,23 +135,55 @@ public class RoundSpecificPeers {
     peers.forEach(n -> assertThat(n.getReceivedMessages()).isEmpty());
   }
 
+  public void verifyNoMessagesReceivedNonProposing() {
+    nonProposingPeers.forEach(n -> assertThat(n.getReceivedMessages()).isEmpty());
+  }
+
+  public void verifyNoMessagesReceivedProposer() {
+    assertThat(proposer.getReceivedMessages()).isEmpty();
+  }
+
+  @SafeVarargs
+  public final void verifyMessagesReceivedPropser(final SignedData<? extends Payload>... msgs) {
+    verifyMessagesReceived(ImmutableList.of(proposer), msgs);
+  }
+
+  @SafeVarargs
+  public final void verifyMessagesReceivedNonPropsingExcluding(final ValidatorPeer exclude,
+      final SignedData<? extends Payload>... msgs) {
+    final Collection<ValidatorPeer> candidates = Lists.newArrayList(nonProposingPeers);
+    candidates.remove(exclude);
+    verifyMessagesReceived(candidates, msgs);
+  }
+
+  @SafeVarargs
+  public final void verifyMessagesReceivedNonPropsing(final SignedData<? extends Payload>... msgs) {
+    verifyMessagesReceived(nonProposingPeers, msgs);
+  }
+
   @SafeVarargs
   public final void verifyMessagesReceived(final SignedData<? extends Payload>... msgs) {
-    peers.forEach(n -> assertThat(n.getReceivedMessages().size()).isEqualTo(msgs.length));
+    verifyMessagesReceived(peers, msgs);
+  }
+
+  @SafeVarargs
+  private final void verifyMessagesReceived(final Collection<ValidatorPeer> candidates,
+      final SignedData<? extends Payload>... msgs) {
+    candidates.forEach(n -> assertThat(n.getReceivedMessages().size()).isEqualTo(msgs.length));
 
     List<SignedData<? extends Payload>> msgList = Arrays.asList(msgs);
 
     for (int i = 0; i < msgList.size(); i++) {
       final int index = i;
       final SignedData<? extends Payload> msg = msgList.get(index);
-      peers.forEach(
+      candidates.forEach(
           n -> {
             final List<MessageData> rxMsgs = n.getReceivedMessages();
             final MessageData rxMsgData = rxMsgs.get(index);
             verifyMessage(rxMsgData, msg);
           });
     }
-    peers.forEach(ValidatorPeer::clearReceivedMessages);
+    candidates.forEach(ValidatorPeer::clearReceivedMessages);
   }
 
   private void verifyMessage(
