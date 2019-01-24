@@ -151,7 +151,7 @@ public class IbftController {
     final BlockHeader newBlockHeader = newChainHead.getNewChainHeadHeader();
     final BlockHeader currentMiningParent = currentHeightManager.getParentBlockHeader();
     if (newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
-      LOG.info(
+      LOG.debug(
           "Discarding NewChainHead event, was for previous block height. chainHeight={} eventHeight={}",
           currentMiningParent.getNumber(),
           newBlockHeader.getNumber());
@@ -160,7 +160,7 @@ public class IbftController {
 
     if (newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
       if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
-        LOG.info(
+        LOG.debug(
             "Discarding duplicate NewChainHead event. chainHeight={} newBlockHash={} parentBlockHash",
             newBlockHeader.getNumber(),
             newBlockHeader.getHash(),
@@ -180,7 +180,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundIndentifier)) {
       currentHeightManager.handleBlockTimerExpiry(roundIndentifier);
     } else {
-      LOG.info(
+      LOG.debug(
           "Block timer event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundIndentifier.getSequenceNumber());
@@ -213,7 +213,7 @@ public class IbftController {
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
-      LOG.info(
+      LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
           msg.getPayload().getMessageType(),
           currentHeightManager.getChainHeight(),

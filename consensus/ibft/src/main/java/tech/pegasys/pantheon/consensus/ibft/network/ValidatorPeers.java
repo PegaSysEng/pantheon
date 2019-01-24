@@ -76,10 +76,7 @@ public class ValidatorPeers implements ValidatorMulticaster, PeerConnectionTrack
   private void sendMessageToSpecificAddresses(
       final Collection<Address> recipients, final MessageData message) {
     LOG.trace(
-        "Sending message to peers messageCode={} messageData={} recipients={}",
-        message.getCode(),
-        message.getData(),
-        recipients);
+        "Sending message to peers messageCode={} recipients={}", message.getCode(), recipients);
     recipients
         .stream()
         .map(peerConnections::get)

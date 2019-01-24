@@ -163,13 +163,13 @@ public class IbftBlockHeightManager {
   }
 
   public void handlePreparePayload(final SignedData<PreparePayload> signedPayload) {
-    LOG.debug("Received a prepare Payload.");
+    LOG.debug("Received a Prepare Payload.");
     actionOrBufferMessage(
         signedPayload, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
   public void handleCommitPayload(final SignedData<CommitPayload> payload) {
-    LOG.debug("Received a commit Payload.");
+    LOG.debug("Received a cCmmit Payload.");
     actionOrBufferMessage(payload, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
@@ -196,7 +196,7 @@ public class IbftBlockHeightManager {
 
     final MessageAge messageAge = determineAgeOfPayload(signedPayload.getPayload());
     if (messageAge == PRIOR_ROUND) {
-      LOG.info("Received RoundChange Payload for a prior round. targetRound={}", targetRound);
+      LOG.debug("Received RoundChange Payload for a prior round. targetRound={}", targetRound);
       return;
     }
 
