@@ -10,25 +10,38 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.orion;
+package tech.pegasys.pantheon.ethereum.core;
 
-public class OrionConfiguration {
+import java.io.File;
+import java.net.URI;
 
-  private static final String DEFAULT_ORION_URL = "http://localhost:8888";
+public class PrivacyParameters {
+
+  private static final String ORION_URL = "http://localhost:8888";
+  public static final URI DEFAULT_ORION_URL = URI.create(ORION_URL);
 
   private boolean enabled;
   private String url;
+  private File publicKey;
 
-  public static OrionConfiguration createDefault() {
-    final OrionConfiguration config = new OrionConfiguration();
+  public File getPublicKey() {
+    return publicKey;
+  }
+
+  public void setPublicKey(final File publicKey) {
+    this.publicKey = publicKey;
+  }
+
+  public static PrivacyParameters noPrivacy() {
+    final PrivacyParameters config = new PrivacyParameters();
     config.setEnabled(false);
-    config.setUrl(DEFAULT_ORION_URL);
+    config.setUrl(ORION_URL);
     return config;
   }
 
   @Override
   public String toString() {
-    return "OrionConfiguration{" + "enabled=" + enabled + ", url='" + url + '\'' + '}';
+    return "PrivacyParameters{" + "enabled=" + enabled + ", url='" + url + '\'' + '}';
   }
 
   public void setUrl(final String url) {

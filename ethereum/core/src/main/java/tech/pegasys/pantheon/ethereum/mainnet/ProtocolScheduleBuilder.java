@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 
 import java.util.OptionalLong;
 import java.util.function.Function;
@@ -22,19 +23,24 @@ public class ProtocolScheduleBuilder<C> {
   private final GenesisConfigOptions config;
   private final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter;
   private final int defaultChainId;
+  private final PrivacyParameters privacyParameters;
 
   public ProtocolScheduleBuilder(
       final GenesisConfigOptions config,
       final int defaultChainId,
-      final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter) {
+      final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter,
+      final PrivacyParameters privacyParameters) {
     this.config = config;
     this.protocolSpecAdapter = protocolSpecAdapter;
     this.defaultChainId = defaultChainId;
+    this.privacyParameters = privacyParameters;
   }
 
   public ProtocolSchedule<C> createProtocolSchedule() {
     final int chainId = config.getChainId().orElse(defaultChainId);
     final MutableProtocolSchedule<C> protocolSchedule = new MutableProtocolSchedule<>(chainId);
+
+    validateForkOrdering();
 
     addProtocolSpec(
         protocolSchedule, OptionalLong.of(0), MainnetProtocolSpecs.frontierDefinition());
@@ -80,6 +86,10 @@ public class ProtocolScheduleBuilder<C> {
         protocolSchedule,
         config.getConstantinopleBlockNumber(),
         MainnetProtocolSpecs.constantinopleDefinition(chainId));
+    addProtocolSpec(
+        protocolSchedule,
+        config.getConstantinopleFixBlockNumber(),
+        MainnetProtocolSpecs.constantinopleFixDefinition(chainId));
 
     return protocolSchedule;
   }
@@ -91,6 +101,40 @@ public class ProtocolScheduleBuilder<C> {
     blockNumber.ifPresent(
         number ->
             protocolSchedule.putMilestone(
-                number, protocolSpecAdapter.apply(definition).build(protocolSchedule)));
+                number,
+                protocolSpecAdapter
+                    .apply(definition)
+                    .privacyParameters(privacyParameters)
+                    .build(protocolSchedule)));
+  }
+
+  private long validateForkOrder(
+      final String forkName, final OptionalLong thisForkBlock, final long lastForkBlock) {
+    final long referenceForkBlock = thisForkBlock.orElse(lastForkBlock);
+    if (lastForkBlock > referenceForkBlock) {
+      throw new RuntimeException(
+          String.format(
+              "Genesis Config Error: '%s' is scheduled for block %d but it must be on or after block %d.",
+              forkName, thisForkBlock.getAsLong(), lastForkBlock));
+    }
+    return referenceForkBlock;
+  }
+
+  private void validateForkOrdering() {
+    long lastForkBlock = 0;
+    lastForkBlock = validateForkOrder("Homestead", config.getHomesteadBlockNumber(), lastForkBlock);
+    lastForkBlock = validateForkOrder("DaoFork", config.getDaoForkBlock(), lastForkBlock);
+    lastForkBlock =
+        validateForkOrder(
+            "TangerineWhistle", config.getTangerineWhistleBlockNumber(), lastForkBlock);
+    lastForkBlock =
+        validateForkOrder("SpuriousDragon", config.getSpuriousDragonBlockNumber(), lastForkBlock);
+    lastForkBlock = validateForkOrder("Byzantium", config.getByzantiumBlockNumber(), lastForkBlock);
+    lastForkBlock =
+        validateForkOrder("Constantinople", config.getConstantinopleBlockNumber(), lastForkBlock);
+    lastForkBlock =
+        validateForkOrder(
+            "ConstantinopleFix", config.getConstantinopleFixBlockNumber(), lastForkBlock);
+    assert (lastForkBlock >= 0);
   }
 }
