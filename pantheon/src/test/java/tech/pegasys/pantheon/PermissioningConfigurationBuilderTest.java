@@ -30,15 +30,26 @@ import org.junit.Test;
 
 public class PermissioningConfigurationBuilderTest {
 
+  static final String PERMISSIONING_CONFIG_TOML = "permissioning_config.toml";
+  static final String PERMISSIONING_CONFIG_ACCOUNT_WHITELIST_ONLY =
+      "permissioning_config_account_whitelist_only.toml";
+  static final String PERMISSIONING_CONFIG_NODE_WHITELIST_ONLY =
+      "permissioning_config_node_whitelist_only.toml";
+  static final String PERMISSIONING_CONFIG_INVALID_ENODE =
+      "permissioning_config_invalid_enode.toml";
+  static final String PERMISSIONING_CONFIG_EMPTY_WHITELISTS =
+      "permissioning_config_empty_whitelists.toml";
+
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
 
   @Test
-  public void permissioningTomlFromResource() throws IOException {
+  public void permissioningConfig() throws IOException {
 
     final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
+    final String uri2 = "enode://" + VALID_NODE_ID + "@192.169.0.9:4568";
 
-    final URL configFile = Resources.getResource("permissioning_config.toml");
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
     final TomlParseResult tomlResult = Toml.parse(toml);
@@ -50,15 +61,16 @@ public class PermissioningConfigurationBuilderTest {
     assertThat(permissioningConfiguration.getAccountWhitelist())
         .containsExactly("0x0000000000000000000000000000000000000009");
     assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
-    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
+    assertThat(permissioningConfiguration.getNodeWhitelist())
+        .containsExactly(URI.create(uri), URI.create(uri2));
   }
 
   @Test
-  public void permissioningTomlFromResourceWithOnlyNodeWhitelistSet() throws IOException {
+  public void permissioningConfigWithOnlyNodeWhitelistSet() throws IOException {
 
     final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
 
-    final URL configFile = Resources.getResource("permissioning_config_node_whitelist_only.toml");
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_NODE_WHITELIST_ONLY);
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
     final TomlParseResult tomlResult = Toml.parse(toml);
@@ -72,10 +84,9 @@ public class PermissioningConfigurationBuilderTest {
   }
 
   @Test
-  public void permissioningTomlFromResourceWithOnlyAccountWhitelistSet() throws IOException {
+  public void permissioningConfigWithOnlyAccountWhitelistSet() throws IOException {
 
-    final URL configFile =
-        Resources.getResource("permissioning_config_account_whitelist_only.toml");
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_ACCOUNT_WHITELIST_ONLY);
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
     final TomlParseResult tomlResult = Toml.parse(toml);
@@ -90,9 +101,9 @@ public class PermissioningConfigurationBuilderTest {
   }
 
   @Test
-  public void permissioningTomlWithInvalidEnode() throws IOException {
+  public void permissioningConfigWithInvalidEnode() throws IOException {
 
-    final URL configFile = Resources.getResource("permissioning_config_invalid_enode.toml");
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_INVALID_ENODE);
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
     final TomlParseResult tomlResult = Toml.parse(toml);
@@ -103,5 +114,22 @@ public class PermissioningConfigurationBuilderTest {
     } catch (IllegalArgumentException e) {
       assertThat(e.getMessage()).startsWith("Enode URL contains an invalid node ID");
     }
+  }
+
+  @Test
+  public void permissioningConfigWithEmptyWhitelistMustNotError() throws IOException {
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_EMPTY_WHITELISTS);
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+    final TomlParseResult tomlResult = Toml.parse(toml);
+
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfigurationBuilder.permissioningConfiguration(tomlResult, true, true);
+
+    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getNodeWhitelist()).isEmpty();
+    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getAccountWhitelist()).isEmpty();
   }
 }
