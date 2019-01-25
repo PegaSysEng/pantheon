@@ -482,6 +482,23 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void genesisAndNetworkMustNotBeUsedTogether() throws Exception {
+    assumeTrue(isFullInstantiation());
+
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    parseCommand("--genesis-file", genesisFile.toString(), "--network", "rinkeby");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .startsWith("--network option and --genesis-file option can't be used at the same time.");
+  }
+
+  @Test
   public void defaultNetworkIdAndBootnodesForCustomNetworkOptions() throws Exception {
     assumeTrue(isFullInstantiation());
 
@@ -1577,16 +1594,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   private void networkValuesCanBeOverridden(final String network) throws Exception {
-    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     parseCommand(
         "--network",
         network,
         "--network-id",
         "1234567",
         "--bootnodes",
-        String.join(",", validENodeStrings),
-        "--genesis-file",
-        genesisFile.toString());
+        String.join(",", validENodeStrings));
 
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
@@ -1594,13 +1608,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(networkArg.getValue().getGenesisConfig())
-        .isEqualTo(encodeJsonGenesis(GENESIS_VALID_JSON));
     assertThat(networkArg.getValue().getBootNodes())
         .isEqualTo(Stream.of(validENodeStrings).map(URI::create).collect(Collectors.toList()));
     assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1234567);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test

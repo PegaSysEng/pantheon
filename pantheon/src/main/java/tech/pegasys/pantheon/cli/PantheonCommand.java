@@ -232,9 +232,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     paramLabel = MANDATORY_NETWORK_FORMAT_HELP,
     description =
         "Synchronize against the indicated network, possible values are ${COMPLETION-CANDIDATES}."
-            + " (default: ${DEFAULT-VALUE})"
+            + " (default: MAINNET)"
   )
-  private final NetworkName network = MAINNET;
+  private final NetworkName network = null;
 
   @Option(
     names = {"--p2p-host"},
@@ -257,7 +257,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     names = {"--network-id"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description =
-        "P2P network identifier. (default: the selected network chain id or custom genesis chain id)",
+        "P2P network identifier. (default: the selected network chain ID or custom genesis chain ID)",
     arity = "1"
   )
   private final Integer networkId = null;
@@ -568,7 +568,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
 
-    final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(network);
+    final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     final PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
     ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
 
@@ -583,6 +583,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         webSocketConfiguration(),
         metricsConfiguration(),
         permissioningConfiguration);
+  }
+
+  private NetworkName getNetwork() {
+    //noinspection ConstantConditions network is not always null but injected by PicoCLI if used
+    return network == null ? MAINNET : network;
   }
 
   private void ensureAllBootnodesAreInWhitelist(
@@ -613,11 +618,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return controllerBuilder
           .synchronizerConfiguration(buildSyncConfig())
           .homePath(dataDir())
-          .ethNetworkConfig(updateNetworkConfig(network))
+          .ethNetworkConfig(updateNetworkConfig(getNetwork()))
           .syncWithOttoman(false) // ottoman feature is still there but it's now removed from CLI
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
-          .devMode(NetworkName.DEV.equals(network))
+          .devMode(NetworkName.DEV.equals(getNetwork()))
           .nodePrivateKeyFile(getNodePrivateKeyFile())
           .metricsSystem(metricsSystem)
           .privacyParameters(orionConfiguration())
@@ -764,6 +769,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     // but also for the network id and the bootnodes list.
     File genesisFile = genesisFile();
     if (genesisFile != null) {
+
+      //noinspection ConstantConditions network is not always null but injected by PicoCLI if used
+      if (this.network != null) {
+        // We check if network option was really provided by user and not only looking at the
+        // default value.
+        // if user provided it and provided the genesis file option at the same time, it raises a
+        // conflict error
+        throw new ParameterException(
+            new CommandLine(this),
+            "--network option and --genesis-file option can't be used at the same time."
+                + "Please refer to CLI reference for more details about this constraint.");
+      }
+
       builder.setGenesisConfig(genesisConfig());
 
       if (networkId == null) {

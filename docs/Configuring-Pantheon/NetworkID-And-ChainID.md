@@ -10,7 +10,7 @@ in the genesis file.
 For most networks including MainNet and the public testnets, the network ID and the chain ID are the
 same and Pantheon network id default values are defined according to the genesis chain id value.
 
-The network ID is then automatically set by Pantheon to the chain id when connecting to the Ethereum networks:
+The network ID is automatically set by Pantheon to the chain ID when connecting to the Ethereum networks:
 
 - **MainNet:** chain-id ==1==, network-id ==1==
 - **Rinkeby:** chain-id  ==4==, network-id ==4==

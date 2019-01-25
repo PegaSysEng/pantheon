@@ -4,9 +4,10 @@ description: Pantheon commande line interface reference
 # Pantheon Command Line
 
 !!! important "Breaking Changes in v0.9"
-    In v0.9, changes will be made to the command line options to improve usability. These will be breaking changes; that is, 
-    in many cases the v0.8 command line options will no longer work. This reference and the rest of the documentation will be 
-    updated to reflect these changes. Any further information required about the changes will be included in the v0.9 release notes. 
+    In v0.9 the command line changed to improve usability. These are breaking changes; that is, 
+    in many cases the v0.8 command line options will no longer work. This reference and the rest of 
+    the documentation will be updated to reflect these changes. Any further information required 
+    about the changes are included in the v0.9 release notes. 
 
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.
 
@@ -125,16 +126,33 @@ The path to the Pantheon data directory. The default is the `/build/distribution
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#persisting-data). 
 
+### genesis-file
 
-### dev-mode
+Genesis file is used to create a custom network.
+
+!!!tip
+    To use a public Ethereum network such as Rinkeby, use the [`--network`](#network) option.
+    The network option defines the genesis file for public networks.
+
+```bash tab="Syntax"
+--genesis-file=<FILE>
+```
+
+```bash tab="Example Command Line"
+--genesis-file=/home/me/me_node/customGenesisFile.json
+```
+
+```bash tab="Example Configuration File"
+genesis-file="/home/me/me_node/customGenesisFile.json"
+```
+
+The path to the genesis file.
 
 !!!important
-    This option was removed in favor of the new [`--network`](#network) option.
+    The [`--genesis-file`](#genesis-file) and [`--network`](#network) option can't be used at the same time.
 
-### goerli
-
-!!!important
-    This option was removed in favor of the new [`--network`](#network) option.
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-genesis-file). 
 
 ### host-whitelist
 
@@ -325,7 +343,7 @@ The default is 1000.
 network="rinkeby"
 ```
 
-Known network predefined configuration.
+Predefined network configuration.
 The default is `mainnet`.
 
 Possible values are :
@@ -337,16 +355,19 @@ Possible values are :
 :   PoW test network similar to current main Ethereum network. 
 
 `rinkeby`
-:   PoA test network using Clique _(only compatible with some clients)_.
+:   PoA test network using Clique.
 
 `goerli`
-:   PoA test network using Clique _(compatible with most clients)_.
+:   PoA test network using Clique.
 
 `dev`
 :   PoW development network with a very low difficulty to enable local CPU mining.
 
 !!!note
     Values are case insensitive, so either `mainnet` or `MAINNET` works.
+    
+!!!important
+    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option can't be used at the same time.
 
 ### network-id
 
@@ -364,8 +385,8 @@ network-id="8675309"
 
 P2P network identifier.
 
-This option can be used to override your current network id.
-The default value is the current network chain id which is defined in the genesis file.
+This option can be used to override your current network ID.
+The default value is the current network chain ID which is defined in the genesis file.
 
 ### no-discovery
 
@@ -430,11 +451,6 @@ Not intended for use with mainnet or public testnets.
 !!!note
     Permissioning is under development and will be available in v1.0.
 
-### ottoman
-
-!!!important
-    This version is not supporting IBFT Ottoman test network anymore. 
- 
 ### p2p-host
 
 ```bash tab="Syntax"
@@ -476,49 +492,6 @@ The default is 30303.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
-
-### genesis-file
-
-Genesis file is used to create a custom network.
-
-!!!tip
-    If you need to use one of the well-known networks like Ethereum MainNet, you should use
-    the [`--network`](#network) option instead as all nodes of a same network have to define the 
-    exact same genesis parameters.
-
-```bash tab="Syntax"
---genesis-file=<FILE>
-```
-
-```bash tab="Example Command Line"
---genesis-file=/home/me/me_node/customGenesisFile.json
-```
-
-```bash tab="Example Configuration File"
-genesis-file="/home/me/me_node/customGenesisFile.json"
-```
-
-The path to the genesis file. There's no default for this option.
-
-!!!important
-    The [`--genesis-file`](#genesis-file) option overrides the genesis file
-    defined in the preset configuration of [`--network`](#network) option.
-    If both are specified, the [`--genesis-file`](#genesis-file) option file is 
-    taken in account and the known network one is ignored.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-genesis-file). 
-
-
-### rinkeby
-
-!!!important
-    This option was removed in favor of the new [`--network`](#network) option.
-  
-### ropsten
-
-!!!important
-    This option was removed in favor of the new [`--network`](#network) option.
 
 ### rpc-http-enabled
 

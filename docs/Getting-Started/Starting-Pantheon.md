@@ -85,9 +85,6 @@ rpc-http-enabled=true
 data-path="/tmp/tmpdata-path"
 ```
 
-!!!note
-    `--network` option is new from 0.9
-    
 ## Run a Node on Ropsten Testnet 
 
 To run a node on Ropsten: 
@@ -101,9 +98,6 @@ To run a node on Ropsten with the HTTP JSON-RPC service enabled and allow Remix 
 ```bash
 pantheon  --network=ropsten --rpc-http-enabled --rpc-http-cors-origins "http://remix.ethereum.org"
 ```
-
-!!!note
-    `--network` option is new from 0.9
     
 ## Run a Node on Rinkeby Testnet
 
@@ -113,9 +107,6 @@ To run a node on Rinkeby specifying a data directory:
 pantheon --network=rinkeby --data-path=<path>/<rinkebydata-path>
 ```
 Where `<path>` and `<rinkebydata-path>` are the path and directory where the Rinkeby chain data is to be saved.
-
-!!!note
-    `--network` option is new from 0.9
 
 ## Run a Node on Goerli Testnet
 
@@ -127,9 +118,6 @@ pantheon --network=goerli --data-path=<path>/<goerlidata-path>
 
 Where `<path>` and `<goerlidata-path>` are the path and directory where the Goerli chain data is to be saved. 
    
-!!!note
-    `--network` option is new from 0.9
-
 ## Run a Node on Ethereum Mainnet 
 
 To run a node on the Ethereum mainnet: 
