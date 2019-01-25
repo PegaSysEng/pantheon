@@ -69,12 +69,9 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import io.vertx.core.Vertx;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class RunnerBuilder {
 
-  private static final Logger LOG = LogManager.getLogger();
   private Vertx vertx;
   private PantheonController<?> pantheonController;
   private boolean p2pEnabled = true;

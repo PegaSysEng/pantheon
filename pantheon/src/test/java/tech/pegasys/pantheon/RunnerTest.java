@@ -129,7 +129,6 @@ public final class RunnerTest {
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
     final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
-
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())

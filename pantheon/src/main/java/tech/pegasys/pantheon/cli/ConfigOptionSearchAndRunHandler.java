@@ -66,9 +66,6 @@ class ConfigOptionSearchAndRunHandler extends AbstractParseResultHandler<List<Ob
             new TomlConfigFileDefaultProvider(commandLine, configFile);
         commandLine.setDefaultValueProvider(tomlConfigFileDefaultProvider);
       }
-      commandLine.parseWithHandlers(
-          resultHandler, exceptionHandler, parseResult.originalArgs().toArray(new String[0]));
-      return new ArrayList<>();
     }
     commandLine.parseWithHandlers(
         resultHandler, exceptionHandler, parseResult.originalArgs().toArray(new String[0]));
