@@ -57,7 +57,9 @@ public class PantheonNodeFactory {
             config.getPermissioningConfiguration(),
             config.isDevMode(),
             config.getGenesisConfigProvider(),
-            serverSocket.getLocalPort());
+            serverSocket.getLocalPort(),
+            config.getP2pEnabled(),
+            config.isDiscoveryEnabled());
     serverSocket.close();
 
     return node;
@@ -93,6 +95,27 @@ public class PantheonNodeFactory {
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .jsonRpcEnabled()
+            .webSocketEnabled()
+            .build());
+  }
+
+  public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)
+      throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(jsonRpcConfigWithAdmin())
+            .webSocketEnabled()
+            .setDiscoveryEnabled(false)
+            .build());
+  }
+
+  public PantheonNode createArchiveNodeWithP2pDisabled(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setP2pEnabled(false)
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
             .webSocketEnabled()
             .build());
   }
@@ -177,6 +200,11 @@ public class PantheonNodeFactory {
             .setJsonRpcConfiguration(rpcConfig)
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
+  }
+
+  public PantheonNode createNodeWithNoDiscovery(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder().setName(name).setDiscoveryEnabled(false).build());
   }
 
   public PantheonNode createCliqueNode(final String name) throws IOException {
@@ -305,6 +333,10 @@ public class PantheonNodeFactory {
 
   private JsonRpcConfiguration jsonRpcConfigWithPermissioning() {
     return createJsonRpcConfigWithRpcApiEnabled(RpcApis.PERM);
+  }
+
+  private JsonRpcConfiguration jsonRpcConfigWithAdmin() {
+    return createJsonRpcConfigWithRpcApiEnabled(RpcApis.ADMIN);
   }
 
   private JsonRpcConfiguration createJsonRpcConfigWithRpcApiEnabled(final RpcApi rpcApi) {

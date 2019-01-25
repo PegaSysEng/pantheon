@@ -58,7 +58,7 @@ $ cd pantheon-<version>/
 $ bin/pantheon --help
 ````
 
-Continue with the [Private Network Quickstart](../Getting-Started/Private-Network-Quickstart.md) or [Starting Pantheon](../Getting-Started/Starting-Pantheon.md).
+Continue with the [Private Network Quickstart](../Tutorials/Private-Network-Quickstart.md) or [Starting Pantheon](../Getting-Started/Starting-Pantheon.md).
 
 
 ## Installation on Windows
@@ -86,7 +86,7 @@ cd pantheon
 Open a Windows command prompt. Build Pantheon with the Gradle wrapper `gradlew`, omitting tests as follows:
 
 ```bat
-gradlew build -x test
+.\gradlew build -x test
 ```
 
 !!!note
@@ -109,7 +109,7 @@ cd pantheon-<version>
 bin\pantheon --help
 ```
 
-Continue with the [Private Network Quickstart](../Getting-Started/Private-Network-Quickstart.md) or [Starting Pantheon](../Getting-Started/Starting-Pantheon.md).
+Continue with the [Private Network Quickstart](../Tutorials/Private-Network-Quickstart.md) or [Starting Pantheon](../Getting-Started/Starting-Pantheon.md).
 
 
 ## Installation on VM

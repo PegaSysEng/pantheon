@@ -58,6 +58,11 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add("--dev-mode");
     }
 
+    if (!node.isDiscoveryEnabled()) {
+      params.add("--no-discovery");
+      params.add("true");
+    }
+
     params.add("--p2p-listen");
     params.add(node.p2pListenAddress());
 
@@ -104,6 +109,11 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add(genesisFile.toString());
       params.add("--network-id");
       params.add(Integer.toString(ethNetworkConfig.getNetworkId()));
+    }
+
+    if (!node.p2pEnabled()) {
+      params.add("--p2p-enabled");
+      params.add("false");
     }
 
     final ProcessBuilder processBuilder =
