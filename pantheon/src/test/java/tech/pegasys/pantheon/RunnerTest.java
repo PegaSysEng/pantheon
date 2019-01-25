@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
@@ -45,9 +44,6 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -55,15 +51,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.io.Resources;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
-import net.consensys.cava.toml.Toml;
-import net.consensys.cava.toml.TomlParseResult;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -80,9 +73,6 @@ import org.junit.rules.TemporaryFolder;
 /** Tests for {@link Runner}. */
 public final class RunnerTest {
 
-  private final String VALID_NODE_ID =
-      "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
-
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   @Test
@@ -94,78 +84,6 @@ public final class RunnerTest {
   @Ignore("Fast sync implementation in progress.")
   public void fastSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FAST);
-  }
-
-  @Test
-  public void permissioningTomlFromResource() throws IOException {
-
-    final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
-
-    final URL configFile = Resources.getResource("permissioning_config.toml");
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, Resources.toByteArray(configFile));
-    final TomlParseResult tomlResult = Toml.parse(toml);
-
-    PermissioningConfiguration permissioningConfiguration =
-        RunnerBuilder.permissioningConfig(tomlResult);
-
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
-    assertThat(permissioningConfiguration.getAccountWhitelist())
-        .containsExactly("0x0000000000000000000000000000000000000009");
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
-    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
-  }
-
-  @Test
-  public void permissioningTomlFromResourceWithOnlyNodeWhitelistSet() throws IOException {
-
-    final String uri = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
-
-    final URL configFile = Resources.getResource("permissioning_config_node_whitelist_only.toml");
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, Resources.toByteArray(configFile));
-    final TomlParseResult tomlResult = Toml.parse(toml);
-
-    PermissioningConfiguration permissioningConfiguration =
-        RunnerBuilder.permissioningConfig(tomlResult);
-
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isFalse();
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
-    assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
-  }
-
-  @Test
-  public void permissioningTomlFromResourceWithOnlyAccountWhitelistSet() throws IOException {
-
-    final URL configFile =
-        Resources.getResource("permissioning_config_account_whitelist_only.toml");
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, Resources.toByteArray(configFile));
-    final TomlParseResult tomlResult = Toml.parse(toml);
-
-    PermissioningConfiguration permissioningConfiguration =
-        RunnerBuilder.permissioningConfig(tomlResult);
-
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isFalse();
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
-    assertThat(permissioningConfiguration.getAccountWhitelist())
-        .containsExactly("0x0000000000000000000000000000000000000009");
-  }
-
-  @Test
-  public void permissioningTomlWithInvalidEnode() throws IOException {
-
-    final URL configFile = Resources.getResource("permissioning_config_invalid_enode.toml");
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, Resources.toByteArray(configFile));
-    final TomlParseResult tomlResult = Toml.parse(toml);
-
-    try {
-      RunnerBuilder.permissioningConfig(tomlResult);
-      fail("Expecting IllegalArgumentException: Enode URL contains an invalid node ID");
-    } catch (IllegalArgumentException e) {
-      assertThat(e.getMessage()).startsWith("Enode URL contains an invalid node ID");
-    }
   }
 
   private void syncFromGenesis(final SyncMode mode) throws Exception {
@@ -210,6 +128,7 @@ public final class RunnerTest {
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
+    final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
 
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
@@ -229,7 +148,7 @@ public final class RunnerTest {
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .metricsConfiguration(aheadMetricsConfiguration)
             .dataDir(dbAhead)
-            .permissioningConfigurationFromToml()
+            .permissioningConfiguration(aheadPermissioningConfiguration)
             .build();
     try {
 

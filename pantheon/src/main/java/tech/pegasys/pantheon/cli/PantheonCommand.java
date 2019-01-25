@@ -24,6 +24,7 @@ import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
+import tech.pegasys.pantheon.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
@@ -505,6 +506,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
+  @Option(
+    names = {"--permissions-nodes-enabled"},
+    description = "Set if node level permissions should be enabled (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean permissionsNodesEnabled = false;
+
+  @Option(
+    names = {"--permissions-accounts-enabled"},
+    description = "Set if account level permissions should be enabled (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean permissionsAccountsEnabled = false;
+
   // Permissioning: A list of whitelist nodes can be passed.
   @Option(
     names = {"--nodes-whitelist"},
@@ -725,9 +738,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private PermissioningConfiguration permissioningConfiguration() {
     final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-    permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+            DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION,
+            permissionsNodesEnabled,
+            permissionsAccountsEnabled);
     return permissioningConfiguration;
   }
 
@@ -777,7 +791,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem)
             .metricsConfiguration(metricsConfiguration)
-            .permissioningConfigurationFromToml()
+            .permissioningConfiguration(permissioningConfiguration)
             .build();
 
     addShutdownHook(runner);
