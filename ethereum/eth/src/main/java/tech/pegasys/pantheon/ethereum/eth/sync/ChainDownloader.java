@@ -54,7 +54,7 @@ public class ChainDownloader<C> {
   private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
   private final SyncState syncState;
-  private final SyncTargetManager syncTargetManager;
+  private final SyncTargetManager<C> syncTargetManager;
   private final BlockImportTaskFactory blockImportTaskFactory;
   private final ProtocolSchedule<C> protocolSchedule;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
@@ -73,7 +73,7 @@ public class ChainDownloader<C> {
       final EthContext ethContext,
       final SyncState syncState,
       final LabelledMetric<OperationTimer> ethTasksTimer,
-      final SyncTargetManager syncTargetManager,
+      final SyncTargetManager<C> syncTargetManager,
       final BlockImportTaskFactory blockImportTaskFactory) {
     this.protocolSchedule = protocolSchedule;
     this.ethTasksTimer = ethTasksTimer;
@@ -96,7 +96,7 @@ public class ChainDownloader<C> {
   }
 
   @VisibleForTesting
-  CompletableFuture<?> getCurrentTask() {
+  public CompletableFuture<?> getCurrentTask() {
     return currentTask;
   }
 
@@ -306,21 +306,6 @@ public class ChainDownloader<C> {
     checkpointHeaders.addFirst(lastImportedCheckpointHeader);
     syncState.setCommonAncestor(lastImportedCheckpointHeader);
     return imported.size() > 1;
-  }
-
-  public interface CheckpointHeaderTaskProvider {
-    EthTask<PeerTaskResult<List<BlockHeader>>> checkpointHeadersTask(
-        BlockHeader lastCheckpointHeader, SyncTarget syncTarget);
-  }
-
-  public interface SyncTargetManager {
-    CompletableFuture<SyncTarget> findSyncTarget();
-
-    boolean isSyncTargetDisconnected();
-
-    void clearSyncTarget(final SyncTarget syncTarget);
-
-    boolean shouldSwitchSyncTarget(SyncTarget currentTarget);
   }
 
   public interface BlockImportTaskFactory {
