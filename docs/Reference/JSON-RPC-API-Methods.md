@@ -13,6 +13,41 @@ The following lists the Pantheon JSON-RPC API commands:
 !!! note
     The `ADMIN` API is not enabled by default. Use the [`--rpc-api` option](Pantheon-CLI-Syntax.md#rpc-api) to enable the `ADMIN` API.
 
+### admin_addPeer
+
+Adds a node to the list of tracked static nodes. The node attempts to maintain connectivity to these nodes.
+ If the remote connection goes down, the node tries to reconnect periodically (how often?)
+
+<accepts only one node?> 
+<can add itself>
+
+**Parameters**
+
+`string` : Enode of peer to add. 
+
+**Returns**
+
+`result` : `boolean` - true if peer added
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":[<ADD>],"id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"admin_addPeer","params":[<ADD>],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : [ <ADD>
+         
+      ]
+    }
+    ```
+
 ### admin_peers
 
 Returns networking information about connected remote nodes. 
