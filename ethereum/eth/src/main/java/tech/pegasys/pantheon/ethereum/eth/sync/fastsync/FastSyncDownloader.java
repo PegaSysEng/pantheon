@@ -42,6 +42,19 @@ public class FastSyncDownloader<C> {
     final CompletableFuture<Void> worldStateFuture =
         worldStateDownloader.downloadWorldState(currentState.getPivotBlockHeader().get());
     final CompletableFuture<Void> chainFuture = fastSyncActions.downloadChain(currentState);
+
+    // If either download fails, cancel the other one.
+    chainFuture.exceptionally(
+        error -> {
+          worldStateFuture.cancel(true);
+          return null;
+        });
+    worldStateFuture.exceptionally(
+        error -> {
+          chainFuture.cancel(true);
+          return null;
+        });
+
     return CompletableFuture.allOf(worldStateFuture, chainFuture)
         .thenApply(complete -> currentState);
   }
