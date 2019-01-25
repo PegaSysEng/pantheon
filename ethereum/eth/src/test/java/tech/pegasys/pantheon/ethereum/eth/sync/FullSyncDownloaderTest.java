@@ -333,8 +333,8 @@ public class FullSyncDownloaderTest {
     peerB.getEthPeer().chainState().update(gen.hash(), 100);
 
     // Process through first task cycle
-    final CompletableFuture<?> firstTask = downloader.currentTask;
-    while (downloader.currentTask == firstTask) {
+    final CompletableFuture<?> firstTask = downloader.getCurrentTask();
+    while (downloader.getCurrentTask() == firstTask) {
       RespondingEthPeer.respondOnce(responder, peerA, peerB);
     }
 
@@ -373,8 +373,8 @@ public class FullSyncDownloaderTest {
     otherPeer.getEthPeer().chainState().update(gen.hash(), 100);
 
     // Process through first task cycle
-    final CompletableFuture<?> firstTask = downloader.currentTask;
-    while (downloader.currentTask == firstTask) {
+    final CompletableFuture<?> firstTask = downloader.getCurrentTask();
+    while (downloader.getCurrentTask() == firstTask) {
       RespondingEthPeer.respondOnce(responder, bestPeer, otherPeer);
     }
 
@@ -416,8 +416,8 @@ public class FullSyncDownloaderTest {
         .update(gen.header(), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
-    final CompletableFuture<?> firstTask = downloader.currentTask;
-    while (downloader.currentTask == firstTask) {
+    final CompletableFuture<?> firstTask = downloader.getCurrentTask();
+    while (downloader.getCurrentTask() == firstTask) {
       RespondingEthPeer.respondOnce(responder, peerA, peerB);
     }
 
@@ -467,8 +467,8 @@ public class FullSyncDownloaderTest {
         .update(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
-    final CompletableFuture<?> firstTask = downloader.currentTask;
-    while (downloader.currentTask == firstTask) {
+    final CompletableFuture<?> firstTask = downloader.getCurrentTask();
+    while (downloader.getCurrentTask() == firstTask) {
       RespondingEthPeer.respondOnce(responder, bestPeer, otherPeer);
     }
 
