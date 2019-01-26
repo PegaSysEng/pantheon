@@ -610,11 +610,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private void ensureAllBootnodesAreInWhitelist(
       final EthNetworkConfig ethNetworkConfig,
       final PermissioningConfiguration permissioningConfiguration) {
-    if (!PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-        ethNetworkConfig, permissioningConfiguration)) {
-      throw new ParameterException(
-          new CommandLine(this),
-          "Cannot start node with bootnode(s) that are not in nodes-whitelist ");
+    try {
+      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
+          ethNetworkConfig, permissioningConfiguration);
+    } catch (Exception e) {
+      throw new ParameterException(new CommandLine(this), e.getMessage());
     }
   }
 

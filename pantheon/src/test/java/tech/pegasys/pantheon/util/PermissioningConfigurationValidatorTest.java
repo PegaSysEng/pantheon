@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import tech.pegasys.pantheon.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -48,10 +49,8 @@ public class PermissioningConfigurationValidatorTest {
     PermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(tomlResult, true, true);
 
-    assertThat(
-            PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-                ethNetworkConfig, permissioningConfiguration))
-        .isTrue();
+    PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
+        ethNetworkConfig, permissioningConfiguration);
   }
 
   @Test
@@ -67,9 +66,12 @@ public class PermissioningConfigurationValidatorTest {
     PermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(tomlResult, true, true);
 
-    assertThat(
-            PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-                ethNetworkConfig, permissioningConfiguration))
-        .isFalse();
+    try {
+      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
+          ethNetworkConfig, permissioningConfiguration);
+      fail("expected exception because ropsten bootnodes are not in node-whitelist");
+    } catch (Exception e) {
+      assertThat(e.getMessage().startsWith("Bootnode")).isTrue();
+    }
   }
 }

@@ -22,16 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class PermissioningConfigurationValidator {
 
-  private static final Logger LOG = LogManager.getLogger();
-
-  public static boolean areAllBootnodesAreInWhitelist(
+  public static void areAllBootnodesAreInWhitelist(
       final EthNetworkConfig ethNetworkConfig,
-      final PermissioningConfiguration permissioningConfiguration) {
+      final PermissioningConfiguration permissioningConfiguration)
+      throws Exception {
     final List<Peer> bootnodesNotInWhitelist = new ArrayList<Peer>();
     final List<Peer> bootnodes =
         DiscoveryConfiguration.getBootstrapPeersFromGenericCollection(
@@ -49,10 +45,8 @@ public class PermissioningConfigurationValidator {
         }
       }
       if (!bootnodesNotInWhitelist.isEmpty()) {
-        LOG.error("Bootnode(s) not in nodes-whitelist " + bootnodesNotInWhitelist);
-        return false;
+        throw new Exception("Bootnode(s) not in nodes-whitelist " + bootnodesNotInWhitelist);
       }
     }
-    return true;
   }
 }
