@@ -30,11 +30,11 @@ Use the button to import our collection of examples to [Postman](https://www.get
 ### Endpoint Host and Port
 
 The placeholder
-`<JSON-RPC-http-endpoint:port>` and `<JSON-RPC-ws-endpoint:port>` means an endpoint (IP address and port) 
+`<JSON-RPC-http-endpoint:port>` and `<JSON-RPC-ws-endpoint:port>` represents an endpoint (IP address and port) 
 of the JSON-RPC service of a Pantheon node for HTTP and WebSocket requests.
 
 To enable JSON-RPC over HTTP or WebSockets, use the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) 
-and [`--rpc-ws-listen`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-listen) options.
+and [`--rpc-ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled) options.
 
 Use the [--rpc-http-host](../Reference/Pantheon-CLI-Syntax.md#rpc-http-host) and [--rpc-ws-host](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-host) 
 options to specify the host on which the JSON-RPC listens. The default host is 127.0.0.1 for HTTP and WebSockets.  
