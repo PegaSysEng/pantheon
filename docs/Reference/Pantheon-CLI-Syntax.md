@@ -388,18 +388,18 @@ P2P network identifier.
 This option can be used to override your current network ID.
 The default value is the current network chain ID which is defined in the genesis file.
 
-### no-discovery
+### discovery-enabled
 
 ```bash tab="Syntax"
---no-discovery
+--discovery-enabled=false
 ```
 
 ```bash tab="Example Configuration File"
-no-discovery=true
+discovery-enabled=false
 ```
 
-Disables P2P peer discovery.
-The default is `false`.
+Enables or disables P2P peer discovery.
+The default is `true`.
 
 ### node-private-key-file
 
@@ -450,6 +450,23 @@ Not intended for use with mainnet or public testnets.
 
 !!!note
     Permissioning is under development and will be available in v1.0.
+
+### p2p-enabled
+
+```bash tab="Syntax"
+--p2p-enabled=<true|false>
+```
+
+```bash tab="Command line"
+--p2p-enabled=false
+```
+
+```bash tab="Example Configuration File"
+p2p-enabled=false
+```
+
+Enables or disables all p2p communication.
+The default is true.
 
 ### p2p-host
 
