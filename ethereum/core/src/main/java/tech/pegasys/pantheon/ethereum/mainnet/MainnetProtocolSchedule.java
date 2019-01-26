@@ -15,13 +15,9 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-
-import java.util.function.Function;
 import tech.pegasys.pantheon.ethereum.development.DevelopmentDifficultyCalculators;
 
-/**
- * Provides {@link ProtocolSpec} lookups for mainnet hard forks.
- */
+/** Provides {@link ProtocolSpec} lookups for mainnet hard forks. */
 public class MainnetProtocolSchedule {
 
   public static final int DEFAULT_CHAIN_ID = 1;
@@ -35,16 +31,17 @@ public class MainnetProtocolSchedule {
    * Create a Mainnet protocol schedule from a config object
    *
    * @param config {@link GenesisConfigOptions} containing the config options for the milestone
-   * starting points
+   *     starting points
    * @param privacyParameters the parameters set for private transactions
    * @return A configured mainnet protocol schedule
    */
   public static ProtocolSchedule<Void> fromConfig(
       final GenesisConfigOptions config, final PrivacyParameters privacyParameters) {
     return new ProtocolScheduleBuilder<>(
-        config, DEFAULT_CHAIN_ID,
-        builder -> builder.difficultyCalculator(DevelopmentDifficultyCalculators.DEVELOPER),
-        privacyParameters)
+            config,
+            DEFAULT_CHAIN_ID,
+            builder -> builder.difficultyCalculator(DevelopmentDifficultyCalculators.DEVELOPER),
+            privacyParameters)
         .createProtocolSchedule();
   }
 }

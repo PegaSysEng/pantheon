@@ -16,7 +16,6 @@ import static tech.pegasys.pantheon.ethereum.mainnet.MainnetTransactionValidator
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.development.DevelopmentDifficultyCalculators;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 

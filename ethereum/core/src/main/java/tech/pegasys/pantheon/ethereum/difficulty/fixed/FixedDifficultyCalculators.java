@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.difficulty.fixed;
 
-import java.math.BigInteger;
-import java.util.OptionalLong;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.DifficultyCalculator;
+
+import java.math.BigInteger;
 
 /**
  * This provides a difficulty calculator that can be used during development efforts; given
