@@ -244,6 +244,24 @@ metrics-host="127.0.0.1"
 Specifies the host on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
 metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
 
+### metrics-mode
+
+```bash tab="Syntax"
+--metrics-mode=<push|pull>
+```
+
+```bash tab="Example Command Line"
+--metrics-mode=push
+```
+
+```bash tab="Example Configuration File"
+metrics-mode=push
+```
+
+Specifies the mode by which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
+metrics. The default is `pull` in which Prometheus polls Pantheon. In `push` mode, Pantheon pushes to the gateway
+specified by `--metrics-host` and `--metrics-port`. 
+
 ### metrics-port
 
 ```bash tab="Syntax"
@@ -260,6 +278,38 @@ metrics-port="6174"
 
 Specifies the port on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
 metrics. The default is `9545`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+
+### metrics-prometheus-job
+
+```bash tab="Syntax"
+--metrics-prometheus-job=<metricsPrometheusJob>
+```
+
+```bash tab="Example Command Line"
+--metrics-prometheus-job="pantheon-metrics"
+```
+
+```bash tab="Example Configuration File"
+metrics-prometheus-job="pantheon-metrics"
+```
+
+Job name when in `push` mode. The default is `pantheon-client`. 
+
+### metrics-push-interval
+
+```bash tab="Syntax"
+--metrics-push-interval=<INTEGER>
+```
+
+```bash tab="Example Command Line"
+--metrics-push-interval=30
+```
+
+```bash tab="Example Configuration File"
+metrics-push-interval=30
+```
+
+Interval in seconds to push metrics when in `push` mode. The default is 15.
 
 ### miner-coinbase
 
