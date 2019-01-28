@@ -30,6 +30,7 @@ public class JsonRpcConfiguration {
   private Collection<String> corsAllowedDomains = Collections.emptyList();
   private Collection<RpcApi> rpcApis;
   private Collection<String> hostsWhitelist = Collections.singletonList("localhost");
+  private boolean authenticationEnabled;
 
   public static JsonRpcConfiguration createDefault() {
     final JsonRpcConfiguration config = new JsonRpcConfiguration();
@@ -97,6 +98,14 @@ public class JsonRpcConfiguration {
     this.hostsWhitelist = hostsWhitelist;
   }
 
+  public boolean getAuthenticationEnabled() {
+    return authenticationEnabled;
+  }
+
+  public void setAuthenticationEnabled(final boolean authenticationEnabled) {
+    this.authenticationEnabled = authenticationEnabled;
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
@@ -106,6 +115,7 @@ public class JsonRpcConfiguration {
         .add("corsAllowedDomains", corsAllowedDomains)
         .add("hostsWhitelist", hostsWhitelist)
         .add("rpcApis", rpcApis)
+        .add("authenticationEnabled", authenticationEnabled)
         .toString();
   }
 
