@@ -27,9 +27,9 @@ public class StringUtils {
    * @return a delimited string representation of the list
    */
   public static Function<List<String>, String> joiningWithLastDelimiter(
-      String delimiter, String lastDelimiter) {
+      final String delimiter, final String lastDelimiter) {
     return list -> {
-      int last = list.size() - 1;
+      final int last = list.size() - 1;
       if (last < 1) return String.join(delimiter, list);
       return String.join(
           lastDelimiter, String.join(delimiter, list.subList(0, last)), list.get(last));
