@@ -177,7 +177,8 @@ public class JsonRpcHttpServiceRpcApisTest {
                     new NoOpMetricsSystem(),
                     supportedCapabilities,
                     mock(AccountWhitelistController.class),
-                    config.getRpcApis()));
+                    config.getRpcApis(),
+                    mock(PrivateTransactionHandler.class)));
     final JsonRpcHttpService jsonRpcHttpService =
         new JsonRpcHttpService(
             vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);

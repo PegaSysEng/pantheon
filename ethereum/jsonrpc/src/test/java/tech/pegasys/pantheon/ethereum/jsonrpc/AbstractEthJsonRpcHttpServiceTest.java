@@ -184,7 +184,8 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
                 new NoOpMetricsSystem(),
                 supportedCapabilities,
                 accountWhitelistController,
-                JSON_RPC_APIS);
+                JSON_RPC_APIS,
+                privateTransactionHandlerMock);
     final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
     config.setPort(0);
     service =

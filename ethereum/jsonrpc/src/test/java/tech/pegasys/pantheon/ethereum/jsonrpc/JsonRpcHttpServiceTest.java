@@ -126,7 +126,8 @@ public class JsonRpcHttpServiceTest {
                     new NoOpMetricsSystem(),
                     supportedCapabilities,
                     mock(AccountWhitelistController.class),
-                    JSON_RPC_APIS));
+                    JSON_RPC_APIS,
+                    mock(PrivateTransactionHandler.class)));
     service = createJsonRpcHttpService();
     service.start().join();
 

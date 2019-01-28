@@ -263,7 +263,8 @@ public class RunnerBuilder {
               supportedCapabilities,
               jsonRpcConfiguration.getRpcApis(),
               filterManager,
-              accountWhitelistController);
+              accountWhitelistController,
+              privateTransactionHandler);
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
@@ -285,7 +286,8 @@ public class RunnerBuilder {
               supportedCapabilities,
               webSocketConfiguration.getRpcApis(),
               filterManager,
-              accountWhitelistController);
+              accountWhitelistController,
+              privateTransactionHandler);
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(
@@ -344,7 +346,8 @@ public class RunnerBuilder {
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> jsonRpcApis,
       final FilterManager filterManager,
-      final AccountWhitelistController accountWhitelistController) {
+      final AccountWhitelistController accountWhitelistController,
+      final PrivateTransactionHandler privateTransactionHandler) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -360,7 +363,8 @@ public class RunnerBuilder {
                 supportedCapabilities,
                 jsonRpcApis,
                 filterManager,
-                accountWhitelistController);
+                accountWhitelistController,
+                privateTransactionHandler);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
   }

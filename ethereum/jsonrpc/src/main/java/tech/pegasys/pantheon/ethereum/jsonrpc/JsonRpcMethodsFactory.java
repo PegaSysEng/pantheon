@@ -111,7 +111,8 @@ public class JsonRpcMethodsFactory {
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> rpcApis,
       final FilterManager filterManager,
-      final AccountWhitelistController accountsWhitelistController) {
+      final AccountWhitelistController accountsWhitelistController,
+      final PrivateTransactionHandler privateTransactionHandler) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
     return methods(
@@ -126,7 +127,8 @@ public class JsonRpcMethodsFactory {
         metricsSystem,
         supportedCapabilities,
         accountsWhitelistController,
-        rpcApis);
+        rpcApis,
+        privateTransactionHandler);
   }
 
   public Map<String, JsonRpcMethod> methods(
@@ -141,7 +143,8 @@ public class JsonRpcMethodsFactory {
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
       final AccountWhitelistController accountsWhitelistController,
-      final Collection<RpcApi> rpcApis) {
+      final Collection<RpcApi> rpcApis,
+      final PrivateTransactionHandler privateTransactionHandler) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
     // @formatter:off
     if (rpcApis.contains(RpcApis.ETH)) {
@@ -249,7 +252,9 @@ public class JsonRpcMethodsFactory {
           new PermRemoveAccountsFromWhitelist(accountsWhitelistController, parameter));
     }
     if (rpcApis.contains(RpcApis.EEA)) {
-      addMethods(enabledMethods, new EeaSendRawTransaction(transactionPool, parameter));
+      addMethods(
+          enabledMethods,
+          new EeaSendRawTransaction(privateTransactionHandler, transactionPool, parameter));
     }
     // @formatter:off
     return enabledMethods;
