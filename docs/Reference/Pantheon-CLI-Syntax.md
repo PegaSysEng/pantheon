@@ -224,7 +224,9 @@ The default is unlimited but the number of trailing peers cannot exceed the valu
 metrics-enabled=true
 ```
 
-Set to `true` to enable the [Prometheus](https://prometheus.io/) monitoring service to access [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-third-party-clients).
+Set to `true` to enable the [Prometheus](https://prometheus.io/) monitoring service to access [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus)
+or Pantheon to push metrics to a [Prometheus Pushgateway](https://github.com/prometheus/pushgateway).
+
 The default is `false`.
 
 ### metrics-host
@@ -241,8 +243,11 @@ The default is `false`.
 metrics-host="127.0.0.1"
 ```
 
-Specifies the host on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+Specifies the host on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus) or which 
+Pantheon pushes metrics to a [Prometheus Pushgateway](https://github.com/prometheus/pushgateway). 
+The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+
+The default is `127.0.0.1`. 
 
 ### metrics-mode
 
@@ -255,12 +260,11 @@ metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-wh
 ```
 
 ```bash tab="Example Configuration File"
-metrics-mode=push
+metrics-mode="push"
 ```
 
-Specifies the mode by which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `pull` in which Prometheus polls Pantheon. In `push` mode, Pantheon pushes to the gateway
-specified by `--metrics-host` and `--metrics-port`. 
+Specifies the mode by which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus). 
+The default is `pull` in which Prometheus polls Pantheon. In `push` mode, Pantheon pushes to a [Prometheus Gateway](https://github.com/prometheus/pushgateway). 
 
 ### metrics-port
 
@@ -276,8 +280,9 @@ specified by `--metrics-host` and `--metrics-port`.
 metrics-port="6174"
 ```
 
-Specifies the port on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `9545`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+Specifies the port on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus) 
+or which Pantheon pushes metrics to a [Prometheus Pushgateway](https://github.com/prometheus/pushgateway).
+The default is `9545`. 
 
 ### metrics-prometheus-job
 
