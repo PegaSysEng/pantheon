@@ -20,7 +20,9 @@ If connections are not getting through the firewalls, ensure the peer discovery 
 
 ## Peer Discovery Port
 
-The [`--p2p-listen`](../Reference/Pantheon-CLI-Syntax.md#p2p-listen) option specifies the host and port on which P2P peer discovery listens. The default is ==127.0.0.1:30303==.
+The [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port)
+options specifies the host and port on which P2P peer discovery listens. The default is ==127.0.0.1==
+for host and ==30303== for port.
  
 ## Limiting Peers
 
@@ -34,7 +36,9 @@ Trailing peers cannot be used to get new blocks and are more likely to be reques
 
 ## No Discovery
 
-The [`--no-discovery`](../Reference/Pantheon-CLI-Syntax.md#no-discovery) command line option disables P2P peer discovery.  Only use this option if you are running a test node or a test network with fixed nodes.
+The [`--rpc-ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled) command line option 
+enables P2P peer discovery.
+Only set this option to `false` if you are running a test node or a test network with fixed nodes.
 
 ## Monitoring Peer Connections
 

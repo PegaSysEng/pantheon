@@ -283,9 +283,6 @@ None
 
 Returns the [chain ID](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 
-!!!note
-    This method is only available from v0.8.2. 
-
 **Parameters**
 
 None
@@ -320,7 +317,7 @@ You can get the Ethereum account address from a client such as MetaMask or Ether
 
 !!!example
     ```bash
-    $ bin/pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-enabled
+    $ bin/pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-http-enabled
     ```
 
 **Parameters**
@@ -2062,7 +2059,7 @@ Lists the validators defined in the specified block.
     
 ### ibft_proposeValidatorVote
 
-Proposes [adding or removing a validator]((../Consensus-Protocols/IBFT.md#adding-and-removing-validators)) with the specified address. 
+Proposes [adding or removing a validator](../Consensus-Protocols/IBFT.md#adding-and-removing-validators)) with the specified address. 
 
 **Parameters**
 
