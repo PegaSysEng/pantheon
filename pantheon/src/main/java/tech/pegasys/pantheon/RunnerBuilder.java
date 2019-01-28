@@ -53,6 +53,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -239,12 +240,15 @@ public class RunnerBuilder {
 
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
-
     final AccountWhitelistController accountWhitelistController =
         new AccountWhitelistController(permissioningConfiguration);
     if (permissioningConfiguration.isAccountWhitelistSet()) {
       transactionPool.setAccountWhitelist(accountWhitelistController);
     }
+
+    final PrivacyParameters privacyParameters = pantheonController.getPrivacyParameters();
+    final PrivateTransactionHandler privateTransactionHandler =
+        new PrivateTransactionHandler(privacyParameters);
 
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 

@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
@@ -94,7 +95,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
       final KeyPair nodeKeys,
-      final MetricsSystem metricsSystem) {
+      final MetricsSystem metricsSystem,
+      final PrivacyParameters privacyParameters) {
 
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final BlockchainStorage blockchainStorage =

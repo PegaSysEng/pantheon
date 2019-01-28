@@ -61,7 +61,8 @@ public interface PantheonController<C> extends Closeable {
           syncConfig,
           miningParameters,
           nodeKeys,
-          metricsSystem);
+          metricsSystem,
+          privacyParameters);
     } else if (configOptions.isRevisedIbft()) {
       return IbftPantheonController.init(
           storageProvider,

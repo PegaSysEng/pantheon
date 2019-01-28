@@ -255,6 +255,12 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   }
 
   @Override
+  public PrivacyParameters getPrivacyParameters() {
+    LOG.warn("CliquePantheonController does not currently support private transactions.");
+    return PrivacyParameters.noPrivacy();
+  }
+
+  @Override
   public Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
       final Collection<RpcApi> enabledRpcApis) {
     return new CliqueJsonRpcMethodsFactory().methods(context, enabledRpcApis);
