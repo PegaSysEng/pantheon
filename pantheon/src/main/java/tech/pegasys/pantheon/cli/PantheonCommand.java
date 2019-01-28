@@ -62,6 +62,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -100,6 +101,8 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements DefaultCommandValues, Runnable {
+
+  private CommandLine commandLine;
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
 
@@ -266,7 +269,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     names = {"--rpc-http-enabled"},
     description = "Set if the JSON-RPC service should be started (default: ${DEFAULT-VALUE})"
   )
-  private final Boolean isHttpRpcEnabled = false;
+  private final Boolean isRpcHttpEnabled = false;
 
   @Option(
     names = {"--rpc-http-host"},
@@ -481,6 +484,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Collection<String> accountsWhitelist = null;
 
   @Option(
+    names = {"--privacy-enabled"},
+    description = "Set if private transaction should be enabled (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean privacyEnabled = false;
+
+  @Option(
     names = {"--privacy-url"},
     description = "The URL on which enclave is running "
   )
@@ -491,12 +500,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "the path to the enclave's public key "
   )
   private final File privacyPublicKeyFile = null;
-
-  @Option(
-    names = {"--privacy-enabled"},
-    description = "Set if private transaction should be enabled (default: ${DEFAULT-VALUE})"
-  )
-  private final Boolean privacyEnabled = false;
 
   @Option(
     names = {"--privacy-precompiled-address"},
@@ -523,7 +526,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final DefaultExceptionHandler<List<Object>> exceptionHandler,
       final String... args) {
 
-    final CommandLine commandLine = new CommandLine(this);
+    commandLine = new CommandLine(this);
 
     commandLine.setCaseInsensitiveEnumValuesAllowed(true);
 
@@ -562,10 +565,27 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
-    if (!p2pEnabled && (bootNodes != null && !bootNodes.isEmpty())) {
-      throw new ParameterException(
-          new CommandLine(this), "Unable to specify bootnodes if p2p is disabled.");
-    }
+    // Check that p2p options are able top work or send an error
+    CommandLineUtils.checkOptionDependencies(
+        commandLine,
+        this,
+        "--p2p-enabled",
+        !p2pEnabled,
+        Arrays.asList(
+            "--bootnodes",
+            "--discovery-enabled",
+            "--max-peers",
+            "--max-trailing-peers",
+            "--banned-node-id",
+            "--banned-node-ids"));
+
+    // Check that mining options are able top work or send an error
+    CommandLineUtils.checkOptionDependencies(
+        commandLine,
+        this,
+        "--miner-enabled",
+        !isMiningEnabled,
+        Arrays.asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -648,8 +668,21 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
+
+    CommandLineUtils.checkOptionDependencies(
+        commandLine,
+        this,
+        "--rpc-http-enabled",
+        !isRpcHttpEnabled,
+        Arrays.asList(
+            "--rpc-http-api",
+            "--rpc-http-apis",
+            "--rpc-http-cors-origins",
+            "--rpc-http-host",
+            "--rpc-http-port"));
+
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
-    jsonRpcConfiguration.setEnabled(isHttpRpcEnabled);
+    jsonRpcConfiguration.setEnabled(isRpcHttpEnabled);
     jsonRpcConfiguration.setHost(rpcHttpHost.toString());
     jsonRpcConfiguration.setPort(rpcHttpPort);
     jsonRpcConfiguration.setCorsAllowedDomains(rpcHttpCorsAllowedOrigins);
@@ -659,6 +692,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private WebSocketConfiguration webSocketConfiguration() {
+
+    CommandLineUtils.checkOptionDependencies(
+        commandLine,
+        this,
+        "--rpc-ws-enabled",
+        !isRpcWsEnabled,
+        Arrays.asList(
+            "--rpc-ws-api",
+            "--rpc-ws-apis",
+            "--rpc-ws-refresh-delay",
+            "--rpc-ws-host",
+            "--rpc-ws-port"));
+
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(isRpcWsEnabled);
     webSocketConfiguration.setHost(rpcWsHost.toString());
@@ -669,6 +715,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   MetricsConfiguration metricsConfiguration() {
+
+    CommandLineUtils.checkOptionDependencies(
+        commandLine,
+        this,
+        "--metrics-enabled",
+        !isMetricsEnabled,
+        Arrays.asList(
+            "--metrics-mode",
+            "--metrics-host",
+            "--metrics-port",
+            "--metrics-push-interval",
+            "--metrics-prometheus-job"));
+
     final MetricsConfiguration metricsConfiguration = createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);
     metricsConfiguration.setMode(metricsMode);
@@ -689,6 +748,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private PrivacyParameters orionConfiguration() {
+
+    // Check that mining options are able top work or send an error
+    CommandLineUtils.checkOptionDependencies(
+        commandLine,
+        this,
+        "--privacy-enabled",
+        !privacyEnabled,
+        Arrays.asList(
+            "--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
+
     final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
     privacyParameters.setEnabled(privacyEnabled);
     privacyParameters.setUrl(privacyUrl.toString());
