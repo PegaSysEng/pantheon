@@ -369,13 +369,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isMetricsEnabled = false;
 
   @Option(
-    names = {"--metrics-mode"},
-    description =
-        "Mode for the metrics service to run in, 'push' or 'pull' (default: ${DEFAULT-VALUE})"
-  )
-  private String metricsMode = MetricsConfiguration.MODE_SERVER_PULL;
-
-  @Option(
     names = {"--metrics-host"},
     paramLabel = MANDATORY_HOST_FORMAT_HELP,
     description = "Host for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
@@ -391,6 +384,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     arity = "1"
   )
   private final Integer metricsPort = DEFAULT_METRICS_PORT;
+
+  @Option(
+    names = {"--metrics-push-enabled"},
+    description =
+        "Set if the metrics push gateway integration should be started (default: ${DEFAULT-VALUE})"
+  )
+  private Boolean isMetricsPushEnabled = false;
 
   @Option(
     names = {"--metrics-push-host"},
@@ -419,7 +419,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer metricsPushInterval = 15;
 
   @Option(
-    names = {"--metrics-prometheus-job"},
+    names = {"--metrics-push-prometheus-job"},
     description = "Job name to use when in push mode (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
@@ -689,9 +689,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   MetricsConfiguration metricsConfiguration() {
     final MetricsConfiguration metricsConfiguration = createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);
-    metricsConfiguration.setMode(metricsMode);
     metricsConfiguration.setHost(metricsHost.toString());
     metricsConfiguration.setPort(metricsPort);
+    metricsConfiguration.setPushEnabled(isMetricsPushEnabled);
     metricsConfiguration.setPushHost(metricsPushHost.toString());
     metricsConfiguration.setPushPort(metricsPushPort);
     metricsConfiguration.setPushInterval(metricsPushInterval);

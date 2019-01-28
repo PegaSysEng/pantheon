@@ -49,10 +49,8 @@ class MetricsPushGatewayService implements MetricsService {
         "Invalid port configuration.");
     checkArgument(config.getPushHost() != null, "Required host is not configured.");
     checkArgument(
-        MetricsConfiguration.MODE_PUSH_GATEWAY.equals(config.getMode()),
-        "Metrics Push Gateway Service cannot start up outside of '"
-            + MetricsConfiguration.MODE_PUSH_GATEWAY
-            + "' mode.");
+        !(config.isEnabled() && config.isPushEnabled()),
+        "Metrics Push Gateway Service cannot run concurrent with the normal metrics.");
     checkArgument(
         metricsSystem instanceof PrometheusMetricsSystem,
         "Push Gateway requires a Prometheus Metrics System.");

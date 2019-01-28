@@ -1420,13 +1420,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void metricsModeOptionMustBeUsed() {
-    parseCommand("--metrics-mode", "pull");
+  public void metricsPushEnabledPropertyMustBeUsed() {
+    parseCommand("--metrics-push-enabled");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(metricsConfigArgumentCaptor.getValue().getMode()).isEqualTo("pull");
+    assertThat(metricsConfigArgumentCaptor.getValue().isPushEnabled()).isTrue();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1463,7 +1463,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsPrometheusJobMustBeUsed() {
-    parseCommand("--metrics-prometheus-job", "pantheon-command-test");
+    parseCommand("--metrics-push-prometheus-job", "pantheon-command-test");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();

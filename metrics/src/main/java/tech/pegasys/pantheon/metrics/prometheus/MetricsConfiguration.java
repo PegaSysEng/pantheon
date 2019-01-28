@@ -25,15 +25,12 @@ public class MetricsConfiguration {
   private static final String DEFAULT_METRICS_PUSH_HOST = "127.0.0.1";
   public static final int DEFAULT_METRICS_PUSH_PORT = 9001;
 
-  public static final String MODE_PUSH_GATEWAY = "push";
-  public static final String MODE_SERVER_PULL = "pull";
-
   private boolean enabled;
   private int port;
   private String host;
+  private boolean pushEnabled;
   private int pushPort;
   private String pushHost;
-  private String mode;
   private int pushInterval;
   private String prometheusJob;
   private Collection<String> hostsWhitelist = Collections.singletonList("localhost");
@@ -43,9 +40,9 @@ public class MetricsConfiguration {
     metricsConfiguration.setEnabled(false);
     metricsConfiguration.setPort(DEFAULT_METRICS_PORT);
     metricsConfiguration.setHost(DEFAULT_METRICS_HOST);
+    metricsConfiguration.setPushEnabled(false);
     metricsConfiguration.setPushPort(DEFAULT_METRICS_PUSH_PORT);
     metricsConfiguration.setPushHost(DEFAULT_METRICS_PUSH_HOST);
-    metricsConfiguration.setMode(MODE_SERVER_PULL);
     metricsConfiguration.setPushInterval(15);
     metricsConfiguration.setPrometheusJob("pantheon-client");
 
@@ -94,12 +91,12 @@ public class MetricsConfiguration {
     this.pushHost = pushHost;
   }
 
-  public String getMode() {
-    return mode;
+  public boolean isPushEnabled() {
+    return pushEnabled;
   }
 
-  public void setMode(final String mode) {
-    this.mode = mode;
+  public void setPushEnabled(final boolean pushEnabled) {
+    this.pushEnabled = pushEnabled;
   }
 
   public int getPushInterval() {
@@ -136,13 +133,12 @@ public class MetricsConfiguration {
         + ", host='"
         + host
         + '\''
+        + ", pushEnabled="
+        + pushEnabled
         + ", pushPort="
         + pushPort
         + ", pushHost='"
         + pushHost
-        + '\''
-        + ", mode='"
-        + mode
         + '\''
         + ", pushInterval="
         + pushInterval
@@ -161,11 +157,11 @@ public class MetricsConfiguration {
     final MetricsConfiguration that = (MetricsConfiguration) o;
     return enabled == that.enabled
         && port == that.port
+        && pushEnabled == that.pushEnabled
         && pushPort == that.pushPort
         && pushInterval == that.pushInterval
         && Objects.equals(host, that.host)
         && Objects.equals(pushHost, that.pushHost)
-        && Objects.equals(mode, that.mode)
         && Objects.equals(prometheusJob, that.prometheusJob)
         && com.google.common.base.Objects.equal(
             Lists.newArrayList(hostsWhitelist), Lists.newArrayList(that.hostsWhitelist));
@@ -174,6 +170,14 @@ public class MetricsConfiguration {
   @Override
   public int hashCode() {
     return Objects.hash(
-        enabled, port, host, pushPort, pushHost, mode, pushInterval, prometheusJob, hostsWhitelist);
+        enabled,
+        port,
+        host,
+        pushEnabled,
+        pushPort,
+        pushHost,
+        pushInterval,
+        prometheusJob,
+        hostsWhitelist);
   }
 }
