@@ -30,10 +30,13 @@ class CommandLineUtils {
    * that could replace this. See https://github.com/remkop/picocli/issues/295
    *
    * @param commandLine the command line required to throw exception from
-   * @param mainOptionName the name of the main option to test dependency against. Only used for display.
-   * @param isMainOptionCondition the condition to test the options dependencies, if true will test if not won't
+   * @param mainOptionName the name of the main option to test dependency against. Only used for
+   *     display.
+   * @param isMainOptionCondition the condition to test the options dependencies, if true will test
+   *     if not won't
    * @param dependentOptionsNames a list of option names that can't be used if condition is met.
-   * Example: if --miner-coinbase is in the list and condition is that --miner-enabled should not be false, we raise an error.
+   *     Example: if --miner-coinbase is in the list and condition is that --miner-enabled should
+   *     not be false, we raise an error.
    */
   static void checkOptionDependencies(
       final CommandLine commandLine,
