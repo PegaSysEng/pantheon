@@ -23,8 +23,6 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
-import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyCalculators;
-import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -55,16 +53,7 @@ public interface PantheonController<C> extends Closeable {
 
     final GenesisConfigOptions configOptions = genesisConfigFile.getConfigOptions();
 
-    if (FixedDifficultyCalculators.isFixedDifficultyInConfig(configOptions)) {
-      return MainnetPantheonController.init(
-          storageProvider,
-          genesisConfigFile,
-          FixedDifficultyProtocolSchedule.create(configOptions),
-          syncConfig,
-          miningParameters,
-          nodeKeys,
-          metricsSystem);
-    } else if (configOptions.isEthHash()) {
+    if (configOptions.isEthHash()) {
       return MainnetPantheonController.init(
           storageProvider,
           genesisConfigFile,

@@ -22,12 +22,13 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 /** A ProtocolSchedule which behaves similarly to MainNet, but with a much reduced difficulty. */
 public class FixedDifficultyProtocolSchedule {
 
-  public static ProtocolSchedule<Void> create(final GenesisConfigOptions config) {
+  public static ProtocolSchedule<Void> create(
+      final GenesisConfigOptions config, final PrivacyParameters privacyParameters) {
     return new ProtocolScheduleBuilder<>(
             config,
             NO_CHAIN_ID,
             builder -> builder.difficultyCalculator(FixedDifficultyCalculators.calculator(config)),
-            PrivacyParameters.noPrivacy())
+            privacyParameters)
         .createProtocolSchedule();
   }
 }
