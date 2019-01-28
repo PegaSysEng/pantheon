@@ -22,6 +22,7 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfigur
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
+import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
 import tech.pegasys.pantheon.Runner;
@@ -392,6 +393,23 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer metricsPort = DEFAULT_METRICS_PORT;
 
   @Option(
+    names = {"--metrics-push-host"},
+    paramLabel = MANDATORY_HOST_FORMAT_HELP,
+    description = "Host of the Prometheus Push Gateway for push mode (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final HostSpecifier metricsPushHost =
+      HostSpecifier.fromValid(autoDiscoverDefaultIP().getHostAddress());
+
+  @Option(
+    names = {"--metrics-push-port"},
+    paramLabel = MANDATORY_PORT_FORMAT_HELP,
+    description = "Port of the Prometheus Push Gateway for push mode (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final Integer metricsPushPort = DEFAULT_METRICS_PUSH_PORT;
+
+  @Option(
     names = {"--metrics-push-interval"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description =
@@ -674,6 +692,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     metricsConfiguration.setMode(metricsMode);
     metricsConfiguration.setHost(metricsHost.toString());
     metricsConfiguration.setPort(metricsPort);
+    metricsConfiguration.setPushHost(metricsPushHost.toString());
+    metricsConfiguration.setPushPort(metricsPushPort);
     metricsConfiguration.setPushInterval(metricsPushInterval);
     metricsConfiguration.setPrometheusJob(metricsPrometheusJob);
     metricsConfiguration.setHostsWhitelist(hostsWhitelist);

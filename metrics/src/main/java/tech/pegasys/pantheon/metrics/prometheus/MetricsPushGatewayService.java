@@ -45,9 +45,9 @@ class MetricsPushGatewayService implements MetricsService {
 
   private void validateConfig(final MetricsConfiguration config) {
     checkArgument(
-        config.getPort() == 0 || NetworkUtility.isValidPort(config.getPort()),
+        config.getPushPort() == 0 || NetworkUtility.isValidPort(config.getPushPort()),
         "Invalid port configuration.");
-    checkArgument(config.getHost() != null, "Required host is not configured.");
+    checkArgument(config.getPushHost() != null, "Required host is not configured.");
     checkArgument(
         MetricsConfiguration.MODE_PUSH_GATEWAY.equals(config.getMode()),
         "Metrics Push Gateway Service cannot start up outside of '"
@@ -60,9 +60,9 @@ class MetricsPushGatewayService implements MetricsService {
 
   @Override
   public CompletableFuture<?> start() {
-    LOG.info("Starting Metrics service on {}:{}", config.getHost(), config.getPort());
+    LOG.info("Starting Metrics service on {}:{}", config.getPushHost(), config.getPushPort());
 
-    pushGateway = new PushGateway(config.getHost() + ":" + config.getPort());
+    pushGateway = new PushGateway(config.getPushHost() + ":" + config.getPushPort());
 
     // Create the executor
     scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();

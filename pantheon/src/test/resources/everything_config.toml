@@ -55,6 +55,8 @@ metrics-enabled=false
 metrics-mode="pull"
 metrics-host="8.6.7.5"
 metrics-port=309
+metrics-push-host="5.5.5.1"
+metrics-push-port=212
 metrics-push-interval=42
 metrics-prometheus-job="pantheon-everything"
 

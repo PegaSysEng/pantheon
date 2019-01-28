@@ -1433,6 +1433,22 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void metricsPushHostAndPushPortOptionMustBeUsed() {
+    final String host = "1.2.3.4";
+    final int port = 1234;
+    parseCommand("--metrics-push-host", host, "--metrics-push-port", String.valueOf(port));
+
+    verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(metricsConfigArgumentCaptor.getValue().getPushHost()).isEqualTo(host);
+    assertThat(metricsConfigArgumentCaptor.getValue().getPushPort()).isEqualTo(port);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void metricsPushIntervalMustBeUsed() {
     parseCommand("--metrics-push-interval", "42");
 
