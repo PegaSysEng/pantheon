@@ -29,9 +29,11 @@ dependencies {
   implementation project(':ethereum:core')
   implementation project(':ethereum:p2p')
   implementation project(':ethereum:rlp')
+  implementation project(':ethereum:trie')
   implementation project(':ethereum:permissioning')
   implementation project(':metrics')
   implementation project(':services:kvstore')
+  implementation project(':services:queue')
 
   implementation 'io.vertx:vertx-core'
   implementation 'com.google.guava:guava'
