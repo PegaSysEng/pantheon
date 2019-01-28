@@ -81,9 +81,15 @@ class MetricsPushGatewayService implements MetricsService {
       // Calling shutdown now cancels the pending push, which is desirable.
       scheduledExecutorService.shutdownNow();
       scheduledExecutorService.awaitTermination(30, TimeUnit.SECONDS);
-      pushGateway.delete(config.getPrometheusJob());
+      try {
+        pushGateway.delete(config.getPrometheusJob());
+      } catch (final Exception e) {
+        LOG.error("Could not clean up results on the  Prometheus Push Gateway.", e);
+        // Do not complete exceptionally, the gateway may be down and failures
+        // here cause the shutdown to loop.  Failure is acceptable.
+      }
       resultFuture.complete(null);
-    } catch (final IOException | InterruptedException e) {
+    } catch (final InterruptedException e) {
       LOG.error(e);
       resultFuture.completeExceptionally(e);
     }
