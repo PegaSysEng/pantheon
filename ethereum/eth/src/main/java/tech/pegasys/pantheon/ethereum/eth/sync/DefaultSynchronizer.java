@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync;
 
+import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.FAST_SYNC_UNAVAILABLE;
+
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
@@ -20,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncActions;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncException;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState;
+import tech.pegasys.pantheon.ethereum.eth.sync.fullsync.FullSyncDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -76,7 +79,10 @@ public class DefaultSynchronizer<C> implements Synchronizer {
           Optional.of(
               new FastSyncDownloader<>(
                   new FastSyncActions<>(
-                      syncConfig, protocolSchedule, protocolContext, ethContext, ethTasksTimer)));
+                      syncConfig, protocolSchedule, protocolContext, ethContext, ethTasksTimer),
+                  pivotBlockHeader -> {
+                    throw new FastSyncException(FAST_SYNC_UNAVAILABLE);
+                  }));
     } else {
       this.fastSyncDownloader = Optional.empty();
     }
