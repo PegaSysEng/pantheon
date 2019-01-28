@@ -568,7 +568,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     // Check that p2p options are able top work or send an error
     CommandLineUtils.checkOptionDependencies(
         commandLine,
-        this,
         "--p2p-enabled",
         !p2pEnabled,
         Arrays.asList(
@@ -582,7 +581,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     // Check that mining options are able top work or send an error
     CommandLineUtils.checkOptionDependencies(
         commandLine,
-        this,
         "--miner-enabled",
         !isMiningEnabled,
         Arrays.asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
@@ -671,7 +669,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     CommandLineUtils.checkOptionDependencies(
         commandLine,
-        this,
         "--rpc-http-enabled",
         !isRpcHttpEnabled,
         Arrays.asList(
@@ -695,7 +692,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     CommandLineUtils.checkOptionDependencies(
         commandLine,
-        this,
         "--rpc-ws-enabled",
         !isRpcWsEnabled,
         Arrays.asList(
@@ -718,7 +714,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     CommandLineUtils.checkOptionDependencies(
         commandLine,
-        this,
         "--metrics-enabled",
         !isMetricsEnabled,
         Arrays.asList(
@@ -752,7 +747,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     // Check that mining options are able top work or send an error
     CommandLineUtils.checkOptionDependencies(
         commandLine,
-        this,
         "--privacy-enabled",
         !privacyEnabled,
         Arrays.asList(

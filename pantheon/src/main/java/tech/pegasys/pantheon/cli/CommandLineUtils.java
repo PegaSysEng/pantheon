@@ -21,17 +21,22 @@ import java.util.stream.Collectors;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
-public class CommandLineUtils {
+class CommandLineUtils {
   /**
    * Check if options are passed that reauire --rpc-http-enabled option to be true to have any
    * effect and show an error with the list of affected options.
    *
    * <p>Note that in future version of PicoCLI some options dependency mechanism may be implemented
    * that could replace this. See https://github.com/remkop/picocli/issues/295
+   *
+   * @param commandLine the command line required to throw exception from
+   * @param mainOptionName the name of the main option to test dependency against. Only used for display.
+   * @param isMainOptionCondition the condition to test the options dependencies, if true will test if not won't
+   * @param dependentOptionsNames a list of option names that can't be used if condition is met.
+   * Example: if --miner-coinbase is in the list and condition is that --miner-enabled should not be false, we raise an error.
    */
-  public static void checkOptionDependencies(
+  static void checkOptionDependencies(
       final CommandLine commandLine,
-      final Object commandClass,
       final String mainOptionName,
       final boolean isMainOptionCondition,
       final List<String> dependentOptionsNames) {
@@ -52,7 +57,7 @@ public class CommandLineUtils {
 
       if (!affectedOptions.isEmpty()) {
         throw new ParameterException(
-            new CommandLine(commandClass),
+            commandLine,
             String.format("%1$s require %2$s option to be true.", affectedOptions, mainOptionName));
       }
     }
