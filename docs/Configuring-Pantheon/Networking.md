@@ -30,8 +30,6 @@ Limiting peers reduces the bandwidth used by Pantheon. It also reduces the CPU t
  
 Use the [`--max-peers`](../Reference/Pantheon-CLI-Syntax.md#max-peers) command line option to reduce the maximum number of peers. The default is 25.
  
-Use the  [`--max-trailing-peers`](../Reference/Pantheon-CLI-Syntax.md#max-trailing-peers) option to reduce the maximum P2P peer connections for peers that are trailing behind the local chain head. The default is unlimited but the number of trailing peers cannot exceed the value specified by [`--max-peers`](../Reference/Pantheon-CLI-Syntax.md#max-peers).
-
 Trailing peers cannot be used to get new blocks and are more likely to be requesting blocks from you. Limiting trailing peers may reduce the time taken to catch up to the chain head when synchronizing. 
 
 ## No Discovery
