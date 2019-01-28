@@ -1476,6 +1476,23 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void metricsAndMetricsPushMustNotBeUsedTogether() throws Exception {
+    assumeTrue(isFullInstantiation());
+
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    parseCommand("--metrics-enabled", "--metrics-push-enabled");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .startsWith("--metrics-enabled option and --metrics-push-enabled option can't be used");
+  }
+
+  @Test
   public void pantheonDoesNotStartInMiningModeIfCoinbaseNotSet() {
     parseCommand("--miner-enabled");
 

@@ -687,6 +687,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   MetricsConfiguration metricsConfiguration() {
+    if (isMetricsEnabled && isMetricsPushEnabled) {
+      throw new ParameterException(
+          new CommandLine(this),
+          "--metrics-enabled option and --metrics-push-enabled option can't be used at the same "
+              + "time.  Please refer to CLI reference for more details about this constraint.");
+    }
+
     final MetricsConfiguration metricsConfiguration = createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);
     metricsConfiguration.setHost(metricsHost.toString());
@@ -805,8 +812,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         // conflict error
         throw new ParameterException(
             new CommandLine(this),
-            "--network option and --genesis-file option can't be used at the same time."
-                + "Please refer to CLI reference for more details about this constraint.");
+            "--network option and --genesis-file option can't be used at the same time.  Please "
+                + "refer to CLI reference for more details about this constraint.");
       }
 
       builder.setGenesisConfig(genesisConfig());
