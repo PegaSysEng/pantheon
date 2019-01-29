@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -89,7 +90,7 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
         .timeout(task)
         .thenApply(
             result -> {
-              if (result.size() != 1 || !result.get(0).equals(pivotBlockHeader)) {
+              if (peerHasDifferentPivotBlock(result)) {
                 bestPeer.disconnect(DisconnectReason.USELESS_PEER);
                 return Optional.<EthPeer>empty();
               } else {
@@ -101,6 +102,10 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
               LOG.debug("Could not confirm best peer had pivot block", error);
               return Optional.empty();
             });
+  }
+
+  private boolean peerHasDifferentPivotBlock(final List<BlockHeader> result) {
+    return result.size() != 1 || !result.get(0).equals(pivotBlockHeader);
   }
 
   @Override
