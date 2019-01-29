@@ -100,23 +100,22 @@ public class BlockImporter {
         final CompletableFuture<Void> extractingFuture =
             CompletableFuture.runAsync(() -> extractSignatures(block));
 
-        final CompletableFuture<Void> otherFuture;
+        final CompletableFuture<Void> calculationFutures;
         if (previousBlockFuture == null) {
-          otherFuture = extractingFuture;
+          calculationFutures = extractingFuture;
         } else {
-          otherFuture =
-              extractingFuture.runAfterBothAsync(previousBlockFuture, () -> {}, importExecutor);
+          calculationFutures = CompletableFuture.allOf(extractingFuture, previousBlockFuture);
         }
 
         try {
           blockBacklog.acquire();
         } catch (final InterruptedException e) {
-          LOG.error(e);
+          LOG.error("Interrupted adding to backlog.", e);
           break;
         }
         previousBlockFuture =
             validationFuture.runAfterBothAsync(
-                otherFuture,
+                calculationFutures,
                 () -> evaluateBlock(context, block, header, protocolSpec),
                 importExecutor);
 
@@ -132,13 +131,13 @@ public class BlockImporter {
       try {
         validationExecutor.awaitTermination(5, SECONDS);
       } catch (final Exception e) {
-        LOG.error(e);
+        LOG.error("Error shutting down validatorExecutor.", e);
       }
       importExecutor.shutdownNow();
       try {
         importExecutor.awaitTermination(5, SECONDS);
       } catch (final Exception e) {
-        LOG.error(e);
+        LOG.error("Error shutting down importExecutor", e);
       }
       pantheonController.close();
     }
