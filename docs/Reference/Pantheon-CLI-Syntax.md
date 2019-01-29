@@ -616,7 +616,7 @@ rpc-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
 Specifies domain URLs for CORS validation.
 Domain URLs must be enclosed in double quotes and comma-separated.
 
-Listed domains can access to node data (whitelisted).
+Listed domains can access the node using JSON-RPC.
 If your client interacts with Pantheon using a browser app (such as Remix or a block explorer), 
 you must whitelist the client domains. 
 
