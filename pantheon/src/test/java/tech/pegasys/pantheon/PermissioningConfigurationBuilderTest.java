@@ -39,6 +39,8 @@ public class PermissioningConfigurationBuilderTest {
       "permissioning_config_invalid_enode.toml";
   static final String PERMISSIONING_CONFIG_EMPTY_WHITELISTS =
       "permissioning_config_empty_whitelists.toml";
+  static final String PERMISSIONING_CONFIG_ABSENT_WHITELISTS =
+      "permissioning_config_absent_whitelists.toml";
 
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
@@ -120,6 +122,23 @@ public class PermissioningConfigurationBuilderTest {
   public void permissioningConfigWithEmptyWhitelistMustNotError() throws IOException {
 
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_EMPTY_WHITELISTS);
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+    final TomlParseResult tomlResult = Toml.parse(toml);
+
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfigurationBuilder.permissioningConfiguration(tomlResult, true, true);
+
+    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getNodeWhitelist()).isEmpty();
+    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.getAccountWhitelist()).isEmpty();
+  }
+
+  @Test
+  public void permissioningConfigWithAbsentWhitelistMustSetValues() throws IOException {
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_ABSENT_WHITELISTS);
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
     final TomlParseResult tomlResult = Toml.parse(toml);
