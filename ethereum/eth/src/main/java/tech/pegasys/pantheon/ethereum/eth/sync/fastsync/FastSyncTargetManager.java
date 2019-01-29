@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.PivotBlockRetriever.MAX_PIVOT_BLOCK_RETRIES;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -22,7 +23,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SyncTargetManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetHeadersFromPeerByNumberTask;
+import tech.pegasys.pantheon.ethereum.eth.sync.tasks.RetryingGetHeaderFromPeerByNumberTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -75,26 +76,31 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
   }
 
   private CompletableFuture<Optional<EthPeer>> confirmPivotBlockHeader(final EthPeer bestPeer) {
+    final RetryingGetHeaderFromPeerByNumberTask task =
+        RetryingGetHeaderFromPeerByNumberTask.forPivotBlock(
+            protocolSchedule,
+            ethContext,
+            ethTasksTimer,
+            pivotBlockHeader.getNumber(),
+            MAX_PIVOT_BLOCK_RETRIES);
+    task.assignPeer(bestPeer);
     return ethContext
         .getScheduler()
-        .timeout(
-            GetHeadersFromPeerByNumberTask.forSingleNumber(
-                    protocolSchedule, ethContext, pivotBlockHeader.getNumber(), ethTasksTimer)
-                .assignPeer(bestPeer))
+        .timeout(task)
         .thenApply(
             result -> {
-              if (result.getResult().size() != 1
-                  || !result.getResult().get(0).equals(pivotBlockHeader)) {
+              if (result.size() != 1 || !result.get(0).equals(pivotBlockHeader)) {
                 bestPeer.disconnect(DisconnectReason.USELESS_PEER);
                 return Optional.<EthPeer>empty();
               } else {
                 return Optional.of(bestPeer);
               }
             })
-        .exceptionally(error -> {
-          LOG.debug("Could not confirm best peer had pivot block", error);
-          return Optional.empty();
-        });
+        .exceptionally(
+            error -> {
+              LOG.debug("Could not confirm best peer had pivot block", error);
+              return Optional.empty();
+            });
   }
 
   @Override

@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 public class PivotBlockRetriever<C> {
 
   private static final Logger LOG = LogManager.getLogger();
-  private static final int MAX_PIVOT_BLOCK_RETRIES = 3;
+  static final int MAX_PIVOT_BLOCK_RETRIES = 3;
   private final long pivotBlockNumber;
   private final EthContext ethContext;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
