@@ -312,10 +312,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void tomlThatConfiguresEverything() throws IOException {
+  public void tomlThatConfiguresEverythingExceptPermissioning() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    // Load a TOML that configures literally everything
+    // Load a TOML that configures literally everything (except permissioning)
     final URL configFile = Resources.getResource("everything_config.toml");
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
@@ -706,7 +706,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void rpcWsRefreshDelayMustBeUSedUsed() {
+  public void rpcWsRefreshDelayMustBeUsed() {
     parseCommand("--rpc-ws-enabled", "--rpc-ws-refresh-delay", "2000");
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
@@ -719,174 +719,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void callingWithRefreshDelayWithNegativeValueMustError() {
+  public void rpcWsRefreshDelayWithNegativeValueMustError() {
     parseCommand("--rpc-ws-enabled", "--rpc-ws-refresh-delay", "-2000");
 
     assertThat(commandOutput.toString()).isEmpty();
     final String expectedErrorMsg = "Refresh delay must be a positive integer between";
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorMsg);
-  }
-
-  @Test
-  public void callingWithInvalidNodesWhitelistMustDisplayErrorAndUsage() {
-    parseCommand("--nodes-whitelist", "invalid_enode_url");
-    assertThat(commandOutput.toString()).isEmpty();
-    /*
-     Because of the way Picocli handles errors parsing errors for lists with arity 0..*, we don't
-     get the nice error msg with that was wrong. It only shows to the user the values that weren't
-     parsed correctly.
-    */
-    final String expectedErrorOutputStart = "Unmatched argument: invalid_enode_url";
-    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
-  }
-
-  @Test
-  public void nodesWhitelistOptionMustBeUsed() {
-    parseCommand(
-        "--nodes-whitelist",
-        String.join(",", validENodeStrings),
-        "--bootnodes",
-        validENodeStrings[0]);
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    final List<String> enodeURLAsStringList =
-        permissioningConfigurationArgumentCaptor
-            .getValue()
-            .getNodeWhitelist()
-            .stream()
-            .map(URI::toString)
-            .collect(Collectors.toList());
-
-    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(validENodeStrings);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void callingWithAccountsWhitelistOptionButNoValueMustNotError() {
-    parseCommand("--accounts-whitelist");
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().getAccountWhitelist()).isEmpty();
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isAccountWhitelistSet())
-        .isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void accountsWhitelistOptionMustBeUsed() {
-    final String[] accounts = {"1111111111111111", "2222222222222222", "ffffffffffffffff"};
-    parseCommand("--accounts-whitelist", String.join(",", accounts));
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().getAccountWhitelist())
-        .containsExactlyInAnyOrder(accounts);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isAccountWhitelistSet())
-        .isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void nodesWhitelistOptionMustIncludeBootnodes() {
-    parseCommand(
-        "--bootnodes",
-        String.join(",", validENodeStrings[0], validENodeStrings[1]),
-        "--nodes-whitelist",
-        String.join(",", validENodeStrings));
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    final List<String> enodeURLAsStringList =
-        permissioningConfigurationArgumentCaptor
-            .getValue()
-            .getNodeWhitelist()
-            .stream()
-            .map(URI::toString)
-            .collect(Collectors.toList());
-
-    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(validENodeStrings);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void nodesWhitelistOptionWhichDoesNotIncludeBootnodesMustDisplayError() {
-    final String bootNodeNotWhitelisted = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
-    parseCommand(
-        "--bootnodes",
-        String.join(",", bootNodeNotWhitelisted, validENodeStrings[2]),
-        "--nodes-whitelist",
-        String.join(",", validENodeStrings));
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
-  }
-
-  @Test
-  public void ropstenWithNodesWhitelistOptionWhichDoesIncludeRopstenBootnodesMustNotDisplayError() {
-    parseCommand("--network", "ropsten", "--nodes-whitelist", String.join(",", ropstenBootnodes));
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    final List<String> enodeURLAsStringList =
-        permissioningConfigurationArgumentCaptor
-            .getValue()
-            .getNodeWhitelist()
-            .stream()
-            .map(URI::toString)
-            .collect(Collectors.toList());
-
-    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(ropstenBootnodes);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void ropstenWithNodesWhitelistOptionWhichDoesNotIncludeRopstenBootnodesMustDisplayError() {
-    parseCommand("--network", "ropsten", "--nodes-whitelist", String.join(",", validENodeStrings));
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
-  }
-
-  @Test
-  public void nodesWhitelistWithEmptyListAndNonEmptyBootnodesMustDisplayError() {
-    parseCommand("--bootnodes", String.join(",", validENodeStrings[0]), "--nodes-whitelist");
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
   }
 
   @Test
@@ -945,15 +783,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand("--sync-mode", "FULL");
     verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void maxTrailingPeersMustBeUsed() {
-    parseCommand("--max-trailing-peers", "3");
-    verify(mockSyncConfBuilder).maxTrailingPeers(3);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
