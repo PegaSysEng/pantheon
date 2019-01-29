@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
@@ -56,7 +57,7 @@ import picocli.CommandLine.RunLast;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class CommandTestAbstract {
 
-  private final Logger LOG = LogManager.getLogger();
+  private final Logger TEST_LOGGER = LogManager.getLogger();
 
   final ByteArrayOutputStream commandOutput = new ByteArrayOutputStream();
   private final PrintStream outPrintStream = new PrintStream(commandOutput);
@@ -71,6 +72,7 @@ public abstract class CommandTestAbstract {
   @Mock SynchronizerConfiguration mockSyncConf;
   @Mock PantheonController<?> mockController;
   @Mock BlockImporter mockBlockImporter;
+  @Mock Logger mockLogger;
 
   @Captor ArgumentCaptor<Collection<String>> stringListArgumentCaptor;
   @Captor ArgumentCaptor<Path> pathArgumentCaptor;
@@ -128,15 +130,19 @@ public abstract class CommandTestAbstract {
   // Display outputs for debug purpose
   @After
   public void displayOutput() {
-    LOG.info("Standard output {}", commandOutput.toString());
-    LOG.info("Standard error {}", commandErrorOutput.toString());
+    TEST_LOGGER.info("Standard output {}", commandOutput.toString());
+    TEST_LOGGER.info("Standard error {}", commandErrorOutput.toString());
   }
 
   CommandLine.Model.CommandSpec parseCommand(final String... args) {
 
     final TestPantheonCommand pantheonCommand =
         new TestPantheonCommand(
-            mockBlockImporter, mockRunnerBuilder, mockControllerBuilder, mockSyncConfBuilder);
+            mockLogger,
+            mockBlockImporter,
+            mockRunnerBuilder,
+            mockControllerBuilder,
+            mockSyncConfBuilder);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
     pantheonCommand.parse(
@@ -151,11 +157,17 @@ public abstract class CommandTestAbstract {
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
 
     TestPantheonCommand(
+        final Logger mockLogger,
         final BlockImporter mockBlockImporter,
         final RunnerBuilder mockRunnerBuilder,
         final PantheonControllerBuilder mockControllerBuilder,
-        final SynchronizerConfiguration.Builder mockSyncConfBuilder) {
-      super(mockBlockImporter, mockRunnerBuilder, mockControllerBuilder, mockSyncConfBuilder);
+        final Builder mockSyncConfBuilder) {
+      super(
+          mockLogger,
+          mockBlockImporter,
+          mockRunnerBuilder,
+          mockControllerBuilder,
+          mockSyncConfBuilder);
     }
   }
 }

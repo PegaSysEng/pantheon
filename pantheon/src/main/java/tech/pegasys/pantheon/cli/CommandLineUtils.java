@@ -18,27 +18,29 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
-import picocli.CommandLine.ParameterException;
 
 class CommandLineUtils {
   /**
-   * Check if options are passed that reauire --rpc-http-enabled option to be true to have any
-   * effect and show an error with the list of affected options.
+   * Check if options are passed that require an option to be true to have any effect and log a
+   * warning with the list of affected options.
    *
    * <p>Note that in future version of PicoCLI some options dependency mechanism may be implemented
    * that could replace this. See https://github.com/remkop/picocli/issues/295
    *
-   * @param commandLine the command line required to throw exception from
+   * @param logger the logger instance used to log the warning
+   * @param commandLine the command line containing the options we want to check
    * @param mainOptionName the name of the main option to test dependency against. Only used for
    *     display.
    * @param isMainOptionCondition the condition to test the options dependencies, if true will test
    *     if not won't
    * @param dependentOptionsNames a list of option names that can't be used if condition is met.
    *     Example: if --miner-coinbase is in the list and condition is that --miner-enabled should
-   *     not be false, we raise an error.
+   *     not be false, we log a warning.
    */
   static void checkOptionDependencies(
+      final Logger logger,
       final CommandLine commandLine,
       final String mainOptionName,
       final boolean isMainOptionCondition,
@@ -59,9 +61,7 @@ class CommandLineUtils {
                       Collectors.toList(), StringUtils.joiningWithLastDelimiter(", ", " and ")));
 
       if (!affectedOptions.isEmpty()) {
-        throw new ParameterException(
-            commandLine,
-            String.format("%1$s require %2$s option to be true.", affectedOptions, mainOptionName));
+        logger.warn("{} require {} option to be true.", affectedOptions, mainOptionName);
       }
     }
   }

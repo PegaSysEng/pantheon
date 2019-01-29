@@ -612,11 +612,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--banned-node-ids",
         String.join(",", nodes));
 
+    verifyOptionsConstraintLoggerCall(
+        "--discovery-enabled, --bootnodes, --max-peers, --max-trailing-peers and --banned-node-ids",
+        "--p2p-enabled");
+
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .startsWith(
-            "--discovery-enabled, --bootnodes, --max-peers, --max-trailing-peers and "
-                + "--banned-node-ids require --p2p-enabled option to be true.");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -1010,11 +1011,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--rpc-http-cors-origins",
         "all");
 
+    verifyOptionsConstraintLoggerCall(
+        "--rpc-http-host, --rpc-http-port, --rpc-http-cors-origins and --rpc-http-api",
+        "--rpc-http-enabled");
+
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .startsWith(
-            "--rpc-http-host, --rpc-http-port, --rpc-http-cors-origins and "
-                + "--rpc-http-api require --rpc-http-enabled option to be true.");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -1397,11 +1399,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--rpc-ws-refresh-delay",
         "2");
 
+    verifyOptionsConstraintLoggerCall(
+        "--rpc-ws-host, --rpc-ws-port, --rpc-ws-api and --rpc-ws-refresh-delay",
+        "--rpc-ws-enabled");
+
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .startsWith(
-            "--rpc-ws-host, --rpc-ws-port, --rpc-ws-api and --rpc-ws-refresh-delay "
-                + "require --rpc-ws-enabled option to be true.");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -1474,11 +1477,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--metrics-prometheus-job",
         "job-nane");
 
+    verifyOptionsConstraintLoggerCall(
+        "--metrics-mode, --metrics-host, --metrics-port, --metrics-push-interval and --metrics-prometheus-job",
+        "--metrics-enabled");
+
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .startsWith(
-            "--metrics-mode, --metrics-host, --metrics-port, --metrics-push-interval and --metrics-prometheus-job "
-                + "require --metrics-enabled option to be true.");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -1565,6 +1569,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void miningOptionsRequiresServiceToBeEnabled() {
+
     final Address requestedCoinbase = Address.fromHexString("0000011111222223333344444");
     parseCommand(
         "--miner-coinbase",
@@ -1574,11 +1579,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--miner-extra-data",
         "0x1122334455667788990011223344556677889900112233445566778899001122");
 
+    verifyOptionsConstraintLoggerCall(
+        "--miner-coinbase, --min-gas-price and --miner-extra-data", "--miner-enabled");
+
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .startsWith(
-            "--miner-coinbase, --min-gas-price and --miner-extra-data "
-                + "require --miner-enabled option to be true.");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -1777,11 +1782,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--privacy-precompiled-address",
         String.valueOf(Byte.MAX_VALUE - 1));
 
+    verifyOptionsConstraintLoggerCall(
+        "--privacy-url, --privacy-public-key-file and --privacy-precompiled-address",
+        "--privacy-enabled");
+
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .startsWith(
-            "--privacy-url, --privacy-public-key-file and --privacy-precompiled-address "
-                + "require --privacy-enabled option to be true.");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -1815,5 +1821,27 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   private static String escapeTomlString(final String s) {
     return StringEscapeUtils.escapeJava(s);
+  }
+
+  /**
+   * Check logger calls
+   *
+   * <p>Here we check the calls to logger and not the result of the log line as we don't test the
+   * logger itself but the fact that we call it.
+   *
+   * @param dependentOptions the string representing the list of dependent options names
+   * @param mainOption the main option name
+   */
+  private void verifyOptionsConstraintLoggerCall(
+      final String dependentOptions, final String mainOption) {
+    verify(mockLogger)
+        .warn(
+            stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture());
+    assertThat(stringArgumentCaptor.getAllValues().get(0))
+        .isEqualTo("{} require {} option to be true.");
+    assertThat(stringArgumentCaptor.getAllValues().get(1)).isEqualTo(dependentOptions);
+    assertThat(stringArgumentCaptor.getAllValues().get(2)).isEqualTo(mainOption);
   }
 }

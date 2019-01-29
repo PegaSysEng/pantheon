@@ -40,6 +40,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
@@ -76,6 +77,7 @@ import com.google.common.net.HostSpecifier;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.DecodeException;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
@@ -101,6 +103,8 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements DefaultCommandValues, Runnable {
+
+  private final Logger logger;
 
   private CommandLine commandLine;
 
@@ -509,10 +513,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer privacyPrecompiledAddress = Address.PRIVACY;
 
   public PantheonCommand(
+      final Logger logger,
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
-      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder) {
+      final Builder synchronizerConfigurationBuilder) {
+    this.logger = logger;
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
@@ -567,6 +573,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     // Check that p2p options are able top work or send an error
     CommandLineUtils.checkOptionDependencies(
+        logger,
         commandLine,
         "--p2p-enabled",
         !p2pEnabled,
@@ -580,6 +587,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     // Check that mining options are able top work or send an error
     CommandLineUtils.checkOptionDependencies(
+        logger,
         commandLine,
         "--miner-enabled",
         !isMiningEnabled,
@@ -668,6 +676,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private JsonRpcConfiguration jsonRpcConfiguration() {
 
     CommandLineUtils.checkOptionDependencies(
+        logger,
         commandLine,
         "--rpc-http-enabled",
         !isRpcHttpEnabled,
@@ -691,6 +700,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private WebSocketConfiguration webSocketConfiguration() {
 
     CommandLineUtils.checkOptionDependencies(
+        logger,
         commandLine,
         "--rpc-ws-enabled",
         !isRpcWsEnabled,
@@ -713,6 +723,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   MetricsConfiguration metricsConfiguration() {
 
     CommandLineUtils.checkOptionDependencies(
+        logger,
         commandLine,
         "--metrics-enabled",
         !isMetricsEnabled,
@@ -746,6 +757,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     // Check that mining options are able top work or send an error
     CommandLineUtils.checkOptionDependencies(
+        logger,
         commandLine,
         "--privacy-enabled",
         !privacyEnabled,
