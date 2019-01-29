@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
@@ -161,7 +160,7 @@ public abstract class CommandTestAbstract {
         final BlockImporter mockBlockImporter,
         final RunnerBuilder mockRunnerBuilder,
         final PantheonControllerBuilder mockControllerBuilder,
-        final Builder mockSyncConfBuilder) {
+        final SynchronizerConfiguration.Builder mockSyncConfBuilder) {
       super(
           mockLogger,
           mockBlockImporter,
