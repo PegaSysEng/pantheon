@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
 public class BlockImporter {
   private static final Logger LOG = getLogger();
 
-  private final Semaphore s = new Semaphore(2);
+  private final Semaphore blockBacklog = new Semaphore(2);
 
   private final ExecutorService validationExecutor = Executors.newCachedThreadPool();
   private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
@@ -108,7 +108,7 @@ public class BlockImporter {
         }
 
         try {
-          s.acquire();
+          blockBacklog.acquire();
         } catch (final InterruptedException e) {
           LOG.error(e);
           break;
@@ -171,7 +171,7 @@ public class BlockImporter {
             "Invalid block at block number " + header.getNumber() + ".");
       }
     } finally {
-      s.release();
+      blockBacklog.release();
     }
   }
 
