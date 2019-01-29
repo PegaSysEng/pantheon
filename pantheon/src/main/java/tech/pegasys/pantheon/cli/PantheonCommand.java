@@ -687,6 +687,24 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         "--metrics-enabled",
         !isMetricsEnabled,
         Arrays.asList(
+            "--metrics-host",
+            "--metrics-port"));
+            
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--metrics-push-enabled",
+        !isMetricsPushEnabled,
+        Arrays.asList(
+            "--metrics-push-host",
+            "--metrics-push-port",
+            "--metrics-push-interval",
+            "--metrics-push-prometheus-job"));
+        logger,
+        commandLine,
+        "--metrics-enabled",
+        !isMetricsEnabled,
+        Arrays.asList(
             "--metrics-mode",
             "--metrics-host",
             "--metrics-port",
