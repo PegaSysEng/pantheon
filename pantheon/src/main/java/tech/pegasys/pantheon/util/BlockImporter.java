@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.util;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -127,6 +128,18 @@ public class BlockImporter {
       }
       return new BlockImporter.ImportResult(blockchain.getChainHead().getTotalDifficulty(), count);
     } finally {
+      validationExecutor.shutdownNow();
+      try {
+        validationExecutor.awaitTermination(5, SECONDS);
+      } catch (final Exception e) {
+        LOG.error(e);
+      }
+      importExecutor.shutdownNow();
+      try {
+        importExecutor.awaitTermination(5, SECONDS);
+      } catch (final Exception e) {
+        LOG.error(e);
+      }
       pantheonController.close();
     }
   }
