@@ -42,7 +42,7 @@ public class PermissioningConfigurationValidator {
               .stream()
               .filter(
                   node ->
-                      permissioningConfiguration
+                      !permissioningConfiguration
                           .getNodeWhitelist()
                           .contains(URI.create(buildEnodeURI(node))))
               .collect(Collectors.toList());
