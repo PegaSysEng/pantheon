@@ -13,6 +13,8 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 
@@ -99,28 +101,48 @@ public class FastSyncCheckpointHeaderManagerTest {
   @Test
   public void shouldNotRequestCheckpointHeadersBeyondThePivotBlock() {
     final SyncTarget syncTarget = syncState.setSyncTarget(peer.getEthPeer(), block(10));
-    final CompletableFuture<List<BlockHeader>> result =
-        checkpointHeaderManager.pullCheckpointHeaders(syncTarget);
-
-    final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
-    peer.respondWhile(responder, peer::hasOutstandingRequests);
-
-    assertThat(result).isCompletedWithValue(asList(block(10), block(15), pivotBlockHeader));
+    assertCheckpointHeaders(syncTarget, asList(block(10), block(15), pivotBlockHeader));
   }
 
   @Test
   public void shouldNotDuplicatePivotBlockAsCheckpoint() {
     final SyncTarget syncTarget = syncState.setSyncTarget(peer.getEthPeer(), block(7));
+    assertCheckpointHeaders(syncTarget, asList(block(7), block(12), pivotBlockHeader));
+  }
+
+  @Test
+  public void shouldHaveNoCheckpointsWhenCommonAncestorIsPivotBlock() {
+    final SyncTarget syncTarget =
+        syncState.setSyncTarget(peer.getEthPeer(), block(pivotBlockHeader.getNumber()));
+    assertCheckpointHeaders(syncTarget, emptyList());
+  }
+
+  @Test
+  public void shouldHaveNoCheckpointsWhenCommonAncestorIsAfterPivotBlock() {
+    final SyncTarget syncTarget =
+        syncState.setSyncTarget(peer.getEthPeer(), block(pivotBlockHeader.getNumber() + 1));
+    assertCheckpointHeaders(syncTarget, emptyList());
+  }
+
+  @Test
+  public void shouldHaveOnlyPivotBlockWhenCommonAncestorImmediatelyBeforePivotBlock() {
+    final SyncTarget syncTarget =
+        syncState.setSyncTarget(peer.getEthPeer(), block(pivotBlockHeader.getNumber() - 1));
+    assertCheckpointHeaders(syncTarget, singletonList(pivotBlockHeader));
+  }
+
+  private void assertCheckpointHeaders(
+      final SyncTarget syncTarget, final List<BlockHeader> expected) {
     final CompletableFuture<List<BlockHeader>> result =
         checkpointHeaderManager.pullCheckpointHeaders(syncTarget);
 
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
-    assertThat(result).isCompletedWithValue(asList(block(7), block(12), pivotBlockHeader));
+    assertThat(result).isCompletedWithValue(expected);
   }
 
-  private BlockHeader block(final int blockNumber) {
+  private BlockHeader block(final long blockNumber) {
     return otherBlockchain.getBlockHeader(blockNumber).get();
   }
 }
