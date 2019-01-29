@@ -61,7 +61,7 @@ class CommandLineUtils {
                       Collectors.toList(), StringUtils.joiningWithLastDelimiter(", ", " and ")));
 
       if (!affectedOptions.isEmpty()) {
-        logger.warn("{} require {} option to be true.", affectedOptions, mainOptionName);
+        logger.warn("{} will have no effect unless {} is in the command line.", affectedOptions, mainOptionName);
       }
     }
   }
