@@ -20,11 +20,15 @@ import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncActions;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncException;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState;
+import tech.pegasys.pantheon.ethereum.eth.sync.fullsync.FullSyncDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
+import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.services.queue.InMemoryBigQueue;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.util.Optional;
@@ -49,6 +53,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       final SynchronizerConfiguration syncConfig,
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
+      final WorldStateStorage worldStateStorage,
       final EthContext ethContext,
       final SyncState syncState,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
@@ -72,11 +77,20 @@ public class DefaultSynchronizer<C> implements Synchronizer {
         ethContext, protocolSchedule, protocolContext.getBlockchain(), syncConfig, ethTasksTimer);
     if (syncConfig.syncMode() == SyncMode.FAST) {
       LOG.info("Fast sync enabled.");
+      final WorldStateDownloader worldStateDownloader =
+          new WorldStateDownloader(
+              ethContext,
+              worldStateStorage,
+              new InMemoryBigQueue<>(),
+              syncConfig.getWorldStateHashCountPerRequest(),
+              syncConfig.getWorldStateRequestParallelism(),
+              ethTasksTimer);
       this.fastSyncDownloader =
           Optional.of(
               new FastSyncDownloader<>(
                   new FastSyncActions<>(
-                      syncConfig, protocolSchedule, protocolContext, ethContext, ethTasksTimer)));
+                      syncConfig, protocolSchedule, protocolContext, ethContext, ethTasksTimer),
+                  worldStateDownloader));
     } else {
       this.fastSyncDownloader = Optional.empty();
     }
