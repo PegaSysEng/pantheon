@@ -1,35 +1,53 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.privacy;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Lists;
+import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.orion.Orion;
+import tech.pegasys.pantheon.orion.types.SendRequest;
+import tech.pegasys.pantheon.orion.types.SendResponse;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
+
+import com.google.common.collect.Lists;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PrivateTransactionHandlerTest {
 
-  @Mock PrivateTransactionHandler privateTransactionHandler;
-  @Mock
-  PrivacyParameters privacyParameters;
+  private static final Logger LOG = LogManager.getLogger();
+  private static final String TRANSACTION_KEY = "My Transaction Key";
+  private static final String TRANSACTION_KEY_HEX = "0x4d79205472616e73616374696f6e204b6579";
+
+  PrivateTransactionHandler privateTransactionHandler;
 
   private static final PrivateTransaction VALID_PRIVATE_TRANSACTION =
       new PrivateTransaction(
@@ -49,7 +67,7 @@ public class PrivateTransactionHandlerTest {
               Byte.valueOf("0")),
           BytesValue.fromHexString("0x"),
           Address.wrap(BytesValue.fromHexString("0x8411b12666f68ef74cace3615c9d5a377729d03f")),
-          0,
+          1,
           BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)),
           Lists.newArrayList(
               BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)),
@@ -61,8 +79,7 @@ public class PrivateTransactionHandlerTest {
           0L,
           Wei.of(1),
           21000L,
-          Optional.of(
-              Address.wrap(BytesValue.fromHexString("0x095e7baea6a6c7c4c2dfeb977efac326af552d87"))),
+          Optional.of(Address.DEFAULT_PRIVACY),
           Wei.of(
               new BigInteger(
                   "115792089237316195423570985008687907853269984665640564039457584007913129639935")),
@@ -72,36 +89,41 @@ public class PrivateTransactionHandlerTest {
               new BigInteger(
                   "14473701025599600909210599917245952381483216609124029382871721729679842002948"),
               Byte.valueOf("0")),
-          BytesValue.fromHexString("0x"),
+          BytesValue.fromHexString(TRANSACTION_KEY_HEX),
           Address.wrap(BytesValue.fromHexString("0x8411b12666f68ef74cace3615c9d5a377729d03f")),
-          0);
+          1);
+
+  Orion mockOrion() {
+    Orion mockOrion = mock(Orion.class);
+    SendResponse response = new SendResponse();
+    response.setKey(TRANSACTION_KEY);
+    try {
+      when(mockOrion.send(any(SendRequest.class))).thenReturn(response);
+    } catch (IOException e) {
+      LOG.error("Orion: failed to test");
+    }
+    return mockOrion;
+  }
 
   @Before
   public void setUp() {
-    privateTransactionHandler = new PrivateTransactionHandler(privacyParameters);
+    privateTransactionHandler = new PrivateTransactionHandler(mockOrion(), Address.DEFAULT_PRIVACY);
   }
-
 
   @Test
   public void validTransactionThroughHandler() {
-    when(privateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION)).thenReturn(PUBLIC_TRANSACTION);
-
-    final Transaction transactionRespose = privateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION);
+    final Transaction transactionRespose =
+        privateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION);
 
     assertThat(transactionRespose).isEqualToComparingFieldByField(PUBLIC_TRANSACTION);
-    verify(privateTransactionHandler).handle(any(PrivateTransaction.class));
   }
 
   @Test
-  public void invalidTransactionThroughHandler() {
-  }
+  public void invalidTransactionThroughHandler() {}
 
   @Test
-  public void requestMissingParametersToSendTransactionToOrion() {
-  }
+  public void requestMissingParametersToSendTransactionToOrion() {}
 
   @Test
-  public void validResponseFromOrion() {
-  }
-
+  public void validResponseFromOrion() {}
 }

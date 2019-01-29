@@ -19,11 +19,14 @@ import tech.pegasys.pantheon.orion.Orion;
 import tech.pegasys.pantheon.orion.types.SendRequest;
 import tech.pegasys.pantheon.orion.types.SendResponse;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,10 +37,14 @@ public class PrivateTransactionHandler {
   private final Address privacyPrecompileAddress;
 
   public PrivateTransactionHandler(final PrivacyParameters privacyParameters) {
+    this(
+        new Orion(privacyParameters.getUrl()),
+        Address.privacyPrecompiled(privacyParameters.getPrivacyAddress()));
+  }
 
-    this.orion = new Orion(privacyParameters.getUrl());
-    this.privacyPrecompileAddress =
-        Address.privacyPrecompiled(privacyParameters.getPrivacyAddress());
+  public PrivateTransactionHandler(final Orion orion, final Address privacyPrecompileAddress) {
+    this.orion = orion;
+    this.privacyPrecompileAddress = privacyPrecompileAddress;
   }
 
   public Transaction handle(final PrivateTransaction privateTransaction) {
@@ -53,12 +60,16 @@ public class PrivateTransactionHandler {
   }
 
   private SendRequest createSendRequest(final PrivateTransaction privateTransaction) {
-    final String[] privateFor =
-        (String[]) privateTransaction.getPrivateFor().stream().map(BytesValue::toString).toArray();
+    final List<String> privateFor =
+        privateTransaction
+            .getPrivateFor()
+            .stream()
+            .map(BytesValues::asString)
+            .collect(Collectors.toList());
 
     return new SendRequest(
         Base64.getEncoder().encodeToString(privateTransaction.getPayload().extractArray()),
-        privateTransaction.getPrivateFrom().toString(),
+        BytesValues.asString(privateTransaction.getPrivateFrom()),
         privateFor);
   }
 
