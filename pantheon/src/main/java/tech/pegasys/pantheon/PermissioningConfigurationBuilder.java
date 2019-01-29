@@ -101,7 +101,7 @@ public class PermissioningConfigurationBuilder {
     if (permissioningConfigFile.exists()) {
       return permissioningConfigFile;
     } else {
-      LOG.error("Unable to load permissioning config file from location {}.", filename);
+      LOG.error("File does not exist: permissioning config path: {}.", filename);
       return null;
     }
   }

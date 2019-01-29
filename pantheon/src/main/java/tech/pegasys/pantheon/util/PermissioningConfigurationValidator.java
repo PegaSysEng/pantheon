@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.util;
 
+import java.net.URI;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
@@ -28,25 +28,20 @@ public class PermissioningConfigurationValidator {
       final EthNetworkConfig ethNetworkConfig,
       final PermissioningConfiguration permissioningConfiguration)
       throws Exception {
-    final List<Peer> bootnodesNotInWhitelist = new ArrayList<Peer>();
+    List<Peer> bootnodesNotInWhitelist = new ArrayList<>();
     final List<Peer> bootnodes =
         DiscoveryConfiguration.getBootstrapPeersFromGenericCollection(
             ethNetworkConfig.getBootNodes());
     if (permissioningConfiguration.isNodeWhitelistSet() && bootnodes != null) {
-      final List<Peer> whitelist =
-          permissioningConfiguration
-              .getNodeWhitelist()
+      bootnodesNotInWhitelist =
+          bootnodes
               .stream()
-              .map(DefaultPeer::fromURI)
+              .filter(
+                  node -> permissioningConfiguration.getNodeWhitelist().contains(URI.create(node.toString())))
               .collect(Collectors.toList());
-      for (final Peer bootnode : bootnodes) {
-        if (!whitelist.contains(bootnode)) {
-          bootnodesNotInWhitelist.add(bootnode);
-        }
-      }
-      if (!bootnodesNotInWhitelist.isEmpty()) {
-        throw new Exception("Bootnode(s) not in nodes-whitelist " + bootnodesNotInWhitelist);
-      }
+    }
+    if (!bootnodesNotInWhitelist.isEmpty()) {
+      throw new Exception("Bootnode(s) not in nodes-whitelist " + bootnodesNotInWhitelist);
     }
   }
 }
