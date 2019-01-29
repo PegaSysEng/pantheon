@@ -25,6 +25,7 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFA
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
+import tech.pegasys.pantheon.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
@@ -45,15 +46,13 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
+import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
@@ -67,7 +66,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
@@ -195,20 +193,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
   )
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
-
-  /**
-   * @deprecated This option is not exposed anymore even if still available as it's bounded by
-   *     max-peers value. It's not useful enough to figure in the help. Will probably completely
-   *     removed in next version.
-   */
-  @Deprecated
-  @Option(
-    names = {"--max-trailing-peers"},
-    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-    description =
-        "Maximum p2p peer connections for peers that are trailing behind our chain head (default: unlimited)"
-  )
-  private final Integer maxTrailingPeers = Integer.MAX_VALUE;
 
   @Option(
     names = {"--banned-node-ids", "--banned-node-id"},
@@ -475,28 +459,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
-  // Permissioning: A list of whitelist nodes can be passed.
   @Option(
-    names = {"--nodes-whitelist"},
-    description =
-        "Comma separated enode URLs for permissioned networks. "
-            + "Not intended to be used with mainnet or public testnets.",
-    split = ",",
-    arity = "0..*",
-    converter = EnodeToURIPropertyConverter.class
+    names = {"--permissions-nodes-enabled"},
+    description = "Set if node level permissions should be enabled (default: ${DEFAULT-VALUE})"
   )
-  private final Collection<URI> nodesWhitelist = null;
+  private final Boolean permissionsNodesEnabled = false;
 
   @Option(
-    names = {"--accounts-whitelist"},
-    paramLabel = "<hex string of account public key>",
-    description =
-        "Comma separated hex strings of account public keys "
-            + "for permissioned/role-based transactions. You may specify an empty list.",
-    split = ",",
-    arity = "0..*"
+    names = {"--permissions-accounts-enabled"},
+    description = "Set if account level permissions should be enabled (default: ${DEFAULT-VALUE})"
   )
-  private final Collection<String> accountsWhitelist = null;
+  private final Boolean permissionsAccountsEnabled = false;
 
   @Option(
     names = {"--privacy-url"},
@@ -618,23 +591,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private void ensureAllBootnodesAreInWhitelist(
       final EthNetworkConfig ethNetworkConfig,
       final PermissioningConfiguration permissioningConfiguration) {
-    final List<Peer> bootnodes =
-        DiscoveryConfiguration.getBootstrapPeersFromGenericCollection(
-            ethNetworkConfig.getBootNodes());
-    if (permissioningConfiguration.isNodeWhitelistSet() && bootnodes != null) {
-      final List<Peer> whitelist =
-          permissioningConfiguration
-              .getNodeWhitelist()
-              .stream()
-              .map(DefaultPeer::fromURI)
-              .collect(Collectors.toList());
-      for (final Peer bootnode : bootnodes) {
-        if (!whitelist.contains(bootnode)) {
-          throw new ParameterException(
-              new CommandLine(this),
-              "Cannot start node with bootnode(s) that are not in nodes-whitelist " + bootnode);
-        }
-      }
+    try {
+      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
+          ethNetworkConfig, permissioningConfiguration);
+    } catch (Exception e) {
+      throw new ParameterException(new CommandLine(this), e.getMessage());
     }
   }
 
@@ -708,10 +669,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private PermissioningConfiguration permissioningConfiguration() {
+
+    if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+      return PermissioningConfiguration.createDefault();
+    }
+
     final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-    permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+            DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION,
+            permissionsNodesEnabled,
+            permissionsAccountsEnabled);
     return permissioningConfiguration;
   }
 
@@ -726,7 +693,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private SynchronizerConfiguration buildSyncConfig() {
     synchronizerConfigurationBuilder.syncMode(syncMode);
-    synchronizerConfigurationBuilder.maxTrailingPeers(maxTrailingPeers);
+    synchronizerConfigurationBuilder.maxTrailingPeers(MAX_TRAILING_PEERS);
     return synchronizerConfigurationBuilder.build();
   }
 

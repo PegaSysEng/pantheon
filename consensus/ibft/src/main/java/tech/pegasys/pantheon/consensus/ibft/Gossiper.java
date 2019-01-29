@@ -10,12 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
+package tech.pegasys.pantheon.consensus.ibft;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 
-import java.util.concurrent.CompletableFuture;
+public interface Gossiper {
 
-public interface WorldStateDownloader {
-  CompletableFuture<Void> downloadWorldState(BlockHeader pivotBlockHeader);
+  void send(Message message);
 }
