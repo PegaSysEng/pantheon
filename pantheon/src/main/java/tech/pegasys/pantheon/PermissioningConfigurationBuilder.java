@@ -35,11 +35,11 @@ public class PermissioningConfigurationBuilder {
 
   // will be used to reload the config from a file while node is running
   public static PermissioningConfiguration permissioningConfigurationFromToml(
-      final String configFilePath,
+      final File configFile,
       final boolean permissionedNodeEnabled,
       final boolean permissionedAccountEnabled) {
 
-    String permToml = permissioningConfigTomlAsString(permissioningConfigFile(configFilePath));
+    String permToml = permissioningConfigTomlAsString(configFile);
     return permissioningConfiguration(
         TomlConfigFileParser.loadConfiguration(permToml),
         permissionedNodeEnabled,

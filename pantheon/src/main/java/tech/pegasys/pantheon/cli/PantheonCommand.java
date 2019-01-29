@@ -467,6 +467,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Boolean permissionsAccountsEnabled = false;
 
+  @Option(
+    names = {"--permissions-config-path"},
+    description = "Path to permissions config TOML file (default: ${DEFAULT-VALUE})"
+  )
+  private final File permissionsConfigPath = null;
+
   // Permissioning: A list of whitelist nodes can be passed.
   @Option(
     names = {"--nodes-whitelist"},
@@ -645,6 +651,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         : KeyPairUtil.getDefaultKeyFile(dataDir());
   }
 
+  private File getPermissionsConfigPath() {
+    return permissionsConfigPath != null
+        ? permissionsConfigPath
+        : new File(DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION);
+  }
+
   private JsonRpcConfiguration jsonRpcConfiguration() {
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     jsonRpcConfiguration.setEnabled(isHttpRpcEnabled);
@@ -686,9 +698,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
-            DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION,
-            permissionsNodesEnabled,
-            permissionsAccountsEnabled);
+            getPermissionsConfigPath(), permissionsNodesEnabled, permissionsAccountsEnabled);
     return permissioningConfiguration;
   }
 

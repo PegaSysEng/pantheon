@@ -328,6 +328,61 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     // Except for meta-options
     options.remove(spec.optionsMap().get("--config-file"));
+    options.remove(spec.optionsMap().get("--permissions-config-path"));
+    options.remove(spec.optionsMap().get("--help"));
+    options.remove(spec.optionsMap().get("--version"));
+
+    for (final String tomlKey : tomlResult.keySet()) {
+      final CommandLine.Model.OptionSpec optionSpec = spec.optionsMap().get("--" + tomlKey);
+      assertThat(optionSpec)
+          .describedAs("Option '%s' should be a configurable option.", tomlKey)
+          .isNotNull();
+      // Verify TOML stores it by the appropriate type
+      if (optionSpec.type().equals(Boolean.class)) {
+        tomlResult.getBoolean(tomlKey);
+      } else if (optionSpec.isMultiValue() || optionSpec.arity().max > 1) {
+        tomlResult.getArray(tomlKey);
+      } else if (Number.class.isAssignableFrom(optionSpec.type())) {
+        tomlResult.getLong(tomlKey);
+      } else {
+        tomlResult.getString(tomlKey);
+      }
+      options.remove(optionSpec);
+    }
+    assertThat(options.stream().map(CommandLine.Model.OptionSpec::longestName)).isEmpty();
+  }
+
+  @Test
+  @Ignore
+  public void tomlThatConfiguresEverythingPlusPermissioning() throws IOException {
+    assumeTrue(isFullInstantiation());
+
+    // Load a TOML that configures literally everything (except permissioning)
+    final URL configFile = Resources.getResource("everything_config.toml");
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+
+    // Parse it.
+    final CommandLine.Model.CommandSpec spec = parseCommand("--config-file", toml.toString());
+    final TomlParseResult tomlResult = Toml.parse(toml);
+
+    // Load a TOML that configures permissioning
+    final URL permissioningConfigFile = Resources.getResource("permissioning_config.toml");
+    final Path permissioningToml = Files.createTempFile("permtoml", "");
+    Files.write(permissioningToml, Resources.toByteArray(permissioningConfigFile));
+
+    // Parse it.
+    final CommandLine.Model.CommandSpec permissioningSpec =
+        parseCommand("--permissions-config-path", permissioningToml.toString());
+    final TomlParseResult permissioningTomlResult = Toml.parse(permissioningToml);
+
+    // Verify we configured everything
+    final HashSet<CommandLine.Model.OptionSpec> options = new HashSet<>(spec.options());
+    options.addAll(permissioningSpec.options());
+
+    // Except for meta-options
+    options.remove(spec.optionsMap().get("--config-file"));
+    options.remove(spec.optionsMap().get("--permissions-config-path"));
     options.remove(spec.optionsMap().get("--help"));
     options.remove(spec.optionsMap().get("--version"));
 
