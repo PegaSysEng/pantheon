@@ -116,13 +116,4 @@ public class PrivateTransactionHandlerTest {
 
     assertThat(transactionRespose).isEqualToComparingFieldByField(PUBLIC_TRANSACTION);
   }
-
-  @Test
-  public void invalidTransactionThroughHandler() {}
-
-  @Test
-  public void requestMissingParametersToSendTransactionToOrion() {}
-
-  @Test
-  public void validResponseFromOrion() {}
 }
