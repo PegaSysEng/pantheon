@@ -109,6 +109,8 @@ public interface PantheonController<C> extends Closeable {
 
   MiningCoordinator getMiningCoordinator();
 
+  PrivacyParameters getPrivacyParameters();
+
   default Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
       final Collection<RpcApi> enabledRpcApis) {
     return emptyMap();

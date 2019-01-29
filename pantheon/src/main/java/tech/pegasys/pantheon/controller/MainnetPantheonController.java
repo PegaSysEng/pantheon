@@ -67,6 +67,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
 
   private final TransactionPool transactionPool;
   private final MiningCoordinator miningCoordinator;
+  private final PrivacyParameters privacyParameters;
   private final Runnable close;
 
   public MainnetPantheonController(
@@ -77,6 +78,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final KeyPair keyPair,
       final TransactionPool transactionPool,
       final MiningCoordinator miningCoordinator,
+      final PrivacyParameters privacyParameters,
       final Runnable close) {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
@@ -85,6 +87,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
     this.keyPair = keyPair;
     this.transactionPool = transactionPool;
     this.miningCoordinator = miningCoordinator;
+    this.privacyParameters = privacyParameters;
     this.close = close;
   }
 
@@ -170,6 +173,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
         nodeKeys,
         transactionPool,
         miningCoordinator,
+        privacyParameters,
         () -> {
           miningCoordinator.disable();
           minerThreadPool.shutdownNow();
@@ -224,5 +228,10 @@ public class MainnetPantheonController implements PantheonController<Void> {
   @Override
   public void close() {
     close.run();
+  }
+
+  @Override
+  public PrivacyParameters getPrivacyParameters() {
+    return privacyParameters;
   }
 }

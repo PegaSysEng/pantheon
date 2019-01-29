@@ -31,49 +31,48 @@ import org.apache.logging.log4j.Logger;
 public class PrivateTransactionHandler {
   private static final Logger LOG = LogManager.getLogger();
   private final Orion orion;
-  private final PrivacyParameters privacyParameters;
+  private final Address privacyPrecompileAddress;
 
   public PrivateTransactionHandler(final PrivacyParameters privacyParameters) {
 
     this.orion = new Orion(privacyParameters.getUrl());
-    this.privacyParameters = privacyParameters;
+    this.privacyPrecompileAddress =
+        Address.privacyPrecompiled(privacyParameters.getPrivacyAddress());
   }
 
   public Transaction handle(final PrivateTransaction privateTransaction) {
-    final String[] privateFor =
-        (String[]) privateTransaction.getPrivateFor().stream().map(BytesValue::toString).toArray();
+    final SendRequest sendRequest = createSendRequest(privateTransaction);
     SendResponse sendResponse = null;
     try {
-      sendResponse =
-          orion.send(
-              new SendRequest(
-                  Base64.getEncoder()
-                      .encodeToString(privateTransaction.getPayload().extractArray()),
-                  privateTransaction.getPrivateFrom().toString(),
-                  privateFor));
+      sendResponse = orion.send(sendRequest);
     } catch (IOException e) {
       LOG.error("Error sending Request to Orion ");
     }
 
-    Transaction privacyMarkerTransaction =
-        createMakerTransaction(sendResponse.getKey(), privateTransaction, privacyParameters);
-
-    return privacyMarkerTransaction;
+    return createPrivacyMarkerTransaction(sendResponse.getKey(), privateTransaction);
   }
 
-  private Transaction createMakerTransaction(
-      final String transactionHash,
-      final PrivateTransaction privateTransaction,
-      final PrivacyParameters privacyParameters) {
+  private SendRequest createSendRequest(final PrivateTransaction privateTransaction) {
+    final String[] privateFor =
+        (String[]) privateTransaction.getPrivateFor().stream().map(BytesValue::toString).toArray();
+
+    return new SendRequest(
+        Base64.getEncoder().encodeToString(privateTransaction.getPayload().extractArray()),
+        privateTransaction.getPrivateFrom().toString(),
+        privateFor);
+  }
+
+  private Transaction createPrivacyMarkerTransaction(
+      final String transactionEnclaveKey, final PrivateTransaction privateTransaction) {
 
     return new Transaction(
         privateTransaction.getNonce(),
         privateTransaction.getGasPrice(),
         privateTransaction.getGasLimit(),
-        Optional.of(Address.privacyPrecompiled(privacyParameters.getPrivacyAddress())),
+        Optional.of(privacyPrecompileAddress),
         privateTransaction.getValue(),
         privateTransaction.getSignature(),
-        BytesValue.wrap(transactionHash.getBytes(Charset.defaultCharset())),
+        BytesValue.wrap(transactionEnclaveKey.getBytes(Charset.defaultCharset())),
         privateTransaction.getSender(),
         privateTransaction.getChainId().getAsInt());
   }
