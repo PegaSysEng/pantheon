@@ -576,7 +576,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--bootnodes",
             "--discovery-enabled",
             "--max-peers",
-            "--max-trailing-peers",
             "--banned-node-id",
             "--banned-node-ids"));
 

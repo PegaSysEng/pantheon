@@ -52,7 +52,6 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -605,16 +604,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "false",
         "--max-peers",
         "42",
-        "--max-trailing-peers",
-        "2",
         "--banned-node-id",
         String.join(",", nodes),
         "--banned-node-ids",
         String.join(",", nodes));
 
     verifyOptionsConstraintLoggerCall(
-        "--discovery-enabled, --bootnodes, --max-peers, --max-trailing-peers and --banned-node-ids",
-        "--p2p-enabled");
+        "--discovery-enabled, --bootnodes, --max-peers and --banned-node-ids", "--p2p-enabled");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
