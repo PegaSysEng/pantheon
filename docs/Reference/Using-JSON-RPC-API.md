@@ -41,8 +41,9 @@ options to specify the host on which the JSON-RPC listens. The default host is 1
 
 Set the host to `0.0.0.0` to allow remote connections. 
 
-!!! important 
-    Setting the host to `0.0.0.0` exposes the RPC connection on your node to all remote connections.  
+!!! caution 
+    Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
+    production environment, ensure you are using a firewall to avoid exposing your node to the internet.  
 
 Use the [--rpc-http-port](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) and [--rpc-ws-port](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-port)
 options to specify the port on which the JSON-RPC listens. The default ports are: 
