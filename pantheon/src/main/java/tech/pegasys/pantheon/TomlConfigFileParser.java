@@ -33,8 +33,7 @@ public class TomlConfigFileParser {
   }
 
   public static TomlParseResult loadConfiguration(final String toml) {
-    TomlParseResult result;
-    result = Toml.parse(toml);
+    TomlParseResult result = Toml.parse(toml);
 
     if (result.hasErrors()) {
       final String errors =
