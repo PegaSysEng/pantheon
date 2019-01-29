@@ -99,7 +99,7 @@ public class PivotBlockRetriever<C> {
 
   private RetryingGetHeaderFromPeerByNumberTask createGetHeaderTask(final EthPeer peer) {
     final RetryingGetHeaderFromPeerByNumberTask task =
-        RetryingGetHeaderFromPeerByNumberTask.forPivotBlock(
+        RetryingGetHeaderFromPeerByNumberTask.forSingleNumber(
             protocolSchedule, ethContext, ethTasksTimer, pivotBlockNumber, MAX_PIVOT_BLOCK_RETRIES);
     task.assignPeer(peer);
     return task;

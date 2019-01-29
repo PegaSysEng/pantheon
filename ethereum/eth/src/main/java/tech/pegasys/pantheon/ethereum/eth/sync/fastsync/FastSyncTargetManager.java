@@ -77,7 +77,7 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
 
   private CompletableFuture<Optional<EthPeer>> confirmPivotBlockHeader(final EthPeer bestPeer) {
     final RetryingGetHeaderFromPeerByNumberTask task =
-        RetryingGetHeaderFromPeerByNumberTask.forPivotBlock(
+        RetryingGetHeaderFromPeerByNumberTask.forSingleNumber(
             protocolSchedule,
             ethContext,
             ethTasksTimer,
