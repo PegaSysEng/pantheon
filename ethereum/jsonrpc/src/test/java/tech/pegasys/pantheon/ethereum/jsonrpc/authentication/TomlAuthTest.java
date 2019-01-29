@@ -26,17 +26,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
-public class TomlAuthImplTest {
+public class TomlAuthTest {
 
   private Vertx vertx;
   private JsonObject validAuthInfo;
-  private TomlAuthImpl tomlAuth;
+  private TomlAuth tomlAuth;
 
   @Before
   public void before(final TestContext context) throws URISyntaxException {
     vertx = Vertx.vertx();
     tomlAuth =
-        new TomlAuthImpl(
+        new TomlAuth(
             vertx, new TomlAuthOptions().setTomlPath(getTomlPath("authentication/auth.toml")));
     validAuthInfo = new JsonObject().put("username", "userA").put("password", "pegasys");
   }
@@ -63,7 +63,7 @@ public class TomlAuthImplTest {
 
   @Test
   public void parseFailureWithIOExceptionShouldFailAuthentication(final TestContext context) {
-    tomlAuth = new TomlAuthImpl(vertx, new TomlAuthOptions().setTomlPath("invalid_path"));
+    tomlAuth = new TomlAuth(vertx, new TomlAuthOptions().setTomlPath("invalid_path"));
 
     tomlAuth.authenticate(
         validAuthInfo,

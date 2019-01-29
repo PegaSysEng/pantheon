@@ -31,7 +31,7 @@ public class TomlAuthOptions implements AuthOptions {
 
   @Override
   public AuthProvider createProvider(final Vertx vertx) {
-    return TomlAuth.create(vertx, this);
+    return new TomlAuth(vertx, this);
   }
 
   @Override
