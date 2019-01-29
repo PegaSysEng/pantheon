@@ -61,7 +61,10 @@ class CommandLineUtils {
                       Collectors.toList(), StringUtils.joiningWithLastDelimiter(", ", " and ")));
 
       if (!affectedOptions.isEmpty()) {
-        logger.warn("{} will have no effect unless {} is in the command line.", affectedOptions, mainOptionName);
+        logger.warn(
+            "{} will have no effect unless {} is defined on the command line.",
+            affectedOptions,
+            mainOptionName);
       }
     }
   }

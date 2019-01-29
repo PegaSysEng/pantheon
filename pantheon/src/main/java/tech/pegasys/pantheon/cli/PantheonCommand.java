@@ -704,16 +704,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "--metrics-enabled option and --metrics-push-enabled option can't be used at the same "
               + "time.  Please refer to CLI reference for more details about this constraint.");
     }
-    
+
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
         "--metrics-enabled",
         !isMetricsEnabled,
-        Arrays.asList(
-            "--metrics-host",
-            "--metrics-port"));
-            
+        Arrays.asList("--metrics-host", "--metrics-port"));
+
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
@@ -724,15 +722,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--metrics-push-port",
             "--metrics-push-interval",
             "--metrics-push-prometheus-job"));
-        logger,
-        commandLine,
-        "--metrics-enabled",
-        !isMetricsEnabled,
-        Arrays.asList(
-            "--metrics-mode",
-            "--metrics-host",
-            "--metrics-port",
-            "--metrics-prometheus-job"));
 
     final MetricsConfiguration metricsConfiguration = createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);

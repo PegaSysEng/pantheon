@@ -179,7 +179,7 @@ public class CommandLineUtilsTest {
             stringArgumentCaptor.capture(),
             stringArgumentCaptor.capture());
     assertThat(stringArgumentCaptor.getAllValues().get(0))
-        .isEqualTo("{} require {} option to be true.");
+        .isEqualTo("{} will have no effect unless {} is defined on the command line.");
     assertThat(stringArgumentCaptor.getAllValues().get(1)).isEqualTo(dependentOptions);
     assertThat(stringArgumentCaptor.getAllValues().get(2)).isEqualTo(mainOption);
   }

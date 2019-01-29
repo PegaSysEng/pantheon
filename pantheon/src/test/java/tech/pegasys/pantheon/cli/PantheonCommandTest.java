@@ -1289,22 +1289,30 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void metricsOptionsRequiresServiceToBeEnabled() {
+  public void metricsPushOptionsRequiresPushToBeEnabled() {
     parseCommand(
-        "--metrics-mode",
-        "push",
-        "--metrics-host",
+        "--metrics-push-host",
         "0.0.0.0",
-        "--metrics-port",
+        "--metrics-push-port",
         "1234",
         "--metrics-push-interval",
         "2",
-        "--metrics-prometheus-job",
-        "job-nane");
+        "--metrics-push-prometheus-job",
+        "job-name");
 
     verifyOptionsConstraintLoggerCall(
-        "--metrics-mode, --metrics-host, --metrics-port, --metrics-push-interval and --metrics-prometheus-job",
-        "--metrics-enabled");
+        "--metrics-push-host, --metrics-push-port, --metrics-push-interval and --metrics-push-prometheus-job",
+        "--metrics-push-enabled");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void metricsOptionsRequiresPullMetricsToBeEnabled() {
+    parseCommand("--metrics-host", "0.0.0.0", "--metrics-port", "1234");
+
+    verifyOptionsConstraintLoggerCall("--metrics-host and --metrics-port", "--metrics-enabled");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1344,7 +1352,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void metricsPushHostAndPushPortOptionMustBeUsed() {
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--metrics-push-enabled", "true", "--metrics-push-host", host, "--metrics-push-port", String.valueOf(port));
+    parseCommand(
+        "--metrics-push-enabled",
+        "--metrics-push-host",
+        host,
+        "--metrics-push-port",
+        String.valueOf(port));
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1358,7 +1371,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsPushIntervalMustBeUsed() {
-    parseCommand("--metrics-push-enabled", "true", "--metrics-push-interval", "42");
+    parseCommand("--metrics-push-enabled", "--metrics-push-interval", "42");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1371,7 +1384,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsPrometheusJobMustBeUsed() {
-    parseCommand("--metrics-push-enabled", "true", "--metrics-push-prometheus-job", "pantheon-command-test");
+    parseCommand(
+        "--metrics-push-enabled", "--metrics-push-prometheus-job", "pantheon-command-test");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1698,7 +1712,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             stringArgumentCaptor.capture(),
             stringArgumentCaptor.capture());
     assertThat(stringArgumentCaptor.getAllValues().get(0))
-        .isEqualTo("{} require {} option to be true.");
+        .isEqualTo("{} will have no effect unless {} is defined on the command line.");
     assertThat(stringArgumentCaptor.getAllValues().get(1)).isEqualTo(dependentOptions);
     assertThat(stringArgumentCaptor.getAllValues().get(2)).isEqualTo(mainOption);
   }
