@@ -18,21 +18,16 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncTargetManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PipelinedImportChainSegmentTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -92,7 +87,6 @@ public class FastSyncChainDownloader<C> {
 
   private CompletableFuture<List<Block>> importBlocksForCheckpoints(
       final List<BlockHeader> checkpointHeaders) {
-    LOG.info("Import blocks for checkpoint block numbers {}", toBlockNumbers(checkpointHeaders));
     if (checkpointHeaders.size() < 2) {
       final BlockHeader chainHeadHeader = protocolContext.getBlockchain().getChainHeadHeader();
       if (chainHeadHeader.getNumber() < pivotBlockHeader.getNumber()) {
@@ -110,53 +104,5 @@ public class FastSyncChainDownloader<C> {
             ethTasksTimer,
             checkpointHeaders);
     return importTask.run();
-  }
-
-  private String toBlockNumbers(final List<BlockHeader> checkpointHeaders) {
-    return checkpointHeaders
-        .stream()
-        .map(BlockHeader::getNumber)
-        .map(Object::toString)
-        .collect(Collectors.joining(", "));
-  }
-
-  private static class FastSyncTargetManager<C> extends SyncTargetManager<C> {
-
-    private final EthContext ethContext;
-    private final BlockHeader pivotBlockHeader;
-
-    public FastSyncTargetManager(
-        final SynchronizerConfiguration config,
-        final ProtocolSchedule<C> protocolSchedule,
-        final ProtocolContext<C> protocolContext,
-        final EthContext ethContext,
-        final SyncState syncState,
-        final LabelledMetric<OperationTimer> ethTasksTimer,
-        final BlockHeader pivotBlockHeader) {
-      super(config, protocolSchedule, protocolContext, ethContext, syncState, ethTasksTimer);
-      this.ethContext = ethContext;
-      this.pivotBlockHeader = pivotBlockHeader;
-    }
-
-    @Override
-    protected Optional<EthPeer> selectBestAvailableSyncTarget() {
-      final Optional<EthPeer> maybeBestPeer = ethContext.getEthPeers().bestPeer();
-      if (!maybeBestPeer.isPresent()) {
-        LOG.info("No sync target, wait for peers.");
-        return Optional.empty();
-      } else {
-        final EthPeer bestPeer = maybeBestPeer.get();
-        if (bestPeer.chainState().getEstimatedHeight() < pivotBlockHeader.getNumber()) {
-          LOG.info("No sync target with sufficient chain height, wait for peers.");
-          return Optional.empty();
-        }
-        return maybeBestPeer;
-      }
-    }
-
-    @Override
-    public boolean shouldSwitchSyncTarget(final SyncTarget currentTarget) {
-      return false;
-    }
   }
 }
