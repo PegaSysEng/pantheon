@@ -24,6 +24,8 @@ import java.math.BigInteger;
  */
 public class FixedDifficultyCalculators {
 
+  public static final int DEFAULT_DIFFICULTY = 100;
+
   public static boolean isFixedDifficultyInConfig(final GenesisConfigOptions config) {
     return config.getEthashConfigOptions().getFixedDifficulty().isPresent();
   }
