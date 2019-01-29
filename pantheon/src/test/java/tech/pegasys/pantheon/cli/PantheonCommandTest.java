@@ -610,8 +610,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         String.join(",", nodes));
 
     verifyOptionsConstraintLoggerCall(
-        "--discovery-enabled, --bootnodes, --max-peers and --banned-node-ids",
-        "--p2p-enabled");
+        "--discovery-enabled, --bootnodes, --max-peers and --banned-node-ids", "--p2p-enabled");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
