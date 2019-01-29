@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
@@ -20,11 +22,14 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SyncTargetManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
+import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetHeadersFromPeerByNumberTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +37,9 @@ import org.apache.logging.log4j.Logger;
 class FastSyncTargetManager<C> extends SyncTargetManager<C> {
   private static final Logger LOG = LogManager.getLogger();
 
+  private final ProtocolSchedule<C> protocolSchedule;
   private final EthContext ethContext;
+  private final LabelledMetric<OperationTimer> ethTasksTimer;
   private final BlockHeader pivotBlockHeader;
 
   public FastSyncTargetManager(
@@ -44,24 +51,50 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
       final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHeader pivotBlockHeader) {
     super(config, protocolSchedule, protocolContext, ethContext, syncState, ethTasksTimer);
+    this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
+    this.ethTasksTimer = ethTasksTimer;
     this.pivotBlockHeader = pivotBlockHeader;
   }
 
   @Override
-  protected Optional<EthPeer> selectBestAvailableSyncTarget() {
+  protected CompletableFuture<Optional<EthPeer>> selectBestAvailableSyncTarget() {
     final Optional<EthPeer> maybeBestPeer = ethContext.getEthPeers().bestPeer();
     if (!maybeBestPeer.isPresent()) {
       LOG.info("No sync target, wait for peers.");
-      return Optional.empty();
+      return completedFuture(Optional.empty());
     } else {
       final EthPeer bestPeer = maybeBestPeer.get();
       if (bestPeer.chainState().getEstimatedHeight() < pivotBlockHeader.getNumber()) {
         LOG.info("No sync target with sufficient chain height, wait for peers.");
-        return Optional.empty();
+        return completedFuture(Optional.empty());
+      } else {
+        return confirmPivotBlockHeader(bestPeer);
       }
-      return maybeBestPeer;
     }
+  }
+
+  private CompletableFuture<Optional<EthPeer>> confirmPivotBlockHeader(final EthPeer bestPeer) {
+    return ethContext
+        .getScheduler()
+        .timeout(
+            GetHeadersFromPeerByNumberTask.forSingleNumber(
+                    protocolSchedule, ethContext, pivotBlockHeader.getNumber(), ethTasksTimer)
+                .assignPeer(bestPeer))
+        .thenApply(
+            result -> {
+              if (result.getResult().size() != 1
+                  || !result.getResult().get(0).equals(pivotBlockHeader)) {
+                bestPeer.disconnect(DisconnectReason.USELESS_PEER);
+                return Optional.<EthPeer>empty();
+              } else {
+                return Optional.of(bestPeer);
+              }
+            })
+        .exceptionally(error -> {
+          LOG.debug("Could not confirm best peer had pivot block", error);
+          return Optional.empty();
+        });
   }
 
   @Override
