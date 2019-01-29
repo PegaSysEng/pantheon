@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
@@ -119,24 +118,6 @@ public class PantheonNodeFactory {
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
             .webSocketEnabled()
             .build());
-  }
-
-  public Node createFixedDifficultyMinerNode(final String name) throws IOException {
-    return create(
-        new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .miningEnabled()
-            .setDevMode(false)
-            .jsonRpcEnabled()
-            .webSocketEnabled()
-            .setGenesisConfigProvider(this::createFixedDifficultyGenesisConfig)
-            .build());
-  }
-
-  private Optional<String> createFixedDifficultyGenesisConfig(
-      final Collection<? extends RunnableNode> runnableNodes) {
-    final String template = genesisTemplateConfig("fixed/fixed.json");
-    return Optional.of(template);
   }
 
   public PantheonNode createArchiveNodeWithCustomRefreshDelay(
