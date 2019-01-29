@@ -44,10 +44,10 @@ import org.apache.logging.log4j.Logger;
 public class BlockImporter {
   private static final Logger LOG = getLogger();
 
-  private Semaphore s = new Semaphore(2);
+  private final Semaphore s = new Semaphore(2);
 
-  private ExecutorService validationExecutor = Executors.newWorkStealingPool();
-  private ExecutorService importExecutor = Executors.newSingleThreadExecutor();
+  private final ExecutorService validationExecutor = Executors.newCachedThreadPool();
+  private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
 
   /**
    * Imports blocks that are stored as concatenated RLP sections in the given file into Pantheon's
