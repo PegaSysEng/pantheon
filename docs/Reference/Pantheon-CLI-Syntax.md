@@ -513,7 +513,7 @@ The default is 30303.
 ### privacy-enabled
 
 ```bash tab="Syntax"
---privacy-enabled=<true|false>
+--privacy-enabled[=<true|false>]
 ```
 
 ```bash tab="Example Command Line"
