@@ -29,11 +29,7 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class FastSyncChainDownloader<C> {
-  private static final Logger LOG = LogManager.getLogger();
   private final ChainDownloader<C> chainDownloader;
   private final SynchronizerConfiguration config;
   private final ProtocolSchedule<C> protocolSchedule;
