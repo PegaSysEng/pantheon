@@ -42,6 +42,7 @@ class PasswordSubCommand implements Runnable {
 
   final PrintStream out;
 
+  @SuppressWarnings("FieldMustBeFinal")
   @Parameters(arity = "1..1", description = "The password input")
   private String password = null;
 

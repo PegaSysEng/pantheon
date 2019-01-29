@@ -372,7 +372,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description =
         "Set if the metrics push gateway integration should be started (default: ${DEFAULT-VALUE})"
   )
-  private Boolean isMetricsPushEnabled = false;
+  private final Boolean isMetricsPushEnabled = false;
 
   @Option(
     names = {"--metrics-push-host"},

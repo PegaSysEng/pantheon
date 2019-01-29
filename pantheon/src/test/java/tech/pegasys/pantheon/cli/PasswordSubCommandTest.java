@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import picocli.CommandLine.Model.CommandSpec;
 
-public class GeneratePasswordHashSubCommandTest extends CommandTestAbstract {
+public class PasswordSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void passwordHashSubCommandExists() {
