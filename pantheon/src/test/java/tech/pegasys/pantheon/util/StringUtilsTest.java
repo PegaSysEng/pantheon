@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.HashMap;

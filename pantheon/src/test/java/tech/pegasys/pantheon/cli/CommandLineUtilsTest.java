@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static picocli.CommandLine.defaultExceptionHandler;
