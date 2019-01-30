@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import static tech.pegasys.pantheon.cli.EthNetworkConfig.mainnet;
+import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -55,7 +56,10 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
     final EthNetworkConfig ethNetworkConfig =
         node.ethNetworkConfig()
-            .orElse(new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build());
+            .orElse(
+                new EthNetworkConfig.Builder(EthNetworkConfig.getNetworkConfig(MAINNET))
+                    .setNetworkId(NETWORK_ID)
+                    .build());
     final PantheonController<?> pantheonController;
     try {
       pantheonController =
@@ -68,6 +72,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .devMode(node.isDevMode())
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
               .metricsSystem(noOpMetricsSystem)
+              .privacyParameters(PrivacyParameters.noPrivacy())
               .build();
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);

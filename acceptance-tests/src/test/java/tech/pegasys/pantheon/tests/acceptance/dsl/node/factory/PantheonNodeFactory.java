@@ -36,6 +36,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -99,13 +100,32 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithP2pDisabled(final String name) throws IOException {
+  public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)
+      throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(jsonRpcConfigWithAdmin())
+            .webSocketEnabled()
+            .setDiscoveryEnabled(false)
+            .build());
+  }
+
+  public PantheonNode createNodeWithP2pDisabled(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .setP2pEnabled(false)
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
-            .webSocketEnabled()
+            .build());
+  }
+
+  public PantheonNode createNodeWithP2pDisabledAndAdmin(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setP2pEnabled(false)
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioningAndAdmin())
             .build());
   }
 
@@ -324,10 +344,18 @@ public class PantheonNodeFactory {
     return createJsonRpcConfigWithRpcApiEnabled(RpcApis.PERM);
   }
 
-  private JsonRpcConfiguration createJsonRpcConfigWithRpcApiEnabled(final RpcApi rpcApi) {
+  private JsonRpcConfiguration jsonRpcConfigWithAdmin() {
+    return createJsonRpcConfigWithRpcApiEnabled(RpcApis.ADMIN);
+  }
+
+  private JsonRpcConfiguration jsonRpcConfigWithPermissioningAndAdmin() {
+    return createJsonRpcConfigWithRpcApiEnabled(RpcApis.PERM, RpcApis.ADMIN);
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfigWithRpcApiEnabled(final RpcApi... rpcApi) {
     final JsonRpcConfiguration jsonRpcConfig = createJsonRpcEnabledConfig();
     final List<RpcApi> rpcApis = new ArrayList<>(jsonRpcConfig.getRpcApis());
-    rpcApis.add(rpcApi);
+    rpcApis.addAll(Arrays.asList(rpcApi));
     jsonRpcConfig.setRpcApis(rpcApis);
     return jsonRpcConfig;
   }

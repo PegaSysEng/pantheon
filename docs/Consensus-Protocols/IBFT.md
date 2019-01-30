@@ -6,6 +6,9 @@ description: Pantheon IBFT 2.0 Proof-of-Authority (PoA) consensus protocol imple
 
 # IBFT 2.0
 
+!!! note 
+    IBFT 2.0 is under development and will be available in v1.0. 
+
 Pantheon implements the IBFT 2.0 Proof-of-Authority (PoA) consensus protocol. IBFT 2.0 can be used for private networks. 
 
 In IBFT 2.0 networks, transactions and blocks are validated by approved accounts, known as validators. 
@@ -71,14 +74,16 @@ Properties that have specific values in IBFT 2.0 genesis files are:
 * `difficulty` - `0x1`
 * `mixHash` - `0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365` for Istanbul block identification.
 
-To start a node on an IBFT 2.0 private network, use the [`--genesis`](../Reference/Pantheon-CLI-Syntax.md#genesis`) option to specify the custom genesis file. 
+To start a node on an IBFT 2.0 private network, use the [`--genesis-file`](../Reference/Pantheon-CLI-Syntax.md#genesis-file`) option to specify the custom genesis file. 
 
 ## Adding and Removing Validators
 
 To propose adding or removing validators using the JSON-RPC methods, enable the HTTP interface 
-using [`--rpc-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-enabled) or WebSockets interface using 
-[`--ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#ws-enabled). If also using the [`--rpc-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-api) 
- or [`--ws-api`](../Reference/Pantheon-CLI-Syntax.md#ws-api) options, include `IBFT`.
+using [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) or WebSockets interface using 
+[`--rpc-ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled). 
+
+The IBFT API methods are not enabled by default. To enable, specify the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) 
+or [`--rpc-ws-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-api) option and include `IBFT`.
 
 The JSON-RPC methods to add or remove validators are:
 

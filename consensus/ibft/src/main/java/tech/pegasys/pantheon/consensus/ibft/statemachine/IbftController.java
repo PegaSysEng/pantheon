@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static java.util.Collections.emptyList;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.Gossiper;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -51,18 +52,14 @@ public class IbftController {
   private final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory;
   private final Map<Long, List<Message>> futureMessages;
   private BlockHeightManager currentHeightManager;
-  private final IbftGossip gossiper;
+  private final Gossiper gossiper;
 
   public IbftController(
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
-      final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory) {
-    this(
-        blockchain,
-        ibftFinalState,
-        ibftBlockHeightManagerFactory,
-        Maps.newHashMap(),
-        new IbftGossip(ibftFinalState.getValidatorMulticaster()));
+      final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
+      final IbftGossip gossiper) {
+    this(blockchain, ibftFinalState, ibftBlockHeightManagerFactory, gossiper, Maps.newHashMap());
   }
 
   @VisibleForTesting
@@ -70,8 +67,8 @@ public class IbftController {
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
-      final Map<Long, List<Message>> futureMessages,
-      final IbftGossip gossiper) {
+      final Gossiper gossiper,
+      final Map<Long, List<Message>> futureMessages) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
@@ -127,7 +124,9 @@ public class IbftController {
 
       default:
         throw new IllegalArgumentException(
-            "Received message does not conform to any recognised IBFT message structure.");
+            String.format(
+                "Received message with messageCode=%d does not conform to any recognised IBFT message structure",
+                message.getData().getCode()));
     }
   }
 
@@ -135,8 +134,12 @@ public class IbftController {
       final Message message,
       final SignedData<P> signedPayload,
       final Consumer<SignedData<P>> handleMessage) {
+    LOG.debug(
+        "Received IBFT message messageType={} payload={}",
+        signedPayload.getPayload().getMessageType(),
+        signedPayload);
     if (processMessage(signedPayload, message)) {
-      gossiper.gossipMessage(message);
+      gossiper.send(message);
       handleMessage.accept(signedPayload);
     }
   }
@@ -145,15 +148,24 @@ public class IbftController {
     final BlockHeader newBlockHeader = newChainHead.getNewChainHeadHeader();
     final BlockHeader currentMiningParent = currentHeightManager.getParentBlockHeader();
     if (newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
-      LOG.info("Discarding NewChainHead event, was for previous block height.");
+      LOG.debug(
+          "Discarding NewChainHead event, was for previous block height. chainHeight={} eventHeight={}",
+          currentMiningParent.getNumber(),
+          newBlockHeader.getNumber());
       return;
     }
 
     if (newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
       if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
-        LOG.info("Discarding duplicate NewChainHead event.");
+        LOG.debug(
+            "Discarding duplicate NewChainHead event. chainHeight={} newBlockHash={} parentBlockHash",
+            newBlockHeader.getNumber(),
+            newBlockHeader.getHash(),
+            currentMiningParent.getHash());
       } else {
-        LOG.error("Subsequent NewChainHead event at same block height indicates chain fork.");
+        LOG.error(
+            "Subsequent NewChainHead event at same block height indicates chain fork. chainHeight={}",
+            currentMiningParent.getNumber());
       }
       return;
     }
@@ -161,10 +173,14 @@ public class IbftController {
   }
 
   public void handleBlockTimerExpiry(final BlockTimerExpiry blockTimerExpiry) {
-    if (isMsgForCurrentHeight(blockTimerExpiry.getRoundIndentifier())) {
-      currentHeightManager.handleBlockTimerExpiry(blockTimerExpiry.getRoundIndentifier());
+    final ConsensusRoundIdentifier roundIndentifier = blockTimerExpiry.getRoundIndentifier();
+    if (isMsgForCurrentHeight(roundIndentifier)) {
+      currentHeightManager.handleBlockTimerExpiry(roundIndentifier);
     } else {
-      LOG.info("Block timer event discarded as it is not for current block height");
+      LOG.debug(
+          "Block timer event discarded as it is not for current block height chainHeight={} eventHeight={}",
+          currentHeightManager.getChainHeight(),
+          roundIndentifier.getSequenceNumber());
     }
   }
 
@@ -172,7 +188,10 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundExpiry.getView())) {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
-      LOG.info("Round expiry event discarded as it is not for current block height");
+      LOG.debug(
+          "Round expiry event discarded as it is not for current block height chainHeight={} eventHeight={}",
+          currentHeightManager.getChainHeight(),
+          roundExpiry.getView().getSequenceNumber());
     }
   }
 
@@ -180,8 +199,7 @@ public class IbftController {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
-    final List<Message> orDefault = futureMessages.getOrDefault(newChainHeight, emptyList());
-    orDefault.forEach(this::handleMessage);
+    futureMessages.getOrDefault(newChainHeight, emptyList()).forEach(this::handleMessage);
     futureMessages.remove(newChainHeight);
   }
 
@@ -192,7 +210,11 @@ public class IbftController {
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
-      LOG.info("IBFT message discarded as it is from a previous block height");
+      LOG.debug(
+          "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
+          msg.getPayload().getMessageType(),
+          currentHeightManager.getChainHeight(),
+          msgRoundIdentifier.getSequenceNumber());
     }
     return false;
   }

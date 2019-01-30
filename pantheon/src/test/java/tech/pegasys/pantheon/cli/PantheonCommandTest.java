@@ -21,9 +21,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static tech.pegasys.pantheon.cli.NetworkName.DEV;
+import static tech.pegasys.pantheon.cli.NetworkName.GOERLI;
+import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
+import static tech.pegasys.pantheon.cli.NetworkName.RINKEBY;
+import static tech.pegasys.pantheon.cli.NetworkName.ROPSTEN;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
 import tech.pegasys.pantheon.PantheonInfo;
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
@@ -46,12 +52,12 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
+import io.vertx.core.json.JsonObject;
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
 import org.apache.commons.text.StringEscapeUtils;
@@ -62,6 +68,7 @@ import org.mockito.ArgumentMatchers;
 import picocli.CommandLine;
 
 public class PantheonCommandTest extends CommandTestAbstract {
+
   private final String ORION_URI = "http://1.2.3.4:5555";
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
@@ -69,7 +76,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   private static final JsonRpcConfiguration defaultJsonRpcConfiguration;
   private static final WebSocketConfiguration defaultWebSocketConfiguration;
   private static final MetricsConfiguration defaultMetricsConfiguration;
-  private static final String GENESIS_CONFIG_TESTDATA = "genesis_config";
+  private static final int GENESIS_CONFIG_TEST_CHAINID = 3141592;
+  private static final JsonObject GENESIS_VALID_JSON =
+      (new JsonObject())
+          .put("config", (new JsonObject()).put("chainId", GENESIS_CONFIG_TEST_CHAINID));
+  private static final JsonObject GENESIS_INVALID_DATA =
+      (new JsonObject()).put("config", new JsonObject());
 
   private final String[] validENodeStrings = {
     "enode://" + VALID_NODE_ID + "@192.168.0.1:4567",
@@ -237,7 +249,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeTrue(isFullInstantiation());
 
     final URL configFile = Resources.getResource("complete_config.toml");
-    final Path genesisFile = createFakeGenesisFile();
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     final String updatedConfig =
         Resources.toString(configFile, UTF_8)
             .replace("~/genesis.json", escapeTomlString(genesisFile.toString()));
@@ -282,8 +294,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(uriListArgumentCaptor.getValue()).isEqualTo(nodes);
 
     final EthNetworkConfig networkConfig =
-        new EthNetworkConfig.Builder(EthNetworkConfig.mainnet())
-            .setGenesisConfig(GENESIS_CONFIG_TESTDATA)
+        new EthNetworkConfig.Builder(EthNetworkConfig.getNetworkConfig(MAINNET))
+            .setNetworkId(42)
+            .setGenesisConfig(encodeJsonGenesis(GENESIS_VALID_JSON))
             .setBootNodes(nodes)
             .build();
     verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata")));
@@ -293,17 +306,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
     // TODO: Re-enable as per NC-1057/NC-1681
     // verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
 
-    assertThat(commandErrorOutput.toString()).isEmpty();
-
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
-  public void tomlThatConfiguresEverything() throws IOException {
+  public void tomlThatConfiguresEverythingExceptPermissioning() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    // Load a TOML that configures literally everything
+    // Load a TOML that configures literally everything (except permissioning)
     final URL configFile = Resources.getResource("everything_config.toml");
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
@@ -406,6 +417,33 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void nodekeyOptionDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final File file = new File("./specific/key");
+
+    parseCommand("--node-private-key-file", file.getPath());
+
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --node-private-key-file, .");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void nodekeyDefaultedUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    parseCommand();
+
+    verify(mockControllerBuilder).nodePrivateKeyFile(fileArgumentCaptor.capture());
+    assertThat(fileArgumentCaptor.getValue()).isEqualTo(new File("/var/lib/pantheon/key"));
+  }
+
+  @Test
   public void dataDirOptionMustBeUsed() throws Exception {
     assumeTrue(isFullInstantiation());
 
@@ -453,19 +491,98 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void genesisPathOptionMustBeUsed() throws Exception {
     assumeTrue(isFullInstantiation());
 
-    final Path genesisFile = createFakeGenesisFile();
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    parseCommand("--private-genesis-file", genesisFile.toString());
+    parseCommand("--genesis-file", genesisFile.toString());
 
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
-    assertThat(networkArg.getValue().getGenesisConfig()).isEqualTo("genesis_config");
+    assertThat(networkArg.getValue().getGenesisConfig())
+        .isEqualTo(encodeJsonGenesis(GENESIS_VALID_JSON));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void genesisAndNetworkMustNotBeUsedTogether() throws Exception {
+    assumeTrue(isFullInstantiation());
+
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    parseCommand("--genesis-file", genesisFile.toString(), "--network", "rinkeby");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .startsWith("--network option and --genesis-file option can't be used at the same time.");
+  }
+
+  @Test
+  public void defaultNetworkIdAndBootnodesForCustomNetworkOptions() throws Exception {
+    assumeTrue(isFullInstantiation());
+
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
+
+    parseCommand("--genesis-file", genesisFile.toString());
+
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilder).build();
+
+    assertThat(networkArg.getValue().getGenesisConfig())
+        .isEqualTo(encodeJsonGenesis(GENESIS_VALID_JSON));
+    assertThat(networkArg.getValue().getBootNodes()).isEmpty();
+    assertThat(networkArg.getValue().getNetworkId()).isEqualTo(GENESIS_CONFIG_TEST_CHAINID);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void defaultNetworkIdForInvalidGenesisMustBeMainnetNetworkId() throws Exception {
+    assumeTrue(isFullInstantiation());
+
+    final Path genesisFile = createFakeGenesisFile(GENESIS_INVALID_DATA);
+
+    parseCommand("--genesis-file", genesisFile.toString());
+
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilder).build();
+
+    assertThat(networkArg.getValue().getGenesisConfig())
+        .isEqualTo(encodeJsonGenesis(GENESIS_INVALID_DATA));
+
+    //    assertThat(networkArg.getValue().getNetworkId())
+    //        .isEqualTo(EthNetworkConfig.getNetworkConfig(MAINNET).getNetworkId());
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void predefinedNetworkIdsMustBeEqualToChainIds() {
+    // check the network id against the one in mainnet genesis config
+    // it implies that EthNetworkConfig.mainnet().getNetworkId() returns a value equals to the chain
+    // id
+    // in this network genesis file.
+
+    GenesisConfigFile genesisConfigFile =
+        GenesisConfigFile.fromConfig(EthNetworkConfig.getNetworkConfig(MAINNET).getGenesisConfig());
+    assertThat(genesisConfigFile.getConfigOptions().getChainId().isPresent()).isTrue();
+    assertThat(genesisConfigFile.getConfigOptions().getChainId().getAsInt())
+        .isEqualTo(EthNetworkConfig.getNetworkConfig(MAINNET).getNetworkId());
   }
 
   @Test
@@ -502,19 +619,35 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void p2pEnabledOptionFalseValueCannotAlsoHaveBootnodesSpecified() {
-    parseCommand("--p2p-enabled", "false", "--bootnodes", String.join(",", validENodeStrings));
+  public void p2pOptionsRequiresServiceToBeEnabled() {
+    final String[] nodes = {"0001", "0002", "0003"};
+
+    parseCommand(
+        "--p2p-enabled",
+        "false",
+        "--bootnodes",
+        String.join(",", validENodeStrings),
+        "--discovery-enabled",
+        "false",
+        "--max-peers",
+        "42",
+        "--banned-node-id",
+        String.join(",", nodes),
+        "--banned-node-ids",
+        String.join(",", nodes));
+
+    verifyOptionsConstraintLoggerCall(
+        "--discovery-enabled, --bootnodes, --max-peers and --banned-node-ids", "--p2p-enabled");
 
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("Unable to specify bootnodes if p2p is disabled.");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
   public void discoveryOptionValueTrueMustBeUsed() {
-    parseCommand("--no-discovery", "true");
-    // Discovery stored in runner is the negative of the option passed to CLI
-    verify(mockRunnerBuilder.discovery(eq(false))).build();
+    parseCommand("--discovery-enabled", "true");
+
+    verify(mockRunnerBuilder.discovery(eq(true))).build();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -522,9 +655,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void discoveryOptionValueFalseMustBeUsed() {
-    parseCommand("--no-discovery", "false");
-    // Discovery stored in runner is the negative of the option passed to CLI
-    verify(mockRunnerBuilder.discovery(eq(true))).build();
+    parseCommand("--discovery-enabled", "false");
+
+    verify(mockRunnerBuilder.discovery(eq(false))).build();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -596,8 +729,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void callingWithRefreshDelayWithValueMustUseValue() {
-    parseCommand("--rpc-ws-refresh-delay", "2000");
+  public void rpcWsRefreshDelayMustBeUsed() {
+    parseCommand("--rpc-ws-enabled", "--rpc-ws-refresh-delay", "2000");
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -609,174 +742,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void callingWithRefreshDelayWithNegativeValueMustError() {
-    parseCommand("--rpc-ws-refresh-delay", "-2000");
+  public void rpcWsRefreshDelayWithNegativeValueMustError() {
+    parseCommand("--rpc-ws-enabled", "--rpc-ws-refresh-delay", "-2000");
 
     assertThat(commandOutput.toString()).isEmpty();
     final String expectedErrorMsg = "Refresh delay must be a positive integer between";
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorMsg);
-  }
-
-  @Test
-  public void callingWithInvalidNodesWhitelistMustDisplayErrorAndUsage() {
-    parseCommand("--nodes-whitelist", "invalid_enode_url");
-    assertThat(commandOutput.toString()).isEmpty();
-    /*
-     Because of the way Picocli handles errors parsing errors for lists with arity 0..*, we don't
-     get the nice error msg with that was wrong. It only shows to the user the values that weren't
-     parsed correctly.
-    */
-    final String expectedErrorOutputStart = "Unmatched argument: invalid_enode_url";
-    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
-  }
-
-  @Test
-  public void nodesWhitelistOptionMustBeUsed() {
-    parseCommand(
-        "--nodes-whitelist",
-        String.join(",", validENodeStrings),
-        "--bootnodes",
-        validENodeStrings[0]);
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    final List<String> enodeURLAsStringList =
-        permissioningConfigurationArgumentCaptor
-            .getValue()
-            .getNodeWhitelist()
-            .stream()
-            .map(URI::toString)
-            .collect(Collectors.toList());
-
-    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(validENodeStrings);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void callingWithAccountsWhitelistOptionButNoValueMustNotError() {
-    parseCommand("--accounts-whitelist");
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().getAccountWhitelist()).isEmpty();
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isAccountWhitelistSet())
-        .isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void accountsWhitelistOptionMustBeUsed() {
-    final String[] accounts = {"1111111111111111", "2222222222222222", "ffffffffffffffff"};
-    parseCommand("--accounts-whitelist", String.join(",", accounts));
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().getAccountWhitelist())
-        .containsExactlyInAnyOrder(accounts);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isAccountWhitelistSet())
-        .isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void nodesWhitelistOptionMustIncludeBootnodes() {
-    parseCommand(
-        "--bootnodes",
-        String.join(",", validENodeStrings[0], validENodeStrings[1]),
-        "--nodes-whitelist",
-        String.join(",", validENodeStrings));
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    final List<String> enodeURLAsStringList =
-        permissioningConfigurationArgumentCaptor
-            .getValue()
-            .getNodeWhitelist()
-            .stream()
-            .map(URI::toString)
-            .collect(Collectors.toList());
-
-    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(validENodeStrings);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void nodesWhitelistOptionWhichDoesNotIncludeBootnodesMustDisplayError() {
-    final String bootNodeNotWhitelisted = "enode://" + VALID_NODE_ID + "@192.168.0.9:4567";
-    parseCommand(
-        "--bootnodes",
-        String.join(",", bootNodeNotWhitelisted, validENodeStrings[2]),
-        "--nodes-whitelist",
-        String.join(",", validENodeStrings));
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
-  }
-
-  @Test
-  public void ropstenWithNodesWhitelistOptionWhichDoesIncludeRopstenBootnodesMustNotDisplayError() {
-    parseCommand("--ropsten", "--nodes-whitelist", String.join(",", ropstenBootnodes));
-
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    final List<String> enodeURLAsStringList =
-        permissioningConfigurationArgumentCaptor
-            .getValue()
-            .getNodeWhitelist()
-            .stream()
-            .map(URI::toString)
-            .collect(Collectors.toList());
-
-    assertThat(enodeURLAsStringList).containsExactlyInAnyOrder(ropstenBootnodes);
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().isNodeWhitelistSet()).isTrue();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void ropstenWithNodesWhitelistOptionWhichDoesNotIncludeRopstenBootnodesMustDisplayError() {
-    parseCommand("--ropsten", "--nodes-whitelist", String.join(",", validENodeStrings));
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
-  }
-
-  @Test
-  public void nodesWhitelistWithEmptyListAndNonEmptyBootnodesMustDisplayError() {
-    parseCommand("--bootnodes", String.join(",", validENodeStrings[0]), "--nodes-whitelist");
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("Cannot start node with bootnode(s) that are not in nodes-whitelist");
   }
 
   @Test
@@ -841,16 +812,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void maxTrailingPeersMustBeUsed() {
-    parseCommand("--max-trailing-peers", "3");
-    verify(mockSyncConfBuilder).maxTrailingPeers(3);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void jsonRpcEnabledPropertyDefaultIsFalse() {
+  public void rpcHttpEnabledPropertyDefaultIsFalse() {
     parseCommand();
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
@@ -863,7 +825,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcEnabledPropertyMustBeUsed() {
+  public void rpcHttpEnabledPropertyMustBeUsed() {
     parseCommand("--rpc-http-enabled");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
@@ -877,13 +839,33 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void rpcApisPropertyMustBeUsed() {
-    parseCommand("--rpc-http-api", "ETH,NET");
+    parseCommand("--rpc-http-api", "ETH,NET", "--rpc-http-enabled");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().getRpcApis())
         .containsExactlyInAnyOrder(RpcApis.ETH, RpcApis.NET);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void rpcHttpOptionsRequiresServiceToBeEnabled() {
+    parseCommand(
+        "--rpc-http-api",
+        "ETH,NET",
+        "--rpc-http-host",
+        "0.0.0.0",
+        "--rpc-http-port",
+        "1234",
+        "--rpc-http-cors-origins",
+        "all");
+
+    verifyOptionsConstraintLoggerCall(
+        "--rpc-http-host, --rpc-http-port, --rpc-http-cors-origins and --rpc-http-api",
+        "--rpc-http-enabled");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -902,11 +884,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostAndPortOptionsMustBeUsed() {
+  public void rpcHttpHostAndPortOptionsMustBeUsed() {
 
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--rpc-http-host", host, "--rpc-http-port", String.valueOf(port));
+    parseCommand(
+        "--rpc-http-enabled", "--rpc-http-host", host, "--rpc-http-port", String.valueOf(port));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -919,9 +902,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsTwoDomainsMustBuildListWithBothDomains() {
+  public void rpcHttpCorsOriginsTwoDomainsMustBuildListWithBothDomains() {
     final String[] origins = {"http://domain1.com", "https://domain2.com"};
-    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-enabled", "--rpc-http-cors-origins", String.join(",", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -934,9 +917,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsDoubleCommaFilteredOut() {
+  public void rpcHttpCorsOriginsDoubleCommaFilteredOut() {
     final String[] origins = {"http://domain1.com", "https://domain2.com"};
-    parseCommand("--rpc-http-cors-origins", String.join(",,", origins));
+    parseCommand("--rpc-http-enabled", "--rpc-http-cors-origins", String.join(",,", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -949,9 +932,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsWithWildcardMustBuildListWithWildcard() {
+  public void rpcHttpCorsOriginsWithWildcardMustBuildListWithWildcard() {
     final String[] origins = {"*"};
-    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-enabled", "--rpc-http-cors-origins", String.join(",", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -964,8 +947,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsWithAllMustBuildListWithWildcard() {
-    parseCommand("--rpc-http-cors-origins", "all");
+  public void rpcHttpCorsOriginsWithAllMustBuildListWithWildcard() {
+    parseCommand("--rpc-http-enabled", "--rpc-http-cors-origins", "all");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -977,9 +960,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsWithNoneMustBuildEmptyList() {
+  public void rpcHttpCorsOriginsWithNoneMustBuildEmptyList() {
     final String[] origins = {"none"};
-    parseCommand("--rpc-http-cors-origins", String.join(",", origins));
+    parseCommand("--rpc-http-enabled", "--rpc-http-cors-origins", String.join(",", origins));
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -991,7 +974,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsNoneWithAnotherDomainMustFail() {
+  public void rpcHttpCorsOriginsNoneWithAnotherDomainMustFail() {
     final String[] origins = {"http://domain1.com", "none"};
     parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
@@ -1003,7 +986,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsNoneWithAnotherDomainMustFailNoneFirst() {
+  public void rpcHttpCorsOriginsNoneWithAnotherDomainMustFailNoneFirst() {
     final String[] origins = {"none", "http://domain1.com"};
     parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
@@ -1015,7 +998,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsAllWithAnotherDomainMustFail() {
+  public void rpcHttpCorsOriginsAllWithAnotherDomainMustFail() {
     parseCommand("--rpc-http-cors-origins=http://domain1.com,all");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -1026,7 +1009,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsAllWithAnotherDomainMustFailAsFlags() {
+  public void rpcHttpCorsOriginsAllWithAnotherDomainMustFailAsFlags() {
     parseCommand("--rpc-http-cors-origins=http://domain1.com", "--rpc-http-cors-origins=all");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -1037,7 +1020,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsWildcardWithAnotherDomainMustFail() {
+  public void rpcHttpCorsOriginsWildcardWithAnotherDomainMustFail() {
     parseCommand("--rpc-http-cors-origins=http://domain1.com,*");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -1048,7 +1031,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsWildcardWithAnotherDomainMustFailAsFlags() {
+  public void rpcHttpCorsOriginsWildcardWithAnotherDomainMustFailAsFlags() {
     parseCommand("--rpc-http-cors-origins=http://domain1.com", "--rpc-http-cors-origins=*");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -1059,7 +1042,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsInvalidRegexShouldFail() {
+  public void rpcHttpCorsOriginsInvalidRegexShouldFail() {
     final String[] origins = {"**"};
     parseCommand("--rpc-http-cors-origins", String.join(",", origins));
 
@@ -1071,7 +1054,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcCorsOriginsEmtyValueFails() {
+  public void rpcHttpCorsOriginsEmtyValueFails() {
     parseCommand("--rpc-http-cors-origins=");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -1082,7 +1065,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistAcceptsSingleArgument() {
+  public void rpcHttpHostWhitelistAcceptsSingleArgument() {
     parseCommand("--host-whitelist", "a");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
@@ -1098,7 +1081,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistAcceptsMultipleArguments() {
+  public void rpcHttpHostWhitelistAcceptsMultipleArguments() {
     parseCommand("--host-whitelist", "a,b");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
@@ -1114,7 +1097,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistAcceptsDoubleComma() {
+  public void rpcHttpHostWhitelistAcceptsDoubleComma() {
     parseCommand("--host-whitelist", "a,,b");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
@@ -1130,7 +1113,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistAcceptsMultipleFlags() {
+  public void rpcHttpHostWhitelistAcceptsMultipleFlags() {
     parseCommand("--host-whitelist=a", "--host-whitelist=b");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
@@ -1146,7 +1129,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistStarWithAnotherHostnameMustFail() {
+  public void rpcHttpHostWhitelistStarWithAnotherHostnameMustFail() {
     final String[] origins = {"friend", "*"};
     parseCommand("--host-whitelist", String.join(",", origins));
 
@@ -1158,7 +1141,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistStarWithAnotherHostnameMustFailStarFirst() {
+  public void rpcHttpHostWhitelistStarWithAnotherHostnameMustFailStarFirst() {
     final String[] origins = {"*", "friend"};
     parseCommand("--host-whitelist", String.join(",", origins));
 
@@ -1170,7 +1153,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistAllWithAnotherHostnameMustFail() {
+  public void rpcHttpHostWhitelistAllWithAnotherHostnameMustFail() {
     final String[] origins = {"friend", "all"};
     parseCommand("--host-whitelist", String.join(",", origins));
 
@@ -1182,7 +1165,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistWithNoneMustBuildEmptyList() {
+  public void rpcHttpHostWhitelistWithNoneMustBuildEmptyList() {
     final String[] origins = {"none"};
     parseCommand("--host-whitelist", String.join(",", origins));
 
@@ -1196,7 +1179,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistNoneWithAnotherDomainMustFail() {
+  public void rpcHttpHostWhitelistNoneWithAnotherDomainMustFail() {
     final String[] origins = {"http://domain1.com", "none"};
     parseCommand("--host-whitelist", String.join(",", origins));
 
@@ -1208,7 +1191,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistNoneWithAnotherDomainMustFailNoneFirst() {
+  public void rpcHttpHostWhitelistNoneWithAnotherDomainMustFailNoneFirst() {
     final String[] origins = {"none", "http://domain1.com"};
     parseCommand("--host-whitelist", String.join(",", origins));
 
@@ -1220,7 +1203,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void jsonRpcHostWhitelistEmptyValueFails() {
+  public void rpcHttpHostWhitelistEmptyValueFails() {
     parseCommand("--host-whitelist=");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -1231,7 +1214,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void wsRpcEnabledPropertyDefaultIsFalse() {
+  public void rpcWsRpcEnabledPropertyDefaultIsFalse() {
     parseCommand();
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
@@ -1244,7 +1227,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void wsRpcEnabledPropertyMustBeUsed() {
+  public void rpcWsRpcEnabledPropertyMustBeUsed() {
     parseCommand("--rpc-ws-enabled");
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
@@ -1257,8 +1240,28 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void wsApiPropertyMustBeUsed() {
-    parseCommand("--rpc-ws-api", "ETH, NET");
+  public void rpcWsOptionsRequiresServiceToBeEnabled() {
+    parseCommand(
+        "--rpc-ws-api",
+        "ETH,NET",
+        "--rpc-ws-host",
+        "0.0.0.0",
+        "--rpc-ws-port",
+        "1234",
+        "--rpc-ws-refresh-delay",
+        "2");
+
+    verifyOptionsConstraintLoggerCall(
+        "--rpc-ws-host, --rpc-ws-port, --rpc-ws-api and --rpc-ws-refresh-delay",
+        "--rpc-ws-enabled");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void rpcWsApiPropertyMustBeUsed() {
+    parseCommand("--rpc-ws-enabled", "--rpc-ws-api", "ETH, NET");
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1271,10 +1274,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void wsRpcHostAndPortOptionMustBeUsed() {
+  public void rpcWsHostAndPortOptionMustBeUsed() {
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--rpc-ws-host", host, "--rpc-ws-port", String.valueOf(port));
+    parseCommand("--rpc-ws-enabled", "--rpc-ws-host", host, "--rpc-ws-port", String.valueOf(port));
 
     verify(mockRunnerBuilder).webSocketConfiguration(wsRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1313,10 +1316,41 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void metricsPushOptionsRequiresPushToBeEnabled() {
+    parseCommand(
+        "--metrics-push-host",
+        "0.0.0.0",
+        "--metrics-push-port",
+        "1234",
+        "--metrics-push-interval",
+        "2",
+        "--metrics-push-prometheus-job",
+        "job-name");
+
+    verifyOptionsConstraintLoggerCall(
+        "--metrics-push-host, --metrics-push-port, --metrics-push-interval and --metrics-push-prometheus-job",
+        "--metrics-push-enabled");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void metricsOptionsRequiresPullMetricsToBeEnabled() {
+    parseCommand("--metrics-host", "0.0.0.0", "--metrics-port", "1234");
+
+    verifyOptionsConstraintLoggerCall("--metrics-host and --metrics-port", "--metrics-enabled");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void metricsHostAndPortOptionMustBeUsed() {
     final String host = "1.2.3.4";
     final int port = 1234;
-    parseCommand("--metrics-host", host, "--metrics-port", String.valueOf(port));
+    parseCommand(
+        "--metrics-enabled", "--metrics-host", host, "--metrics-port", String.valueOf(port));
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1329,13 +1363,34 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void metricsModeOptionMustBeUsed() {
-    parseCommand("--metrics-mode", "pull");
+  public void metricsPushEnabledPropertyMustBeUsed() {
+    parseCommand("--metrics-push-enabled");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(metricsConfigArgumentCaptor.getValue().getMode()).isEqualTo("pull");
+    assertThat(metricsConfigArgumentCaptor.getValue().isPushEnabled()).isTrue();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void metricsPushHostAndPushPortOptionMustBeUsed() {
+    final String host = "1.2.3.4";
+    final int port = 1234;
+    parseCommand(
+        "--metrics-push-enabled",
+        "--metrics-push-host",
+        host,
+        "--metrics-push-port",
+        String.valueOf(port));
+
+    verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(metricsConfigArgumentCaptor.getValue().getPushHost()).isEqualTo(host);
+    assertThat(metricsConfigArgumentCaptor.getValue().getPushPort()).isEqualTo(port);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1343,7 +1398,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsPushIntervalMustBeUsed() {
-    parseCommand("--metrics-push-interval", "42");
+    parseCommand("--metrics-push-enabled", "--metrics-push-interval", "42");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1356,7 +1411,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsPrometheusJobMustBeUsed() {
-    parseCommand("--metrics-prometheus-job", "pantheon-command-test");
+    parseCommand(
+        "--metrics-push-enabled", "--metrics-push-prometheus-job", "pantheon-command-test");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1366,6 +1422,23 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void metricsAndMetricsPushMustNotBeUsedTogether() throws Exception {
+    assumeTrue(isFullInstantiation());
+
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
+
+    parseCommand("--metrics-enabled", "--metrics-push-enabled");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .startsWith("--metrics-enabled option and --metrics-push-enabled option can't be used");
   }
 
   @Test
@@ -1394,11 +1467,31 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void miningOptionsRequiresServiceToBeEnabled() {
+
+    final Address requestedCoinbase = Address.fromHexString("0000011111222223333344444");
+    parseCommand(
+        "--miner-coinbase",
+        requestedCoinbase.toString(),
+        "--min-gas-price",
+        "42",
+        "--miner-extra-data",
+        "0x1122334455667788990011223344556677889900112233445566778899001122");
+
+    verifyOptionsConstraintLoggerCall(
+        "--miner-coinbase, --min-gas-price and --miner-extra-data", "--miner-enabled");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void miningParametersAreCaptured() throws Exception {
     final Address requestedCoinbase = Address.fromHexString("0000011111222223333344444");
     final String extraDataString =
         "0x1122334455667788990011223344556677889900112233445566778899001122";
     parseCommand(
+        "--miner-enabled",
         "--miner-coinbase=" + requestedCoinbase.toString(),
         "--min-gas-price=15",
         "--miner-extra-data=" + extraDataString);
@@ -1419,10 +1512,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void devModeOptionMustBeUsed() throws Exception {
-    parseCommand("--dev-mode");
+    parseCommand("--network", "dev");
+
+    final ArgumentCaptor<EthNetworkConfig> networkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
 
     verify(mockControllerBuilder).devMode(eq(true));
+    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
+
+    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(DEV));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1430,7 +1529,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void rinkebyValuesAreUsed() throws Exception {
-    parseCommand("--rinkeby");
+    parseCommand("--network", "rinkeby");
 
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
@@ -1438,14 +1537,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
+    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(RINKEBY));
+
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.rinkeby());
   }
 
   @Test
   public void ropstenValuesAreUsed() throws Exception {
-    parseCommand("--ropsten");
+    parseCommand("--network", "ropsten");
 
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
@@ -1453,14 +1553,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
+    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(ROPSTEN));
+
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.ropsten());
   }
 
   @Test
   public void goerliValuesAreUsed() throws Exception {
-    parseCommand("--goerli");
+    parseCommand("--network", "goerli");
 
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
@@ -1468,19 +1569,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
+    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(GOERLI));
+
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.goerli());
-  }
-
-  @Test
-  public void noSeveralNetworkOptions() {
-    parseCommand("--goerli", "--rinkeby");
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).contains("Unable to connect to multiple networks");
   }
 
   @Test
@@ -1493,16 +1585,24 @@ public class PantheonCommandTest extends CommandTestAbstract {
     networkValuesCanBeOverridden("goerli");
   }
 
+  @Test
+  public void ropstenValuesCanBeOverridden() throws Exception {
+    networkValuesCanBeOverridden("ropsten");
+  }
+
+  @Test
+  public void devValuesCanBeOverridden() throws Exception {
+    networkValuesCanBeOverridden("dev");
+  }
+
   private void networkValuesCanBeOverridden(final String network) throws Exception {
-    final Path genesisFile = createFakeGenesisFile();
     parseCommand(
-        "--" + network,
+        "--network",
+        network,
         "--network-id",
-        "1",
+        "1234567",
         "--bootnodes",
-        String.join(",", validENodeStrings),
-        "--private-genesis-file",
-        genesisFile.toString());
+        String.join(",", validENodeStrings));
 
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
@@ -1510,12 +1610,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(networkArg.getValue().getGenesisConfig()).isEqualTo("genesis_config");
     assertThat(networkArg.getValue().getBootNodes())
         .isEqualTo(Stream.of(validENodeStrings).map(URI::create).collect(Collectors.toList()));
-    assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1);
+    assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1234567);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -1528,7 +1628,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).doesNotContain("--config-file");
     assertThat(commandOutput.toString()).doesNotContain("--data-path");
-    assertThat(commandOutput.toString()).doesNotContain("--private-genesis-file");
+    assertThat(commandOutput.toString()).doesNotContain("--genesis-file");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
@@ -1540,7 +1640,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).contains("--config-file");
     assertThat(commandOutput.toString()).contains("--data-path");
-    assertThat(commandOutput.toString()).contains("--private-genesis-file");
+    assertThat(commandOutput.toString()).contains("--genesis-file");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
@@ -1569,6 +1669,27 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void privacyOptionsRequiresServiceToBeEnabled() {
+
+    final File file = new File("./specific/public_key");
+
+    parseCommand(
+        "--privacy-url",
+        ORION_URI,
+        "--privacy-public-key-file",
+        file.getPath(),
+        "--privacy-precompiled-address",
+        String.valueOf(Byte.MAX_VALUE - 1));
+
+    verifyOptionsConstraintLoggerCall(
+        "--privacy-url, --privacy-public-key-file and --privacy-precompiled-address",
+        "--privacy-enabled");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void mustVerifyPrivacyIsDisabled() throws IOException {
     parseCommand();
 
@@ -1583,10 +1704,14 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(orionArg.getValue().isEnabled()).isEqualTo(false);
   }
 
-  private Path createFakeGenesisFile() throws IOException {
+  private Path createFakeGenesisFile(final JsonObject jsonGenesis) throws IOException {
     final Path genesisFile = Files.createTempFile("genesisFile", "");
-    Files.write(genesisFile, "genesis_config".getBytes(UTF_8));
+    Files.write(genesisFile, encodeJsonGenesis(jsonGenesis).getBytes(UTF_8));
     return genesisFile;
+  }
+
+  private String encodeJsonGenesis(final JsonObject jsonGenesis) {
+    return jsonGenesis.encodePrettily();
   }
 
   private boolean isFullInstantiation() {
@@ -1595,5 +1720,27 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   private static String escapeTomlString(final String s) {
     return StringEscapeUtils.escapeJava(s);
+  }
+
+  /**
+   * Check logger calls
+   *
+   * <p>Here we check the calls to logger and not the result of the log line as we don't test the
+   * logger itself but the fact that we call it.
+   *
+   * @param dependentOptions the string representing the list of dependent options names
+   * @param mainOption the main option name
+   */
+  private void verifyOptionsConstraintLoggerCall(
+      final String dependentOptions, final String mainOption) {
+    verify(mockLogger)
+        .warn(
+            stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture(),
+            stringArgumentCaptor.capture());
+    assertThat(stringArgumentCaptor.getAllValues().get(0))
+        .isEqualTo("{} will have no effect unless {} is defined on the command line.");
+    assertThat(stringArgumentCaptor.getAllValues().get(1)).isEqualTo(dependentOptions);
+    assertThat(stringArgumentCaptor.getAllValues().get(2)).isEqualTo(mainOption);
   }
 }

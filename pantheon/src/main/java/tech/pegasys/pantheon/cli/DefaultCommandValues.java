@@ -35,13 +35,14 @@ interface DefaultCommandValues {
   String DEFAULT_DATA_DIR_PATH = "./build/data";
   String MANDATORY_INTEGER_FORMAT_HELP = "<INTEGER>";
   String MANDATORY_MODE_FORMAT_HELP = "<MODE>";
-  String MANDATORY_NETWORK_FORMAT_HELP = "<CHAIN>";
+  String MANDATORY_NETWORK_FORMAT_HELP = "<NETWORK>";
   String MANDATORY_NODE_ID_FORMAT_HELP = "<NODEID>";
   Wei DEFAULT_MIN_TRANSACTION_GAS_PRICE = Wei.of(1000);
   BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
   long DEFAULT_MAX_REFRESH_DELAY = 3600000;
   long DEFAULT_MIN_REFRESH_DELAY = 1;
   String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
+  String PERMISSIONING_CONFIG_LOCATION = "/etc/pantheon/permissioned_config.toml";
   String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
   String MANDATORY_HOST_FORMAT_HELP = "<HOST>";
   String MANDATORY_PORT_FORMAT_HELP = "<PORT>";
@@ -49,6 +50,7 @@ interface DefaultCommandValues {
   // but we use FULL for the moment as Fast is still in progress
   SyncMode DEFAULT_SYNC_MODE = SyncMode.FULL;
   int DEFAULT_MAX_PEERS = 25;
+  int MAX_TRAILING_PEERS = Integer.MAX_VALUE;
 
   static Path getDefaultPantheonDataPath(final Object command) {
     // this property is retrieved from Gradle tasks or Pantheon running shell script.

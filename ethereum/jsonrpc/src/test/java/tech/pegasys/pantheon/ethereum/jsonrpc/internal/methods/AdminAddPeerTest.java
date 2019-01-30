@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 
 import org.junit.Before;
@@ -91,6 +92,35 @@ public class AdminAddPeerTest {
   }
 
   @Test
+  public void requestRefusesListOfNodes() {
+    final JsonRpcRequest request =
+        new JsonRpcRequest(
+            "2.0",
+            "admin_addPeer",
+            new String[] {
+              "enode://"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "@127.0.0.1:30303",
+              "enode://"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000001"
+                  + "@127.0.0.2:30303"
+            });
+
+    final JsonRpcResponse expectedResponse =
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
+
+    final JsonRpcResponse actualResponse = method.response(request);
+
+    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+  }
+
+  @Test
   public void requestReturnsFalseIfAddFails() {
     when(p2pNetwork.addMaintainConnectionPeer(any())).thenReturn(false);
 
@@ -108,6 +138,33 @@ public class AdminAddPeerTest {
             });
 
     final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(request.getId(), false);
+
+    final JsonRpcResponse actualResponse = method.response(request);
+
+    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+  }
+
+  @Test
+  public void requestReturnsErrorWhenP2pDisabled() {
+    when(p2pNetwork.addMaintainConnectionPeer(any()))
+        .thenThrow(
+            new P2pDisabledException("P2P networking disabled.  Unable to connect to add peer."));
+
+    final JsonRpcRequest request =
+        new JsonRpcRequest(
+            "2.0",
+            "admin_addPeer",
+            new String[] {
+              "enode://"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "00000000000000000000000000000000"
+                  + "@127.0.0.1:30303"
+            });
+
+    final JsonRpcResponse expectedResponse =
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.P2P_DISABLED);
 
     final JsonRpcResponse actualResponse = method.response(request);
 

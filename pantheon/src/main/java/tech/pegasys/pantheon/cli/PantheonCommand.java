@@ -22,13 +22,16 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfigur
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
+import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
+import tech.pegasys.pantheon.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
@@ -43,15 +46,13 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
+import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
@@ -66,14 +67,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import com.google.common.net.HostSpecifier;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.DecodeException;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
@@ -99,6 +101,10 @@ import picocli.CommandLine.ParameterException;
   footer = "Pantheon is licensed under the Apache License 2.0"
 )
 public class PantheonCommand implements DefaultCommandValues, Runnable {
+
+  private final Logger logger;
+
+  private CommandLine commandLine;
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
 
@@ -140,14 +146,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // CLI options defined by user at runtime.
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
-  @Option(
-    names = {"--node-private-key-file"},
-    paramLabel = MANDATORY_PATH_FORMAT_HELP,
-    description =
-        "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)"
-  )
-  private final File nodePrivateKeyFile = null;
-
   // Completely disables p2p within Pantheon.
   @Option(
     names = {"--p2p-enabled"},
@@ -166,11 +164,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Also many other software use the same negative option scheme for false defaults
   // meaning that it's probably the right way to handle disabling options.
   @Option(
-    names = {"--no-discovery"},
-    description = "Disable p2p peer discovery (default: ${DEFAULT-VALUE})",
+    names = {"--discovery-enabled"},
+    description = "Enable p2p peer discovery (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final Boolean noPeerDiscovery = false;
+  private final Boolean peerDiscoveryEnabled = true;
 
   // A list of bootstrap nodes can be passed
   // and a hardcoded list will be used otherwise by the Runner.
@@ -185,7 +183,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     arity = "0..*",
     converter = EnodeToURIPropertyConverter.class
   )
-  private final Collection<URI> bootstrapNodes = null;
+  private final Collection<URI> bootNodes = null;
 
   @Option(
     names = {"--max-peers"},
@@ -193,20 +191,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})"
   )
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
-
-  /**
-   * @deprecated This option is not exposed anymore even if still available as it's bounded by
-   *     max-peers value. It's not useful enough to figure in the help. Will probably completely
-   *     removed in next version.
-   */
-  @Deprecated
-  @Option(
-    names = {"--max-trailing-peers"},
-    paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-    description =
-        "Maximum p2p peer connections for peers that are trailing behind our chain head (default: unlimited)"
-  )
-  private final Integer maxTrailingPeers = Integer.MAX_VALUE;
 
   @Option(
     names = {"--banned-node-ids", "--banned-node-id"},
@@ -231,47 +215,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     paramLabel = MANDATORY_NETWORK_FORMAT_HELP,
     description =
         "Synchronize against the indicated network, possible values are ${COMPLETION-CANDIDATES}."
-            + " (default: ${DEFAULT-VALUE})"
+            + " (default: MAINNET)"
   )
-  private final NetworkName network = MAINNET;
-
-  /** @deprecated Deprecated in favour of --network option */
-  @Deprecated
-  // Boolean option to indicate if the client have to sync against the ottoman test network
-  // (see https://github.com/ethereum/EIPs/issues/650).
-  @Option(
-    names = {"--ottoman"},
-    description =
-        "Synchronize against the Ottoman test network, only useful if using an iBFT genesis file"
-            + " - see https://github.com/ethereum/EIPs/issues/650 (default: ${DEFAULT-VALUE})"
-  )
-  private final Boolean syncWithOttoman = false;
-
-  /** @deprecated Deprecated in favour of --network option */
-  @Deprecated
-  @Option(
-    names = {"--rinkeby"},
-    description =
-        "Use the Rinkeby test network"
-            + " - see https://github.com/ethereum/EIPs/issues/225 (default: ${DEFAULT-VALUE})"
-  )
-  private final Boolean rinkeby = false;
-
-  /** @deprecated Deprecated in favour of --network option */
-  @Deprecated
-  @Option(
-    names = {"--ropsten"},
-    description = "Use the Ropsten test network (default: ${DEFAULT-VALUE})"
-  )
-  private final Boolean ropsten = false;
-
-  /** @deprecated Deprecated in favour of --network option */
-  @Deprecated
-  @Option(
-    names = {"--goerli"},
-    description = "Use the Goerli test network (default: ${DEFAULT-VALUE})"
-  )
-  private final Boolean goerli = false;
+  private final NetworkName network = null;
 
   @Option(
     names = {"--p2p-host"},
@@ -290,12 +236,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final Integer p2pPort = DEFAULT_PORT;
 
-  /** @deprecated Deprecated in favour of --network option */
-  @Deprecated
   @Option(
     names = {"--network-id"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-    description = "P2P network identifier (default: ${DEFAULT-VALUE})",
+    description =
+        "P2P network identifier. (default: the selected network chain ID or custom genesis chain ID)",
     arity = "1"
   )
   private final Integer networkId = null;
@@ -304,7 +249,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     names = {"--rpc-http-enabled"},
     description = "Set if the JSON-RPC service should be started (default: ${DEFAULT-VALUE})"
   )
-  private final Boolean isHttpRpcEnabled = false;
+  private final Boolean isRpcHttpEnabled = false;
 
   @Option(
     names = {"--rpc-http-host"},
@@ -406,13 +351,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isMetricsEnabled = false;
 
   @Option(
-    names = {"--metrics-mode"},
-    description =
-        "Mode for the metrics service to run in, 'push' or 'pull' (default: ${DEFAULT-VALUE})"
-  )
-  private String metricsMode = MetricsConfiguration.MODE_SERVER_PULL;
-
-  @Option(
     names = {"--metrics-host"},
     paramLabel = MANDATORY_HOST_FORMAT_HELP,
     description = "Host for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
@@ -430,6 +368,30 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer metricsPort = DEFAULT_METRICS_PORT;
 
   @Option(
+    names = {"--metrics-push-enabled"},
+    description =
+        "Set if the metrics push gateway integration should be started (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean isMetricsPushEnabled = false;
+
+  @Option(
+    names = {"--metrics-push-host"},
+    paramLabel = MANDATORY_HOST_FORMAT_HELP,
+    description = "Host of the Prometheus Push Gateway for push mode (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final HostSpecifier metricsPushHost =
+      HostSpecifier.fromValid(autoDiscoverDefaultIP().getHostAddress());
+
+  @Option(
+    names = {"--metrics-push-port"},
+    paramLabel = MANDATORY_PORT_FORMAT_HELP,
+    description = "Port of the Prometheus Push Gateway for push mode (default: ${DEFAULT-VALUE})",
+    arity = "1"
+  )
+  private final Integer metricsPushPort = DEFAULT_METRICS_PUSH_PORT;
+
+  @Option(
     names = {"--metrics-push-interval"},
     paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
     description =
@@ -439,7 +401,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer metricsPushInterval = 15;
 
   @Option(
-    names = {"--metrics-prometheus-job"},
+    names = {"--metrics-push-prometheus-job"},
     description = "Job name to use when in push mode (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
@@ -453,16 +415,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     defaultValue = "localhost"
   )
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
-
-  /** @deprecated Deprecated in favour of --network option */
-  @Deprecated
-  @Option(
-    names = {"--dev-mode"},
-    description =
-        "set during development to have a custom genesis with specific chain id "
-            + "and reduced difficulty to enable CPU mining (default: ${DEFAULT-VALUE})."
-  )
-  private final Boolean isDevMode = false;
 
   @Option(
     names = {"--logging", "-l"},
@@ -505,28 +457,23 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   )
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
-  // Permissioning: A list of whitelist nodes can be passed.
   @Option(
-    names = {"--nodes-whitelist"},
-    description =
-        "Comma separated enode URLs for permissioned networks. "
-            + "Not intended to be used with mainnet or public testnets.",
-    split = ",",
-    arity = "0..*",
-    converter = EnodeToURIPropertyConverter.class
+    names = {"--permissions-nodes-enabled"},
+    description = "Set if node level permissions should be enabled (default: ${DEFAULT-VALUE})"
   )
-  private final Collection<URI> nodesWhitelist = null;
+  private final Boolean permissionsNodesEnabled = false;
 
   @Option(
-    names = {"--accounts-whitelist"},
-    paramLabel = "<hex string of account public key>",
-    description =
-        "Comma separated hex strings of account public keys "
-            + "for permissioned/role-based transactions. You may specify an empty list.",
-    split = ",",
-    arity = "0..*"
+    names = {"--permissions-accounts-enabled"},
+    description = "Set if account level permissions should be enabled (default: ${DEFAULT-VALUE})"
   )
-  private final Collection<String> accountsWhitelist = null;
+  private final Boolean permissionsAccountsEnabled = false;
+
+  @Option(
+    names = {"--privacy-enabled"},
+    description = "Set if private transaction should be enabled (default: ${DEFAULT-VALUE})"
+  )
+  private final Boolean privacyEnabled = false;
 
   @Option(
     names = {"--privacy-url"},
@@ -541,16 +488,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final File privacyPublicKeyFile = null;
 
   @Option(
-    names = {"--privacy-enabled"},
-    description = "Set if private transaction should be enabled (default: ${DEFAULT-VALUE})"
+    names = {"--privacy-precompiled-address"},
+    description =
+        "The address to which the privacy pre-compiled contract will be mapped to (default: ${DEFAULT-VALUE})"
   )
-  private final Boolean privacyEnabled = false;
+  private final Integer privacyPrecompiledAddress = Address.PRIVACY;
 
   public PantheonCommand(
+      final Logger logger,
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
       final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder) {
+    this.logger = logger;
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
@@ -564,7 +514,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final DefaultExceptionHandler<List<Object>> exceptionHandler,
       final String... args) {
 
-    final CommandLine commandLine = new CommandLine(this);
+    commandLine = new CommandLine(this);
+
+    commandLine.setCaseInsensitiveEnumValuesAllowed(true);
 
     standaloneCommands = new StandaloneCommand();
 
@@ -576,6 +528,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
     commandLine.addSubcommand(
         PublicKeySubCommand.COMMAND_NAME, new PublicKeySubCommand(resultHandler.out()));
+    commandLine.addSubcommand(
+        PasswordSubCommand.COMMAND_NAME, new PasswordSubCommand(resultHandler.out()));
 
     commandLine.registerConverter(Address.class, Address::fromHexString);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
@@ -601,10 +555,26 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
-    if (!p2pEnabled && (bootstrapNodes != null && !bootstrapNodes.isEmpty())) {
-      throw new ParameterException(
-          new CommandLine(this), "Unable to specify bootnodes if p2p is disabled.");
-    }
+    // Check that p2p options are able top work or send an error
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--p2p-enabled",
+        !p2pEnabled,
+        Arrays.asList(
+            "--bootnodes",
+            "--discovery-enabled",
+            "--max-peers",
+            "--banned-node-id",
+            "--banned-node-ids"));
+
+    // Check that mining options are able top work or send an error
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--miner-enabled",
+        !isMiningEnabled,
+        Arrays.asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -613,20 +583,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
-    if (trueCount(ropsten, rinkeby, goerli) > 1) {
-      throw new ParameterException(
-          new CommandLine(this),
-          "Unable to connect to multiple networks simultaneously. Specify one of --ropsten, --rinkeby or --goerli");
-    }
 
-    final EthNetworkConfig ethNetworkConfig = ethNetworkConfig();
+    final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     final PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
     ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
 
     synchronize(
         buildController(),
         p2pEnabled,
-        noPeerDiscovery,
+        peerDiscoveryEnabled,
         ethNetworkConfig.getBootNodes(),
         maxPeers,
         HostAndPort.fromParts(p2pHost.toString(), p2pPort),
@@ -636,31 +601,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         permissioningConfiguration);
   }
 
+  private NetworkName getNetwork() {
+    //noinspection ConstantConditions network is not always null but injected by PicoCLI if used
+    return network == null ? MAINNET : network;
+  }
+
   private void ensureAllBootnodesAreInWhitelist(
       final EthNetworkConfig ethNetworkConfig,
       final PermissioningConfiguration permissioningConfiguration) {
-    final List<Peer> bootnodes =
-        DiscoveryConfiguration.getBootstrapPeersFromGenericCollection(
-            ethNetworkConfig.getBootNodes());
-    if (permissioningConfiguration.isNodeWhitelistSet() && bootnodes != null) {
-      final List<Peer> whitelist =
-          permissioningConfiguration
-              .getNodeWhitelist()
-              .stream()
-              .map(DefaultPeer::fromURI)
-              .collect(Collectors.toList());
-      for (final Peer bootnode : bootnodes) {
-        if (!whitelist.contains(bootnode)) {
-          throw new ParameterException(
-              new CommandLine(this),
-              "Cannot start node with bootnode(s) that are not in nodes-whitelist " + bootnode);
-        }
-      }
+    try {
+      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
+          ethNetworkConfig, permissioningConfiguration);
+    } catch (Exception e) {
+      throw new ParameterException(new CommandLine(this), e.getMessage());
     }
-  }
-
-  private static int trueCount(final Boolean... b) {
-    return (int) Arrays.stream(b).filter(bool -> bool).count();
   }
 
   PantheonController<?> buildController() {
@@ -668,12 +622,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return controllerBuilder
           .synchronizerConfiguration(buildSyncConfig())
           .homePath(dataDir())
-          .ethNetworkConfig(ethNetworkConfig())
-          .syncWithOttoman(syncWithOttoman)
+          .ethNetworkConfig(updateNetworkConfig(getNetwork()))
+          .syncWithOttoman(false) // ottoman feature is still there but it's now removed from CLI
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
-          .devMode(isDevMode)
-          .nodePrivateKeyFile(getNodePrivateKeyFile())
+          .devMode(NetworkName.DEV.equals(getNetwork()))
+          .nodePrivateKeyFile(nodePrivateKeyFile())
           .metricsSystem(metricsSystem)
           .privacyParameters(orionConfiguration())
           .build();
@@ -684,15 +638,22 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private File getNodePrivateKeyFile() {
-    return nodePrivateKeyFile != null
-        ? nodePrivateKeyFile
-        : KeyPairUtil.getDefaultKeyFile(dataDir());
-  }
-
   private JsonRpcConfiguration jsonRpcConfiguration() {
+
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--rpc-http-enabled",
+        !isRpcHttpEnabled,
+        Arrays.asList(
+            "--rpc-http-api",
+            "--rpc-http-apis",
+            "--rpc-http-cors-origins",
+            "--rpc-http-host",
+            "--rpc-http-port"));
+
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
-    jsonRpcConfiguration.setEnabled(isHttpRpcEnabled);
+    jsonRpcConfiguration.setEnabled(isRpcHttpEnabled);
     jsonRpcConfiguration.setHost(rpcHttpHost.toString());
     jsonRpcConfiguration.setPort(rpcHttpPort);
     jsonRpcConfiguration.setCorsAllowedDomains(rpcHttpCorsAllowedOrigins);
@@ -702,6 +663,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private WebSocketConfiguration webSocketConfiguration() {
+
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--rpc-ws-enabled",
+        !isRpcWsEnabled,
+        Arrays.asList(
+            "--rpc-ws-api",
+            "--rpc-ws-apis",
+            "--rpc-ws-refresh-delay",
+            "--rpc-ws-host",
+            "--rpc-ws-port"));
+
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(isRpcWsEnabled);
     webSocketConfiguration.setHost(rpcWsHost.toString());
@@ -712,11 +686,38 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   MetricsConfiguration metricsConfiguration() {
+    if (isMetricsEnabled && isMetricsPushEnabled) {
+      throw new ParameterException(
+          new CommandLine(this),
+          "--metrics-enabled option and --metrics-push-enabled option can't be used at the same "
+              + "time.  Please refer to CLI reference for more details about this constraint.");
+    }
+
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--metrics-enabled",
+        !isMetricsEnabled,
+        Arrays.asList("--metrics-host", "--metrics-port"));
+
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--metrics-push-enabled",
+        !isMetricsPushEnabled,
+        Arrays.asList(
+            "--metrics-push-host",
+            "--metrics-push-port",
+            "--metrics-push-interval",
+            "--metrics-push-prometheus-job"));
+
     final MetricsConfiguration metricsConfiguration = createDefault();
     metricsConfiguration.setEnabled(isMetricsEnabled);
-    metricsConfiguration.setMode(metricsMode);
     metricsConfiguration.setHost(metricsHost.toString());
     metricsConfiguration.setPort(metricsPort);
+    metricsConfiguration.setPushEnabled(isMetricsPushEnabled);
+    metricsConfiguration.setPushHost(metricsPushHost.toString());
+    metricsConfiguration.setPushPort(metricsPushPort);
     metricsConfiguration.setPushInterval(metricsPushInterval);
     metricsConfiguration.setPrometheusJob(metricsPrometheusJob);
     metricsConfiguration.setHostsWhitelist(hostsWhitelist);
@@ -724,24 +725,41 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private PermissioningConfiguration permissioningConfiguration() {
+
+    if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+      return PermissioningConfiguration.createDefault();
+    }
+
     final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-    permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+            DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION,
+            permissionsNodesEnabled,
+            permissionsAccountsEnabled);
     return permissioningConfiguration;
   }
 
   private PrivacyParameters orionConfiguration() {
+
+    // Check that mining options are able top work or send an error
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--privacy-enabled",
+        !privacyEnabled,
+        Arrays.asList(
+            "--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
+
     final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
     privacyParameters.setEnabled(privacyEnabled);
     privacyParameters.setUrl(privacyUrl.toString());
     privacyParameters.setPublicKey(privacyPublicKeyFile);
+    privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
     return privacyParameters;
   }
 
   private SynchronizerConfiguration buildSyncConfig() {
     synchronizerConfigurationBuilder.syncMode(syncMode);
-    synchronizerConfigurationBuilder.maxTrailingPeers(maxTrailingPeers);
+    synchronizerConfigurationBuilder.maxTrailingPeers(MAX_TRAILING_PEERS);
     return synchronizerConfigurationBuilder.build();
   }
 
@@ -749,7 +767,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private void synchronize(
       final PantheonController<?> controller,
       final boolean p2pEnabled,
-      final boolean noPeerDiscovery,
+      final boolean peerDiscoveryEnabled,
       final Collection<?> bootstrapNodes,
       final int maxPeers,
       final HostAndPort discoveryHostAndPort,
@@ -765,8 +783,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .vertx(Vertx.vertx())
             .pantheonController(controller)
             .p2pEnabled(p2pEnabled)
-            // BEWARE: Peer discovery boolean must be inverted as it's negated in the options !
-            .discovery(!noPeerDiscovery)
+            .discovery(peerDiscoveryEnabled)
             .bootstrapPeers(bootstrapNodes)
             .discoveryHost(discoveryHostAndPort.getHost())
             .discoveryPort(discoveryHostAndPort.getPort())
@@ -811,31 +828,69 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return autoDiscoveredDefaultIP;
   }
 
-  private EthNetworkConfig ethNetworkConfig() {
-    final EthNetworkConfig predefinedNetworkConfig;
-    if (rinkeby) {
-      predefinedNetworkConfig = EthNetworkConfig.rinkeby();
-    } else if (ropsten) {
-      predefinedNetworkConfig = EthNetworkConfig.ropsten();
-    } else if (goerli) {
-      predefinedNetworkConfig = EthNetworkConfig.goerli();
-    } else {
-      predefinedNetworkConfig = EthNetworkConfig.mainnet();
-    }
-    return updateNetworkConfig(predefinedNetworkConfig);
-  }
+  private EthNetworkConfig updateNetworkConfig(final NetworkName network) {
+    final EthNetworkConfig.Builder builder =
+        new EthNetworkConfig.Builder(EthNetworkConfig.getNetworkConfig(network));
 
-  private EthNetworkConfig updateNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
-    final EthNetworkConfig.Builder builder = new EthNetworkConfig.Builder(ethNetworkConfig);
-    if (genesisFile() != null) {
+    // custom genesis file use comes with specific default values for the genesis file itself
+    // but also for the network id and the bootnodes list.
+    File genesisFile = genesisFile();
+    if (genesisFile != null) {
+
+      //noinspection ConstantConditions network is not always null but injected by PicoCLI if used
+      if (this.network != null) {
+        // We check if network option was really provided by user and not only looking at the
+        // default value.
+        // if user provided it and provided the genesis file option at the same time, it raises a
+        // conflict error
+        throw new ParameterException(
+            new CommandLine(this),
+            "--network option and --genesis-file option can't be used at the same time.  Please "
+                + "refer to CLI reference for more details about this constraint.");
+      }
+
       builder.setGenesisConfig(genesisConfig());
+
+      if (networkId == null) {
+        // if no network id option is defined on the CLI we have to set a default value from the
+        // genesis file.
+        // We do the genesis parsing only in this case as we already have network id constants
+        // for known networks to speed up the process.
+        // Also we have to parse the genesis as we don't already have a parsed version at this
+        // stage.
+        // If no chain id is found in the genesis as it's an optional, we use mainnet network id.
+        try {
+          GenesisConfigFile genesisConfigFile = GenesisConfigFile.fromConfig(genesisConfig());
+          builder.setNetworkId(
+              genesisConfigFile
+                  .getConfigOptions()
+                  .getChainId()
+                  .orElse(EthNetworkConfig.getNetworkConfig(MAINNET).getNetworkId()));
+        } catch (DecodeException e) {
+          throw new ParameterException(
+              new CommandLine(this),
+              String.format("Unable to parse genesis file %s.", genesisFile),
+              e);
+        }
+      }
+
+      if (bootNodes == null) {
+        // We default to an empty bootnodes list if the option is not provided on CLI because
+        // mainnet bootnodes won't work as the default value for a custom genesis,
+        // so it's better to have an empty list as default value that forces to create a custom one
+        // than a useless one that may make user think that it can work when it can't.
+        builder.setBootNodes(new ArrayList<>());
+      }
     }
+
     if (networkId != null) {
       builder.setNetworkId(networkId);
     }
-    if (bootstrapNodes != null) {
-      builder.setBootNodes(bootstrapNodes);
+
+    if (bootNodes != null) {
+      builder.setBootNodes(bootNodes);
     }
+
     return builder.build();
   }
 
@@ -873,6 +928,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } else {
       return getDefaultPantheonDataPath(this);
     }
+  }
+
+  private File nodePrivateKeyFile() {
+    File nodePrivateKeyFile = null;
+    if (isFullInstantiation()) {
+      nodePrivateKeyFile = standaloneCommands.nodePrivateKeyFile;
+    }
+
+    return nodePrivateKeyFile != null
+        ? nodePrivateKeyFile
+        : KeyPairUtil.getDefaultKeyFile(dataDir());
   }
 
   private boolean isFullInstantiation() {
