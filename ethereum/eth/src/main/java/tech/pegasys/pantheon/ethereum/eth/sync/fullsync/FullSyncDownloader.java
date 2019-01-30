@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask.PeerTaskResult;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
+import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.ImportBlocksTask;
@@ -26,12 +27,10 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
-import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 
 public class FullSyncDownloader<C> {
   private final ChainDownloader<C> chainDownloader;
@@ -56,13 +55,13 @@ public class FullSyncDownloader<C> {
     chainDownloader =
         new ChainDownloader<>(
             config,
-            protocolSchedule,
-            protocolContext,
             ethContext,
             syncState,
             ethTasksTimer,
             new FullSyncTargetManager<>(
                 config, protocolSchedule, protocolContext, ethContext, syncState, ethTasksTimer),
+            new CheckpointHeaderManager<>(
+                config, protocolContext, ethContext, syncState, protocolSchedule, ethTasksTimer),
             this::importBlocksForCheckpoints);
   }
 
@@ -76,7 +75,7 @@ public class FullSyncDownloader<C> {
   }
 
   private CompletableFuture<List<Block>> importBlocksForCheckpoints(
-      final Deque<BlockHeader> checkpointHeaders) {
+      final List<BlockHeader> checkpointHeaders) {
     final CompletableFuture<List<Block>> importedBlocks;
     if (checkpointHeaders.size() < 2) {
       // Download blocks without constraining the end block
@@ -85,7 +84,7 @@ public class FullSyncDownloader<C> {
               protocolSchedule,
               protocolContext,
               ethContext,
-              checkpointHeaders.getFirst(),
+              checkpointHeaders.get(0),
               config.downloaderChainSegmentSize(),
               ethTasksTimer);
       importedBlocks = importTask.run().thenApply(PeerTaskResult::getResult);
@@ -97,7 +96,7 @@ public class FullSyncDownloader<C> {
               ethContext,
               config.downloaderParallelism(),
               ethTasksTimer,
-              Lists.newArrayList(checkpointHeaders));
+              checkpointHeaders);
       importedBlocks = importTask.run();
     }
     return importedBlocks;
