@@ -2,7 +2,7 @@
 # The odds are you are reading this because you added a CLI and didn't add it
 # here and a test broke.  To fix the test add your CLI to this file.
 #
-# Please use a plausable value, Pantheon has to at least be able to parse it.
+# Please use a plausible value, Pantheon has to at least be able to parse it.
 # If it is a multi-valued CLI make it a TOML array.
 # If it is a number or boolean make it a number or boolean
 # All other config options are strings, and must be quoted.
@@ -26,7 +26,6 @@ banned-node-id=["0x6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec
 p2p-host="1.2.3.4"
 p2p-port=1234
 max-peers=42
-max-trailing-peers=5
 host-whitelist=["all"]
 
 # chain
@@ -52,11 +51,13 @@ rpc-ws-refresh-delay=500
 
 # Prometheus Metrics Endpoint
 metrics-enabled=false
-metrics-mode="pull"
 metrics-host="8.6.7.5"
 metrics-port=309
+metrics-push-enabled=false
+metrics-push-host="5.5.5.1"
+metrics-push-port=212
 metrics-push-interval=42
-metrics-prometheus-job="pantheon-everything"
+metrics-push-prometheus-job="pantheon-everything"
 
 # Mining
 miner-enabled=false
@@ -65,8 +66,8 @@ miner-extra-data="0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C
 min-gas-price="1"
 
 # Permissioning
-accounts-whitelist=["0x0000000000000000000000000000000000000009"]
-nodes-whitelist=["all"]
+permissions-nodes-enabled=false
+permissions-accounts-enabled=false
 
 # Privacy
 privacy-url="http://127.0.0.1:8888"
