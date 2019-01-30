@@ -40,6 +40,7 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
   private static final Logger LOG = LogManager.getLogger();
 
   private final ProtocolSchedule<C> protocolSchedule;
+  private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
   private final BlockHeader pivotBlockHeader;
@@ -54,6 +55,7 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
       final BlockHeader pivotBlockHeader) {
     super(config, protocolSchedule, protocolContext, ethContext, syncState, ethTasksTimer);
     this.protocolSchedule = protocolSchedule;
+    this.protocolContext = protocolContext;
     this.ethContext = ethContext;
     this.ethTasksTimer = ethTasksTimer;
     this.pivotBlockHeader = pivotBlockHeader;
@@ -111,5 +113,10 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
   @Override
   public boolean shouldSwitchSyncTarget(final SyncTarget currentTarget) {
     return false;
+  }
+
+  @Override
+  public boolean shouldContinueDownloading() {
+    return !protocolContext.getBlockchain().getChainHeadHash().equals(pivotBlockHeader.getHash());
   }
 }

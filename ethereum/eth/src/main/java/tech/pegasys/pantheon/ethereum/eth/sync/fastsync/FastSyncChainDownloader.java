@@ -79,8 +79,8 @@ public class FastSyncChainDownloader<C> {
             this::importBlocksForCheckpoints);
   }
 
-  public void start() {
-    chainDownloader.start();
+  public CompletableFuture<Void> start() {
+    return chainDownloader.start();
   }
 
   private CompletableFuture<List<Block>> importBlocksForCheckpoints(
