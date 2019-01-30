@@ -306,6 +306,17 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void permissionsTomlPathWithoutOptionMustDisplayUsage() throws IOException {
+    parseCommand("--permissions-config-path");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Missing required parameter for option '--permissions-config-path'");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void tomlThatConfiguresEverythingExceptPermissioning() throws IOException {
     assumeTrue(isFullInstantiation());
 
