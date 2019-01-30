@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PipelinedImportChainSegmentTask;
+import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
@@ -101,6 +102,7 @@ public class FastSyncChainDownloader<C> {
             ethTasksTimer,
             new FastSyncBlockHandler<>(
                 protocolSchedule, protocolContext, ethContext, ethTasksTimer),
+            HeaderValidationMode.LIGHT_DETACHED_ONLY,
             checkpointHeaders);
     return importTask
         .run()

@@ -17,12 +17,14 @@ import static java.util.Collections.emptyList;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask.PeerTaskResult;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.CompleteBlocksTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetReceiptsFromPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PipelinedImportChainSegmentTask.BlockHandler;
+import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
@@ -75,7 +77,8 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
 
   private List<BlockWithReceipts> combineBlocksAndReceipts(
       final List<Block> blocks, final Map<BlockHeader, List<TransactionReceipt>> receiptsByHeader) {
-    return blocks.stream()
+    return blocks
+        .stream()
         .map(
             block -> {
               final List<TransactionReceipt> receipts =
@@ -93,8 +96,16 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
         blocksWithReceipts.get(0).getHeader().getNumber(),
         blocksWithReceipts.get(blocksWithReceipts.size() - 1).getHeader().getNumber());
     blocksWithReceipts.forEach(
-        block ->
-            protocolContext.getBlockchain().appendBlock(block.getBlock(), block.getReceipts()));
+        block -> {
+          final BlockImporter<C> blockImporter =
+              protocolSchedule.getByBlockNumber(block.getHeader().getNumber()).getBlockImporter();
+          // TODO: This is still doing full ommer validation. Is that required?
+          blockImporter.fastImportBlock(
+              protocolContext,
+              block.getBlock(),
+              block.getReceipts(),
+              HeaderValidationMode.LIGHT_SKIP_DETACHED);
+        });
     return CompletableFuture.completedFuture(blocksWithReceipts);
   }
 }

@@ -98,6 +98,7 @@ public class PipelinedImportChainSegmentTaskTest
         1,
         ethTasksTimer,
         createBlockHandler(),
+        HeaderValidationMode.DETACHED_ONLY,
         previousBlock.getHeader(),
         lastBlock.getHeader());
   }
@@ -133,6 +134,7 @@ public class PipelinedImportChainSegmentTaskTest
             1,
             ethTasksTimer,
             createBlockHandler(),
+            HeaderValidationMode.DETACHED_ONLY,
             firstBlock.getHeader(),
             secondBlock.getHeader());
 
@@ -184,6 +186,7 @@ public class PipelinedImportChainSegmentTaskTest
             1,
             ethTasksTimer,
             createBlockHandler(),
+            HeaderValidationMode.DETACHED_ONLY,
             fakeFirstBlock.getHeader(),
             thirdBlock.getHeader());
 
@@ -239,6 +242,7 @@ public class PipelinedImportChainSegmentTaskTest
             1,
             ethTasksTimer,
             createBlockHandler(),
+            HeaderValidationMode.DETACHED_ONLY,
             checkpointHeaders);
 
     // Execute task and wait for response
@@ -301,6 +305,7 @@ public class PipelinedImportChainSegmentTaskTest
             2,
             ethTasksTimer,
             createBlockHandler(),
+            HeaderValidationMode.DETACHED_ONLY,
             checkpointHeaders);
 
     // Execute task and wait for response
@@ -367,6 +372,7 @@ public class PipelinedImportChainSegmentTaskTest
             3,
             ethTasksTimer,
             createBlockHandler(),
+            HeaderValidationMode.DETACHED_ONLY,
             checkpointHeaders);
 
     // Execute task and wait for response

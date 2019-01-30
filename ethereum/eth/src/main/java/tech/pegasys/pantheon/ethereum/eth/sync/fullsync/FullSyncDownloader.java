@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.ImportBlocksTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PipelinedImportChainSegmentTask;
+import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
@@ -101,6 +102,7 @@ public class FullSyncDownloader<C> {
               ethTasksTimer,
               new FullSyncBlockHandler<>(
                   protocolSchedule, protocolContext, ethContext, ethTasksTimer),
+              HeaderValidationMode.DETACHED_ONLY,
               checkpointHeaders);
       importedBlocks = importTask.run();
     }

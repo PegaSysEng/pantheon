@@ -51,6 +51,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
   private final List<BlockHeader> checkpointHeaders;
   private final int chunksInTotal;
   private final BlockHandler<B> blockHandler;
+  private final HeaderValidationMode headerValidationMode;
   private int chunksIssued;
   private int chunksCompleted;
   private final int maxActiveChunks;
@@ -69,7 +70,8 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
       final int maxActiveChunks,
       final List<BlockHeader> checkpointHeaders,
       final LabelledMetric<OperationTimer> ethTasksTimer,
-      final BlockHandler<B> blockHandler) {
+      final BlockHandler<B> blockHandler,
+      final HeaderValidationMode headerValidationMode) {
     super(ethTasksTimer);
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
@@ -81,6 +83,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
     this.chunksIssued = 0;
     this.chunksCompleted = 0;
     this.maxActiveChunks = maxActiveChunks;
+    this.headerValidationMode = headerValidationMode;
   }
 
   public static <C, B> PipelinedImportChainSegmentTask<C, B> forCheckpoints(
@@ -90,6 +93,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
       final int maxActiveChunks,
       final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHandler<B> blockHandler,
+      final HeaderValidationMode headerValidationMode,
       final BlockHeader... checkpointHeaders) {
     return forCheckpoints(
         protocolSchedule,
@@ -98,6 +102,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
         maxActiveChunks,
         ethTasksTimer,
         blockHandler,
+        headerValidationMode,
         Arrays.asList(checkpointHeaders));
   }
 
@@ -108,6 +113,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
       final int maxActiveChunks,
       final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHandler<B> blockHandler,
+      final HeaderValidationMode headerValidationMode,
       final List<BlockHeader> checkpointHeaders) {
     return new PipelinedImportChainSegmentTask<>(
         protocolSchedule,
@@ -116,7 +122,8 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
         maxActiveChunks,
         checkpointHeaders,
         ethTasksTimer,
-        blockHandler);
+        blockHandler,
+        headerValidationMode);
   }
 
   @Override
@@ -234,7 +241,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
           final BlockHeaderValidator<C> blockHeaderValidator =
               protocolSpec.getBlockHeaderValidator();
           if (blockHeaderValidator.validateHeader(
-              childHeader, parentHeader, protocolContext, HeaderValidationMode.DETACHED_ONLY)) {
+              childHeader, parentHeader, protocolContext, headerValidationMode)) {
             // The first header will be imported by the previous request range.
             result.complete(headers.subList(1, headers.size()));
           } else {
