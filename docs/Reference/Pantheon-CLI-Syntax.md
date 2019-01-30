@@ -506,7 +506,7 @@ URL on which enclave is running.
 ```
 
 ```bash tab="Example Configuration File"
-permissions-accounts-enabled="true"
+permissions-accounts-enabled=true
 ```
 
 Set to enable account level permissions.
@@ -526,7 +526,7 @@ The default is `false`.
 ```
 
 ```bash tab="Example Configuration File"
-permissions-nodes-enabled="true"
+permissions-nodes-enabled=true
 ```
 
 Set to enable node level permissions.
