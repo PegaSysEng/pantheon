@@ -47,6 +47,7 @@ public class PrivateTransactionHandlerTest {
   private static final String TRANSACTION_KEY_HEX = "0x4d79205472616e73616374696f6e204b6579";
 
   PrivateTransactionHandler privateTransactionHandler;
+  PrivateTransactionHandler brokenPrivateTransactionHandler;
 
   private static final PrivateTransaction VALID_PRIVATE_TRANSACTION =
       new PrivateTransaction(
@@ -92,28 +93,39 @@ public class PrivateTransactionHandlerTest {
           Address.wrap(BytesValue.fromHexString("0x8411b12666f68ef74cace3615c9d5a377729d03f")),
           1);
 
-  Orion mockOrion() {
+  Orion mockOrion() throws IOException {
     Orion mockOrion = mock(Orion.class);
     SendResponse response = new SendResponse();
     response.setKey(TRANSACTION_KEY);
-    try {
-      when(mockOrion.send(any(SendRequest.class))).thenReturn(response);
-    } catch (IOException e) {
-      LOG.error("Orion: failed to test");
-    }
+    when(mockOrion.send(any(SendRequest.class))).thenReturn(response);
+    return mockOrion;
+  }
+
+  Orion brokenMockOrion() throws IOException {
+    Orion mockOrion = mock(Orion.class);
+    SendResponse response = new SendResponse();
+    response.setKey(TRANSACTION_KEY);
+    when(mockOrion.send(any(SendRequest.class))).thenThrow(IOException.class);
     return mockOrion;
   }
 
   @Before
-  public void setUp() {
+  public void setUp() throws IOException {
     privateTransactionHandler = new PrivateTransactionHandler(mockOrion(), Address.DEFAULT_PRIVACY);
+    brokenPrivateTransactionHandler =
+        new PrivateTransactionHandler(brokenMockOrion(), Address.DEFAULT_PRIVACY);
   }
 
   @Test
-  public void validTransactionThroughHandler() {
+  public void validTransactionThroughHandler() throws IOException {
     final Transaction transactionRespose =
         privateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION);
 
     assertThat(transactionRespose).isEqualToComparingFieldByField(PUBLIC_TRANSACTION);
+  }
+
+  @Test(expected = IOException.class)
+  public void enclaveIsDownWhileHandling() throws IOException {
+    brokenPrivateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION);
   }
 }

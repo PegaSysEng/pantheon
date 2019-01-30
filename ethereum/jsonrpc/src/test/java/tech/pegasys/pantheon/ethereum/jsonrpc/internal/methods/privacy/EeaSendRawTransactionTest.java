@@ -35,6 +35,7 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -122,7 +123,7 @@ public class EeaSendRawTransactionTest {
   }
 
   @Test
-  public void validTransactionIsSentToTransactionPool() {
+  public void validTransactionIsSentToTransactionPool() throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
     when(privateTxHandler.handle(any(PrivateTransaction.class))).thenReturn(PUBLIC_TRANSACTION);
@@ -145,51 +146,52 @@ public class EeaSendRawTransactionTest {
   }
 
   @Test
-  public void transactionWithNonceBelowAccountNonceIsRejected() {
+  public void transactionWithNonceBelowAccountNonceIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.NONCE_TOO_LOW, JsonRpcError.NONCE_TOO_LOW);
   }
 
   @Test
-  public void transactionWithNonceAboveAccountNonceIsRejected() {
+  public void transactionWithNonceAboveAccountNonceIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.INCORRECT_NONCE, JsonRpcError.INCORRECT_NONCE);
   }
 
   @Test
-  public void transactionWithInvalidSignatureIsRejected() {
+  public void transactionWithInvalidSignatureIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.INVALID_SIGNATURE, JsonRpcError.INVALID_TRANSACTION_SIGNATURE);
   }
 
   @Test
-  public void transactionWithIntrinsicGasExceedingGasLimitIsRejected() {
+  public void transactionWithIntrinsicGasExceedingGasLimitIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.INTRINSIC_GAS_EXCEEDS_GAS_LIMIT,
         JsonRpcError.INTRINSIC_GAS_EXCEEDS_LIMIT);
   }
 
   @Test
-  public void transactionWithUpfrontGasExceedingAccountBalanceIsRejected() {
+  public void transactionWithUpfrontGasExceedingAccountBalanceIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.UPFRONT_COST_EXCEEDS_BALANCE,
         JsonRpcError.TRANSACTION_UPFRONT_COST_EXCEEDS_BALANCE);
   }
 
   @Test
-  public void transactionWithGasLimitExceedingBlockGasLimitIsRejected() {
+  public void transactionWithGasLimitExceedingBlockGasLimitIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.EXCEEDS_BLOCK_GAS_LIMIT, JsonRpcError.EXCEEDS_BLOCK_GAS_LIMIT);
   }
 
   @Test
-  public void transactionWithNotWhitelistedSenderAccountIsRejected() {
+  public void transactionWithNotWhitelistedSenderAccountIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED, JsonRpcError.TX_SENDER_NOT_AUTHORIZED);
   }
 
   private void verifyErrorForInvalidTransaction(
-      final TransactionInvalidReason transactionInvalidReason, final JsonRpcError expectedError) {
+      final TransactionInvalidReason transactionInvalidReason, final JsonRpcError expectedError)
+      throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
     when(privateTxHandler.handle(any(PrivateTransaction.class))).thenReturn(PUBLIC_TRANSACTION);

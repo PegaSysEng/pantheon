@@ -59,7 +59,10 @@ public enum JsonRpcError {
   NODE_WHITELIST_NOT_SET(-32000, "Node whitelist has not been set"),
   NODE_WHITELIST_DUPLICATED_ENTRY(-32000, "Node whitelist cannot contain duplicated node entries"),
   NODE_WHITELIST_MISSING_ENTRY(-32000, "Node whitelist does not contain a specified node"),
-  NODE_WHITELIST_INVALID_ENTRY(-32000, "Unable to add invalid node to the node whitelist");
+  NODE_WHITELIST_INVALID_ENTRY(-32000, "Unable to add invalid node to the node whitelist"),
+
+  // Private transaction errors
+  ENCLAVE_IS_DOWN(-32000, "Enclave is down");
 
   private final int code;
   private final String message;

@@ -28,11 +28,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class PrivateTransactionHandler {
-  private static final Logger LOG = LogManager.getLogger();
+
   private final Orion orion;
   private final Address privacyPrecompileAddress;
 
@@ -47,13 +44,13 @@ public class PrivateTransactionHandler {
     this.privacyPrecompileAddress = privacyPrecompileAddress;
   }
 
-  public Transaction handle(final PrivateTransaction privateTransaction) {
+  public Transaction handle(final PrivateTransaction privateTransaction) throws IOException {
     final SendRequest sendRequest = createSendRequest(privateTransaction);
-    SendResponse sendResponse = null;
+    final SendResponse sendResponse;
     try {
       sendResponse = orion.send(sendRequest);
     } catch (IOException e) {
-      LOG.error("Error sending Request to Orion ");
+      throw e;
     }
 
     return createPrivacyMarkerTransaction(sendResponse.getKey(), privateTransaction);
