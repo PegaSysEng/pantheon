@@ -21,7 +21,7 @@ public interface GenesisConfigOptions {
 
   boolean isIbft();
 
-  boolean isRevisedIbft();
+  boolean isIbft2();
 
   boolean isClique();
 
@@ -29,7 +29,7 @@ public interface GenesisConfigOptions {
 
   CliqueConfigOptions getCliqueConfigOptions();
 
-  IbftConfigOptions getRevisedIbftConfigOptions();
+  IbftConfigOptions getIbft2ConfigOptions();
 
   EthashConfigOptions getEthashConfigOptions();
 

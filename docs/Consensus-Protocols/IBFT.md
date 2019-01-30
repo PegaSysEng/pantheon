@@ -23,7 +23,7 @@ To use IBFT 2.0 requires an IBFT 2.0 genesis file. The genesis file defines prop
       {
         "config": {
           ...
-          "revisedibft": {
+          "ibft2": {
             "blockperiodseconds": 2,
             "epochlength": 30000,
             "requesttimeoutseconds": 10

@@ -62,7 +62,7 @@ public interface PantheonController<C> extends Closeable {
           miningParameters,
           nodeKeys,
           metricsSystem);
-    } else if (configOptions.isRevisedIbft()) {
+    } else if (configOptions.isIbft2()) {
       return IbftPantheonController.init(
           storageProvider,
           genesisConfigFile,

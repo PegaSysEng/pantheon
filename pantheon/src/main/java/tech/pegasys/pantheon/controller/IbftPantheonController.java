@@ -143,7 +143,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
     final IbftConfigOptions ibftConfig =
-        genesisConfig.getConfigOptions().getRevisedIbftConfigOptions();
+        genesisConfig.getConfigOptions().getIbft2ConfigOptions();
     final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
 
     final BlockInterface blockInterface = new IbftBlockInterface();
