@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
-import java.util.HashSet;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class AccountWhitelistController {
