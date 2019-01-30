@@ -58,8 +58,8 @@ public enum JsonRpcError {
 
   // Node whitelist errors
   NODE_WHITELIST_NOT_SET(-32000, "Node whitelist has not been set"),
-  NODE_WHITELIST_DUPLICATED_ENTRY(-32000, "Request cannot contain duplicated node entries"),
-  NODE_WHITELIST_EXISTING_ENTRY(-32000, "Node whitelist cannot contain duplicated node entries"),
+  NODE_WHITELIST_DUPLICATED_ENTRY(-32000, "Request can't contain duplicated node entries"),
+  NODE_WHITELIST_EXISTING_ENTRY(-32000, "Node whitelist can't contain duplicated node entries"),
   NODE_WHITELIST_MISSING_ENTRY(-32000, "Node whitelist does not contain a specified node"),
   NODE_WHITELIST_INVALID_ENTRY(-32000, "Unable to add invalid node to the node whitelist");
 
