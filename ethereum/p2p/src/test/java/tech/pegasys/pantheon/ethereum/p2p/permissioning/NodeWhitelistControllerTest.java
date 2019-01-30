@@ -47,7 +47,7 @@ public class NodeWhitelistControllerTest {
     controller.addNode(DefaultPeer.fromURI(enode1));
 
     NodesWhitelistResult expected =
-        new NodesWhitelistResult(NodesWhitelistResultType.ADD_ERROR_EXISTING_ENTRY);
+        new NodesWhitelistResult(NodesWhitelistResultType.ERROR_EXISTING_ENTRY);
     NodesWhitelistResult actualResult =
         controller.addNodes(
             Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode2)));
@@ -70,7 +70,7 @@ public class NodeWhitelistControllerTest {
   @Test
   public void whenRemoveNodesInputHasAbsentNodeShouldReturnRemoveErrorAbsentEntry() {
     NodesWhitelistResult expected =
-        new NodesWhitelistResult(NodesWhitelistResultType.REMOVE_ERROR_ABSENT_ENTRY);
+        new NodesWhitelistResult(NodesWhitelistResultType.ERROR_ABSENT_ENTRY);
     NodesWhitelistResult actualResult =
         controller.removeNodes(
             Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode2)));

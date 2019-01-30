@@ -57,7 +57,7 @@ public class NodeWhitelistController {
     for (DefaultPeer peer : peers) {
       if (nodesWhitelist.contains(peer)) {
         return new NodesWhitelistResult(
-            NodesWhitelistResultType.ADD_ERROR_EXISTING_ENTRY,
+            NodesWhitelistResultType.ERROR_EXISTING_ENTRY,
             String.format("Specified peer: %s already exists in whitelist.", peer.getId()));
       }
     }
@@ -79,7 +79,7 @@ public class NodeWhitelistController {
     for (DefaultPeer peer : peers) {
       if (!(nodesWhitelist.contains(peer))) {
         return new NodesWhitelistResult(
-            NodesWhitelistResultType.REMOVE_ERROR_ABSENT_ENTRY,
+            NodesWhitelistResultType.ERROR_ABSENT_ENTRY,
             String.format("Specified peer: %s does not exist in whitelist.", peer.getId()));
       }
     }
@@ -130,7 +130,7 @@ public class NodeWhitelistController {
   public enum NodesWhitelistResultType {
     SUCCESS,
     ERROR_DUPLICATED_ENTRY,
-    ADD_ERROR_EXISTING_ENTRY,
-    REMOVE_ERROR_ABSENT_ENTRY
+    ERROR_EXISTING_ENTRY,
+    ERROR_ABSENT_ENTRY
   }
 }
