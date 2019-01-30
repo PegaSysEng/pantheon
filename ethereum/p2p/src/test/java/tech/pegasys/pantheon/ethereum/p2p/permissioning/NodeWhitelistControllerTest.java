@@ -79,7 +79,7 @@ public class NodeWhitelistControllerTest {
   }
 
   @Test
-  public void whenRemoveNodesInputHasDuplicateNodesShouldReturnRemoveErrorAbsentEntry() {
+  public void whenRemoveNodesInputHasDuplicateNodesShouldReturnErrorDuplicatedEntry() {
     NodesWhitelistResult expected =
         new NodesWhitelistResult(NodesWhitelistResultType.ERROR_DUPLICATED_ENTRY);
     NodesWhitelistResult actualResult =

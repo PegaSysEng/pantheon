@@ -12,13 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 
+import java.util.HashSet;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +66,7 @@ public class NodeWhitelistController {
   }
 
   private boolean peerListHasDuplicates(final List<DefaultPeer> peers) {
-    return peers.stream().anyMatch(p -> Collections.frequency(peers, p) > 1);
+    return !peers.stream().allMatch(new HashSet<>()::add);
   }
 
   public NodesWhitelistResult removeNodes(final List<DefaultPeer> peers) {

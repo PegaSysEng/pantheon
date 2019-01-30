@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import java.util.HashSet;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AccountWhitelistController {
@@ -67,7 +67,7 @@ public class AccountWhitelistController {
   }
 
   private boolean inputHasDuplicates(final List<String> accounts) {
-    return accounts.stream().anyMatch(acc -> Collections.frequency(accounts, acc) > 1);
+    return !accounts.stream().allMatch(new HashSet<>()::add);
   }
 
   public boolean contains(final String account) {
