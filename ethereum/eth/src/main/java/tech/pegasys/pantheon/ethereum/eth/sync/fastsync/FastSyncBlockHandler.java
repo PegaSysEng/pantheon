@@ -57,22 +57,32 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
   @Override
   public CompletableFuture<List<BlockWithReceipts>> downloadBlocks(
       final List<BlockHeader> headers) {
-    final CompletableFuture<List<Block>> bodiesFuture =
-        CompleteBlocksTask.forHeaders(protocolSchedule, ethContext, headers, ethTasksTimer).run();
-    final CompletableFuture<PeerTaskResult<Map<BlockHeader, List<TransactionReceipt>>>>
-        receiptsFuture =
-            GetReceiptsFromPeerTask.forHeaders(ethContext, headers, ethTasksTimer).run();
-    return bodiesFuture.thenCombine(
-        receiptsFuture,
-        (blocks, receipts) ->
-            blocks
-                .stream()
-                .map(
-                    block ->
-                        new BlockWithReceipts(
-                            block,
-                            receipts.getResult().getOrDefault(block.getHeader(), emptyList())))
-                .collect(Collectors.toList()));
+    return downloadBodies(headers)
+        .thenCombine(downloadReceipts(headers), this::combineBlocksAndReceipts);
+  }
+
+  private CompletableFuture<List<Block>> downloadBodies(final List<BlockHeader> headers) {
+    return CompleteBlocksTask.forHeaders(protocolSchedule, ethContext, headers, ethTasksTimer)
+        .run();
+  }
+
+  private CompletableFuture<Map<BlockHeader, List<TransactionReceipt>>> downloadReceipts(
+      final List<BlockHeader> headers) {
+    return GetReceiptsFromPeerTask.forHeaders(ethContext, headers, ethTasksTimer)
+        .run()
+        .thenApply(PeerTaskResult::getResult);
+  }
+
+  private List<BlockWithReceipts> combineBlocksAndReceipts(
+      final List<Block> blocks, final Map<BlockHeader, List<TransactionReceipt>> receiptsByHeader) {
+    return blocks.stream()
+        .map(
+            block -> {
+              final List<TransactionReceipt> receipts =
+                  receiptsByHeader.getOrDefault(block.getHeader(), emptyList());
+              return new BlockWithReceipts(block, receipts);
+            })
+        .collect(Collectors.toList());
   }
 
   @Override
