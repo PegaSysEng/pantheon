@@ -32,8 +32,6 @@ import java.math.BigInteger;
 import java.util.Optional;
 
 import com.google.common.collect.Lists;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +40,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PrivateTransactionHandlerTest {
 
-  private static final Logger LOG = LogManager.getLogger();
   private static final String TRANSACTION_KEY = "My Transaction Key";
   private static final String TRANSACTION_KEY_HEX = "0x4d79205472616e73616374696f6e204b6579";
 
@@ -103,8 +100,6 @@ public class PrivateTransactionHandlerTest {
 
   Orion brokenMockOrion() throws IOException {
     Orion mockOrion = mock(Orion.class);
-    SendResponse response = new SendResponse();
-    response.setKey(TRANSACTION_KEY);
     when(mockOrion.send(any(SendRequest.class))).thenThrow(IOException.class);
     return mockOrion;
   }

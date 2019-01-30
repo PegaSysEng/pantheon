@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.privacy;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.orion.Orion;
 import tech.pegasys.pantheon.orion.types.SendRequest;
 import tech.pegasys.pantheon.orion.types.SendResponse;
@@ -64,8 +65,11 @@ public class PrivateTransactionHandler {
             .map(BytesValues::asString)
             .collect(Collectors.toList());
 
+    final BytesValueRLPOutput bvrlp = new BytesValueRLPOutput();
+    privateTransaction.writeTo(bvrlp);
+
     return new SendRequest(
-        Base64.getEncoder().encodeToString(privateTransaction.getPayload().extractArray()),
+        Base64.getEncoder().encodeToString(bvrlp.encoded().extractArray()),
         BytesValues.asString(privateTransaction.getPrivateFrom()),
         privateFor);
   }
