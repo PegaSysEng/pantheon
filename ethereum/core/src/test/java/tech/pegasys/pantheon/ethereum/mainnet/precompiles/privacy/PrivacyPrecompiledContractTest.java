@@ -26,33 +26,36 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
 public class PrivacyPrecompiledContractTest {
   private final String actual = "Test String";
+  private final String publicKey = "public key";
   private final BytesValue key = BytesValue.wrap(actual.getBytes(UTF_8));
   private PrivacyPrecompiledContract privacyPrecompiledContract;
-  private static final Logger LOG = LogManager.getLogger();
+  private PrivacyPrecompiledContract brokenPrivateTransactionHandler;
 
-  Orion mockOrion() {
+  Orion mockOrion() throws IOException {
     Orion mockOrion = mock(Orion.class);
     ReceiveResponse response = new ReceiveResponse(actual.getBytes(UTF_8));
-    try {
-      when(mockOrion.receive(any(ReceiveRequest.class))).thenReturn(response);
-    } catch (IOException e) {
-      LOG.error("Orion: failed to test");
-    }
+    when(mockOrion.receive(any(ReceiveRequest.class))).thenReturn(response);
+    return mockOrion;
+  }
+
+  Orion brokenMockOrion() throws IOException {
+    Orion mockOrion = mock(Orion.class);
+    when(mockOrion.receive(any(ReceiveRequest.class))).thenThrow(IOException.class);
     return mockOrion;
   }
 
   @Before
-  public void setUp() {
-    Orion orion = mockOrion();
+  public void setUp() throws IOException {
     privacyPrecompiledContract =
-        new PrivacyPrecompiledContract(new SpuriousDragonGasCalculator(), "public key", orion);
+        new PrivacyPrecompiledContract(new SpuriousDragonGasCalculator(), publicKey, mockOrion());
+    brokenPrivateTransactionHandler =
+        new PrivacyPrecompiledContract(
+            new SpuriousDragonGasCalculator(), publicKey, brokenMockOrion());
   }
 
   @Test
@@ -62,5 +65,12 @@ public class PrivacyPrecompiledContractTest {
 
     String exp = new String(expected.extractArray(), UTF_8);
     assertThat(exp).isEqualTo(actual);
+  }
+
+  @Test
+  public void enclaveIsDownWhileHandling() {
+    final BytesValue expected = brokenPrivateTransactionHandler.compute(key);
+
+    assertThat(expected).isEqualTo(BytesValue.EMPTY);
   }
 }

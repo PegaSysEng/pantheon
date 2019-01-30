@@ -61,8 +61,8 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
       return BytesValue.wrap(receiveResponse.getPayload());
       // pass it to private tx processor
     } catch (IOException e) {
-      LOG.error("Orion threw an unhandled exception.", e);
+      LOG.fatal("Orion threw an unhandled exception.", e);
+      return BytesValue.EMPTY;
     }
-    return null;
   }
 }
