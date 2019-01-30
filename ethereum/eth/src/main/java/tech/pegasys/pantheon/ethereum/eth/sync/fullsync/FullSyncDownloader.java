@@ -31,8 +31,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FullSyncDownloader<C> {
+  private static final Logger LOG = LogManager.getLogger();
   private final ChainDownloader<C> chainDownloader;
   private final SynchronizerConfiguration config;
   private final ProtocolSchedule<C> protocolSchedule;
@@ -89,13 +92,15 @@ public class FullSyncDownloader<C> {
               ethTasksTimer);
       importedBlocks = importTask.run().thenApply(PeerTaskResult::getResult);
     } else {
-      final PipelinedImportChainSegmentTask<C> importTask =
+      final PipelinedImportChainSegmentTask<C, Block> importTask =
           PipelinedImportChainSegmentTask.forCheckpoints(
               protocolSchedule,
               protocolContext,
               ethContext,
               config.downloaderParallelism(),
               ethTasksTimer,
+              new FullSyncBlockHandler<>(
+                  protocolSchedule, protocolContext, ethContext, ethTasksTimer),
               checkpointHeaders);
       importedBlocks = importTask.run();
     }

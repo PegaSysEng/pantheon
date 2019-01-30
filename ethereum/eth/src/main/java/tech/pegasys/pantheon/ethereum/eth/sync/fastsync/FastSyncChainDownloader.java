@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class FastSyncChainDownloader<C> {
   private final ChainDownloader<C> chainDownloader;
@@ -91,14 +92,20 @@ public class FastSyncChainDownloader<C> {
         return CompletableFuture.completedFuture(emptyList());
       }
     }
-    final PipelinedImportChainSegmentTask<C> importTask =
+    final PipelinedImportChainSegmentTask<C, BlockWithReceipts> importTask =
         PipelinedImportChainSegmentTask.forCheckpoints(
             protocolSchedule,
             protocolContext,
             ethContext,
             config.downloaderParallelism(),
             ethTasksTimer,
+            new FastSyncBlockHandler<>(
+                protocolSchedule, protocolContext, ethContext, ethTasksTimer),
             checkpointHeaders);
-    return importTask.run();
+    return importTask
+        .run()
+        .thenApply(
+            results ->
+                results.stream().map(BlockWithReceipts::getBlock).collect(Collectors.toList()));
   }
 }
