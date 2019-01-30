@@ -4,10 +4,10 @@ description: Pantheon commande line interface reference
 # Pantheon Command Line
 
 !!! important "Breaking Changes in v0.9"
-    In v0.9 the command line changed to improve usability. These are breaking changes; that is, 
-    in many cases the v0.8 command line options will no longer work. This reference and the rest of 
-    the documentation will be updated to reflect these changes. Any further information required 
-    about the changes are included in the v0.9 release notes. 
+    In v0.9, the command line changed to improve usability. These are breaking changes; that is, 
+    in many cases the v0.8 command line options no longer work. 
+    This reference and the rest of the documentation has been updated to reflect these changes. The [release notes](https://github.com/PegaSysEng/pantheon/blob/master/CHANGELOG.md) 
+    include a mapping of the previous command line options to the new options. 
 
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.
 
@@ -21,21 +21,6 @@ Runs the Pantheon Ethereum full node client.
     Use a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md) to save the command line options in a file.
 
 ## Options
-
-### accounts-whitelist
-
-```bash tab="Syntax"
---accounts-whitelist[=<hex string of account public key>[,<hex string of account public key>...]...
-```
-
-```bash tab="Example"
- --accounts-whitelist=[0xfe3b557e8fb62b89f4916b721be55ceb828dbd73, 0x627306090abaB3A6e1400e9345bC60c78a8BEf57]
-```
-
-Comma separated account public keys for permissioned transactions. You can specify an empty list.
-
-!!!note
-    Permissioning is under development and will be available in v1.0.
 
 ### banned-node-ids
 
@@ -52,9 +37,6 @@ banned-nodeids=["0xc35c3...d615f","0xf42c13...fc456"]
 ```
 
 List of node IDs with which this node will not peer. The node ID is the public key of the node. You can specify the banned node IDs with or without the `0x` prefix.
-  
-!!!info
-    This option is only available from v0.8.2. 
 
 !!!tip
     The singular `--banned-node-id` and plural `--banned-node-ids` are available and are just two
@@ -126,6 +108,19 @@ The path to the Pantheon data directory. The default is the `/build/distribution
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#persisting-data). 
 
+### discovery-enabled
+
+```bash tab="Syntax"
+--discovery-enabled=false
+```
+
+```bash tab="Example Configuration File"
+discovery-enabled=false
+```
+
+Enables or disables P2P peer discovery.
+The default is `true`.
+
 ### genesis-file
 
 Genesis file is used to create a custom network.
@@ -173,9 +168,6 @@ Comma-separated list of hostnames to allow access to the HTTP JSON-RPC API. Defa
 !!!tip
     To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
 
-!!!note
-    This option is only available from v0.8.3. Earlier versions allow access by all hostnames. 
-
 ### max-peers
 
 ```bash tab="Syntax"
@@ -193,27 +185,6 @@ max-peers=42
 Specifies the maximum P2P peer connections that can be established.
 The default is 25.
 
-### max-trailing-peers
-
-!!!important
-    This option is deprecated in favor of a intelligent default setting and will be removed in 0.9
-    release.
-    
-```bash tab="Syntax"
---max-trailing-peers=<INTEGER>
-```
-
-```bash tab="Example Command Line"
---max-trailing-peers=2
-```
-
-```bash tab="Example Configuration File"
-max-trailing-peers=2
-```
-
-Specifies the maximum P2P peer connections for peers that are trailing behind the local chain head. 
-The default is unlimited but the number of trailing peers cannot exceed the value specified by [`--max-peers`](#max-peers).
-
 ### metrics-enabled
 
 ```bash tab="Syntax"
@@ -224,8 +195,11 @@ The default is unlimited but the number of trailing peers cannot exceed the valu
 metrics-enabled=true
 ```
 
-Set to `true` to enable the [Prometheus](https://prometheus.io/) monitoring service to access [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-third-party-clients).
+Set to `true` to enable the [metrics exporter](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
 The default is `false`.
+
+`--metrics-enabled` cannot be specified with `--metrics-push-enabled`. That is, either Prometheus polling or Prometheus 
+push gateway support can be enabled but not both at once. 
 
 ### metrics-host
 
@@ -241,8 +215,10 @@ The default is `false`.
 metrics-host="127.0.0.1"
 ```
 
-Specifies the host on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+Specifies the host on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus). 
+The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+
+The default is `127.0.0.1`. 
 
 ### metrics-port
 
@@ -258,8 +234,98 @@ metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-wh
 metrics-port="6174"
 ```
 
-Specifies the port on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `9545`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+Specifies the port on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
+The default is `9545`. 
+
+### metrics-push-enabled 
+
+```bash tab="Syntax"
+--metrics-push-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--metrics-push-enabled
+```
+
+```bash tab="Example Configuration File"
+metrics-push-enabled="true"
+```
+
+Set to `true` to start the [push gateway integration](../Using-Pantheon/Debugging.md#running-prometheus-with-pantheon-in-push-mode).
+
+`--metrics-push-enabled` cannot be specified with `--metrics-enabled`. That is, either Prometheus polling or Prometheus 
+push gateway support can be enabled but not both at once.
+
+### metrics-push-host
+
+```bash tab="Syntax"
+--metrics-push-host=<HOST>
+```
+
+```bash tab="Example Command Line"
+--metrics-push-host=127.0.0.1
+```
+
+```bash tab="Example Configuration File"
+metrics-push-host="127.0.0.1"
+```
+
+Host of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
+The default is `127.0.0.1`. 
+The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+
+!!! note
+    When pushing metrics, ensure `--metrics-push-host` is set to the machine on which the push gateway is. 
+    Generally, this will be a different machine to the machine on which Pantheon is running.  
+
+### metrics-push-interval
+
+```bash tab="Syntax"
+--metrics-push-interval=<INTEGER>
+```
+
+```bash tab="Example Command Line"
+--metrics-push-interval=30
+```
+
+```bash tab="Example Configuration File"
+metrics-push-interval=30
+```
+
+Interval in seconds to push metrics when in `push` mode. The default is 15.
+
+### metrics-push-port
+
+```bash tab="Syntax"
+--metrics-push-port=<PORT>
+```
+
+```bash tab="Example Command Line"
+--metrics-push-port=6174
+```
+
+```bash tab="Example Configuration File"
+metrics-push-port="6174"
+```
+
+Port of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
+The default is `9001`. 
+
+### metrics-push-prometheus-job
+
+```bash tab="Syntax"
+--metrics-prometheus-job=<metricsPrometheusJob>
+```
+
+```bash tab="Example Command Line"
+--metrics-prometheus-job="my-custom-job"
+```
+
+```bash tab="Example Configuration File"
+metrics-prometheus-job="my-custom-job"
+```
+
+Job name when in `push` mode. The default is `pantheon-client`. 
 
 ### miner-coinbase
 
@@ -367,7 +433,7 @@ Possible values are :
     Values are case insensitive, so either `mainnet` or `MAINNET` works.
     
 !!!important
-    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option can't be used at the same time.
+    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option cannot be used at the same time.
 
 ### network-id
 
@@ -383,23 +449,10 @@ Possible values are :
 network-id="8675309"
 ```
 
-P2P network identifier.
+[P2P network identifier](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 
-This option can be used to override your current network ID.
-The default value is the current network chain ID which is defined in the genesis file.
-
-### discovery-enabled
-
-```bash tab="Syntax"
---discovery-enabled=false
-```
-
-```bash tab="Example Configuration File"
-discovery-enabled=false
-```
-
-Enables or disables P2P peer discovery.
-The default is `true`.
+This option can be used to override the default network ID.
+The default value is the network chain ID defined in the genesis file.
 
 ### node-private-key-file
 
@@ -420,36 +473,11 @@ The default is the key file in the data directory.
 If no key file exists, a key file containing the generated private key is created;
 otherwise, the existing key file specifies the node private key.
 
-
 !!!attention
     The private key is not encrypted.
-  
-!!!note
-    This option is only available from v0.8.2. 
-
-### nodes-whitelist
-
-```bash tab="Syntax"
---nodes-whitelist[=<enode://id@host:port>[,<enode://id@host:port>...]...]
-```
-
-```bash tab="Example Command Line"
---nodes-whitelist=enode://c35c3...d615f@3.14.15.92:30303,enode://f42c13...fc456@65.35.89.79:30303
-```
-
-```bash tab="Example Configuration File"
-nodes-whitelist=["enode://c35c3...d615f@3.14.15.92:30303","enode://f42c13...fc456@65.35.89.79:30303"]
-```
-
-Comma-separated enode URLs for permissioned networks.
-Not intended for use with mainnet or public testnets. 
-
 
 !!!note
-    This option is only available from v0.8.3. 
-
-!!!note
-    Permissioning is under development and will be available in v1.0.
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). 
 
 ### p2p-enabled
 
@@ -510,6 +538,100 @@ The default is 30303.
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
+### privacy-enabled
+
+```bash tab="Syntax"
+--privacy-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--privacy-enabled=false
+```
+
+```bash tab="Example Configuration File"
+privacy-enabled=false
+```
+
+Set to enable private transactions. 
+The default is false.
+
+!!!note
+    Privacy is under development and will be available in v1.1.  
+
+### privacy-precompiled-address
+
+```bash tab="Syntax"
+--privacy-precompiled-address=<privacyPrecompiledAddress>
+```
+
+Address to which the privacy pre-compiled contract is mapped.
+The default is 126. 
+
+!!!note
+    Privacy is under development and will be available in v1.1.    
+    
+### privacy-public-key-file
+
+```bash tab="Syntax"
+--privacy-public-key-file=<privacyPublicKeyFile>
+```
+
+Path to the public key for the enclave.     
+
+!!!note
+    Privacy is under development and will be available in v1.1.
+
+### privacy-url
+
+```bash tab="Syntax"
+--privacy-url=<privacyUrl>
+```
+
+URL on which enclave is running.    
+
+!!!note
+    Privacy is under development and will be available in v1.1.
+
+### permissions-accounts-enabled
+
+```bash tab="Syntax"
+--permissions-accounts-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-accounts-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-accounts-enabled=true
+```
+
+Set to enable account level permissions.
+The default is `false`.
+
+!!!note
+    Permissions is under development and will be available in v1.0. 
+
+### permissions-nodes-enabled
+
+```bash tab="Syntax"
+--permissions-nodes-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-nodes-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-nodes-enabled=true
+```
+
+Set to enable node level permissions.
+The default is `false`.
+
+!!!note
+    Permissions is under development and will be available in v1.0.
+
 ### rpc-http-enabled
 
 ```bash tab="Syntax"
@@ -540,6 +662,12 @@ rpc-http-host="0.0.0.0"
 
 Specifies the host on which HTTP JSON-RPC listens.
 The default is 127.0.0.1.
+
+To allow remote connections, set to `0.0.0.0`
+
+!!! caution 
+    Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
+    production environment, ensure you are using a firewall to avoid exposing your node to the internet. 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -585,7 +713,7 @@ The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, 
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
+    IBFT 2.0 is under development and will be available in v1.0.  
 
 !!!tip
     The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are just two
@@ -608,7 +736,7 @@ rpc-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
 ```
 
 ```bash tab="Remix IDE domain example"
-# The following allows Remix to interact with your Pantheon node without using MetaMask.
+# The following allows Remix to interact with your Pantheon node.
 
 --rpc-http-cors-origins="http://remix.ethereum.org"
 ```
@@ -616,17 +744,17 @@ rpc-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
 Specifies domain URLs for CORS validation.
 Domain URLs must be enclosed in double quotes and comma-separated.
 
-Listed domains will be allowed access to node data (whitelisted).
-If your client interacts with Pantheon using a browser app (such as Remix using a direct connection or a block explorer), 
+Listed domains can access the node using JSON-RPC.
+If your client interacts with Pantheon using a browser app (such as Remix or a block explorer), 
 you must whitelist the client domains. 
 
 The default value is `"none"`.
-If you don't whitelist any domains, you won't be able to use webapps to interact with your Pantheon node.
+If you don't whitelist any domains, browser apps cannot interact with your Pantheon node.
 
 !!!note
-    MetaMask runs as native code so does not require CORS validation.
-    If Remix is connecting to the node through MetaMask, it also does not require CORS validation.
-    
+    To run a local Pantheon node as a backend for MetaMask and use MetaMask anywhere, set `--rpc-http-cors-origins` to `"all"` or `"*"`. 
+    To allow a specific domain to use MetaMask with the Pantheon node, set `--rpc-http-cors-origins` to the client domain. 
+        
 !!!tip
     For development purposes, you can use `"all"` or `"*"` to accept requests from any domain, 
     but we don't recommend this for production code.
@@ -664,7 +792,7 @@ The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, 
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
+    IBFT 2.0 is under development and will be available in v1.0.  
 
 !!!tip
     The singular `--rpc-ws-api` and plural `--rpc-ws-apis` are available and are just two
@@ -687,6 +815,8 @@ ws-host="0.0.0.0"
 
 Host for Websocket WS-RPC to listen on.
 The default is 127.0.0.1.
+
+To allow remote connections, set to `0.0.0.0`
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -795,3 +925,14 @@ $ pantheon public-key export --to=/home/me/me_project/not_precious_pub_key
 ```
 
 Exports node public key to the specified file. 
+
+### password-hash
+
+This command generates the hash of a given password.
+
+```bash tab="Syntax"
+$ pantheon password-hash <my-password>
+```
+
+```bash tab="Example"
+$ pantheon password-hash "password123"
