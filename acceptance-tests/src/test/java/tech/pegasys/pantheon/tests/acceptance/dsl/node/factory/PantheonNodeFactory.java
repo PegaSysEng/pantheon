@@ -111,24 +111,21 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithP2pDisabled(final String name) throws IOException {
+  public PantheonNode createNodeWithP2pDisabled(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .setP2pEnabled(false)
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
-            .webSocketEnabled()
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithP2pDisabledAndAdmin(final String name)
-      throws IOException {
+  public PantheonNode createNodeWithP2pDisabledAndAdmin(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .setP2pEnabled(false)
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioningAndAdmin())
-            .webSocketEnabled()
             .build());
   }
 

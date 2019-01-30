@@ -36,7 +36,7 @@ public class AdminAddPeerWithP2PDisabledAcceptanceTest extends AcceptanceTestBas
     final ClusterConfiguration clusterConfiguration =
         new ClusterConfigurationBuilder().setAwaitPeerDiscovery(false).build();
     p2pDisabledCluster = new Cluster(clusterConfiguration, net);
-    nodeA = pantheon.createArchiveNodeWithP2pDisabledAndAdmin("nodeA");
+    nodeA = pantheon.createNodeWithP2pDisabledAndAdmin("nodeA");
     nodeB = pantheon.createArchiveNodeWithDiscoveryDisabledAndAdmin("nodeB");
     p2pDisabledCluster.start(nodeA, nodeB);
   }
@@ -55,6 +55,13 @@ public class AdminAddPeerWithP2PDisabledAcceptanceTest extends AcceptanceTestBas
     } catch (ClientConnectionException e) {
       assertThat(e.getMessage().contains("P2P has been disabled")).isTrue();
     }
+    nodeB.verify(net.awaitPeerCount(0));
+  }
+
+  @Test
+  public void adminAddPeerFailsWhenP2PDisabled2() {
+    final String nodeAEnode = nodeA.enodeUrl();
+    nodeB.verify(admin.addPeer(nodeAEnode));
     nodeB.verify(net.awaitPeerCount(0));
   }
 }
