@@ -22,21 +22,6 @@ Runs the Pantheon Ethereum full node client.
 
 ## Options
 
-### accounts-whitelist
-
-```bash tab="Syntax"
---accounts-whitelist[=<hex string of account public key>[,<hex string of account public key>...]...
-```
-
-```bash tab="Example"
- --accounts-whitelist=[0xfe3b557e8fb62b89f4916b721be55ceb828dbd73, 0x627306090abaB3A6e1400e9345bC60c78a8BEf57]
-```
-
-Comma separated account public keys for permissioned transactions. You can specify an empty list.
-
-!!!note
-    Permissioning is under development and will be available in v1.0.
-
 ### banned-node-ids
 
 ```bash tab="Syntax"
@@ -448,7 +433,7 @@ Possible values are :
     Values are case insensitive, so either `mainnet` or `MAINNET` works.
     
 !!!important
-    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option can't be used at the same time.
+    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option cannot be used at the same time.
 
 ### network-id
 
@@ -464,10 +449,10 @@ Possible values are :
 network-id="8675309"
 ```
 
-P2P network identifier.
+[P2P network identifier](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 
-This option can be used to override your current network ID.
-The default value is the current network chain ID which is defined in the genesis file.
+This option can be used to override the default network ID.
+The default value is the network chain ID defined in the genesis file.
 
 ### node-private-key-file
 
@@ -488,29 +473,11 @@ The default is the key file in the data directory.
 If no key file exists, a key file containing the generated private key is created;
 otherwise, the existing key file specifies the node private key.
 
-
 !!!attention
     The private key is not encrypted.
 
-### nodes-whitelist
-
-```bash tab="Syntax"
---nodes-whitelist[=<enode://id@host:port>[,<enode://id@host:port>...]...]
-```
-
-```bash tab="Example Command Line"
---nodes-whitelist=enode://c35c3...d615f@3.14.15.92:30303,enode://f42c13...fc456@65.35.89.79:30303
-```
-
-```bash tab="Example Configuration File"
-nodes-whitelist=["enode://c35c3...d615f@3.14.15.92:30303","enode://f42c13...fc456@65.35.89.79:30303"]
-```
-
-Comma-separated enode URLs for permissioned networks.
-Not intended for use with mainnet or public testnets. 
-
 !!!note
-    Permissioning is under development and will be available in v1.0.
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). 
 
 ### p2p-enabled
 
@@ -625,6 +592,46 @@ URL on which enclave is running.
 !!!note
     Privacy is under development and will be available in v1.1.
 
+### permissions-accounts-enabled
+
+```bash tab="Syntax"
+--permissions-accounts-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-accounts-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-accounts-enabled=true
+```
+
+Set to enable account level permissions.
+The default is `false`.
+
+!!!note
+    Permissions is under development and will be available in v1.0. 
+
+### permissions-nodes-enabled
+
+```bash tab="Syntax"
+--permissions-nodes-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-nodes-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-nodes-enabled=true
+```
+
+Set to enable node level permissions.
+The default is `false`.
+
+!!!note
+    Permissions is under development and will be available in v1.0.
+
 ### rpc-http-enabled
 
 ```bash tab="Syntax"
@@ -657,6 +664,10 @@ Specifies the host on which HTTP JSON-RPC listens.
 The default is 127.0.0.1.
 
 To allow remote connections, set to `0.0.0.0`
+
+!!! caution 
+    Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
+    production environment, ensure you are using a firewall to avoid exposing your node to the internet. 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -702,7 +713,7 @@ The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, 
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
+    IBFT 2.0 is under development and will be available in v1.0.  
 
 !!!tip
     The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are just two
@@ -781,7 +792,7 @@ The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, 
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
+    IBFT 2.0 is under development and will be available in v1.0.  
 
 !!!tip
     The singular `--rpc-ws-api` and plural `--rpc-ws-apis` are available and are just two
