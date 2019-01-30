@@ -21,7 +21,20 @@ If the remote connection goes down, the node attempts to reconnect every 60 seco
 
 **Parameters**
 
-`string` : Enode of peer to add. 
+`string` : Enode of peer to add
+
+The enode is `enode://<id>@<host:port>` where:
+             
+* `<id>` is the node public key excluding the initial 0x. 
+* `<host:port>` is the host and port the node is listening on for P2P peer discovery. 
+   Specified by the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and 
+   [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options.
+             
+!!! example
+    If the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) or [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options are not specified and the node public key is `0xc35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f`            
+    The enode URL is:
+    `enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303` 
+ 
 
 **Returns**
 
