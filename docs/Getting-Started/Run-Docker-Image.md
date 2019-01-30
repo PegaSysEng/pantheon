@@ -113,7 +113,7 @@ Where `mygenesis.json` is your custom configuration file and `path` is the absol
 
 ### Exposing Ports
 
-Expose ports for P2P peer discovery, metrics, JSON-RPC, and WebSockets. This is required to use the 
+Expose ports for P2P peer discovery, metrics, and HTTP and WebSockets JSON-RPC. This is required to use the 
 defaults ports or specify different ports (the equivalent of specifying the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port), 
 [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port), [`--rpc-ws-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-port), 
 [`--metrics-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-port), and [`--metrics-push-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-push-port) 
