@@ -510,7 +510,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine = new CommandLine(this);
 
     commandLine.setCaseInsensitiveEnumValuesAllowed(true);
-    //    commandLine.setToggleBooleanFlags(false);
 
     standaloneCommands = new StandaloneCommand();
 
