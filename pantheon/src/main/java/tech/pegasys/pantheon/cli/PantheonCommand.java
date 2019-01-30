@@ -146,14 +146,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // CLI options defined by user at runtime.
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
-  @Option(
-    names = {"--node-private-key-file"},
-    paramLabel = MANDATORY_PATH_FORMAT_HELP,
-    description =
-        "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)"
-  )
-  private final File nodePrivateKeyFile = null;
-
   // Completely disables p2p within Pantheon.
   @Option(
     names = {"--p2p-enabled"},
@@ -380,7 +372,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description =
         "Set if the metrics push gateway integration should be started (default: ${DEFAULT-VALUE})"
   )
-  private Boolean isMetricsPushEnabled = false;
+  private final Boolean isMetricsPushEnabled = false;
 
   @Option(
     names = {"--metrics-push-host"},
@@ -536,6 +528,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
     commandLine.addSubcommand(
         PublicKeySubCommand.COMMAND_NAME, new PublicKeySubCommand(resultHandler.out()));
+    commandLine.addSubcommand(
+        PasswordSubCommand.COMMAND_NAME, new PasswordSubCommand(resultHandler.out()));
 
     commandLine.registerConverter(Address.class, Address::fromHexString);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
@@ -633,7 +627,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(NetworkName.DEV.equals(getNetwork()))
-          .nodePrivateKeyFile(getNodePrivateKeyFile())
+          .nodePrivateKeyFile(nodePrivateKeyFile())
           .metricsSystem(metricsSystem)
           .privacyParameters(orionConfiguration())
           .build();
@@ -642,12 +636,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } catch (final IOException e) {
       throw new ExecutionException(new CommandLine(this), "Invalid path", e);
     }
-  }
-
-  private File getNodePrivateKeyFile() {
-    return nodePrivateKeyFile != null
-        ? nodePrivateKeyFile
-        : KeyPairUtil.getDefaultKeyFile(dataDir());
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
@@ -940,6 +928,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } else {
       return getDefaultPantheonDataPath(this);
     }
+  }
+
+  private File nodePrivateKeyFile() {
+    File nodePrivateKeyFile = null;
+    if (isFullInstantiation()) {
+      nodePrivateKeyFile = standaloneCommands.nodePrivateKeyFile;
+    }
+
+    return nodePrivateKeyFile != null
+        ? nodePrivateKeyFile
+        : KeyPairUtil.getDefaultKeyFile(dataDir());
   }
 
   private boolean isFullInstantiation() {
