@@ -22,21 +22,6 @@ Runs the Pantheon Ethereum full node client.
 
 ## Options
 
-### accounts-whitelist
-
-```bash tab="Syntax"
---accounts-whitelist[=<hex string of account public key>[,<hex string of account public key>...]...
-```
-
-```bash tab="Example"
- --accounts-whitelist=[0xfe3b557e8fb62b89f4916b721be55ceb828dbd73, 0x627306090abaB3A6e1400e9345bC60c78a8BEf57]
-```
-
-Comma separated account public keys for permissioned transactions. You can specify an empty list.
-
-!!!note
-    Permissioning is under development and will be available in v1.0.
-
 ### banned-node-ids
 
 ```bash tab="Syntax"
@@ -210,8 +195,11 @@ The default is 25.
 metrics-enabled=true
 ```
 
-Set to `true` to enable the [Prometheus](https://prometheus.io/) monitoring service to access [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-third-party-clients).
+Set to `true` to enable the [metrics exporter](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
 The default is `false`.
+
+`--metrics-enabled` cannot be specified with `--metrics-push-enabled`. That is, either Prometheus polling or Prometheus 
+push gateway support can be enabled but not both at once. 
 
 ### metrics-host
 
@@ -227,8 +215,10 @@ The default is `false`.
 metrics-host="127.0.0.1"
 ```
 
-Specifies the host on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+Specifies the host on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus). 
+The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+
+The default is `127.0.0.1`. 
 
 ### metrics-port
 
@@ -244,8 +234,98 @@ metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-wh
 metrics-port="6174"
 ```
 
-Specifies the port on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `9545`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+Specifies the port on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
+The default is `9545`. 
+
+### metrics-push-enabled 
+
+```bash tab="Syntax"
+--metrics-push-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--metrics-push-enabled
+```
+
+```bash tab="Example Configuration File"
+metrics-push-enabled="true"
+```
+
+Set to `true` to start the [push gateway integration](../Using-Pantheon/Debugging.md#running-prometheus-with-pantheon-in-push-mode).
+
+`--metrics-push-enabled` cannot be specified with `--metrics-enabled`. That is, either Prometheus polling or Prometheus 
+push gateway support can be enabled but not both at once.
+
+### metrics-push-host
+
+```bash tab="Syntax"
+--metrics-push-host=<HOST>
+```
+
+```bash tab="Example Command Line"
+--metrics-push-host=127.0.0.1
+```
+
+```bash tab="Example Configuration File"
+metrics-push-host="127.0.0.1"
+```
+
+Host of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
+The default is `127.0.0.1`. 
+The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+
+!!! note
+    When pushing metrics, ensure `--metrics-push-host` is set to the machine on which the push gateway is. 
+    Generally, this will be a different machine to the machine on which Pantheon is running.  
+
+### metrics-push-interval
+
+```bash tab="Syntax"
+--metrics-push-interval=<INTEGER>
+```
+
+```bash tab="Example Command Line"
+--metrics-push-interval=30
+```
+
+```bash tab="Example Configuration File"
+metrics-push-interval=30
+```
+
+Interval in seconds to push metrics when in `push` mode. The default is 15.
+
+### metrics-push-port
+
+```bash tab="Syntax"
+--metrics-push-port=<PORT>
+```
+
+```bash tab="Example Command Line"
+--metrics-push-port=6174
+```
+
+```bash tab="Example Configuration File"
+metrics-push-port="6174"
+```
+
+Port of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
+The default is `9001`. 
+
+### metrics-push-prometheus-job
+
+```bash tab="Syntax"
+--metrics-prometheus-job=<metricsPrometheusJob>
+```
+
+```bash tab="Example Command Line"
+--metrics-prometheus-job="my-custom-job"
+```
+
+```bash tab="Example Configuration File"
+metrics-prometheus-job="my-custom-job"
+```
+
+Job name when in `push` mode. The default is `pantheon-client`. 
 
 ### miner-coinbase
 
@@ -353,7 +433,7 @@ Possible values are :
     Values are case insensitive, so either `mainnet` or `MAINNET` works.
     
 !!!important
-    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option can't be used at the same time.
+    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option cannot be used at the same time.
 
 ### network-id
 
@@ -369,10 +449,10 @@ Possible values are :
 network-id="8675309"
 ```
 
-P2P network identifier.
+[P2P network identifier](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 
-This option can be used to override your current network ID.
-The default value is the current network chain ID which is defined in the genesis file.
+This option can be used to override the default network ID.
+The default value is the network chain ID defined in the genesis file.
 
 ### node-private-key-file
 
@@ -393,29 +473,11 @@ The default is the key file in the data directory.
 If no key file exists, a key file containing the generated private key is created;
 otherwise, the existing key file specifies the node private key.
 
-
 !!!attention
     The private key is not encrypted.
 
-### nodes-whitelist
-
-```bash tab="Syntax"
---nodes-whitelist[=<enode://id@host:port>[,<enode://id@host:port>...]...]
-```
-
-```bash tab="Example Command Line"
---nodes-whitelist=enode://c35c3...d615f@3.14.15.92:30303,enode://f42c13...fc456@65.35.89.79:30303
-```
-
-```bash tab="Example Configuration File"
-nodes-whitelist=["enode://c35c3...d615f@3.14.15.92:30303","enode://f42c13...fc456@65.35.89.79:30303"]
-```
-
-Comma-separated enode URLs for permissioned networks.
-Not intended for use with mainnet or public testnets. 
-
 !!!note
-    Permissioning is under development and will be available in v1.0.
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). 
 
 ### p2p-enabled
 
@@ -476,6 +538,100 @@ The default is 30303.
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
+### privacy-enabled
+
+```bash tab="Syntax"
+--privacy-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--privacy-enabled=false
+```
+
+```bash tab="Example Configuration File"
+privacy-enabled=false
+```
+
+Set to enable private transactions. 
+The default is false.
+
+!!!note
+    Privacy is under development and will be available in v1.1.  
+
+### privacy-precompiled-address
+
+```bash tab="Syntax"
+--privacy-precompiled-address=<privacyPrecompiledAddress>
+```
+
+Address to which the privacy pre-compiled contract is mapped.
+The default is 126. 
+
+!!!note
+    Privacy is under development and will be available in v1.1.    
+    
+### privacy-public-key-file
+
+```bash tab="Syntax"
+--privacy-public-key-file=<privacyPublicKeyFile>
+```
+
+Path to the public key for the enclave.     
+
+!!!note
+    Privacy is under development and will be available in v1.1.
+
+### privacy-url
+
+```bash tab="Syntax"
+--privacy-url=<privacyUrl>
+```
+
+URL on which enclave is running.    
+
+!!!note
+    Privacy is under development and will be available in v1.1.
+
+### permissions-accounts-enabled
+
+```bash tab="Syntax"
+--permissions-accounts-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-accounts-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-accounts-enabled=true
+```
+
+Set to enable account level permissions.
+The default is `false`.
+
+!!!note
+    Permissions is under development and will be available in v1.0. 
+
+### permissions-nodes-enabled
+
+```bash tab="Syntax"
+--permissions-nodes-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-nodes-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-nodes-enabled=true
+```
+
+Set to enable node level permissions.
+The default is `false`.
+
+!!!note
+    Permissions is under development and will be available in v1.0.
+
 ### rpc-http-enabled
 
 ```bash tab="Syntax"
@@ -508,6 +664,10 @@ Specifies the host on which HTTP JSON-RPC listens.
 The default is 127.0.0.1.
 
 To allow remote connections, set to `0.0.0.0`
+
+!!! caution 
+    Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
+    production environment, ensure you are using a firewall to avoid exposing your node to the internet. 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -553,7 +713,7 @@ The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, 
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
+    IBFT 2.0 is under development and will be available in v1.0.  
 
 !!!tip
     The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are just two
@@ -632,7 +792,7 @@ The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, 
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
+    IBFT 2.0 is under development and will be available in v1.0.  
 
 !!!tip
     The singular `--rpc-ws-api` and plural `--rpc-ws-apis` are available and are just two
@@ -765,3 +925,14 @@ $ pantheon public-key export --to=/home/me/me_project/not_precious_pub_key
 ```
 
 Exports node public key to the specified file. 
+
+### password-hash
+
+This command generates the hash of a given password.
+
+```bash tab="Syntax"
+$ pantheon password-hash <my-password>
+```
+
+```bash tab="Example"
+$ pantheon password-hash "password123"
