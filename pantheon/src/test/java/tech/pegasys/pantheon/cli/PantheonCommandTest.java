@@ -783,6 +783,22 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void p2pHostMayBeLocalhost() {
+
+    final String host = "localhost";
+    parseCommand("--p2p-host", host);
+
+    verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
+    verify(mockRunnerBuilder).discoveryPort(intArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(stringArgumentCaptor.getValue()).isEqualTo(host);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void maxpeersOptionMustBeUsed() {
 
     final int maxPeers = 123;

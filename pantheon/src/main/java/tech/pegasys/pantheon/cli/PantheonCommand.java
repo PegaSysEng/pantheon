@@ -223,7 +223,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Host for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final String p2pHost = autoDiscoverDefaultIP().getHostAddress();
+  private String p2pHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
     names = {"--p2p-port"},
@@ -254,7 +254,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Host for HTTP JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final String rpcHttpHost = autoDiscoverDefaultIP().getHostAddress();
+  private String rpcHttpHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
     names = {"--rpc-http-port"},
@@ -295,7 +295,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Host for WebSocket JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final String rpcWsHost = autoDiscoverDefaultIP().getHostAddress();
+  private String rpcWsHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
     names = {"--rpc-ws-port"},
@@ -351,7 +351,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Host for the metrics exporter to listen on (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final String metricsHost = autoDiscoverDefaultIP().getHostAddress();
+  private String metricsHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
     names = {"--metrics-port"},
@@ -374,7 +374,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     description = "Host of the Prometheus Push Gateway for push mode (default: ${DEFAULT-VALUE})",
     arity = "1"
   )
-  private final String metricsPushHost = autoDiscoverDefaultIP().getHostAddress();
+  private String metricsPushHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
     names = {"--metrics-push-port"},
