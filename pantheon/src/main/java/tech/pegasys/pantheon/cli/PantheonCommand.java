@@ -479,7 +479,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
     names = {"--permissions-config-path"},
-    description = "Path to permissions config TOML file (default: ${DEFAULT-VALUE})"
+    description =
+        "Path to permissions config TOML file (default:  a file named \"permissions_config.toml\" in the Pantheon data folder)"
   )
   private final File permissionsConfigPath = null;
 
@@ -659,7 +660,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private File getPermissionsConfigPath() {
     return permissionsConfigPath != null
         ? permissionsConfigPath
-        : new File(DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION);
+        : new File(dataDir().toFile(), DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION);
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
