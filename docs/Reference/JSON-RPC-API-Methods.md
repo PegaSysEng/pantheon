@@ -15,11 +15,8 @@ The following lists the Pantheon JSON-RPC API commands:
 
 ### admin_addPeer
 
-Adds a node to the list of tracked static nodes. The node attempts to maintain connectivity to these nodes.
- If the remote connection goes down, the node tries to reconnect periodically (how often?)
-
-<accepts only one node?> 
-<can add itself>
+Adds a node to the list of tracked static nodes. The node attempts to maintain connectivity to tracked static nodes.
+If the remote connection goes down, the node attempts to reconnect every 60 seconds. 
 
 **Parameters**
 
@@ -27,24 +24,22 @@ Adds a node to the list of tracked static nodes. The node attempts to maintain c
 
 **Returns**
 
-`result` : `boolean` - true if peer added
+`result` : `boolean` - `true` if peer added or `false` if peer already on list of static nodes. 
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":[<ADD>],"id":1}' <JSON-RPC-http-endpoint:port>
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}' <JSON-RPC-http-endpoint:port>
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"admin_addPeer","params":[<ADD>],"id":1}
+    {"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}
     ```
     
     ```json tab="JSON result"
     {
-      "jsonrpc" : "2.0",
-      "id" : 1,
-      "result" : [ <ADD>
-         
-      ]
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": true
     }
     ```
 
