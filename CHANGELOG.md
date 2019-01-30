@@ -16,7 +16,7 @@ The [documentation](https://docs.pantheon.pegasys.tech/en/latest/) has been upda
 | `--genesis`                         | [`--genesis-file`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#genesis-file)                                                                                                                                | Renamed                          |
 | `--goerli`                          | [`--network=goerli`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#network)                                                                                                                                  | Replaced by `--network` option   |
 | `--metrics-listen=<HOST:PORT>`      | [`--metrics-host=<HOST>`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#metrics-host) and [`--metrics-port=<PORT>`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#metrics-port) | Split into host and port options |
-| `--miner-extraData`                 | [`--miner-extra-data`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#miner-extra-data)]                                                                                                                       | Renamed                          |
+| `--miner-extraData`                 | [`--miner-extra-data`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#miner-extra-data)                                                                                                                       | Renamed                          |
 | `--miner-minTransactionGasPriceWei` | [`--min-gas-price`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#min-gas-price)                                                                                                                              | Renamed                          |
 | `--no-discovery`                    | [`--discovery-enabled`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#discovery-enabled)                                                                                                                      | Replaced                         |
 | `--node-private-key`                | [`--node-private-key-file`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#node-private-key-file)                                                                                                              | Renamed                          |
@@ -27,7 +27,7 @@ The [documentation](https://docs.pantheon.pegasys.tech/en/latest/) has been upda
 | `--rpc-enabled`                     | [` --rpc-http-enabled`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-http-enabled)| Renamed| 
 | `--rpc-listen=<HOST:PORT>`          | [`--rpc-http-host=<HOST>`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-http-host) and [`--rpc-http-port=<PORT>`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-http-port) | Split into host and port options |
 | `--rpc-api`                         | [`--rpc-http-api`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-http-api)| Renamed |
-| `--rpc-cors-origins`                | [`--rpc-http-cors-origins`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-http-cors-origins)
+| `--rpc-cors-origins`                | [`--rpc-http-cors-origins`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-http-cors-origins) | Renamed | 
 | `--ws-enabled`                      | [`--rpc-ws-enabled`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-ws-enabled)  | Renamed | 
 | `--ws-api`                          | [`--rpc-ws-api`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-ws-api) | Renamed|
 | `--ws-listen=<HOST:PORT>`           | [`--rpc-ws-host=<HOST>`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-ws-host) and [`--rpc-ws-port=<PORT>`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#rpc-ws-port) | Split into host and port options |
@@ -46,8 +46,11 @@ repository. The [Private Network Quickstart tutorial](https://docs.pantheon.pega
 has been updated to use the moved quickstart.
 
 ### Additions and Improvements 
-- Added privacy command line commands [\#584](https://github.com/PegaSysEng/pantheon/pull/584) ([Puneetha17](https://github.com/Puneetha17))
+
+- TOML authentication provider [\#689](https://github.com/PegaSysEng/pantheon/pull/689) 
+- Metrics Push Gateway Options [\#678](https://github.com/PegaSysEng/pantheon/pull/678)
 - Additional logging details for IBFT 2.0 [\#650](https://github.com/PegaSysEng/pantheon/pull/650) 
+- Permissioning config TOML file [\#643](https://github.com/PegaSysEng/pantheon/pull/643)
 - Added metrics Prometheus Push Gateway Support [\#638](https://github.com/PegaSysEng/pantheon/pull/638) 
 - Clique and IBFT not enabled by default in RPC APIs [\#635](https://github.com/PegaSysEng/pantheon/pull/635)
 - Added `admin_addPeer` JSON-RPC API method [\#622](https://github.com/PegaSysEng/pantheon/pull/622)
@@ -56,23 +59,44 @@ has been updated to use the moved quickstart.
 - Added IBFT get pending votes [\#603](https://github.com/PegaSysEng/pantheon/pull/603) 
 - Implement Petersburg hardfork [\#601](https://github.com/PegaSysEng/pantheon/pull/601) 
 - Added private transaction abstraction [\#592](https://github.com/PegaSysEng/pantheon/pull/592) ([iikirilov](https://github.com/iikirilov))
+- Added privacy command line commands [\#584](https://github.com/PegaSysEng/pantheon/pull/584) ([Puneetha17](https://github.com/Puneetha17))
 - Documentation updates include:
   - Updated [Private Network Quickstart tutorial](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Private-Network-Quickstart/) 
     to use quickstart in `pantheon-quickstart` repository and indicate that the quickstart is not supported on Windows.
   - Added IBFT 2.0 [content](https://docs.pantheon.pegasys.tech/en/latest/Consensus-Protocols/IBFT/) and [JSON RPC API methods](https://docs.pantheon.pegasys.tech/en/latest/Reference/JSON-RPC-API-Methods/#ibft-20-methods). 
   - Added [consensus protocols content](https://docs.pantheon.pegasys.tech/en/latest/Consensus-Protocols/Comparing-PoA/).
   - Added content on [events and logs](https://docs.pantheon.pegasys.tech/en/latest/Using-Pantheon/Events-and-Logs/), and [using filters](https://docs.pantheon.pegasys.tech/en/latest/Using-Pantheon/Accessing-Logs-Using-JSON-RPC/). 
-  - Added Prometheus Push Gateway content
+  - Added content on integrating with [Prometheus Push Gateway](https://docs.pantheon.pegasys.tech/en/latest/Using-Pantheon/Debugging/#running-prometheus-with-pantheon-in-push-mode)
   
 ### Technical Improvements 
+
+- Download receipts during fast sync and import without processing transactions [\#701](https://github.com/PegaSysEng/pantheon/pull/701) 
+- Removed CLI options for `--nodes-whitelist` and `--accounts-whitelist` [\#694](https://github.com/PegaSysEng/pantheon/pull/694) 
+- Delegate `getRootCause` through to Guava's implementation [\#692](https://github.com/PegaSysEng/pantheon/pull/692) 
+- Benchmark update [\#691](https://github.com/PegaSysEng/pantheon/pull/691)
+- Implement chain download for fast sync [\#690](https://github.com/PegaSysEng/pantheon/pull/690) 
+- Allow missing accounts to create zero-cost transactions [\#685](https://github.com/PegaSysEng/pantheon/pull/685) 
+- Node private key location should be fixed under docker [\#684](https://github.com/PegaSysEng/pantheon/pull/684) 
+- Parallel Processing File Import Performance [\#683](https://github.com/PegaSysEng/pantheon/pull/683) 
+- Integrate actual `WorldStateDownloader` with the fast sync work flow [\#682](https://github.com/PegaSysEng/pantheon/pull/682) 
+- Removed `--max-trailing-peers` option [\#680](https://github.com/PegaSysEng/pantheon/pull/680)
+- Enabled warning on CLI dependent options [\#679](https://github.com/PegaSysEng/pantheon/pull/679)
+- Update WorldStateDownloader run\(\) interface to accept header [\#677](https://github.com/PegaSysEng/pantheon/pull/677)
+- Fixed Difficulty calculator [\#663](https://github.com/PegaSysEng/pantheon/pull/663)
 - `discovery-enabled` option refactoring [\#661](https://github.com/PegaSysEng/pantheon/pull/661)
+- Update orion default port approach [\#660](https://github.com/PegaSysEng/pantheon/pull/660)
+- Extract out generic parts of Downloader [\#659](https://github.com/PegaSysEng/pantheon/pull/659)
+- Start world downloader [\#658](https://github.com/PegaSysEng/pantheon/pull/658)
 - Create a simple `WorldStateDownloader` [\#657](https://github.com/PegaSysEng/pantheon/pull/657) 
 - Added handling for when p2p is disabled [\#655](https://github.com/PegaSysEng/pantheon/pull/655)
 - Enabled command line configuration for privacy precompiled contract address [\#653](https://github.com/PegaSysEng/pantheon/pull/653) ([Puneetha17](https://github.com/Puneetha17))
+- IBFT transmitted packets are logged by gossiper [\#652](https://github.com/PegaSysEng/pantheon/pull/652)
 - `admin_addPeer` acceptance test [\#651](https://github.com/PegaSysEng/pantheon/pull/651) 
 - Added `p2pEnabled` configuration to `ProcessPantheonNodeRunner` [\#649](https://github.com/PegaSysEng/pantheon/pull/649) 
 - Added description to automatic benchmarks [\#646](https://github.com/PegaSysEng/pantheon/pull/646) 
 - Added `network` option [\#645](https://github.com/PegaSysEng/pantheon/pull/645) 
+- Remove OrionConfiguration [\#644](https://github.com/PegaSysEng/pantheon/pull/644) ([Puneetha17](https://github.com/Puneetha17))
+- IBFT Json Acceptance tests [\#634](https://github.com/PegaSysEng/pantheon/pull/634)
 - Upgraded build image to one that contains libsodium [\#632](https://github.com/PegaSysEng/pantheon/pull/632) 
 - Command line fixes [\#630](https://github.com/PegaSysEng/pantheon/pull/630) 
 - Consider peer count insufficient until minimum peers for fast sync are connected [\#629](https://github.com/PegaSysEng/pantheon/pull/629) 
