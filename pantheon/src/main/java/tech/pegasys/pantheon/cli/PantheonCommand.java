@@ -638,10 +638,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private String getPermissionsConfigPath() {
+
     return permissionsConfigPath != null
         ? permissionsConfigPath
-        : new File(dataDir().toFile(), DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION)
-            .getPath();
+        : dataDir().toAbsolutePath()
+            + System.getProperty("file.separator")
+            + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
