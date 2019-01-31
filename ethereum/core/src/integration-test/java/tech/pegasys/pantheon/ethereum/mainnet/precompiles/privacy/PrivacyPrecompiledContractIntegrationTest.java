@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -64,7 +65,8 @@ public class PrivacyPrecompiledContractIntegrationTest {
   public void testSendAndReceive() throws IOException {
     List<String> publicKeys = testHarness.getPublicKeys();
 
-    SendRequest sc = new SendRequest(PAYLOAD, publicKeys.get(0), new String[] {publicKeys.get(1)});
+    SendRequest sc =
+        new SendRequest(PAYLOAD, publicKeys.get(0), Lists.newArrayList(publicKeys.get(1)));
     SendResponse sr = orion.send(sc);
 
     PrivacyPrecompiledContract privacyPrecompiledContract =
