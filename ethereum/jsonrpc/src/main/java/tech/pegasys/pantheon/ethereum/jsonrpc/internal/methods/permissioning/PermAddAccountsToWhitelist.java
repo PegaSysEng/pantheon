@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController.AddResult;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class PermAddAccountsToWhitelist implements JsonRpcMethod {
   @SuppressWarnings("unchecked")
   public JsonRpcResponse response(final JsonRpcRequest request) {
     final List<String> accountsList = parameters.required(request.getParams(), 0, List.class);
-    final AddResult addResult = whitelistController.addAccounts(accountsList);
+    final WhitelistOperationResult addResult = whitelistController.addAccounts(accountsList);
 
     switch (addResult) {
       case ERROR_INVALID_ENTRY:

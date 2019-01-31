@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResult;
-import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResultType;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -30,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 
 import java.util.List;
 
@@ -97,7 +97,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.removeNodes(any()))
-        .thenReturn(new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS));
+        .thenReturn(new NodesWhitelistResult(WhitelistOperationResult.SUCCESS));
 
     final JsonRpcResponse actual = method.response(request);
 
@@ -114,7 +114,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.removeNodes(any()))
-        .thenReturn(new NodesWhitelistResult(NodesWhitelistResultType.SUCCESS));
+        .thenReturn(new NodesWhitelistResult(WhitelistOperationResult.SUCCESS));
 
     final JsonRpcResponse actual = method.response(request);
 
@@ -144,7 +144,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.removeNodes(any()))
-        .thenReturn(new NodesWhitelistResult(NodesWhitelistResultType.ERROR_DUPLICATED_ENTRY));
+        .thenReturn(new NodesWhitelistResult(WhitelistOperationResult.ERROR_DUPLICATED_ENTRY));
 
     final JsonRpcResponse actual = method.response(request);
 
