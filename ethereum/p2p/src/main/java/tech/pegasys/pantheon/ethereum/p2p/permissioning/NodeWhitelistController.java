@@ -49,10 +49,9 @@ public class NodeWhitelistController {
   }
 
   public NodesWhitelistResult addNodes(final List<DefaultPeer> peers) {
-    if (peerListHasDuplicates(peers)) {
-      return new NodesWhitelistResult(
-          WhitelistOperationResult.ERROR_DUPLICATED_ENTRY,
-          String.format("Specified peer list contains duplicates"));
+    final NodesWhitelistResult inputValidationResult = validInput(peers);
+    if (inputValidationResult.result() != WhitelistOperationResult.SUCCESS) {
+      return inputValidationResult;
     }
 
     for (DefaultPeer peer : peers) {
@@ -71,10 +70,9 @@ public class NodeWhitelistController {
   }
 
   public NodesWhitelistResult removeNodes(final List<DefaultPeer> peers) {
-    if (peerListHasDuplicates(peers)) {
-      return new NodesWhitelistResult(
-          WhitelistOperationResult.ERROR_DUPLICATED_ENTRY,
-          String.format("Specified peer list contains duplicates"));
+    final NodesWhitelistResult inputValidationResult = validInput(peers);
+    if (inputValidationResult.result() != WhitelistOperationResult.SUCCESS) {
+      return inputValidationResult;
     }
 
     for (DefaultPeer peer : peers) {
@@ -85,6 +83,21 @@ public class NodeWhitelistController {
       }
     }
     peers.forEach(this::removeNode);
+    return new NodesWhitelistResult(WhitelistOperationResult.SUCCESS);
+  }
+
+  private NodesWhitelistResult validInput(final List<DefaultPeer> peers) {
+    if (peers == null || peers.isEmpty()) {
+      return new NodesWhitelistResult(
+          WhitelistOperationResult.ERROR_EMPTY_ENTRY, String.format("Null/empty peers list"));
+    }
+
+    if (peerListHasDuplicates(peers)) {
+      return new NodesWhitelistResult(
+          WhitelistOperationResult.ERROR_DUPLICATED_ENTRY,
+          String.format("Specified peer list contains duplicates"));
+    }
+
     return new NodesWhitelistResult(WhitelistOperationResult.SUCCESS);
   }
 

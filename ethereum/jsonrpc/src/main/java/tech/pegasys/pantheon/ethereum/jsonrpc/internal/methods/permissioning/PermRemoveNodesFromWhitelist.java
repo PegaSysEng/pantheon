@@ -63,6 +63,8 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
       switch (nodesWhitelistResult.result()) {
         case SUCCESS:
           return new JsonRpcSuccessResponse(req.getId(), true);
+        case ERROR_EMPTY_ENTRY:
+          return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_EMPTY_ENTRY);
         case ERROR_ABSENT_ENTRY:
           return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_MISSING_ENTRY);
         case ERROR_DUPLICATED_ENTRY:

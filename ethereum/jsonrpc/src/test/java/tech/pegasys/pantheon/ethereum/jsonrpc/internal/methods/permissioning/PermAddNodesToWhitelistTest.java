@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -31,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.assertj.core.util.Lists;
@@ -109,6 +111,21 @@ public class PermAddNodesToWhitelistTest {
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.addNodes(any()))
         .thenReturn(new NodesWhitelistResult(WhitelistOperationResult.ERROR_DUPLICATED_ENTRY));
+
+    final JsonRpcResponse actual = method.response(request);
+
+    assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
+  }
+
+  @Test
+  public void whenRequestContainsEmptyListOfNodesShouldReturnEmptyEntryError() {
+    final JsonRpcRequest request = buildRequest(new ArrayList<>());
+    final JsonRpcResponse expected =
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.NODE_WHITELIST_EMPTY_ENTRY);
+
+    when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(nodeWhitelistController.addNodes(eq(new ArrayList<>())))
+        .thenReturn(new NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY));
 
     final JsonRpcResponse actual = method.response(request);
 

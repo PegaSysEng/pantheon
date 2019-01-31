@@ -158,4 +158,18 @@ public class AccountWhitelistControllerTest {
 
     assertThat(removeResult).isEqualTo(WhitelistOperationResult.ERROR_DUPLICATED_ENTRY);
   }
+
+  @Test
+  public void removeNullListShouldReturnEmptyEntryResult() {
+    WhitelistOperationResult removeResult = controller.removeAccounts(null);
+
+    assertThat(removeResult).isEqualTo(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+  }
+
+  @Test
+  public void removeEmptyListShouldReturnEmptyEntryResult() {
+    WhitelistOperationResult removeResult = controller.removeAccounts(new ArrayList<>());
+
+    assertThat(removeResult).isEqualTo(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+  }
 }

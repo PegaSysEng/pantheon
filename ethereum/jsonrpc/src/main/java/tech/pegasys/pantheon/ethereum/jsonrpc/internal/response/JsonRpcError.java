@@ -51,19 +51,20 @@ public enum JsonRpcError {
 
   // Permissioning errors
   ACCOUNT_WHITELIST_NOT_SET(-32000, "Account whitelist has not been set"),
+  ACCOUNT_WHITELIST_EMPTY_ENTRY(-32000, "Request contains an empty list of accounts"),
+  ACCOUNT_WHITELIST_INVALID_ENTRY(-32000, "Request contains an invalid account"),
   ACCOUNT_WHITELIST_DUPLICATED_ENTRY(-32000, "Request contains duplicated accounts"),
   ACCOUNT_WHITELIST_EXISTING_ENTRY(-32000, "Can't add an existing account to whitelist"),
   ACCOUNT_WHITELIST_ABSENT_ENTRY(-32000, "Can't remove an absent account from whitelist"),
-  ACCOUNT_WHITELIST_INVALID_ENTRY(-32000, "Request contains an invalid account"),
 
   // Node whitelist errors
   NODE_WHITELIST_NOT_SET(-32000, "Node whitelist has not been set"),
+  NODE_WHITELIST_EMPTY_ENTRY(-32000, "Request contains an empty list of nodes"),
+  NODE_WHITELIST_INVALID_ENTRY(-32000, "Request contains an invalid node"),
   NODE_WHITELIST_DUPLICATED_ENTRY(-32000, "Request contains duplicated nodes"),
   NODE_WHITELIST_EXISTING_ENTRY(-32000, "Can't add an existing node to whitelist"),
   NODE_WHITELIST_MISSING_ENTRY(-32000, "Can't remove an absent node from whitelist"),
-  NODE_WHITELIST_INVALID_ENTRY(-32000, "Request contains an invalid node"),
 
-  // Private transaction errors
   ENCLAVE_IS_DOWN(-32000, "Enclave is down");
 
   private final int code;

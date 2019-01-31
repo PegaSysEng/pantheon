@@ -47,6 +47,9 @@ public class PermAddAccountsToWhitelist implements JsonRpcMethod {
     final WhitelistOperationResult addResult = whitelistController.addAccounts(accountsList);
 
     switch (addResult) {
+      case ERROR_EMPTY_ENTRY:
+        return new JsonRpcErrorResponse(
+            request.getId(), JsonRpcError.ACCOUNT_WHITELIST_EMPTY_ENTRY);
       case ERROR_INVALID_ENTRY:
         return new JsonRpcErrorResponse(
             request.getId(), JsonRpcError.ACCOUNT_WHITELIST_INVALID_ENTRY);

@@ -47,6 +47,9 @@ public class PermRemoveAccountsFromWhitelist implements JsonRpcMethod {
     final WhitelistOperationResult removeResult = whitelistController.removeAccounts(accountsList);
 
     switch (removeResult) {
+      case ERROR_EMPTY_ENTRY:
+        return new JsonRpcErrorResponse(
+            request.getId(), JsonRpcError.ACCOUNT_WHITELIST_EMPTY_ENTRY);
       case ERROR_INVALID_ENTRY:
         return new JsonRpcErrorResponse(
             request.getId(), JsonRpcError.ACCOUNT_WHITELIST_INVALID_ENTRY);

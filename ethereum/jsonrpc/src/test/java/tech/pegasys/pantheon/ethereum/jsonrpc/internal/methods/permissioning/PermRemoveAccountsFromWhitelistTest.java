@@ -103,6 +103,19 @@ public class PermRemoveAccountsFromWhitelistTest {
   }
 
   @Test
+  public void whenEmptyListOnRequestShouldReturnEmptyEntryErrorResponse() {
+    JsonRpcResponse expectedResponse =
+        new JsonRpcErrorResponse(null, JsonRpcError.ACCOUNT_WHITELIST_EMPTY_ENTRY);
+
+    when(accountWhitelist.removeAccounts(eq(new ArrayList<>())))
+        .thenReturn(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+
+    JsonRpcResponse actualResponse = method.response(request(new ArrayList<>()));
+
+    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+  }
+
+  @Test
   public void whenEmptyParamOnRequestShouldThrowInvalidJsonRpcException() {
     JsonRpcRequest request =
         new JsonRpcRequest("2.0", "perm_removeAccountsFromWhitelist", new Object[] {});

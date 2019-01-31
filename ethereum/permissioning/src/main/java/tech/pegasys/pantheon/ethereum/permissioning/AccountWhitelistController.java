@@ -26,17 +26,17 @@ public class AccountWhitelistController {
 
   public AccountWhitelistController(final PermissioningConfiguration configuration) {
     if (configuration != null && configuration.isAccountWhitelistSet()) {
-      addAccounts(configuration.getAccountWhitelist());
+      this.isAccountWhitelistSet = configuration.isAccountWhitelistSet();
+      if (!configuration.getAccountWhitelist().isEmpty()) {
+        addAccounts(configuration.getAccountWhitelist());
+      }
     }
   }
 
   public WhitelistOperationResult addAccounts(final List<String> accounts) {
-    if (containsInvalidAccount(accounts)) {
-      return WhitelistOperationResult.ERROR_INVALID_ENTRY;
-    }
-
-    if (inputHasDuplicates(accounts)) {
-      return WhitelistOperationResult.ERROR_DUPLICATED_ENTRY;
+    final WhitelistOperationResult inputValidationResult = inputValidation(accounts);
+    if (inputValidationResult != WhitelistOperationResult.SUCCESS) {
+      return inputValidationResult;
     }
 
     boolean inputHasExistingAccount = accounts.stream().anyMatch(accountWhitelist::contains);
@@ -50,6 +50,24 @@ public class AccountWhitelistController {
   }
 
   public WhitelistOperationResult removeAccounts(final List<String> accounts) {
+    final WhitelistOperationResult inputValidationResult = inputValidation(accounts);
+    if (inputValidationResult != WhitelistOperationResult.SUCCESS) {
+      return inputValidationResult;
+    }
+
+    if (!accountWhitelist.containsAll(accounts)) {
+      return WhitelistOperationResult.ERROR_ABSENT_ENTRY;
+    }
+
+    this.accountWhitelist.removeAll(accounts);
+    return WhitelistOperationResult.SUCCESS;
+  }
+
+  private WhitelistOperationResult inputValidation(final List<String> accounts) {
+    if (accounts == null || accounts.isEmpty()) {
+      return WhitelistOperationResult.ERROR_EMPTY_ENTRY;
+    }
+
     if (containsInvalidAccount(accounts)) {
       return WhitelistOperationResult.ERROR_INVALID_ENTRY;
     }
@@ -58,11 +76,6 @@ public class AccountWhitelistController {
       return WhitelistOperationResult.ERROR_DUPLICATED_ENTRY;
     }
 
-    if (!accountWhitelist.containsAll(accounts)) {
-      return WhitelistOperationResult.ERROR_ABSENT_ENTRY;
-    }
-
-    this.accountWhitelist.removeAll(accounts);
     return WhitelistOperationResult.SUCCESS;
   }
 

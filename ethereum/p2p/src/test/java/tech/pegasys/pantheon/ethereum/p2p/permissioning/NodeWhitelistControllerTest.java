@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.google.common.collect.Lists;
@@ -68,6 +69,24 @@ public class NodeWhitelistControllerTest {
   }
 
   @Test
+  public void whenAddNodesInputHasEmptyListOfNodesShouldReturnErrorEmptyEntry() {
+    NodesWhitelistResult expected =
+        new NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodesWhitelistResult actualResult = controller.removeNodes(new ArrayList<>());
+
+    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
+  }
+
+  @Test
+  public void whenAddNodesInputHasNullListOfNodesShouldReturnErrorEmptyEntry() {
+    NodesWhitelistResult expected =
+        new NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodesWhitelistResult actualResult = controller.removeNodes(null);
+
+    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
+  }
+
+  @Test
   public void whenRemoveNodesInputHasAbsentNodeShouldReturnRemoveErrorAbsentEntry() {
     NodesWhitelistResult expected =
         new NodesWhitelistResult(WhitelistOperationResult.ERROR_ABSENT_ENTRY);
@@ -85,6 +104,24 @@ public class NodeWhitelistControllerTest {
     NodesWhitelistResult actualResult =
         controller.removeNodes(
             Lists.newArrayList(DefaultPeer.fromURI(enode1), DefaultPeer.fromURI(enode1)));
+
+    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
+  }
+
+  @Test
+  public void whenRemoveNodesInputHasEmptyListOfNodesShouldReturnErrorEmptyEntry() {
+    NodesWhitelistResult expected =
+        new NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodesWhitelistResult actualResult = controller.removeNodes(new ArrayList<>());
+
+    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
+  }
+
+  @Test
+  public void whenRemoveNodesInputHasNullListOfNodesShouldReturnErrorEmptyEntry() {
+    NodesWhitelistResult expected =
+        new NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodesWhitelistResult actualResult = controller.removeNodes(null);
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
