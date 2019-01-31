@@ -45,7 +45,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PermAddNodesToWhitelistTest {
 
-  private static final boolean JSON_SUCCESS = true;
+  private static final String JSON_SUCCESS = "Success";
   private PermAddNodesToWhitelist method;
   private static final String METHOD_NAME = "perm_addNodesToWhitelist";
 

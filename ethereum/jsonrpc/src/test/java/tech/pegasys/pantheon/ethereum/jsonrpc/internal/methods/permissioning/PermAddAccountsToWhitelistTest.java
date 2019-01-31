@@ -55,9 +55,9 @@ public class PermAddAccountsToWhitelistTest {
   }
 
   @Test
-  public void whenAccountsAreAddedToWhitelistShouldReturnTrue() {
+  public void whenAccountsAreAddedToWhitelistShouldReturnSuccess() {
     List<String> accounts = Arrays.asList("0x0", "0x1");
-    JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, true);
+    JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, "Success");
     when(accountWhitelist.addAccounts(eq(accounts))).thenReturn(WhitelistOperationResult.SUCCESS);
 
     JsonRpcResponse actualResponse = method.response(request(accounts));

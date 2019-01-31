@@ -45,7 +45,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PermRemoveNodesFromWhitelistTest {
 
-  private static final boolean SUCCESS_RESULT = true;
+  private static final String SUCCESS_RESULT = "Success";
   private PermRemoveNodesFromWhitelist method;
   private static final String METHOD_NAME = "perm_removeNodesFromWhitelist";
 
