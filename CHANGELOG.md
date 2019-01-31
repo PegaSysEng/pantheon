@@ -58,8 +58,8 @@ has been updated to use the moved quickstart.
 - Command options and commands renaming [\#618](https://github.com/PegaSysEng/pantheon/pull/618) 
 - Added IBFT get pending votes [\#603](https://github.com/PegaSysEng/pantheon/pull/603) 
 - Implement Petersburg hardfork [\#601](https://github.com/PegaSysEng/pantheon/pull/601) 
-- Added private transaction abstraction [\#592](https://github.com/PegaSysEng/pantheon/pull/592) ([iikirilov](https://github.com/iikirilov))
-- Added privacy command line commands [\#584](https://github.com/PegaSysEng/pantheon/pull/584) ([Puneetha17](https://github.com/Puneetha17))
+- Added private transaction abstraction [\#592](https://github.com/PegaSysEng/pantheon/pull/592) (thanks to [iikirilov](https://github.com/iikirilov))
+- Added privacy command line commands [\#584](https://github.com/PegaSysEng/pantheon/pull/584) (thanks to [Puneetha17](https://github.com/Puneetha17))
 - Documentation updates include:
   - Updated [Private Network Quickstart tutorial](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Private-Network-Quickstart/) 
     to use quickstart in `pantheon-quickstart` repository and indicate that the quickstart is not supported on Windows.
@@ -89,13 +89,13 @@ has been updated to use the moved quickstart.
 - Start world downloader [\#658](https://github.com/PegaSysEng/pantheon/pull/658)
 - Create a simple `WorldStateDownloader` [\#657](https://github.com/PegaSysEng/pantheon/pull/657) 
 - Added handling for when p2p is disabled [\#655](https://github.com/PegaSysEng/pantheon/pull/655)
-- Enabled command line configuration for privacy precompiled contract address [\#653](https://github.com/PegaSysEng/pantheon/pull/653) ([Puneetha17](https://github.com/Puneetha17))
+- Enabled command line configuration for privacy precompiled contract address [\#653](https://github.com/PegaSysEng/pantheon/pull/653) (thanks to [Puneetha17](https://github.com/Puneetha17))
 - IBFT transmitted packets are logged by gossiper [\#652](https://github.com/PegaSysEng/pantheon/pull/652)
 - `admin_addPeer` acceptance test [\#651](https://github.com/PegaSysEng/pantheon/pull/651) 
 - Added `p2pEnabled` configuration to `ProcessPantheonNodeRunner` [\#649](https://github.com/PegaSysEng/pantheon/pull/649) 
 - Added description to automatic benchmarks [\#646](https://github.com/PegaSysEng/pantheon/pull/646) 
 - Added `network` option [\#645](https://github.com/PegaSysEng/pantheon/pull/645) 
-- Remove OrionConfiguration [\#644](https://github.com/PegaSysEng/pantheon/pull/644) ([Puneetha17](https://github.com/Puneetha17))
+- Remove OrionConfiguration [\#644](https://github.com/PegaSysEng/pantheon/pull/644) (thanks to [Puneetha17](https://github.com/Puneetha17))
 - IBFT Json Acceptance tests [\#634](https://github.com/PegaSysEng/pantheon/pull/634)
 - Upgraded build image to one that contains libsodium [\#632](https://github.com/PegaSysEng/pantheon/pull/632) 
 - Command line fixes [\#630](https://github.com/PegaSysEng/pantheon/pull/630) 
@@ -118,7 +118,7 @@ has been updated to use the moved quickstart.
 - Added `GetReceiptsFromPeerTask` [\#598](https://github.com/PegaSysEng/pantheon/pull/598) 
 - Added `GetNodeDataFromPeerTask` [\#597](https://github.com/PegaSysEng/pantheon/pull/597) 
 - Fixed deprecation warnings [\#596](https://github.com/PegaSysEng/pantheon/pull/596) 
-- IBFT Integration Tests - Future Height [\#591](https://github.com/PegaSysEng/pantheon/pull/591) ([rain-on](https://github.com/rain-on))
+- IBFT Integration Tests - Future Height [\#591](https://github.com/PegaSysEng/pantheon/pull/591) 
 - Added `getNodeData` to `EthPeer` to enable requesting node data [\#589](https://github.com/PegaSysEng/pantheon/pull/589) 
 - `Blockcreator` to use `parentblock` specified at constuction [\#588](https://github.com/PegaSysEng/pantheon/pull/588) 
 - Support responding to `GetNodeData` requests [\#587](https://github.com/PegaSysEng/pantheon/pull/587) 
@@ -134,7 +134,7 @@ has been updated to use the moved quickstart.
 - Tests that CLI options are disabled under docker [\#566](https://github.com/PegaSysEng/pantheon/pull/566) 
 - Renamed IBFT networking classes [\#555](https://github.com/PegaSysEng/pantheon/pull/555) 
 - Removed dead code from the consensus package [\#554](https://github.com/PegaSysEng/pantheon/pull/554) 
-- Prepared private transaction support [\#538](https://github.com/PegaSysEng/pantheon/pull/538) ([iikirilov](https://github.com/iikirilov))
+- Prepared private transaction support [\#538](https://github.com/PegaSysEng/pantheon/pull/538) (thanks to [iikirilov](https://github.com/iikirilov))
 
 ## 0.8.5
 
