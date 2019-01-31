@@ -71,7 +71,7 @@ public interface PantheonController<C> extends Closeable {
           networkId,
           nodeKeys,
           metricsSystem);
-    } else if (configOptions.isIbft()) {
+    } else if (configOptions.isIbftLegacy()) {
       return IbftLegacyPantheonController.init(
           storageProvider,
           genesisConfigFile,

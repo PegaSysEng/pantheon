@@ -19,13 +19,13 @@ public interface GenesisConfigOptions {
 
   boolean isEthHash();
 
-  boolean isIbft();
+  boolean isIbftLegacy();
 
   boolean isIbft2();
 
   boolean isClique();
 
-  IbftConfigOptions getIbftConfigOptions();
+  IbftConfigOptions getIbftLegacyConfigOptions();
 
   CliqueConfigOptions getCliqueConfigOptions();
 

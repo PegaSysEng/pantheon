@@ -35,7 +35,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public boolean isIbft() {
+  public boolean isIbftLegacy() {
     return configRoot.containsKey(IBFT_CONFIG_KEY);
   }
 
@@ -50,8 +50,8 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public IbftConfigOptions getIbftConfigOptions() {
-    return isIbft()
+  public IbftConfigOptions getIbftLegacyConfigOptions() {
+    return isIbftLegacy()
         ? new IbftConfigOptions(configRoot.getJsonObject(IBFT_CONFIG_KEY))
         : IbftConfigOptions.DEFAULT;
   }

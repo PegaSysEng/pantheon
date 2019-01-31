@@ -32,7 +32,7 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public boolean isIbft() {
+  public boolean isIbftLegacy() {
     return false;
   }
 
@@ -47,7 +47,7 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public IbftConfigOptions getIbftConfigOptions() {
+  public IbftConfigOptions getIbftLegacyConfigOptions() {
     return IbftConfigOptions.DEFAULT;
   }
 
