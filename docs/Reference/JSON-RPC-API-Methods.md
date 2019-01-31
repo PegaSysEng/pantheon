@@ -11,7 +11,51 @@ The following lists the Pantheon JSON-RPC API commands:
 ## Admin Methods
 
 !!! note
-    The `ADMIN` API is not enabled by default. Use the [`--rpc-api` option](Pantheon-CLI-Syntax.md#rpc-api) to enable the `ADMIN` API.
+    The `ADMIN` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `ADMIN` API methods.
+
+### admin_addPeer
+
+Adds a node to the list of tracked static nodes. The node attempts to maintain connectivity to tracked static nodes.
+If the remote connection goes down, the node attempts to reconnect every 60 seconds. 
+
+**Parameters**
+
+`string` : Enode of peer to add
+
+The enode is `enode://<id>@<host:port>` where:
+             
+* `<id>` is the node public key excluding the initial 0x. 
+* `<host:port>` is the host and port the node is listening on for P2P peer discovery. 
+   Specified by the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and 
+   [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options.
+             
+!!! example
+    If the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) or [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options are not specified and the node public key is `0xc35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f`            
+    The enode URL is:
+    `enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303` 
+ 
+
+**Returns**
+
+`result` : `boolean` - `true` if peer added or `false` if peer already on list of static nodes. 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": true
+    }
+    ```
 
 ### admin_peers
 
@@ -283,9 +327,6 @@ None
 
 Returns the [chain ID](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 
-!!!note
-    This method is only available from v0.8.2. 
-
 **Parameters**
 
 None
@@ -320,7 +361,7 @@ You can get the Ethereum account address from a client such as MetaMask or Ether
 
 !!!example
     ```bash
-    $ bin/pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-http-enabled
+    pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-http-enabled
     ```
 
 **Parameters**
@@ -1528,6 +1569,10 @@ None
 
 ## Clique Methods
 
+!!! note
+    The `CLIQUE` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `CLIQUE` API methods.
+
 ### clique_discard
 
 Discards a proposal to add or remove a signer with the specified address. 
@@ -1683,7 +1728,8 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
 ## Debug Methods
 
 !!! note
-    The `DEBUG` API is not enabled by default. Use the [`--rpc-api` option](Pantheon-CLI-Syntax.md#rpc-api) to enable the `DEBUG` API.
+    The `DEBUG` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `DEBUG` API methods.
 
 ### debug_metrics
 
@@ -1869,7 +1915,8 @@ Reruns the transaction with the same state as when the transaction was executed.
 ## Miner Methods
 
 !!! note
-    The `MINER` API is not enabled by default. Use the [`--rpc-api option`](Pantheon-CLI-Syntax.md#rpc-api) to enable the `MINER` API.
+    The `MINER` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `MINER` API methods.
 
 ### miner_start
 
@@ -1930,6 +1977,13 @@ None
     ```
 
 ## IBFT 2.0 Methods 
+
+!!! note 
+    IBFT 2.0 is under development and will be available in v1.0. 
+
+!!! note
+    The `IBFT` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `IBFT` API methods.
 
 ### ibft_discardValidatorVote
 

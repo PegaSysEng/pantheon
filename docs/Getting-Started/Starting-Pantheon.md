@@ -3,6 +3,12 @@ description: Starting Pantheon
 
 # Starting Pantheon
 
+!!! important "Breaking Changes in v0.9"
+    In v0.9, the command line changed to improve usability. These are breaking changes; that is, 
+    in many cases the v0.8 command line options no longer work. 
+    The examples below and the rest of the documentation has been updated to reflect these changes. The [release notes](https://github.com/PegaSysEng/pantheon/blob/master/CHANGELOG.md) 
+    include a mapping of the previous command line options to the new options. 
+
 Pantheon nodes can be used for varying purposes as described in the [Overview](../index.md).
 Nodes can connect to the Ethereum mainnet, public testnets such as Ropsten, or private networks.
 
@@ -23,8 +29,8 @@ Pantheon specifies the genesis configuration, and sets the network ID and bootno
 to [Mainnet](#run-a-node-on-ethereum-mainnet), [Goerli](#run-a-node-on-goerli-testnet), [Rinkeby](#run-a-node-on-rinkeby-testnet), and [Ropsten](#run-a-node-on-ropsten-testnet). 
 
 When [`--network=dev`](../Reference/Pantheon-CLI-Syntax.md#network) is specified, Pantheon uses the 
-development mode genesis configuration associated to a low difficulty.
-The default bootnodes setting for dev network is to have an empty bootnodes list.
+development mode genesis configuration with a fixed low difficulty.
+A node started with [`--network=dev`](../Reference/Pantheon-CLI-Syntax.md#network) has an empty bootnodes list by default.
 
 The genesis files defining the genesis configurations are in the [Pantheon source files](https://github.com/PegaSysEng/pantheon/tree/master/config/src/main/resources). 
 
@@ -69,7 +75,7 @@ call [JSON-RPC API methods](../Reference/JSON-RPC-API-Methods.md) to confirm the
 To run a node that mines blocks at a rate suitable for testing purposes: 
 
 ```bash
-pantheon --network=dev --miner-enabled --miner-coinbase=0xfe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-cors-origins="all" --host-whitelist="all" --rpc-rpc-ws-enabled --rpc-http-enabled --data-path=/tmp/tmpDatdir
+pantheon --network=dev --miner-enabled --miner-coinbase=0xfe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-cors-origins="all" --host-whitelist="all" --rpc-ws-enabled --rpc-http-enabled --data-path=/tmp/tmpDatdir
 ```
 
 Alternatively, use the following [configuration file](../Configuring-Pantheon/Using-Configuration-File.md) 
