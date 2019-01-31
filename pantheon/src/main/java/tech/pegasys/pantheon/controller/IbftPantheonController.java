@@ -200,8 +200,12 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
 
-    final UniqueMessageMulticaster uniqueMessageMulticaster = new UniqueMessageMulticaster(
-        new ValidatorPeers(protocolContext.getConsensusState().getVoteTally()));
+    // NOTE: peers should not be used for accessing the network as it does not enforce the
+    // "only send once" filter applied by the UniqueMessageMulticaster.
+    final ValidatorPeers peers =
+        new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
+
+    final UniqueMessageMulticaster uniqueMessageMulticaster = new UniqueMessageMulticaster(peers);
 
     final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
 
