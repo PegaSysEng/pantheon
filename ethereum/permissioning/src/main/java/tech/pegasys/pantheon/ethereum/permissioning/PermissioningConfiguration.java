@@ -65,7 +65,7 @@ public class PermissioningConfiguration {
     return configurationFilePath;
   }
 
-  public void setConfigurationFilePath(String configurationFilePath) {
+  public void setConfigurationFilePath(final String configurationFilePath) {
     this.configurationFilePath = configurationFilePath;
   }
 }
