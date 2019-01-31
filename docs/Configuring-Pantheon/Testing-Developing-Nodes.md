@@ -21,7 +21,7 @@ To start a bootnode for a private network:
 
     !!! example
         ```bash
-        pantheon --genesis-file=privateNetworkGenesis.json --data-path=nodeDataPath export-pub-key bootnode
+        pantheon --genesis-file=privateNetworkGenesis.json --data-path=nodeDataPath public-key export --to=bootnode
         ```
         Where `privateNetworkGenesis.json` and `nodeDataPath` are changed to the relevant values for 
         your private network. 
@@ -31,10 +31,11 @@ To start a bootnode for a private network:
 2. Start the bootnode, specifying:
 
     * Genesis file and data directory as in the previous step. 
+    * No arguments for the [`--bootnodes` option](../Reference/Pantheon-CLI-Syntax.md#bootnodes) because this is your bootnode.
     
     !!! example
         ```
-        pantheon --genesis-file=privateNetworkGenesis.json --data-path=nodeDataPath
+        pantheon --genesis-file=privateNetworkGenesis.json --data-path=nodeDataPath --bootnodes
          ```
      
 To specify this bootnode for another node, the enode URL for the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) 
@@ -42,8 +43,8 @@ option is `enode://<id>@<host:port>` where:
 
 * `<id>` is the node public key written to the specified file (`bootnode` in the above example) excluding the initial 0x. 
 * `<host:port>` is the host and port the bootnode is listening on for P2P peer discovery. 
-Specified by the [`--p2p-host` option](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and 
-[`--p2p-port` option](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option for the bootnode
+Specified by the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and 
+[`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options for the bootnode
 (default host is `127.0.0.1` and port is `30303`).
 
 !!! example
