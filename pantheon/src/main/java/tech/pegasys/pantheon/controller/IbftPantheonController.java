@@ -199,14 +199,11 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
-    final ValidatorPeers peers =
-        new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
-    final UniqueMessageMulticaster uniqueMessageMulticaster = new UniqueMessageMulticaster(peers);
 
-    final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
-    minedBlockObservers.subscribe(ethProtocolManager);
+    final UniqueMessageMulticaster uniqueMessageMulticaster = new UniqueMessageMulticaster(
+        new ValidatorPeers(protocolContext.getConsensusState().getVoteTally()));
 
-    final IbftGossip gossiper = new IbftGossip(peers);
+    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
 
     final IbftFinalState finalState =
         new IbftFinalState(
@@ -230,6 +227,9 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final MessageValidatorFactory messageValidatorFactory =
         new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
+
+    final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
+    minedBlockObservers.subscribe(ethProtocolManager);
 
     final IbftController ibftController =
         new IbftController(
