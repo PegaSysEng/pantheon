@@ -20,7 +20,7 @@ import io.vertx.core.json.JsonObject;
 public class JsonGenesisConfigOptions implements GenesisConfigOptions {
 
   private static final String ETHASH_CONFIG_KEY = "ethash";
-  private static final String IBFT_CONFIG_KEY = "ibft";
+  private static final String IBFT_LEGACY_CONFIG_KEY = "ibft";
   private static final String IBFT2_CONFIG_KEY = "ibft2";
   private static final String CLIQUE_CONFIG_KEY = "clique";
   private final JsonObject configRoot;
@@ -36,7 +36,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
 
   @Override
   public boolean isIbftLegacy() {
-    return configRoot.containsKey(IBFT_CONFIG_KEY);
+    return configRoot.containsKey(IBFT_LEGACY_CONFIG_KEY);
   }
 
   @Override
@@ -52,7 +52,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   @Override
   public IbftConfigOptions getIbftLegacyConfigOptions() {
     return isIbftLegacy()
-        ? new IbftConfigOptions(configRoot.getJsonObject(IBFT_CONFIG_KEY))
+        ? new IbftConfigOptions(configRoot.getJsonObject(IBFT_LEGACY_CONFIG_KEY))
         : IbftConfigOptions.DEFAULT;
   }
 
