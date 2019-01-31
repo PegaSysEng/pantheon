@@ -47,6 +47,7 @@ has been updated to use the moved quickstart.
 
 ### Additions and Improvements 
 
+- `--network=goerli` supports relaunch of Görli testnet [\#717](https://github.com/PegaSysEng/pantheon/pull/717)
 - TOML authentication provider [\#689](https://github.com/PegaSysEng/pantheon/pull/689) 
 - Metrics Push Gateway Options [\#678](https://github.com/PegaSysEng/pantheon/pull/678)
 - Additional logging details for IBFT 2.0 [\#650](https://github.com/PegaSysEng/pantheon/pull/650) 
