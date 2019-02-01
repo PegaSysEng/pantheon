@@ -93,45 +93,12 @@ public class UniqueMessageMulticasterTest {
 
   @Test
   public void anonymousMessageDataClassesContainingTheSameDataAreConsideredIdentical() {
+
     final MessageData arbitraryMessage_1 =
-        new MessageData() {
-          private int size = 4;
-
-          @Override
-          public int getSize() {
-            return size;
-          }
-
-          @Override
-          public int getCode() {
-            return 3;
-          }
-
-          @Override
-          public BytesValue getData() {
-            return BytesValue.wrap(new byte[size]);
-          }
-        };
+        createAnonymousMessageData(BytesValue.wrap(new byte[4]), 1);
 
     final MessageData arbitraryMessage_2 =
-        new MessageData() {
-          private int size = 4;
-
-          @Override
-          public int getSize() {
-            return size;
-          }
-
-          @Override
-          public int getCode() {
-            return 3;
-          }
-
-          @Override
-          public BytesValue getData() {
-            return BytesValue.wrap(new byte[size]);
-          }
-        };
+        createAnonymousMessageData(BytesValue.wrap(new byte[4]), 1);
 
     messageTracker.send(arbitraryMessage_1);
     verify(multicaster, times(1)).send(arbitraryMessage_1, emptyList());
@@ -139,5 +106,25 @@ public class UniqueMessageMulticasterTest {
 
     messageTracker.send(arbitraryMessage_2);
     verifyZeroInteractions(multicaster);
+  }
+
+  private MessageData createAnonymousMessageData(final BytesValue content, final int code) {
+    return new MessageData() {
+
+      @Override
+      public int getSize() {
+        return content.size();
+      }
+
+      @Override
+      public int getCode() {
+        return code;
+      }
+
+      @Override
+      public BytesValue getData() {
+        return content;
+      }
+    };
   }
 }
