@@ -60,7 +60,7 @@ public class PermRemoveAccountsFromWhitelist implements JsonRpcMethod {
         return new JsonRpcErrorResponse(
             request.getId(), JsonRpcError.ACCOUNT_WHITELIST_DUPLICATED_ENTRY);
       case SUCCESS:
-        return new JsonRpcSuccessResponse(request.getId(), "Success");
+        return new JsonRpcSuccessResponse(request.getId());
       default:
         throw new IllegalStateException("Unmapped result from AccountWhitelistController");
     }
