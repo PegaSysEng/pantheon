@@ -23,8 +23,13 @@ import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.AdminJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.IbftJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PermissioningJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
@@ -49,6 +54,8 @@ import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
+import org.web3j.protocol.Web3jService;
+import org.web3j.protocol.core.JsonRpc2_0Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.websocket.WebSocketClient;
 import org.web3j.protocol.websocket.WebSocketListener;
@@ -64,17 +71,20 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final KeyPair keyPair;
   private final int p2pPort;
   private final Properties portsProperties = new Properties();
+  private final Boolean p2pEnabled;
 
   private final String name;
   private final MiningParameters miningParameters;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
+  private final MetricsConfiguration metricsConfiguration;
   private final PermissioningConfiguration permissioningConfiguration;
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
+  private final boolean discoveryEnabled;
 
   private List<String> bootnodes = new ArrayList<>();
-  private PantheonWeb3j pantheonWeb3j;
+  private JsonRequestFactories jsonRequestFactories;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
 
   public PantheonNode(
@@ -82,10 +92,13 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
+      final MetricsConfiguration metricsConfiguration,
       final PermissioningConfiguration permissioningConfiguration,
       final boolean devMode,
       final GenesisConfigProvider genesisConfigProvider,
-      final int p2pPort)
+      final int p2pPort,
+      final Boolean p2pEnabled,
+      final boolean discoveryEnabled)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
@@ -94,9 +107,12 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.miningParameters = miningParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
+    this.metricsConfiguration = metricsConfiguration;
     this.permissioningConfiguration = permissioningConfiguration;
     this.genesisConfigProvider = genesisConfigProvider;
     this.devMode = devMode;
+    this.p2pEnabled = p2pEnabled;
+    this.discoveryEnabled = discoveryEnabled;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -153,19 +169,23 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return LOCALHOST;
   }
 
-  private PantheonWeb3j pantheonWeb3j() {
+  private JsonRequestFactories jsonRequestFactories() {
+    if (jsonRequestFactories == null) {
+      final Web3jService web3jService =
+          jsonRpcBaseUrl()
+              .map(url -> new HttpService(url))
+              .orElse(new HttpService("http://" + LOCALHOST + ":8545"));
 
-    if (pantheonWeb3j == null) {
-      if (!jsonRpcBaseUrl().isPresent()) {
-        return new PantheonWeb3j(
-            new HttpService("http://" + LOCALHOST + ":8545"), 2000, Async.defaultExecutorService());
-      }
-
-      return new PantheonWeb3j(
-          new HttpService(jsonRpcBaseUrl().get()), 2000, Async.defaultExecutorService());
+      jsonRequestFactories =
+          new JsonRequestFactories(
+              new JsonRpc2_0Web3j(web3jService, 2000, Async.defaultExecutorService()),
+              new CliqueJsonRpcRequestFactory(web3jService),
+              new IbftJsonRpcRequestFactory(web3jService),
+              new PermissioningJsonRpcRequestFactory(web3jService),
+              new AdminJsonRpcRequestFactory(web3jService));
     }
 
-    return pantheonWeb3j;
+    return jsonRequestFactories;
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
@@ -178,19 +198,17 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     final WebSocketService webSocketService = new WebSocketService(url, true);
     try {
       webSocketService.connect();
-    } catch (ConnectException e) {
+    } catch (final ConnectException e) {
       throw new RuntimeException("Error connection to WebSocket endpoint", e);
     }
 
-    if (pantheonWeb3j != null) {
-      pantheonWeb3j.shutdown();
+    if (jsonRequestFactories != null) {
+      jsonRequestFactories.shutdown();
     }
-
-    pantheonWeb3j = new PantheonWeb3j(webSocketService, 2000, Async.defaultExecutorService());
   }
 
   private void checkIfWebSocketEndpointIsAvailable(final String url) {
-    WebSocketClient webSocketClient = new WebSocketClient(URI.create(url));
+    final WebSocketClient webSocketClient = new WebSocketClient(URI.create(url));
     // Web3j implementation always invoke the listener (even when one hasn't been set). We are using
     // this stub implementation to avoid a NullPointerException.
     webSocketClient.setListener(
@@ -216,7 +234,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     webSocketClient.connect();
     try {
       Awaitility.await().atMost(5, TimeUnit.SECONDS).until(webSocketClient::isOpen);
-    } catch (ConditionTimeoutException e) {
+    } catch (final ConditionTimeoutException e) {
       throw new WebsocketNotConnectedException();
     } finally {
       webSocketClient.close();
@@ -289,6 +307,10 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         webSocketConfiguration().getHost() + ":" + webSocketConfiguration().getPort());
   }
 
+  MetricsConfiguration metricsConfiguration() {
+    return metricsConfiguration;
+  }
+
   int p2pPort() {
     return p2pPort;
   }
@@ -305,6 +327,10 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         .collect(Collectors.toList());
   }
 
+  Boolean p2pEnabled() {
+    return p2pEnabled;
+  }
+
   @Override
   public void bootnodes(final List<String> bootnodes) {
     this.bootnodes = bootnodes;
@@ -318,6 +344,10 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return devMode;
   }
 
+  public boolean isDiscoveryEnabled() {
+    return discoveryEnabled;
+  }
+
   PermissioningConfiguration getPermissioningConfiguration() {
     return permissioningConfiguration;
   }
@@ -329,14 +359,16 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         .add("p2pPort", p2pPort)
         .add("homeDirectory", homeDirectory)
         .add("keyPair", keyPair)
+        .add("p2pEnabled", p2pEnabled)
+        .add("discoveryEnabled", discoveryEnabled)
         .toString();
   }
 
   @Override
   public void stop() {
-    if (pantheonWeb3j != null) {
-      pantheonWeb3j.shutdown();
-      pantheonWeb3j = null;
+    if (jsonRequestFactories != null) {
+      jsonRequestFactories.shutdown();
+      jsonRequestFactories = null;
     }
   }
 
@@ -367,7 +399,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public <T> T execute(final Transaction<T> transaction) {
-    return transaction.execute(pantheonWeb3j());
+    return transaction.execute(jsonRequestFactories());
   }
 
   @Override

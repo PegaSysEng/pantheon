@@ -23,6 +23,7 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   private OptionalLong spuriousDragonBlockNumber = OptionalLong.empty();
   private OptionalLong byzantiumBlockNumber = OptionalLong.empty();
   private OptionalLong constantinopleBlockNumber = OptionalLong.empty();
+  private OptionalLong constantinopleFixBlockNumber = OptionalLong.empty();
   private OptionalInt chainId = OptionalInt.empty();
 
   @Override
@@ -61,6 +62,11 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
+  public EthashConfigOptions getEthashConfigOptions() {
+    return EthashConfigOptions.DEFAULT;
+  }
+
+  @Override
   public OptionalLong getHomesteadBlockNumber() {
     return homesteadBlockNumber;
   }
@@ -88,6 +94,11 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   @Override
   public OptionalLong getConstantinopleBlockNumber() {
     return constantinopleBlockNumber;
+  }
+
+  @Override
+  public OptionalLong getConstantinopleFixBlockNumber() {
+    return constantinopleFixBlockNumber;
   }
 
   @Override
@@ -122,6 +133,11 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
 
   public StubGenesisConfigOptions constantinopleBlock(final long blockNumber) {
     constantinopleBlockNumber = OptionalLong.of(blockNumber);
+    return this;
+  }
+
+  public StubGenesisConfigOptions constantinopleFixBlock(final long blockNumber) {
+    constantinopleFixBlockNumber = OptionalLong.of(blockNumber);
     return this;
   }
 

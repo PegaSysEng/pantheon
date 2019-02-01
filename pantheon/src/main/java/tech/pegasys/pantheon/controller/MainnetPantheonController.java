@@ -19,15 +19,15 @@ import tech.pegasys.pantheon.ethereum.blockcreation.DefaultBlockScheduler;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMinerExecutor;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
+import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
-import tech.pegasys.pantheon.ethereum.db.BlockchainStorage;
-import tech.pegasys.pantheon.ethereum.db.DefaultMutableBlockchain;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
@@ -41,6 +41,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -65,6 +67,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
 
   private final TransactionPool transactionPool;
   private final MiningCoordinator miningCoordinator;
+  private final PrivacyParameters privacyParameters;
   private final Runnable close;
 
   public MainnetPantheonController(
@@ -75,6 +78,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final KeyPair keyPair,
       final TransactionPool transactionPool,
       final MiningCoordinator miningCoordinator,
+      final PrivacyParameters privacyParameters,
       final Runnable close) {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
@@ -83,6 +87,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
     this.keyPair = keyPair;
     this.transactionPool = transactionPool;
     this.miningCoordinator = miningCoordinator;
+    this.privacyParameters = privacyParameters;
     this.close = close;
   }
 
@@ -93,7 +98,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final SynchronizerConfiguration taintedSyncConfig,
       final MiningParameters miningParams,
       final KeyPair nodeKeys,
-      final MetricsSystem metricsSystem) {
+      final MetricsSystem metricsSystem,
+      final PrivacyParameters privacyParameters) {
 
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final BlockchainStorage blockchainStorage =
@@ -101,8 +107,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
     final MutableBlockchain blockchain =
         new DefaultMutableBlockchain(genesisState.getBlock(), blockchainStorage, metricsSystem);
 
-    final WorldStateArchive worldStateArchive =
-        new WorldStateArchive(storageProvider.createWorldStateStorage());
+    final WorldStateStorage worldStateStorage = storageProvider.createWorldStateStorage();
+    final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
     genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
     final ProtocolContext<Void> protocolContext =
@@ -113,6 +119,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
             protocolContext.getBlockchain(),
+            protocolContext.getWorldStateArchive(),
             genesisConfig
                 .getConfigOptions()
                 .getChainId()
@@ -128,6 +135,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
             syncConfig,
             protocolSchedule,
             protocolContext,
+            worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
             metricsSystem.createLabelledTimer(
@@ -165,6 +173,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
         nodeKeys,
         transactionPool,
         miningCoordinator,
+        privacyParameters,
         () -> {
           miningCoordinator.disable();
           minerThreadPool.shutdownNow();
@@ -219,5 +228,10 @@ public class MainnetPantheonController implements PantheonController<Void> {
   @Override
   public void close() {
     close.run();
+  }
+
+  @Override
+  public PrivacyParameters getPrivacyParameters() {
+    return privacyParameters;
   }
 }

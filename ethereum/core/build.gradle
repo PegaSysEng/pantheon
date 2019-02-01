@@ -32,6 +32,7 @@ dependencies {
   implementation project(':ethereum:trie')
   implementation project(':ethereum:permissioning')
   implementation project(':metrics')
+  implementation project(':orion')
   implementation project(':services:kvstore')
 
   implementation 'com.fasterxml.jackson.core:jackson-databind'
@@ -62,16 +63,18 @@ dependencies {
   testSupportImplementation 'org.assertj:assertj-core'
   testSupportImplementation 'org.mockito:mockito-core'
 
+  compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
+
   jmhImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   jmhImplementation project(':crypto')
   jmhImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
   jmhImplementation project(':ethereum:rlp')
   jmhImplementation project(':ethereum:trie')
+  jmhImplementation project(':metrics')
   jmhImplementation project(':services:kvstore')
   jmhImplementation project(':util')
 
   jmhImplementation 'com.google.guava:guava'
-  jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
 }
 
 configurations { testArtifacts }

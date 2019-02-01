@@ -17,7 +17,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +57,11 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add("--dev-mode");
     }
 
+    if (!node.isDiscoveryEnabled()) {
+      params.add("--no-discovery");
+      params.add("true");
+    }
+
     params.add("--p2p-listen");
     params.add(node.p2pListenAddress());
 
@@ -69,13 +73,6 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
     params.add("--bootnodes");
     params.add(String.join(",", node.bootnodes().toString()));
-
-    final PermissioningConfiguration permissioningConfiguration =
-        node.getPermissioningConfiguration();
-    if (permissioningConfiguration.isNodeWhitelistSet()) {
-      params.add("--nodes-whitelist");
-      params.add(String.join(",", permissioningConfiguration.getNodeWhitelist().toString()));
-    }
 
     if (node.jsonRpcEnabled()) {
       params.add("--rpc-enabled");
@@ -100,6 +97,11 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add(genesisFile.toString());
       params.add("--network-id");
       params.add(Integer.toString(ethNetworkConfig.getNetworkId()));
+    }
+
+    if (!node.p2pEnabled()) {
+      params.add("--p2p-enabled");
+      params.add("false");
     }
 
     final ProcessBuilder processBuilder =
@@ -146,6 +148,12 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     localMap.forEach(this::killPantheonProcess);
   }
 
+  @Override
+  public boolean isActive(final String nodeName) {
+    final Process process = pantheonProcesses.get(nodeName);
+    return process.isAlive();
+  }
+
   private void killPantheonProcess(final String name, final Process process) {
     LOG.info("Killing " + name + " process");
 
@@ -154,6 +162,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
             () -> {
               if (process.isAlive()) {
                 process.destroy();
+                pantheonProcesses.remove(name);
                 return false;
               } else {
                 pantheonProcesses.remove(name);

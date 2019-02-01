@@ -14,13 +14,13 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-  id 'com.diffplug.gradle.spotless' version '3.13.0'
+  id 'com.diffplug.gradle.spotless' version '3.17.0'
   id 'com.jfrog.bintray' version '1.8.4'
   id 'com.github.ben-manes.versions' version '0.20.0'
   id 'com.github.hierynomus.license' version '0.15.0'
   id 'io.spring.dependency-management' version '1.0.6.RELEASE'
-  id 'me.champeau.gradle.jmh' version '0.4.7' apply false
-  id 'net.ltgt.errorprone' version '0.6'
+  id 'me.champeau.gradle.jmh' version '0.4.8' apply false
+  id 'net.ltgt.errorprone' version '0.6.1'
   id 'net.researchgate.release' version '2.7.0'
 }
 
@@ -79,6 +79,7 @@ allprojects {
 
   repositories {
     if ("$System.env.JENKINS_URL" == 'https://jenkins.pegasys.tech/') {
+      maven { url "https://nexus.int.pegasys.tech/repository/consensys-pegasys/" }
       maven { url "https://nexus.int.pegasys.tech/repository/jcenter/" }
     } else {
       jcenter()
@@ -163,8 +164,9 @@ allprojects {
       check('ImmutableEnumChecker', CheckSeverity.OFF)
       // This is a style check instead of an error-prone pattern.
       check('UnnecessaryParentheses', CheckSeverity.OFF)
+      // Lazy impl causes excess CPU usage O(n) of non-final fiield when it should be O(1).
+      check('FieldCanBeFinal', CheckSeverity.OFF)
 
-      check('FieldCanBeFinal', CheckSeverity.WARN)
       check('InsecureCryptoUsage', CheckSeverity.WARN)
       check('WildcardImport', CheckSeverity.WARN)
     }
@@ -372,10 +374,10 @@ distZip {
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
-  additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
-  sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
-  classDirectories = files(subprojects.sourceSets.main.output)
-  executionData = files(subprojects.jacocoTestReport.executionData)  //how to exclude some package/classes com.test.**
+  additionalSourceDirs.from files(subprojects.sourceSets.main.allSource.srcDirs)
+  sourceDirectories.from files(subprojects.sourceSets.main.allSource.srcDirs)
+  classDirectories.from files(subprojects.sourceSets.main.output)
+  executionData.from files(subprojects.jacocoTestReport.executionData) //how to exclude some package/classes com.test.**
   reports {
     xml.enabled true
     csv.enabled true

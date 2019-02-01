@@ -12,7 +12,8 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
+@FunctionalInterface
 public interface Transaction<T> {
 
-  T execute(final PantheonWeb3j node);
+  T execute(final JsonRequestFactories node);
 }

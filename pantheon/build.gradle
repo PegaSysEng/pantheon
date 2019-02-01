@@ -40,6 +40,7 @@ dependencies {
   implementation project(':ethereum:p2p')
   implementation project(':ethereum:rlp')
   implementation project(':metrics')
+  implementation project(':orion')
   implementation project(':services:kvstore')
 
   implementation 'com.google.guava:guava'
@@ -48,6 +49,7 @@ dependencies {
   implementation 'io.vertx:vertx-web'
   implementation 'net.consensys.cava:cava-toml'
   implementation 'org.apache.logging.log4j:log4j-api'
+  implementation 'org.springframework.security:spring-security-crypto'
 
   runtime 'org.apache.logging.log4j:log4j-core'
 

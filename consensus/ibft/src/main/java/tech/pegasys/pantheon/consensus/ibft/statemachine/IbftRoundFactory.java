@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -24,22 +25,22 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.Subscribers;
 
 public class IbftRoundFactory {
-
   private final IbftFinalState finalState;
-
   private final IbftBlockCreatorFactory blockCreatorFactory;
   private final ProtocolContext<IbftContext> protocolContext;
   private final ProtocolSchedule<IbftContext> protocolSchedule;
-  private final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
+  private final Subscribers<MinedBlockObserver> minedBlockObservers;
 
   public IbftRoundFactory(
       final IbftFinalState finalState,
       final ProtocolContext<IbftContext> protocolContext,
-      final ProtocolSchedule<IbftContext> protocolSchedule) {
+      final ProtocolSchedule<IbftContext> protocolSchedule,
+      final Subscribers<MinedBlockObserver> minedBlockObservers) {
     this.finalState = finalState;
     this.blockCreatorFactory = finalState.getBlockCreatorFactory();
     this.protocolContext = protocolContext;
     this.protocolSchedule = protocolSchedule;
+    this.minedBlockObservers = minedBlockObservers;
   }
 
   public IbftRound createNewRound(final BlockHeader parentHeader, final int round) {
@@ -47,15 +48,18 @@ public class IbftRoundFactory {
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(nextBlockHeight, round);
 
+    BlockValidator<IbftContext> blockValidator =
+        protocolSchedule.getByBlockNumber(nextBlockHeight).getBlockValidator();
+
     final RoundState roundState =
         new RoundState(
             roundIdentifier,
-            finalState.getQuorumSize(),
+            finalState.getQuorum(),
             new MessageValidator(
                 finalState.getValidators(),
                 finalState.getProposerForRound(roundIdentifier),
                 roundIdentifier,
-                finalState.getBlockHeaderValidator(),
+                blockValidator,
                 protocolContext,
                 parentHeader));
 

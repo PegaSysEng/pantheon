@@ -13,17 +13,20 @@
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPreparedCertificate;
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.NewRoundPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorForHeightFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -38,19 +41,19 @@ public class NewRoundMessageValidator {
   private final Collection<Address> validators;
   private final ProposerSelector proposerSelector;
   private final MessageValidatorForHeightFactory messageValidatorFactory;
-  private final long quorumSize;
+  private final long quorum;
   private final long chainHeight;
 
   public NewRoundMessageValidator(
       final Collection<Address> validators,
       final ProposerSelector proposerSelector,
       final MessageValidatorForHeightFactory messageValidatorFactory,
-      final long quorumSize,
+      final long quorum,
       final long chainHeight) {
     this.validators = validators;
     this.proposerSelector = proposerSelector;
     this.messageValidatorFactory = messageValidatorFactory;
-    this.quorumSize = quorumSize;
+    this.quorum = quorum;
     this.chainHeight = chainHeight;
   }
 
@@ -61,7 +64,7 @@ public class NewRoundMessageValidator {
     final Address expectedProposer = proposerSelector.selectProposerForRound(rootRoundIdentifier);
     final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
 
-    if (!expectedProposer.equals(msg.getSender())) {
+    if (!expectedProposer.equals(msg.getAuthor())) {
       LOG.info("Invalid NewRound message, did not originate from expected proposer.");
       return false;
     }
@@ -76,15 +79,11 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    final SignedData<ProposalPayload> proposalMessage = payload.getProposalPayload();
-
-    if (!msg.getSender().equals(proposalMessage.getSender())) {
-      LOG.info("Invalid NewRound message, embedded Proposal message not signed by sender.");
-      return false;
-    }
-
-    if (!proposalMessage.getPayload().getRoundIdentifier().equals(rootRoundIdentifier)) {
-      LOG.info("Invalid NewRound message, embedded Proposal has mismatched round.");
+    final SignedData<ProposalPayload> proposalPayload = payload.getProposalPayload();
+    final MessageValidator proposalValidator =
+        messageValidatorFactory.createAt(rootRoundIdentifier);
+    if (!proposalValidator.addSignedProposalPayload(proposalPayload)) {
+      LOG.info("Invalid NewRound message, embedded proposal failed validation");
       return false;
     }
 
@@ -102,7 +101,7 @@ public class NewRoundMessageValidator {
     final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
         roundChangeCert.getRoundChangePayloads();
 
-    if (roundChangeMsgs.size() < quorumSize) {
+    if (roundChangeMsgs.size() < quorum) {
       LOG.info(
           "Invalid NewRound message, RoundChange certificate has insufficient "
               + "RoundChange messages.");
@@ -123,7 +122,10 @@ public class NewRoundMessageValidator {
         roundChangeCert.getRoundChangePayloads()) {
       final RoundChangeMessageValidator roundChangeValidator =
           new RoundChangeMessageValidator(
-              messageValidatorFactory, validators, quorumSize, chainHeight);
+              messageValidatorFactory,
+              validators,
+              prepareMessageCountForQuorum(quorum),
+              chainHeight);
 
       if (!roundChangeValidator.validateMessage(roundChangeMsg)) {
         LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");
@@ -148,13 +150,22 @@ public class NewRoundMessageValidator {
           "No round change messages have a preparedCertificate, any valid block may be proposed.");
       return true;
     }
-    if (!latestPreparedCertificate
-        .get()
-        .getProposalPayload()
-        .getPayload()
-        .getBlock()
-        .getHash()
-        .equals(payload.getProposalPayload().getPayload().getBlock().getHash())) {
+
+    // Get the hash of the block in latest prepareCert, not including the Round field.
+    final Hash roundAgnosticBlockHashPreparedCert =
+        IbftBlockHashing.calculateHashOfIbftBlockOnChain(
+            latestPreparedCertificate
+                .get()
+                .getProposalPayload()
+                .getPayload()
+                .getBlock()
+                .getHeader());
+
+    final Hash roundAgnosticBlockHashProposal =
+        IbftBlockHashing.calculateHashOfIbftBlockOnChain(
+            payload.getProposalPayload().getPayload().getBlock().getHeader());
+
+    if (!roundAgnosticBlockHashPreparedCert.equals(roundAgnosticBlockHashProposal)) {
       LOG.info(
           "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
       return false;

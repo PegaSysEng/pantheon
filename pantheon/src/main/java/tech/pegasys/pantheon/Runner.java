@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketService;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,9 +40,9 @@ public class Runner implements AutoCloseable {
   private final ExecutorService exec = Executors.newCachedThreadPool();
 
   private final NetworkRunner networkRunner;
-
   private final Optional<JsonRpcHttpService> jsonRpc;
   private final Optional<WebSocketService> websocketRpc;
+  private final Optional<MetricsService> metrics;
 
   private final PantheonController<?> pantheonController;
   private final Path dataDir;
@@ -51,12 +52,14 @@ public class Runner implements AutoCloseable {
       final NetworkRunner networkRunner,
       final Optional<JsonRpcHttpService> jsonRpc,
       final Optional<WebSocketService> websocketRpc,
+      final Optional<MetricsService> metrics,
       final PantheonController<?> pantheonController,
       final Path dataDir) {
     this.vertx = vertx;
     this.networkRunner = networkRunner;
     this.jsonRpc = jsonRpc;
     this.websocketRpc = websocketRpc;
+    this.metrics = metrics;
     this.pantheonController = pantheonController;
     this.dataDir = dataDir;
   }
@@ -65,9 +68,12 @@ public class Runner implements AutoCloseable {
     try {
       LOG.info("Starting Ethereum main loop ... ");
       networkRunner.start();
-      pantheonController.getSynchronizer().start();
+      if (networkRunner.getNetwork().isP2pEnabled()) {
+        pantheonController.getSynchronizer().start();
+      }
       jsonRpc.ifPresent(service -> service.start().join());
       websocketRpc.ifPresent(service -> service.start().join());
+      metrics.ifPresent(service -> service.start().join());
       LOG.info("Ethereum main loop is up.");
       writePantheonPortsToFile();
       networkRunner.awaitStop();
@@ -84,10 +90,12 @@ public class Runner implements AutoCloseable {
   public void close() throws Exception {
     networkRunner.stop();
     networkRunner.awaitStop();
+
     exec.shutdown();
     try {
       jsonRpc.ifPresent(service -> service.stop().join());
       websocketRpc.ifPresent(service -> service.stop().join());
+      metrics.ifPresent(service -> service.stop().join());
     } finally {
       try {
         exec.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
@@ -103,15 +111,20 @@ public class Runner implements AutoCloseable {
 
   private void writePantheonPortsToFile() {
     final Properties properties = new Properties();
+
     if (networkRunner.getNetwork().isListening()) {
       properties.setProperty("discovery", String.valueOf(getP2pUdpPort()));
       properties.setProperty("p2p", String.valueOf(getP2pTcpPort()));
     }
+
     if (getJsonRpcPort().isPresent()) {
       properties.setProperty("json-rpc", String.valueOf(getJsonRpcPort().get()));
     }
     if (getWebsocketPort().isPresent()) {
       properties.setProperty("ws-rpc", String.valueOf(getWebsocketPort().get()));
+    }
+    if (getMetricsPort().isPresent()) {
+      properties.setProperty("metrics", String.valueOf(getMetricsPort().get()));
     }
 
     final File portsFile = new File(dataDir.toFile(), "pantheon.ports");
@@ -134,11 +147,19 @@ public class Runner implements AutoCloseable {
     return websocketRpc.map(service -> service.socketAddress().getPort());
   }
 
+  public Optional<Integer> getMetricsPort() {
+    if (metrics.isPresent()) {
+      return metrics.get().getPort();
+    } else {
+      return Optional.empty();
+    }
+  }
+
   public int getP2pUdpPort() {
     return networkRunner.getNetwork().getDiscoverySocketAddress().getPort();
   }
 
   public int getP2pTcpPort() {
-    return networkRunner.getNetwork().getSelf().getPort();
+    return networkRunner.getNetwork().getLocalPeerInfo().getPort();
   }
 }

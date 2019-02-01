@@ -10,6 +10,53 @@ The following lists the Pantheon JSON-RPC API commands:
 
 ## Admin Methods
 
+!!! note
+    The `ADMIN` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `ADMIN` API methods.
+
+### admin_addPeer
+
+Adds a node to the list of tracked static nodes. The node attempts to maintain connectivity to tracked static nodes.
+If the remote connection goes down, the node attempts to reconnect every 60 seconds. 
+
+**Parameters**
+
+`string` : Enode of peer to add
+
+The enode is `enode://<id>@<host:port>` where:
+             
+* `<id>` is the node public key excluding the initial 0x. 
+* `<host:port>` is the host and port the node is listening on for P2P peer discovery. 
+   Specified by the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and 
+   [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options.
+             
+!!! example
+    If the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) or [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options are not specified and the node public key is `0xc35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f`            
+    The enode URL is:
+    `enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303` 
+ 
+
+**Returns**
+
+`result` : `boolean` - `true` if peer added or `false` if peer already on list of static nodes. 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": true
+    }
+    ```
+
 ### admin_peers
 
 Returns networking information about connected remote nodes. 
@@ -280,9 +327,6 @@ None
 
 Returns the [chain ID](../Configuring-Pantheon/NetworkID-And-ChainID.md).
 
-!!!note
-    This method is only available from v0.8.2. 
-
 **Parameters**
 
 None
@@ -317,7 +361,7 @@ You can get the Ethereum account address from a client such as MetaMask or Ether
 
 !!!example
     ```bash
-    $ bin/pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-enabled
+    pantheon --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73" --rpc-http-enabled
     ```
 
 **Parameters**
@@ -371,6 +415,35 @@ None
       "jsonrpc" : "2.0",
       "id" : 53,
       "result" : true
+    }
+    ```
+
+### eth_hashrate
+
+Returns the number of hashes per second with which the node is mining. 
+
+**Parameters**
+
+None
+
+**Returns**
+
+`result` : `quantity` - Number of hashes per second
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_hashrate","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"eth_hashrate","params":[],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x12b"
     }
     ```
 
@@ -711,33 +784,35 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 ### eth_sendRawTransaction
 
-Sends a signed transaction. A transaction can send ether, deploy a contract, or interact with a contract.  
+Sends a [signed transaction](../Using-Pantheon/Transactions.md). A transaction can send ether, deploy a contract, or interact with a contract.  
 
 You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
-To avoid exposing your private key, create signed transactions offline and send the signed transaction data using this method. For information on creating signed transactions and using `eth_sendRawTransaction`, refer to [Using Pantheon](../Using-Pantheon/Transactions.md).  
+To avoid exposing your private key, create signed transactions offline and send the signed transaction data using `eth_sendRawTransaction`. 
 
 !!!important
     Pantheon does not implement [eth_sendTransaction](Using-JSON-RPC-API.md#account-management).
 
 **Parameters**
 
-`DATA` - Hash of the signed raw transaction in hexadecimal format; for example:
+`data` -  Signed transaction serialized to hexadecimal format. For example:
 
-`params: ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]`
+`params: ["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"]`
 
+!!! note
+    [Creating and Sending Transactions](../Using-Pantheon/Transactions.md) includes examples of creating signed transactions using the [web3.js](https://github.com/ethereum/web3.js/) library.
 
 **Returns**
 
-`result` : `DATA` - 32-byte transaction hash, or zero hash if the transaction is not yet available.
+`result` : `data` - 32-byte transaction hash
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}' <JSON-RPC-http-endpoint:port>
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}' <JSON-RPC-http-endpoint:port>
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"],"id":1}
+    {"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -783,37 +858,75 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 ### eth_estimateGas
 
-Generates and returns an estimate of how much gas is necessary to allow the transaction to complete. (Per Etherscan: gas price * gas used.) The transaction is added to the blockchain. The estimate may be significantly more than the amount of gas actually used by the transaction for reasons including EVM mechanics and node performance.
+Returns an estimate of how much gas is needed for a transaction to complete. The estimation process does not use
+gas and the transaction is not added to the blockchain. The resulting estimate can be greater than the amount of
+gas that the transaction actually uses, for various reasons including EVM mechanics and node performance.
+
+The `eth_estimateGas` call does not send a transaction. You must make a subsequent call to
+[eth_sendRawTransaction](#eth_sendrawtransaction) to execute the transaction.
 
 **Parameters**
 
-!!!note
-    Parameters are the same as the eth_call parameters, except that all properties are optional. If you do not specify a `gas` limit, Pantheon uses the gas limit from the pending block as an upper bound. As a result, the returned estimate might not be enough to execute the call or transaction when the amount of gas is higher than the pending block's gas limit.
+The transaction call object parameters are the same as those for [eth_call](#eth_call), except that in `eth_estimateGas`,
+all fields are optional. Setting a gas limit is irrelevant to the estimation process (unlike transactions, in which gas
+limits apply).
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
-*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
-
 **Returns**
 
-`result` (*QUANTITY*) -  Amount of gas used.
+`result` : `quantity` -  Amount of gas used.
+
+The following example returns an estimate of 21000 wei (0x5208) for the transaction.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0x687422eea2cb73b5d3e242ba5456b782919afc85","to":"0xdd37f65db31c107f773e82a4f85c693058fef7a9","value":"0x1"}],"id":53}' <JSON-RPC-http-endpoint:port>
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73","to":"0x44Aa93095D6749A706051658B970b941c72c1D53","value":"0x1"}],"id":53}' <JSON-RPC-endpoint:port>
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0x687422eea2cb73b5d3e242ba5456b782919afc85","to":"0xdd37f65db31c107f773e82a4f85c693058fef7a9","value":"0x1"}],"id":53}
+    {"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73","to":"0x44Aa93095D6749A706051658B970b941c72c1D53","value":"0x1"}],"id":53}
     ```
     
     ```json tab="JSON result"
     {
       "jsonrpc" : "2.0",
-      "id" : 54,
+      "id" : 53,
       "result" : "0x5208"
     }
     ```
+
+The following example request estimates the cost of deploying a simple storage smart contract to the network. The data field
+contains the hash of the compiled contract to be deployed. (You can obtain the compiled contract hash from your IDE;
+for example, **Remix > Compile tab > details > WEB3DEPLOY**.) The result is 113355 wei.
+
+**Returns**
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST \
+        http://localhost:8545 \
+        -H 'Content-Type: application/json' \
+        -d '{
+          "jsonrpc": "2.0",
+          "method": "eth_estimateGas",
+          "params": [{
+            "from": "0x8bad598904ec5d93d07e204a366d084a80c7694e",
+            "data": "0x608060405234801561001057600080fd5b5060e38061001f6000396000f3fe6080604052600436106043576000357c0100000000000000000000000000000000000000000000000000000000900480633fa4f24514604857806355241077146070575b600080fd5b348015605357600080fd5b50605a60a7565b6040518082815260200191505060405180910390f35b348015607b57600080fd5b5060a560048036036020811015609057600080fd5b810190808035906020019092919050505060ad565b005b60005481565b806000819055505056fea165627a7a7230582020d7ad478b98b85ca751c924ef66bcebbbd8072b93031073ef35270a4c42f0080029"
+          }],
+          "id": 1
+        }'
+    ```
+
+!!! example
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x1bacb"
+    }
+    ```
+
 
 ### eth_getBlockByHash
 
@@ -1102,19 +1215,11 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 ### eth_newFilter
 
-Creates a logs filter to log state changes. To poll for state changes, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a [log filter](../Using-Pantheon/Events-and-Logs.md). To poll for logs associated with the created filter, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
 `Object` - [Filter options object](JSON-RPC-API-Objects.md#filter-options-object). 
-
-Topics are order-dependent. A transaction with a log containing topics `[A, B]` would be matched with the following topic filters:
-
-    * [] - Match any topic
-    * [A] - Match A in first position (and any topic thereafter)
-    * [null, B] - Match any topic in first position AND B in second position (and any topic thereafter)
-    * [A, B] - Match A in first position AND B in second position (and any topic thereafter)
-    * [[A, B], [A, B]] - Match (A OR B) in first position AND (A OR B) in second position (and any topic thereafter)
 
 !!!note
     `fromBlock` and `toBlock` in the filter options object default to `latest`. To obtain logs using `eth_getFilterLogs`, set `fromBlock` and `toBlock` appropriately.
@@ -1142,7 +1247,7 @@ Topics are order-dependent. A transaction with a log containing topics `[A, B]` 
     
 ### eth_newBlockFilter
 
-Creates a filter to log when a new block arrives. To poll for new blocks, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a filter to retrieve new block hashes. To poll for new blocks, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
@@ -1171,7 +1276,7 @@ None
 
 ### eth_newPendingTransactionFilter
 
-Creates a filter to log when new pending transactions arrive. To poll for new pending transactions, use [eth_getFilterChanges](#eth_getfilterchanges).
+Creates a filter to retrieve new pending transactions hashes. To poll for new pending transactions, use [eth_getFilterChanges](#eth_getfilterchanges).
 
 **Parameters**
 
@@ -1202,7 +1307,7 @@ None
 
 Uninstalls a filter with the specified ID. When a filter is no longer required, call this method.
 
-Filters time out when they are not requested by [eth_getFilterChanges](#eth_getfilterchanges) for a period of time.
+Filters time out when not requested by [eth_getFilterChanges](#eth_getfilterchanges) for 10 minutes.
 
 **Parameters**
 
@@ -1241,7 +1346,7 @@ Polls the specified filter and returns an array of changes that have occurred si
 
 **Returns**
 
-`result` : `Array of Object` - If nothing has changed since the last poll, an empty list. Otherwise:
+`result` : `Array of Object` - If nothing changed since the last poll, an empty list. Otherwise:
 
 * For filters created with `eth_newBlockFilter`, returns block hashes.
 * For filters created with `eth_newPendingTransactionFilter`, returns transaction hashes.
@@ -1320,12 +1425,12 @@ Polls the specified filter and returns an array of changes that have occurred si
 
 ### eth_getFilterLogs
 
-Returns an array of logs for the specified filter.
+Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) for the specified filter.
 
 !!!note
      `eth_getFilterLogs` is only used for filters created with `eth_newFilter`. 
       
-      You can use `eth_getLogs` to specify a filter object and get logs without without creating a filter.
+      You can use `eth_getLogs` to specify a filter object and get logs without creating a filter.
 
 **Parameters**
 
@@ -1375,7 +1480,7 @@ Returns an array of logs for the specified filter.
 
 ### eth_getLogs
 
-Returns an array of logs matching a specified filter object.
+Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) matching a specified filter object.
 
 **Parameters**
 
@@ -1463,6 +1568,10 @@ None
 
 
 ## Clique Methods
+
+!!! note
+    The `CLIQUE` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `CLIQUE` API methods.
 
 ### clique_discard
 
@@ -1617,6 +1726,10 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
     ```
 
 ## Debug Methods
+
+!!! note
+    The `DEBUG` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `DEBUG` API methods.
 
 ### debug_metrics
 
@@ -1801,6 +1914,10 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 ## Miner Methods
 
+!!! note
+    The `MINER` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `MINER` API methods.
+
 ### miner_start
 
 Starts the CPU mining process. To start mining, a miner coinbase must have been previously specified using the [`--miner-coinbase`](../Reference/Pantheon-CLI-Syntax.md#miner-coinbase) command line option.  
@@ -1859,6 +1976,175 @@ None
     }
     ```
 
-## ibft Methods
+## IBFT 2.0 Methods 
 
-:construction: IBFT is not currently supported. Support for IBFT is in active development. 
+!!! note 
+    IBFT 2.0 is under development and will be available in v1.0. 
+
+!!! note
+    The `IBFT` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `IBFT` API methods.
+
+### ibft_discardValidatorVote
+
+Discards a proposal to [add or remove a validator](../Consensus-Protocols/IBFT.md#adding-and-removing-validators) with the specified address. 
+
+**Parameters** 
+
+`data` - 20-byte address of proposed validator 
+
+**Returns** 
+
+`result: boolean` - `true`
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xef1bfb6a12794615c9b0b5a21e6741f01e570185"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xef1bfb6a12794615c9b0b5a21e6741f01e570185"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : true
+    }
+    ```
+
+### ibft_getPendingVotes
+
+Returns [current votes](../Consensus-Protocols/IBFT.md#adding-and-removing-validators). 
+
+**Parameters**
+
+None
+
+**Returns** 
+
+`result`: `object` - Map of account addresses to corresponding boolean values indicating the vote for each account. 
+
+If the boolean value is `true`, the vote is to add a validator. If `false`, the proposal is to remove a validator. 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "0xef1bfb6a12794615c9b0b5a21e6741f01e570185": true,
+            "0x42d4287eac8078828cf5f3486cfe601a275a49a5": true
+        }
+    }
+    ```
+    
+### ibft_getValidatorsByBlockHash
+
+Lists the validators defined in the specified block.
+
+**Parameters**
+
+`data` - 32-byte block hash 
+
+**Returns** 
+
+`result: array of data` - List of validator addresses
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0xbae7d3feafd743343b9a4c578cab5e5d65eb735f6855fb845c00cab356331256"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0xbae7d3feafd743343b9a4c578cab5e5d65eb735f6855fb845c00cab356331256"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            "0x42d4287eac8078828cf5f3486cfe601a275a49a5",
+            "0xb1b2bc9582d2901afdc579f528a35ca41403fa85",
+            "0xef1bfb6a12794615c9b0b5a21e6741f01e570185"
+        ]
+    }
+    ```
+
+### ibft_getValidatorsByBlockNumber
+
+Lists the validators defined in the specified block. 
+
+**Parameters** 
+
+`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter). 
+
+**Returns**
+
+`result: array of data` - List of validator addresses 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            "0x42d4287eac8078828cf5f3486cfe601a275a49a5",
+            "0xb1b2bc9582d2901afdc579f528a35ca41403fa85",
+            "0xef1bfb6a12794615c9b0b5a21e6741f01e570185"
+        ]
+    }
+    ```
+    
+### ibft_proposeValidatorVote
+
+Proposes [adding or removing a validator](../Consensus-Protocols/IBFT.md#adding-and-removing-validators)) with the specified address. 
+
+**Parameters**
+
+`data` - Account address
+ 
+`boolean` -  `true` to propose adding validator or `false` to propose removing validator. 
+
+**Returns** 
+
+`result: boolean` - `true`
+   
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["42d4287eac8078828cf5f3486cfe601a275a49a5",true], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["42d4287eac8078828cf5f3486cfe601a275a49a5",true], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+     "jsonrpc" : "2.0",
+     "id" : 1,
+     "result" : true
+    }
+    ```
+
+## Permissioning Methods
+
+Permissioning is under development and will be available in v1.0. 

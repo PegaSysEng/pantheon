@@ -14,6 +14,9 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyCalculators;
+import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 
 import java.util.function.Function;
 
@@ -23,7 +26,8 @@ public class MainnetProtocolSchedule {
   public static final int DEFAULT_CHAIN_ID = 1;
 
   public static ProtocolSchedule<Void> create() {
-    return fromConfig(GenesisConfigFile.mainnet().getConfigOptions());
+    return fromConfig(
+        GenesisConfigFile.mainnet().getConfigOptions(), PrivacyParameters.noPrivacy());
   }
 
   /**
@@ -31,10 +35,16 @@ public class MainnetProtocolSchedule {
    *
    * @param config {@link GenesisConfigOptions} containing the config options for the milestone
    *     starting points
+   * @param privacyParameters the parameters set for private transactions
    * @return A configured mainnet protocol schedule
    */
-  public static ProtocolSchedule<Void> fromConfig(final GenesisConfigOptions config) {
-    return new ProtocolScheduleBuilder<>(config, DEFAULT_CHAIN_ID, Function.identity())
+  public static ProtocolSchedule<Void> fromConfig(
+      final GenesisConfigOptions config, final PrivacyParameters privacyParameters) {
+    if (FixedDifficultyCalculators.isFixedDifficultyInConfig(config)) {
+      return FixedDifficultyProtocolSchedule.create(config, privacyParameters);
+    }
+    return new ProtocolScheduleBuilder<>(
+            config, DEFAULT_CHAIN_ID, Function.identity(), privacyParameters)
         .createProtocolSchedule();
   }
 }

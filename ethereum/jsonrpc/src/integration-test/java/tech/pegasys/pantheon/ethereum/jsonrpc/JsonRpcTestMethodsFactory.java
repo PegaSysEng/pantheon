@@ -24,7 +24,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterRepository;
@@ -35,6 +34,9 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
@@ -78,6 +80,10 @@ public class JsonRpcTestMethodsFactory {
             blockchainQueries, transactionPool, new FilterIdGenerator(), new FilterRepository());
     final EthHashMiningCoordinator miningCoordinator = mock(EthHashMiningCoordinator.class);
     final MetricsSystem metricsSystem = new NoOpMetricsSystem();
+    final AccountWhitelistController accountWhitelistController =
+        mock(AccountWhitelistController.class);
+    final PrivateTransactionHandler privateTransactionHandler =
+        mock(PrivateTransactionHandler.class);
 
     return new JsonRpcMethodsFactory()
         .methods(
@@ -91,6 +97,8 @@ public class JsonRpcTestMethodsFactory {
             miningCoordinator,
             metricsSystem,
             new HashSet<>(),
-            RpcApis.DEFAULT_JSON_RPC_APIS);
+            accountWhitelistController,
+            RpcApis.DEFAULT_JSON_RPC_APIS,
+            privateTransactionHandler);
   }
 }

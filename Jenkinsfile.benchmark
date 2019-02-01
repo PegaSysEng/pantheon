@@ -1,0 +1,49 @@
+properties([
+        parameters([
+                string(name: 'BENCHMARK_GITHUB_ORG', defaultValue: 'PegaSysEng', description: 'The user or org from which to checkout the benchmark repo', trim: true),
+                string(name: 'BENCHMARK_REPO', defaultValue: 'pantheon-benchmark', description: 'The benchmark repo to be checked out', trim: true),
+                string(name: 'BENCHMARK_BRANCH', defaultValue: 'master', description: 'The benchmark branch to be checked out', trim: true),
+                choice(name: 'NETWORK', choices: ['ropsten', 'mainnet'], description: 'The name of the network being tested', trim: true),
+                choice(name: 'DATASET', choices: ['from-0-by-100k', 'from-0-to-1m', 'from-0', 'from-6784589'], description: 'Ropsten: choose from-0-by-100k or from-0-to-1m, Mainnet choose from-0 or from-from-6784589', trim: true),
+                choice(name: 'IMPORT_FILE', choices: ['ropsten-000k-100k.blocks', 'ropsten-0-1M.blocks', '0-999.blocks', '6784590-6785589.blocks'], description: 'The name of the file to import, same ordial position as DATASET', trim: true)
+        ])
+])
+
+pipeline {
+    agent {
+        docker {
+            image "pantheon-benchmarks/${params.NETWORK}-${params.DATASET}-pantheon:latest"
+            label 'jenkins-benchmark-1'
+            args '-v /benchmarks/block-import:/benchmarks-data'
+        }
+    }
+
+    stages {
+        stage('Pull pantheon-benchmark') {
+            steps {
+                script {
+                    // because of JENKINS-28447 we can't rely on late eval
+                    def URL = 'git@github.com:' + params.BENCHMARK_GITHUB_ORG + '/' + params.BENCHMARK_REPO + '.git'
+                    def branch = '*/' + params.BENCHMARK_BRANCH
+                    checkout([$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pantheon-benchmarks']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'f3f67c22-eead-47db-a8c1-fe32b483583a', url: URL]]])
+                }
+            }
+        }
+        stage('Run benchmarks jenkinsfile') {
+            steps {
+                withEnv([
+                        "DATA_DIR=/data",
+                        "BENCHMARKS_DATA=/benchmarks-data",
+                        "PANTHEON_SRC_DIR=${WORKSPACE}",
+                        "DESCRIPTION=automatic"
+                ]) {
+                    dir('pantheon-benchmarks') {
+                        script {
+                            evaluate(readFile('jenkins/Jenkinsfile.pantheon-block-import'))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

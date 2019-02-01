@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -47,7 +48,8 @@ public interface PantheonController<C> extends Closeable {
       final int networkId,
       final MiningParameters miningParameters,
       final KeyPair nodeKeys,
-      final MetricsSystem metricsSystem) {
+      final MetricsSystem metricsSystem,
+      final PrivacyParameters privacyParameters) {
 
     final GenesisConfigOptions configOptions = genesisConfigFile.getConfigOptions();
 
@@ -55,11 +57,12 @@ public interface PantheonController<C> extends Closeable {
       return MainnetPantheonController.init(
           storageProvider,
           genesisConfigFile,
-          MainnetProtocolSchedule.fromConfig(configOptions),
+          MainnetProtocolSchedule.fromConfig(configOptions, privacyParameters),
           syncConfig,
           miningParameters,
           nodeKeys,
-          metricsSystem);
+          metricsSystem,
+          privacyParameters);
     } else if (configOptions.isRevisedIbft()) {
       return IbftPantheonController.init(
           storageProvider,
@@ -105,6 +108,8 @@ public interface PantheonController<C> extends Closeable {
   TransactionPool getTransactionPool();
 
   MiningCoordinator getMiningCoordinator();
+
+  PrivacyParameters getPrivacyParameters();
 
   default Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
       final Collection<RpcApi> enabledRpcApis) {

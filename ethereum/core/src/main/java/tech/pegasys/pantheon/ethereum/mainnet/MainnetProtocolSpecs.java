@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
+import tech.pegasys.pantheon.ethereum.MainnetBlockValidator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -87,6 +88,7 @@ public abstract class MainnetProtocolSpecs {
         .transactionReceiptFactory(MainnetProtocolSpecs::frontierTransactionReceiptFactory)
         .blockReward(FRONTIER_BLOCK_REWARD)
         .blockProcessorBuilder(MainnetBlockProcessor::new)
+        .blockValidatorBuilder(MainnetBlockValidator::new)
         .blockImporterBuilder(MainnetBlockImporter::new)
         .transactionReceiptType(TransactionReceiptType.ROOT)
         .blockHashFunction(MainnetBlockHashFunction::createHash)
@@ -189,6 +191,12 @@ public abstract class MainnetProtocolSpecs {
         .evmBuilder(MainnetEvmRegistries::constantinople)
         .blockReward(CONSTANTINOPLE_BLOCK_REWARD)
         .name("Constantinople");
+  }
+
+  public static ProtocolSpecBuilder<Void> constantinopleFixDefinition(final int chainId) {
+    return constantinopleDefinition(chainId)
+        .gasCalculator(ConstantinopleFixGasCalculator::new)
+        .name("ConstantinopleFix");
   }
 
   private static TransactionReceipt frontierTransactionReceiptFactory(

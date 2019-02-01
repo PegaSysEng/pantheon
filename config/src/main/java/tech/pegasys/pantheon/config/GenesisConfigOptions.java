@@ -31,6 +31,8 @@ public interface GenesisConfigOptions {
 
   IbftConfigOptions getRevisedIbftConfigOptions();
 
+  EthashConfigOptions getEthashConfigOptions();
+
   OptionalLong getHomesteadBlockNumber();
 
   OptionalLong getDaoForkBlock();
@@ -42,6 +44,8 @@ public interface GenesisConfigOptions {
   OptionalLong getByzantiumBlockNumber();
 
   OptionalLong getConstantinopleBlockNumber();
+
+  OptionalLong getConstantinopleFixBlockNumber();
 
   OptionalInt getChainId();
 }

@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.BlockTestUtil;
@@ -55,10 +56,12 @@ public final class BlockImporterTest {
             1,
             new MiningParametersTestBuilder().enabled(false).build(),
             KeyPair.generate(),
-            new NoOpMetricsSystem());
+            new NoOpMetricsSystem(),
+            PrivacyParameters.noPrivacy());
     final BlockImporter.ImportResult result =
         blockImporter.importBlockchain(source, targetController);
-    assertThat(result.count).isEqualTo(1000);
+    // Don't count the Genesis block
+    assertThat(result.count).isEqualTo(999);
     assertThat(result.td).isEqualTo(UInt256.of(21991996248790L));
   }
 
@@ -87,9 +90,11 @@ public final class BlockImporterTest {
             10,
             new MiningParametersTestBuilder().enabled(false).build(),
             KeyPair.generate(),
-            new NoOpMetricsSystem());
+            new NoOpMetricsSystem(),
+            PrivacyParameters.noPrivacy());
     final BlockImporter.ImportResult result = blockImporter.importBlockchain(source, controller);
 
-    assertThat(result.count).isEqualTo(959);
+    // Don't count the Genesis block
+    assertThat(result.count).isEqualTo(958);
   }
 }

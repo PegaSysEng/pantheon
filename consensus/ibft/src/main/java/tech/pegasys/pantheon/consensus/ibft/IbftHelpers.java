@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -32,6 +32,10 @@ public class IbftHelpers {
 
   public static int calculateRequiredValidatorQuorum(final int validatorCount) {
     return Util.fastDivCeiling(2 * validatorCount, 3);
+  }
+
+  public static long prepareMessageCountForQuorum(final long quorum) {
+    return quorum - 1;
   }
 
   public static Block createSealedBlock(

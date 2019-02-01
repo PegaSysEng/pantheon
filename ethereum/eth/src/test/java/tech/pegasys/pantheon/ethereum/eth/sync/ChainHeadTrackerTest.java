@@ -18,7 +18,8 @@ import static org.mockito.Mockito.mock;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.development.DevelopmentProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.manager.ChainState;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -36,7 +37,7 @@ public class ChainHeadTrackerTest {
   private final BlockchainSetupUtil<Void> blockchainSetupUtil = BlockchainSetupUtil.forTesting();
   private final MutableBlockchain blockchain = blockchainSetupUtil.getBlockchain();
   private final EthProtocolManager ethProtocolManager =
-      EthProtocolManagerTestUtil.create(blockchain);
+      EthProtocolManagerTestUtil.create(blockchain, blockchainSetupUtil.getWorldArchive());
   private final RespondingEthPeer respondingPeer =
       RespondingEthPeer.create(
           ethProtocolManager,
@@ -44,7 +45,9 @@ public class ChainHeadTrackerTest {
           blockchain.getChainHead().getTotalDifficulty(),
           0);
   private final ProtocolSchedule<Void> protocolSchedule =
-      DevelopmentProtocolSchedule.create(GenesisConfigFile.DEFAULT.getConfigOptions());
+      FixedDifficultyProtocolSchedule.create(
+          GenesisConfigFile.development().getConfigOptions(), PrivacyParameters.noPrivacy());
+
   private final TrailingPeerLimiter trailingPeerLimiter = mock(TrailingPeerLimiter.class);
   private final ChainHeadTracker chainHeadTracker =
       new ChainHeadTracker(
@@ -56,7 +59,8 @@ public class ChainHeadTrackerTest {
   @Test
   public void shouldRequestHeaderChainHeadWhenNewPeerConnects() {
     final Responder responder =
-        RespondingEthPeer.blockchainResponder(blockchainSetupUtil.getBlockchain());
+        RespondingEthPeer.blockchainResponder(
+            blockchainSetupUtil.getBlockchain(), blockchainSetupUtil.getWorldArchive());
     chainHeadTracker.onPeerConnected(respondingPeer.getEthPeer());
 
     assertThat(chainHeadState().getEstimatedHeight()).isZero();
@@ -70,7 +74,8 @@ public class ChainHeadTrackerTest {
   @Test
   public void shouldIgnoreHeadersIfChainHeadHasAlreadyBeenUpdatedWhileWaiting() {
     final Responder responder =
-        RespondingEthPeer.blockchainResponder(blockchainSetupUtil.getBlockchain());
+        RespondingEthPeer.blockchainResponder(
+            blockchainSetupUtil.getBlockchain(), blockchainSetupUtil.getWorldArchive());
     chainHeadTracker.onPeerConnected(respondingPeer.getEthPeer());
 
     // Change the hash of the current known head
@@ -84,7 +89,8 @@ public class ChainHeadTrackerTest {
   @Test
   public void shouldCheckTrialingPeerLimits() {
     final Responder responder =
-        RespondingEthPeer.blockchainResponder(blockchainSetupUtil.getBlockchain());
+        RespondingEthPeer.blockchainResponder(
+            blockchainSetupUtil.getBlockchain(), blockchainSetupUtil.getWorldArchive());
     chainHeadTracker.onPeerConnected(respondingPeer.getEthPeer());
 
     assertThat(chainHeadState().getEstimatedHeight()).isZero();

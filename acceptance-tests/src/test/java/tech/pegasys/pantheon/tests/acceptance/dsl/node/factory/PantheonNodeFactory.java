@@ -16,13 +16,17 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE;
+import static tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis.IBFT;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
+import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
@@ -32,9 +36,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import com.google.common.io.Resources;
 
@@ -48,10 +54,13 @@ public class PantheonNodeFactory {
             config.getMiningParameters(),
             config.getJsonRpcConfiguration(),
             config.getWebSocketConfiguration(),
+            config.getMetricsConfiguration(),
             config.getPermissioningConfiguration(),
             config.isDevMode(),
             config.getGenesisConfigProvider(),
-            serverSocket.getLocalPort());
+            serverSocket.getLocalPort(),
+            config.getP2pEnabled(),
+            config.isDiscoveryEnabled());
     serverSocket.close();
 
     return node;
@@ -88,6 +97,35 @@ public class PantheonNodeFactory {
             .setName(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
+            .build());
+  }
+
+  public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)
+      throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(jsonRpcConfigWithAdmin())
+            .webSocketEnabled()
+            .setDiscoveryEnabled(false)
+            .build());
+  }
+
+  public PantheonNode createNodeWithP2pDisabled(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setP2pEnabled(false)
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
+            .build());
+  }
+
+  public PantheonNode createNodeWithP2pDisabledAndAdmin(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setP2pEnabled(false)
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioningAndAdmin())
             .build());
   }
 
@@ -132,9 +170,50 @@ public class PantheonNodeFactory {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
-            .jsonRpcEnabled()
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
+  }
+
+  public PantheonNode createNodeWithAccountsWhitelist(
+      final String name, final List<String> accountsWhitelist) throws IOException {
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
+            .setPermissioningConfiguration(permissioningConfiguration)
+            .build());
+  }
+
+  public PantheonNode createNodeWithNodesWhitelistAndPermRPC(
+      final String name, final List<URI> nodesWhitelist) throws IOException {
+    PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+
+    JsonRpcConfiguration rpcConfig = JsonRpcConfiguration.createDefault();
+
+    rpcConfig.setEnabled(true);
+    rpcConfig.setPort(0);
+    rpcConfig.setHostsWhitelist(singletonList("*"));
+    rpcConfig.addRpcApi(RpcApis.PERM);
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(rpcConfig)
+            .setPermissioningConfiguration(permissioningConfiguration)
+            .build());
+  }
+
+  public PantheonNode createNodeWithNoDiscovery(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder().setName(name).setDiscoveryEnabled(false).build());
   }
 
   public PantheonNode createCliqueNode(final String name) throws IOException {
@@ -142,32 +221,23 @@ public class PantheonNodeFactory {
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(jsonRpcConfigWithClique())
+            .setJsonRpcConfiguration(createJsonRpcConfigWithClique())
             .setWebSocketConfiguration(createWebSocketEnabledConfig())
             .setDevMode(false)
             .setGenesisConfigProvider(this::createCliqueGenesisConfig)
             .build());
   }
 
-  private Optional<String> createCliqueGenesisConfig(final Collection<RunnableNode> validators) {
-    String genesisTemplate = cliqueGenesisTemplateConfig();
-    String cliqueExtraData = encodeCliqueExtraData(validators);
-    String genesis = genesisTemplate.replaceAll("%cliqueExtraData%", cliqueExtraData);
-    return Optional.of(genesis);
-  }
-
-  private String encodeCliqueExtraData(final Collection<RunnableNode> nodes) {
-    final List<Address> addresses = nodes.stream().map(RunnableNode::getAddress).collect(toList());
-    return CliqueExtraData.createGenesisExtraDataString(addresses);
-  }
-
-  private String cliqueGenesisTemplateConfig() {
-    try {
-      URI uri = Resources.getResource("clique/clique.json").toURI();
-      return Resources.toString(uri.toURL(), Charset.defaultCharset());
-    } catch (URISyntaxException | IOException e) {
-      throw new IllegalStateException("Unable to get test clique genesis config");
-    }
+  public PantheonNode createIbftNode(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .setJsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .setWebSocketConfiguration(createWebSocketEnabledConfig())
+            .setDevMode(false)
+            .setGenesisConfigProvider(this::createIbftGenesisConfig)
+            .build());
   }
 
   public PantheonNode createCliqueNodeWithValidators(final String name, final String... validators)
@@ -177,27 +247,82 @@ public class PantheonNodeFactory {
         new PantheonFactoryConfigurationBuilder()
             .setName(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(jsonRpcConfigWithClique())
+            .setJsonRpcConfiguration(createJsonRpcConfigWithClique())
             .setWebSocketConfiguration(createWebSocketEnabledConfig())
             .setDevMode(false)
             .setGenesisConfigProvider(
-                nodes -> createCliqueGenesisConfigForValidators(asList(validators), nodes))
+                nodes ->
+                    createGenesisConfigForValidators(
+                        asList(validators), nodes, this::createCliqueGenesisConfig))
             .build());
   }
 
-  private Optional<String> createCliqueGenesisConfigForValidators(
-      final Collection<String> validators, final Collection<RunnableNode> pantheonNodes) {
-    List<RunnableNode> collect =
-        pantheonNodes.stream().filter(n -> validators.contains(n.getName())).collect(toList());
-    return createCliqueGenesisConfig(collect);
+  public PantheonNode createIbftNodeWithValidators(final String name, final String... validators)
+      throws IOException {
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .setJsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .setWebSocketConfiguration(createWebSocketEnabledConfig())
+            .setDevMode(false)
+            .setGenesisConfigProvider(
+                nodes ->
+                    createGenesisConfigForValidators(
+                        asList(validators), nodes, this::createIbftGenesisConfig))
+            .build());
   }
 
-  private JsonRpcConfiguration jsonRpcConfigWithClique() {
-    final JsonRpcConfiguration jsonRpcConfig = createJsonRpcEnabledConfig();
-    final List<RpcApi> rpcApis = new ArrayList<>(jsonRpcConfig.getRpcApis());
-    rpcApis.add(CLIQUE);
-    jsonRpcConfig.setRpcApis(rpcApis);
-    return jsonRpcConfig;
+  private Optional<String> createCliqueGenesisConfig(
+      final Collection<? extends RunnableNode> validators) {
+    final String template = genesisTemplateConfig("clique/clique.json");
+    return updateGenesisExtraData(
+        validators, template, CliqueExtraData::createGenesisExtraDataString);
+  }
+
+  private Optional<String> createIbftGenesisConfig(
+      final Collection<? extends RunnableNode> validators) {
+    final String template = genesisTemplateConfig("ibft/ibft.json");
+    return updateGenesisExtraData(
+        validators, template, IbftExtraData::createGenesisExtraDataString);
+  }
+
+  private Optional<String> updateGenesisExtraData(
+      final Collection<? extends RunnableNode> validators,
+      final String genesisTemplate,
+      final Function<List<Address>, String> extraDataCreator) {
+    final List<Address> addresses =
+        validators.stream().map(RunnableNode::getAddress).collect(toList());
+    final String extraDataString = extraDataCreator.apply(addresses);
+    final String genesis = genesisTemplate.replaceAll("%extraData%", extraDataString);
+    return Optional.of(genesis);
+  }
+
+  private String genesisTemplateConfig(final String template) {
+    try {
+      URI uri = Resources.getResource(template).toURI();
+      return Resources.toString(uri.toURL(), Charset.defaultCharset());
+    } catch (URISyntaxException | IOException e) {
+      throw new IllegalStateException("Unable to get test genesis config " + template);
+    }
+  }
+
+  private Optional<String> createGenesisConfigForValidators(
+      final Collection<String> validators,
+      final Collection<? extends RunnableNode> pantheonNodes,
+      final GenesisConfigProvider genesisConfigProvider) {
+    final List<RunnableNode> nodes =
+        pantheonNodes.stream().filter(n -> validators.contains(n.getName())).collect(toList());
+    return genesisConfigProvider.createGenesisConfig(nodes);
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfigWithClique() {
+    return createJsonRpcConfigWithRpcApiEnabled(CLIQUE);
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfigWithIbft() {
+    return createJsonRpcConfigWithRpcApiEnabled(IBFT);
   }
 
   private JsonRpcConfiguration createJsonRpcEnabledConfig() {
@@ -213,5 +338,25 @@ public class PantheonNodeFactory {
     config.setEnabled(true);
     config.setPort(0);
     return config;
+  }
+
+  private JsonRpcConfiguration jsonRpcConfigWithPermissioning() {
+    return createJsonRpcConfigWithRpcApiEnabled(RpcApis.PERM);
+  }
+
+  private JsonRpcConfiguration jsonRpcConfigWithAdmin() {
+    return createJsonRpcConfigWithRpcApiEnabled(RpcApis.ADMIN);
+  }
+
+  private JsonRpcConfiguration jsonRpcConfigWithPermissioningAndAdmin() {
+    return createJsonRpcConfigWithRpcApiEnabled(RpcApis.PERM, RpcApis.ADMIN);
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfigWithRpcApiEnabled(final RpcApi... rpcApi) {
+    final JsonRpcConfiguration jsonRpcConfig = createJsonRpcEnabledConfig();
+    final List<RpcApi> rpcApis = new ArrayList<>(jsonRpcConfig.getRpcApis());
+    rpcApis.addAll(Arrays.asList(rpcApi));
+    jsonRpcConfig.setRpcApis(rpcApis);
+    return jsonRpcConfig;
   }
 }

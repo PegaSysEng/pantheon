@@ -20,6 +20,8 @@ import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockImporter;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.ethereum.MainnetBlockValidator;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
@@ -43,7 +45,8 @@ public class IbftProtocolSchedule {
     return new ProtocolScheduleBuilder<>(
             config,
             DEFAULT_CHAIN_ID,
-            builder -> applyIbftChanges(blockPeriod, epochManager, builder))
+            builder -> applyIbftChanges(blockPeriod, epochManager, builder),
+            PrivacyParameters.noPrivacy())
         .createProtocolSchedule();
   }
 
@@ -56,10 +59,10 @@ public class IbftProtocolSchedule {
             difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
             difficultyCalculator -> ibftBlockHeaderValidator(secondsBetweenBlocks),
             MainnetBlockBodyValidator::new,
-            (blockHeaderValidator, blockBodyValidator, blockProcessor) ->
+            MainnetBlockValidator::new,
+            (blockValidator) ->
                 new IbftBlockImporter(
-                    new MainnetBlockImporter<>(
-                        blockHeaderValidator, blockBodyValidator, blockProcessor),
+                    new MainnetBlockImporter<>(blockValidator),
                     new VoteTallyUpdater(epochManager, new IbftLegacyBlockInterface())),
             (time, parent, protocolContext) -> BigInteger.ONE)
         .blockReward(Wei.ZERO)

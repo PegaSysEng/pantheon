@@ -16,9 +16,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -58,7 +58,7 @@ public class BlockDataGenerator {
     final List<Block> seq = new ArrayList<>(count);
 
     final MutableWorldState worldState =
-        worldStateArchive.getMutable(Hash.wrap(MerklePatriciaTrie.EMPTY_TRIE_ROOT_HASH));
+        worldStateArchive.getMutable(Hash.wrap(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH));
 
     long nextBlockNumber = nextBlock;
     Hash parentHash = parent;
@@ -93,6 +93,33 @@ public class BlockDataGenerator {
     }
 
     return seq;
+  }
+
+  public List<Account> createRandomAccounts(final MutableWorldState worldState, final int count) {
+    WorldUpdater updater = worldState.updater();
+    List<Account> accounts = new ArrayList<>(count);
+    for (int i = 0; i < count; i++) {
+      MutableAccount account = updater.getOrCreate(address());
+      // Make some accounts contract accounts
+      if (random.nextFloat() < .5) {
+        // Subset of random accounts are contract accounts
+        account.setCode(bytesValue(5, 50));
+        if (random.nextFloat() < .75) {
+          // Add some storage for most contract accounts
+          int storageValues = random.nextInt(20) + 10;
+          for (int j = 0; j < storageValues; j++) {
+            account.setStorageValue(uint256(), uint256());
+          }
+        }
+      }
+      account.setNonce(random.nextInt(10));
+      account.setBalance(Wei.of(positiveLong()));
+
+      accounts.add(account);
+    }
+    updater.commit();
+    worldState.persist();
+    return accounts;
   }
 
   public List<Block> blockSequence(final int count) {

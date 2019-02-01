@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
 import java.util.Optional;
@@ -30,10 +31,13 @@ public class PantheonFactoryConfigurationBuilder {
       new MiningParametersTestBuilder().enabled(false).build();
   private JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
   private WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
+  private MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
   private PermissioningConfiguration permissioningConfiguration =
       PermissioningConfiguration.createDefault();
   private boolean devMode = true;
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
+  private Boolean p2pEnabled = true;
+  private boolean discoveryEnabled = true;
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
     this.name = name;
@@ -73,6 +77,12 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder setMetricsConfiguration(
+      final MetricsConfiguration metricsConfiguration) {
+    this.metricsConfiguration = metricsConfiguration;
+    return this;
+  }
+
   public PantheonFactoryConfigurationBuilder webSocketEnabled() {
     final WebSocketConfiguration config = WebSocketConfiguration.createDefault();
     config.setEnabled(true);
@@ -99,14 +109,27 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder setP2pEnabled(final Boolean p2pEnabled) {
+    this.p2pEnabled = p2pEnabled;
+    return this;
+  }
+
+  public PantheonFactoryConfigurationBuilder setDiscoveryEnabled(final boolean discoveryEnabled) {
+    this.discoveryEnabled = discoveryEnabled;
+    return this;
+  }
+
   public PantheonFactoryConfiguration build() {
     return new PantheonFactoryConfiguration(
         name,
         miningParameters,
         jsonRpcConfiguration,
         webSocketConfiguration,
+        metricsConfiguration,
         permissioningConfiguration,
         devMode,
-        genesisConfigProvider);
+        genesisConfigProvider,
+        p2pEnabled,
+        discoveryEnabled);
   }
 }

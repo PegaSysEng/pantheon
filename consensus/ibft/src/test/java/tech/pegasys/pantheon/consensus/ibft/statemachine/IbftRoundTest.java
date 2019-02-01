@@ -28,11 +28,12 @@ import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
+import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -46,7 +47,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -66,16 +67,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class IbftRoundTest {
 
   private final KeyPair localNodeKeys = KeyPair.generate();
-  private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 1);
+  private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
+  private final Subscribers<MinedBlockObserver> subscribers = new Subscribers<>();
   private ProtocolContext<IbftContext> protocolContext;
 
   @Mock private MutableBlockchain blockChain;
   @Mock private WorldStateArchive worldStateArchive;
   @Mock private BlockImporter<IbftContext> blockImporter;
-  @Mock private Subscribers<MinedBlockObserver> subscribers;
   @Mock private IbftMessageTransmitter transmitter;
-
+  @Mock private MinedBlockObserver minedBlockObserver;
   @Mock private IbftBlockCreator blockCreator;
   @Mock private MessageValidator messageValidator;
 
@@ -117,6 +118,8 @@ public class IbftRoundTest {
     when(blockCreator.createBlock(anyLong())).thenReturn(proposedBlock);
 
     when(blockImporter.importBlock(any(), any(), any())).thenReturn(true);
+
+    subscribers.subscribe(minedBlockObserver);
   }
 
   @Test
@@ -354,5 +357,73 @@ public class IbftRoundTest {
     round.handlePrepareMessage(
         messageFactory.createSignedPreparePayload(roundIdentifier, proposedBlock.getHash()));
     assertThat(roundState.isPrepared()).isTrue();
+  }
+
+  @Test
+  public void creatingNewBlockNotifiesBlockMiningObservers() {
+    final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
+    final IbftRound round =
+        new IbftRound(
+            roundState,
+            blockCreator,
+            protocolContext,
+            blockImporter,
+            subscribers,
+            localNodeKeys,
+            messageFactory,
+            transmitter);
+    round.createAndSendProposalMessage(15);
+    verify(minedBlockObserver).blockMined(any());
+  }
+
+  @Test
+  public void blockIsOnlyImportedOnceWhenCommitsAreReceivedBeforeProposal() {
+    final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
+    final int QUORUM_SIZE = 2;
+    final RoundState roundState = new RoundState(roundIdentifier, QUORUM_SIZE, messageValidator);
+    final IbftRound round =
+        new IbftRound(
+            roundState,
+            blockCreator,
+            protocolContext,
+            blockImporter,
+            subscribers,
+            localNodeKeys,
+            messageFactory,
+            transmitter);
+
+    round.handleCommitMessage(
+        messageFactory.createSignedCommitPayload(
+            roundIdentifier, proposedBlock.getHash(), remoteCommitSeal));
+
+    round.handleProposalMessage(
+        messageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock));
+
+    verify(blockImporter, times(1)).importBlock(any(), any(), any());
+  }
+
+  @Test
+  public void blockIsImportedOnlyOnceIfQuorumCommitsAreReceivedPriorToProposal() {
+    final int QUORUM_SIZE = 1;
+    final RoundState roundState = new RoundState(roundIdentifier, QUORUM_SIZE, messageValidator);
+    final IbftRound round =
+        new IbftRound(
+            roundState,
+            blockCreator,
+            protocolContext,
+            blockImporter,
+            subscribers,
+            localNodeKeys,
+            messageFactory,
+            transmitter);
+
+    round.handleCommitMessage(
+        messageFactory.createSignedCommitPayload(
+            roundIdentifier, proposedBlock.getHash(), remoteCommitSeal));
+
+    round.handleProposalMessage(
+        messageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock));
+
+    verify(blockImporter, times(1)).importBlock(any(), any(), any());
   }
 }

@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.BlockSyncTestUtils;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
@@ -39,6 +40,7 @@ import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
@@ -64,6 +66,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -79,6 +82,7 @@ public final class RunnerTest {
   }
 
   @Test
+  @Ignore("Fast sync implementation in progress.")
   public void fastSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FAST);
   }
@@ -106,7 +110,8 @@ public final class RunnerTest {
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
             aheadDbNodeKeys,
-            noOpMetricsSystem)) {
+            noOpMetricsSystem,
+            PrivacyParameters.noPrivacy())) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
@@ -119,11 +124,13 @@ public final class RunnerTest {
             fastSyncConfig,
             new MiningParametersTestBuilder().enabled(false).build(),
             aheadDbNodeKeys,
-            noOpMetricsSystem);
+            noOpMetricsSystem,
+            PrivacyParameters.noPrivacy());
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final ExecutorService executorService = Executors.newFixedThreadPool(2);
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
+    final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
     final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
@@ -141,6 +148,7 @@ public final class RunnerTest {
             .bootstrapPeers(Collections.emptyList())
             .jsonRpcConfiguration(aheadJsonRpcConfiguration)
             .webSocketConfiguration(aheadWebSocketConfiguration)
+            .metricsConfiguration(aheadMetricsConfiguration)
             .dataDir(dbAhead)
             .permissioningConfiguration(aheadPermissioningConfiguration)
             .build();
@@ -149,6 +157,7 @@ public final class RunnerTest {
       executorService.submit(runnerAhead::execute);
       final JsonRpcConfiguration behindJsonRpcConfiguration = jsonRpcConfiguration();
       final WebSocketConfiguration behindWebSocketConfiguration = wsRpcConfiguration();
+      final MetricsConfiguration behindMetricsConfiguration = metricsConfiguration();
 
       // Setup runner with no block data
       final PantheonController<Void> controllerBehind =
@@ -159,7 +168,8 @@ public final class RunnerTest {
               fastSyncConfig,
               new MiningParametersTestBuilder().enabled(false).build(),
               KeyPair.generate(),
-              noOpMetricsSystem);
+              noOpMetricsSystem,
+              PrivacyParameters.noPrivacy());
       final Runner runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
@@ -172,6 +182,7 @@ public final class RunnerTest {
                           runnerAhead.getP2pTcpPort())))
               .jsonRpcConfiguration(behindJsonRpcConfiguration)
               .webSocketConfiguration(behindWebSocketConfiguration)
+              .metricsConfiguration(behindMetricsConfiguration)
               .dataDir(temp.newFolder().toPath())
               .metricsSystem(noOpMetricsSystem)
               .build();
@@ -245,7 +256,7 @@ public final class RunnerTest {
   }
 
   private StorageProvider createKeyValueStorageProvider(final Path dbAhead) throws IOException {
-    return RocksDbStorageProvider.create(dbAhead);
+    return RocksDbStorageProvider.create(dbAhead, new NoOpMetricsSystem());
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
@@ -260,6 +271,13 @@ public final class RunnerTest {
     final WebSocketConfiguration configuration = WebSocketConfiguration.createDefault();
     configuration.setPort(0);
     configuration.setEnabled(true);
+    return configuration;
+  }
+
+  private MetricsConfiguration metricsConfiguration() {
+    final MetricsConfiguration configuration = MetricsConfiguration.createDefault();
+    configuration.setPort(0);
+    configuration.setEnabled(false);
     return configuration;
   }
 

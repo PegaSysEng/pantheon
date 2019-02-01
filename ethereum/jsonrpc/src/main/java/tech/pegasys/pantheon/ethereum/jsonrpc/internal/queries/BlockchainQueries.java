@@ -26,8 +26,8 @@ import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.db.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.LogsQuery;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -368,6 +368,10 @@ public class BlockchainQueries {
    */
   public Optional<BlockWithMetadata<Hash, Hash>> blockByNumberWithTxHashes(final long blockNumber) {
     return blockchain.getBlockHashByNumber(blockNumber).flatMap(this::blockByHashWithTxHashes);
+  }
+
+  public Optional<BlockHeader> getBlockHeaderByNumber(final long number) {
+    return blockchain.getBlockHeader(number);
   }
 
   /**
