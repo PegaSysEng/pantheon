@@ -56,7 +56,6 @@ import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -600,7 +599,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           webSocketConfiguration(),
           metricsConfiguration(),
           permissioningConfiguration);
-    } catch (FileNotFoundException e) {
+    } catch (Exception e) {
       throw new ParameterException(new CommandLine(this), e.getMessage());
     }
   }
@@ -737,7 +736,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsConfiguration;
   }
 
-  private PermissioningConfiguration permissioningConfiguration() throws FileNotFoundException {
+  private PermissioningConfiguration permissioningConfiguration() throws Exception {
 
     if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
       return PermissioningConfiguration.createDefault();
