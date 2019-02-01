@@ -168,4 +168,16 @@ public class PermissioningConfigurationBuilderTest {
     assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist()).isEmpty();
   }
+
+  @Test
+  public void permissioningConfigFromNonexistentFileMustThrowException() throws IOException {
+
+    try {
+      PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+          "file-does-not-exist", true, true);
+      fail("expected exception because file does not exist");
+    } catch (Exception e) {
+      assertThat(e.getMessage().contains("File does not exist")).isTrue();
+    }
+  }
 }

@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,8 @@ public class PermissioningConfigurationBuilder {
   public static PermissioningConfiguration permissioningConfigurationFromToml(
       final String configFilePath,
       final boolean permissionedNodeEnabled,
-      final boolean permissionedAccountEnabled) {
+      final boolean permissionedAccountEnabled)
+      throws FileNotFoundException {
 
     return permissioningConfiguration(
         configFilePath, permissionedNodeEnabled, permissionedAccountEnabled);
@@ -46,7 +48,8 @@ public class PermissioningConfigurationBuilder {
   public static PermissioningConfiguration permissioningConfiguration(
       final String configFilePath,
       final boolean permissionedNodeEnabled,
-      final boolean permissionedAccountEnabled) {
+      final boolean permissionedAccountEnabled)
+      throws FileNotFoundException {
 
     TomlParseResult permToml =
         TomlConfigFileParser.loadConfiguration(
@@ -97,14 +100,14 @@ public class PermissioningConfigurationBuilder {
     }
   }
 
-  private static File permissioningConfigFile(final String filename) {
+  private static File permissioningConfigFile(final String filename) throws FileNotFoundException {
 
     final File permissioningConfigFile = new File(filename);
     if (permissioningConfigFile.exists()) {
       return permissioningConfigFile;
     } else {
-      LOG.error("File does not exist: permissioning config path: {}.", filename);
-      return null;
+      throw new FileNotFoundException(
+          "File does not exist: permissioning config path: " + filename);
     }
   }
 }

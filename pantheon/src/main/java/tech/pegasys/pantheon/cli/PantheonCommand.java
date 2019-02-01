@@ -56,6 +56,7 @@ import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -583,21 +584,25 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
-    final PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
-    ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
+    try {
+      final PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
+      ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
 
-    synchronize(
-        buildController(),
-        p2pEnabled,
-        peerDiscoveryEnabled,
-        ethNetworkConfig.getBootNodes(),
-        maxPeers,
-        p2pHost,
-        p2pPort,
-        jsonRpcConfiguration(),
-        webSocketConfiguration(),
-        metricsConfiguration(),
-        permissioningConfiguration);
+      synchronize(
+          buildController(),
+          p2pEnabled,
+          peerDiscoveryEnabled,
+          ethNetworkConfig.getBootNodes(),
+          maxPeers,
+          p2pHost,
+          p2pPort,
+          jsonRpcConfiguration(),
+          webSocketConfiguration(),
+          metricsConfiguration(),
+          permissioningConfiguration);
+    } catch (FileNotFoundException e) {
+      throw new ParameterException(new CommandLine(this), e.getMessage());
+    }
   }
 
   private NetworkName getNetwork() {
@@ -732,7 +737,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsConfiguration;
   }
 
-  private PermissioningConfiguration permissioningConfiguration() {
+  private PermissioningConfiguration permissioningConfiguration() throws FileNotFoundException {
 
     if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
       return PermissioningConfiguration.createDefault();
