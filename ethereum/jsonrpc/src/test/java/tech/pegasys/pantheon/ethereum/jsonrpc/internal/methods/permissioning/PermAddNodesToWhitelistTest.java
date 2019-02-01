@@ -45,7 +45,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PermAddNodesToWhitelistTest {
 
-  private static final String JSON_SUCCESS = "Success";
   private PermAddNodesToWhitelist method;
   private static final String METHOD_NAME = "perm_addNodesToWhitelist";
 
@@ -135,7 +134,7 @@ public class PermAddNodesToWhitelistTest {
   @Test
   public void shouldAddSingleValidNode() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1));
-    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), JSON_SUCCESS);
+    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId());
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.addNodes(any()))
@@ -152,7 +151,7 @@ public class PermAddNodesToWhitelistTest {
   @Test
   public void shouldAddMultipleValidNodes() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1, enode2, enode3));
-    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), JSON_SUCCESS);
+    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId());
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.addNodes(any()))

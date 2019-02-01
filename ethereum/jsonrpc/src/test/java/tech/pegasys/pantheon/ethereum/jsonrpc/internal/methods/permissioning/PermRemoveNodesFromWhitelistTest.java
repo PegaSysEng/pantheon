@@ -45,7 +45,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PermRemoveNodesFromWhitelistTest {
 
-  private static final String SUCCESS_RESULT = "Success";
   private PermRemoveNodesFromWhitelist method;
   private static final String METHOD_NAME = "perm_removeNodesFromWhitelist";
 
@@ -95,7 +94,7 @@ public class PermRemoveNodesFromWhitelistTest {
   @Test
   public void shouldRemoveSingleValidNode() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1));
-    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), SUCCESS_RESULT);
+    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId());
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.removeNodes(any()))
@@ -112,7 +111,7 @@ public class PermRemoveNodesFromWhitelistTest {
   @Test
   public void shouldRemoveMultipleValidNodes() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1, enode2, enode3));
-    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), SUCCESS_RESULT);
+    final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId());
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
     when(nodeWhitelistController.removeNodes(any()))

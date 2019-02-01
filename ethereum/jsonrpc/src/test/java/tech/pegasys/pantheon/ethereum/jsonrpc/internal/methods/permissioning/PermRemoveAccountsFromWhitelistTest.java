@@ -57,7 +57,7 @@ public class PermRemoveAccountsFromWhitelistTest {
   @Test
   public void whenAccountsAreRemovedFromWhitelistShouldReturnSuccess() {
     List<String> accounts = Arrays.asList("0x0", "0x1");
-    JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, "Success");
+    JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null);
     when(accountWhitelist.removeAccounts(eq(accounts)))
         .thenReturn(WhitelistOperationResult.SUCCESS);
 
