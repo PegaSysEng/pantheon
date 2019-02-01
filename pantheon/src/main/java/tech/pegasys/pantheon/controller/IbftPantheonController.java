@@ -54,6 +54,7 @@ import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.core.Util;
@@ -198,14 +199,15 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
+
+    // NOTE: peers should not be used for accessing the network as it does not enforce the
+    // "only send once" filter applied by the UniqueMessageMulticaster.
     final ValidatorPeers peers =
         new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
+
     final UniqueMessageMulticaster uniqueMessageMulticaster = new UniqueMessageMulticaster(peers);
 
-    final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
-    minedBlockObservers.subscribe(ethProtocolManager);
-
-    final IbftGossip gossiper = new IbftGossip(peers);
+    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
 
     final IbftFinalState finalState =
         new IbftFinalState(
@@ -229,6 +231,9 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final MessageValidatorFactory messageValidatorFactory =
         new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
+
+    final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
+    minedBlockObservers.subscribe(ethProtocolManager);
 
     final IbftController ibftController =
         new IbftController(
@@ -315,6 +320,12 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   @Override
   public MiningCoordinator getMiningCoordinator() {
     return null;
+  }
+
+  @Override
+  public PrivacyParameters getPrivacyParameters() {
+    LOG.warn("IbftPantheonController does not currently support private transactions.");
+    return PrivacyParameters.noPrivacy();
   }
 
   @Override
