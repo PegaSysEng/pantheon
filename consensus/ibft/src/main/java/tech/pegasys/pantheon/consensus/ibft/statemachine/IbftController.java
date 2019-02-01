@@ -27,8 +27,8 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
-import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.IbftMessage;
+import tech.pegasys.pantheon.consensus.ibft.payload.Authored;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
@@ -130,17 +130,15 @@ public class IbftController {
     }
   }
 
-  private <P extends Payload> void consumeMessage(
-      final Message message,
-      final SignedData<P> signedPayload,
-      final Consumer<SignedData<P>> handleMessage) {
+  private <P extends IbftMessage<?>> void consumeMessage(
+      final Message message, final P ibftMessage, final Consumer<P> handleMessage) {
     LOG.debug(
         "Received IBFT message messageType={} payload={}",
-        signedPayload.getPayload().getMessageType(),
-        signedPayload);
-    if (processMessage(signedPayload, message)) {
+        ibftMessage.getMessageType(),
+        ibftMessage);
+    if (processMessage(ibftMessage, message)) {
       gossiper.send(message);
-      handleMessage.accept(signedPayload);
+      handleMessage.accept(ibftMessage);
     }
   }
 
@@ -203,8 +201,8 @@ public class IbftController {
     futureMessages.remove(newChainHeight);
   }
 
-  private boolean processMessage(final SignedData<? extends Payload> msg, final Message rawMsg) {
-    final ConsensusRoundIdentifier msgRoundIdentifier = msg.getPayload().getRoundIdentifier();
+  private boolean processMessage(final IbftMessage<?> msg, final Message rawMsg) {
+    final ConsensusRoundIdentifier msgRoundIdentifier = msg.getRoundIdentifier();
     if (isMsgForCurrentHeight(msgRoundIdentifier)) {
       return isMsgFromKnownValidator(msg) && ibftFinalState.isLocalNodeValidator();
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
@@ -212,14 +210,14 @@ public class IbftController {
     } else {
       LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
-          msg.getPayload().getMessageType(),
+          msg.getMessageType(),
           currentHeightManager.getChainHeight(),
           msgRoundIdentifier.getSequenceNumber());
     }
     return false;
   }
 
-  private boolean isMsgFromKnownValidator(final SignedData<? extends Payload> msg) {
+  private boolean isMsgFromKnownValidator(final Authored msg) {
     return ibftFinalState.getValidators().contains(msg.getAuthor());
   }
 
