@@ -25,19 +25,19 @@ public interface BlockHeightManager {
 
   void start();
 
-  void handleBlockTimerExpiry(final ConsensusRoundIdentifier roundIdentifier);
+  void handleBlockTimerExpiry(ConsensusRoundIdentifier roundIdentifier);
 
-  void roundExpired(final RoundExpiry expire);
+  void roundExpired(RoundExpiry expire);
 
-  void handleProposalPayload(final Proposal proposal);
+  void handleProposalPayload(Proposal proposal);
 
-  void handlePreparePayload(final Prepare prepare);
+  void handlePreparePayload(Prepare prepare);
 
-  void handleCommitPayload(final Commit commit);
+  void handleCommitPayload(Commit commit);
 
-  void handleRoundChangePayload(final RoundChange roundChange);
+  void handleRoundChangePayload(RoundChange roundChange);
 
-  void handleNewRoundPayload(final NewRound newRound);
+  void handleNewRoundPayload(NewRound newRound);
 
   long getChainHeight();
 
