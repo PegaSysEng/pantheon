@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -50,6 +52,12 @@ import org.junit.Test;
 public class FastSyncBlockHandlerTest {
   private static final String PROTOCOL_NAME = "ETH";
   private static final BlockBody EMPTY_BODY = new BlockBody(emptyList(), emptyList());
+  private static final BlockHeader HEADER = new BlockHeaderTestFixture().buildHeader();
+  private static final Block BLOCK = new Block(HEADER, EMPTY_BODY);
+  private static final Block BLOCK2 =
+      new Block(new BlockHeaderTestFixture().number(2).buildHeader(), EMPTY_BODY);
+  private static final Block BLOCK3 =
+      new Block(new BlockHeaderTestFixture().number(3).buildHeader(), EMPTY_BODY);
 
   @SuppressWarnings("unchecked")
   private final ProtocolSchedule<Void> protocolSchedule = mock(ProtocolSchedule.class);
@@ -74,8 +82,6 @@ public class FastSyncBlockHandlerTest {
 
   private final FastSyncBlockHandler<Void> blockHandler =
       new FastSyncBlockHandler<>(protocolSchedule, protocolContext, ethContext, ethTasksTimer);
-  private static final BlockHeader HEADER = new BlockHeaderTestFixture().buildHeader();
-  private static final Block BLOCK = new Block(HEADER, EMPTY_BODY);
 
   @Before
   public void setUp() {
@@ -112,5 +118,28 @@ public class FastSyncBlockHandlerTest {
             singletonList(new BlockWithReceipts(BLOCK, emptyList())));
 
     assertThat(result).isCompletedExceptionally();
+  }
+
+  @Test
+  public void shouldNotContinueImportingBlocksAfterValidationFailure() {
+    when(blockImporter.fastImportBlock(protocolContext, BLOCK, emptyList(), LIGHT_SKIP_DETACHED))
+        .thenReturn(true);
+    when(blockImporter.fastImportBlock(protocolContext, BLOCK2, emptyList(), LIGHT_SKIP_DETACHED))
+        .thenReturn(false);
+
+    final CompletableFuture<List<BlockWithReceipts>> result =
+        blockHandler.validateAndImportBlocks(
+            asList(
+                new BlockWithReceipts(BLOCK, emptyList()),
+                new BlockWithReceipts(BLOCK2, emptyList()),
+                new BlockWithReceipts(BLOCK3, emptyList())));
+
+    assertThat(result).isCompletedExceptionally();
+
+    verify(blockImporter).fastImportBlock(protocolContext, BLOCK, emptyList(), LIGHT_SKIP_DETACHED);
+    verify(blockImporter)
+        .fastImportBlock(protocolContext, BLOCK2, emptyList(), LIGHT_SKIP_DETACHED);
+    verify(blockImporter, never())
+        .fastImportBlock(protocolContext, BLOCK3, emptyList(), LIGHT_SKIP_DETACHED);
   }
 }
