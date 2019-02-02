@@ -301,15 +301,17 @@ public class IbftRoundTest {
     final RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(
             Collections.singletonList(
-                messageFactory.createSignedRoundChangePayload(
-                    roundIdentifier,
-                    Optional.of(
-                        new PreparedCertificate(
-                            messageFactory.createSignedProposalPayload(
-                                priorRoundChange, proposedBlock),
-                            Collections
-                                .emptyList()))))); // NOTE: IbftRound assumes the prepare's are
-    // valid
+                messageFactory
+                    .createSignedRoundChangePayload(
+                        roundIdentifier,
+                        Optional.of(
+                            new PreparedCertificate(
+                                messageFactory
+                                    .createSignedProposalPayload(priorRoundChange, proposedBlock)
+                                    .getSignedPayload(),
+                                Collections.emptyList())))
+                    .getSignedPayload()));
+    // NOTE: IbftRound assumes the prepare's are valid
 
     round.startRoundWith(roundChangeCertificate, 15);
     verify(transmitter, times(1))
@@ -345,7 +347,9 @@ public class IbftRoundTest {
     final RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(
             Collections.singletonList(
-                messageFactory.createSignedRoundChangePayload(roundIdentifier, Optional.empty())));
+                messageFactory
+                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty())
+                    .getSignedPayload()));
 
     round.startRoundWith(roundChangeCertificate, 15);
     verify(transmitter, times(1))

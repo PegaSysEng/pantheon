@@ -31,7 +31,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -145,9 +144,8 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
     final RoundChange localRoundChange =
-        new RoundChange(
-            messageFactory.createSignedRoundChangePayload(
-                currentRound.getRoundIdentifier(), latestPreparedCertificate));
+        messageFactory.createSignedRoundChangePayload(
+            currentRound.getRoundIdentifier(), latestPreparedCertificate);
     transmitter.multicastRoundChange(currentRound.getRoundIdentifier(), latestPreparedCertificate);
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
@@ -177,18 +175,18 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
   private <P extends Payload, M extends IbftMessage<P>> void actionOrBufferMessage(
       final M ibftMessage,
-      final Consumer<SignedData<P>> inRoundHandler,
-      final BiConsumer<RoundState, SignedData<P>> buffer) {
+      final Consumer<M> inRoundHandler,
+      final BiConsumer<RoundState, M> buffer) {
     final MessageAge messageAge =
         determineAgeOfPayload(ibftMessage.getRoundIdentifier().getRoundNumber());
     if (messageAge == CURRENT_ROUND) {
-      inRoundHandler.accept(ibftMessage.getSignedPayload());
+      inRoundHandler.accept(ibftMessage);
     } else if (messageAge == FUTURE_ROUND) {
       final ConsensusRoundIdentifier msgRoundId = ibftMessage.getRoundIdentifier();
       final RoundState roundstate =
           futureRoundStateBuffer.computeIfAbsent(
               msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      buffer.accept(roundstate, ibftMessage.getSignedPayload());
+      buffer.accept(roundstate, ibftMessage);
     }
   }
 
@@ -205,7 +203,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     }
 
     final Optional<RoundChangeCertificate> result =
-        roundChangeManager.appendRoundChangeMessage(message.getSignedPayload());
+        roundChangeManager.appendRoundChangeMessage(message);
     if (result.isPresent()) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
@@ -248,7 +246,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(newRound.getRoundIdentifier().getRoundNumber());
       }
-      currentRound.handleProposalFromNewRound(newRound.getSignedPayload());
+      currentRound.handleProposalFromNewRound(newRound);
     }
   }
 
