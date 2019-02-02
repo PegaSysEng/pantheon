@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.assertj.core.util.Lists;
@@ -72,7 +73,7 @@ public class PermGetNodesWhitelistTest {
     final JsonRpcResponse expected =
         new JsonRpcSuccessResponse(request.getId(), Lists.newArrayList(enode1, enode2, enode3));
 
-    when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(p2pNetwork.getNodeWhitelistController()).thenReturn(Optional.of(nodeWhitelistController));
     when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(true);
     when(nodeWhitelistController.getNodesWhitelist())
         .thenReturn(buildNodesList(enode1, enode2, enode3));
@@ -91,7 +92,8 @@ public class PermGetNodesWhitelistTest {
     final JsonRpcRequest request = buildRequest();
     final JsonRpcResponse expected = new JsonRpcSuccessResponse(request.getId(), Lists.emptyList());
 
-    when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(p2pNetwork.getNodeWhitelistController())
+        .thenReturn(java.util.Optional.of(nodeWhitelistController));
     when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(true);
     when(nodeWhitelistController.getNodesWhitelist()).thenReturn(buildNodesList());
 
@@ -110,7 +112,7 @@ public class PermGetNodesWhitelistTest {
     final JsonRpcResponse expected =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.NODE_WHITELIST_NOT_SET);
 
-    when(p2pNetwork.getNodeWhitelistController()).thenReturn(nodeWhitelistController);
+    when(p2pNetwork.getNodeWhitelistController()).thenReturn(Optional.of(nodeWhitelistController));
     when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(false);
 
     final JsonRpcResponse actual = method.response(request);

@@ -20,11 +20,13 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 
+import java.util.Optional;
+
 public class PermGetAccountsWhitelist implements JsonRpcMethod {
 
-  private final AccountWhitelistController whitelistController;
+  private final Optional<AccountWhitelistController> whitelistController;
 
-  public PermGetAccountsWhitelist(final AccountWhitelistController whitelistController) {
+  public PermGetAccountsWhitelist(final Optional<AccountWhitelistController> whitelistController) {
     this.whitelistController = whitelistController;
   }
 
@@ -35,10 +37,17 @@ public class PermGetAccountsWhitelist implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    if (!whitelistController.isAccountWhiteListSet()) {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.ACCOUNT_WHITELIST_NOT_SET);
-    } else {
-      return new JsonRpcSuccessResponse(request.getId(), whitelistController.getAccountWhitelist());
-    }
+    return whitelistController
+        .map(
+            awc -> {
+              if (!awc.isAccountWhiteListSet()) {
+                return new JsonRpcErrorResponse(
+                    request.getId(), JsonRpcError.ACCOUNT_WHITELIST_NOT_SET);
+              } else {
+                return new JsonRpcSuccessResponse(request.getId(), awc.getAccountWhitelist());
+              }
+            })
+        .orElse(
+            new JsonRpcErrorResponse(request.getId(), JsonRpcError.ACCOUNT_WHITELIST_NOT_ENABLED));
   }
 }

@@ -43,7 +43,7 @@ public class PermGetAccountsWhitelistTest {
 
   @Before
   public void before() {
-    method = new PermGetAccountsWhitelist(accountWhitelist);
+    method = new PermGetAccountsWhitelist(java.util.Optional.of(accountWhitelist));
   }
 
   @Test

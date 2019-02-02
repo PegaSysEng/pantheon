@@ -35,6 +35,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +82,10 @@ public abstract class CommandTestAbstract {
   @Captor ArgumentCaptor<JsonRpcConfiguration> jsonRpcConfigArgumentCaptor;
   @Captor ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
   @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
-  @Captor ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
+
+  @Captor
+  ArgumentCaptor<Optional<PermissioningConfiguration>> permissioningConfigurationArgumentCaptor;
+
   @Captor ArgumentCaptor<Collection<URI>> uriListArgumentCaptor;
 
   @Rule public final TemporaryFolder temp = new TemporaryFolder();

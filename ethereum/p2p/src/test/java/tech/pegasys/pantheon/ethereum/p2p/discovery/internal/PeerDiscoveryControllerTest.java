@@ -885,8 +885,7 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  public void shouldNotBondWithNonWhitelistedPeer()
-      throws InterruptedException, ExecutionException, TimeoutException {
+  public void shouldNotBondWithNonWhitelistedPeer() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
     final DiscoveryPeer discoPeer = peers.get(0);
     final DiscoveryPeer otherPeer = peers.get(1);
@@ -905,7 +904,7 @@ public class PeerDiscoveryControllerTest {
         getControllerBuilder()
             .peers(discoPeer)
             .blacklist(blacklist)
-            .whitelist(nodeWhitelistController)
+            .whitelist(Optional.of(nodeWhitelistController))
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -969,7 +968,7 @@ public class PeerDiscoveryControllerTest {
         getControllerBuilder()
             .peers(discoPeer)
             .blacklist(blacklist)
-            .whitelist(nodeWhitelistController)
+            .whitelist(Optional.of(nodeWhitelistController))
             .build();
 
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
@@ -1039,8 +1038,8 @@ public class PeerDiscoveryControllerTest {
   static class ControllerBuilder {
     private Collection<DiscoveryPeer> discoPeers = Collections.emptyList();
     private PeerBlacklist blacklist = new PeerBlacklist();
-    private NodeWhitelistController whitelist =
-        new NodeWhitelistController(PermissioningConfiguration.createDefault());
+    private Optional<NodeWhitelistController> whitelist =
+        Optional.of(new NodeWhitelistController(PermissioningConfiguration.createDefault()));
     private MockTimerUtil timerUtil = new MockTimerUtil();
     private KeyPair keypair;
     private DiscoveryPeer localPeer;
@@ -1067,7 +1066,7 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder whitelist(final NodeWhitelistController whitelist) {
+    ControllerBuilder whitelist(final Optional<NodeWhitelistController> whitelist) {
       this.whitelist = whitelist;
       return this;
     }
