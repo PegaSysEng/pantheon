@@ -215,7 +215,9 @@ public class RunnerBuilder {
             bannedNodeIds.stream().map(BytesValue::fromHexString).collect(Collectors.toSet()));
 
     final Optional<NodeWhitelistController> nodeWhitelistController =
-        permissioningConfiguration.map(NodeWhitelistController::new);
+        permissioningConfiguration
+            .filter(PermissioningConfiguration::isNodeWhitelistEnabled)
+            .map(NodeWhitelistController::new);
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
 
@@ -242,14 +244,15 @@ public class RunnerBuilder {
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
     final Optional<AccountWhitelistController> accountWhitelistController =
-        permissioningConfiguration.map(AccountWhitelistController::new);
-
-    permissioningConfiguration.ifPresent(
-        permConfig -> {
-          if (permConfig.isAccountWhitelistSet()) {
-            transactionPool.setAccountWhitelist(accountWhitelistController.get());
-          }
-        });
+        permissioningConfiguration
+            .filter(PermissioningConfiguration::isAccountWhitelistEnabled)
+            .map(
+                configuration -> {
+                  AccountWhitelistController whitelistController =
+                      new AccountWhitelistController(configuration);
+                  transactionPool.setAccountWhitelist(whitelistController);
+                  return whitelistController;
+                });
 
     final PrivacyParameters privacyParameters = pantheonController.getPrivacyParameters();
     final PrivateTransactionHandler privateTransactionHandler =

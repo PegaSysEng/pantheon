@@ -74,7 +74,6 @@ public class PermGetNodesWhitelistTest {
         new JsonRpcSuccessResponse(request.getId(), Lists.newArrayList(enode1, enode2, enode3));
 
     when(p2pNetwork.getNodeWhitelistController()).thenReturn(Optional.of(nodeWhitelistController));
-    when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(true);
     when(nodeWhitelistController.getNodesWhitelist())
         .thenReturn(buildNodesList(enode1, enode2, enode3));
 
@@ -82,7 +81,6 @@ public class PermGetNodesWhitelistTest {
 
     assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
 
-    verify(nodeWhitelistController, times(1)).nodeWhitelistSet();
     verify(nodeWhitelistController, times(1)).getNodesWhitelist();
     verifyNoMoreInteractions(nodeWhitelistController);
   }
@@ -94,32 +92,13 @@ public class PermGetNodesWhitelistTest {
 
     when(p2pNetwork.getNodeWhitelistController())
         .thenReturn(java.util.Optional.of(nodeWhitelistController));
-    when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(true);
     when(nodeWhitelistController.getNodesWhitelist()).thenReturn(buildNodesList());
 
     final JsonRpcResponse actual = method.response(request);
 
     assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
 
-    verify(nodeWhitelistController, times(1)).nodeWhitelistSet();
     verify(nodeWhitelistController, times(1)).getNodesWhitelist();
-    verifyNoMoreInteractions(nodeWhitelistController);
-  }
-
-  @Test
-  public void shouldReturnFailResponseWhenListNotSet() {
-    final JsonRpcRequest request = buildRequest();
-    final JsonRpcResponse expected =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.NODE_WHITELIST_NOT_SET);
-
-    when(p2pNetwork.getNodeWhitelistController()).thenReturn(Optional.of(nodeWhitelistController));
-    when(nodeWhitelistController.nodeWhitelistSet()).thenReturn(false);
-
-    final JsonRpcResponse actual = method.response(request);
-
-    assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
-
-    verify(nodeWhitelistController, times(1)).nodeWhitelistSet();
     verifyNoMoreInteractions(nodeWhitelistController);
   }
 

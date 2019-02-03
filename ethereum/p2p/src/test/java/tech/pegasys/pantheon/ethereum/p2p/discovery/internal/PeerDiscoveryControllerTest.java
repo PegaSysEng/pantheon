@@ -588,8 +588,7 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  public void shouldNotBondWithBlacklistedPeer()
-      throws InterruptedException, ExecutionException, TimeoutException {
+  public void shouldNotBondWithBlacklistedPeer() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
     final DiscoveryPeer discoPeer = peers.get(0);
     final DiscoveryPeer otherPeer = peers.get(1);
@@ -962,13 +961,14 @@ public class PeerDiscoveryControllerTest {
     // don't add disco peer to whitelist
     PermissioningConfiguration config = PermissioningConfiguration.createDefault();
     config.setNodeWhitelist(new ArrayList<>());
-    NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    Optional<NodeWhitelistController> nodeWhitelistController =
+        Optional.of(new NodeWhitelistController(config));
 
     controller =
         getControllerBuilder()
             .peers(discoPeer)
             .blacklist(blacklist)
-            .whitelist(Optional.of(nodeWhitelistController))
+            .whitelist(nodeWhitelistController)
             .build();
 
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
@@ -1038,8 +1038,7 @@ public class PeerDiscoveryControllerTest {
   static class ControllerBuilder {
     private Collection<DiscoveryPeer> discoPeers = Collections.emptyList();
     private PeerBlacklist blacklist = new PeerBlacklist();
-    private Optional<NodeWhitelistController> whitelist =
-        Optional.of(new NodeWhitelistController(PermissioningConfiguration.createDefault()));
+    private Optional<NodeWhitelistController> whitelist = Optional.empty();
     private MockTimerUtil timerUtil = new MockTimerUtil();
     private KeyPair keypair;
     private DiscoveryPeer localPeer;

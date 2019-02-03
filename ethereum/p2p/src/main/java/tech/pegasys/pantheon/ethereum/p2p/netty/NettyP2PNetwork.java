@@ -302,13 +302,12 @@ public class NettyP2PNetwork implements P2PNetwork {
     return nodeWhitelistController
         .map(
             nwc ->
-                nwc.contains(
+                nwc.isPermitted(
                     new DefaultPeer(
                         connection.getPeer().getNodeId(),
                         ch.remoteAddress().getAddress().getHostAddress(),
                         connection.getPeer().getPort(),
                         connection.getPeer().getPort())))
-        // TODO: Has to be a bug
         .orElse(true);
   }
 
