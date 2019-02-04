@@ -339,7 +339,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(permissioningConfigurationArgumentCaptor.getValue().get())
+    assertThat(permissioningConfigurationArgumentCaptor.getValue())
         .isEqualToComparingFieldByField(permissioningConfiguration);
 
     assertThat(commandErrorOutput.toString()).isEmpty();

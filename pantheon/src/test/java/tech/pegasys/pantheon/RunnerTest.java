@@ -48,7 +48,6 @@ import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -132,8 +131,7 @@ public final class RunnerTest {
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
-    final Optional<PermissioningConfiguration> aheadPermissioningConfiguration =
-        Optional.of(permissioningConfiguration());
+    final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())

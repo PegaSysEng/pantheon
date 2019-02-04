@@ -88,7 +88,8 @@ public class RunnerBuilder {
   private Collection<String> bannedNodeIds;
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
-  private Optional<PermissioningConfiguration> permissioningConfiguration;
+  private Optional<PermissioningConfiguration> permissioningConfiguration =
+      PermissioningConfiguration.disabled();
 
   public RunnerBuilder vertx(final Vertx vertx) {
     this.vertx = vertx;
@@ -141,8 +142,8 @@ public class RunnerBuilder {
   }
 
   public RunnerBuilder permissioningConfiguration(
-      final Optional<PermissioningConfiguration> permissioningConfiguration) {
-    this.permissioningConfiguration = permissioningConfiguration;
+      final PermissioningConfiguration permissioningConfiguration) {
+    this.permissioningConfiguration = Optional.of(permissioningConfiguration);
     return this;
   }
 

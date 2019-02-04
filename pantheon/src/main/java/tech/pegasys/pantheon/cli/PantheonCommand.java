@@ -737,7 +737,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Optional<PermissioningConfiguration> permissioningConfiguration() {
 
     if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
-      return Optional.empty();
+      return PermissioningConfiguration.disabled();
     }
 
     final PermissioningConfiguration permissioningConfiguration =
@@ -792,6 +792,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     checkNotNull(runnerBuilder);
 
+    permissioningConfiguration.ifPresent(runnerBuilder::permissioningConfiguration);
+
     final Runner runner =
         runnerBuilder
             .vertx(Vertx.vertx())
@@ -808,7 +810,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem)
             .metricsConfiguration(metricsConfiguration)
-            .permissioningConfiguration(permissioningConfiguration)
             .build();
 
     addShutdownHook(runner);

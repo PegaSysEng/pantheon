@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -79,8 +78,11 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       throw new RuntimeException("Error building PantheonController", e);
     }
 
+    RunnerBuilder runnerBuilder = new RunnerBuilder();
+    node.getPermissioningConfiguration().ifPresent(runnerBuilder::permissioningConfiguration);
+
     final Runner runner =
-        new RunnerBuilder()
+        runnerBuilder
             .vertx(Vertx.vertx())
             .pantheonController(pantheonController)
             .discovery(node.isDiscoveryEnabled())
@@ -94,7 +96,6 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .bannedNodeIds(Collections.emptySet())
             .metricsSystem(noOpMetricsSystem)
             .metricsConfiguration(node.metricsConfiguration())
-            .permissioningConfiguration(Optional.of(node.getPermissioningConfiguration()))
             .p2pEnabled(node.p2pEnabled())
             .build();
 

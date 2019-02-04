@@ -35,7 +35,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,8 +82,7 @@ public abstract class CommandTestAbstract {
   @Captor ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
   @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
 
-  @Captor
-  ArgumentCaptor<Optional<PermissioningConfiguration>> permissioningConfigurationArgumentCaptor;
+  @Captor ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
 
   @Captor ArgumentCaptor<Collection<URI>> uriListArgumentCaptor;
 
@@ -122,7 +120,6 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.p2pEnabled(anyBoolean())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.jsonRpcConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.webSocketConfiguration(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.permissioningConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.dataDir(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.bannedNodeIds(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.metricsSystem(any())).thenReturn(mockRunnerBuilder);
