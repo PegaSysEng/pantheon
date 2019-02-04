@@ -40,4 +40,3 @@ include 'testutil'
 include 'util'
 include 'quickstart'
 include 'enclave'
-

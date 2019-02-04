@@ -16,12 +16,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-
 import tech.pegasys.orion.testutil.OrionTestHarness;
-import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
+import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -71,8 +70,8 @@ public class PrivacyPrecompiledContractIntegrationTest {
     SendResponse sr = enclave.send(sc);
 
     PrivacyPrecompiledContract privacyPrecompiledContract =
-        new PrivacyPrecompiledContract(new SpuriousDragonGasCalculator(), publicKeys.get(0),
-            enclave);
+        new PrivacyPrecompiledContract(
+            new SpuriousDragonGasCalculator(), publicKeys.get(0), enclave);
 
     BytesValue result =
         privacyPrecompiledContract.compute(BytesValue.wrap(sr.getKey().getBytes(UTF_8)));

@@ -18,10 +18,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
+import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;

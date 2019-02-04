@@ -750,7 +750,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return Optional.of(permissioningConfiguration);
   }
 
-  private PrivacyParameters privacyParameters() throws IOException  {
+  private PrivacyParameters privacyParameters() throws IOException {
 
     CommandLineUtils.checkOptionDependencies(
         logger,

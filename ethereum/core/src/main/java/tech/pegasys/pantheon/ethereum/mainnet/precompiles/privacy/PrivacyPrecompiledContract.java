@@ -15,12 +15,12 @@ package tech.pegasys.pantheon.ethereum.mainnet.precompiles.privacy;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import tech.pegasys.pantheon.enclave.Enclave;
+import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
+import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
-import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
