@@ -72,7 +72,7 @@ import picocli.CommandLine;
 public class PantheonCommandTest extends CommandTestAbstract {
 
   private final String ENCLAVE_URI = "http://1.2.3.4:5555";
-  private final String ORION_PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
+  private final String ENCLAVE_PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
   static final String PERMISSIONING_CONFIG_TOML = "permissioning_config.toml";
@@ -1839,7 +1839,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).build();
 
     assertThat(enclaveArg.getValue().getUrl()).isEqualTo(ENCLAVE_URI);
-    assertThat(enclaveArg.getValue().getPublicKey()).isEqualTo(ORION_PUBLIC_KEY);
+    assertThat(enclaveArg.getValue().getPublicKey()).isEqualTo(ENCLAVE_PUBLIC_KEY);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();

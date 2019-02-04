@@ -36,12 +36,8 @@ public class Enclave {
   private String url;
   private final OkHttpClient client;
 
-  public Orion() {
-    this.client = new OkHttpClient();
-  }
-
-  public Enclave(final String orionUrl) {
-    this.url = orionUrl;
+  public Enclave(final String enclaveUrl) {
+    this.url = enclaveUrl;
     this.client = new OkHttpClient();
   }
 
