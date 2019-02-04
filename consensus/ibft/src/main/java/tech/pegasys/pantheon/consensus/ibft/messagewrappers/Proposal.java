@@ -14,10 +14,36 @@ package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
+import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class Proposal extends IbftMessage<ProposalPayload> {
 
   public Proposal(final SignedData<ProposalPayload> payload) {
     super(payload);
+  }
+
+  public Block getBlock() {
+    return getPayload().getBlock();
+  }
+
+  @Override
+  public BytesValue encode() {
+    final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
+    rlpOut.startList();
+    getSignedPayload().writeTo(rlpOut);
+    rlpOut.endList();
+    return rlpOut.encoded();
+  }
+
+  public static Proposal decode(final BytesValue data) {
+    RLPInput rlpIn = RLP.input(data);
+    rlpIn.enterList();
+    final SignedData<ProposalPayload> payload = SignedData.readSignedProposalPayloadFrom(rlpIn);
+    rlpIn.leaveList();
+    return new Proposal(payload);
   }
 }
