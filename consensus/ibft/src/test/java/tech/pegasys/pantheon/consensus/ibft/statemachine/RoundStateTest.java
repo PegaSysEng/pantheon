@@ -270,7 +270,7 @@ public class RoundStateTest {
 
     assertThat(roundState.getCommitSeals())
         .containsOnly(
-            firstCommit.getSignedPayload().getPayload().getCommitSeal(),
-            secondCommit.getSignedPayload().getPayload().getCommitSeal());
+            firstCommit.getCommitSeal(),
+            secondCommit.getCommitSeal());
   }
 }
