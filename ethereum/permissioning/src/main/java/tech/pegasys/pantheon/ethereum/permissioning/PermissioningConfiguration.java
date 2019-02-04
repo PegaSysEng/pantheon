@@ -16,7 +16,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public class PermissioningConfiguration {
   private List<URI> nodeWhitelist;
@@ -27,10 +26,6 @@ public class PermissioningConfiguration {
 
   public List<URI> getNodeWhitelist() {
     return nodeWhitelist;
-  }
-
-  public static Optional<PermissioningConfiguration> disabled() {
-    return Optional.empty();
   }
 
   public static PermissioningConfiguration createDefault() {
