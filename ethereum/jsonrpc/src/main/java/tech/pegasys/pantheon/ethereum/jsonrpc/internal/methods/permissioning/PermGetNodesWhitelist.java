@@ -45,20 +45,16 @@ public class PermGetNodesWhitelist implements JsonRpcMethod {
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
     try {
-      return p2pNetwork
-          .getNodeWhitelistController()
-          .<JsonRpcResponse>map(
-              nodeWhitelistController -> {
-                List<Peer> nodesWhitelist = nodeWhitelistController.getNodesWhitelist();
-                List<String> enodeList =
-                    nodesWhitelist
-                        .parallelStream()
-                        .map(this::buildEnodeURI)
-                        .collect(Collectors.toList());
+      if (p2pNetwork.getNodeWhitelistController().isPresent()) {
+        List<Peer> nodesWhitelist =
+            p2pNetwork.getNodeWhitelistController().get().getNodesWhitelist();
+        List<String> enodeList =
+            nodesWhitelist.parallelStream().map(this::buildEnodeURI).collect(Collectors.toList());
 
-                return new JsonRpcSuccessResponse(req.getId(), enodeList);
-              })
-          .orElse(new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_NOT_ENABLED));
+        return new JsonRpcSuccessResponse(req.getId(), enodeList);
+      } else {
+        return new JsonRpcErrorResponse(req.getId(), JsonRpcError.NODE_WHITELIST_NOT_ENABLED);
+      }
     } catch (P2pDisabledException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
     }

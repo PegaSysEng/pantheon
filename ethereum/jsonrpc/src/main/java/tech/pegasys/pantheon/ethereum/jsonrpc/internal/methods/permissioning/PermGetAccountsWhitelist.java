@@ -37,10 +37,11 @@ public class PermGetAccountsWhitelist implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    return whitelistController
-        .<JsonRpcResponse>map(
-            awc -> new JsonRpcSuccessResponse(request.getId(), awc.getAccountWhitelist()))
-        .orElse(
-            new JsonRpcErrorResponse(request.getId(), JsonRpcError.ACCOUNT_WHITELIST_NOT_ENABLED));
+    if (whitelistController.isPresent()) {
+      return new JsonRpcSuccessResponse(
+          request.getId(), whitelistController.get().getAccountWhitelist());
+    } else {
+      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.ACCOUNT_WHITELIST_NOT_ENABLED);
+    }
   }
 }
