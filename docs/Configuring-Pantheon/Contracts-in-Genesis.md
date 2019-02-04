@@ -1,12 +1,12 @@
 description: Pre-deploying contracts in genesis file 
 <!--- END of page meta data -->
 
-# Specifying Pre-deployed Contracts in the Genesis File 
+# Predeploying Contracts in the Genesis File 
 
-Specify contract code in the genesis file to pre-deploy a contract when starting Pantheon. 
+To predeploy contracts when starting Pantheon, specify contract code in the genesis file. 
 
-!!! example="Contract Code in Genesis File" 
-    ```
+!!! example "Contract Code in Genesis File"
+    ```json
     {
       ...
       "alloc": {
