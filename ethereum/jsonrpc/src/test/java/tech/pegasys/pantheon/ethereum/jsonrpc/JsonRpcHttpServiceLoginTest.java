@@ -56,7 +56,6 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.junit.AfterClass;
@@ -85,7 +84,6 @@ public class JsonRpcHttpServiceLoginTest {
   protected static Synchronizer synchronizer;
   protected static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.ADMIN);
-  protected final JsonRpcTestHelper testHelper = new JsonRpcTestHelper();
   private static StubAuthProvider stubCredentialProvider;
   private static final JWTAuthOptions jwtOptions =
       new JWTAuthOptions()
@@ -191,7 +189,7 @@ public class JsonRpcHttpServiceLoginTest {
 
     final RequestBody body =
         RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
-    final Request request = new Builder().post(body).url(baseUrl + "/login").build();
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(401);
       assertThat(resp.message()).isEqualTo("Unauthorized");
@@ -206,7 +204,7 @@ public class JsonRpcHttpServiceLoginTest {
 
     final RequestBody body =
         RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
-    final Request request = new Builder().post(body).url(baseUrl + "/login").build();
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       assertThat(resp.message()).isEqualTo("OK");
@@ -249,7 +247,7 @@ public class JsonRpcHttpServiceLoginTest {
 
     final RequestBody body =
         RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
-    final Request request = new Builder().post(body).url(baseUrl + "/login").build();
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(200);
       assertThat(resp.message()).isEqualTo("OK");
