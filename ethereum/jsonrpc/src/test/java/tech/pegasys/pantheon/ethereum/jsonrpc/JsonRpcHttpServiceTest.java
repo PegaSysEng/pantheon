@@ -71,7 +71,6 @@ import io.vertx.core.json.JsonObject;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.junit.AfterClass;
@@ -170,7 +169,7 @@ public class JsonRpcHttpServiceTest {
   public void handleLoginRequestWithAuthDisabled() throws Exception {
     final RequestBody body =
         RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
-    final Request request = new Builder().post(body).url(baseUrl + "/login").build();
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(400);
       assertThat(resp.message()).isEqualTo("Authentication not enabled");
