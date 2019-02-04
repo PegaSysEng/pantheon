@@ -92,6 +92,7 @@ public class JsonRpcHttpService {
 
   /**
    * Construct a JsonRpcHttpService handler that has authentication enabled
+   *
    * @param vertx The vertx process that will be running this service
    * @param dataDir The data directory where requests can be buffered
    * @param config Configuration for the rpc methods being loaded
@@ -120,6 +121,7 @@ public class JsonRpcHttpService {
 
   /**
    * Construct a JsonRpcHttpService handler that doesn't have authentication enabled
+   *
    * @param vertx The vertx process that will be running this service
    * @param dataDir The data directory where requests can be buffered
    * @param config Configuration for the rpc methods being loaded

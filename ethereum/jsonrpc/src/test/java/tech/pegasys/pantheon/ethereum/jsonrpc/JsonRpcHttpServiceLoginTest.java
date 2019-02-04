@@ -17,9 +17,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.ext.auth.PubSecKeyOptions;
-import io.vertx.ext.auth.jwt.JWTAuth;
 import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
@@ -49,9 +46,12 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.PubSecKeyOptions;
 import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -65,7 +65,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -88,13 +87,14 @@ public class JsonRpcHttpServiceLoginTest {
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.ADMIN);
   protected final JsonRpcTestHelper testHelper = new JsonRpcTestHelper();
   private static StubAuthProvider stubCredentialProvider;
-  private static final JWTAuthOptions jwtOptions = new JWTAuthOptions()
-      .setPermissionsClaimKey("permissions")
-      .addPubSecKey(new PubSecKeyOptions()
-          .setAlgorithm("HS256")
-          .setPublicKey("keyboard cat")
-          .setSymmetric(true)
-      );
+  private static final JWTAuthOptions jwtOptions =
+      new JWTAuthOptions()
+          .setPermissionsClaimKey("permissions")
+          .addPubSecKey(
+              new PubSecKeyOptions()
+                  .setAlgorithm("HS256")
+                  .setPublicKey("keyboard cat")
+                  .setSymmetric(true));
 
   private static class StubAuthProvider implements AuthProvider {
     private Optional<User> respondUser = Optional.empty();
@@ -223,14 +223,18 @@ public class JsonRpcHttpServiceLoginTest {
 
       final JWTAuth auth = JWTAuth.create(vertx, jwtOptions);
 
-      auth.authenticate(new JsonObject().put("jwt", token), (r) -> {
-        assertThat(r.succeeded()).isTrue();
-        final User user = r.result();
-        user.isAuthorized("noauths", (authed) -> {
-          assertThat(authed.succeeded()).isTrue();
-          assertThat(authed.result()).isFalse();
-        });
-      });
+      auth.authenticate(
+          new JsonObject().put("jwt", token),
+          (r) -> {
+            assertThat(r.succeeded()).isTrue();
+            final User user = r.result();
+            user.isAuthorized(
+                "noauths",
+                (authed) -> {
+                  assertThat(authed.succeeded()).isTrue();
+                  assertThat(authed.result()).isFalse();
+                });
+          });
     }
   }
 
@@ -238,7 +242,10 @@ public class JsonRpcHttpServiceLoginTest {
   public void loginWithGoodCredentialsAndPermissions() throws IOException {
     final User mockUser = mock(User.class);
     stubCredentialProvider.setRespondUser(mockUser);
-    when(mockUser.principal()).thenReturn(new JsonObject().put("permissions", new JsonArray(Collections.singletonList("fakePermission"))));
+    when(mockUser.principal())
+        .thenReturn(
+            new JsonObject()
+                .put("permissions", new JsonArray(Collections.singletonList("fakePermission"))));
 
     final RequestBody body =
         RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
@@ -259,18 +266,24 @@ public class JsonRpcHttpServiceLoginTest {
 
       final JWTAuth auth = JWTAuth.create(vertx, jwtOptions);
 
-      auth.authenticate(new JsonObject().put("jwt", token), (r) -> {
-        assertThat(r.succeeded()).isTrue();
-        final User user = r.result();
-        user.isAuthorized("noauths", (authed) -> {
-          assertThat(authed.succeeded()).isTrue();
-          assertThat(authed.result()).isFalse();
-        });
-        user.isAuthorized("fakePermission", (authed) -> {
-          assertThat(authed.succeeded()).isTrue();
-          assertThat(authed.result()).isTrue();
-        });
-      });
+      auth.authenticate(
+          new JsonObject().put("jwt", token),
+          (r) -> {
+            assertThat(r.succeeded()).isTrue();
+            final User user = r.result();
+            user.isAuthorized(
+                "noauths",
+                (authed) -> {
+                  assertThat(authed.succeeded()).isTrue();
+                  assertThat(authed.result()).isFalse();
+                });
+            user.isAuthorized(
+                "fakePermission",
+                (authed) -> {
+                  assertThat(authed.succeeded()).isTrue();
+                  assertThat(authed.result()).isTrue();
+                });
+          });
     }
   }
 }
