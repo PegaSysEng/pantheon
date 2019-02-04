@@ -17,7 +17,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.fail;
 
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -59,10 +58,10 @@ public class PermissioningConfigurationBuilderTest {
         PermissioningConfigurationBuilder.permissioningConfiguration(
             toml.toAbsolutePath().toString(), true, true);
 
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist())
         .containsExactly("0x0000000000000000000000000000000000000009");
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist())
         .containsExactly(URI.create(uri), URI.create(uri2));
   }
@@ -80,8 +79,8 @@ public class PermissioningConfigurationBuilderTest {
         PermissioningConfigurationBuilder.permissioningConfiguration(
             toml.toAbsolutePath().toString(), true, false);
 
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isFalse();
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isFalse();
+    assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist()).containsExactly(URI.create(uri));
   }
 
@@ -96,8 +95,8 @@ public class PermissioningConfigurationBuilderTest {
         PermissioningConfigurationBuilder.permissioningConfiguration(
             toml.toAbsolutePath().toString(), false, true);
 
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isFalse();
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isFalse();
+    assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist())
         .containsExactly("0x0000000000000000000000000000000000000009");
   }
@@ -129,9 +128,9 @@ public class PermissioningConfigurationBuilderTest {
         PermissioningConfigurationBuilder.permissioningConfiguration(
             toml.toAbsolutePath().toString(), true, true);
 
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist()).isEmpty();
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
+    assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist()).isEmpty();
   }
 
@@ -197,15 +196,10 @@ public class PermissioningConfigurationBuilderTest {
             toml.toString(), true, true);
 
     assertThat(permissioningConfiguration.getConfigurationFilePath()).isEqualTo(toml.toString());
-
-    assertThat(permissioningConfiguration.isAccountWhitelistSet()).isTrue();
-    assertThat(permissioningConfiguration.getAccountWhitelist())
-        .containsExactly("0x0000000000000000000000000000000000000009");
-    assertThat(permissioningConfiguration.isNodeWhitelistSet()).isTrue();
   }
 
   @Test
-  public void permissioningConfigFromNonexistentFileMustThrowException() throws IOException {
+  public void permissioningConfigFromNonexistentFileMustThrowException() {
 
     try {
       PermissioningConfigurationBuilder.permissioningConfigurationFromToml(

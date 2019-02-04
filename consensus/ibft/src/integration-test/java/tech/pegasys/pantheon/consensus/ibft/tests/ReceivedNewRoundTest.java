@@ -12,17 +12,17 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createValidPreparedCertificate;
+import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createValidTerminatedRoundArtefacts;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -71,9 +71,12 @@ public class ReceivedNewRoundTest {
     nextProposer.injectNewRound(
         targetRound,
         new RoundChangeCertificate(roundChanges),
-        nextProposer.getMessageFactory().createSignedProposalPayload(targetRound, blockToPropose));
+        nextProposer
+            .getMessageFactory()
+            .createSignedProposalPayload(targetRound, blockToPropose)
+            .getSignedPayload());
 
-    final SignedData<PreparePayload> expectedPrepare =
+    final Prepare expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(targetRound, blockToPropose.getHash());
 
     peers.verifyMessagesReceived(expectedPrepare);
@@ -96,7 +99,8 @@ public class ReceivedNewRoundTest {
         new RoundChangeCertificate(roundChanges),
         illegalProposer
             .getMessageFactory()
-            .createSignedProposalPayload(nextRoundId, blockToPropose));
+            .createSignedProposalPayload(nextRoundId, blockToPropose)
+            .getSignedPayload());
 
     peers.verifyNoMessagesReceived();
   }
@@ -107,11 +111,11 @@ public class ReceivedNewRoundTest {
     final Block reproposedBlock = context.createBlockForProposalFromChainHead(1, 15);
     final ConsensusRoundIdentifier nextRoundId = new ConsensusRoundIdentifier(1, 1);
 
-    final PreparedCertificate preparedCertificate =
-        createValidPreparedCertificate(context, roundId, initialBlock);
+    final TerminatedRoundArtefacts terminatedRoundArtefacts =
+        createValidTerminatedRoundArtefacts(context, roundId, initialBlock);
 
     final List<SignedData<RoundChangePayload>> roundChanges =
-        peers.createSignedRoundChangePayload(nextRoundId, preparedCertificate);
+        peers.createSignedRoundChangePayload(nextRoundId, terminatedRoundArtefacts);
 
     final ValidatorPeer nextProposer = context.roundSpecificPeers(nextRoundId).getProposer();
 
@@ -121,7 +125,8 @@ public class ReceivedNewRoundTest {
         peers
             .getNonProposing(0)
             .getMessageFactory()
-            .createSignedProposalPayload(nextRoundId, reproposedBlock));
+            .createSignedProposalPayload(nextRoundId, reproposedBlock)
+            .getSignedPayload());
 
     peers.verifyMessagesReceived(
         localNodeMessageFactory.createSignedPreparePayload(nextRoundId, reproposedBlock.getHash()));
@@ -141,14 +146,14 @@ public class ReceivedNewRoundTest {
     final ValidatorPeer interimRoundProposer =
         context.roundSpecificPeers(interimRound).getProposer();
 
-    final SignedData<ProposalPayload> proposal =
+    final Proposal proposal =
         interimRoundProposer
             .getMessageFactory()
             .createSignedProposalPayload(
                 interimRound, context.createBlockForProposalFromChainHead(1, 30));
 
     interimRoundProposer.injectNewRound(
-        interimRound, new RoundChangeCertificate(roundChangePayloads), proposal);
+        interimRound, new RoundChangeCertificate(roundChangePayloads), proposal.getSignedPayload());
 
     peers.verifyNoMessagesReceived();
   }
@@ -159,11 +164,11 @@ public class ReceivedNewRoundTest {
     final Block reproposedBlock = context.createBlockForProposalFromChainHead(1, 15);
     final ConsensusRoundIdentifier nextRoundId = new ConsensusRoundIdentifier(1, 1);
 
-    final PreparedCertificate preparedCertificate =
-        createValidPreparedCertificate(context, roundId, initialBlock);
+    final TerminatedRoundArtefacts terminatedRoundArtefacts =
+        createValidTerminatedRoundArtefacts(context, roundId, initialBlock);
 
     final List<SignedData<RoundChangePayload>> roundChanges =
-        peers.createSignedRoundChangePayload(nextRoundId, preparedCertificate);
+        peers.createSignedRoundChangePayload(nextRoundId, terminatedRoundArtefacts);
 
     final RoundSpecificPeers nextRoles = context.roundSpecificPeers(nextRoundId);
     final ValidatorPeer nextProposer = nextRoles.getProposer();
@@ -174,7 +179,8 @@ public class ReceivedNewRoundTest {
         peers
             .getNonProposing(0)
             .getMessageFactory()
-            .createSignedProposalPayload(nextRoundId, reproposedBlock));
+            .createSignedProposalPayload(nextRoundId, reproposedBlock)
+            .getSignedPayload());
 
     peers.verifyMessagesReceived(
         localNodeMessageFactory.createSignedPreparePayload(nextRoundId, reproposedBlock.getHash()));
@@ -189,15 +195,17 @@ public class ReceivedNewRoundTest {
         peers
             .getNonProposing(0)
             .getMessageFactory()
-            .createSignedProposalPayload(nextRoundId, reproposedBlock));
+            .createSignedProposalPayload(nextRoundId, reproposedBlock)
+            .getSignedPayload());
 
     peers.verifyNoMessagesReceived();
 
     nextRoles.getNonProposing(1).injectPrepare(nextRoundId, reproposedBlock.getHash());
 
-    final SignedData<CommitPayload> expectedCommit =
-        TestHelpers.createSignedCommitPayload(
-            nextRoundId, reproposedBlock, context.getLocalNodeParams().getNodeKeyPair());
+    final Commit expectedCommit =
+        new Commit(
+            TestHelpers.createSignedCommitPayload(
+                nextRoundId, reproposedBlock, context.getLocalNodeParams().getNodeKeyPair()));
 
     peers.verifyMessagesReceived(expectedCommit);
   }

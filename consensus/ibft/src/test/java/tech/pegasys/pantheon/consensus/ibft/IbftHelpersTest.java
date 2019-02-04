@@ -17,10 +17,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequiredValidatorQuorum;
 
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -90,12 +90,12 @@ public class IbftHelpersTest {
     final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 4);
 
     final ConsensusRoundIdentifier preparedRound = TestHelpers.createFrom(roundIdentifier, 0, -1);
-    final SignedData<ProposalPayload> differentProposal =
+    final Proposal differentProposal =
         proposerMessageFactory.createSignedProposalPayload(preparedRound, proposedBlock);
 
-    final Optional<PreparedCertificate> latterPreparedCert =
+    final Optional<TerminatedRoundArtefacts> latterTerminatedRoundArtefacts =
         Optional.of(
-            new PreparedCertificate(
+            new TerminatedRoundArtefacts(
                 differentProposal,
                 Lists.newArrayList(
                     proposerMessageFactory.createSignedPreparePayload(
@@ -107,11 +107,11 @@ public class IbftHelpersTest {
     // is correctly followed.
     final ConsensusRoundIdentifier earlierPreparedRound =
         TestHelpers.createFrom(roundIdentifier, 0, -2);
-    final SignedData<ProposalPayload> earlierProposal =
+    final Proposal earlierProposal =
         proposerMessageFactory.createSignedProposalPayload(earlierPreparedRound, proposedBlock);
-    final Optional<PreparedCertificate> earlierPreparedCert =
+    final Optional<TerminatedRoundArtefacts> earlierTerminatedRoundArtefacts =
         Optional.of(
-            new PreparedCertificate(
+            new TerminatedRoundArtefacts(
                 earlierProposal,
                 Lists.newArrayList(
                     proposerMessageFactory.createSignedPreparePayload(
@@ -122,12 +122,16 @@ public class IbftHelpersTest {
     final Optional<PreparedCertificate> newestCert =
         IbftHelpers.findLatestPreparedCertificate(
             Lists.newArrayList(
-                proposerMessageFactory.createSignedRoundChangePayload(
-                    roundIdentifier, earlierPreparedCert),
-                proposerMessageFactory.createSignedRoundChangePayload(
-                    roundIdentifier, latterPreparedCert)));
+                proposerMessageFactory
+                    .createSignedRoundChangePayload(
+                        roundIdentifier, earlierTerminatedRoundArtefacts)
+                    .getSignedPayload(),
+                proposerMessageFactory
+                    .createSignedRoundChangePayload(roundIdentifier, latterTerminatedRoundArtefacts)
+                    .getSignedPayload()));
 
-    assertThat(newestCert).isEqualTo(latterPreparedCert);
+    assertThat(newestCert.get())
+        .isEqualTo(latterTerminatedRoundArtefacts.get().getPreparedCertificate());
   }
 
   @Test
@@ -139,10 +143,12 @@ public class IbftHelpersTest {
     final Optional<PreparedCertificate> newestCert =
         IbftHelpers.findLatestPreparedCertificate(
             Lists.newArrayList(
-                proposerMessageFactory.createSignedRoundChangePayload(
-                    roundIdentifier, Optional.empty()),
-                proposerMessageFactory.createSignedRoundChangePayload(
-                    roundIdentifier, Optional.empty())));
+                proposerMessageFactory
+                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty())
+                    .getSignedPayload(),
+                proposerMessageFactory
+                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty())
+                    .getSignedPayload()));
 
     assertThat(newestCert).isEmpty();
   }

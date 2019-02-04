@@ -21,14 +21,12 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.BlockValidator.BlockProcessingOutputs;
@@ -88,33 +86,30 @@ public class RoundChangeManagerTest {
     when(messageValidatorFactory.createAt(ri1))
         .thenAnswer(
             invocation ->
-                new MessageValidator(
+                new SignedDataValidator(
                     validators,
                     Util.publicKeyToAddress(proposerKey.getPublicKey()),
                     ri1,
                     blockValidator,
-                    protocolContext,
-                    parentHeader));
+                    protocolContext));
     when(messageValidatorFactory.createAt(ri2))
         .thenAnswer(
             invocation ->
-                new MessageValidator(
+                new SignedDataValidator(
                     validators,
                     Util.publicKeyToAddress(validator1Key.getPublicKey()),
                     ri2,
                     blockValidator,
-                    protocolContext,
-                    parentHeader));
+                    protocolContext));
     when(messageValidatorFactory.createAt(ri3))
         .thenAnswer(
             invocation ->
-                new MessageValidator(
+                new SignedDataValidator(
                     validators,
                     Util.publicKeyToAddress(validator2Key.getPublicKey()),
                     ri3,
                     blockValidator,
-                    protocolContext,
-                    parentHeader));
+                    protocolContext));
 
     final RoundChangeMessageValidator roundChangeMessageValidator =
         new RoundChangeMessageValidator(
@@ -129,7 +124,7 @@ public class RoundChangeManagerTest {
   private RoundChange makeRoundChangeMessage(
       final KeyPair key, final ConsensusRoundIdentifier round) {
     MessageFactory messageFactory = new MessageFactory(key);
-    return new RoundChange(messageFactory.createSignedRoundChangePayload(round, Optional.empty()));
+    return messageFactory.createSignedRoundChangePayload(round, Optional.empty());
   }
 
   private RoundChange makeRoundChangeMessageWithPreparedCert(
@@ -143,10 +138,9 @@ public class RoundChangeManagerTest {
     final ConsensusRoundIdentifier proposalRound = TestHelpers.createFrom(round, 0, -1);
     final Block block = TestHelpers.createProposalBlock(validators, proposalRound.getRoundNumber());
     // Proposal must come from an earlier round.
-    final SignedData<ProposalPayload> proposal =
-        messageFactory.createSignedProposalPayload(proposalRound, block);
+    final Proposal proposal = messageFactory.createSignedProposalPayload(proposalRound, block);
 
-    final List<SignedData<PreparePayload>> preparePayloads =
+    final List<Prepare> preparePayloads =
         prepareProviders
             .stream()
             .map(
@@ -156,9 +150,11 @@ public class RoundChangeManagerTest {
                 })
             .collect(Collectors.toList());
 
-    final PreparedCertificate cert = new PreparedCertificate(proposal, preparePayloads);
+    final TerminatedRoundArtefacts terminatedRoundArtects =
+        new TerminatedRoundArtefacts(proposal, preparePayloads);
 
-    return new RoundChange(messageFactory.createSignedRoundChangePayload(round, Optional.of(cert)));
+    return messageFactory.createSignedRoundChangePayload(
+        round, Optional.of(terminatedRoundArtects));
   }
 
   @Test
