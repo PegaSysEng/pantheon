@@ -1733,6 +1733,50 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
 
 ### debug_storageRangeAt
 
+[Remix](https://remix.ethereum.org/) uses `debug_storageRangeAt` to implement debugging. Use the _Debugger_ tab in Remix rather than calling `debug_storageRangeAt` directly.  
+
+Returns the contract storage for the specified range. 
+
+**Parameters**
+
+`blockHash` : `data` - Block hash
+
+`txIndex` : `integer` - Transaction index from which to start
+
+`address` : `data` - Contract address 
+
+`startKey` : `hash` - Start key
+
+`limit` : `integer` - Number of storage entries to return 
+
+**Returns**
+
+`result`:`object` - [Range object](JSON-RPC-API-Objects.md#range-object)  
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_storageRangeAt","params":["0x2b76b3a2fc44c0e21ea183d06c846353279a7acf12abcc6fb9d5e8fb14ae2f8c",0,"0x0e0d2c8f7794e82164f11798276a188147fbd415","0x0000000000000000000000000000000000000000000000000000000000000000",1], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"debug_storageRangeAt","params":["0x2b76b3a2fc44c0e21ea183d06c846353279a7acf12abcc6fb9d5e8fb14ae2f8c",0,"0x0e0d2c8f7794e82164f11798276a188147fbd415","0x0000000000000000000000000000000000000000000000000000000000000000",1], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "storage": {
+                "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563": {
+                    "key": null,
+                    "value": "0x0000000000000000000000000000000000000000000000000000000000000001"
+                }
+            },
+            "nextKey": "0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6"
+        }
+    }
+    ```
 
 ### debug_metrics
 
