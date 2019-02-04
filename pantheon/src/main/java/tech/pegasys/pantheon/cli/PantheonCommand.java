@@ -583,21 +583,27 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
-    final PermissioningConfiguration permissioningConfiguration = permissioningConfiguration();
-    ensureAllBootnodesAreInWhitelist(ethNetworkConfig, permissioningConfiguration);
+    try {
+      final Optional<PermissioningConfiguration> permissioningConfiguration =
+          permissioningConfiguration();
+      permissioningConfiguration.ifPresent(
+          p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
 
-    synchronize(
-        buildController(),
-        p2pEnabled,
-        peerDiscoveryEnabled,
-        ethNetworkConfig.getBootNodes(),
-        maxPeers,
-        p2pHost,
-        p2pPort,
-        jsonRpcConfiguration(),
-        webSocketConfiguration(),
-        metricsConfiguration(),
-        permissioningConfiguration);
+      synchronize(
+          buildController(),
+          p2pEnabled,
+          peerDiscoveryEnabled,
+          ethNetworkConfig.getBootNodes(),
+          maxPeers,
+          p2pHost,
+          p2pPort,
+          jsonRpcConfiguration(),
+          webSocketConfiguration(),
+          metricsConfiguration(),
+          permissioningConfiguration);
+    } catch (Exception e) {
+      throw new ParameterException(new CommandLine(this), e.getMessage());
+    }
   }
 
   private NetworkName getNetwork() {
@@ -732,21 +738,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsConfiguration;
   }
 
-  private PermissioningConfiguration permissioningConfiguration() {
+  private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
 
     if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
-      return PermissioningConfiguration.createDefault();
+      return Optional.empty();
     }
 
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
             getPermissionsConfigPath(), permissionsNodesEnabled, permissionsAccountsEnabled);
-    return permissioningConfiguration;
+    return Optional.of(permissioningConfiguration);
   }
 
-  private PrivacyParameters orionConfiguration() {
+  private PrivacyParameters orionConfiguration() throws IOException {
 
-    // Check that mining options are able top work or send an error
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
@@ -756,10 +761,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
 
     final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
-    privacyParameters.setEnabled(privacyEnabled);
-    privacyParameters.setUrl(privacyUrl.toString());
-    privacyParameters.setPublicKey(privacyPublicKeyFile);
-    privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
+    if (privacyEnabled) {
+      privacyParameters.setEnabled(privacyEnabled);
+      privacyParameters.setUrl(privacyUrl.toString());
+      if (privacyPublicKeyFile != null) {
+        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile);
+      } else {
+        throw new IOException("Please specify Enclave public Key file path to Enable Privacy");
+      }
+      privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
+    }
     return privacyParameters;
   }
 
@@ -781,9 +792,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final PermissioningConfiguration permissioningConfiguration) {
+      final Optional<PermissioningConfiguration> permissioningConfiguration) {
 
     checkNotNull(runnerBuilder);
+
+    permissioningConfiguration.ifPresent(runnerBuilder::permissioningConfiguration);
 
     final Runner runner =
         runnerBuilder
@@ -801,7 +814,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem)
             .metricsConfiguration(metricsConfiguration)
-            .permissioningConfiguration(permissioningConfiguration)
             .build();
 
     addShutdownHook(runner);

@@ -126,7 +126,7 @@ public class JsonRpcHttpServiceTest {
                     mock(EthHashMiningCoordinator.class),
                     new NoOpMetricsSystem(),
                     supportedCapabilities,
-                    mock(AccountWhitelistController.class),
+                    Optional.of(mock(AccountWhitelistController.class)),
                     JSON_RPC_APIS,
                     mock(PrivateTransactionHandler.class)));
     service = createJsonRpcHttpService();
@@ -163,6 +163,17 @@ public class JsonRpcHttpServiceTest {
   @AfterClass
   public static void shutdownServer() {
     service.stop().join();
+  }
+
+  @Test
+  public void handleLoginRequestWithAuthDisabled() throws Exception {
+    final RequestBody body =
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
+    try (final Response resp = client.newCall(request).execute()) {
+      assertThat(resp.code()).isEqualTo(400);
+      assertThat(resp.message()).isEqualTo("Authentication not enabled");
+    }
   }
 
   @Test
