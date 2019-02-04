@@ -1731,10 +1731,10 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
     The `DEBUG` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `DEBUG` API methods.
 
-### debug_metrics
+### debug_storageRangeAt
 
-!!!note
-    This method is only available only from v0.8.3.
+
+### debug_metrics
 
 Returns metrics providing information on the internal operation of Pantheon. 
 
