@@ -269,8 +269,6 @@ public class RoundStateTest {
     assertThat(roundState.isCommitted()).isTrue();
 
     assertThat(roundState.getCommitSeals())
-        .containsOnly(
-            firstCommit.getCommitSeal(),
-            secondCommit.getCommitSeal());
+        .containsOnly(firstCommit.getCommitSeal(), secondCommit.getCommitSeal());
   }
 }
