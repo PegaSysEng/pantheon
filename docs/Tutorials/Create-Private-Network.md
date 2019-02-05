@@ -24,7 +24,7 @@ To create a private network:
 1. [Get Public Key of First Node](#3-get-public-key-of-first-node)
 1. [Start First Node as Bootnode](#4-restart-first-node-as-bootnode)
 1. [Start Additional Nodes](#5-start-additional-nodes)
-1. [Confirm Private Network Working](#6-confirm-private-network-working)
+1. [Confirm Private Network Working](#6-confirm-private-network-is-working)
 
 ### 1. Create Folders 
 
@@ -165,7 +165,7 @@ Start another terminal, change to the `Node-3` directory and start Node-3 specif
  * Bootnode, genesis file, and network ID as for Node-2. 
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-3-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port30305      
+pantheon --data-path=Node-3-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30305      
 ```
 
 ```bash tab="Windows"
