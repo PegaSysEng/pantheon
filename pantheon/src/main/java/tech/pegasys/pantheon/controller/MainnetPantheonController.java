@@ -43,7 +43,6 @@ import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.IOException;
@@ -138,13 +137,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
             worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem.createLabelledTimer(
-                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"),
-            metricsSystem.createLabelledCounter(
-                MetricCategory.SYNCHRONIZER,
-                "fast_sync_validation_mode",
-                "Number of blocks validated using light vs full validation during fast sync",
-                "validationMode"));
+            metricsSystem);
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(

@@ -26,8 +26,9 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.services.queue.InMemoryBigQueue;
 import tech.pegasys.pantheon.util.ExceptionUtils;
@@ -57,11 +58,14 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       final WorldStateStorage worldStateStorage,
       final EthContext ethContext,
       final SyncState syncState,
-      final LabelledMetric<OperationTimer> ethTasksTimer,
-      final LabelledMetric<Counter> fastSyncValidationCounter) {
+      final MetricsSystem metricsSystem) {
     this.syncConfig = syncConfig;
     this.ethContext = ethContext;
     this.syncState = syncState;
+
+    final LabelledMetric<OperationTimer> ethTasksTimer =
+        metricsSystem.createLabelledTimer(
+            MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
     this.blockPropagationManager =
         new BlockPropagationManager<>(
             syncConfig,
@@ -97,7 +101,11 @@ public class DefaultSynchronizer<C> implements Synchronizer {
                       ethContext,
                       syncState,
                       ethTasksTimer,
-                      fastSyncValidationCounter),
+                      metricsSystem.createLabelledCounter(
+                          MetricCategory.SYNCHRONIZER,
+                          "fast_sync_validation_mode",
+                          "Number of blocks validated using light vs full validation during fast sync",
+                          "validationMode")),
                   worldStateDownloader));
     } else {
       this.fastSyncDownloader = Optional.empty();

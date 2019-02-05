@@ -74,7 +74,6 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
@@ -179,13 +178,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem.createLabelledTimer(
-                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"),
-            metricsSystem.createLabelledCounter(
-                MetricCategory.SYNCHRONIZER,
-                "fast_sync_validation_mode",
-                "Number of blocks validated using light vs full validation during fast sync",
-                "validationMode"));
+            metricsSystem);
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
