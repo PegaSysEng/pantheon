@@ -233,25 +233,30 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
     return executeWorkerSubTask(
         ethContext.getScheduler(),
         () -> {
-          final CompletableFuture<List<BlockHeader>> result = new CompletableFuture<>();
-          final BlockHeader parentHeader = headers.get(0);
-          final BlockHeader childHeader = headers.get(1);
-          final ProtocolSpec<C> protocolSpec =
-              protocolSchedule.getByBlockNumber(childHeader.getNumber());
-          final BlockHeaderValidator<C> blockHeaderValidator =
-              protocolSpec.getBlockHeaderValidator();
-          if (blockHeaderValidator.validateHeader(
-              childHeader, parentHeader, protocolContext, headerValidationMode)) {
-            // The first header will be imported by the previous request range.
-            result.complete(headers.subList(1, headers.size()));
-          } else {
-            result.completeExceptionally(
-                new InvalidBlockException(
-                    "Provided first header does not connect to last header.",
-                    parentHeader.getNumber(),
-                    parentHeader.getHash()));
+          try {
+            final CompletableFuture<List<BlockHeader>> result = new CompletableFuture<>();
+            final BlockHeader parentHeader = headers.get(0);
+            final BlockHeader childHeader = headers.get(1);
+            final ProtocolSpec<C> protocolSpec =
+                protocolSchedule.getByBlockNumber(childHeader.getNumber());
+            final BlockHeaderValidator<C> blockHeaderValidator =
+                protocolSpec.getBlockHeaderValidator();
+            if (blockHeaderValidator.validateHeader(
+                childHeader, parentHeader, protocolContext, headerValidationMode)) {
+              // The first header will be imported by the previous request range.
+              result.complete(headers.subList(1, headers.size()));
+            } else {
+              result.completeExceptionally(
+                  new InvalidBlockException(
+                      "Provided first header does not connect to last header.",
+                      parentHeader.getNumber(),
+                      parentHeader.getHash()));
+            }
+            return result;
+          } catch (Throwable t) {
+            LOG.error("Failed", t);
+            throw t;
           }
-          return result;
         });
   }
 
