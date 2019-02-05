@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync;
 
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 
+@FunctionalInterface
 public interface ValidationPolicy {
 
   HeaderValidationMode getValidationModeForNextBlock();
