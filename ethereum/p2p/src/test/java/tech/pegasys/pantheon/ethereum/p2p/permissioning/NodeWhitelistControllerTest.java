@@ -129,7 +129,7 @@ public class NodeWhitelistControllerTest {
   }
 
   @Test
-  public void whenNodesIdAreDifferentItShouldNotBePermitted() {
+  public void whenNodeIdsAreDifferentItShouldNotBePermitted() {
     Peer peer1 =
         new DefaultPeer(
             BytesValue.fromHexString(
@@ -169,7 +169,7 @@ public class NodeWhitelistControllerTest {
   }
 
   @Test
-  public void whenNodesUpdPortsAreDifferentItShouldNotBePermitted() {
+  public void whenNodesUdpPortsAreDifferentItShouldNotBePermitted() {
     Peer peer1 =
         new DefaultPeer(
             BytesValue.fromHexString(
@@ -189,7 +189,7 @@ public class NodeWhitelistControllerTest {
   }
 
   @Test
-  public void whenCheckingIfNodeIsPermittedTpcPortShouldNotBeConsideredIfAbsent() {
+  public void whenCheckingIfNodeIsPermittedTcpPortShouldNotBeConsideredIfAbsent() {
     Peer peerWithTcpPortSet =
         new DefaultPeer(
             BytesValue.fromHexString(
@@ -197,20 +197,20 @@ public class NodeWhitelistControllerTest {
             "127.0.0.1",
             30303,
             10001);
-    Peer peerWithoutTpcPortSet =
+    Peer peerWithoutTcpPortSet =
         new DefaultPeer(
             BytesValue.fromHexString(
                 "0x6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0"),
             "127.0.0.1",
             30303);
 
-    controller.addNode(peerWithoutTpcPortSet);
+    controller.addNode(peerWithoutTcpPortSet);
 
     assertThat(controller.isPermitted(peerWithTcpPortSet)).isTrue();
   }
 
   @Test
-  public void whenCheckingIfNodeIsPermittedTpcPortShouldBeConsideredIfPresent() {
+  public void whenCheckingIfNodeIsPermittedTcpPortShouldBeConsideredIfPresent() {
     Peer peerWithTcpPortSet =
         new DefaultPeer(
             BytesValue.fromHexString(
@@ -218,7 +218,7 @@ public class NodeWhitelistControllerTest {
             "127.0.0.1",
             30303,
             10001);
-    Peer peerWithDifferentTpcPortSet =
+    Peer peerWithDifferentTcpPortSet =
         new DefaultPeer(
             BytesValue.fromHexString(
                 "0x6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0"),
@@ -226,7 +226,7 @@ public class NodeWhitelistControllerTest {
             30303,
             10002);
 
-    controller.addNode(peerWithDifferentTpcPortSet);
+    controller.addNode(peerWithDifferentTcpPortSet);
 
     assertThat(controller.isPermitted(peerWithTcpPortSet)).isFalse();
   }
