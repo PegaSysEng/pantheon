@@ -60,6 +60,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Map;
@@ -109,6 +110,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
       final MiningParameters miningParams,
       final int networkId,
       final KeyPair nodeKeys,
+      final Path dataDirectory,
       final MetricsSystem metricsSystem) {
     final Address localAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
     final CliqueConfigOptions cliqueConfig =
@@ -150,7 +152,8 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             networkId,
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism());
+            syncConfig.transactionsParallelism(),
+            syncConfig.computationParallelism());
     final SyncState syncState =
         new SyncState(
             protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
@@ -162,6 +165,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
+            dataDirectory,
             metricsSystem);
 
     final TransactionPool transactionPool =

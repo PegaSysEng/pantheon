@@ -29,9 +29,9 @@ public class SynchronizerConfiguration {
   private static final Logger LOG = LogManager.getLogger();
 
   // TODO: Determine reasonable defaults here
-  public static int DEFAULT_PIVOT_DISTANCE_FROM_HEAD = 500;
-  public static float DEFAULT_FULL_VALIDATION_RATE = .1f;
-  public static int DEFAULT_FAST_SYNC_MINIMUM_PEERS = 5;
+  public static final int DEFAULT_PIVOT_DISTANCE_FROM_HEAD = 500;
+  public static final float DEFAULT_FULL_VALIDATION_RATE = .1f;
+  public static final int DEFAULT_FAST_SYNC_MINIMUM_PEERS = 5;
   private static final Duration DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME = Duration.ofMinutes(5);
   private static final int DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST = 200;
   private static final int DEFAULT_WORLD_STATE_REQUEST_PARALLELISM = 10;
@@ -62,6 +62,7 @@ public class SynchronizerConfiguration {
   private final int maxTrailingPeers;
   private final int downloaderParallelism;
   private final int transactionsParallelism;
+  private final int computationParallelism;
 
   private SynchronizerConfiguration(
       final SyncMode requestedSyncMode,
@@ -82,7 +83,8 @@ public class SynchronizerConfiguration {
       final long trailingPeerBlocksBehindThreshold,
       final int maxTrailingPeers,
       final int downloaderParallelism,
-      final int transactionsParallelism) {
+      final int transactionsParallelism,
+      final int computationParallelism) {
     this.requestedSyncMode = requestedSyncMode;
     this.fastSyncPivotDistance = fastSyncPivotDistance;
     this.fastSyncFullValidationRate = fastSyncFullValidationRate;
@@ -102,6 +104,7 @@ public class SynchronizerConfiguration {
     this.maxTrailingPeers = maxTrailingPeers;
     this.downloaderParallelism = downloaderParallelism;
     this.transactionsParallelism = transactionsParallelism;
+    this.computationParallelism = computationParallelism;
   }
 
   /**
@@ -147,7 +150,8 @@ public class SynchronizerConfiguration {
         trailingPeerBlocksBehindThreshold,
         maxTrailingPeers,
         downloaderParallelism,
-        transactionsParallelism);
+        transactionsParallelism,
+        computationParallelism);
   }
 
   public static Builder builder() {
@@ -232,6 +236,10 @@ public class SynchronizerConfiguration {
     return transactionsParallelism;
   }
 
+  public int computationParallelism() {
+    return computationParallelism;
+  }
+
   /**
    * The rate at which blocks should be fully validated during fast sync. At a rate of 1f, all
    * blocks are fully validated. At rates less than 1f, a subset of blocks will undergo light-weight
@@ -260,8 +268,6 @@ public class SynchronizerConfiguration {
   }
 
   public static class Builder {
-    private int fastSyncPivotDistance = DEFAULT_PIVOT_DISTANCE_FROM_HEAD;
-    private float fastSyncFullValidationRate = DEFAULT_FULL_VALIDATION_RATE;
     private SyncMode syncMode = SyncMode.FULL;
     private Range<Long> blockPropagationRange = Range.closed(-10L, 30L);
     private long downloaderChangeTargetThresholdByHeight = 20L;
@@ -274,6 +280,11 @@ public class SynchronizerConfiguration {
     private int maxTrailingPeers = Integer.MAX_VALUE;
     private int downloaderParallelism = 2;
     private int transactionsParallelism = 2;
+    private int computationParallelism = Runtime.getRuntime().availableProcessors();
+    private int fastSyncPivotDistance = DEFAULT_PIVOT_DISTANCE_FROM_HEAD;
+    private float fastSyncFullValidationRate = DEFAULT_FULL_VALIDATION_RATE;
+    private int fastSyncMinimumPeerCount = DEFAULT_FAST_SYNC_MINIMUM_PEERS;
+    private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
 
     public Builder fastSyncPivotDistance(final int distance) {
       fastSyncPivotDistance = distance;
@@ -350,13 +361,28 @@ public class SynchronizerConfiguration {
       return this;
     }
 
+    public Builder computationParallelism(final int computationParallelism) {
+      this.computationParallelism = computationParallelism;
+      return this;
+    }
+
+    public Builder fastSyncMinimumPeerCount(final int fastSyncMinimumPeerCount) {
+      this.fastSyncMinimumPeerCount = fastSyncMinimumPeerCount;
+      return this;
+    }
+
+    public Builder fastSyncMaximumPeerWaitTime(final Duration fastSyncMaximumPeerWaitTime) {
+      this.fastSyncMaximumPeerWaitTime = fastSyncMaximumPeerWaitTime;
+      return this;
+    }
+
     public SynchronizerConfiguration build() {
       return new SynchronizerConfiguration(
           syncMode,
           fastSyncPivotDistance,
           fastSyncFullValidationRate,
-          DEFAULT_FAST_SYNC_MINIMUM_PEERS,
-          DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME,
+          fastSyncMinimumPeerCount,
+          fastSyncMaximumPeerWaitTime,
           DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST,
           DEFAULT_WORLD_STATE_REQUEST_PARALLELISM,
           blockPropagationRange,
@@ -370,7 +396,8 @@ public class SynchronizerConfiguration {
           trailingPeerBlocksBehindThreshold,
           maxTrailingPeers,
           downloaderParallelism,
-          transactionsParallelism);
+          transactionsParallelism,
+          computationParallelism);
     }
   }
 }

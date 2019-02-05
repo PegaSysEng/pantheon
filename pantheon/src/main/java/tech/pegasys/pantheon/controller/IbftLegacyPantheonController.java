@@ -57,6 +57,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -107,6 +108,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
       final boolean ottomanTestnetOperation,
       final int networkId,
       final KeyPair nodeKeys,
+      final Path dataDirectory,
       final MetricsSystem metricsSystem) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
         IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
@@ -148,7 +150,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig.transactionsParallelism(),
+              syncConfig.computationParallelism());
     } else {
       ethSubProtocol = EthProtocol.get();
       ethProtocolManager =
@@ -158,7 +161,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig.transactionsParallelism(),
+              syncConfig.computationParallelism());
     }
 
     final SyncState syncState =
@@ -172,6 +176,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
+            dataDirectory,
             metricsSystem);
 
     final Runnable closer =
