@@ -14,11 +14,11 @@ package tech.pegasys.pantheon.cli;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.consensys.cava.toml.Toml;
-import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseError;
 import net.consensys.cava.toml.TomlParseResult;
 import picocli.CommandLine;
@@ -53,48 +53,51 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
   }
 
   private String getConfigurationValue(final OptionSpec optionSpec) {
-    final String optionKey = getConfigurationKey(optionSpec);
     final String
         defaultValue; // Convert values to the right string representation for default string value
     if (optionSpec.type().equals(Boolean.class)) {
-      defaultValue = getBooleanEntryAsString(optionKey);
+      defaultValue = getBooleanEntryAsString(optionSpec);
     } else if (optionSpec.isMultiValue()) {
-      defaultValue = getListEntryAsString(optionKey);
+      defaultValue = getListEntryAsString(optionSpec);
     } else if (optionSpec.type().equals(Integer.class)) {
-      defaultValue = getIntegerEntryAsString(optionKey);
+      defaultValue = getIntegerEntryAsString(optionSpec);
     } else { // else will be treated as String
-      defaultValue = getEntryAsString(optionKey);
+      defaultValue = getEntryAsString(optionSpec);
     }
     return defaultValue;
   }
 
-  private String getEntryAsString(final String optionKey) {
-    return result.getString(optionKey);
+  private String getEntryAsString(final OptionSpec spec) {
+    // return the string value of the config line corresponding to the option
+    // or null if non present in the config
+    return getKeyName(spec).map(result::getString).orElse(null);
   }
 
-  private String getListEntryAsString(final String optionKey) {
-    final TomlArray tomlArray = result.getArray(optionKey);
-    if (tomlArray != null) {
-      final List<String> items =
-          tomlArray.toList().stream().map(e -> (String) e).collect(Collectors.toList());
-      return String.join(",", items);
-    }
-    return null;
+  private Optional<String> getKeyName(final OptionSpec spec) {
+    // If any of the names of the option are used as key in the toml results
+    // then return the value of first one.
+    return Arrays.stream(spec.names())
+        .map(name -> name.replaceFirst("^-+", ""))
+        .filter(result::contains).findFirst();
   }
 
-  private String getBooleanEntryAsString(final String optionKey) {
-    final Boolean booleanValue = result.getBoolean(optionKey);
-    if (booleanValue != null) {
-      return !booleanValue ? "false" : "true";
-    }
-    return null;
+  private String getListEntryAsString(final OptionSpec spec) {
+    // return the array value of the config line corresponding to the option
+    // or null if non present in the config
+    return getKeyName(spec)
+        .map(result::getArray)
+        .map(
+            tomlArray ->
+                tomlArray.toList().stream().map(Object::toString).collect(Collectors.joining(",")))
+        .orElse(null);
   }
 
-  private String getIntegerEntryAsString(final String optionKey) {
-    if (result.get(optionKey) != null) {
-      return String.valueOf(result.get(optionKey));
-    }
-    return null;
+  private String getBooleanEntryAsString(final OptionSpec spec) {
+    return getKeyName(spec).map(result::getBoolean).map(Object::toString).orElse(null);
+  }
+
+  private String getIntegerEntryAsString(final OptionSpec spec) {
+    return getKeyName(spec).map(result::get).map(String::valueOf).orElse(null);
   }
 
   private void checkConfigurationValidity() {
