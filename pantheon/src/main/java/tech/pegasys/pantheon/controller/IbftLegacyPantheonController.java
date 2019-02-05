@@ -174,7 +174,11 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             ethProtocolManager.ethContext(),
             syncState,
             metricsSystem.createLabelledTimer(
-                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"));
+                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"),
+            metricsSystem.createLabelledCounter(
+                MetricCategory.SYNCHRONIZER,
+                "fast_sync_validation_mode",
+                "Number of blocks validated using light vs full validation during fast sync"));
 
     final Runnable closer =
         () -> {

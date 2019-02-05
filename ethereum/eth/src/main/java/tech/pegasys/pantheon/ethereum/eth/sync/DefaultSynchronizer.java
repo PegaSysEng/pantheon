@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.services.queue.InMemoryBigQueue;
@@ -56,7 +57,8 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       final WorldStateStorage worldStateStorage,
       final EthContext ethContext,
       final SyncState syncState,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final LabelledMetric<OperationTimer> ethTasksTimer,
+      final LabelledMetric<Counter> fastSyncValidationCounter) {
     this.syncConfig = syncConfig;
     this.ethContext = ethContext;
     this.syncState = syncState;
@@ -94,7 +96,8 @@ public class DefaultSynchronizer<C> implements Synchronizer {
                       protocolContext,
                       ethContext,
                       syncState,
-                      ethTasksTimer),
+                      ethTasksTimer,
+                      fastSyncValidationCounter),
                   worldStateDownloader));
     } else {
       this.fastSyncDownloader = Optional.empty();
