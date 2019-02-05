@@ -168,7 +168,8 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             metricsSystem.createLabelledCounter(
                 MetricCategory.SYNCHRONIZER,
                 "fast_sync_validation_mode",
-                "Number of blocks validated using light vs full validation during fast sync"));
+                "Number of blocks validated using light vs full validation during fast sync",
+                "validationMode"));
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
