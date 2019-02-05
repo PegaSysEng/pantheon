@@ -78,7 +78,8 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
     // then return the value of first one.
     return Arrays.stream(spec.names())
         .map(name -> name.replaceFirst("^-+", ""))
-        .filter(result::contains).findFirst();
+        .filter(result::contains)
+        .findFirst();
   }
 
   private String getListEntryAsString(final OptionSpec spec) {
