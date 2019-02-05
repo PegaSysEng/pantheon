@@ -71,7 +71,7 @@ public class RoundStateTest {
 
     assertThat(roundState.isPrepared()).isFalse();
     assertThat(roundState.isCommitted()).isFalse();
-    assertThat(roundState.constructPreparedCertificate()).isEmpty();
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isEmpty();
   }
 
   @Test
@@ -85,7 +85,7 @@ public class RoundStateTest {
     assertThat(roundState.setProposedBlock(proposal)).isFalse();
     assertThat(roundState.isPrepared()).isFalse();
     assertThat(roundState.isCommitted()).isFalse();
-    assertThat(roundState.constructPreparedCertificate()).isEmpty();
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isEmpty();
   }
 
   @Test
@@ -99,15 +99,20 @@ public class RoundStateTest {
     assertThat(roundState.setProposedBlock(proposal)).isTrue();
     assertThat(roundState.isPrepared()).isTrue();
     assertThat(roundState.isCommitted()).isFalse();
-    assertThat(roundState.constructPreparedCertificate()).isNotEmpty();
-    assertThat(roundState.constructPreparedCertificate().get().getProposalPayload())
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isNotEmpty();
+    assertThat(
+            roundState
+                .constructTerminatedRoundArtefacts()
+                .get()
+                .getPreparedCertificate()
+                .getProposalPayload())
         .isEqualTo(proposal.getSignedPayload());
   }
 
   @Test
   public void singleValidatorRequiresCommitMessageToBeCommitted() {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
 
     final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
 
@@ -129,7 +134,7 @@ public class RoundStateTest {
     roundState.addCommitMessage(commit);
     assertThat(roundState.isPrepared()).isTrue();
     assertThat(roundState.isCommitted()).isTrue();
-    assertThat(roundState.constructPreparedCertificate()).isNotEmpty();
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isNotEmpty();
   }
 
   @Test
@@ -152,19 +157,19 @@ public class RoundStateTest {
     roundState.addPrepareMessage(firstPrepare);
     assertThat(roundState.isPrepared()).isFalse();
     assertThat(roundState.isCommitted()).isFalse();
-    assertThat(roundState.constructPreparedCertificate()).isEmpty();
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isEmpty();
 
     roundState.addPrepareMessage(secondPrepare);
     assertThat(roundState.isPrepared()).isFalse();
     assertThat(roundState.isCommitted()).isFalse();
-    assertThat(roundState.constructPreparedCertificate()).isEmpty();
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isEmpty();
 
     final Proposal proposal =
         validatorMessageFactories.get(0).createSignedProposalPayload(roundIdentifier, block);
     assertThat(roundState.setProposedBlock(proposal)).isTrue();
     assertThat(roundState.isPrepared()).isTrue();
     assertThat(roundState.isCommitted()).isFalse();
-    assertThat(roundState.constructPreparedCertificate()).isNotEmpty();
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isNotEmpty();
   }
 
   @Test
@@ -184,9 +189,8 @@ public class RoundStateTest {
     final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
 
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(firstPrepare.getSignedPayload())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(secondPrepare.getSignedPayload()))
-        .thenReturn(false);
+    when(messageValidator.validatePrepareMessage(firstPrepare)).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(secondPrepare)).thenReturn(false);
 
     roundState.addPrepareMessage(firstPrepare);
     roundState.addPrepareMessage(secondPrepare);
@@ -198,7 +202,7 @@ public class RoundStateTest {
     assertThat(roundState.setProposedBlock(proposal)).isTrue();
     assertThat(roundState.isPrepared()).isFalse();
     assertThat(roundState.isCommitted()).isFalse();
-    assertThat(roundState.constructPreparedCertificate()).isEmpty();
+    assertThat(roundState.constructTerminatedRoundArtefacts()).isEmpty();
   }
 
   @Test
@@ -219,10 +223,8 @@ public class RoundStateTest {
         validatorMessageFactories.get(0).createSignedProposalPayload(roundIdentifier, block);
 
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(firstPrepare.getSignedPayload()))
-        .thenReturn(false);
-    when(messageValidator.validatePrepareMessage(secondPrepare.getSignedPayload()))
-        .thenReturn(true);
+    when(messageValidator.validatePrepareMessage(firstPrepare)).thenReturn(false);
+    when(messageValidator.validatePrepareMessage(secondPrepare)).thenReturn(true);
 
     roundState.setProposedBlock(proposal);
     assertThat(roundState.isPrepared()).isFalse();
@@ -237,7 +239,7 @@ public class RoundStateTest {
   @Test
   public void commitSealsAreExtractedFromReceivedMessages() {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
 
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
 
@@ -267,8 +269,6 @@ public class RoundStateTest {
     assertThat(roundState.isCommitted()).isTrue();
 
     assertThat(roundState.getCommitSeals())
-        .containsOnly(
-            firstCommit.getSignedPayload().getPayload().getCommitSeal(),
-            secondCommit.getSignedPayload().getPayload().getCommitSeal());
+        .containsOnly(firstCommit.getCommitSeal(), secondCommit.getCommitSeal());
   }
 }
