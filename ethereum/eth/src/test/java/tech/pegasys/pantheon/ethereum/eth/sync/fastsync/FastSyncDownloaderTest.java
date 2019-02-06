@@ -56,6 +56,8 @@ public class FastSyncDownloaderTest {
         .thenReturn(completedFuture(downloadPivotBlockHeaderState));
     when(fastSyncActions.downloadChain(downloadPivotBlockHeaderState)).thenReturn(COMPLETE);
     when(worldStateDownloader.run(pivotBlockHeader)).thenReturn(COMPLETE);
+    when(fastSyncActions.finalizeFastSync(downloadPivotBlockHeaderState))
+        .thenReturn(downloadPivotBlockHeaderState);
 
     final CompletableFuture<FastSyncState> result = downloader.start();
 
@@ -64,8 +66,8 @@ public class FastSyncDownloaderTest {
     verify(fastSyncActions).downloadPivotBlockHeader(selectPivotBlockState);
     verify(fastSyncActions).downloadChain(downloadPivotBlockHeaderState);
     verify(worldStateDownloader).run(pivotBlockHeader);
-    verifyNoMoreInteractions(fastSyncActions);
-    verifyNoMoreInteractions(worldStateDownloader);
+    verify(fastSyncActions).finalizeFastSync(downloadPivotBlockHeaderState);
+    verifyNoMoreInteractions(fastSyncActions, worldStateDownloader);
     assertThat(result).isCompletedWithValue(downloadPivotBlockHeaderState);
   }
 
