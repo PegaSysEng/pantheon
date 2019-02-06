@@ -36,7 +36,8 @@ public class FastSyncDownloader<C> {
         .waitForSuitablePeers()
         .thenCompose(state -> fastSyncActions.selectPivotBlock())
         .thenCompose(fastSyncActions::downloadPivotBlockHeader)
-        .thenCompose(this::downloadChainAndWorldState);
+        .thenCompose(this::downloadChainAndWorldState)
+        .thenApply(fastSyncActions::finalizeFastSync);
   }
 
   private CompletableFuture<FastSyncState> downloadChainAndWorldState(

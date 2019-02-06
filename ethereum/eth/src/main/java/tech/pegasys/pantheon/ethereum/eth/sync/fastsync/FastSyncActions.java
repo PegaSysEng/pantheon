@@ -176,4 +176,9 @@ public class FastSyncActions<C> {
             currentState.getPivotBlockHeader().get());
     return downloader.start();
   }
+
+  public FastSyncState finalizeFastSync(final FastSyncState fastSyncState) {
+    protocolContext.getBlockchain().fastSyncComplete();
+    return fastSyncState;
+  }
 }

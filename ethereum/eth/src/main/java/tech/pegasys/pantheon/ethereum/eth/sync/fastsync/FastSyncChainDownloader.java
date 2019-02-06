@@ -40,7 +40,6 @@ public class FastSyncChainDownloader<C> {
   private final EthContext ethContext;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
   private final LabelledMetric<Counter> fastSyncValidationCounter;
-  private final BlockHeader pivotBlockHeader;
 
   FastSyncChainDownloader(
       final SynchronizerConfiguration config,
@@ -57,7 +56,6 @@ public class FastSyncChainDownloader<C> {
     this.ethContext = ethContext;
     this.ethTasksTimer = ethTasksTimer;
     this.fastSyncValidationCounter = fastSyncValidationCounter;
-    this.pivotBlockHeader = pivotBlockHeader;
     chainDownloader =
         new ChainDownloader<>(
             config,
@@ -117,8 +115,7 @@ public class FastSyncChainDownloader<C> {
                 protocolContext,
                 ethContext,
                 ethTasksTimer,
-                attachedValidationPolicy,
-                pivotBlockHeader),
+                attachedValidationPolicy),
             detatchedValidationPolicy,
             checkpointHeaders);
     return importTask
