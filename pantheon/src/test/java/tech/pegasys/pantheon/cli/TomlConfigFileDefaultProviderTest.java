@@ -61,14 +61,14 @@ public class TomlConfigFileDefaultProviderTest {
       assertThat(providerUnderTest.defaultValue(OptionSpec.builder("a-short-option").build()))
           .isEqualTo("123");
 
-      // this option must be found in config as one of it's names is present in the file.
+      // this option must be found in config as one of its names is present in the file.
       // also this is the shortest one.
       assertThat(
               providerUnderTest.defaultValue(
                   OptionSpec.builder("a-short-option", "another-name-for-the-option").build()))
           .isEqualTo("123");
 
-      // this option must be found in config as one of it's names is present in the file.
+      // this option must be found in config as one of its names is present in the file.
       // also this is the longest one.
       assertThat(
               providerUnderTest.defaultValue(

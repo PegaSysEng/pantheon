@@ -47,14 +47,9 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
     return argSpec.isOption() ? getConfigurationValue(((OptionSpec) argSpec)) : null;
   }
 
-  private String getConfigurationKey(final OptionSpec optionSpec) {
-    // remove leading dashes on option name as we can have "--" or "-" options
-    return optionSpec.longestName().replaceFirst("^-+", "");
-  }
-
   private String getConfigurationValue(final OptionSpec optionSpec) {
-    final String
-        defaultValue; // Convert values to the right string representation for default string value
+    final String defaultValue;
+    // Convert config values to the right string representation for default string value
     if (optionSpec.type().equals(Boolean.class)) {
       defaultValue = getBooleanEntryAsString(optionSpec);
     } else if (optionSpec.isMultiValue()) {
@@ -68,23 +63,25 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
   }
 
   private String getEntryAsString(final OptionSpec spec) {
-    // return the string value of the config line corresponding to the option
-    // or null if non present in the config
+    // returns the string value of the config line corresponding to the option in toml file
+    // or null if not present in the config
     return getKeyName(spec).map(result::getString).orElse(null);
   }
 
   private Optional<String> getKeyName(final OptionSpec spec) {
     // If any of the names of the option are used as key in the toml results
-    // then return the value of first one.
+    // then returns the value of first one.
     return Arrays.stream(spec.names())
+        // remove leading dashes on option name as we can have "--" or "-" options
         .map(name -> name.replaceFirst("^-+", ""))
         .filter(result::contains)
         .findFirst();
   }
 
   private String getListEntryAsString(final OptionSpec spec) {
-    // return the array value of the config line corresponding to the option
-    // or null if non present in the config
+    // returns the string representation of the array value of the config line in CLI format
+    // corresponding to the option in toml file
+    // or null if not present in the config
     return getKeyName(spec)
         .map(result::getArray)
         .map(
@@ -94,10 +91,16 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
   }
 
   private String getBooleanEntryAsString(final OptionSpec spec) {
+    // return the string representation of the boolean value corresponding to the option in toml
+    // file
+    // or null if not present in the config
     return getKeyName(spec).map(result::getBoolean).map(Object::toString).orElse(null);
   }
 
   private String getIntegerEntryAsString(final OptionSpec spec) {
+    // return the string representation of the integer value corresponding to the option in toml
+    // file
+    // or null if not present in the config
     return getKeyName(spec).map(result::get).map(String::valueOf).orElse(null);
   }
 
