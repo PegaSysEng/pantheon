@@ -117,6 +117,10 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
 
   @Override
   public boolean shouldContinueDownloading() {
-    return !protocolContext.getBlockchain().getChainHeadHash().equals(pivotBlockHeader.getHash());
+    return !protocolContext
+        .getBlockchain()
+        .getFastSyncHeadHash()
+        .map(headHash -> headHash.equals(pivotBlockHeader.getHash()))
+        .orElse(false);
   }
 }
