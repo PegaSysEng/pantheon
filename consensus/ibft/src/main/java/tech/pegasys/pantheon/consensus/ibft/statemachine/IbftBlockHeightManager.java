@@ -29,13 +29,12 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.time.Clock;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +69,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   private final Function<ConsensusRoundIdentifier, RoundState> roundStateCreator;
   private final IbftFinalState finalState;
 
-  private Optional<PreparedCertificate> latestPreparedCertificate = Optional.empty();
+  private Optional<TerminatedRoundArtefacts> latesteTerminatedRoundArtefacts = Optional.empty();
 
   private IbftRound currentRound;
 
@@ -98,7 +97,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
             new RoundState(
                 roundIdentifier,
                 finalState.getQuorum(),
-                messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
+                messageValidatorFactory.createMessageValidator(roundIdentifier));
   }
 
   @Override
@@ -134,19 +133,20 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     LOG.info(
         "Round has expired, creating PreparedCertificate and notifying peers. round={}",
         currentRound.getRoundIdentifier());
-    final Optional<PreparedCertificate> preparedCertificate =
-        currentRound.createPrepareCertificate();
+    final Optional<TerminatedRoundArtefacts> terminatedRoundArtefats =
+        currentRound.constructTerminatedRoundArtefacts();
 
-    if (preparedCertificate.isPresent()) {
-      latestPreparedCertificate = preparedCertificate;
+    if (terminatedRoundArtefats.isPresent()) {
+      latesteTerminatedRoundArtefacts = terminatedRoundArtefats;
     }
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
     final RoundChange localRoundChange =
         messageFactory.createSignedRoundChangePayload(
-            currentRound.getRoundIdentifier(), latestPreparedCertificate);
-    transmitter.multicastRoundChange(currentRound.getRoundIdentifier(), latestPreparedCertificate);
+            currentRound.getRoundIdentifier(), latesteTerminatedRoundArtefacts);
+    transmitter.multicastRoundChange(
+        currentRound.getRoundIdentifier(), latesteTerminatedRoundArtefacts);
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
     // message - so it must be handled accordingly.
@@ -202,15 +202,18 @@ public class IbftBlockHeightManager implements BlockHeightManager {
       return;
     }
 
-    final Optional<RoundChangeCertificate> result =
+    final Optional<Collection<RoundChange>> result =
         roundChangeManager.appendRoundChangeMessage(message);
     if (result.isPresent()) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
       }
 
+      final RoundChangeArtefacts roundChangeArtefacts = RoundChangeArtefacts.create(result.get());
+
       if (finalState.isLocalNodeProposerForRound(targetRound)) {
-        currentRound.startRoundWith(result.get(), TimeUnit.MILLISECONDS.toSeconds(clock.millis()));
+        currentRound.startRoundWith(
+            roundChangeArtefacts, TimeUnit.MILLISECONDS.toSeconds(clock.millis()));
       }
     }
   }
@@ -242,7 +245,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     }
     LOG.info("Received NewRound Payload for {}", newRound.getRoundIdentifier());
 
-    if (newRoundMessageValidator.validateNewRoundMessage(newRound.getSignedPayload())) {
+    if (newRoundMessageValidator.validateNewRoundMessage(newRound)) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(newRound.getRoundIdentifier().getRoundNumber());
       }

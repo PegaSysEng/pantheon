@@ -40,7 +40,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
@@ -91,9 +90,9 @@ public class IbftBlockHeightManagerTest {
   @Mock private BlockImporter<IbftContext> blockImporter;
   @Mock private BlockTimer blockTimer;
   @Mock private RoundTimer roundTimer;
-  @Mock private NewRoundMessageValidator newRoundMessageValidator;
+  @Mock private NewRoundMessageValidator newRoundPayloadValidator;
 
-  @Captor private ArgumentCaptor<Optional<PreparedCertificate>> preparedCaptor;
+  @Captor private ArgumentCaptor<Optional<TerminatedRoundArtefacts>> terminatedRoundArtefactsCaptor;
 
   private final List<KeyPair> validatorKeys = Lists.newArrayList();
   private final List<Address> validators = Lists.newArrayList();
@@ -127,7 +126,7 @@ public class IbftBlockHeightManagerTest {
 
     final MessageValidator messageValidator = mock(MessageValidator.class);
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
     when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
     when(finalState.getTransmitter()).thenReturn(messageTransmitter);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
@@ -135,10 +134,10 @@ public class IbftBlockHeightManagerTest {
     when(finalState.getQuorum()).thenReturn(3);
     when(finalState.getMessageFactory()).thenReturn(messageFactory);
     when(blockCreator.createBlock(anyLong())).thenReturn(createdBlock);
-    when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
+    when(newRoundPayloadValidator.validateNewRoundMessage(any())).thenReturn(true);
     when(messageValidatorFactory.createNewRoundValidator(any()))
-        .thenReturn(newRoundMessageValidator);
-    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(messageValidator);
+        .thenReturn(newRoundPayloadValidator);
+    when(messageValidatorFactory.createMessageValidator(any())).thenReturn(messageValidator);
 
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
@@ -219,8 +218,7 @@ public class IbftBlockHeightManagerTest {
     final RoundChange roundChange =
         messageFactory.createSignedRoundChangePayload(futureRoundIdentifier, Optional.empty());
     when(roundChangeManager.appendRoundChangeMessage(any()))
-        .thenReturn(
-            Optional.of(new RoundChangeCertificate(singletonList(roundChange.getSignedPayload()))));
+        .thenReturn(Optional.of(singletonList(roundChange)));
     when(finalState.isLocalNodeProposerForRound(any())).thenReturn(false);
 
     final IbftBlockHeightManager manager =
@@ -267,7 +265,7 @@ public class IbftBlockHeightManagerTest {
         new RoundChangeCertificate(singletonList(roundChange.getSignedPayload()));
 
     when(roundChangeManager.appendRoundChangeMessage(any()))
-        .thenReturn(Optional.of(roundChangCert));
+        .thenReturn(Optional.of(singletonList(roundChange)));
     when(finalState.isLocalNodeProposerForRound(any())).thenReturn(true);
 
     final IbftBlockHeightManager manager =
@@ -360,12 +358,13 @@ public class IbftBlockHeightManagerTest {
     final ConsensusRoundIdentifier nextRound = createFrom(roundIdentifier, 0, +1);
 
     verify(messageTransmitter, times(1))
-        .multicastRoundChange(eq(nextRound), preparedCaptor.capture());
-    final Optional<PreparedCertificate> preparedCert = preparedCaptor.getValue();
+        .multicastRoundChange(eq(nextRound), terminatedRoundArtefactsCaptor.capture());
+    final Optional<TerminatedRoundArtefacts> preparedCert =
+        terminatedRoundArtefactsCaptor.getValue();
 
     assertThat(preparedCert).isNotEmpty();
 
-    assertThat(preparedCert.get().getPreparePayloads())
+    assertThat(preparedCert.get().getPreparedCertificate().getPreparePayloads())
         .containsOnly(firstPrepare.getSignedPayload(), secondPrepare.getSignedPayload());
   }
 }
