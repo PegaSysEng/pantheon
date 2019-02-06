@@ -13,7 +13,7 @@ and feel free to propose changes to this document in a pull request.
 [How To Contribute](#how-to-contribute)
   * [Reporting Bugs](#reporting-bugs)
   * [Suggesting Enhancements](#suggesting-enhancements)
-  * [Your First Code Contribution](#your-first-code-contribution)
+  * [Your First Contribution](#your-first-contribution)
   * [Pull Requests](#pull-requests)
   * [Code Reviews]
 
@@ -100,13 +100,16 @@ logfile during startup.
 ### Suggesting Enhancements
 
 This section guides you through submitting an enhancement suggestion, including completely new features 
-and minor improvements to existing functionality. Following these guidelines helps maintainers and the 
-community understand your suggestion and find related suggestions.
+and minor improvements to existing functionality or documentation changes.
+
+Following these guidelines helps maintainers and the community understand your suggestion and find related suggestions.
 
 Before creating enhancement suggestions, please check the 
 [before-submitting-an-enhancement-suggestion](#before-submitting-an-enhancement-suggestion) list as 
-you might find out that you don't need to create one. When you are creating an enhancement suggestion, 
-please [include as many details as possible](#how-do-i-submit-a-good-enhancement-suggestion). 
+you might find out that you don't need to create one.
+
+When you are creating an enhancement suggestion, please 
+[include as many details as possible](#how-do-i-submit-a-good-enhancement-suggestion). 
 Fill in the [issue_template.md](.github/issue_template.md), including the steps that you imagine you 
 would take if the feature you're requesting existed.
 
@@ -120,7 +123,7 @@ to the existing issue instead of opening a new one.
 #### How Do I Submit A (Good) Enhancement Suggestion?
 
 Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com/features/issues/).
-Issues should and provide the following information by filling in the [issue_template.md](.github/issue_template.md) 
+Issues should provide the following information by filling in the [issue_template.md](.github/issue_template.md) 
 and providing the following information:
 
 * **Use a clear and descriptive title** for the issue to identify the suggestion.
@@ -135,25 +138,38 @@ in those examples, as [Markdown code blocks](https://help.github.com/articles/ma
 `pantheon -v` in your terminal.
 * **Specify the name and version of the OS you're using.**
 
-## Your First Code Contribution
-Start by looking through the 'good first issue' and 'help wanted' issues:
-* [Good First Issue][search-label-good-first-issue] - issues which should only require a few lines of code, 
+## Your First Contribution
+Start by looking through the 'good first issue' and 'help wanted' labeled issues:
+* [Good First Issue][search-label-good-first-issue] - issues which should only require a few lines of code or documentation, 
 and a test or two.
 * [Help wanted issues][search-label-help-wanted] - issues which are a bit more involved than `good first issue` issues.
 
-### Local Development
-The codebase is maintained using the "*contributor workflow*" where everyone without exception contributes 
-patch proposals using "*pull-requests*". This facilitates social contribution, easy testing and peer review.
+### Contribution Workflow
+The codebase and documentation are maintained using the same "*contributor workflow*" where everyone 
+without exception contributes changes proposals using "*pull-requests*".
+This facilitates social contribution, easy testing and peer review.
 
 To contribute a patch, the workflow is as follows:
 
-* Fork repository
-* Create topic branch
-* Commit patch
-* Create pull-request, adhering to the coding conventions herein set forth
-
-In general a commit serves a single purpose and diffs should be easily comprehensible. For this reason 
-do not mix any formatting fixes or code moves with actual code changes.
+1. [**Fork the repository**](https://github.com/PegaSysEng/pantheon/fork).
+1. **Clone your fork** on your computer.
+1. **Create a topic branch** _, name it in a way you can know what it's about.
+Starting the name by the issue number is a good practice and a reminder to fix only one issue in a PR._
+1. **Make your changes** adhering to the coding and documentation conventions herein set forth.
+_In general a commit serves a single purpose and diffs should be easily comprehensible.
+For this reason do not mix any formatting fixes or code moves with actual code changes._
+1. **Commit your changes** using a clear commit message.
+1. **Push your changes** to your remote fork.
+1. **Create a pull-request** (PR) on the original Pantheon Github repository to merge your branch with the master branch.
+1. **Add the labels** to identify the type of your PR. _For instance, if your PR only changes documentation, add the
+"documentation" label. If it fixes a bug, add the "bug" label._
+1. **Make your changes reviewed**.
+_To do so, you have to select the reviewers you would like to review your PR,
+if you don't know who to choose, simply select the ones that are proposed by GitHub._
+1. **You may have some changes to do** on your contribution given the reviewers feedback.
+_Make these changes and commit them to your branch and push the changes to your remote fork._
+1. **When your PR is validated**, all tests passed and your branch has no conflicts with the target branch,
+you can **"squash and merge"** your PR and you're done. You contributed to Pantheon ! Thanks !
 
 ### Architectural Best Practices
 
@@ -166,7 +182,6 @@ in the code’s robustness, while avoiding redundant tests.
 
 >**Important** 
 > The [`libsodium`](https://download.libsodium.org/doc/installation) library must be installed to run `./gradlew integrationTest`. 
-
 
 ### Pull Requests
 
@@ -181,12 +196,13 @@ The process described here has several goals:
 
 Please follow these steps to have your contribution considered by the approvers:
 
-1. Complete the CLA, as described in [CLA.md]
-2. Follow all instructions in [PULL-REQUEST-TEMPLATE.md](.github/pull_request_template.md)
-3. Include appropriate test coverage.  Testing is 100% automated.  There is no such thing as a manual test.
-4. Follow the [Style Guides](#style-guides)
+1. Complete the CLA, as described in [CLA.md].
+2. Follow all instructions in [PULL-REQUEST-TEMPLATE.md](.github/pull_request_template.md).
+3. Include appropriate test coverage. Testing is 100% automated. There is no such thing as a manual test.
+4. Follow the [Style Guides](#style-guides).
 5. After you submit your pull request, verify that all [status checks](https://help.github.com/articles/about-status-checks/) 
-are passing <details><summary>What if the status checks are failing?</summary>If a status check is failing, 
+are passing.
+<details><summary>What if the status checks are failing?</summary>If a status check is failing, 
 and you believe that the failure is unrelated to your change, please leave a comment on the pull request 
 explaining why you believe the failure is unrelated. A maintainer will re-run the status check for you. 
 If we conclude that the failure was a false positive, then we will open an issue to track that problem 
@@ -211,6 +227,12 @@ Code style will be checked automatically during a build.
 ## Coding Conventions
 We have a set of [coding conventions](CODING-CONVENTIONS.md) to which we try to adhere.
 These are not strictly enforced during the build, but should be adhered to and called out in code reviews.
+
+## Documentation Style Guide
+If you have to make changes to the documentation, we propose a set of 
+[documentation guidelines and examples](DOC-STYLE-GUIDE.md) to help you. 
+These rules are not automatically enforced yet, but it's highly recommended to follow them
+as much as possible to make the documentation coherent and the user experience as pleasant as possible. 
 
 ## Git Commit Messages & Pull Request Messages
 * Use the present tense ("Add feature" not "Added feature")
@@ -253,6 +275,7 @@ These are not strictly enforced during the build, but should be adhered to and c
 |-----------------------------------------------------|------------------------------------------------------------------------------------------|
 | [`work-in-progress`][search-label-work-in-progress] | Pull requests which are still being worked on, more changes will follow.                 |
 | [`requires-changes`][search-label-requires-changes] | Pull requests which need to be updated based on review comments and then reviewed again. |
+| [`needs engineering approval`][search-label-needs-engineering-approval] | Pull requests which need to be approved from a technical person, mainly documentation PRs. |
 
 [search-label-windows]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awindows
 [search-label-linux]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Alinux
@@ -275,6 +298,7 @@ These are not strictly enforced during the build, but should be adhered to and c
 [search-label-do-we-want-this]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ado%20we%20want%20this
 [search-label-work-in-progress]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Awork%20in%20progress
 [search-label-requires-changes]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Arequires%20changes
+[search-label-needs-engineering-approval]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3A"needs+engineering+approval"
 
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
