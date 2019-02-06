@@ -16,6 +16,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.PivotBlockRetriever.MAX_PIVOT_BLOCK_RETRIES;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
@@ -108,6 +109,12 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
 
   private boolean peerHasDifferentPivotBlock(final List<BlockHeader> result) {
     return result.size() != 1 || !result.get(0).equals(pivotBlockHeader);
+  }
+
+  @Override
+  protected long getChainHeadBlockNumber() {
+    final Blockchain blockchain = protocolContext.getBlockchain();
+    return blockchain.getFastSyncHeadBlockNumber().orElseGet(blockchain::getChainHeadBlockNumber);
   }
 
   @Override

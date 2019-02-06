@@ -162,7 +162,8 @@ public class DetermineCommonAncestorTaskParameterizedTest {
             ethContext,
             respondingEthPeer.getEthPeer(),
             headerRequestSize,
-            ethTasksTimer);
+            ethTasksTimer,
+            getChainHeadBlockNumber(protocolContext));
 
     final CompletableFuture<BlockHeader> future = task.run();
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
@@ -176,5 +177,9 @@ public class DetermineCommonAncestorTaskParameterizedTest {
     assertThat(actualResult.get()).isNotNull();
     assertThat(actualResult.get().getHash())
         .isEqualTo(MainnetBlockHashFunction.createHash(commonHeader));
+  }
+
+  private long getChainHeadBlockNumber(final ProtocolContext<Void> protocolContext) {
+    return localBlockchain.getChainHeadBlockNumber();
   }
 }

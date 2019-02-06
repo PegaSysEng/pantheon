@@ -117,7 +117,8 @@ public class DetermineCommonAncestorTaskTest {
             ethContext,
             respondingEthPeer.getEthPeer(),
             defaultHeaderRequestSize,
-            ethTasksTimer);
+            ethTasksTimer,
+            protocolContext.getBlockchain().getChainHeadBlockNumber());
 
     final CompletableFuture<BlockHeader> future = task.run();
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());
@@ -154,7 +155,8 @@ public class DetermineCommonAncestorTaskTest {
             ethContext,
             respondingEthPeer.getEthPeer(),
             defaultHeaderRequestSize,
-            ethTasksTimer);
+            ethTasksTimer,
+            protocolContext.getBlockchain().getChainHeadBlockNumber());
 
     // Execute task and wait for response
     final AtomicReference<Throwable> failure = new AtomicReference<>();
@@ -225,7 +227,8 @@ public class DetermineCommonAncestorTaskTest {
             ethContext,
             respondingEthPeer.getEthPeer(),
             defaultHeaderRequestSize,
-            ethTasksTimer);
+            ethTasksTimer,
+            protocolContext.getBlockchain().getChainHeadBlockNumber());
     final DetermineCommonAncestorTask<Void> spy = spy(task);
 
     // Execute task
@@ -282,7 +285,8 @@ public class DetermineCommonAncestorTaskTest {
             ethContext,
             respondingEthPeer.getEthPeer(),
             defaultHeaderRequestSize,
-            ethTasksTimer);
+            ethTasksTimer,
+            protocolContext.getBlockchain().getChainHeadBlockNumber());
     final DetermineCommonAncestorTask<Void> spy = spy(task);
 
     // Execute task
@@ -354,7 +358,8 @@ public class DetermineCommonAncestorTaskTest {
             ethContext,
             respondingEthPeer.getEthPeer(),
             defaultHeaderRequestSize,
-            ethTasksTimer);
+            ethTasksTimer,
+            protocolContext.getBlockchain().getChainHeadBlockNumber());
     final DetermineCommonAncestorTask<Void> spy = spy(task);
 
     // Execute task
@@ -386,7 +391,8 @@ public class DetermineCommonAncestorTaskTest {
             ethContext,
             peer,
             defaultHeaderRequestSize,
-            ethTasksTimer);
+            ethTasksTimer,
+            protocolContext.getBlockchain().getChainHeadBlockNumber());
 
     final CompletableFuture<BlockHeader> result = task.run();
     assertThat(result).isCompletedWithValue(genesisBlock.getHeader());

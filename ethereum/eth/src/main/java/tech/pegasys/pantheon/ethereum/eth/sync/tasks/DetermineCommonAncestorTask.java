@@ -50,7 +50,8 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
       final EthContext ethContext,
       final EthPeer peer,
       final int headerRequestSize,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final LabelledMetric<OperationTimer> ethTasksTimer,
+      final long chainHeadBlockNumber) {
     super(ethTasksTimer);
     this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
@@ -58,7 +59,7 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
     this.peer = peer;
     this.headerRequestSize = headerRequestSize;
 
-    maximumPossibleCommonAncestorNumber = protocolContext.getBlockchain().getChainHeadBlockNumber();
+    maximumPossibleCommonAncestorNumber = chainHeadBlockNumber;
     minimumPossibleCommonAncestorNumber = BlockHeader.GENESIS_BLOCK_NUMBER;
     commonAncestorCandidate =
         protocolContext.getBlockchain().getBlockHeader(BlockHeader.GENESIS_BLOCK_NUMBER).get();
@@ -70,9 +71,16 @@ public class DetermineCommonAncestorTask<C> extends AbstractEthTask<BlockHeader>
       final EthContext ethContext,
       final EthPeer peer,
       final int headerRequestSize,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final LabelledMetric<OperationTimer> ethTasksTimer,
+      final long chainHeadBlockNumber) {
     return new DetermineCommonAncestorTask<>(
-        protocolSchedule, protocolContext, ethContext, peer, headerRequestSize, ethTasksTimer);
+        protocolSchedule,
+        protocolContext,
+        ethContext,
+        peer,
+        headerRequestSize,
+        ethTasksTimer,
+        chainHeadBlockNumber);
   }
 
   @Override

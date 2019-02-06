@@ -76,7 +76,8 @@ public abstract class SyncTargetManager<C> {
                         ethContext,
                         bestPeer,
                         config.downloaderHeaderRequestSize(),
-                        ethTasksTimer)
+                        ethTasksTimer,
+                        getChainHeadBlockNumber())
                     .run()
                     .handle((r, t) -> r)
                     .thenCompose(
@@ -97,6 +98,10 @@ public abstract class SyncTargetManager<C> {
                 return waitForPeerAndThenSetSyncTarget();
               }
             });
+  }
+
+  protected long getChainHeadBlockNumber() {
+    return protocolContext.getBlockchain().getChainHeadBlockNumber();
   }
 
   protected abstract CompletableFuture<Optional<EthPeer>> selectBestAvailableSyncTarget();
