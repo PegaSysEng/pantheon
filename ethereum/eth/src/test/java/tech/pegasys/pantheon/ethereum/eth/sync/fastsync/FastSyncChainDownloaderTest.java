@@ -101,9 +101,9 @@ public class FastSyncChainDownloaderTest {
     peer.respondWhile(responder, () -> !result.isDone());
 
     assertThat(result).isCompleted();
-    assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
-    assertThat(localBlockchain.getChainHeadHeader())
-        .isEqualTo(otherBlockchain.getBlockHeader(pivotBlockNumber).get());
+    assertThat(localBlockchain.getFastSyncHeadBlockNumber()).contains(pivotBlockNumber);
+    assertThat(localBlockchain.getFastSyncHeadHash())
+        .contains(otherBlockchain.getBlockHeader(pivotBlockNumber).get().getHash());
   }
 
   @Test
@@ -123,9 +123,9 @@ public class FastSyncChainDownloaderTest {
     peer.respondWhile(responder, () -> !result.isDone());
 
     assertThat(result).isCompleted();
-    assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
-    assertThat(localBlockchain.getChainHeadHeader())
-        .isEqualTo(otherBlockchain.getBlockHeader(pivotBlockNumber).get());
+    assertThat(localBlockchain.getFastSyncHeadBlockNumber()).contains(pivotBlockNumber);
+    assertThat(localBlockchain.getFastSyncHeadHash())
+        .contains(otherBlockchain.getBlockHeader(pivotBlockNumber).get().getHash());
   }
 
   @Test
@@ -153,12 +153,12 @@ public class FastSyncChainDownloaderTest {
     final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
 
-    while (localBlockchain.getChainHeadBlockNumber() < 15) {
+    while (localBlockchain.getFastSyncHeadBlockNumber().orElse(0L) < 15) {
       bestPeer.respond(bestResponder);
       secondBestPeer.respond(shorterResponder);
     }
 
-    assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(15);
+    assertThat(localBlockchain.getFastSyncHeadBlockNumber()).contains(15L);
     assertThat(result).isNotCompleted();
 
     ethProtocolManager.handleDisconnect(bestPeer.getPeerConnection(), TOO_MANY_PEERS, true);
@@ -166,8 +166,8 @@ public class FastSyncChainDownloaderTest {
     secondBestPeer.respondWhile(shorterResponder, () -> !result.isDone());
 
     assertThat(result).isCompleted();
-    assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
-    assertThat(localBlockchain.getChainHeadHeader())
-        .isEqualTo(otherBlockchain.getBlockHeader(pivotBlockNumber).get());
+    assertThat(localBlockchain.getFastSyncHeadBlockNumber()).contains(pivotBlockNumber);
+    assertThat(localBlockchain.getFastSyncHeadHash())
+        .contains(otherBlockchain.getBlockHeader(pivotBlockNumber).get().getHash());
   }
 }
