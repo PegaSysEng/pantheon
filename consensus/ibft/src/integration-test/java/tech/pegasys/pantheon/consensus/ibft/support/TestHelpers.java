@@ -55,9 +55,7 @@ public class TestHelpers {
 
     return new PreparedRoundArtifacts(
         peers.getProposer().getMessageFactory().createProposal(preparedRound, block),
-        peers
-            .createSignedPreparePayloadOfNonProposing(preparedRound, block.getHash())
-            .stream()
+        peers.createSignedPreparePayloadOfNonProposing(preparedRound, block.getHash()).stream()
             .map(Prepare::new)
             .collect(Collectors.toList()));
   }
