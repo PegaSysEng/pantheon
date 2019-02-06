@@ -16,9 +16,9 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.AbstractEthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
+import tech.pegasys.pantheon.ethereum.eth.sync.ValidationPolicy;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -45,13 +45,12 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
   private final ProtocolContext<C> protocolContext;
   private final ProtocolSchedule<C> protocolSchedule;
   private final List<B> importedBlocks = new ArrayList<>();
-  private final LabelledMetric<OperationTimer> ethTasksTimer;
 
   // First header is assumed  to already be imported
   private final List<BlockHeader> checkpointHeaders;
   private final int chunksInTotal;
   private final BlockHandler<B> blockHandler;
-  private final HeaderValidationMode headerValidationMode;
+  private final ValidationPolicy validationPolicy;
   private int chunksIssued;
   private int chunksCompleted;
   private final int maxActiveChunks;
@@ -71,19 +70,18 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
       final List<BlockHeader> checkpointHeaders,
       final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHandler<B> blockHandler,
-      final HeaderValidationMode headerValidationMode) {
+      final ValidationPolicy validationPolicy) {
     super(ethTasksTimer);
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
-    this.ethTasksTimer = ethTasksTimer;
     this.checkpointHeaders = checkpointHeaders;
     this.chunksInTotal = checkpointHeaders.size() - 1;
     this.blockHandler = blockHandler;
+    this.validationPolicy = validationPolicy;
     this.chunksIssued = 0;
     this.chunksCompleted = 0;
     this.maxActiveChunks = maxActiveChunks;
-    this.headerValidationMode = headerValidationMode;
   }
 
   public static <C, B> PipelinedImportChainSegmentTask<C, B> forCheckpoints(
@@ -93,7 +91,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
       final int maxActiveChunks,
       final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHandler<B> blockHandler,
-      final HeaderValidationMode headerValidationMode,
+      final ValidationPolicy validationPolicy,
       final BlockHeader... checkpointHeaders) {
     return forCheckpoints(
         protocolSchedule,
@@ -102,7 +100,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
         maxActiveChunks,
         ethTasksTimer,
         blockHandler,
-        headerValidationMode,
+        validationPolicy,
         Arrays.asList(checkpointHeaders));
   }
 
@@ -113,7 +111,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
       final int maxActiveChunks,
       final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHandler<B> blockHandler,
-      final HeaderValidationMode headerValidationMode,
+      final ValidationPolicy validationPolicy,
       final List<BlockHeader> checkpointHeaders) {
     return new PipelinedImportChainSegmentTask<>(
         protocolSchedule,
@@ -123,7 +121,7 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
         checkpointHeaders,
         ethTasksTimer,
         blockHandler,
-        headerValidationMode);
+        validationPolicy);
   }
 
   @Override
@@ -241,7 +239,10 @@ public class PipelinedImportChainSegmentTask<C, B> extends AbstractEthTask<List<
           final BlockHeaderValidator<C> blockHeaderValidator =
               protocolSpec.getBlockHeaderValidator();
           if (blockHeaderValidator.validateHeader(
-              childHeader, parentHeader, protocolContext, headerValidationMode)) {
+              childHeader,
+              parentHeader,
+              protocolContext,
+              validationPolicy.getValidationModeForNextBlock())) {
             // The first header will be imported by the previous request range.
             result.complete(headers.subList(1, headers.size()));
           } else {

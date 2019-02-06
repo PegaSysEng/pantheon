@@ -23,7 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -46,17 +46,15 @@ public class TestHelpers {
 
     final MessageFactory messageFactory = new MessageFactory(signingKeyPair);
 
-    return messageFactory
-        .createSignedCommitPayload(roundId, block.getHash(), commitSeal)
-        .getSignedPayload();
+    return messageFactory.createCommit(roundId, block.getHash(), commitSeal).getSignedPayload();
   }
 
-  public static TerminatedRoundArtefacts createValidTerminatedRoundArtefacts(
+  public static PreparedRoundArtifacts createValidPreparedRoundArtifacts(
       final TestContext context, final ConsensusRoundIdentifier preparedRound, final Block block) {
     final RoundSpecificPeers peers = context.roundSpecificPeers(preparedRound);
 
-    return new TerminatedRoundArtefacts(
-        peers.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
+    return new PreparedRoundArtifacts(
+        peers.getProposer().getMessageFactory().createProposal(preparedRound, block),
         peers
             .createSignedPreparePayloadOfNonProposing(preparedRound, block.getHash())
             .stream()
@@ -71,7 +69,7 @@ public class TestHelpers {
       final Block blockToPropose) {
 
     final Proposal proposal =
-        proposer.getMessageFactory().createSignedProposalPayload(targetRoundId, blockToPropose);
+        proposer.getMessageFactory().createProposal(targetRoundId, blockToPropose);
 
     return proposer.injectNewRound(
         targetRoundId,
