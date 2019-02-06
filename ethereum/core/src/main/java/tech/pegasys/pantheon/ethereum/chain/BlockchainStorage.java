@@ -26,6 +26,8 @@ public interface BlockchainStorage {
 
   Optional<Hash> getChainHead();
 
+  Optional<Hash> getFastSyncHead();
+
   Collection<Hash> getForkHeads();
 
   Optional<BlockHeader> getBlockHeader(Hash blockHash);
@@ -57,6 +59,8 @@ public interface BlockchainStorage {
     void putTotalDifficulty(Hash blockHash, UInt256 totalDifficulty);
 
     void setChainHead(Hash blockHash);
+
+    void setFastSyncHead(Hash blockHash);
 
     void setForkHeads(Collection<Hash> forkHeadHashes);
 

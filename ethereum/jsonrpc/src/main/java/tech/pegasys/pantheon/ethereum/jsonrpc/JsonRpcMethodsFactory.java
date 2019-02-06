@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthCall;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthChainId;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthCoinbase;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthEstimateGas;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthFastSyncBlockNumber;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGasPrice;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetBalance;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetBlockByHash;
@@ -154,6 +155,7 @@ public class JsonRpcMethodsFactory {
           enabledMethods,
           new EthAccounts(),
           new EthBlockNumber(blockchainQueries),
+          new EthFastSyncBlockNumber(blockchainQueries),
           new EthGetBalance(blockchainQueries, parameter),
           new EthGetBlockByHash(blockchainQueries, blockResult, parameter),
           new EthGetBlockByNumber(blockchainQueries, blockResult, parameter),

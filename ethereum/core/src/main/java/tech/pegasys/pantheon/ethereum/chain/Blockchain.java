@@ -40,6 +40,17 @@ public interface Blockchain {
   long getChainHeadBlockNumber();
 
   /**
+   * Return the block number of the best block currently downloaded as part of fast sync.
+   *
+   * <p>Will be empty if fast sync has not been used.
+   *
+   * <p>If fast sync has completed, will be the pivot block used by fast sync.
+   *
+   * @return The block number that fast sync has reached.
+   */
+  Optional<Long> getFastSyncHeadBlockNumber();
+
+  /**
    * Return the hash of the head of the canonical chain.
    *
    * @return The hash of the head of the chain.

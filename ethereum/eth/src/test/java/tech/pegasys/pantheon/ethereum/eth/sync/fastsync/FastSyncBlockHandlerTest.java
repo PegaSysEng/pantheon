@@ -86,7 +86,7 @@ public class FastSyncBlockHandlerTest {
 
   private final FastSyncBlockHandler<Void> blockHandler =
       new FastSyncBlockHandler<>(
-          protocolSchedule, protocolContext, ethContext, ethTasksTimer, validationPolicy);
+          protocolSchedule, protocolContext, ethContext, ethTasksTimer, validationPolicy, HEADER);
 
   @Before
   public void setUp() {

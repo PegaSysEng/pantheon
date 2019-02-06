@@ -47,18 +47,21 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
   private final EthContext ethContext;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
   private final ValidationPolicy validationPolicy;
+  private final BlockHeader pivotBlockHeader;
 
   public FastSyncBlockHandler(
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,
       final LabelledMetric<OperationTimer> ethTasksTimer,
-      final ValidationPolicy validationPolicy) {
+      final ValidationPolicy validationPolicy,
+      final BlockHeader pivotBlockHeader) {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
     this.ethTasksTimer = ethTasksTimer;
     this.validationPolicy = validationPolicy;
+    this.pivotBlockHeader = pivotBlockHeader;
   }
 
   @Override
@@ -110,6 +113,9 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
           blockWithReceipt.getReceipts(),
           validationPolicy.getValidationModeForNextBlock())) {
         return invalidBlockFailure(block);
+      }
+      if (block.getHash().equals(pivotBlockHeader.getHash())) {
+        protocolContext.getBlockchain().fastSyncComplete();
       }
     }
     return CompletableFuture.completedFuture(blocksWithReceipts);

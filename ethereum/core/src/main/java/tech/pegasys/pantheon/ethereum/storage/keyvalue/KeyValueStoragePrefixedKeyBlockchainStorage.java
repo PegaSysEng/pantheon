@@ -38,6 +38,8 @@ public class KeyValueStoragePrefixedKeyBlockchainStorage implements BlockchainSt
 
   private static final BytesValue CHAIN_HEAD_KEY =
       BytesValue.wrap("chainHeadHash".getBytes(StandardCharsets.UTF_8));
+  private static final BytesValue FAST_SYNC_HEAD_KEY =
+      BytesValue.wrap("fastSyncHeadHash".getBytes(StandardCharsets.UTF_8));
   private static final BytesValue FORK_HEADS_KEY =
       BytesValue.wrap("forkHeads".getBytes(StandardCharsets.UTF_8));
 
@@ -61,6 +63,11 @@ public class KeyValueStoragePrefixedKeyBlockchainStorage implements BlockchainSt
   @Override
   public Optional<Hash> getChainHead() {
     return get(CONSTANTS_PREFIX, CHAIN_HEAD_KEY).map(this::bytesToHash);
+  }
+
+  @Override
+  public Optional<Hash> getFastSyncHead() {
+    return get(CONSTANTS_PREFIX, FAST_SYNC_HEAD_KEY).map(this::bytesToHash);
   }
 
   @Override
@@ -163,6 +170,11 @@ public class KeyValueStoragePrefixedKeyBlockchainStorage implements BlockchainSt
     @Override
     public void setChainHead(final Hash blockHash) {
       set(CONSTANTS_PREFIX, CHAIN_HEAD_KEY, blockHash);
+    }
+
+    @Override
+    public void setFastSyncHead(final Hash blockHash) {
+      set(CONSTANTS_PREFIX, FAST_SYNC_HEAD_KEY, blockHash);
     }
 
     @Override

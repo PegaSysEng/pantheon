@@ -94,6 +94,14 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   }
 
   @Override
+  public Optional<Long> getFastSyncHeadBlockNumber() {
+    return blockchainStorage
+        .getFastSyncHead()
+        .flatMap(blockchainStorage::getBlockHeader)
+        .map(BlockHeader::getNumber);
+  }
+
+  @Override
   public Optional<BlockHeader> getBlockHeader(final long blockNumber) {
     return blockchainStorage.getBlockHash(blockNumber).flatMap(blockchainStorage::getBlockHeader);
   }
@@ -141,22 +149,45 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
 
   @Override
   public synchronized void appendBlock(final Block block, final List<TransactionReceipt> receipts) {
+    appendBlock(block, receipts, false).ifPresent(this::notifyBlockAdded);
+  }
+
+  @Override
+  public synchronized void fastAppendBlock(
+      final Block block, final List<TransactionReceipt> receipts) {
+    appendBlock(block, receipts, true);
+  }
+
+  @Override
+  public void fastSyncComplete() {
+    final Hash hash =
+        blockchainStorage
+            .getFastSyncHead()
+            .orElseThrow(() -> new IllegalStateException("Fast sync is not in progress"));
+
+    final BlockchainStorage.Updater updater = blockchainStorage.updater();
+    // Update canonical chain data
+    updater.setChainHead(hash);
+    updater.commit();
+  }
+
+  public synchronized Optional<BlockAddedEvent> appendBlock(
+      final Block block, final List<TransactionReceipt> receipts, final boolean isFastSync) {
     checkArgument(
         block.getBody().getTransactions().size() == receipts.size(),
         "Supplied receipts do not match block transactions.");
     if (blockIsAlreadyTracked(block)) {
-      return;
+      return Optional.empty();
     }
     if (!blockIsConnected(block)) {
       throw new IllegalArgumentException("Attempt to append non-connected block.");
     }
 
-    final BlockAddedEvent blockAddedEvent = appendBlockHelper(block, receipts);
-    notifyBlockAdded(blockAddedEvent);
+    return Optional.of(appendBlockHelper(block, receipts, isFastSync));
   }
 
   private BlockAddedEvent appendBlockHelper(
-      final Block block, final List<TransactionReceipt> receipts) {
+      final Block block, final List<TransactionReceipt> receipts, final boolean isFastSync) {
     final Hash hash = block.getHash();
     final UInt256 td = calculateTotalDifficulty(block);
 
@@ -168,7 +199,8 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     updater.putTotalDifficulty(hash, td);
 
     // Update canonical chain data
-    final BlockAddedEvent blockAddedEvent = updateCanonicalChainData(updater, block, td);
+    final BlockAddedEvent blockAddedEvent =
+        updateCanonicalChainData(updater, block, td, isFastSync);
 
     updater.commit();
 
@@ -192,7 +224,8 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   private BlockAddedEvent updateCanonicalChainData(
       final BlockchainStorage.Updater updater,
       final Block newBlock,
-      final UInt256 totalDifficulty) {
+      final UInt256 totalDifficulty,
+      final boolean isFastSync) {
     final Hash chainHead = blockchainStorage.getChainHead().orElse(null);
     if (newBlock.getHeader().getNumber() != BlockHeader.GENESIS_BLOCK_NUMBER && chainHead == null) {
       throw new IllegalStateException("Blockchain is missing chain head.");
@@ -200,10 +233,16 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
 
     final Hash newBlockHash = newBlock.getHash();
     try {
-      if (chainHead == null || newBlock.getHeader().getParentHash().equals(chainHead)) {
+      if (chainHead == null
+          || newBlock.getHeader().getParentHash().equals(chainHead)
+          || isFastSync) {
         // This block advances the chain, update the chain head
         updater.putBlockHash(newBlock.getHeader().getNumber(), newBlockHash);
-        updater.setChainHead(newBlockHash);
+        if (isFastSync) {
+          updater.setFastSyncHead(newBlockHash);
+        } else {
+          updater.setChainHead(newBlockHash);
+        }
         indexTransactionForBlock(updater, newBlockHash, newBlock.getBody().getTransactions());
         return BlockAddedEvent.createForHeadAdvancement(newBlock);
       } else if (totalDifficulty.compareTo(blockchainStorage.getTotalDifficulty(chainHead).get())
