@@ -102,6 +102,11 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   }
 
   @Override
+  public Optional<Hash> getFastSyncHeadHash() {
+    return blockchainStorage.getFastSyncHead();
+  }
+
+  @Override
   public Optional<BlockHeader> getBlockHeader(final long blockNumber) {
     return blockchainStorage.getBlockHash(blockNumber).flatMap(blockchainStorage::getBlockHeader);
   }

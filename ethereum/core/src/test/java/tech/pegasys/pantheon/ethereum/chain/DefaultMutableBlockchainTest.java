@@ -136,6 +136,57 @@ public class DefaultMutableBlockchainTest {
   }
 
   @Test
+  public void fastAppendBlock() {
+    final BlockDataGenerator gen = new BlockDataGenerator();
+
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final Block genesisBlock = gen.genesisBlock();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, genesisBlock);
+
+    final BlockOptions options =
+        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+    final Block newBlock = gen.block(options);
+    final List<TransactionReceipt> receipts = gen.receipts(newBlock);
+    blockchain.fastAppendBlock(newBlock, receipts);
+
+    assertBlockIsHead(blockchain, genesisBlock);
+    assertBlockIsFastSyncHead(blockchain, newBlock);
+    assertThat(blockchain.getTotalDifficultyByHash(newBlock.getHash()).get())
+        .isEqualTo(calculateExpectedTotalDifficulty(blockchain, newBlock));
+    assertThat(blockchain.getForks()).isEmpty();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void fastAppendUnconnectedBlock() {
+    final BlockDataGenerator gen = new BlockDataGenerator();
+
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final Block genesisBlock = gen.genesisBlock();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, genesisBlock);
+
+    final BlockOptions options = new BlockOptions().setBlockNumber(1L).setParentHash(Hash.ZERO);
+    final Block newBlock = gen.block(options);
+    final List<TransactionReceipt> receipts = gen.receipts(newBlock);
+    blockchain.fastAppendBlock(newBlock, receipts);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void fastAppendBlockWithMismatchedReceipts() {
+    final BlockDataGenerator gen = new BlockDataGenerator();
+
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final Block genesisBlock = gen.genesisBlock();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, genesisBlock);
+
+    final BlockOptions options =
+        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+    final Block newBlock = gen.block(options);
+    final List<TransactionReceipt> receipts = gen.receipts(newBlock);
+    receipts.add(gen.receipt());
+    blockchain.fastAppendBlock(newBlock, receipts);
+  }
+
+  @Test
   public void createSmallChain() {
     final BlockDataGenerator gen = new BlockDataGenerator();
     final List<Block> chain = gen.blockSequence(3);
@@ -153,6 +204,34 @@ public class DefaultMutableBlockchainTest {
     }
 
     final Block head = chain.get(chain.size() - 1);
+    assertBlockIsHead(blockchain, head);
+    assertTotalDifficultiesAreConsistent(blockchain, head);
+    assertThat(blockchain.getForks()).isEmpty();
+  }
+
+  @Test
+  public void createSmallChainWithFastSync() {
+    final BlockDataGenerator gen = new BlockDataGenerator();
+    final List<Block> chain = gen.blockSequence(3);
+    final List<List<TransactionReceipt>> blockReceipts =
+        chain.stream().map(gen::receipts).collect(Collectors.toList());
+
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
+    for (int i = 1; i < chain.size(); i++) {
+      blockchain.fastAppendBlock(chain.get(i), blockReceipts.get(i));
+    }
+
+    for (int i = 1; i < chain.size(); i++) {
+      assertBlockDataIsStored(blockchain, chain.get(i), blockReceipts.get(i));
+    }
+
+    final Block head = chain.get(chain.size() - 1);
+    assertBlockIsFastSyncHead(blockchain, head);
+    assertBlockIsHead(blockchain, chain.get(0));
+
+    blockchain.fastSyncComplete();
+    assertBlockIsFastSyncHead(blockchain, head);
     assertBlockIsHead(blockchain, head);
     assertTotalDifficultiesAreConsistent(blockchain, head);
     assertThat(blockchain.getForks()).isEmpty();
@@ -691,8 +770,21 @@ public class DefaultMutableBlockchainTest {
     assertEquals(head.getHash(), blockchain.getChainHead().getHash());
   }
 
+  private void assertBlockIsFastSyncHead(final Blockchain blockchain, final Block head) {
+    assertEquals(
+        head.getHeader().getNumber(), (long) blockchain.getFastSyncHeadBlockNumber().get());
+    assertEquals(head.getHash(), blockchain.getFastSyncHeadHash().get());
+  }
+
   private void assertTotalDifficultiesAreConsistent(final Blockchain blockchain, final Block head) {
     // Check that total difficulties are summed correctly
+    final UInt256 td = calculateExpectedTotalDifficulty(blockchain, head);
+
+    // Check reported chainhead td
+    assertEquals(td, blockchain.getChainHead().getTotalDifficulty());
+  }
+
+  private UInt256 calculateExpectedTotalDifficulty(final Blockchain blockchain, final Block head) {
     long num = BlockHeader.GENESIS_BLOCK_NUMBER;
     UInt256 td = UInt256.of(0);
     while (num <= head.getHeader().getNumber()) {
@@ -703,9 +795,7 @@ public class DefaultMutableBlockchainTest {
 
       num += 1;
     }
-
-    // Check reported chainhead td
-    assertEquals(td, blockchain.getChainHead().getTotalDifficulty());
+    return td;
   }
 
   private DefaultMutableBlockchain createBlockchain(

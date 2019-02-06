@@ -98,6 +98,11 @@ public class TestBlockchain implements Blockchain {
   }
 
   @Override
+  public Optional<Hash> getFastSyncHeadHash() {
+    throw new NonDeterministicOperationException(CHAIN_HEAD_ERROR);
+  }
+
+  @Override
   public Hash getChainHeadHash() {
     throw new NonDeterministicOperationException(CHAIN_HEAD_ERROR);
   }
