@@ -58,7 +58,8 @@ public class SyncState {
   }
 
   public long chainHeadNumber() {
-    return blockchain.getChainHeadBlockNumber();
+    return Math.max(
+        blockchain.getFastSyncHeadBlockNumber().orElse(0L), blockchain.getChainHeadBlockNumber());
   }
 
   public UInt256 chainHeadTotalDifficulty() {
