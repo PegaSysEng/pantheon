@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -76,24 +77,23 @@ public class GetReceiptsForHeadersTask
   }
 
   private void completeEmptyReceipts(final List<BlockHeader> headers) {
-    headers
-        .stream()
-        .filter(header -> header.getTransactionsRoot().equals(Hash.EMPTY_TRIE_HASH))
+    headers.stream()
+        .filter(header -> header.getReceiptsRoot().equals(Hash.EMPTY_TRIE_HASH))
         .forEach(header -> receipts.put(header, emptyList()));
   }
 
   @Override
   protected CompletableFuture<Map<BlockHeader, List<TransactionReceipt>>> executePeerTask(
       final Optional<EthPeer> assignedPeer) {
-    if (isComplete()) {
-      return CompletableFuture.completedFuture(receipts);
-    }
-    return requestBodies(assignedPeer).thenCompose(this::processResponse);
+    return requestReceipts(assignedPeer).thenCompose(this::processResponse);
   }
 
-  private CompletableFuture<PeerTaskResult<Map<BlockHeader, List<TransactionReceipt>>>>
-      requestBodies(final Optional<EthPeer> assignedPeer) {
+  private CompletableFuture<Map<BlockHeader, List<TransactionReceipt>>> requestReceipts(
+      final Optional<EthPeer> assignedPeer) {
     final List<BlockHeader> incompleteHeaders = incompleteHeaders();
+    if (incompleteHeaders.isEmpty()) {
+      return CompletableFuture.completedFuture(emptyMap());
+    }
     LOG.debug(
         "Requesting bodies to complete {} blocks, starting with {}.",
         incompleteHeaders.size(),
@@ -103,19 +103,19 @@ public class GetReceiptsForHeadersTask
           final GetReceiptsFromPeerTask task =
               GetReceiptsFromPeerTask.forHeaders(ethContext, incompleteHeaders, ethTasksTimer);
           assignedPeer.ifPresent(task::assignPeer);
-          return task.run();
+          return task.run().thenApply(PeerTaskResult::getResult);
         });
   }
 
   private CompletableFuture<Map<BlockHeader, List<TransactionReceipt>>> processResponse(
-      final PeerTaskResult<Map<BlockHeader, List<TransactionReceipt>>> responseData) {
-    receipts.putAll(responseData.getResult());
+      final Map<BlockHeader, List<TransactionReceipt>> responseData) {
+    receipts.putAll(responseData);
 
     if (isComplete()) {
       result.get().complete(receipts);
     }
 
-    return CompletableFuture.completedFuture(responseData.getResult());
+    return CompletableFuture.completedFuture(responseData);
   }
 
   private List<BlockHeader> incompleteHeaders() {

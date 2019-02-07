@@ -12,7 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
+import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.ethereum.core.Hash.EMPTY_TRIE_HASH;
+
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
@@ -22,6 +27,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import org.junit.Test;
 
 public class GetReceiptsForHeadersTaskTest
     extends RetryingMessageTaskTest<Map<BlockHeader, List<TransactionReceipt>>> {
@@ -43,5 +51,20 @@ public class GetReceiptsForHeadersTaskTest
     final List<BlockHeader> headersToComplete = new ArrayList<>(requestedData.keySet());
     return GetReceiptsForHeadersTask.forHeaders(
         ethContext, headersToComplete, maxRetries, NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+  }
+
+  @Test
+  public void shouldBeCompleteWhenAllReceiptsAreEmpty() {
+    final BlockHeader header1 =
+        new BlockHeaderTestFixture().number(1).receiptsRoot(EMPTY_TRIE_HASH).buildHeader();
+    final BlockHeader header2 =
+        new BlockHeaderTestFixture().number(2).receiptsRoot(EMPTY_TRIE_HASH).buildHeader();
+    final BlockHeader header3 =
+        new BlockHeaderTestFixture().number(3).receiptsRoot(EMPTY_TRIE_HASH).buildHeader();
+
+    final Map<BlockHeader, List<TransactionReceipt>> expected =
+        ImmutableMap.of(header1, emptyList(), header2, emptyList(), header3, emptyList());
+
+    assertThat(createTask(expected).run()).isCompletedWithValue(expected);
   }
 }
