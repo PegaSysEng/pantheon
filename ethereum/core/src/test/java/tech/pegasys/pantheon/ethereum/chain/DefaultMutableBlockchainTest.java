@@ -143,9 +143,7 @@ public class DefaultMutableBlockchainTest {
     final Block genesisBlock = gen.genesisBlock();
     final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, genesisBlock);
 
-    final BlockOptions options =
-        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
-    final Block newBlock = gen.block(options);
+    final Block newBlock = gen.nextBlock(genesisBlock);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     blockchain.appendFastSyncBlock(newBlock, receipts);
 
