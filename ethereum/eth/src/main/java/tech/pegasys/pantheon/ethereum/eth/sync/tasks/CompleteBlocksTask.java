@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
       final List<BlockHeader> headers,
       final int maxRetries,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethContext, maxRetries, ethTasksTimer);
+    super(ethContext, maxRetries, ethTasksTimer, Collection::isEmpty);
     checkArgument(headers.size() > 0, "Must supply a non-empty headers list");
     this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
