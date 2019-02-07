@@ -15,12 +15,10 @@ package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
@@ -32,8 +30,6 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.List;
@@ -50,22 +46,17 @@ public class FastSyncCheckpointHeaderManagerTest {
   protected ProtocolContext<Void> protocolContext;
   private SyncState syncState;
 
-  private BlockDataGenerator gen;
-  private BlockchainSetupUtil<Void> localBlockchainSetup;
   protected MutableBlockchain localBlockchain;
-  private BlockchainSetupUtil<Void> otherBlockchainSetup;
   protected Blockchain otherBlockchain;
-  private LabelledMetric<OperationTimer> ethTasksTimer;
   private BlockHeader pivotBlockHeader;
   private FastSyncCheckpointHeaderManager<Void> checkpointHeaderManager;
   private RespondingEthPeer peer;
 
   @Before
   public void setupTest() {
-    gen = new BlockDataGenerator();
-    localBlockchainSetup = BlockchainSetupUtil.forTesting();
-    localBlockchain = spy(localBlockchainSetup.getBlockchain());
-    otherBlockchainSetup = BlockchainSetupUtil.forTesting();
+    final BlockchainSetupUtil<Void> localBlockchainSetup = BlockchainSetupUtil.forTesting();
+    localBlockchain = localBlockchainSetup.getBlockchain();
+    final BlockchainSetupUtil<Void> otherBlockchainSetup = BlockchainSetupUtil.forTesting();
     otherBlockchain = otherBlockchainSetup.getBlockchain();
 
     protocolSchedule = localBlockchainSetup.getProtocolSchedule();
@@ -75,13 +66,11 @@ public class FastSyncCheckpointHeaderManagerTest {
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
 
-    ethTasksTimer = NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
-
     otherBlockchainSetup.importFirstBlocks(30);
 
     pivotBlockHeader = block(17);
 
-    peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, localBlockchain);
+    peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
 
     checkpointHeaderManager =
         new FastSyncCheckpointHeaderManager<>(
@@ -93,7 +82,7 @@ public class FastSyncCheckpointHeaderManagerTest {
             ethContext,
             syncState,
             protocolSchedule,
-            ethTasksTimer,
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
             pivotBlockHeader);
   }
 
