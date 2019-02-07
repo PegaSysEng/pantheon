@@ -78,7 +78,8 @@ public class PrivacyPrecompiledContractIntegrationTest {
             new SpuriousDragonGasCalculator(), publicKeys.get(0), enclave);
 
     BytesValue result =
-        privacyPrecompiledContract.compute(BytesValue.wrap(sr.getKey().getBytes(UTF_8)), messageFrame);
+        privacyPrecompiledContract.compute(
+            BytesValue.wrap(sr.getKey().getBytes(UTF_8)), messageFrame);
 
     String expected = new String(result.extractArray(), UTF_8);
 
