@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
+import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -53,13 +54,21 @@ public class IbftController {
   private final Map<Long, List<Message>> futureMessages;
   private BlockHeightManager currentHeightManager;
   private final Gossiper gossiper;
+  private final MessageTracker messageTracker;
 
   public IbftController(
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
-      final IbftGossip gossiper) {
-    this(blockchain, ibftFinalState, ibftBlockHeightManagerFactory, gossiper, Maps.newHashMap());
+      final IbftGossip gossiper,
+      final MessageTracker messageTracker) {
+    this(
+        blockchain,
+        ibftFinalState,
+        ibftBlockHeightManagerFactory,
+        gossiper,
+        Maps.newHashMap(),
+        messageTracker);
   }
 
   @VisibleForTesting
@@ -68,12 +77,14 @@ public class IbftController {
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
-      final Map<Long, List<Message>> futureMessages) {
+      final Map<Long, List<Message>> futureMessages,
+      final MessageTracker messageTracker) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessages = futureMessages;
     this.gossiper = gossiper;
+    this.messageTracker = messageTracker;
   }
 
   public void start() {
@@ -81,7 +92,9 @@ public class IbftController {
   }
 
   public void handleMessageEvent(final IbftReceivedMessageEvent msg) {
-    handleMessage(msg.getMessage());
+    if (!messageTracker.hasSeenMessage(msg.getMessage().getData())) {
+      handleMessage(msg.getMessage());
+    }
   }
 
   private void handleMessage(final Message message) {

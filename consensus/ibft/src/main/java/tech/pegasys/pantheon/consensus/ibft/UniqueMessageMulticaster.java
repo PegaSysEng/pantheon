@@ -12,32 +12,27 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import static java.util.Collections.newSetFromMap;
-
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 public class UniqueMessageMulticaster implements ValidatorMulticaster {
   private final ValidatorMulticaster multicaster;
-  private final Set<Hash> seenMessages;
+  private final MessageTracker messageTracker;
 
   /**
    * Constructor that attaches gossip logic to a set of multicaster
    *
    * @param multicaster Network connections to the remote validators
-   * @param gossipHistoryLimit Maximum messages to track as seen
+   * @param messageTracker Tracks seen messages
    */
   public UniqueMessageMulticaster(
-      final ValidatorMulticaster multicaster, final int gossipHistoryLimit) {
+      final ValidatorMulticaster multicaster, final MessageTracker messageTracker) {
     this.multicaster = multicaster;
-    // Set that starts evicting members when it hits capacity
-    this.seenMessages = newSetFromMap(new SizeLimitedMap<>(gossipHistoryLimit));
+    this.messageTracker = messageTracker;
   }
 
   @Override
@@ -47,11 +42,10 @@ public class UniqueMessageMulticaster implements ValidatorMulticaster {
 
   @Override
   public void send(final MessageData message, final Collection<Address> blackList) {
-    final Hash uniqueID = Hash.hash(message.getData());
-    if (seenMessages.contains(uniqueID)) {
+    if (messageTracker.hasSeenMessage(message)) {
       return;
     }
     multicaster.send(message, blackList);
-    seenMessages.add(uniqueID);
+    messageTracker.addSeenMessage(message);
   }
 }

@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
+import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
@@ -112,11 +113,11 @@ public class TestContextBuilder {
   public static final int EPOCH_LENGTH = 10_000;
   public static final int BLOCK_TIMER_SEC = 3;
   public static final int ROUND_TIMER_SEC = 12;
-  public static final int EVENT_QUEUE_SIZE = 1000;
-  public static final int SEEN_MESSAGE_SIZE = 100;
+  public static final int MESSAGE_QUEUE_LIMIT = 1000;
+  public static final int GOSSIPED_HISTORY_LIMIT = 100;
 
   private Clock clock = Clock.fixed(Instant.MIN, ZoneId.of("UTC"));
-  private IbftEventQueue ibftEventQueue = new IbftEventQueue(EVENT_QUEUE_SIZE);
+  private IbftEventQueue ibftEventQueue = new IbftEventQueue(MESSAGE_QUEUE_LIMIT);
   private int validatorCount = 4;
   private int indexOfFirstLocallyProposedBlock = 0; // Meaning first block is from remote peer.
   private boolean useGossip = false;
@@ -159,15 +160,15 @@ public class TestContextBuilder {
 
     // Use a stubbed version of the multicaster, to prevent creating PeerConnections etc.
     final StubValidatorMulticaster multicaster = new StubValidatorMulticaster();
-
+    final MessageTracker messageTracker = new MessageTracker(GOSSIPED_HISTORY_LIMIT);
     final UniqueMessageMulticaster uniqueMulticaster =
-        new UniqueMessageMulticaster(multicaster, SEEN_MESSAGE_SIZE);
+        new UniqueMessageMulticaster(multicaster, messageTracker);
 
     final Gossiper gossiper = useGossip ? new IbftGossip(uniqueMulticaster) : mock(Gossiper.class);
 
     final ControllerAndState controllerAndState =
         createControllerAndFinalState(
-            blockChain, multicaster, nodeKeys, clock, ibftEventQueue, gossiper);
+            blockChain, multicaster, nodeKeys, clock, ibftEventQueue, gossiper, messageTracker);
 
     // Add each networkNode to the Multicaster (such that each can receive msgs from local node).
     // NOTE: the remotePeers needs to be ordered based on Address (as this is used to determine
@@ -230,7 +231,8 @@ public class TestContextBuilder {
       final KeyPair nodeKeys,
       final Clock clock,
       final IbftEventQueue ibftEventQueue,
-      final Gossiper gossiper) {
+      final Gossiper gossiper,
+      final MessageTracker messageTracker) {
 
     final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
 
@@ -310,7 +312,8 @@ public class TestContextBuilder {
                     messageValidatorFactory),
                 messageValidatorFactory),
             gossiper,
-            new HashMap<>());
+            new HashMap<>(),
+            messageTracker);
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     //////////////////////////// END IBFT PantheonController ////////////////////////////
