@@ -75,10 +75,6 @@ public class BlockchainQueries {
     return blockchain.getChainHeadBlockNumber();
   }
 
-  public Optional<Long> fastSyncHeadBlockNumber() {
-    return blockchain.getFastSyncHeadBlockNumber();
-  }
-
   /**
    * Determines the block header for the address associated with this storage index.
    *
