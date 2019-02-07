@@ -2211,8 +2211,8 @@ Adds accounts (participants) to the accounts whitelist.
 
 **Returns** 
 
-`result` - `Success` or `error`. For example, errors include attempting to add accounts already on the whitelist or 
-including an invalid account address. 
+`result` - `Success` or `error`. Errors include attempting to add accounts already on the whitelist or 
+including invalid account addresses. 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2276,8 +2276,8 @@ Removes accounts (participants) from the accounts whitelist.
 
 **Returns** 
 
-`result` - `Success` or `error`. For example, errors include attempting to remove accounts not on the whitelist or 
-including an invalid account address.
+`result` - `Success` or `error`. Errors include attempting to remove accounts not on the whitelist or 
+including invalid account addresses.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2308,8 +2308,8 @@ Adds nodes to the nodes whitelist.
 
 **Returns** 
 
-`result` - `Success` or `error`. For example, errors include attempting to add nodes already on the whitelist or 
-including an invalid enode URL.
+`result` - `Success` or `error`. Errors include attempting to add nodes already on the whitelist or 
+including invalid enode URLs.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2338,7 +2338,7 @@ None
 
 **Returns** 
 
-`result: list` - Enode URLs of nodes in the nodes whitelist. 
+`result: list` - [Enode URLs](../Configuring-Pantheon/Node-Keys.md#enode-url) of nodes in the nodes whitelist. 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2373,8 +2373,8 @@ Removes nodes from the nodes whitelist.
 
 **Returns** 
 
-`result` - `Success` or `error`. For example, errors include attempting to remove accounts not on the whitelist or 
-including an invalid enode URL.
+`result` - `Success` or `error`. Errors include attempting to remove nodes not on the whitelist or 
+including invalid enode URLs.
 
 !!! example
     ```bash tab="curl HTTP request"
