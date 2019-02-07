@@ -263,11 +263,12 @@ public class JsonRpcHttpService {
           perm,
           (authed) -> {
             if (authed.result()) {
-              LOG.trace("user {} has permission to do method {}", user, perm);
+              LOG.trace("user {} authorized : {} via permission {}", user, jsonRpcMethod.getName(), perm);
               foundMatchingPermission.set(true);
             }
           });
     }
+    LOG.trace("user {} NOT authorized : {}", user, jsonRpcMethod.getName());
     return foundMatchingPermission.get();
   }
 
