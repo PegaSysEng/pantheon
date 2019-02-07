@@ -78,7 +78,7 @@ public class GetReceiptsForHeadersTask
   private void completeEmptyReceipts(final List<BlockHeader> headers) {
     headers
         .stream()
-        .filter(header -> header.getTransactionsRoot().equals(Hash.EMPTY_LIST_HASH))
+        .filter(header -> header.getTransactionsRoot().equals(Hash.EMPTY_TRIE_HASH))
         .forEach(header -> receipts.put(header, emptyList()));
   }
 
