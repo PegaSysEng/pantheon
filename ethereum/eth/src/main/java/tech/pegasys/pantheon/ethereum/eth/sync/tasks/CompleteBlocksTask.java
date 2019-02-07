@@ -67,8 +67,7 @@ public class CompleteBlocksTask<C> extends AbstractRetryingPeerTask<List<Block>>
 
     this.headers = headers;
     this.blocks =
-        headers
-            .stream()
+        headers.stream()
             .filter(this::hasEmptyBody)
             .collect(toMap(BlockHeader::getNumber, header -> new Block(header, BlockBody.empty())));
   }
