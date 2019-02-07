@@ -125,9 +125,9 @@ public class IbftBlockHeightManagerTest {
     buildCreatedBlock();
 
     final MessageValidator messageValidator = mock(MessageValidator.class);
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(messageValidator.validateProposal(any())).thenReturn(true);
+    when(messageValidator.validateCommit(any())).thenReturn(true);
+    when(messageValidator.validatePrepare(any())).thenReturn(true);
     when(finalState.getTransmitter()).thenReturn(messageTransmitter);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
     when(finalState.getRoundTimer()).thenReturn(roundTimer);
@@ -135,7 +135,7 @@ public class IbftBlockHeightManagerTest {
     when(finalState.getMessageFactory()).thenReturn(messageFactory);
     when(blockCreator.createBlock(anyLong())).thenReturn(createdBlock);
     when(newRoundPayloadValidator.validateNewRoundMessage(any())).thenReturn(true);
-    when(messageValidatorFactory.createNewRoundValidator(any()))
+    when(messageValidatorFactory.createNewRoundValidator(anyLong()))
         .thenReturn(newRoundPayloadValidator);
     when(messageValidatorFactory.createMessageValidator(any())).thenReturn(messageValidator);
 
