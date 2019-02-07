@@ -92,7 +92,7 @@ public class IbftBlockHeightManagerTest {
   @Mock private RoundTimer roundTimer;
   @Mock private NewRoundMessageValidator newRoundPayloadValidator;
 
-  @Captor private ArgumentCaptor<Optional<PreparedRoundArtefacts>> preparedRoundArtefactsCaptor;
+  @Captor private ArgumentCaptor<Optional<PreparedRoundArtifacts>> preparedRoundArtifactsCaptor;
 
   private final List<KeyPair> validatorKeys = Lists.newArrayList();
   private final List<Address> validators = Lists.newArrayList();
@@ -125,9 +125,9 @@ public class IbftBlockHeightManagerTest {
     buildCreatedBlock();
 
     final MessageValidator messageValidator = mock(MessageValidator.class);
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(messageValidator.validateProposal(any())).thenReturn(true);
+    when(messageValidator.validateCommit(any())).thenReturn(true);
+    when(messageValidator.validatePrepare(any())).thenReturn(true);
     when(finalState.getTransmitter()).thenReturn(messageTransmitter);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
     when(finalState.getRoundTimer()).thenReturn(roundTimer);
@@ -135,7 +135,7 @@ public class IbftBlockHeightManagerTest {
     when(finalState.getMessageFactory()).thenReturn(messageFactory);
     when(blockCreator.createBlock(anyLong())).thenReturn(createdBlock);
     when(newRoundPayloadValidator.validateNewRoundMessage(any())).thenReturn(true);
-    when(messageValidatorFactory.createNewRoundValidator(any()))
+    when(messageValidatorFactory.createNewRoundValidator(anyLong()))
         .thenReturn(newRoundPayloadValidator);
     when(messageValidatorFactory.createMessageValidator(any())).thenReturn(messageValidator);
 
@@ -356,8 +356,8 @@ public class IbftBlockHeightManagerTest {
     final ConsensusRoundIdentifier nextRound = createFrom(roundIdentifier, 0, +1);
 
     verify(messageTransmitter, times(1))
-        .multicastRoundChange(eq(nextRound), preparedRoundArtefactsCaptor.capture());
-    final Optional<PreparedRoundArtefacts> preparedCert = preparedRoundArtefactsCaptor.getValue();
+        .multicastRoundChange(eq(nextRound), preparedRoundArtifactsCaptor.capture());
+    final Optional<PreparedRoundArtifacts> preparedCert = preparedRoundArtifactsCaptor.getValue();
 
     assertThat(preparedCert).isNotEmpty();
 
