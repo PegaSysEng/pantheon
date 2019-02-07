@@ -15,21 +15,21 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginUnauthorizedTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginUnauthorizedTransaction;
 
 public class Login {
 
   public Condition loginSucceeds(final String username, final String password) {
     return (n) -> {
-      final String token = n.execute(new LoginTransaction(username, password));
+      final String token = n.executeHttpTransaction(new LoginTransaction(username, password));
       assertThat(token).isNotBlank();
     };
   }
 
   public Condition loginFails(final String username, final String password) {
     return (n) -> {
-      n.execute(new LoginUnauthorizedTransaction(username, password));
+      n.executeHttpTransaction(new LoginUnauthorizedTransaction(username, password));
     };
   }
 }

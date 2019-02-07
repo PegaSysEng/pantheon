@@ -413,7 +413,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   @Override
-  public <T> T execute(final HttpTransaction<T> transaction) {
+  public <T> T executeHttpTransaction(final HttpTransaction<T> transaction) {
     return transaction.execute(httpRequestFactory());
   }
 
