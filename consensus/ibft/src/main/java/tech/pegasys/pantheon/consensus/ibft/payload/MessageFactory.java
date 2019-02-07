@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
-import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -37,7 +37,7 @@ public class MessageFactory {
     this.validatorKeyPair = validatorKeyPair;
   }
 
-  public Proposal createSignedProposalPayload(
+  public Proposal createProposal(
       final ConsensusRoundIdentifier roundIdentifier, final Block block) {
 
     final ProposalPayload payload = new ProposalPayload(roundIdentifier, block);
@@ -45,15 +45,14 @@ public class MessageFactory {
     return new Proposal(createSignedMessage(payload));
   }
 
-  public Prepare createSignedPreparePayload(
-      final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
+  public Prepare createPrepare(final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
 
     final PreparePayload payload = new PreparePayload(roundIdentifier, digest);
 
     return new Prepare(createSignedMessage(payload));
   }
 
-  public Commit createSignedCommitPayload(
+  public Commit createCommit(
       final ConsensusRoundIdentifier roundIdentifier,
       final Hash digest,
       final Signature commitSeal) {
@@ -63,19 +62,19 @@ public class MessageFactory {
     return new Commit(createSignedMessage(payload));
   }
 
-  public RoundChange createSignedRoundChangePayload(
+  public RoundChange createRoundChange(
       final ConsensusRoundIdentifier roundIdentifier,
-      final Optional<TerminatedRoundArtefacts> terminatedRoundArtefacts) {
+      final Optional<PreparedRoundArtifacts> preparedRoundArtifacts) {
 
     final RoundChangePayload payload =
         new RoundChangePayload(
             roundIdentifier,
-            terminatedRoundArtefacts.map(TerminatedRoundArtefacts::getPreparedCertificate));
+            preparedRoundArtifacts.map(PreparedRoundArtifacts::getPreparedCertificate));
 
     return new RoundChange(createSignedMessage(payload));
   }
 
-  public NewRound createSignedNewRoundPayload(
+  public NewRound createNewRound(
       final ConsensusRoundIdentifier roundIdentifier,
       final RoundChangeCertificate roundChangeCertificate,
       final SignedData<ProposalPayload> proposalPayload) {

@@ -26,10 +26,10 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -79,14 +79,14 @@ public class ValidatorPeer {
   }
 
   public Proposal injectProposal(final ConsensusRoundIdentifier rId, final Block block) {
-    final Proposal payload = messageFactory.createSignedProposalPayload(rId, block);
+    final Proposal payload = messageFactory.createProposal(rId, block);
 
     injectMessage(ProposalMessageData.create(payload));
     return payload;
   }
 
   public Prepare injectPrepare(final ConsensusRoundIdentifier rId, final Hash digest) {
-    final Prepare payload = messageFactory.createSignedPreparePayload(rId, digest);
+    final Prepare payload = messageFactory.createPrepare(rId, digest);
     injectMessage(PrepareMessageData.create(payload));
     return payload;
   }
@@ -103,7 +103,7 @@ public class ValidatorPeer {
 
   public Commit injectCommit(
       final ConsensusRoundIdentifier rId, final Hash digest, final Signature commitSeal) {
-    final Commit payload = messageFactory.createSignedCommitPayload(rId, digest, commitSeal);
+    final Commit payload = messageFactory.createCommit(rId, digest, commitSeal);
     injectMessage(CommitMessageData.create(payload));
     return payload;
   }
@@ -111,19 +111,28 @@ public class ValidatorPeer {
   public NewRound injectNewRound(
       final ConsensusRoundIdentifier rId,
       final RoundChangeCertificate roundChangeCertificate,
-      final SignedData<ProposalPayload> proposalPayload) {
+      final Proposal proposal) {
 
     final NewRound payload =
-        messageFactory.createSignedNewRoundPayload(rId, roundChangeCertificate, proposalPayload);
+        messageFactory.createNewRound(rId, roundChangeCertificate, proposal.getSignedPayload());
     injectMessage(NewRoundMessageData.create(payload));
     return payload;
   }
 
+  public NewRound injectEmptyNewRound(
+      final ConsensusRoundIdentifier targetRoundId,
+      final List<SignedData<RoundChangePayload>> roundChangePayloads,
+      final Block blockToPropose) {
+
+    final Proposal proposal = messageFactory.createProposal(targetRoundId, blockToPropose);
+
+    return injectNewRound(targetRoundId, new RoundChangeCertificate(roundChangePayloads), proposal);
+  }
+
   public RoundChange injectRoundChange(
       final ConsensusRoundIdentifier rId,
-      final Optional<TerminatedRoundArtefacts> terminatedRoundArtefacts) {
-    final RoundChange payload =
-        messageFactory.createSignedRoundChangePayload(rId, terminatedRoundArtefacts);
+      final Optional<PreparedRoundArtifacts> preparedRoundArtifacts) {
+    final RoundChange payload = messageFactory.createRoundChange(rId, preparedRoundArtifacts);
     injectMessage(RoundChangeMessageData.create(payload));
     return payload;
   }

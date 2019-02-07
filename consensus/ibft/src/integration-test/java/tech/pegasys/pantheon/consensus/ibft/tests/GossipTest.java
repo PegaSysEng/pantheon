@@ -74,7 +74,7 @@ public class GossipTest {
   @Test
   public void gossipMessagesToPeers() {
     final Prepare localPrepare =
-        context.getLocalNodeMessageFactory().createSignedPreparePayload(roundId, block.getHash());
+        context.getLocalNodeMessageFactory().createPrepare(roundId, block.getHash());
     peers.verifyNoMessagesReceivedNonProposing();
 
     final Proposal proposal = sender.injectProposal(roundId, block);
@@ -90,12 +90,10 @@ public class GossipTest {
     peers.verifyMessagesReceivedNonPropsing(commit);
     peers.verifyNoMessagesReceivedProposer();
 
-    final RoundChange roundChange =
-        msgFactory.createSignedRoundChangePayload(roundId, Optional.empty());
+    final RoundChange roundChange = msgFactory.createRoundChange(roundId, Optional.empty());
     final RoundChangeCertificate roundChangeCert =
         new RoundChangeCertificate(singleton(roundChange.getSignedPayload()));
-    final NewRound newRound =
-        sender.injectNewRound(roundId, roundChangeCert, proposal.getSignedPayload());
+    final NewRound newRound = sender.injectNewRound(roundId, roundChangeCert, proposal);
     peers.verifyMessagesReceivedNonPropsing(newRound);
     peers.verifyNoMessagesReceivedProposer();
 
@@ -120,7 +118,7 @@ public class GossipTest {
   public void messageWithUnknownValidatorIsNotGossiped() {
     final KeyPair unknownKeyPair = KeyPair.generate();
     final MessageFactory unknownMsgFactory = new MessageFactory(unknownKeyPair);
-    final Proposal unknownProposal = unknownMsgFactory.createSignedProposalPayload(roundId, block);
+    final Proposal unknownProposal = unknownMsgFactory.createProposal(roundId, block);
 
     sender.injectMessage(
         ProposalMessageData.create(new Proposal(unknownProposal.getSignedPayload())));
@@ -131,7 +129,7 @@ public class GossipTest {
   public void messageIsNotGossipedToSenderOrCreator() {
     final ValidatorPeer msgCreator = peers.getFirstNonProposer();
     final MessageFactory peerMsgFactory = msgCreator.getMessageFactory();
-    final Proposal proposalFromPeer = peerMsgFactory.createSignedProposalPayload(roundId, block);
+    final Proposal proposalFromPeer = peerMsgFactory.createProposal(roundId, block);
 
     sender.injectMessage(ProposalMessageData.create(proposalFromPeer));
 
@@ -142,7 +140,7 @@ public class GossipTest {
   @Test
   public void futureMessageIsNotGossipedImmediately() {
     ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(2, 0);
-    msgFactory.createSignedProposalPayload(futureRoundId, block);
+    msgFactory.createProposal(futureRoundId, block);
 
     sender.injectProposal(futureRoundId, block);
     peers.verifyNoMessagesReceived();

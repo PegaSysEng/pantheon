@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommitPayload;
+import static tech.pegasys.pantheon.consensus.ibft.support.IntegrationTestHelpers.createSignedCommitPayload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
@@ -63,8 +63,7 @@ public class LocalNodeIsProposerTest {
   @Before
   public void setup() {
     expectedProposedBlock = context.createBlockForProposalFromChainHead(0, blockTimeStamp);
-    expectedTxProposal =
-        localNodeMessageFactory.createSignedProposalPayload(roundId, expectedProposedBlock);
+    expectedTxProposal = localNodeMessageFactory.createProposal(roundId, expectedProposedBlock);
 
     expectedTxCommit =
         new Commit(
