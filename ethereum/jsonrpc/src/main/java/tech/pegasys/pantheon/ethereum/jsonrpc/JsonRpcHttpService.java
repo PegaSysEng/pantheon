@@ -284,9 +284,7 @@ public class JsonRpcHttpService {
   }
 
   private boolean hostIsInWhitelist(final String hostHeader) {
-    return config
-        .getHostsWhitelist()
-        .stream()
+    return config.getHostsWhitelist().stream()
         .anyMatch(whitelistEntry -> whitelistEntry.toLowerCase().equals(hostHeader.toLowerCase()));
   }
 
@@ -446,8 +444,7 @@ public class JsonRpcHttpService {
       final RoutingContext routingContext, final JsonArray jsonArray) {
     // Interpret json as rpc request
     final List<Future> responses =
-        jsonArray
-            .stream()
+        jsonArray.stream()
             .map(
                 obj -> {
                   if (!(obj instanceof JsonObject)) {
@@ -482,9 +479,7 @@ public class JsonRpcHttpService {
                 return;
               }
               final JsonRpcResponse[] completed =
-                  res.result()
-                      .list()
-                      .stream()
+                  res.result().list().stream()
                       .map(JsonRpcResponse.class::cast)
                       .filter(this::isNonEmptyResponses)
                       .toArray(JsonRpcResponse[]::new);
