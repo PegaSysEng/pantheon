@@ -160,11 +160,13 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   @Override
   public synchronized void appendFastSyncBlock(
       final Block block, final List<TransactionReceipt> receipts) {
+    checkFastSyncAllowed();
     appendBlock(block, receipts, true);
   }
 
   @Override
   public synchronized void completeFastSync() {
+    checkFastSyncAllowed();
     final Hash hash =
         blockchainStorage
             .getFastSyncHead()
@@ -174,6 +176,13 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     // Update canonical chain data
     updater.setChainHead(hash);
     updater.commit();
+  }
+
+  private void checkFastSyncAllowed() {
+    if (getChainHeadBlockNumber() != BlockHeader.GENESIS_BLOCK_NUMBER) {
+      throw new IllegalStateException(
+          "Cannot append fast sync blocks if chain head is not genesis");
+    }
   }
 
   private Optional<BlockAddedEvent> appendBlock(
