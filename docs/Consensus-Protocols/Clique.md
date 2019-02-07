@@ -51,7 +51,7 @@ The `extraData` field consists of:
 * 32 bytes (64 hex characters) of vanity data 
 * Concatenated list of initial signer addresses. 20 bytes (40 hex characters) for each signer. At least one
 initial signer must be specified. 
-* 65 bytes (130 hex characters) for proposer signature. In the genesis block there is no initial proproser so the proproser signature is 0s. 
+* 65 bytes (130 hex characters) for proposer signature. In the genesis block there is no initial proproser so the proproser signature is all zeros. 
 
 !!! example "One Initial Signer"
     `extraData` field for a Clique network with one initial signer with an address of `dd37f65db31c107f773e82a4f85c693058fef7a9`

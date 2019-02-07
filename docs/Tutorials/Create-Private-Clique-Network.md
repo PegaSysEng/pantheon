@@ -24,7 +24,7 @@ To create a private network:
 1. [Start First Node as Bootnode](#6-start-first-node-as-bootnode)
 1. [Start Node-2](#7-start-node-2)
 1. [Start Node-3](#8-start-node-3)
-1. [Confirm Private Network Working](#9-confirm-private-network-is-working)
+1. [Confirm Private Network is Working](#9-confirm-private-network-is-working)
 
 ### 1. Create Folders 
 
@@ -44,10 +44,10 @@ Clique-Network/
 
 ### 2. Get Public Key for Node-1
 
-To enable nodes to discover each other, a network requires one or more nodes to be bootnodes. 
+To enable nodes to discover each other, a network requires one or more bootnodes. 
 For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the enode URL. 
 
-In the `Node-1` directory, use the [`export-pub-key`](../Reference/Pantheon-CLI-Syntax.md#export-pub-key) subcommand to write 
+In the `Node-1` directory, use the [`public-key`](../Reference/Pantheon-CLI-Syntax.md#public-key) subcommand to write 
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
 
 ```bash tab="MacOS"
@@ -114,56 +114,41 @@ Copy the following genesis definition to a file called `cliqueGenesis.json` and 
   "nonce":"0x0",
   "timestamp":"0x5c51a607",
   "alloc": {
-    "<Node 1 Address>": {
-      "privateKey": "<Node 1 Private Key>",
-      "balance": "90000000000000000000000"
-    }
-  },
+      "fe3b557e8fb62b89f4916b721be55ceb828dbd73": {
+        "privateKey": "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
+        "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+        "balance": "0xad78ebc5ac6200000"
+      },
+      "627306090abaB3A6e1400e9345bC60c78a8BEf57": {
+        "privateKey": "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3",
+        "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+        "balance": "90000000000000000000000"
+      },
+      "f17f52151EbEF6C7334FAD080c5704D77216b732": {
+        "privateKey": "ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f",
+        "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+        "balance": "90000000000000000000000"
+      }
+   },
   "number":"0x0",
   "gasUsed":"0x0",
   "parentHash":"0x0000000000000000000000000000000000000000000000000000000000000000"
 }
 ```
 
-Replace:
- 
- * `<Node 1 Address>` with the [address for Node-1](#3-get-address-for-node-1) in `extraData` and `alloc`. 
- * `<Node 1 Private Key>` with the private key in the `key` file in the `Node-1-data-path` directory excluding the 0x prefix. 
+Replace `<Node 1 Address>` with the [address for Node-1](#3-get-address-for-node-1) in `extraData`. 
 
 !!! example
     
     ```json
     {
-      "config":{
-        "chainId":123,
-        "clique":{
-          "blockperiodseconds":15,
-          "epochlength":30000
-        }
-      },
-      "coinbase":"0x0000000000000000000000000000000000000000",
-      "difficulty":"0x1",
-    
+      ...
     "extraData":"0x0000000000000000000000000000000000000000000000000000000000000000b9b81ee349c3807e46bc71aa2632203c5b4620340000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      "gasLimit":"0xa00000",
-      "mixHash":"0x0000000000000000000000000000000000000000000000000000000000000000",
-      "nonce":"0x0",
-      "timestamp":"0x5c51a607",
-      "alloc": {
-        "b9b81ee349c3807e46bc71aa2632203c5b462034": {
-          "privateKey": "4ff55c423e4136c1a118721aaaadf0271f823c42b7d1438c6706efe0c001f7fe",
-          "balance": "90000000000000000000000"
-        }
-      },
-      "number":"0x0",
-      "gasUsed":"0x0",
-      "parentHash":"0x0000000000000000000000000000000000000000000000000000000000000000"
+      ...
     }
     ```
 
-!!! warning
-    Do not use the accounts in the genesis file above on mainnet or any public network except for testing.
-    The private keys are displayed so the accounts are not secure. 
+{!global/test_accounts.md!}
 
 ### 5. Delete Database Directory
 
@@ -172,13 +157,7 @@ The node cannot be started with the Clique genesis file while the previously gen
 
 ### 6. Start First Node as Bootnode
 
-Start Node-1 specifying:
-
-* No arguments for the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option because this is your bootnode
-* JSON-RPC API is enabled using the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option
-* ETH,NET, and CLIQUE APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
-* All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option
-* All domains can access the node using the HTTP JSON-RPC API using the [`--rpc-http-cors-origins`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-cors-origins) option 
+Start Node-1:
 
 ```bash tab="MacOS"
 pantheon --data-path=Node-1-data-path --genesis-file=../cliqueGenesis.json --bootnodes --network-id 123 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-whitelist=* --rpc-http-cors-origins="all"      
@@ -188,29 +167,20 @@ pantheon --data-path=Node-1-data-path --genesis-file=../cliqueGenesis.json --boo
 pantheon --data-path=Node-1-data-path --genesis-file=..\cliqueGenesis.json --bootnodes --network-id 123 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-whitelist=* --rpc-http-cors-origins="all"    
 ```
 
+The command line specifies: 
+
+* No arguments for the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option because this is your bootnode
+* JSON-RPC API is enabled using the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option
+* ETH,NET, and CLIQUE APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
+* All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option
+* All domains can access the node using the HTTP JSON-RPC API using the [`--rpc-http-cors-origins`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-cors-origins) option 
+
 ### 6. Start Node-2 
 
-You need the enode URL for Node-1 to specify Node-1 as a bootnode. 
+You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Node-1 to specify Node-1 as a bootnode. 
 
-The enode URL is `enode://<id>@<host:port>` where:
-
-* `<id>` is the node public key excluding the initial 0x. The node public key for Node-1 was written to `publicKeyNode1` in [step 2](#2-get-public-key-for-node-1). 
-* `<host:port>` is the host and port the bootnode is listening on for P2P peer discovery. Node-1 is using the default host and port of `127.0.0.1:30303`. 
-
-!!! example
-    If the default host and port are used for P2P peer discovery and the node public key exported is: `0xc35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f`
-    
-    The enode URL is:
-    `enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303` 
-
-Start another terminal, change to the `Node-2` directory and start Node-2 specifying:
+Start another terminal, change to the `Node-2` directory and start Node-2 replacing the enode URL with your bootonde:
  
-* Different port to Node-1 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
-* Different port to Node-1 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option.
-* Enode URL for Node-1 using the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option.
-* Data directory for Node-2 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
-* Other options as for [Node-1](#5-start-first-node-as-bootnode).  
-
 ```bash tab="MacOS"
 pantheon --data-path=Node-2-data-path --genesis-file=../cliqueGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8546     
 ```
@@ -219,15 +189,18 @@ pantheon --data-path=Node-2-data-path --genesis-file=../cliqueGenesis.json --boo
 pantheon --data-path=Node-2-data-path --genesis-file=..\cliqueGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8546     
 ```
 
+The command line specifies: 
+
+* Different port to Node-1 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
+* Different port to Node-1 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option.
+* Enode URL for Node-1 using the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option.
+* Data directory for Node-2 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
+* Other options as for [Node-1](#5-start-first-node-as-bootnode).
+
+
 ### 7. Start Node-3
 
-Start another terminal, change to the `Node-3` directory and start Node-3 specifying: 
- 
- * Different port to Node-1 and Node-2 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
- * Different port to Node-1 and Node-2 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option.
- * Data directory for Node-3 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
- * Bootnode as for [Node-2](#6-start-node-2).
- * Other options as for [Node-1](#5-start-first-node-as-bootnode). 
+Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootnode: 
 
 ```bash tab="MacOS"
 pantheon --data-path=Node-3-data-path --genesis-file=../cliqueGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8547    
@@ -236,6 +209,14 @@ pantheon --data-path=Node-3-data-path --genesis-file=../cliqueGenesis.json --boo
 ```bash tab="Windows"
 pantheon --data-path=Node-3-data-path --genesis-file=..\cliqueGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8547    
 ```
+
+The command line specifies: 
+
+ * Different port to Node-1 and Node-2 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
+ * Different port to Node-1 and Node-2 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option.
+ * Data directory for Node-3 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
+ * Bootnode as for [Node-2](#6-start-node-2).
+ * Other options as for [Node-1](#5-start-first-node-as-bootnode). 
 
 ### 8. Confirm Private Network is Working 
 
@@ -262,6 +243,11 @@ Use the [Clique API to add](../Consensus-Protocols/Clique.md#adding-and-removing
 
 !!! note
     To add Node-2 or Node-3 as a signer you need the [node address as when specifying Node-1](#2-get-address-for-node-1) as the initial signer. 
+
+Import accounts to MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask)
+
+!!! info 
+    Pantheon does not implement [private key management](../Using-Pantheon/Account-Management.md).
 
 ## Stop Nodes
 
