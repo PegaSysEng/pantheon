@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
+import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
   }
 
   @Override
-  public BytesValue compute(final BytesValue input) {
+  public BytesValue compute(final BytesValue input, final MessageFrame messageFrame) {
     try {
       String key = new String(input.extractArray(), UTF_8);
       ReceiveRequest receiveRequest = new ReceiveRequest(key, enclavePublicKey);

@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
+import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class PrivacyPrecompiledContractTest {
   private final BytesValue key = BytesValue.wrap(actual.getBytes(UTF_8));
   private PrivacyPrecompiledContract privacyPrecompiledContract;
   private PrivacyPrecompiledContract brokenPrivateTransactionHandler;
+  private MessageFrame messageFrame;
 
   Enclave mockEnclave() throws IOException {
     Enclave mockEnclave = mock(Enclave.class);
@@ -56,12 +58,13 @@ public class PrivacyPrecompiledContractTest {
     brokenPrivateTransactionHandler =
         new PrivacyPrecompiledContract(
             new SpuriousDragonGasCalculator(), publicKey, brokenMockEnclave());
+    messageFrame = mock(MessageFrame.class);
   }
 
   @Test
   public void testPrivacyPrecompiledContract() {
 
-    final BytesValue expected = privacyPrecompiledContract.compute(key);
+    final BytesValue expected = privacyPrecompiledContract.compute(key, messageFrame);
 
     String exp = new String(expected.extractArray(), UTF_8);
     assertThat(exp).isEqualTo(actual);
@@ -69,7 +72,7 @@ public class PrivacyPrecompiledContractTest {
 
   @Test
   public void enclaveIsDownWhileHandling() {
-    final BytesValue expected = brokenPrivateTransactionHandler.compute(key);
+    final BytesValue expected = brokenPrivateTransactionHandler.compute(key, messageFrame);
 
     assertThat(expected).isEqualTo(BytesValue.EMPTY);
   }
