@@ -15,12 +15,14 @@ package tech.pegasys.pantheon.ethereum.mainnet.precompiles.privacy;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
 import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
+import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -39,6 +41,7 @@ public class PrivacyPrecompiledContractIntegrationTest {
 
   private static final String PAYLOAD = "a wonderful transaction";
   private static Enclave enclave;
+  private static MessageFrame messageFrame;
 
   private static OrionTestHarness testHarness;
 
@@ -49,6 +52,7 @@ public class PrivacyPrecompiledContractIntegrationTest {
     testHarness = OrionTestHarness.create(folder.newFolder().toPath());
 
     enclave = new Enclave(testHarness.clientUrl());
+    messageFrame = mock(MessageFrame.class);
   }
 
   @AfterClass
@@ -74,7 +78,7 @@ public class PrivacyPrecompiledContractIntegrationTest {
             new SpuriousDragonGasCalculator(), publicKeys.get(0), enclave);
 
     BytesValue result =
-        privacyPrecompiledContract.compute(BytesValue.wrap(sr.getKey().getBytes(UTF_8)));
+        privacyPrecompiledContract.compute(BytesValue.wrap(sr.getKey().getBytes(UTF_8)), messageFrame);
 
     String expected = new String(result.extractArray(), UTF_8);
 
