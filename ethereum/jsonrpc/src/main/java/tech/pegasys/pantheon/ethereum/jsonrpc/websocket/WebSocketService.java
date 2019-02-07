@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.websocket;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 
 import java.net.InetSocketAddress;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import io.vertx.core.AsyncResult;
@@ -26,9 +25,6 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.ext.auth.AuthProvider;
-import io.vertx.ext.auth.jwt.JWTAuth;
-import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,41 +40,13 @@ public class WebSocketService {
 
   private HttpServer httpServer;
 
-  private final Optional<JWTAuth> jwtAuthProvider;
-  private final Optional<AuthProvider> credentialAuthProvider;
-
-  public WebSocketService(
-      final Vertx vertx,
-      final WebSocketConfiguration configuration,
-      final WebSocketRequestHandler websocketRequestHandler,
-      final JWTAuthOptions jwtOptions,
-      final AuthProvider credentialAuthProvider) {
-    this(
-        vertx,
-        configuration,
-        websocketRequestHandler,
-        Optional.of(jwtOptions),
-        Optional.of(credentialAuthProvider));
-  }
-
   public WebSocketService(
       final Vertx vertx,
       final WebSocketConfiguration configuration,
       final WebSocketRequestHandler websocketRequestHandler) {
-    this(vertx, configuration, websocketRequestHandler, Optional.empty(), Optional.empty());
-  }
-
-  private WebSocketService(
-      final Vertx vertx,
-      final WebSocketConfiguration configuration,
-      final WebSocketRequestHandler websocketRequestHandler,
-      final Optional<JWTAuthOptions> jwtOptions,
-      final Optional<AuthProvider> credentialAuthProvider) {
     this.vertx = vertx;
     this.configuration = configuration;
     this.websocketRequestHandler = websocketRequestHandler;
-    this.credentialAuthProvider = credentialAuthProvider;
-    this.jwtAuthProvider = jwtOptions.map(options -> JWTAuth.create(vertx, options));
   }
 
   public CompletableFuture<?> start() {
