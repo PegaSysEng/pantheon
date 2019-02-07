@@ -2206,9 +2206,13 @@ Adds accounts (participants) to the accounts whitelist.
 
 `list of strings` - List of account addresses 
 
+!!! note 
+    The parameters list contains a list which is why the account addresses are enclosed by double square brackets. 
+
 **Returns** 
 
-`result` - `Success` or `error`
+`result` - `Success` or `error`. For example, errors include attempting to add accounts already on the whitelist or 
+including an invalid account address. 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2267,9 +2271,13 @@ Removes accounts (participants) from the accounts whitelist.
 
 `list of strings` - List of account addresses 
 
+!!! note 
+    The parameters list contains a list which is why the account addresses are enclosed by double square brackets.
+
 **Returns** 
 
-`result` - `Success` or `error`
+`result` - `Success` or `error`. For example, errors include attempting to remove accounts not on the whitelist or 
+including an invalid account address.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2293,16 +2301,15 @@ Adds nodes to the nodes whitelist.
 
 **Parameters** 
 
-`list of strings` - List of enode URLs 
+`list of strings` - List of [enode URLs](../Configuring-Pantheon/Node-Keys.md#enode-url) 
 
-The enode URL is `enode://<id>@<host:port>` where:
-
-* `<id>` is the [node public key](../Configuring-Pantheon/Node-Keys.md#node-public-key) excluding the 0x prefix
-* `<host:port>` is the host and port the node is listening on for P2P peer discovery
+!!! note 
+    The parameters list contains a list which is why the enode URLs are enclosed by double square brackets.
 
 **Returns** 
 
-`result` - `Success` or `error`
+`result` - `Success` or `error`. For example, errors include attempting to add nodes already on the whitelist or 
+including an invalid enode URL.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2359,11 +2366,15 @@ Removes nodes from the nodes whitelist.
 
 **Parameters** 
 
-`list of strings` - List of [enode URLs](#perm_addnodestowhitelist) 
+`list of strings` - List of [enode URLs](../Configuring-Pantheon/Node-Keys.md#enode-url)
+
+!!! note 
+    The parameters list contains a list which is why the enode URLs are enclosed by double square brackets.
 
 **Returns** 
 
-`result` - `Success` or `error`
+`result` - `Success` or `error`. For example, errors include attempting to remove accounts not on the whitelist or 
+including an invalid enode URL.
 
 !!! example
     ```bash tab="curl HTTP request"
