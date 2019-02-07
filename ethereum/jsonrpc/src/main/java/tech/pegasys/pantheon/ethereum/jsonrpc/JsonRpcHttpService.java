@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -67,6 +68,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.handler.JWTAuthHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -204,6 +206,8 @@ public class JsonRpcHttpService {
         .produces(APPLICATION_JSON)
         .handler(this::handleLogin);
 
+    jwtAuthProvider.ifPresent(jwtAuth -> router.route("/").handler(JWTAuthHandler.create(jwtAuth)));
+
     final CompletableFuture<?> resultFuture = new CompletableFuture<>();
     httpServer
         .requestHandler(router)
@@ -247,6 +251,24 @@ public class JsonRpcHttpService {
             .end("{\"message\":\"Host not authorized.\"}");
       }
     };
+  }
+
+  @VisibleForTesting
+  public boolean isPermitted(final User user, final JsonRpcMethod jsonRpcMethod) {
+
+    AtomicBoolean foundMatchingPermission = new AtomicBoolean();
+
+    for (String perm : jsonRpcMethod.getPermissions()) {
+      user.isAuthorized(
+          perm,
+          (authed) -> {
+            if (authed.result()) {
+              LOG.trace("user {} has permission to do method {}", user, perm);
+              foundMatchingPermission.set(true);
+            }
+          });
+    }
+    return foundMatchingPermission.get();
   }
 
   private Optional<String> getAndValidateHostHeader(final RoutingContext event) {
