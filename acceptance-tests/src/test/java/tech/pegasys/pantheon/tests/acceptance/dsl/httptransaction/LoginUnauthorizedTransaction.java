@@ -16,11 +16,11 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
-public class LoginRejectedTransaction implements HttpTransaction<Void> {
+public class LoginUnauthorizedTransaction implements HttpTransaction<Void> {
   private final String username;
   private final String password;
 
-  public LoginRejectedTransaction(final String username, final String password) {
+  public LoginUnauthorizedTransaction(final String username, final String password) {
     this.username = username;
     this.password = password;
   }

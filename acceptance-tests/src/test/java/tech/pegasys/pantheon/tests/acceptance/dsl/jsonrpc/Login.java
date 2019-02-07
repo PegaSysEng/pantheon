@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginRejectedTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginUnauthorizedTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginTransaction;
 
 public class Login {
@@ -29,7 +29,7 @@ public class Login {
 
   public Condition loginFails(final String username, final String password) {
     return (n) -> {
-      n.execute(new LoginRejectedTransaction(username, password));
+      n.execute(new LoginUnauthorizedTransaction(username, password));
     };
   }
 }
