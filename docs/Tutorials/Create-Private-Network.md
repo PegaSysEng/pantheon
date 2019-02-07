@@ -24,7 +24,7 @@ To create a private network:
 1. [Get Public Key of First Node](#3-get-public-key-of-first-node)
 1. [Start First Node as Bootnode](#4-restart-first-node-as-bootnode)
 1. [Start Additional Nodes](#5-start-additional-nodes)
-1. [Confirm Private Network Working](#6-confirm-private-network-is-working)
+1. [Confirm Private Network is Working](#6-confirm-private-network-is-working)
 
 ### 1. Create Folders 
 
@@ -82,10 +82,10 @@ Copy the following genesis definition to a file called `privateNetworkGenesis.js
    
 ### 3. Get Public Key of First Node
 
-To enable nodes to discover each other, a network requires one or more nodes to be bootnodes. 
+To enable nodes to discover each other, a network requires one or more bootnodes. 
 For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the enode URL. 
 
-In the `Node-1` directory, use the [`export-pub-key` subcommand](../Reference/Pantheon-CLI-Syntax.md#export-pub-key) to write 
+In the `Node-1` directory, use the [`public-key` subcommand](../Reference/Pantheon-CLI-Syntax.md#public-key) to write 
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
 
 ```bash tab="MacOS"

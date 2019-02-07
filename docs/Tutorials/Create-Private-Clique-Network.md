@@ -1,6 +1,7 @@
 # Creating a Private Network using Clique (Proof of Authority) Consensus Protocol
 
-A private network provides a configurable network for testing. 
+A private network provides a configurable network for testing. This private network uses the [Clique (Proof of Authority)
+consensus protocol](../Consensus-Protocols/Clique.md). 
 
 !!!important
     An Ethereum private network created as described here is isolated but not protected or secure. 
@@ -28,7 +29,7 @@ To create a private network:
 
 ### 1. Create Folders 
 
-Each node requires a data directory for the blockchain data. When the node is started, the node key is saved in this directory. 
+Each node requires a data directory for the blockchain data. When the node is started, the [node key](../Configuring-Pantheon/Node-Keys.md) is saved in this directory. 
 
 Create directories for your private network, each of the three nodes, and a data directory for each node: 
 
@@ -45,7 +46,7 @@ Clique-Network/
 ### 2. Get Public Key for Node-1
 
 To enable nodes to discover each other, a network requires one or more bootnodes. 
-For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the enode URL. 
+For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url). 
 
 In the `Node-1` directory, use the [`public-key`](../Reference/Pantheon-CLI-Syntax.md#public-key) subcommand to write 
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
@@ -136,7 +137,7 @@ Copy the following genesis definition to a file called `cliqueGenesis.json` and 
 }
 ```
 
-Replace `<Node 1 Address>` with the [address for Node-1](#3-get-address-for-node-1) in `extraData`. 
+In `extraData`, replace `<Node 1 Address>` with the [address for Node-1](#3-get-address-for-node-1) excluding the 0x prefix. 
 
 !!! example
     
@@ -148,7 +149,10 @@ Replace `<Node 1 Address>` with the [address for Node-1](#3-get-address-for-node
     }
     ```
 
-{!global/test_accounts.md!}
+!!! warning 
+    Do not use the accounts in `alloc` in the genesis file on mainnet or any public network except for testing.
+        
+    The private keys are displayed which means the accounts are not secure.  
 
 ### 5. Delete Database Directory
 
@@ -175,7 +179,7 @@ The command line specifies:
 * All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option
 * All domains can access the node using the HTTP JSON-RPC API using the [`--rpc-http-cors-origins`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-cors-origins) option 
 
-### 6. Start Node-2 
+### 7. Start Node-2 
 
 You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Node-1 to specify Node-1 as a bootnode. 
 
@@ -198,7 +202,7 @@ The command line specifies:
 * Other options as for [Node-1](#5-start-first-node-as-bootnode).
 
 
-### 7. Start Node-3
+### 8. Start Node-3
 
 Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootnode: 
 
@@ -218,7 +222,7 @@ The command line specifies:
  * Bootnode as for [Node-2](#6-start-node-2).
  * Other options as for [Node-1](#5-start-first-node-as-bootnode). 
 
-### 8. Confirm Private Network is Working 
+### 9. Confirm Private Network is Working 
 
 Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
@@ -254,4 +258,4 @@ Import accounts to MetaMask and send transactions as described in the [Private N
 When finished using the private network, stop all nodes using ++ctrl+c++ in each terminal window. 
 
 !!!tip
-    To restart the Clique network in the future, start from [5. Start First Node as Bootnode](#5-start-first-node-as-bootnode). 
+    To restart the Clique network in the future, start from [6. Start First Node as Bootnode](#6-start-first-node-as-bootnode). 
