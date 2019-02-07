@@ -28,7 +28,7 @@ public class LoginRejectedTransaction implements HttpTransaction<Void> {
   @Override
   public Void execute(final HttpRequestFactory httpFactory) {
     try {
-      httpFactory.loginFailed(username, password);
+      httpFactory.loginUnauthorized(username, password);
       return null;
     } catch (IOException e) {
       fail("Login request failed with exception: " + e.toString());

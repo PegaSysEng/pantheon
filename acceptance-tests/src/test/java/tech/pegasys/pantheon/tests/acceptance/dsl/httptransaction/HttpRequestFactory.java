@@ -52,12 +52,11 @@ public class HttpRequestFactory {
       assertThat(bodyString).isNotNull();
       assertThat(bodyString).isNotBlank();
 
-      final JsonObject responseBodyJson = new JsonObject(bodyString);
-      return responseBodyJson;
+      return new JsonObject(bodyString);
     }
   }
 
-  public void loginFailed(final String username, final String password) throws IOException {
+  public void loginUnauthorized(final String username, final String password) throws IOException {
     final RequestBody requestBody =
         RequestBody.create(
             JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
