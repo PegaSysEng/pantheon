@@ -147,9 +147,10 @@ and a test or two.
 ### Contribution Workflow
 The codebase and documentation are maintained using the same "*contributor workflow*" where everyone 
 without exception contributes changes proposals using "*pull-requests*".
+
 This facilitates social contribution, easy testing and peer review.
 
-To contribute a patch, the workflow is as follows:
+To contribute and propose your changes, the workflow is as follows:
 
 1. [**Fork the repository**](https://github.com/PegaSysEng/pantheon/fork).
 1. **Clone your fork** on your computer.
@@ -177,11 +178,12 @@ Questions on architectural best practices will be guided by the principles set f
 [Effective Java](http://index-of.es/Java/Effective%20Java.pdf) by Joshua Bloch
 
 ### Automated Test coverage
-All code submissions must be accompanied by appropriate automated tests.  The goal is to provide confidence 
-in the code’s robustness, while avoiding redundant tests.
+All code submissions must be accompanied by appropriate automated tests.
+The goal is to provide confidence in the code’s robustness, while avoiding redundant tests.
 
 >**Important** 
-> The [`libsodium`](https://download.libsodium.org/doc/installation) library must be installed to run `./gradlew integrationTest`. 
+> The [`libsodium`](https://download.libsodium.org/doc/installation) library must be installed to 
+run `./gradlew integrationTest`. 
 
 ### Pull Requests
 
@@ -230,9 +232,10 @@ These are not strictly enforced during the build, but should be adhered to and c
 
 ## Documentation Style Guide
 If you have to make changes to the documentation, we propose a set of 
-[documentation guidelines and examples](DOC-STYLE-GUIDE.md) to help you. 
+[documentation guidelines and examples](DOC-STYLE-GUIDE.md) to help you.
+
 These rules are not automatically enforced yet, but it's highly recommended to follow them
-as much as possible to make the documentation coherent and the user experience as pleasant as possible. 
+to make the documentation coherent and the user experience as pleasant as possible. 
 
 ## Git Commit Messages & Pull Request Messages
 * Use the present tense ("Add feature" not "Added feature")
@@ -271,34 +274,33 @@ as much as possible to make the documentation coherent and the user experience a
 
 #### Pull Request Labels
 
-| Label name                                          | Description                                                                              |
-|-----------------------------------------------------|------------------------------------------------------------------------------------------|
-| [`work-in-progress`][search-label-work-in-progress] | Pull requests which are still being worked on, more changes will follow.                 |
-| [`requires-changes`][search-label-requires-changes] | Pull requests which need to be updated based on review comments and then reviewed again. |
+| Label name                                                              | Description                                                                                |
+|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| [`work-in-progress`][search-label-work-in-progress]                     | Pull requests which are still being worked on, more changes will follow.                   |
+| [`requires-changes`][search-label-requires-changes]                     | Pull requests which need to be updated based on review comments and then reviewed again.   |
 | [`needs engineering approval`][search-label-needs-engineering-approval] | Pull requests which need to be approved from a technical person, mainly documentation PRs. |
 
-[search-label-windows]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awindows
-[search-label-linux]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Alinux
-[search-label-mac]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Amac
-[search-label-documentation]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Adocumentation
-[search-label-performance]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aperformance
-[search-label-security]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Asecurity
-[search-label-api]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aapi
-
-[search-label-enhancement]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aenhancement
-[search-label-bug]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Abug
-[search-label-help-wanted]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ahelp%20wanted
-[search-label-good-first-issue]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Agood%20first%20issue
-[search-label-info-needed]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ainfo%20needed
-[search-label-needs-reproduction]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aneeds%20reproduction
-[search-label-blocked]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ablocked
-[search-label-duplicate]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Aduplicate
-[search-label-wontfix]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Awontfix
-[search-label-invalid]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ainvalid
-[search-label-do-we-want-this]: https://github.com/search?q=is%3Aopen+is%3Aissue+repo%3APegasysEng%2FPantheon+label%3Ado%20we%20want%20this
-[search-label-work-in-progress]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Awork%20in%20progress
-[search-label-requires-changes]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3Arequires%20changes
-[search-label-needs-engineering-approval]: https://github.com/search?q=is%3Aopen+is%3Apr+repo%3APegasysEng%2FPantheon+label%3A"needs+engineering+approval"
+[search-label-windows]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22windows%22
+[search-label-linux]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22linux%22
+[search-label-mac]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22mac%22
+[search-label-documentation]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22documentation%22
+[search-label-performance]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22performance%22
+[search-label-security]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22security%22
+[search-label-api]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22api%22
+[search-label-enhancement]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22enhancement%22
+[search-label-bug]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22bug%22
+[search-label-help-wanted]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22help%20wanted%22
+[search-label-good-first-issue]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22good%20first%20issue%22
+[search-label-info-needed]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22info%20needed%22
+[search-label-needs-reproduction]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22needs%20reproduction%22
+[search-label-blocked]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22blocked%22
+[search-label-duplicate]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22duplicate%22
+[search-label-wontfix]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22wontfix%22
+[search-label-invalid]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22invalid%22
+[search-label-do-we-want-this]: https://github.com/PegaSysEng/pantheon/issues?q=is%3Aopen+is%3Aissue+label%3A%22do%20we%20want%20this%22
+[search-label-work-in-progress]: https://github.com/PegaSysEng/pantheon/pulls?q=is%3Aopen+is%3Apr+label%3A%22work%20in%20progress%22
+[search-label-requires-changes]: https://github.com/PegaSysEng/pantheon/pulls?q=is%3Aopen+is%3Apr+label%3A%22requires%20changes%22
+[search-label-needs-engineering-approval]: https://github.com/PegaSysEng/pantheon/pulls?q=is%3Aopen+is%3Apr+label%3A%22needs+engineering+approval%22
 
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
