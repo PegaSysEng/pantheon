@@ -137,7 +137,7 @@ public class FastSyncTargetManagerTest {
   @Test
   public void shouldResumeSyncingFromFastSyncHead() {
     final BlockHeader importedHeader = otherBlockchain.getBlockHeader(1).get();
-    localBlockchain.fastAppendBlock(
+    localBlockchain.appendFastSyncBlock(
         new Block(importedHeader, otherBlockchain.getBlockBody(importedHeader.getHash()).get()),
         otherBlockchain.getTxReceipts(importedHeader.getHash()).get());
 

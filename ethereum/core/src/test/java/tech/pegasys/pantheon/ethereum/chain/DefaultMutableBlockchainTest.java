@@ -147,7 +147,7 @@ public class DefaultMutableBlockchainTest {
         new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
-    blockchain.fastAppendBlock(newBlock, receipts);
+    blockchain.appendFastSyncBlock(newBlock, receipts);
 
     assertBlockIsHead(blockchain, genesisBlock);
     assertBlockIsFastSyncHead(blockchain, newBlock);
@@ -167,7 +167,7 @@ public class DefaultMutableBlockchainTest {
     final BlockOptions options = new BlockOptions().setBlockNumber(1L).setParentHash(Hash.ZERO);
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
-    blockchain.fastAppendBlock(newBlock, receipts);
+    blockchain.appendFastSyncBlock(newBlock, receipts);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -183,7 +183,7 @@ public class DefaultMutableBlockchainTest {
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     receipts.add(gen.receipt());
-    blockchain.fastAppendBlock(newBlock, receipts);
+    blockchain.appendFastSyncBlock(newBlock, receipts);
   }
 
   @Test
@@ -219,7 +219,7 @@ public class DefaultMutableBlockchainTest {
     final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
     final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
     for (int i = 1; i < chain.size(); i++) {
-      blockchain.fastAppendBlock(chain.get(i), blockReceipts.get(i));
+      blockchain.appendFastSyncBlock(chain.get(i), blockReceipts.get(i));
     }
 
     for (int i = 1; i < chain.size(); i++) {
@@ -230,7 +230,7 @@ public class DefaultMutableBlockchainTest {
     assertBlockIsFastSyncHead(blockchain, head);
     assertBlockIsHead(blockchain, chain.get(0));
 
-    blockchain.fastSyncComplete();
+    blockchain.completeFastSync();
     assertBlockIsFastSyncHead(blockchain, head);
     assertBlockIsHead(blockchain, head);
     assertTotalDifficultiesAreConsistent(blockchain, head);

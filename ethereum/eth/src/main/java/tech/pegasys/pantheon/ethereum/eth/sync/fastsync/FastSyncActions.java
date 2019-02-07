@@ -180,7 +180,7 @@ public class FastSyncActions<C> {
   public FastSyncState finalizeFastSync(final FastSyncState fastSyncState) {
     LOG.info(
         "Updating chain head to fast sync pivot block {}", fastSyncState.getPivotBlockNumber());
-    protocolContext.getBlockchain().fastSyncComplete();
+    protocolContext.getBlockchain().completeFastSync();
     return fastSyncState;
   }
 }

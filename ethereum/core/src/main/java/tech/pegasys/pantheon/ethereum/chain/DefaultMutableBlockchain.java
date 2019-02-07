@@ -158,13 +158,13 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   }
 
   @Override
-  public synchronized void fastAppendBlock(
+  public synchronized void appendFastSyncBlock(
       final Block block, final List<TransactionReceipt> receipts) {
     appendBlock(block, receipts, true);
   }
 
   @Override
-  public void fastSyncComplete() {
+  public synchronized void completeFastSync() {
     final Hash hash =
         blockchainStorage
             .getFastSyncHead()
@@ -176,7 +176,7 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     updater.commit();
   }
 
-  public synchronized Optional<BlockAddedEvent> appendBlock(
+  private Optional<BlockAddedEvent> appendBlock(
       final Block block, final List<TransactionReceipt> receipts, final boolean isFastSync) {
     checkArgument(
         block.getBody().getTransactions().size() == receipts.size(),

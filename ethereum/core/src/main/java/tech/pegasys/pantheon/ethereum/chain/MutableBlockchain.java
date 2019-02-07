@@ -40,8 +40,8 @@ public interface MutableBlockchain extends Blockchain {
    * @param block The block to append.
    * @param receipts The list of receipts associated with this block's transactions.
    */
-  void fastAppendBlock(Block block, List<TransactionReceipt> receipts);
+  void appendFastSyncBlock(Block block, List<TransactionReceipt> receipts);
 
   /** Updates the chain head to point to the fast sync chain head. */
-  void fastSyncComplete();
+  void completeFastSync();
 }
