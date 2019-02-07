@@ -44,6 +44,7 @@ public interface PrecompiledContract {
    * Executes the pre-compiled contract.
    *
    * @param input the input for the pre-compiled contract.
+   * @param messageFrame context for this message
    * @return the output of the pre-compiled contract.
    */
   BytesValue compute(BytesValue input, MessageFrame messageFrame);
