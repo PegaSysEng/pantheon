@@ -297,8 +297,7 @@ public class BlockchainQueries {
                                           formatTransactions(
                                               txs, header.getNumber(), blockHeaderHash);
                                       final List<Hash> ommers =
-                                          body.getOmmers()
-                                              .stream()
+                                          body.getOmmers().stream()
                                               .map(BlockHeader::getHash)
                                               .collect(Collectors.toList());
                                       final int size = new Block(header, body).calculateSize();
@@ -349,13 +348,11 @@ public class BlockchainQueries {
                                 .map(
                                     (td) -> {
                                       final List<Hash> txs =
-                                          body.getTransactions()
-                                              .stream()
+                                          body.getTransactions().stream()
                                               .map(Transaction::hash)
                                               .collect(Collectors.toList());
                                       final List<Hash> ommers =
-                                          body.getOmmers()
-                                              .stream()
+                                          body.getOmmers().stream()
                                               .map(BlockHeader::getHash)
                                               .collect(Collectors.toList());
                                       final int size = new Block(header, body).calculateSize();
