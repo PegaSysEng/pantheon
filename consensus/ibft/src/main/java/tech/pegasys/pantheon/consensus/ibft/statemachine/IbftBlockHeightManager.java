@@ -69,7 +69,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   private final Function<ConsensusRoundIdentifier, RoundState> roundStateCreator;
   private final IbftFinalState finalState;
 
-  private Optional<TerminatedRoundArtefacts> latesteTerminatedRoundArtefacts = Optional.empty();
+  private Optional<PreparedRoundArtifacts> latestPreparedRoundArtifacts = Optional.empty();
 
   private IbftRound currentRound;
 
@@ -90,7 +90,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     this.roundChangeManager = roundChangeManager;
     this.finalState = finalState;
 
-    newRoundMessageValidator = messageValidatorFactory.createNewRoundValidator(parentHeader);
+    newRoundMessageValidator = messageValidatorFactory.createNewRoundValidator(getChainHeight());
 
     roundStateCreator =
         (roundIdentifier) ->
@@ -133,20 +133,20 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     LOG.info(
         "Round has expired, creating PreparedCertificate and notifying peers. round={}",
         currentRound.getRoundIdentifier());
-    final Optional<TerminatedRoundArtefacts> terminatedRoundArtefats =
-        currentRound.constructTerminatedRoundArtefacts();
+    final Optional<PreparedRoundArtifacts> preparedRoundArtifacts =
+        currentRound.constructPreparedRoundArtifacts();
 
-    if (terminatedRoundArtefats.isPresent()) {
-      latesteTerminatedRoundArtefacts = terminatedRoundArtefats;
+    if (preparedRoundArtifacts.isPresent()) {
+      latestPreparedRoundArtifacts = preparedRoundArtifacts;
     }
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
     final RoundChange localRoundChange =
-        messageFactory.createSignedRoundChangePayload(
-            currentRound.getRoundIdentifier(), latesteTerminatedRoundArtefacts);
+        messageFactory.createRoundChange(
+            currentRound.getRoundIdentifier(), latestPreparedRoundArtifacts);
     transmitter.multicastRoundChange(
-        currentRound.getRoundIdentifier(), latesteTerminatedRoundArtefacts);
+        currentRound.getRoundIdentifier(), latestPreparedRoundArtifacts);
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
     // message - so it must be handled accordingly.
@@ -209,11 +209,11 @@ public class IbftBlockHeightManager implements BlockHeightManager {
         startNewRound(targetRound.getRoundNumber());
       }
 
-      final RoundChangeArtefacts roundChangeArtefacts = RoundChangeArtefacts.create(result.get());
+      final RoundChangeArtifacts roundChangeArtifacts = RoundChangeArtifacts.create(result.get());
 
       if (finalState.isLocalNodeProposerForRound(targetRound)) {
         currentRound.startRoundWith(
-            roundChangeArtefacts, TimeUnit.MILLISECONDS.toSeconds(clock.millis()));
+            roundChangeArtifacts, TimeUnit.MILLISECONDS.toSeconds(clock.millis()));
       }
     }
   }
@@ -255,7 +255,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
   @Override
   public long getChainHeight() {
-    return currentRound.getRoundIdentifier().getSequenceNumber();
+    return parentHeader.getNumber() + 1;
   }
 
   @Override

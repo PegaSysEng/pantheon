@@ -58,29 +58,28 @@ public class MessageValidatorTest {
 
   @Before
   public void setup() {
-    when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(signedDataValidator.validatePrepareMessage(any())).thenReturn(true);
-    when(signedDataValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(signedDataValidator.validateProposal(any())).thenReturn(true);
+    when(signedDataValidator.validatePrepare(any())).thenReturn(true);
+    when(signedDataValidator.validateCommit(any())).thenReturn(true);
   }
 
   @Test
   public void messageValidatorDefersToUnderlyingSignedDataValidator() {
-    final Proposal proposal = messageFactory.createSignedProposalPayload(roundIdentifier, block);
+    final Proposal proposal = messageFactory.createProposal(roundIdentifier, block);
 
-    final Prepare prepare =
-        messageFactory.createSignedPreparePayload(roundIdentifier, block.getHash());
+    final Prepare prepare = messageFactory.createPrepare(roundIdentifier, block.getHash());
 
     final Commit commit =
-        messageFactory.createSignedCommitPayload(
+        messageFactory.createCommit(
             roundIdentifier, block.getHash(), SECP256K1.sign(block.getHash(), keyPair));
 
-    messageValidator.addSignedProposalPayload(proposal);
-    verify(signedDataValidator, times(1)).addSignedProposalPayload(proposal.getSignedPayload());
+    messageValidator.validateProposal(proposal);
+    verify(signedDataValidator, times(1)).validateProposal(proposal.getSignedPayload());
 
-    messageValidator.validatePrepareMessage(prepare);
-    verify(signedDataValidator, times(1)).validatePrepareMessage(prepare.getSignedPayload());
+    messageValidator.validatePrepare(prepare);
+    verify(signedDataValidator, times(1)).validatePrepare(prepare.getSignedPayload());
 
-    messageValidator.validateCommitMessage(commit);
-    verify(signedDataValidator, times(1)).validateCommmitMessage(commit.getSignedPayload());
+    messageValidator.validateCommit(commit);
+    verify(signedDataValidator, times(1)).validateCommit(commit.getSignedPayload());
   }
 }
