@@ -50,6 +50,7 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
    * @param ethContext The context of the current Eth network we are attached to.
    * @param maxRetries Maximum number of retries to accept before completing exceptionally.
    * @param ethTasksTimer The metrics timer to use to time the duration of the task.
+   * @param isEmptyResponse Test if the response received was empty.
    */
   public AbstractRetryingPeerTask(
       final EthContext ethContext,
