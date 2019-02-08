@@ -293,6 +293,64 @@ public class DefaultMutableBlockchainTest {
   }
 
   @Test
+  public void appendFastSyncBlockWithReorgToChainAtEqualHeight() {
+    final BlockDataGenerator gen = new BlockDataGenerator(1);
+
+    // Setup an initial blockchain
+    final int chainLength = 3;
+    final List<Block> chain = gen.blockSequence(chainLength);
+    final List<List<TransactionReceipt>> blockReceipts =
+        chain.stream().map(gen::receipts).collect(Collectors.toList());
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
+    for (int i = 1; i < chain.size(); i++) {
+      blockchain.appendFastSyncBlock(chain.get(i), blockReceipts.get(i));
+    }
+    assertThat(blockchain.getForks()).isEmpty();
+    final Block originalHead = chain.get(chainLength - 1);
+
+    // Create parallel fork of length 1
+    final int forkBlock = 2;
+    final int commonAncestor = 1;
+    final BlockOptions options =
+        new BlockOptions()
+            .setParentHash(chain.get(commonAncestor).getHash())
+            .setBlockNumber(forkBlock)
+            .setDifficulty(chain.get(forkBlock).getHeader().getDifficulty().plus(10L));
+    final Block fork = gen.block(options);
+    final List<TransactionReceipt> forkReceipts = gen.receipts(fork);
+    final List<Block> reorgedChain = new ArrayList<>(chain.subList(0, forkBlock));
+    reorgedChain.add(fork);
+    final List<List<TransactionReceipt>> reorgedReceipts =
+        new ArrayList<>(blockReceipts.subList(0, forkBlock));
+    reorgedReceipts.add(forkReceipts);
+
+    // Add fork
+    blockchain.appendFastSyncBlock(fork, forkReceipts);
+
+    // Check chain has reorganized
+    for (int i = 0; i < reorgedChain.size(); i++) {
+      assertBlockDataIsStored(blockchain, reorgedChain.get(i), reorgedReceipts.get(i));
+    }
+    // Check old transactions have been removed
+    for (final Transaction tx : originalHead.getBody().getTransactions()) {
+      assertThat(blockchain.getTransactionByHash(tx.hash())).isNotPresent();
+    }
+
+    assertBlockIsFastSyncHead(blockchain, fork);
+    // Old chain head should not be tracked as a fork because we don't track fast sync forks
+    final Set<Hash> forks = blockchain.getForks();
+    assertThat(forks.size()).isEqualTo(0);
+    // Old chain should not be on canonical chain.
+    for (int i = commonAncestor + 1; i < chainLength; i++) {
+      assertThat(blockchain.blockIsOnCanonicalChain(chain.get(i).getHash())).isFalse();
+    }
+
+    blockchain.completeFastSync();
+    assertTotalDifficultiesAreConsistent(blockchain, fork);
+  }
+
+  @Test
   public void appendBlockWithReorgToShorterChain() {
     final BlockDataGenerator gen = new BlockDataGenerator(2);
 
@@ -384,6 +442,86 @@ public class DefaultMutableBlockchainTest {
     forks = blockchain.getForks();
     assertThat(forks.size()).isEqualTo(1);
     assertThat(forks.stream().anyMatch(f -> f.equals(originalHead.getHash()))).isTrue();
+    // Old chain should not be on canonical chain.
+    for (int i = commonAncestor + 1; i < originalChainLength; i++) {
+      assertThat(blockchain.blockIsOnCanonicalChain(chain.get(i).getHash())).isFalse();
+    }
+  }
+
+  @Test
+  public void appendFastSyncBlockWithReorgToShorterChain() {
+    final BlockDataGenerator gen = new BlockDataGenerator(2);
+
+    // Setup an initial blockchain
+    final int originalChainLength = 4;
+    final List<Block> chain = gen.blockSequence(originalChainLength);
+    final List<List<TransactionReceipt>> blockReceipts =
+        chain.stream().map(gen::receipts).collect(Collectors.toList());
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
+    for (int i = 1; i < chain.size(); i++) {
+      blockchain.appendFastSyncBlock(chain.get(i), blockReceipts.get(i));
+    }
+    final Block originalHead = chain.get(originalChainLength - 1);
+
+    // Create parallel fork of length 2 from 3 blocks back
+    final List<Block> forkBlocks = new ArrayList<>();
+    final int forkStart = 1;
+    final int commonAncestor = 0;
+    // Generate first block
+    BlockOptions options =
+        new BlockOptions()
+            .setParentHash(chain.get(commonAncestor).getHash())
+            .setBlockNumber(forkStart)
+            .setDifficulty(chain.get(forkStart).getHeader().getDifficulty().minus(5L));
+    forkBlocks.add(gen.block(options));
+    // Generate second block
+    final UInt256 remainingDifficultyToOutpace =
+        chain
+            .get(forkStart + 1)
+            .getHeader()
+            .getDifficulty()
+            .plus(chain.get(forkStart + 2).getHeader().getDifficulty());
+    options =
+        new BlockOptions()
+            .setParentHash(forkBlocks.get(0).getHash())
+            .setBlockNumber(forkStart + 1)
+            .setDifficulty(remainingDifficultyToOutpace.plus(10L));
+    forkBlocks.add(gen.block(options));
+    // Generate corresponding receipts
+    final List<List<TransactionReceipt>> forkReceipts =
+        forkBlocks.stream().map(gen::receipts).collect(Collectors.toList());
+
+    // Add first block in fork, which reorgs because we always consider fast sync canonical
+    blockchain.appendFastSyncBlock(forkBlocks.get(0), forkReceipts.get(0));
+    // Check chain has reorganized
+    assertBlockDataIsStored(blockchain, forkBlocks.get(0), forkReceipts.get(0));
+    assertBlockIsFastSyncHead(blockchain, forkBlocks.get(0));
+    assertThat(blockchain.blockIsOnCanonicalChain(forkBlocks.get(0).getHash())).isTrue();
+    // Check new transactions were indexed
+    for (final Transaction tx : forkBlocks.get(0).getBody().getTransactions()) {
+      assertThat(blockchain.getTransactionByHash(tx.hash())).isPresent();
+    }
+    // Check old transactions have been removed
+    final List<Transaction> removedTransactions = new ArrayList<>();
+    for (int i = forkStart; i < originalChainLength; i++) {
+      removedTransactions.addAll(chain.get(i).getBody().getTransactions());
+    }
+    for (final Transaction tx : removedTransactions) {
+      assertThat(blockchain.getTransactionByHash(tx.hash())).isNotPresent();
+    }
+    // Check that blockNumber index for previous chain head has been removed
+    assertThat(blockchain.getBlockHashByNumber(originalChainLength - 1)).isNotPresent();
+
+    // Forks should not be tracked for fast sync
+    assertThat(blockchain.getForks().size()).isEqualTo(0);
+
+    // Add second block
+    blockchain.appendFastSyncBlock(forkBlocks.get(1), forkReceipts.get(1));
+    assertBlockIsFastSyncHead(blockchain, forkBlocks.get(1));
+
+    // Old chain head should now be tracked as a fork.
+    assertThat(blockchain.getForks().size()).isEqualTo(0);
     // Old chain should not be on canonical chain.
     for (int i = commonAncestor + 1; i < originalChainLength; i++) {
       assertThat(blockchain.blockIsOnCanonicalChain(chain.get(i).getHash())).isFalse();

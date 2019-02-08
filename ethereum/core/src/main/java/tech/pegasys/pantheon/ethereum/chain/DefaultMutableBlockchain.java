@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
+import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage.Updater;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -240,29 +241,25 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
       final Block newBlock,
       final UInt256 totalDifficulty,
       final boolean isFastSync) {
-    final Hash chainHead = blockchainStorage.getChainHead().orElse(null);
+    final Hash activeChainHead = blockchainStorage.getChainHead().orElse(null);
+    final Hash chainHead =
+        isFastSync ? blockchainStorage.getFastSyncHead().orElse(activeChainHead) : activeChainHead;
     if (newBlock.getHeader().getNumber() != BlockHeader.GENESIS_BLOCK_NUMBER && chainHead == null) {
       throw new IllegalStateException("Blockchain is missing chain head.");
     }
 
     final Hash newBlockHash = newBlock.getHash();
     try {
-      if (chainHead == null
-          || newBlock.getHeader().getParentHash().equals(chainHead)
-          || isFastSync) {
+      if (chainHead == null || newBlock.getHeader().getParentHash().equals(chainHead)) {
         // This block advances the chain, update the chain head
         updater.putBlockHash(newBlock.getHeader().getNumber(), newBlockHash);
-        if (isFastSync) {
-          updater.setFastSyncHead(newBlockHash);
-        } else {
-          updater.setChainHead(newBlockHash);
-        }
+        updateChainHead(updater, newBlockHash, isFastSync);
         indexTransactionForBlock(updater, newBlockHash, newBlock.getBody().getTransactions());
         return BlockAddedEvent.createForHeadAdvancement(newBlock);
-      } else if (totalDifficulty.compareTo(blockchainStorage.getTotalDifficulty(chainHead).get())
-          > 0) {
+      } else if (isFastSync // Fast sync chain is always the canonical one.
+          || totalDifficulty.compareTo(blockchainStorage.getTotalDifficulty(chainHead).get()) > 0) {
         // New block represents a chain reorganization
-        return handleChainReorg(updater, newBlock);
+        return handleChainReorg(updater, newBlock, chainHead, isFastSync);
       } else {
         // New block represents a fork
         return handleFork(updater, newBlock);
@@ -272,6 +269,15 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
       // corruption or a bug.
       updater.rollback();
       throw new IllegalStateException("Blockchain is missing data that should be present.", e);
+    }
+  }
+
+  private void updateChainHead(
+      final Updater updater, final Hash newBlockHash, final boolean isFastSync) {
+    if (isFastSync) {
+      updater.setFastSyncHead(newBlockHash);
+    } else {
+      updater.setChainHead(newBlockHash);
     }
   }
 
@@ -292,13 +298,15 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   }
 
   private BlockAddedEvent handleChainReorg(
-      final BlockchainStorage.Updater updater, final Block newChainHead) {
-    final Hash oldChainHead = blockchainStorage.getChainHead().get();
+      final BlockchainStorage.Updater updater,
+      final Block newChainHead,
+      final Hash oldChainHead,
+      final boolean isFastSync) {
     BlockHeader oldChain = blockchainStorage.getBlockHeader(oldChainHead).get();
     BlockHeader newChain = newChainHead.getHeader();
 
     // Update chain head
-    updater.setChainHead(newChain.getHash());
+    updateChainHead(updater, newChain.getHash(), isFastSync);
 
     // Track transactions to be added and removed
     final Map<Hash, List<Transaction>> newTransactions = new HashMap<>();
@@ -355,7 +363,17 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
         });
     clearIndexedTransactionsForBlock(updater, removedTransactions);
 
-    // Update tracked forks
+    if (!isFastSync) {
+      updateForksForReorg(updater, newChainHead, oldChainHead);
+    }
+    return BlockAddedEvent.createForChainReorg(
+        newChainHead,
+        newTransactions.values().stream().flatMap(Collection::stream).collect(toList()),
+        removedTransactions);
+  }
+
+  private void updateForksForReorg(
+      final Updater updater, final Block newChainHead, final Hash oldChainHead) {
     final Collection<Hash> forks = blockchainStorage.getForkHeads();
     // Old head is now a fork
     forks.add(oldChainHead);
@@ -364,10 +382,6 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
         forks.stream().filter(f -> f.equals(newChainHead.getHeader().getParentHash())).findAny();
     parentFork.ifPresent(forks::remove);
     updater.setForkHeads(forks);
-    return BlockAddedEvent.createForChainReorg(
-        newChainHead,
-        newTransactions.values().stream().flatMap(Collection::stream).collect(toList()),
-        removedTransactions);
   }
 
   private static void indexTransactionForBlock(
