@@ -29,7 +29,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -80,8 +80,7 @@ public class RoundSpecificPeers {
 
   public List<SignedData<RoundChangePayload>> roundChangeForNonProposing(
       final ConsensusRoundIdentifier targetRound) {
-    return nonProposingPeers
-        .stream()
+    return nonProposingPeers.stream()
         .map(peer -> peer.injectRoundChange(targetRound, empty()).getSignedPayload())
         .collect(Collectors.toList());
   }
@@ -102,25 +101,18 @@ public class RoundSpecificPeers {
 
   public List<SignedData<RoundChangePayload>> createSignedRoundChangePayload(
       final ConsensusRoundIdentifier roundId) {
-    return peers
-        .stream()
-        .map(
-            p ->
-                p.getMessageFactory()
-                    .createSignedRoundChangePayload(roundId, empty())
-                    .getSignedPayload())
+    return peers.stream()
+        .map(p -> p.getMessageFactory().createRoundChange(roundId, empty()).getSignedPayload())
         .collect(Collectors.toList());
   }
 
   public List<SignedData<RoundChangePayload>> createSignedRoundChangePayload(
-      final ConsensusRoundIdentifier roundId,
-      final TerminatedRoundArtefacts terminatedRoundArtefacts) {
-    return peers
-        .stream()
+      final ConsensusRoundIdentifier roundId, final PreparedRoundArtifacts preparedRoundArtifacts) {
+    return peers.stream()
         .map(
             p ->
                 p.getMessageFactory()
-                    .createSignedRoundChangePayload(roundId, Optional.of(terminatedRoundArtefacts))
+                    .createRoundChange(roundId, Optional.of(preparedRoundArtifacts))
                     .getSignedPayload())
         .collect(Collectors.toList());
   }
@@ -135,13 +127,8 @@ public class RoundSpecificPeers {
 
   public Collection<SignedData<PreparePayload>> createSignedPreparePayloadOfNonProposing(
       final ConsensusRoundIdentifier preparedRound, final Hash hash) {
-    return nonProposingPeers
-        .stream()
-        .map(
-            role ->
-                role.getMessageFactory()
-                    .createSignedPreparePayload(preparedRound, hash)
-                    .getSignedPayload())
+    return nonProposingPeers.stream()
+        .map(role -> role.getMessageFactory().createPrepare(preparedRound, hash).getSignedPayload())
         .collect(Collectors.toList());
   }
 

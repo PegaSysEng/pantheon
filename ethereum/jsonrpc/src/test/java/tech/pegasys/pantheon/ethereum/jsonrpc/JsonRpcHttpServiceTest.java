@@ -126,7 +126,7 @@ public class JsonRpcHttpServiceTest {
                     mock(EthHashMiningCoordinator.class),
                     new NoOpMetricsSystem(),
                     supportedCapabilities,
-                    mock(AccountWhitelistController.class),
+                    Optional.of(mock(AccountWhitelistController.class)),
                     JSON_RPC_APIS,
                     mock(PrivateTransactionHandler.class)));
     service = createJsonRpcHttpService();
@@ -1824,10 +1824,7 @@ public class JsonRpcHttpServiceTest {
     final int size = block.calculateSize();
 
     final List<Hash> txs =
-        block
-            .getBody()
-            .getTransactions()
-            .stream()
+        block.getBody().getTransactions().stream()
             .map(Transaction::hash)
             .collect(Collectors.toList());
     final List<Hash> ommers =

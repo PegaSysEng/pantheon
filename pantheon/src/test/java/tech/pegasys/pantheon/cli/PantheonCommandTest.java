@@ -26,6 +26,9 @@ import static tech.pegasys.pantheon.cli.NetworkName.GOERLI;
 import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.cli.NetworkName.RINKEBY;
 import static tech.pegasys.pantheon.cli.NetworkName.ROPSTEN;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.ETH;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.NET;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.WEB3;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
 import tech.pegasys.pantheon.PantheonInfo;
@@ -36,7 +39,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -71,8 +74,8 @@ import picocli.CommandLine;
 
 public class PantheonCommandTest extends CommandTestAbstract {
 
-  private final String ORION_URI = "http://1.2.3.4:5555";
-  private final String ORION_PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
+  private final String ENCLAVE_URI = "http://1.2.3.4:5555";
+  private final String ENCLAVE_PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
   static final String PERMISSIONING_CONFIG_TOML = "permissioning_config.toml";
@@ -255,18 +258,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, updatedConfig.getBytes(UTF_8));
 
+    Collection<RpcApi> expectedApis = asList(ETH, WEB3);
+
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     jsonRpcConfiguration.setEnabled(false);
     jsonRpcConfiguration.setHost("5.6.7.8");
     jsonRpcConfiguration.setPort(5678);
     jsonRpcConfiguration.setCorsAllowedDomains(Collections.emptyList());
-    jsonRpcConfiguration.setRpcApis(RpcApis.DEFAULT_JSON_RPC_APIS);
+    jsonRpcConfiguration.setRpcApis(expectedApis);
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(false);
     webSocketConfiguration.setHost("9.10.11.12");
     webSocketConfiguration.setPort(9101);
-    webSocketConfiguration.setRpcApis(WebSocketConfiguration.DEFAULT_WEBSOCKET_APIS);
+    webSocketConfiguration.setRpcApis(expectedApis);
 
     final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
     metricsConfiguration.setEnabled(false);
@@ -317,6 +322,17 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandErrorOutput.toString())
         .startsWith("Missing required parameter for option '--permissions-config-path'");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsEnabledWithNonexistentConfigFileMustError() {
+    parseCommand(
+        "--permissions-accounts-enabled", "--permissions-config-path", "file-does-not-exist");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).contains("File does not exist");
     assertThat(commandOutput.toString()).isEmpty();
   }
 
@@ -911,7 +927,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).build();
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().getRpcApis())
-        .containsExactlyInAnyOrder(RpcApis.ETH, RpcApis.NET);
+        .containsExactlyInAnyOrder(ETH, NET);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1363,7 +1379,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).build();
 
     assertThat(wsRpcConfigArgumentCaptor.getValue().getRpcApis())
-        .containsExactlyInAnyOrder(RpcApis.ETH, RpcApis.NET);
+        .containsExactlyInAnyOrder(ETH, NET);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1811,24 +1827,24 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void mustUseOrionUriAndOptions() throws IOException {
+  public void mustUseEnclaveUriAndOptions() throws IOException {
     final URL configFile = Resources.getResource("orion_publickey.pub");
 
     parseCommand(
         "--privacy-enabled",
         "--privacy-url",
-        ORION_URI,
+        ENCLAVE_URI,
         "--privacy-public-key-file",
         configFile.getPath());
 
-    final ArgumentCaptor<PrivacyParameters> orionArg =
+    final ArgumentCaptor<PrivacyParameters> enclaveArg =
         ArgumentCaptor.forClass(PrivacyParameters.class);
 
-    verify(mockControllerBuilder).privacyParameters(orionArg.capture());
+    verify(mockControllerBuilder).privacyParameters(enclaveArg.capture());
     verify(mockControllerBuilder).build();
 
-    assertThat(orionArg.getValue().getUrl()).isEqualTo(ORION_URI);
-    assertThat(orionArg.getValue().getPublicKey()).isEqualTo(ORION_PUBLIC_KEY);
+    assertThat(enclaveArg.getValue().getUrl()).isEqualTo(ENCLAVE_URI);
+    assertThat(enclaveArg.getValue().getPublicKey()).isEqualTo(ENCLAVE_PUBLIC_KEY);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1841,7 +1857,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand(
         "--privacy-url",
-        ORION_URI,
+        ENCLAVE_URI,
         "--privacy-public-key-file",
         file.getPath(),
         "--privacy-precompiled-address",
@@ -1859,15 +1875,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void mustVerifyPrivacyIsDisabled() throws IOException {
     parseCommand();
 
-    final ArgumentCaptor<PrivacyParameters> orionArg =
+    final ArgumentCaptor<PrivacyParameters> enclaveArg =
         ArgumentCaptor.forClass(PrivacyParameters.class);
 
-    verify(mockControllerBuilder).privacyParameters(orionArg.capture());
+    verify(mockControllerBuilder).privacyParameters(enclaveArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(orionArg.getValue().isEnabled()).isEqualTo(false);
+    assertThat(enclaveArg.getValue().isEnabled()).isEqualTo(false);
   }
 
   private Path createFakeGenesisFile(final JsonObject jsonGenesis) throws IOException {

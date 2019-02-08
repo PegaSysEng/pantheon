@@ -221,9 +221,7 @@ public class PeerDiscoveryControllerTest {
     controller.start();
 
     assertThat(
-            controller
-                .getPeers()
-                .stream()
+            controller.getPeers().stream()
                 .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
@@ -242,9 +240,7 @@ public class PeerDiscoveryControllerTest {
         .send(eq(peers.get(0)), matchPacketOfType(PacketType.FIND_NEIGHBORS));
 
     assertThat(
-            controller
-                .getPeers()
-                .stream()
+            controller.getPeers().stream()
                 .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(2);
     assertThat(
@@ -274,9 +270,7 @@ public class PeerDiscoveryControllerTest {
     controller.start();
 
     assertThat(
-            controller
-                .getPeers()
-                .stream()
+            controller.getPeers().stream()
                 .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
@@ -291,9 +285,7 @@ public class PeerDiscoveryControllerTest {
         .send(eq(peers.get(1)), matchPacketOfType(PacketType.FIND_NEIGHBORS));
 
     assertThat(
-            controller
-                .getPeers()
-                .stream()
+            controller.getPeers().stream()
                 .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
   }
@@ -338,9 +330,7 @@ public class PeerDiscoveryControllerTest {
     final ArgumentCaptor<Packet> captor = ArgumentCaptor.forClass(Packet.class);
     verify(outboundMessageHandler, atLeast(1)).send(eq(peers.get(0)), captor.capture());
     List<Packet> neighborsPackets =
-        captor
-            .getAllValues()
-            .stream()
+        captor.getAllValues().stream()
             .filter(p -> p.getType().equals(PacketType.FIND_NEIGHBORS))
             .collect(Collectors.toList());
     assertThat(neighborsPackets.size()).isEqualTo(1);
@@ -588,8 +578,7 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  public void shouldNotBondWithBlacklistedPeer()
-      throws InterruptedException, ExecutionException, TimeoutException {
+  public void shouldNotBondWithBlacklistedPeer() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
     final DiscoveryPeer discoPeer = peers.get(0);
     final DiscoveryPeer otherPeer = peers.get(1);
@@ -885,8 +874,7 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  public void shouldNotBondWithNonWhitelistedPeer()
-      throws InterruptedException, ExecutionException, TimeoutException {
+  public void shouldNotBondWithNonWhitelistedPeer() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
     final DiscoveryPeer discoPeer = peers.get(0);
     final DiscoveryPeer otherPeer = peers.get(1);
@@ -905,7 +893,7 @@ public class PeerDiscoveryControllerTest {
         getControllerBuilder()
             .peers(discoPeer)
             .blacklist(blacklist)
-            .whitelist(nodeWhitelistController)
+            .whitelist(Optional.of(nodeWhitelistController))
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -963,7 +951,8 @@ public class PeerDiscoveryControllerTest {
     // don't add disco peer to whitelist
     PermissioningConfiguration config = PermissioningConfiguration.createDefault();
     config.setNodeWhitelist(new ArrayList<>());
-    NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    Optional<NodeWhitelistController> nodeWhitelistController =
+        Optional.of(new NodeWhitelistController(config));
 
     controller =
         getControllerBuilder()
@@ -1039,8 +1028,7 @@ public class PeerDiscoveryControllerTest {
   static class ControllerBuilder {
     private Collection<DiscoveryPeer> discoPeers = Collections.emptyList();
     private PeerBlacklist blacklist = new PeerBlacklist();
-    private NodeWhitelistController whitelist =
-        new NodeWhitelistController(PermissioningConfiguration.createDefault());
+    private Optional<NodeWhitelistController> whitelist = Optional.empty();
     private MockTimerUtil timerUtil = new MockTimerUtil();
     private KeyPair keypair;
     private DiscoveryPeer localPeer;
@@ -1067,7 +1055,7 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder whitelist(final NodeWhitelistController whitelist) {
+    ControllerBuilder whitelist(final Optional<NodeWhitelistController> whitelist) {
       this.whitelist = whitelist;
       return this;
     }

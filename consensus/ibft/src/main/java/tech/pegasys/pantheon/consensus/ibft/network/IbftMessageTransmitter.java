@@ -27,7 +27,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -46,7 +46,7 @@ public class IbftMessageTransmitter {
   }
 
   public void multicastProposal(final ConsensusRoundIdentifier roundIdentifier, final Block block) {
-    final Proposal data = messageFactory.createSignedProposalPayload(roundIdentifier, block);
+    final Proposal data = messageFactory.createProposal(roundIdentifier, block);
 
     final ProposalMessageData message = ProposalMessageData.create(data);
 
@@ -54,7 +54,7 @@ public class IbftMessageTransmitter {
   }
 
   public void multicastPrepare(final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
-    final Prepare data = messageFactory.createSignedPreparePayload(roundIdentifier, digest);
+    final Prepare data = messageFactory.createPrepare(roundIdentifier, digest);
 
     final PrepareMessageData message = PrepareMessageData.create(data);
 
@@ -65,8 +65,7 @@ public class IbftMessageTransmitter {
       final ConsensusRoundIdentifier roundIdentifier,
       final Hash digest,
       final Signature commitSeal) {
-    final Commit data =
-        messageFactory.createSignedCommitPayload(roundIdentifier, digest, commitSeal);
+    final Commit data = messageFactory.createCommit(roundIdentifier, digest, commitSeal);
 
     final CommitMessageData message = CommitMessageData.create(data);
 
@@ -75,10 +74,10 @@ public class IbftMessageTransmitter {
 
   public void multicastRoundChange(
       final ConsensusRoundIdentifier roundIdentifier,
-      final Optional<TerminatedRoundArtefacts> terminatedRoundArtefacts) {
+      final Optional<PreparedRoundArtifacts> preparedRoundArtifacts) {
 
     final RoundChange data =
-        messageFactory.createSignedRoundChangePayload(roundIdentifier, terminatedRoundArtefacts);
+        messageFactory.createRoundChange(roundIdentifier, preparedRoundArtifacts);
 
     final RoundChangeMessageData message = RoundChangeMessageData.create(data);
 
@@ -91,8 +90,7 @@ public class IbftMessageTransmitter {
       final SignedData<ProposalPayload> proposalPayload) {
 
     final NewRound signedPayload =
-        messageFactory.createSignedNewRoundPayload(
-            roundIdentifier, roundChangeCertificate, proposalPayload);
+        messageFactory.createNewRound(roundIdentifier, roundChangeCertificate, proposalPayload);
 
     final NewRoundMessageData message = NewRoundMessageData.create(signedPayload);
 

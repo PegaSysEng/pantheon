@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 
 import java.util.Collection;
@@ -58,26 +57,28 @@ public class MessageValidatorFactory {
     return new MessageValidator(createSignedDataValidator(roundIdentifier));
   }
 
-  public RoundChangeMessageValidator createRoundChangeMessageValidator(
-      final BlockHeader parentHeader) {
+  public RoundChangeMessageValidator createRoundChangeMessageValidator(final long chainHeight) {
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
+
     return new RoundChangeMessageValidator(
-        this::createSignedDataValidator,
-        validators,
-        prepareMessageCountForQuorum(
-            IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
-        parentHeader.getNumber() + 1);
+        new RoundChangePayloadValidator(
+            this::createSignedDataValidator,
+            validators,
+            prepareMessageCountForQuorum(
+                IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
+            chainHeight));
   }
 
-  public NewRoundMessageValidator createNewRoundValidator(final BlockHeader parentHeader) {
+  public NewRoundMessageValidator createNewRoundValidator(final long chainHeight) {
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
     return new NewRoundMessageValidator(
-        validators,
-        proposerSelector,
-        this::createSignedDataValidator,
-        IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
-        parentHeader.getNumber() + 1);
+        new NewRoundPayloadValidator(
+            validators,
+            proposerSelector,
+            this::createSignedDataValidator,
+            IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
+            chainHeight));
   }
 }

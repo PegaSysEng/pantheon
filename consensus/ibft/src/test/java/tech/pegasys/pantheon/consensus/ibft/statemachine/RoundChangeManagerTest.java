@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangePayloadValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
@@ -80,8 +81,8 @@ public class RoundChangeManagerTest {
         .thenReturn(Optional.of(new BlockProcessingOutputs(null, null)));
     BlockHeader parentHeader = mock(BlockHeader.class);
 
-    RoundChangeMessageValidator.MessageValidatorForHeightFactory messageValidatorFactory =
-        mock(RoundChangeMessageValidator.MessageValidatorForHeightFactory.class);
+    RoundChangePayloadValidator.MessageValidatorForHeightFactory messageValidatorFactory =
+        mock(RoundChangePayloadValidator.MessageValidatorForHeightFactory.class);
 
     when(messageValidatorFactory.createAt(ri1))
         .thenAnswer(
@@ -113,18 +114,19 @@ public class RoundChangeManagerTest {
 
     final RoundChangeMessageValidator roundChangeMessageValidator =
         new RoundChangeMessageValidator(
-            messageValidatorFactory,
-            validators,
-            IbftHelpers.calculateRequiredValidatorQuorum(
-                IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
-            2);
+            new RoundChangePayloadValidator(
+                messageValidatorFactory,
+                validators,
+                IbftHelpers.calculateRequiredValidatorQuorum(
+                    IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
+                2));
     manager = new RoundChangeManager(2, roundChangeMessageValidator);
   }
 
   private RoundChange makeRoundChangeMessage(
       final KeyPair key, final ConsensusRoundIdentifier round) {
     MessageFactory messageFactory = new MessageFactory(key);
-    return messageFactory.createSignedRoundChangePayload(round, Optional.empty());
+    return messageFactory.createRoundChange(round, Optional.empty());
   }
 
   private RoundChange makeRoundChangeMessageWithPreparedCert(
@@ -138,23 +140,21 @@ public class RoundChangeManagerTest {
     final ConsensusRoundIdentifier proposalRound = TestHelpers.createFrom(round, 0, -1);
     final Block block = TestHelpers.createProposalBlock(validators, proposalRound.getRoundNumber());
     // Proposal must come from an earlier round.
-    final Proposal proposal = messageFactory.createSignedProposalPayload(proposalRound, block);
+    final Proposal proposal = messageFactory.createProposal(proposalRound, block);
 
     final List<Prepare> preparePayloads =
-        prepareProviders
-            .stream()
+        prepareProviders.stream()
             .map(
                 k -> {
                   final MessageFactory prepareFactory = new MessageFactory(k);
-                  return prepareFactory.createSignedPreparePayload(proposalRound, block.getHash());
+                  return prepareFactory.createPrepare(proposalRound, block.getHash());
                 })
             .collect(Collectors.toList());
 
-    final TerminatedRoundArtefacts terminatedRoundArtects =
-        new TerminatedRoundArtefacts(proposal, preparePayloads);
+    final PreparedRoundArtifacts preparedRoundArtifacts =
+        new PreparedRoundArtifacts(proposal, preparePayloads);
 
-    return messageFactory.createSignedRoundChangePayload(
-        round, Optional.of(terminatedRoundArtects));
+    return messageFactory.createRoundChange(round, Optional.of(preparedRoundArtifacts));
   }
 
   @Test

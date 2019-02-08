@@ -24,12 +24,12 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class RoundChangeArtefacts {
+public class RoundChangeArtifacts {
 
   private final Optional<Block> block;
   private final Collection<SignedData<RoundChangePayload>> roundChangePayloads;
 
-  public RoundChangeArtefacts(
+  public RoundChangeArtifacts(
       final Optional<Block> block,
       final Collection<SignedData<RoundChangePayload>> roundChangePayloads) {
     this.block = block;
@@ -44,18 +44,17 @@ public class RoundChangeArtefacts {
     return new RoundChangeCertificate(roundChangePayloads);
   }
 
-  public static RoundChangeArtefacts create(final Collection<RoundChange> roundChanges) {
+  public static RoundChangeArtifacts create(final Collection<RoundChange> roundChanges) {
 
     final Collection<SignedData<RoundChangePayload>> payloads =
-        roundChanges
-            .stream()
+        roundChanges.stream()
             .map(roundChange -> roundChange.getSignedPayload())
             .collect(Collectors.toList());
 
     final Optional<PreparedCertificate> latestPreparedCertificate =
         IbftHelpers.findLatestPreparedCertificate(payloads);
 
-    return new RoundChangeArtefacts(
+    return new RoundChangeArtifacts(
         latestPreparedCertificate.map(cert -> cert.getProposalPayload().getPayload().getBlock()),
         payloads);
   }

@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PipelinedImportChainSegmentTask;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
@@ -38,7 +39,7 @@ public class FastSyncChainDownloader<C> {
   private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
-  private final BlockHeader pivotBlockHeader;
+  private final LabelledMetric<Counter> fastSyncValidationCounter;
 
   FastSyncChainDownloader(
       final SynchronizerConfiguration config,
@@ -47,13 +48,14 @@ public class FastSyncChainDownloader<C> {
       final EthContext ethContext,
       final SyncState syncState,
       final LabelledMetric<OperationTimer> ethTasksTimer,
+      final LabelledMetric<Counter> fastSyncValidationCounter,
       final BlockHeader pivotBlockHeader) {
     this.config = config;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
     this.ethTasksTimer = ethTasksTimer;
-    this.pivotBlockHeader = pivotBlockHeader;
+    this.fastSyncValidationCounter = fastSyncValidationCounter;
     chainDownloader =
         new ChainDownloader<>(
             config,
@@ -86,13 +88,21 @@ public class FastSyncChainDownloader<C> {
   private CompletableFuture<List<Block>> importBlocksForCheckpoints(
       final List<BlockHeader> checkpointHeaders) {
     if (checkpointHeaders.size() < 2) {
-      final BlockHeader chainHeadHeader = protocolContext.getBlockchain().getChainHeadHeader();
-      if (chainHeadHeader.getNumber() < pivotBlockHeader.getNumber()) {
-        checkpointHeaders.add(0, chainHeadHeader);
-      } else {
-        return CompletableFuture.completedFuture(emptyList());
-      }
+      return CompletableFuture.completedFuture(emptyList());
     }
+    final FastSyncValidationPolicy attachedValidationPolicy =
+        new FastSyncValidationPolicy(
+            config.fastSyncFullValidationRate(),
+            HeaderValidationMode.LIGHT_SKIP_DETACHED,
+            HeaderValidationMode.SKIP_DETACHED,
+            fastSyncValidationCounter);
+    final FastSyncValidationPolicy detatchedValidationPolicy =
+        new FastSyncValidationPolicy(
+            config.fastSyncFullValidationRate(),
+            HeaderValidationMode.LIGHT_DETACHED_ONLY,
+            HeaderValidationMode.DETACHED_ONLY,
+            fastSyncValidationCounter);
+
     final PipelinedImportChainSegmentTask<C, BlockWithReceipts> importTask =
         PipelinedImportChainSegmentTask.forCheckpoints(
             protocolSchedule,
@@ -101,8 +111,12 @@ public class FastSyncChainDownloader<C> {
             config.downloaderParallelism(),
             ethTasksTimer,
             new FastSyncBlockHandler<>(
-                protocolSchedule, protocolContext, ethContext, ethTasksTimer),
-            HeaderValidationMode.LIGHT_DETACHED_ONLY,
+                protocolSchedule,
+                protocolContext,
+                ethContext,
+                ethTasksTimer,
+                attachedValidationPolicy),
+            detatchedValidationPolicy,
             checkpointHeaders);
     return importTask
         .run()

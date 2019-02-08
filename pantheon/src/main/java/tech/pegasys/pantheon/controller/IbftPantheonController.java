@@ -74,11 +74,11 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Map;
@@ -130,6 +130,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final MiningParameters miningParams,
       final int networkId,
       final KeyPair nodeKeys,
+      final Path dataDirectory,
       final MetricsSystem metricsSystem) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
         IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
@@ -165,7 +166,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             networkId,
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism());
+            syncConfig.transactionsParallelism(),
+            syncConfig.computationParallelism());
     final SubProtocol ethSubProtocol = EthProtocol.get();
 
     final SyncState syncState =
@@ -179,14 +181,14 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem.createLabelledTimer(
-                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"));
+            dataDirectory,
+            metricsSystem);
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
             protocolSchedule, protocolContext, ethProtocolManager.ethContext());
 
-    final IbftEventQueue ibftEventQueue = new IbftEventQueue();
+    final IbftEventQueue ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
 
     final IbftBlockCreatorFactory blockCreatorFactory =
         new IbftBlockCreatorFactory(
@@ -205,7 +207,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final ValidatorPeers peers =
         new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
 
-    final UniqueMessageMulticaster uniqueMessageMulticaster = new UniqueMessageMulticaster(peers);
+    final UniqueMessageMulticaster uniqueMessageMulticaster =
+        new UniqueMessageMulticaster(peers, ibftConfig.getGossipedHistoryLimit());
 
     final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
 
@@ -242,7 +245,11 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             new IbftBlockHeightManagerFactory(
                 finalState,
                 new IbftRoundFactory(
-                    finalState, protocolContext, protocolSchedule, minedBlockObservers),
+                    finalState,
+                    protocolContext,
+                    protocolSchedule,
+                    minedBlockObservers,
+                    messageValidatorFactory),
                 messageValidatorFactory),
             gossiper);
     ibftController.start();
@@ -324,7 +331,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
   @Override
   public PrivacyParameters getPrivacyParameters() {
-    LOG.warn("IbftPantheonController does not currently support private transactions.");
     return PrivacyParameters.noPrivacy();
   }
 
