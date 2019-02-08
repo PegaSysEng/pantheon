@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.jsonrpc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
@@ -38,6 +37,7 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,17 +46,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
-import io.vertx.ext.auth.PubSecKeyOptions;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jwt.JWTAuth;
-import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -88,46 +81,10 @@ public class JsonRpcHttpServiceLoginTest {
   protected static Synchronizer synchronizer;
   protected static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.ADMIN);
-  private static StubAuthProvider stubCredentialProvider;
-  private static final JWTAuthOptions jwtOptions =
-      new JWTAuthOptions()
-          .setPermissionsClaimKey("permissions")
-          .addPubSecKey(
-              new PubSecKeyOptions()
-                  .setAlgorithm("HS256")
-                  .setPublicKey("keyboard cat")
-                  .setSymmetric(true));
-
-  private static class StubAuthProvider implements AuthProvider {
-    private Optional<User> respondUser = Optional.empty();
-    private Optional<String> respondError = Optional.empty();
-
-    @Override
-    public void authenticate(
-        final JsonObject authInfo, final Handler<AsyncResult<User>> resultHandler) {
-      if (respondUser.isPresent()) {
-        resultHandler.handle(Future.succeededFuture(respondUser.get()));
-      } else if (respondError.isPresent()) {
-        resultHandler.handle(Future.failedFuture(respondError.get()));
-      } else {
-        throw new IllegalStateException("Setup your auth provider stub");
-      }
-    }
-
-    public void setRespondUser(final User respondUser) {
-      this.respondError = Optional.empty();
-      this.respondUser = Optional.of(respondUser);
-    }
-
-    public void setRespondError(final String respondError) {
-      this.respondUser = Optional.empty();
-      this.respondError = Optional.of(respondError);
-    }
-  }
+  private static JWTAuth jwtAuth;
 
   @BeforeClass
   public static void initServerAndClient() throws Exception {
-    stubCredentialProvider = new StubAuthProvider();
     peerDiscoveryMock = mock(P2PNetwork.class);
     blockchainQueries = mock(BlockchainQueries.class);
     synchronizer = mock(Synchronizer.class);
@@ -156,6 +113,7 @@ public class JsonRpcHttpServiceLoginTest {
                     JSON_RPC_APIS,
                     mock(PrivateTransactionHandler.class)));
     service = createJsonRpcHttpService();
+    jwtAuth = service.jwtAuthProvider.get();
     service.start().join();
 
     // Build an OkHttp client.
@@ -164,14 +122,17 @@ public class JsonRpcHttpServiceLoginTest {
   }
 
   private static JsonRpcHttpService createJsonRpcHttpService() throws Exception {
+    final String authTomlPath =
+        Paths.get(ClassLoader.getSystemResource("JsonRpcHttpService/auth.toml").toURI())
+            .toAbsolutePath()
+            .toString();
+
+    final JsonRpcConfiguration config = createJsonRpcConfig();
+    config.setAuthenticationEnabled(true);
+    config.setAuthenticationCredentialsFile(authTomlPath);
+
     return new JsonRpcHttpService(
-        vertx,
-        folder.newFolder().toPath(),
-        createJsonRpcConfig(),
-        new NoOpMetricsSystem(),
-        rpcMethods,
-        jwtOptions,
-        stubCredentialProvider);
+        vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
   }
 
   private static JsonRpcConfiguration createJsonRpcConfig() {
@@ -189,10 +150,8 @@ public class JsonRpcHttpServiceLoginTest {
 
   @Test
   public void loginWithBadCredentials() throws IOException {
-    stubCredentialProvider.setRespondError("Invalid password");
-
     final RequestBody body =
-        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"badpass\"}");
     final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(401);
@@ -202,12 +161,8 @@ public class JsonRpcHttpServiceLoginTest {
 
   @Test
   public void loginWithGoodCredentials() throws IOException {
-    final User mockUser = mock(User.class);
-    stubCredentialProvider.setRespondUser(mockUser);
-    when(mockUser.principal()).thenReturn(new JsonObject());
-
     final RequestBody body =
-        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
     final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(200);
@@ -223,9 +178,7 @@ public class JsonRpcHttpServiceLoginTest {
       final String token = respBody.getString("token");
       assertThat(token).isNotNull();
 
-      final JWTAuth auth = JWTAuth.create(vertx, jwtOptions);
-
-      auth.authenticate(
+      jwtAuth.authenticate(
           new JsonObject().put("jwt", token),
           (r) -> {
             assertThat(r.succeeded()).isTrue();
@@ -242,15 +195,8 @@ public class JsonRpcHttpServiceLoginTest {
 
   @Test
   public void loginWithGoodCredentialsAndPermissions() throws IOException {
-    final User mockUser = mock(User.class);
-    stubCredentialProvider.setRespondUser(mockUser);
-    when(mockUser.principal())
-        .thenReturn(
-            new JsonObject()
-                .put("permissions", new JsonArray(Collections.singletonList("fakePermission"))));
-
     final RequestBody body =
-        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
     final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(200);
@@ -266,9 +212,7 @@ public class JsonRpcHttpServiceLoginTest {
       final String token = respBody.getString("token");
       assertThat(token).isNotNull();
 
-      final JWTAuth auth = JWTAuth.create(vertx, jwtOptions);
-
-      auth.authenticate(
+      jwtAuth.authenticate(
           new JsonObject().put("jwt", token),
           (r) -> {
             assertThat(r.succeeded()).isTrue();
