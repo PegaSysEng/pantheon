@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerDisconnectedException;
+import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeersTask;
@@ -106,10 +106,8 @@ public class ChainDownloader<C> {
                       LOG.trace("Download cancelled", t);
                     } else if (rootCause instanceof InvalidBlockException) {
                       LOG.debug("Invalid block downloaded", t);
-                    } else if (rootCause instanceof PeerDisconnectedException) {
-                      LOG.debug(
-                          "Peer disconnected during chain download - {}",
-                          ((PeerDisconnectedException) rootCause).getPeer());
+                    } else if (rootCause instanceof EthTaskException) {
+                      LOG.debug("Error in task - {}", rootCause.toString());
                     } else {
                       LOG.error("Error encountered while downloading", t);
                     }
@@ -214,10 +212,8 @@ public class ChainDownloader<C> {
           } else if (t != null || r.isEmpty()) {
             if (t != null) {
               final Throwable rootCause = ExceptionUtils.rootCause(t);
-              if (rootCause instanceof PeerDisconnectedException) {
-                LOG.debug(
-                    "Peer disconnected during chain download - {}",
-                    ((PeerDisconnectedException) rootCause).getPeer());
+              if (rootCause instanceof EthTaskException) {
+                LOG.debug("Error in task - {}", rootCause.toString());
               } else {
                 LOG.error("Encountered error importing blocks", t);
               }

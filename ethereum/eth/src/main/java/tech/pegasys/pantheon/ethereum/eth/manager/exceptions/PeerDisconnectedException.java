@@ -19,7 +19,11 @@ public class PeerDisconnectedException extends EthTaskException {
   private final EthPeer peer;
 
   public PeerDisconnectedException(final EthPeer peer) {
-    super(FailureReason.PEER_DISCONNECTED);
+    super(
+        "Task failed: "
+            + FailureReason.PEER_DISCONNECTED
+            + (peer == null ? " peer <null>" : " peer " + peer.toString()),
+        FailureReason.PEER_DISCONNECTED);
     this.peer = peer;
   }
 
