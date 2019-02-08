@@ -83,7 +83,7 @@ public class ParallelDownloadHeadersTask<C>
       result.get().completeExceptionally(e);
       return Optional.empty();
     }
-    // FIXME    headers.add(nextCheckpointHeader);
+    headers.add(nextCheckpointHeader);
     if (headers.size() > 2) {
       LOG.debug(
           "Downloaded headers {} to {}",
