@@ -19,20 +19,29 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class UniqueMessageMulticaster implements ValidatorMulticaster {
   private final ValidatorMulticaster multicaster;
-  private final MessageTracker messageTracker;
+  private final MessageTracker gossipedMessageTracker;
 
   /**
    * Constructor that attaches gossip logic to a set of multicaster
    *
    * @param multicaster Network connections to the remote validators
-   * @param messageTracker Tracks seen messages
+   * @param gossipHistoryLimit Maximum messages to track as seen
    */
   public UniqueMessageMulticaster(
-      final ValidatorMulticaster multicaster, final MessageTracker messageTracker) {
+      final ValidatorMulticaster multicaster, final int gossipHistoryLimit) {
     this.multicaster = multicaster;
-    this.messageTracker = messageTracker;
+    this.gossipedMessageTracker = new MessageTracker(gossipHistoryLimit);
+  }
+
+  @VisibleForTesting
+  public UniqueMessageMulticaster(
+      final ValidatorMulticaster multicaster, final MessageTracker gossipedMessageTracker) {
+    this.multicaster = multicaster;
+    this.gossipedMessageTracker = gossipedMessageTracker;
   }
 
   @Override
@@ -42,10 +51,10 @@ public class UniqueMessageMulticaster implements ValidatorMulticaster {
 
   @Override
   public void send(final MessageData message, final Collection<Address> blackList) {
-    if (messageTracker.hasSeenMessage(message)) {
+    if (gossipedMessageTracker.hasSeenMessage(message)) {
       return;
     }
     multicaster.send(message, blackList);
-    messageTracker.addSeenMessage(message);
+    gossipedMessageTracker.addSeenMessage(message);
   }
 }

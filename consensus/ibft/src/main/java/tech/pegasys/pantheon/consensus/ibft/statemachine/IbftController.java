@@ -16,7 +16,6 @@ import static java.util.Collections.emptyList;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
-import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
@@ -46,29 +45,28 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IbftController {
-
   private static final Logger LOG = LogManager.getLogger();
+  private static final int SEEN_MESSAGE_LIMIT = 100;
   private final Blockchain blockchain;
   private final IbftFinalState ibftFinalState;
   private final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory;
   private final Map<Long, List<Message>> futureMessages;
   private BlockHeightManager currentHeightManager;
   private final Gossiper gossiper;
-  private final MessageTracker messageTracker;
+  private final MessageTracker seenMessageTracker;
 
   public IbftController(
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
-      final IbftGossip gossiper,
-      final MessageTracker messageTracker) {
+      final Gossiper gossiper) {
     this(
         blockchain,
         ibftFinalState,
         ibftBlockHeightManagerFactory,
         gossiper,
         Maps.newHashMap(),
-        messageTracker);
+        new MessageTracker(SEEN_MESSAGE_LIMIT));
   }
 
   @VisibleForTesting
@@ -78,13 +76,13 @@ public class IbftController {
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
       final Map<Long, List<Message>> futureMessages,
-      final MessageTracker messageTracker) {
+      final MessageTracker seenMessageTracker) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessages = futureMessages;
     this.gossiper = gossiper;
-    this.messageTracker = messageTracker;
+    this.seenMessageTracker = seenMessageTracker;
   }
 
   public void start() {
@@ -92,7 +90,9 @@ public class IbftController {
   }
 
   public void handleMessageEvent(final IbftReceivedMessageEvent msg) {
-    if (!messageTracker.hasSeenMessage(msg.getMessage().getData())) {
+    final MessageData data = msg.getMessage().getData();
+    if (!seenMessageTracker.hasSeenMessage(data)) {
+      seenMessageTracker.addSeenMessage(data);
       handleMessage(msg.getMessage());
     }
   }

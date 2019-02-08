@@ -22,8 +22,8 @@ import java.util.Set;
 public class MessageTracker {
   private final Set<Hash> seenMessages;
 
-  public MessageTracker(final int gossipHistoryLimit) {
-    this.seenMessages = newSetFromMap(new SizeLimitedMap<>(gossipHistoryLimit));
+  public MessageTracker(final int messageTrackingLimit) {
+    this.seenMessages = newSetFromMap(new SizeLimitedMap<>(messageTrackingLimit));
   }
 
   public void addSeenMessage(final MessageData message) {

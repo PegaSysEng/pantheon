@@ -445,6 +445,7 @@ public class IbftControllerTest {
     when(messageTracker.hasSeenMessage(proposalMessageData)).thenReturn(true);
     setupProposal(roundIdentifier, validator);
     verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(proposalMessage));
+    verify(messageTracker).addSeenMessage(proposalMessageData);
   }
 
   @Test
