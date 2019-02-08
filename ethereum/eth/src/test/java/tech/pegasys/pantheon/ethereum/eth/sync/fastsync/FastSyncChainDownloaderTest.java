@@ -129,7 +129,6 @@ public class FastSyncChainDownloaderTest {
     final CompletableFuture<Void> result = downloader.start();
 
     peer.respondWhileOtherThreadsWork(responder, () -> !result.isDone());
-    ;
 
     assertThat(result).isCompleted();
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
@@ -173,7 +172,6 @@ public class FastSyncChainDownloaderTest {
     ethProtocolManager.handleDisconnect(bestPeer.getPeerConnection(), TOO_MANY_PEERS, true);
 
     secondBestPeer.respondWhileOtherThreadsWork(shorterResponder, () -> !result.isDone());
-    ;
 
     assertThat(result).isCompleted();
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
