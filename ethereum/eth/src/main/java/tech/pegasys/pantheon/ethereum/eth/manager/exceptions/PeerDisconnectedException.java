@@ -12,9 +12,18 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager.exceptions;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+
 public class PeerDisconnectedException extends EthTaskException {
 
-  public PeerDisconnectedException() {
+  private final EthPeer peer;
+
+  public PeerDisconnectedException(final EthPeer peer) {
     super(FailureReason.PEER_DISCONNECTED);
+    this.peer = peer;
+  }
+
+  public EthPeer getPeer() {
+    return peer;
   }
 }
