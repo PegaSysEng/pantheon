@@ -86,7 +86,6 @@ public class JsonRpcHttpServiceLoginTest {
   protected static P2PNetwork peerDiscoveryMock;
   protected static BlockchainQueries blockchainQueries;
   protected static Synchronizer synchronizer;
-  private final JsonRpcTestHelper testHelper = new JsonRpcTestHelper();
   protected static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.ADMIN);
   private static StubAuthProvider stubCredentialProvider;
@@ -291,7 +290,7 @@ public class JsonRpcHttpServiceLoginTest {
   }
 
   @Test
-  public void checkJsonRpcMethodsAvailableWithGoodCredentialsAndPermission() throws IOException {
+  public void checkJsonRpcMethodsAvailableWithGoodCredentialsAndPermissions() throws IOException {
     final User mockUser = mock(User.class);
     stubCredentialProvider.setRespondUser(mockUser);
     when(mockUser.principal())
@@ -330,16 +329,23 @@ public class JsonRpcHttpServiceLoginTest {
             assertThat(r.succeeded()).isTrue();
             final User user = r.result();
             // single eth/blockNumber method permitted
-            assertThat(service.isPermitted(user, ethBlockNumber)).isTrue();
+            assertThat(service.isPermitted(Optional.of(user), ethBlockNumber)).isTrue();
             // eth/accounts not permitted
-            assertThat(service.isPermitted(user, ethAccounts)).isFalse();
+            assertThat(service.isPermitted(Optional.of(user), ethAccounts)).isFalse();
             // allowed by web3/*
-            assertThat(service.isPermitted(user, web3ClientVersion)).isTrue();
-            assertThat(service.isPermitted(user, web3Sha3)).isTrue();
+            assertThat(service.isPermitted(Optional.of(user), web3ClientVersion)).isTrue();
+            assertThat(service.isPermitted(Optional.of(user), web3Sha3)).isTrue();
             // no net permissions
-            assertThat(service.isPermitted(user, netVersion)).isFalse();
+            assertThat(service.isPermitted(Optional.of(user), netVersion)).isFalse();
           });
     }
+  }
+
+  @Test
+  public void checkPermissionsWithEmptyUser() {
+    JsonRpcMethod ethAccounts = new EthAccounts();
+
+    assertThat(service.isPermitted(Optional.empty(), ethAccounts)).isTrue();
   }
 
   private Request buildRequest(final RequestBody body) {

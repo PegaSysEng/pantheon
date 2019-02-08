@@ -254,22 +254,59 @@ public class JsonRpcHttpService {
   }
 
   @VisibleForTesting
-  public boolean isPermitted(final User user, final JsonRpcMethod jsonRpcMethod) {
+  public boolean isPermitted(final Optional<User> optionalUser, final JsonRpcMethod jsonRpcMethod) {
 
     AtomicBoolean foundMatchingPermission = new AtomicBoolean();
 
-    for (String perm : jsonRpcMethod.getPermissions()) {
-      user.isAuthorized(
-          perm,
-          (authed) -> {
-            if (authed.result()) {
-              LOG.trace("user {} authorized : {} via permission {}", user, jsonRpcMethod.getName(), perm);
-              foundMatchingPermission.set(true);
-            }
-          });
+    if (optionalUser.isPresent()) {
+      User user = optionalUser.get();
+      for (String perm : jsonRpcMethod.getPermissions()) {
+        user.isAuthorized(
+            perm,
+            (authed) -> {
+              if (authed.result()) {
+                LOG.trace(
+                    "user {} authorized : {} via permission {}",
+                    user,
+                    jsonRpcMethod.getName(),
+                    perm);
+                foundMatchingPermission.set(true);
+              }
+            });
+      }
+    } else {
+      // no user means auth provider configured thus anything is permitted
+      foundMatchingPermission.set(true);
     }
-    LOG.trace("user {} NOT authorized : {}", user, jsonRpcMethod.getName());
+
+    if (!foundMatchingPermission.get()) {
+      LOG.trace("user NOT authorized : {}", jsonRpcMethod.getName());
+    }
     return foundMatchingPermission.get();
+  }
+
+  private void getUser(final RoutingContext routingContext, final Handler<Optional<User>> handler) {
+
+    if (!jwtAuthProvider.isPresent()) {
+      handler.handle(Optional.empty());
+    }
+
+    String token = routingContext.request().getHeader("Bearer");
+    if (token == null) {
+      // TODO
+      // if null future failed
+    }
+
+    if (jwtAuthProvider.isPresent()) {
+      jwtAuthProvider
+          .get()
+          .authenticate(
+              new JsonObject().put("jwt", token),
+              (r) -> {
+                final User user = r.result();
+                handler.handle(Optional.of(user));
+              });
+    }
   }
 
   private Optional<String> getAndValidateHostHeader(final RoutingContext event) {
@@ -327,14 +364,22 @@ public class JsonRpcHttpService {
     try {
       final String json = routingContext.getBodyAsString().trim();
       if (!json.isEmpty() && json.charAt(0) == '{') {
-        handleJsonSingleRequest(routingContext, new JsonObject(json));
+        getUser(
+            routingContext,
+            user -> {
+              handleJsonSingleRequest(routingContext, new JsonObject(json), user);
+            });
       } else {
         final JsonArray array = new JsonArray(json);
         if (array.size() < 1) {
           handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
           return;
         }
-        handleJsonBatchRequest(routingContext, array);
+        getUser(
+            routingContext,
+            user -> {
+              handleJsonBatchRequest(routingContext, array, user);
+            });
       }
     } catch (final DecodeException ex) {
       handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
@@ -347,11 +392,11 @@ public class JsonRpcHttpService {
   }
 
   private void handleJsonSingleRequest(
-      final RoutingContext routingContext, final JsonObject request) {
+      final RoutingContext routingContext, final JsonObject request, final Optional<User> user) {
     final HttpServerResponse response = routingContext.response();
     vertx.executeBlocking(
         future -> {
-          final JsonRpcResponse jsonRpcResponse = process(request);
+          final JsonRpcResponse jsonRpcResponse = process(request, user);
           future.complete(jsonRpcResponse);
         },
         false,
@@ -442,7 +487,7 @@ public class JsonRpcHttpService {
 
   @SuppressWarnings("rawtypes")
   private void handleJsonBatchRequest(
-      final RoutingContext routingContext, final JsonArray jsonArray) {
+      final RoutingContext routingContext, final JsonArray jsonArray, final Optional<User> user) {
     // Interpret json as rpc request
     final List<Future> responses =
         jsonArray.stream()
@@ -456,7 +501,7 @@ public class JsonRpcHttpService {
                   final JsonObject req = (JsonObject) obj;
                   final Future<JsonRpcResponse> fut = Future.future();
                   vertx.executeBlocking(
-                      future -> future.complete(process(req)),
+                      future -> future.complete(process(req, user)),
                       false,
                       ar -> {
                         if (ar.failed()) {
@@ -493,7 +538,7 @@ public class JsonRpcHttpService {
     return result.getType() != JsonRpcResponseType.NONE;
   }
 
-  private JsonRpcResponse process(final JsonObject requestJson) {
+  private JsonRpcResponse process(final JsonObject requestJson, final Optional<User> user) {
     final JsonRpcRequest request;
     Object id = null;
     try {
@@ -515,12 +560,16 @@ public class JsonRpcHttpService {
       return errorResponse(id, JsonRpcError.METHOD_NOT_FOUND);
     }
 
-    // Generate response
-    try (final TimingContext ignored = requestTimer.labels(request.getMethod()).startTimer()) {
-      return method.response(request);
-    } catch (final InvalidJsonRpcParameters e) {
-      LOG.debug(e);
-      return errorResponse(id, JsonRpcError.INVALID_PARAMS);
+    if (isPermitted(user, method)) {
+      // Generate response
+      try (final TimingContext ignored = requestTimer.labels(request.getMethod()).startTimer()) {
+        return method.response(request);
+      } catch (final InvalidJsonRpcParameters e) {
+        LOG.debug(e);
+        return errorResponse(id, JsonRpcError.INVALID_PARAMS);
+      }
+    } else {
+      return errorResponse(id, JsonRpcError.UNAUTHORIZED);
     }
   }
 
