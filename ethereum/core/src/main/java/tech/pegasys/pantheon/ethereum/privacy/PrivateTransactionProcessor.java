@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
+import static tech.pegasys.pantheon.ethereum.vm.OperationTracer.NO_TRACING;
+
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -52,6 +54,9 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
   private final AbstractMessageProcessor contractCreationProcessor;
 
   private final AbstractMessageProcessor messageCallProcessor;
+
+  private MutableAccount sender;
+  private Address senderAddress;
 
   public static class Result implements TransactionProcessor.Result {
 
@@ -139,6 +144,46 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
     this.clearEmptyAccounts = clearEmptyAccounts;
   }
 
+  public TransactionProcessor.Result processPrivateTransaction(
+      final Blockchain blockchain,
+      final WorldUpdater privateWorldState,
+      final WorldUpdater publicWorldState,
+      final ProcessableBlockHeader blockHeader,
+      final PrivateTransaction privateTransaction,
+      final Address miningBeneficiary,
+      final BlockHashLookup blockHashLookup) {
+    Transaction transaction =
+        new Transaction(
+            privateTransaction.getNonce(),
+            privateTransaction.getGasPrice(),
+            privateTransaction.getGasLimit(),
+            privateTransaction.getTo(),
+            privateTransaction.getValue(),
+            privateTransaction.getSignature(),
+            privateTransaction.getPayload(),
+            privateTransaction.getSender(),
+            privateTransaction.getChainId().getAsInt());
+
+    final Address senderAddress = transaction.getSender();
+    this.senderAddress = senderAddress;
+    Account sender = privateWorldState.get(senderAddress);
+    if (sender == null) {
+      sender = publicWorldState.get(senderAddress);
+      this.sender = privateWorldState.createAccount(sender.getAddress(), 0, sender.getBalance());
+    } else {
+      this.sender = privateWorldState.getMutable(senderAddress);
+    }
+
+    return processTransaction(
+        blockchain,
+        privateWorldState,
+        blockHeader,
+        transaction,
+        miningBeneficiary,
+        NO_TRACING,
+        blockHashLookup);
+  }
+
   @Override
   public Result processTransaction(
       final Blockchain blockchain,
@@ -160,8 +205,6 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
       return Result.invalid(validationResult);
     }
 
-    final Address senderAddress = transaction.getSender();
-    final MutableAccount sender = worldState.getOrCreate(senderAddress);
     validationResult =
         transactionValidator.validateForSender(transaction, sender, OptionalLong.empty());
     if (!validationResult.isValid()) {

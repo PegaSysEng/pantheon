@@ -21,12 +21,16 @@ import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
+import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
+import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,18 +72,25 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
       ReceiveRequest receiveRequest = new ReceiveRequest(key, enclavePublicKey);
       ReceiveResponse receiveResponse = enclave.receive(receiveRequest);
 
-      WorldUpdater privateWorldState = messageFrame.getPrivateWorldState(DEFAULT_PRIVACY_GROUP_ID);
-      //      TransactionProcessor.Result result =
-      //          privateTransactionProcessor.processTransaction(
-      //              messageFrame.getBlockchain(),
-      //              privateWorldState,
-      //              messageFrame.getBlockHeader(),
-      //              null,
-      //              messageFrame.getMiningBeneficiary(),
-      //              messageFrame.getBlockHashLookup());
+      final BytesValueRLPInput bytesValueRLPInput =
+          new BytesValueRLPInput(
+              BytesValue.wrap(Base64.getDecoder().decode(receiveResponse.getPayload())), false);
 
-      //      return result.getOutput();
-      return BytesValue.wrap(receiveResponse.getPayload());
+      PrivateTransaction transaction = PrivateTransaction.readFrom(bytesValueRLPInput);
+
+      WorldUpdater privateWorldState = messageFrame.getPrivateWorldState(DEFAULT_PRIVACY_GROUP_ID);
+      WorldUpdater publicWorldState = messageFrame.getWorldState();
+      TransactionProcessor.Result result =
+          privateTransactionProcessor.processPrivateTransaction(
+              messageFrame.getBlockchain(),
+              privateWorldState,
+              publicWorldState,
+              messageFrame.getBlockHeader(),
+              transaction,
+              messageFrame.getMiningBeneficiary(),
+              messageFrame.getBlockHashLookup());
+
+      return result.getOutput();
     } catch (IOException e) {
       LOG.fatal("Enclave threw an unhandled exception.", e);
       return BytesValue.EMPTY;
