@@ -99,7 +99,7 @@ can synchronise and add blocks containing transactions from accounts that are no
     Node B to which it is propagated if the account is not in the Node B whitelist. 
     We recommend each node in the network has the same nodes whitelist.
         
-    On-chain permissioning is under development. On-chain permissioning will use one onchain 
+    On-chain permissioning is under development. On-chain permissioning will use one on-chain 
     node whitelist. 
 
 To add or remove accounts from the accounts whitelist when the node is running, use the JSON-RPC API methods: 
