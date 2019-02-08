@@ -40,11 +40,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -72,33 +67,28 @@ public class IbftControllerTest {
   @Mock private BlockHeader chainHeadBlockHeader;
   @Mock private BlockHeader nextBlock;
   @Mock private BlockHeightManager blockHeightManager;
-  @Mock private MessageTracker messageTracker;
 
   @Mock private Proposal proposal;
   private Message proposalMessage;
   @Mock private ProposalMessageData proposalMessageData;
-  @Mock private ProposalPayload proposalPayload;
 
   @Mock private Prepare prepare;
   private Message prepareMessage;
   @Mock private PrepareMessageData prepareMessageData;
-  @Mock private PreparePayload preparePayload;
 
   @Mock private Commit commit;
   private Message commitMessage;
   @Mock private CommitMessageData commitMessageData;
-  @Mock private CommitPayload commitPayload;
 
   @Mock private NewRound newRound;
   private Message newRoundMessage;
   @Mock private NewRoundMessageData newRoundMessageData;
-  @Mock private NewRoundPayload newRoundPayload;
 
   @Mock private RoundChange roundChange;
   private Message roundChangeMessage;
   @Mock private RoundChangeMessageData roundChangeMessageData;
-  @Mock private RoundChangePayload roundChangePayload;
 
+  @Mock private MessageTracker messageTracker;
   private final Map<Long, List<Message>> futureMessages = new HashMap<>();
   private final Address validator = Address.fromHexString("0x0");
   private final Address unknownValidator = Address.fromHexString("0x2");
@@ -445,14 +435,17 @@ public class IbftControllerTest {
     when(messageTracker.hasSeenMessage(proposalMessageData)).thenReturn(true);
     setupProposal(roundIdentifier, validator);
     verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(proposalMessage));
-    verify(messageTracker).addSeenMessage(proposalMessageData);
+    verify(messageTracker, never()).addSeenMessage(proposalMessageData);
   }
 
   @Test
-  public void duplicateFutureMessagesAreNotBuffered() {
-    when(messageTracker.hasSeenMessage(proposalMessageData)).thenReturn(true);
-    setupProposal(futureRoundIdentifier, validator);
-    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(proposalMessage));
+  public void uniqueMessagesAreAddedAsSeen() {
+    when(messageTracker.hasSeenMessage(proposalMessageData)).thenReturn(false);
+    setupProposal(roundIdentifier, validator);
+    ibftController.start();
+    ibftController.handleMessageEvent(new IbftReceivedMessageEvent(proposalMessage));
+
+    verify(messageTracker).addSeenMessage(proposalMessageData);
   }
 
   private void verifyNotHandledAndNoFutureMsgs(final IbftReceivedMessageEvent msg) {
