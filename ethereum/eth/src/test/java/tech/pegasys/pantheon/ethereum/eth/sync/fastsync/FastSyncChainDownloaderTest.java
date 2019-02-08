@@ -36,7 +36,6 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.LockSupport;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -107,12 +106,7 @@ public class FastSyncChainDownloaderTest {
     final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
 
-    peer.respondWhile(
-        responder,
-        () -> {
-          LockSupport.parkNanos(1000000);
-          return !result.isDone();
-        });
+    peer.respondWhileOtherThreadsWork(responder, () -> !result.isDone());
 
     assertThat(result).isCompleted();
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
@@ -134,12 +128,7 @@ public class FastSyncChainDownloaderTest {
     final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
 
-    peer.respondWhile(
-        responder,
-        () -> {
-          LockSupport.parkNanos(1000000);
-          return !result.isDone();
-        });
+    peer.respondWhileOtherThreadsWork(responder, () -> !result.isDone());;
 
     assertThat(result).isCompleted();
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
@@ -182,12 +171,7 @@ public class FastSyncChainDownloaderTest {
 
     ethProtocolManager.handleDisconnect(bestPeer.getPeerConnection(), TOO_MANY_PEERS, true);
 
-    secondBestPeer.respondWhile(
-        shorterResponder,
-        () -> {
-          LockSupport.parkNanos(1000000);
-          return !result.isDone();
-        });
+    secondBestPeer.respondWhileOtherThreadsWork(shorterResponder, () -> !result.isDone());;
 
     assertThat(result).isCompleted();
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(pivotBlockNumber);
