@@ -49,17 +49,19 @@ The genesis file defines the genesis block of the blockchain (that is, the start
 The genesis file includes entries for configuring the blockchain such as the mining difficulty and initial 
 accounts and balances.    
 
-All nodes in a network must use the same genesis file. 
+All nodes in a network must use the same genesis file. The [network ID](../Configuring-Pantheon/NetworkID-And-ChainID.md) 
+defaults to the `chainID` in the genesis file. The `fixeddifficulty` enables blocks to be mined quickly.   
 
 Copy the following genesis definition to a file called `privateNetworkGenesis.json` and save it in the `Private-Network` directory: 
 
 ```json
 {
   "config": {
-    "ethash": {
-      "fixeddifficulty": 1000
-    }
-  },
+      "ethash": {
+        "fixeddifficulty": 1000
+      },
+       "chainID": 1981
+   },
   "nonce": "0x42",
   "gasLimit": "0x1000000",
   "difficulty": "0x10000",
@@ -114,11 +116,11 @@ The `database` directory contains the blockchain data.
 Start Node-1:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-1-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes --network-id 123 --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled --host-whitelist=* --rpc-http-cors-origins="all"     
+pantheon --data-path=Node-1-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled --host-whitelist=* --rpc-http-cors-origins="all"     
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-1-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes --network-id 123 --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled --host-whitelist=* --rpc-http-cors-origins="all"    
+pantheon --data-path=Node-1-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled --host-whitelist=* --rpc-http-cors-origins="all"    
 ```
 
 The command line specifies: 
@@ -140,11 +142,11 @@ You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Nod
 Start another terminal, change to the `Node-2` directory and start Node-2 replacing the enode URL with your bootnode:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-2-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30304      
+pantheon --data-path=Node-2-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304      
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30304      
+pantheon --data-path=Node-2-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304      
 ```
 
 The command line specifies: 
@@ -152,25 +154,25 @@ The command line specifies:
 * Different port to Node-1 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
 * Enode URL for Node-1 using the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option.
 * Data directory for Node-2 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
-* Genesis file and network ID as for Node-1.  
+* Genesis file as for Node-1.  
 
 ### 6. Start Node-3
 
 Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootnode: 
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-3-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port30305      
+pantheon --data-path=Node-3-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port30305      
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-3-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30305      
+pantheon --data-path=Node-3-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30305      
 ```
 
 The command line specifies: 
 
  * Different port to Node-1 and Node-2 for P2P peer discovery.
  * Data directory for Node-3 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
- * Bootnode, genesis file, and network ID as for Node-2. 
+ * Bootnode and genesis file as for Node-2. 
 
 ### 7. Confirm Private Network is Working 
 
