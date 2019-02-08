@@ -50,7 +50,7 @@ The bootnodes must be included in the nodes whitelist.
      --bootnodes="enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304","enode://7b61d5ee4b44335873e6912cb5dd3e3877c860ba21417c9b9ef1f7e500a82213737d4b269046d0669fb2299a234ca03443f25fe5f706b693b3669e5c92478ade@127.0.0.1:30305" 
      ```
     
-    The `nodes-whitelist` in `permissioning_config.toml` must contain the specified bootnodes. 
+    The `nodes-whitelist` in `permissions_config.toml` must contain the specified bootnodes. 
 
 ### Enabling Node Whitelisting     
 
@@ -121,7 +121,7 @@ or [`--rpc-ws-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-api) options to e
 The `permissions_config.toml` file contains the nodes and accounts whitelists. The `permissions_config.toml` 
 must be in the [data directory](../Reference/Pantheon-CLI-Syntax.md#data-path) for the node.
 
-!!! example "Example permissioning_config.toml"  
+!!! example "Example permissions_config.toml"  
     ```toml 
     accounts-whitelist=["0xb9b81ee349c3807e46bc71aa2632203c5b462032", "0xb9b81ee349c3807e46bc71aa2632203c5b462034"]
     
