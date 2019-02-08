@@ -29,14 +29,8 @@ try {
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage(stage_name + 'Compile') {
-                            sh './gradlew --no-daemon --parallel clean compileJava'
-                        }
-                        stage(stage_name + 'compile tests') {
-                            sh './gradlew --no-daemon --parallel compileTestJava'
-                        }
-                        stage(stage_name + 'assemble') {
-                            sh './gradlew --no-daemon --parallel assemble'
+                        stage(stage_name + 'Prepare') {
+                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
                         }
                         stage(stage_name + 'Unit tests') {
                             sh './gradlew --no-daemon --parallel build'
@@ -59,14 +53,8 @@ try {
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage(stage_name + 'Compile') {
-                            sh './gradlew --no-daemon --parallel clean compileJava'
-                        }
-                        stage(stage_name + 'compile tests') {
-                            sh './gradlew --no-daemon --parallel compileTestJava'
-                        }
-                        stage(stage_name + 'assemble') {
-                            sh './gradlew --no-daemon --parallel assemble'
+                        stage(stage_name + 'Prepare') {
+                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
                         }
                         stage(stage_name + 'Reference tests') {
                             sh './gradlew --no-daemon --parallel referenceTest'
@@ -89,14 +77,8 @@ try {
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage(stage_name + 'Compile') {
-                            sh './gradlew --no-daemon --parallel clean compileJava'
-                        }
-                        stage(stage_name + 'compile tests') {
-                            sh './gradlew --no-daemon --parallel compileTestJava'
-                        }
-                        stage(stage_name + 'assemble') {
-                            sh './gradlew --no-daemon --parallel assemble'
+                        stage(stage_name + 'Prepare') {
+                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
                         }
                         stage(stage_name + 'Integration Tests') {
                             sh './gradlew --no-daemon --parallel integrationTest'
@@ -119,14 +101,8 @@ try {
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage(stage_name + 'Compile') {
-                            sh './gradlew --no-daemon --parallel clean compileJava'
-                        }
-                        stage(stage_name + 'compile tests') {
-                            sh './gradlew --no-daemon --parallel compileTestJava'
-                        }
-                        stage(stage_name + 'assemble') {
-                            sh './gradlew --no-daemon --parallel assemble'
+                        stage(stage_name + 'Prepare') {
+                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
                         }
                         stage(stage_name + 'Acceptance Tests') {
                             sh './gradlew --no-daemon --parallel acceptanceTest'
@@ -149,14 +125,8 @@ try {
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage(stage_name + 'Compile') {
-                            sh './gradlew --no-daemon --parallel clean compileJava'
-                        }
-                        stage(stage_name + 'compile tests') {
-                            sh './gradlew --no-daemon --parallel compileTestJava'
-                        }
-                        stage(stage_name + 'assemble') {
-                            sh './gradlew --no-daemon --parallel assemble'
+                        stage(stage_name + 'Prepare') {
+                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
                         }
                         stage(stage_name + 'Check Licenses') {
                             sh './gradlew --no-daemon --parallel checkLicenses'
