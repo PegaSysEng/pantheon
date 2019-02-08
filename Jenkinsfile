@@ -23,21 +23,22 @@ def build_image = 'pegasyseng/pantheon-build:0.0.5-jdk11'
 
 try {
     parallel UnitTests: {
+        def stage = "Unit tests stage: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage('Compile') {
+                        stage(stage + 'Compile') {
                             sh './gradlew --no-daemon --parallel clean compileJava'
                         }
-                        stage('compile tests') {
+                        stage(stage + 'compile tests') {
                             sh './gradlew --no-daemon --parallel compileTestJava'
                         }
-                        stage('assemble') {
+                        stage(stage + 'assemble') {
                             sh './gradlew --no-daemon --parallel assemble'
                         }
-                        stage('Build') {
+                        stage(stage + 'Unit tests') {
                             sh './gradlew --no-daemon --parallel build'
                         }
                     } finally {
@@ -52,21 +53,22 @@ try {
             }
         }
     }, ReferenceTests: {
+        def stage = "Reference tests stage: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage('Compile') {
+                        stage(stage + 'Compile') {
                             sh './gradlew --no-daemon --parallel clean compileJava'
                         }
-                        stage('compile tests') {
+                        stage(stage + 'compile tests') {
                             sh './gradlew --no-daemon --parallel compileTestJava'
                         }
-                        stage('assemble') {
+                        stage(stage + 'assemble') {
                             sh './gradlew --no-daemon --parallel assemble'
                         }
-                        stage('Reference tests') {
+                        stage(stage + 'Reference tests') {
                             sh './gradlew --no-daemon --parallel referenceTest'
                         }
                     } finally {
@@ -81,21 +83,22 @@ try {
             }
         }
     }, IntegrationTests: {
+        def stage = "Integration tests stage: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage('Compile') {
+                        stage(stage + 'Compile') {
                             sh './gradlew --no-daemon --parallel clean compileJava'
                         }
-                        stage('compile tests') {
+                        stage(stage + 'compile tests') {
                             sh './gradlew --no-daemon --parallel compileTestJava'
                         }
-                        stage('assemble') {
+                        stage(stage + 'assemble') {
                             sh './gradlew --no-daemon --parallel assemble'
                         }
-                        stage('Integration Tests') {
+                        stage(stage + 'Integration Tests') {
                             sh './gradlew --no-daemon --parallel integrationTest'
                         }
                     } finally {
@@ -110,21 +113,22 @@ try {
             }
         }
     }, AcceptanceTests: {
+        def stage = "Acceptance tests stage: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage('Compile') {
+                        stage(stage + 'Compile') {
                             sh './gradlew --no-daemon --parallel clean compileJava'
                         }
-                        stage('compile tests') {
+                        stage(stage + 'compile tests') {
                             sh './gradlew --no-daemon --parallel compileTestJava'
                         }
-                        stage('assemble') {
+                        stage(stage + 'assemble') {
                             sh './gradlew --no-daemon --parallel assemble'
                         }
-                        stage('Acceptance Tests') {
+                        stage(stage + 'Acceptance Tests') {
                             sh './gradlew --no-daemon --parallel acceptanceTest'
                         }
                     } finally {
@@ -139,33 +143,34 @@ try {
             }
         }
     }, OtherChecks: {
+        def stage = "Other checks stage: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
-                        stage('Compile') {
+                        stage(stage + 'Compile') {
                             sh './gradlew --no-daemon --parallel clean compileJava'
                         }
-                        stage('compile tests') {
+                        stage(stage + 'compile tests') {
                             sh './gradlew --no-daemon --parallel compileTestJava'
                         }
-                        stage('assemble') {
+                        stage(stage + 'assemble') {
                             sh './gradlew --no-daemon --parallel assemble'
                         }
-                        stage('Check Licenses') {
+                        stage(stage + 'Check Licenses') {
                             sh './gradlew --no-daemon --parallel checkLicenses'
                         }
-                        stage('Check javadoc') {
+                        stage(stage + 'Check javadoc') {
                             sh './gradlew --no-daemon --parallel javadoc'
                         }
                     } finally {
-                        archiveArtifacts '**/build/reports/**'
-                        archiveArtifacts '**/build/test-results/**'
-                        archiveArtifacts 'build/reports/**'
-                        archiveArtifacts 'build/distributions/**'
+                        archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/**'
+                        archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/test-results/**'
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/**'
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'build/distributions/**'
 
-                        junit '**/build/test-results/**/*.xml'
+                        junit allowEmptyResults: true, testResults: '**/build/test-results/**/*.xml'
                     }
                 }
             }
