@@ -3,7 +3,7 @@ description: Pantheon Create a Permissioned network
 
 # Creating a Permissioned Network
 
-The following steps set up a permissioned network with 3 nodes and 2 accounts. The network uses the 
+The following steps set up a permissioned network with nodes and accounts permissions. The network uses the 
 [Clique Proof of Authority consensus protocol](../Consensus-Protocols/Clique.md). 
 
 !!!important 
@@ -27,8 +27,8 @@ To create a permissoned network:
 1. [Create Permissions Configuration File](#5-create-permissions-configuration-file)
 1. [Delete Database Directories](#6-delete-database-directories)
 1. [Start First Node as Bootnode](#7-start-first-node-as-bootnode)
-1. [Start Node-2](#8-start-node-1)
-1. [Start Node-3](#9-start-node-2)
+1. [Start Node-2](#8-start-node-2)
+1. [Start Node-3](#9-start-node-3)
 1. [Confirm Permissioned Network is Working](#10-confirm-permissioned-network-is-working)
 
 ### 1. Create Folders 
@@ -41,18 +41,18 @@ Create directories for your permissioned network, each of the three nodes, and a
 ```bash
 Permissioned-Network/
 ├── Node-1
-│   ├── Node-1-Datadir
+│   ├── Node-1-data-path
 ├── Node-2
-│   ├── Node-2-Datadir
+│   ├── Node-2-data-path
 └── Node-3
-    ├── Node-3-Datadir
+    ├── Node-3-data-path
 ```
 
 ### 2. Get Node Public Keys
 
-The [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) of each node is needed for the [nodes whitelist]<ADD HERE>.
+The [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) of each node is needed for the nodes whitelist.
 
-In the `Node-1` directory, use the [`export-pub-key` subcommand](../Reference/Pantheon-CLI-Syntax.md#export-pub-key) to write 
+In the `Node-1` directory, use the [`public-key` subcommand](../Reference/Pantheon-CLI-Syntax.md#public-key) to write 
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
 
 ```bash tab="MacOS"
@@ -174,16 +174,17 @@ In `extraData`, replace `<Node 1 Address>` with the [address for Node-1](#3-get-
 
 ### 5. Create Permissions Configuration File 
 
-The permissions configuration file defines the [nodes and accounts whitelists]<ADD HERE>. 
+The permissions configuration file defines the nodes and accounts whitelists. 
 
-Copy the following permissions configuration to a file called `permissioning_config.toml` and save a copy in the `Node-1-data-path`, 
+Copy the following permissions configuration to a file called `permissions_config.toml` and save a copy in the `Node-1-data-path`, 
 `Node-2-data-path`, and `Node-3-data-path` directories:
 
-```toml 
-     accounts-whitelist=["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"]
+!!! example "permissions_config.toml"
+    ```toml 
+    accounts-whitelist=["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"]
      
-     nodes-whitelist=["enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303","enode://<publicKeyNode2 ex 0x>@127.0.0.1:30304","enode://<publicKeyNode3 ex 0x>@127.0.0.1:30305"]
-```
+    nodes-whitelist=["enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303","enode://<publicKeyNode2 ex 0x>@127.0.0.1:30304","enode://<publicKeyNode3 ex 0x>@127.0.0.1:30305"]
+    ```
 
 Replace the public key as indicated for each enode URL with the [node public keys](#3-get-node-public-keys). 
 
@@ -193,7 +194,7 @@ The permissions configuration file includes:
 * Enode URLs for each node. 
 
 !!! note
-    Permissions are specified at the node level. The `permissioning_config.toml` file must be saved in the 
+    Permissions are specified at the node level. The `permissions_config.toml` file must be saved in the 
     data directory for each node. 
     
     On-chain permissioning is under development. On-chain permissioning will use one onchain 
