@@ -285,16 +285,14 @@ public class JsonRpcHttpService {
     return foundMatchingPermission.get();
   }
 
-  private void getUser(final RoutingContext routingContext, final Handler<Optional<User>> handler) {
+  private String getToken(final RoutingContext routingContext) {
+    return routingContext.request().getHeader("Bearer");
+  }
+
+  private void getUser(final String token, final Handler<Optional<User>> handler) {
 
     if (!jwtAuthProvider.isPresent()) {
       handler.handle(Optional.empty());
-    }
-
-    String token = routingContext.request().getHeader("Bearer");
-    if (token == null) {
-      // TODO
-      // if null future failed
     }
 
     if (jwtAuthProvider.isPresent()) {
@@ -360,12 +358,18 @@ public class JsonRpcHttpService {
   }
 
   private void handleJsonRPCRequest(final RoutingContext routingContext) {
+    // first check token if authentication is enabled
+    String token = getToken(routingContext);
+    if (jwtAuthProvider.isPresent() && token == null) {
+      handleJsonRpcError(routingContext, null, JsonRpcError.UNAUTHORIZED);
+    }
+
     // Parse json
     try {
       final String json = routingContext.getBodyAsString().trim();
       if (!json.isEmpty() && json.charAt(0) == '{') {
         getUser(
-            routingContext,
+            token,
             user -> {
               handleJsonSingleRequest(routingContext, new JsonObject(json), user);
             });
@@ -376,7 +380,7 @@ public class JsonRpcHttpService {
           return;
         }
         getUser(
-            routingContext,
+            token,
             user -> {
               handleJsonBatchRequest(routingContext, array, user);
             });
