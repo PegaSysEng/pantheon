@@ -61,7 +61,6 @@ public class ParallelDownloadHeadersTask<C>
     }
     final int segmentLength =
         (int) (nextCheckpointHeader.getNumber() - previousCheckpointHeader.get().getNumber()) - 1;
-    // body
     LOG.trace(
         "Requesting download of {} blocks ending at {}",
         segmentLength,
@@ -84,7 +83,7 @@ public class ParallelDownloadHeadersTask<C>
       result.get().completeExceptionally(e);
       return Optional.empty();
     }
-    headers.add(nextCheckpointHeader);
+    // FIXME    headers.add(nextCheckpointHeader);
     if (headers.size() > 2) {
       LOG.debug(
           "Downloaded headers {} to {}",

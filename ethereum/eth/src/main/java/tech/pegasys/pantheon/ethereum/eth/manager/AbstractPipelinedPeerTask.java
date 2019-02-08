@@ -35,7 +35,7 @@ public abstract class AbstractPipelinedPeerTask<I, O> extends AbstractPeerTask<L
   private BlockingQueue<O> outboundQueue;
   private List<O> results;
 
-  private boolean lameDuckMode = false;
+  private boolean shuttingDown = false;
   private AtomicReference<Throwable> processingException = new AtomicReference<>(null);
 
   protected AbstractPipelinedPeerTask(
@@ -53,7 +53,7 @@ public abstract class AbstractPipelinedPeerTask<I, O> extends AbstractPeerTask<L
   protected void executeTaskWithPeer(final EthPeer peer) {
     Optional<I> previousInput = Optional.empty();
     while (!isDone() && processingException.get() == null) {
-      if (lameDuckMode && inboundQueue.isEmpty()) {
+      if (shuttingDown && inboundQueue.isEmpty()) {
         break;
       }
       final I input;
@@ -90,12 +90,8 @@ public abstract class AbstractPipelinedPeerTask<I, O> extends AbstractPeerTask<L
     return outboundQueue;
   }
 
-  public boolean isLameDuckMode() {
-    return lameDuckMode;
-  }
-
-  public void setLameDuckMode(final boolean lameDuckMode) {
-    this.lameDuckMode = lameDuckMode;
+  public void shutdown() {
+    this.shuttingDown = true;
   }
 
   protected void failExceptionally(final Throwable t) {

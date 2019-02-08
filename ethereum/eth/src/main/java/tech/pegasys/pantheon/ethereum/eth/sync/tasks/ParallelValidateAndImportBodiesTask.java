@@ -47,7 +47,7 @@ public class ParallelValidateAndImportBodiesTask<B>
 
   @Override
   protected Optional<List<B>> processStep(
-      final List<B> blocks, final Optional<List<B>> previousHeaders, final EthPeer peer) {
+      final List<B> blocks, final Optional<List<B>> previousBlocks, final EthPeer peer) {
     final long firstBlock = blockHandler.extractBlockNumber(blocks.get(0));
     final long lastBlock = blockHandler.extractBlockNumber(blocks.get(blocks.size() - 1));
     LOG.debug("Starting import of chain segment {} to {}", firstBlock, lastBlock);

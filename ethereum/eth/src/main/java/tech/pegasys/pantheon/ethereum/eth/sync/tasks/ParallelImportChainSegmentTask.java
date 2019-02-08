@@ -75,7 +75,6 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
     }
     this.checkpointHeaders =
         new ArrayBlockingQueue<>(checkpointHeaders.size(), false, checkpointHeaders);
-    //    this.chunksInTotal = checkpointHeaders.size() - 1;
     this.blockHandler = blockHandler;
     this.validationPolicy = validationPolicy;
   }
@@ -150,10 +149,10 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
           scheduler.scheduleServiceTask(validateAndImportBodiesTask);
 
       // Hook in pipeline completion signaling.
-      downloadHeadersTask.setLameDuckMode(true);
-      downloadHeaderFuture.thenRun(() -> validateHeadersTask.setLameDuckMode(true));
-      validateHeaderFuture.thenRun(() -> downloadBodiesTask.setLameDuckMode(true));
-      downloadBodiesFuture.thenRun(() -> validateAndImportBodiesTask.setLameDuckMode(true));
+      downloadHeadersTask.shutdown();
+      downloadHeaderFuture.thenRun(() -> validateHeadersTask.shutdown());
+      validateHeaderFuture.thenRun(() -> downloadBodiesTask.shutdown());
+      downloadBodiesFuture.thenRun(() -> validateAndImportBodiesTask.shutdown());
 
       final BiConsumer<? super Object, ? super Throwable> cancelOnException =
           (s, e) -> {
@@ -171,8 +170,9 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
       downloadBodiesFuture.whenComplete(cancelOnException);
       validateBodiesFuture.whenComplete(
           (r, e) -> {
-            cancelOnException.accept(r, e);
-            if (r != null) {
+            if (e != null) {
+              cancelOnException.accept(null, e);
+            } else if (r != null) {
               try {
                 final List<B> importedBlocks =
                     validateBodiesFuture.get().getResult().stream()
