@@ -12,30 +12,35 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
+import com.google.common.io.Files;
+
 public class PrivacyParameters {
-  private static final String ORION_URL = "http://localhost:8888";
-  public static final URI DEFAULT_ORION_URL = URI.create(ORION_URL);
+  private static final String ENCLAVE_URL = "http://localhost:8888";
+  public static final URI DEFAULT_ENCLAVE_URL = URI.create(ENCLAVE_URL);
 
   private Integer privacyAddress;
   private boolean enabled;
   private String url;
-  private File publicKey;
+  private String publicKey;
 
-  public File getPublicKey() {
+  public String getPublicKey() {
     return publicKey;
   }
 
-  public void setPublicKey(final File publicKey) {
-    this.publicKey = publicKey;
+  public void setPublicKeyUsingFile(final File publicKeyFile) throws IOException {
+    this.publicKey = Files.asCharSource(publicKeyFile, UTF_8).read();
   }
 
   public static PrivacyParameters noPrivacy() {
     final PrivacyParameters config = new PrivacyParameters();
     config.setEnabled(false);
-    config.setUrl(ORION_URL);
+    config.setUrl(ENCLAVE_URL);
     config.setPrivacyAddress(Address.PRIVACY);
     return config;
   }

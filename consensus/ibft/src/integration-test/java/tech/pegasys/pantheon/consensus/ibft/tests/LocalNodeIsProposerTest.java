@@ -13,14 +13,13 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommitPayload;
+import static tech.pegasys.pantheon.consensus.ibft.support.IntegrationTestHelpers.createSignedCommitPayload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -58,18 +57,18 @@ public class LocalNodeIsProposerTest {
   private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
 
   private Block expectedProposedBlock;
-  private SignedData<ProposalPayload> expectedTxProposal;
-  private SignedData<CommitPayload> expectedTxCommit;
+  private Proposal expectedTxProposal;
+  private Commit expectedTxCommit;
 
   @Before
   public void setup() {
     expectedProposedBlock = context.createBlockForProposalFromChainHead(0, blockTimeStamp);
-    expectedTxProposal =
-        localNodeMessageFactory.createSignedProposalPayload(roundId, expectedProposedBlock);
+    expectedTxProposal = localNodeMessageFactory.createProposal(roundId, expectedProposedBlock);
 
     expectedTxCommit =
-        createSignedCommitPayload(
-            roundId, expectedProposedBlock, context.getLocalNodeParams().getNodeKeyPair());
+        new Commit(
+            createSignedCommitPayload(
+                roundId, expectedProposedBlock, context.getLocalNodeParams().getNodeKeyPair()));
 
     // Start the Controller, and trigger "block timer" to send proposal.
     context.getController().start();

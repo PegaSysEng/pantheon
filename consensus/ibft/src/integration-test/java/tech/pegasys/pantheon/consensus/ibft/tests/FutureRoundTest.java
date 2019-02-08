@@ -13,14 +13,12 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.injectEmptyNewRound;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -93,22 +91,21 @@ public class FutureRoundTest {
 
     // inject a newRound to move to 'futureRoundId', and ensure localnode sends prepare, commit
     // and updates blockchain
-    injectEmptyNewRound(
-        futureRoundId,
-        futurePeers.getProposer(),
-        futurePeers.createSignedRoundChangePayload(futureRoundId),
-        futureBlock);
+    futurePeers
+        .getProposer()
+        .injectEmptyNewRound(
+            futureRoundId, futurePeers.createSignedRoundChangePayload(futureRoundId), futureBlock);
 
-    final SignedData<PreparePayload> expectedPrepare =
-        localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
+    final Prepare expectedPrepare =
+        localNodeMessageFactory.createPrepare(futureRoundId, futureBlock.getHash());
 
     peers.verifyMessagesReceived(expectedPrepare);
 
     // following 1 more prepare, a commit msg will be sent
     futurePeers.getNonProposing(quorum - 3).injectPrepare(futureRoundId, futureBlock.getHash());
 
-    final SignedData<CommitPayload> expectedCommit =
-        localNodeMessageFactory.createSignedCommitPayload(
+    final Commit expectedCommit =
+        localNodeMessageFactory.createCommit(
             futureRoundId,
             futureBlock.getHash(),
             SECP256K1.sign(futureBlock.getHash(), context.getLocalNodeParams().getNodeKeyPair()));
@@ -137,14 +134,13 @@ public class FutureRoundTest {
 
     peers.clearReceivedMessages();
 
-    injectEmptyNewRound(
-        futureRoundId,
-        futurePeers.getProposer(),
-        futurePeers.createSignedRoundChangePayload(futureRoundId),
-        futureBlock);
+    futurePeers
+        .getProposer()
+        .injectEmptyNewRound(
+            futureRoundId, futurePeers.createSignedRoundChangePayload(futureRoundId), futureBlock);
 
-    final SignedData<PreparePayload> expectedFuturePrepare =
-        localNodeMessageFactory.createSignedPreparePayload(futureRoundId, futureBlock.getHash());
+    final Prepare expectedFuturePrepare =
+        localNodeMessageFactory.createPrepare(futureRoundId, futureBlock.getHash());
     peers.verifyMessagesReceived(expectedFuturePrepare);
 
     // attempt to complete the previous round

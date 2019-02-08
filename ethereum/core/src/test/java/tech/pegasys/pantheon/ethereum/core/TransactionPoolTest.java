@@ -364,7 +364,6 @@ public class TransactionPoolTest {
     transactionPool.setAccountWhitelist(accountWhitelistController);
     givenTransactionIsValid(transaction1);
 
-    when(accountWhitelistController.isAccountWhiteListSet()).thenReturn(true);
     when(accountWhitelistController.contains(transaction1.getSender().toString())).thenReturn(true);
 
     assertThat(transactionPool.addLocalTransaction(transaction1)).isEqualTo(valid());
@@ -377,7 +376,6 @@ public class TransactionPoolTest {
     transactionPool.setAccountWhitelist(accountWhitelistController);
     givenTransactionIsValid(transaction1);
 
-    when(accountWhitelistController.isAccountWhiteListSet()).thenReturn(true);
     when(accountWhitelistController.contains(transaction1.getSender().toString()))
         .thenReturn(false);
 
@@ -431,8 +429,7 @@ public class TransactionPoolTest {
                 .buildHeader(),
             new BlockBody(transactionList, emptyList()));
     final List<TransactionReceipt> transactionReceipts =
-        transactionList
-            .stream()
+        transactionList.stream()
             .map(transaction -> new TransactionReceipt(1, 1, emptyList()))
             .collect(toList());
     blockchain.appendBlock(block, transactionReceipts);
