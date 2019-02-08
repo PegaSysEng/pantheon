@@ -224,8 +224,6 @@ and [`--permissions-accounts-enabled`](../Reference/Pantheon-CLI-Syntax.md#permi
 * JSON-RPC API is enabled using the [`--rpc-http-enabled` option](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled)
 *  ETH,NET,PERM, and CLIQUE APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
 * All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist` option](../Reference/Pantheon-CLI-Syntax.md#host-whitelist). 
-* Mining is enabled and the account to which mining rewards are paid using the [`--miner-enabled`](../Reference/Pantheon-CLI-Syntax.md#miner-enabled) 
-and [`--miner-coinbase` options](../Reference/Pantheon-CLI-Syntax.md#miner-coinbase).
 
 !!! info
     The miner coinbase account is an account defined in the genesis file. 
@@ -237,19 +235,20 @@ You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Nod
 Start another terminal, change to the `Node-2` directory and start Node-2 replacing the enode URL with your bootonde:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-2-data-path --bootnodes="enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30304     
+pantheon --data-path=Node-2-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30304 --rpc-http-port=8546    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path --bootnodes="enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30304    
+pantheon --data-path=Node-2-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30304 --rpc-http-port=8546   
 ```
 
 The command line specifies:
  
-* Different port to Node-1 for P2P peer discovery using the [`--p2p-port` option](../Reference/Pantheon-CLI-Syntax.md#p2p-port).
-* Enode URL for Node-1 using the [`--bootnodes` option](../Reference/Pantheon-CLI-Syntax.md#bootnodes).
-* Data directory for Node-2 using the [`--data-path` option](../Reference/Pantheon-CLI-Syntax.md#data-path).
-* Other options as for as for Node-1 except mining not enabled.  
+* Different port to Node-1 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option
+* Different port to Node-1 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option
+* Enode URL for Node-1 using the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option
+* Data directory for Node-2 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option
+* Other options as for as for Node-1.  
 
 
 ### 9. Start Node-3
@@ -257,21 +256,24 @@ The command line specifies:
 Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootonde:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-3-data-path --bootnodes="enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30305     
+pantheon --data-path=Node-3-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30305 --rpc-http-port=8547    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-3-data-path --bootnodes="enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30305    
+pantheon --data-path=Node-3-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30305 --rpc-http-port=8547   
 ```
 
 The command line specifies:
  
-* Different port to Node-1 and Node-2 for P2P peer discovery using the [`--p2p-port` option](../Reference/Pantheon-CLI-Syntax.md#p2p-port).
-* Enode URL for Node-1 using the [`--bootnodes` option](../Reference/Pantheon-CLI-Syntax.md#bootnodes).
-* Data directory for Node-3 using the [`--data-path` option](../Reference/Pantheon-CLI-Syntax.md#data-path).
-* Other options as for as for Node-1 except mining not enabled.  
+* Different port to Node-1 and Node-2 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option
+* Different port to Node-1 and Node-2 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option
+* Enode URL for Node-1 using the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option
+* Data directory for Node-3 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option
+* Other options as for as for Node-1.  
 
 ### 10. Confirm Permissioned Network is Working 
+
+#### Check Peer Count 
 
 Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
@@ -288,19 +290,49 @@ The result confirms Node-1 (the node running the JSON-RPC service) has two peers
 }
 ```
 
-## Next Steps <up to here> 
+#### Send a Transaction from an Account in the Whitelist 
 
-### Try Connecting a Node Not in the Nodes Whitelist 
+Import the first account from the geneis file into MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask):
 
-
-### Send a Transaction from an Account in the Whitelist 
-
-Import accounts to MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask)
+!!! example "Account 1 (Miner Coinbase Account)"
+    * Address: `0xfe3b557e8fb62b89f4916b721be55ceb828dbd73`
+    * Private key : ==0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63==
+    * Initial balance : `0xad78ebc5ac6200000` (200000000000000000000 in decimal)   
 
 !!! info 
     Pantheon does not implement [private key management](../Using-Pantheon/Account-Management.md).
 
 ### Try Sending a Transaction from an Account Not in the Account Whitelist 
+
+Import the last account from the geneis file into MetaMask and try to send a transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask):
+
+!!! example "Account 3"
+    * Address: `0xf17f52151EbEF6C7334FAD080c5704D77216b732`
+    * Private key : ==0xae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f==
+    * Initial balance : `0x90000000000000000000000` (2785365088392105618523029504 in decimal)
+
+### Remove Node-2 from the Nodes Whitelist 
+
+Call `perm_removeNodesFromWhitelist` replacing the public key as indicated with the [node public key for Node-2](#3-get-node-public-keys): 
+
+```bash
+curl -X POST --data '{"jsonrpc":"2.0","method":"perm_removeNodesFromWhitelist","params":[["enode://<publicKeyNode2 ex 0x>@127.0.0.1:30304"]], "id":1}' 127.0.0.1:8545
+```
+
+Call [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount): 
+
+```bash
+curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' 127.0.0.1:8545
+```
+
+The result confirms Node-1 now only has one peer (Node-3):
+```json
+{
+  "jsonrpc" : "2.0",
+  "id" : 1,
+  "result" : "0x2"
+}
+```
 
 ## Stop Nodes
 
