@@ -23,7 +23,7 @@ def build_image = 'pegasyseng/pantheon-build:0.0.5-jdk11'
 
 try {
     parallel UnitTests: {
-        def stage_name = "Unit tests stage: "
+        def stage_name = "Unit tests node: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
@@ -47,7 +47,7 @@ try {
             }
         }
     }, ReferenceTests: {
-        def stage_name = "Reference tests stage: "
+        def stage_name = "Reference tests node: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
@@ -71,7 +71,7 @@ try {
             }
         }
     }, IntegrationTests: {
-        def stage_name = "Integration tests stage: "
+        def stage_name = "Integration tests node: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
@@ -82,6 +82,12 @@ try {
                         }
                         stage(stage_name + 'Integration Tests') {
                             sh './gradlew --no-daemon --parallel integrationTest'
+                        }
+                        stage(stage_name + 'Check Licenses') {
+                            sh './gradlew --no-daemon --parallel checkLicenses'
+                        }
+                        stage(stage_name + 'Check javadoc') {
+                            sh './gradlew --no-daemon --parallel javadoc'
                         }
                     } finally {
                         archiveArtifacts '**/build/reports/**'
@@ -95,7 +101,7 @@ try {
             }
         }
     }, AcceptanceTests: {
-        def stage_name = "Acceptance tests stage: "
+        def stage_name = "Acceptance tests node: "
         node {
             checkout scm
             docker.image(docker_image).withRun('--privileged') { d ->
@@ -114,33 +120,6 @@ try {
                         archiveArtifacts 'build/distributions/**'
 
                         junit '**/build/test-results/**/*.xml'
-                    }
-                }
-            }
-        }
-    }, OtherChecks: {
-        def stage_name = "Other checks stage: "
-        node {
-            checkout scm
-            docker.image(docker_image).withRun('--privileged') { d ->
-                docker.image(build_image).inside("--link ${d.id}:docker") {
-                    try {
-                        stage(stage_name + 'Prepare') {
-                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
-                        }
-                        stage(stage_name + 'Check Licenses') {
-                            sh './gradlew --no-daemon --parallel checkLicenses'
-                        }
-                        stage(stage_name + 'Check javadoc') {
-                            sh './gradlew --no-daemon --parallel javadoc'
-                        }
-                    } finally {
-                        archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/**'
-                        archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/test-results/**'
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/**'
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'build/distributions/**'
-
-                        junit allowEmptyResults: true, testResults: '**/build/test-results/**/*.xml'
                     }
                 }
             }
