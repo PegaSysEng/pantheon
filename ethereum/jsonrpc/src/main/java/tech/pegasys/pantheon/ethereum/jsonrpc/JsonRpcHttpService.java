@@ -441,7 +441,10 @@ public class JsonRpcHttpService {
 
                 final JWTOptions options =
                     new JWTOptions().setExpiresInMinutes(5).setAlgorithm("RS256");
-                final String token = jwtAuthProvider.get().generateToken(user.principal(), options);
+                final JsonObject jwtContents = new JsonObject()
+                    .put("permissions", user.principal().getValue("permissions"))
+                    .put("username", user.principal().getValue("username"));
+                final String token = jwtAuthProvider.get().generateToken(jwtContents, options);
 
                 final JsonObject responseBody = new JsonObject().put("token", token);
                 final HttpServerResponse response = routingContext.response();
