@@ -81,7 +81,8 @@ public class JsonRpcHttpServiceLoginTest {
   protected static Synchronizer synchronizer;
   protected static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.ADMIN);
-  private static JWTAuth jwtAuth;
+  protected static JWTAuth jwtAuth;
+  protected static String authPermissionsConfigFilePath = "JsonRpcHttpService/auth.toml";
 
   @BeforeClass
   public static void initServerAndClient() throws Exception {
@@ -123,7 +124,7 @@ public class JsonRpcHttpServiceLoginTest {
 
   private static JsonRpcHttpService createJsonRpcHttpService() throws Exception {
     final String authTomlPath =
-        Paths.get(ClassLoader.getSystemResource("JsonRpcHttpService/auth.toml").toURI())
+        Paths.get(ClassLoader.getSystemResource(authPermissionsConfigFilePath).toURI())
             .toAbsolutePath()
             .toString();
 
@@ -235,15 +236,9 @@ public class JsonRpcHttpServiceLoginTest {
 
   @Test
   public void checkJsonRpcMethodsAvailableWithGoodCredentialsAndPermissions() throws IOException {
-    final User mockUser = mock(User.class);
-    stubCredentialProvider.setRespondUser(mockUser);
-    when(mockUser.principal())
-        .thenReturn(
-            new JsonObject()
-                .put("permissions", new JsonArray(Arrays.asList("eth/blockNumber", "web3/*"))));
 
     final RequestBody body =
-        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
     final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(200);
@@ -265,9 +260,7 @@ public class JsonRpcHttpServiceLoginTest {
       JsonRpcMethod web3Sha3 = new Web3Sha3();
       JsonRpcMethod web3ClientVersion = new Web3ClientVersion("777");
 
-      final JWTAuth auth = JWTAuth.create(vertx, jwtOptions);
-
-      auth.authenticate(
+      jwtAuth.authenticate(
           new JsonObject().put("jwt", token),
           (r) -> {
             assertThat(r.succeeded()).isTrue();
@@ -290,9 +283,5 @@ public class JsonRpcHttpServiceLoginTest {
     JsonRpcMethod ethAccounts = new EthAccounts();
 
     assertThat(service.isPermitted(Optional.empty(), ethAccounts)).isTrue();
-  }
-
-  private Request buildRequest(final RequestBody body) {
-    return new Request.Builder().post(body).url(baseUrl).build();
   }
 }
