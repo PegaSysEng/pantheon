@@ -62,7 +62,7 @@ public class CliqueBlockInterface implements BlockInterface {
   public static BlockHeaderBuilder insertVoteToHeaderBuilder(
       final BlockHeaderBuilder builder,
       final EpochManager epochManager,
-      Optional<ValidatorVote> vote,
+      final Optional<ValidatorVote> vote,
       final long block) {
     if (epochManager.isEpochBlock(block) || !vote.isPresent()) {
       builder.nonce(voteToValue.get(VoteType.DROP));
