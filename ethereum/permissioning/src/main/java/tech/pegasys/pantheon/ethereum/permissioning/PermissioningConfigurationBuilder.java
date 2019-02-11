@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
-import tech.pegasys.pantheon.ethereum.core.*;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.URI;
@@ -66,9 +65,16 @@ public class PermissioningConfigurationBuilder {
                 .toList()
                 .parallelStream()
                 .map(Object::toString)
-                .map(Address::fromHexString)
-                .map(Address::toString)
                 .collect(Collectors.toList());
+
+        accountsWhitelistToml.stream()
+            .filter(s -> !AccountWhitelistController.isValidAccountString(s))
+            .findFirst()
+            .ifPresent(
+                s -> {
+                  throw new IllegalArgumentException("Invalid account " + s);
+                });
+
         permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
       } else {
         throw new Exception(

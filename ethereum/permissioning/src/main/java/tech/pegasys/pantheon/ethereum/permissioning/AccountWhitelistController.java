@@ -145,10 +145,10 @@ public class AccountWhitelistController {
   }
 
   private boolean containsInvalidAccount(final List<String> accounts) {
-    return !accounts.stream().allMatch(this::isValidAccountString);
+    return !accounts.stream().allMatch(AccountWhitelistController::isValidAccountString);
   }
 
-  private boolean isValidAccountString(final String account) {
+  static boolean isValidAccountString(final String account) {
     try {
       BytesValue bytesValue = BytesValue.fromHexString(account);
       return bytesValue.size() == ACCOUNT_BYTES_SIZE;
