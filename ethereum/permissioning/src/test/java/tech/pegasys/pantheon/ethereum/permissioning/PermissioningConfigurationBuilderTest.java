@@ -15,16 +15,12 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
 
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-
+import com.google.common.io.Resources;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import com.google.common.io.Resources;
 import org.junit.Test;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 
 public class PermissioningConfigurationBuilderTest {
 
@@ -35,6 +31,8 @@ public class PermissioningConfigurationBuilderTest {
       "permissioning_config_node_whitelist_only.toml";
   static final String PERMISSIONING_CONFIG_INVALID_ENODE =
       "permissioning_config_invalid_enode.toml";
+  static final String PERMISSIONING_CONFIG_INVALID_ACCOUNT =
+      "permissioning_config_invalid_account.toml";
   static final String PERMISSIONING_CONFIG_EMPTY_WHITELISTS =
       "permissioning_config_empty_whitelists.toml";
   static final String PERMISSIONING_CONFIG_ABSENT_WHITELISTS =
@@ -102,6 +100,22 @@ public class PermissioningConfigurationBuilderTest {
     assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist())
         .containsExactly("0x0000000000000000000000000000000000000009");
+  }
+
+  @Test
+  public void permissioningConfigWithInvalidAccount() throws Exception {
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_INVALID_ACCOUNT);
+    final Path toml = Files.createTempFile("toml", "");
+    Files.write(toml, Resources.toByteArray(configFile));
+
+    try {
+      PermissioningConfigurationBuilder.permissioningConfiguration(
+          toml.toAbsolutePath().toString(), true, true);
+      fail("Expecting IllegalArgumentException: Illegal character 'o' found at index 1");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage()).startsWith("Illegal character 'o' found at index 1");
+    }
   }
 
   @Test

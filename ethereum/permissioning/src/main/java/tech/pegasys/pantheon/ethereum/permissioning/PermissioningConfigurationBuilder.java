@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
+import tech.pegasys.pantheon.ethereum.core.*;
 
 public class PermissioningConfigurationBuilder {
 
@@ -64,6 +65,8 @@ public class PermissioningConfigurationBuilder {
                 .toList()
                 .parallelStream()
                 .map(Object::toString)
+                .map(Address::fromHexString)
+                .map(Address::toString)
                 .collect(Collectors.toList());
         permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
       } else {
