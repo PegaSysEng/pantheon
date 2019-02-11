@@ -13,10 +13,8 @@
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -33,8 +31,6 @@ public class ECRECPrecompiledContractTest {
       new ECRECPrecompiledContract(new SpuriousDragonGasCalculator());
 
   public ECRECPrecompiledContractTest() {}
-
-  private MessageFrame messageFrame = mock(MessageFrame.class);
 
   @Parameters
   public static Object[][] parameters() {
@@ -460,6 +456,6 @@ public class ECRECPrecompiledContractTest {
     final BytesValue input = BytesValue.fromHexString(this.input);
     final BytesValue expected =
         expectedResult == null ? BytesValue.EMPTY : Bytes32.fromHexString(expectedResult);
-    assertThat(contract.compute(input, messageFrame)).isEqualTo(expected);
+    assertThat(contract.compute(input)).isEqualTo(expected);
   }
 }

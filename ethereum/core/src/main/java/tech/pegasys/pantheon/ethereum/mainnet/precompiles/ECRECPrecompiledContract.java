@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
@@ -42,7 +41,7 @@ public class ECRECPrecompiledContract extends AbstractPrecompiledContract {
   }
 
   @Override
-  public BytesValue compute(final BytesValue input, final MessageFrame messageFrame) {
+  public BytesValue compute(final BytesValue input) {
     final int size = input.size();
     final BytesValue d =
         size >= 128 ? input : BytesValue.wrap(input, MutableBytesValue.create(128 - size));

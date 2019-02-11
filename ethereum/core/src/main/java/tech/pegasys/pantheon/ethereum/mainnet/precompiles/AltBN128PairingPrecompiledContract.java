@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.crypto.altbn128.Fq2;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
@@ -52,7 +51,7 @@ public class AltBN128PairingPrecompiledContract extends AbstractPrecompiledContr
   }
 
   @Override
-  public BytesValue compute(final BytesValue input, final MessageFrame messageFrame) {
+  public BytesValue compute(final BytesValue input) {
     if (input.isEmpty()) {
       return TRUE;
     }

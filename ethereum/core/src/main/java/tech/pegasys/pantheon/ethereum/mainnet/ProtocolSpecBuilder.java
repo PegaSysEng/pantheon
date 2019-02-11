@@ -15,14 +15,11 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.ethereum.BlockValidator;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.privacy.PrivacyPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
 import tech.pegasys.pantheon.ethereum.vm.EVM;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 
@@ -54,7 +51,6 @@ public class ProtocolSpecBuilder<T> {
   private String name;
   private MiningBeneficiaryCalculator miningBeneficiaryCalculator;
   private PrivacyParameters privacyParameters;
-  private PrivateTransactionProcessorBuilder privateTransactionProcessorBuilder;
 
   public ProtocolSpecBuilder<T> gasCalculator(final Supplier<GasCalculator> gasCalculatorBuilder) {
     this.gasCalculatorBuilder = gasCalculatorBuilder;
@@ -150,12 +146,6 @@ public class ProtocolSpecBuilder<T> {
     return this;
   }
 
-  public ProtocolSpecBuilder<T> privateTransactionProcessorBuilder(
-      final PrivateTransactionProcessorBuilder privateTransactionProcessorBuilder) {
-    this.privateTransactionProcessorBuilder = privateTransactionProcessorBuilder;
-    return this;
-  }
-
   public ProtocolSpecBuilder<T> blockProcessorBuilder(
       final BlockProcessorBuilder blockProcessorBuilder) {
     this.blockProcessorBuilder = blockProcessorBuilder;
@@ -212,7 +202,6 @@ public class ProtocolSpecBuilder<T> {
         .precompileContractRegistryBuilder(precompileContractRegistryBuilder)
         .messageCallProcessorBuilder(messageCallProcessorBuilder)
         .transactionProcessorBuilder(transactionProcessorBuilder)
-        .privateTransactionProcessorBuilder(privateTransactionProcessorBuilder)
         .blockHeaderValidatorBuilder(blockHeaderValidatorBuilder)
         .ommerHeaderValidatorBuilder(ommerHeaderValidatorBuilder)
         .blockBodyValidatorBuilder(blockBodyValidatorBuilder)
@@ -236,7 +225,6 @@ public class ProtocolSpecBuilder<T> {
     checkNotNull(precompileContractRegistryBuilder, "Missing precompile contract registry");
     checkNotNull(messageCallProcessorBuilder, "Missing message call processor");
     checkNotNull(transactionProcessorBuilder, "Missing transaction processor");
-    checkNotNull(privateTransactionProcessorBuilder, "Missing transaction processor");
     checkNotNull(blockHeaderValidatorBuilder, "Missing block header validator");
     checkNotNull(blockBodyValidatorBuilder, "Missing block body validator");
     checkNotNull(blockProcessorBuilder, "Missing block processor");
@@ -267,18 +255,6 @@ public class ProtocolSpecBuilder<T> {
     final TransactionProcessor transactionProcessor =
         transactionProcessorBuilder.apply(
             gasCalculator, transactionValidator, contractCreationProcessor, messageCallProcessor);
-
-    // Set private Tx Processor
-    if (privacyParameters.isEnabled()) {
-      final PrivateTransactionProcessor privateTransactionProcessor =
-          privateTransactionProcessorBuilder.apply(
-              gasCalculator, transactionValidator, contractCreationProcessor, messageCallProcessor);
-      Address address = Address.privacyPrecompiled(privacyParameters.getPrivacyAddress());
-      PrivacyPrecompiledContract privacyPrecompiledContract =
-          (PrivacyPrecompiledContract) precompileContractRegistry.get(address);
-      privacyPrecompiledContract.setPrivateTransactionProcessor(privateTransactionProcessor);
-    }
-
     final BlockHeaderValidator<T> blockHeaderValidator =
         blockHeaderValidatorBuilder.apply(difficultyCalculator);
     final BlockHeaderValidator<T> ommerHeaderValidator =
@@ -310,20 +286,11 @@ public class ProtocolSpecBuilder<T> {
         difficultyCalculator,
         blockReward,
         transactionReceiptType,
-        miningBeneficiaryCalculator,
-        precompileContractRegistry);
+        miningBeneficiaryCalculator);
   }
 
   public interface TransactionProcessorBuilder {
     TransactionProcessor apply(
-        GasCalculator gasCalculator,
-        TransactionValidator transactionValidator,
-        AbstractMessageProcessor contractCreationProcessor,
-        AbstractMessageProcessor messageCallProcessor);
-  }
-
-  public interface PrivateTransactionProcessorBuilder {
-    PrivateTransactionProcessor apply(
         GasCalculator gasCalculator,
         TransactionValidator transactionValidator,
         AbstractMessageProcessor contractCreationProcessor,

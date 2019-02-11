@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.crypto.altbn128.Fq;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
 
@@ -40,7 +39,7 @@ public class AltBN128MulPrecompiledContract extends AbstractPrecompiledContract 
   }
 
   @Override
-  public BytesValue compute(final BytesValue input, final MessageFrame messageFrame) {
+  public BytesValue compute(final BytesValue input) {
     final BigInteger x = extractParameter(input, 0, 32);
     final BigInteger y = extractParameter(input, 32, 32);
     final BigInteger n = extractParameter(input, 64, 32);
