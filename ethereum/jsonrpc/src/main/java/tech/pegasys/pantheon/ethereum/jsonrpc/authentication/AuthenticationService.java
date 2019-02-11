@@ -33,7 +33,7 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.web.RoutingContext;
 
-/** Provides authentication handlers for use in the http & websocket services */
+/** Provides authentication handlers for use in the http and websocket services */
 public class AuthenticationService {
   private final JWTAuth jwtAuthProvider;
   @VisibleForTesting public final JWTAuthOptions jwtAuthOptions;
