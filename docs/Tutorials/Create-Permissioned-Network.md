@@ -210,36 +210,35 @@ The nodes cannot be started while the previously generated data is in the `datab
 Start Node-1:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-1-data-path --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73      
+pantheon --data-path=Node-1-data-path --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=*      
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-1-data-path --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73     
+pantheon --data-path=Node-1-data-path --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=*    
 ```
 
 The command line specifies: 
 
 * Nodes and accounts permissions are enabled using the [`--permissions-nodes-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-enabled)
 and [`--permissions-accounts-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-enabled)
-* JSON-RPC API is enabled using the [`--rpc-http-enabled` option](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled)
+* JSON-RPC API is enabled using the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option
 *  ETH,NET,PERM, and CLIQUE APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
-* All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist` option](../Reference/Pantheon-CLI-Syntax.md#host-whitelist). 
+* All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option 
+* All domains can access the node using the HTTP JSON-RPC API using the [`--rpc-http-cors-origins`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-cors-origins) option. 
 
-!!! info
-    The miner coinbase account is an account defined in the genesis file. 
 
 ### 8. Start Node-2 
 
 You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Node-1 to specify Node-1 as a bootnode. 
 
-Start another terminal, change to the `Node-2` directory and start Node-2 replacing the enode URL with your bootonde:
+Start another terminal, change to the `Node-2` directory and start Node-2 replacing the public key in the enode URL with your bootonde:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-2-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30304 --rpc-http-port=8546    
+pantheon --data-path=Node-2-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30304 --rpc-http-port=8546    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30304 --rpc-http-port=8546   
+pantheon --data-path=Node-2-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30304 --rpc-http-port=8546   
 ```
 
 The command line specifies:
@@ -253,14 +252,14 @@ The command line specifies:
 
 ### 9. Start Node-3
 
-Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootonde:
+Start another terminal, change to the `Node-3` directory and start Node-3 replacing the public key in the enode URL with your bootonde:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-3-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30305 --rpc-http-port=8547    
+pantheon --data-path=Node-3-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-3-data-path --bootnodes="<enode://publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --p2p-port=30305 --rpc-http-port=8547   
+pantheon --data-path=Node-3-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547   
 ```
 
 The command line specifies:
