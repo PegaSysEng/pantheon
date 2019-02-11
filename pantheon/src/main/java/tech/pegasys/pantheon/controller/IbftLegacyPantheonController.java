@@ -48,7 +48,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
-import tech.pegasys.pantheon.ethereum.storage.Storage;
+import tech.pegasys.pantheon.ethereum.storage.DataStores;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -112,8 +112,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
     final IbftConfigOptions ibftConfig =
         genesisConfig.getConfigOptions().getIbftLegacyConfigOptions();
 
-    final Storage<IbftContext> storage =
-        Storage.initStorage(
+    final DataStores<IbftContext> dataStores =
+        DataStores.initDataStores(
             storageProvider,
             genesisState,
             protocolSchedule,
@@ -128,7 +128,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               return new IbftContext(voteTally, voteProposer);
             });
 
-    final ProtocolContext<IbftContext> protocolContext = storage.getProtocolContext();
+    final ProtocolContext<IbftContext> protocolContext = dataStores.getProtocolContext();
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
@@ -167,7 +167,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             syncConfig,
             protocolSchedule,
             protocolContext,
-            storage.getWorldStateStorage(),
+            dataStores.getWorldStateStorage(),
             ethProtocolManager.ethContext(),
             syncState,
             dataDirectory,

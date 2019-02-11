@@ -25,18 +25,18 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.function.BiFunction;
 
-public class Storage<T> {
+public class DataStores<T> {
 
   private final ProtocolContext<T> protocolContext;
   private final WorldStateStorage worldStateStorage;
 
-  private Storage(
+  private DataStores(
       final ProtocolContext<T> protocolContext, final WorldStateStorage worldStateStorage) {
     this.protocolContext = protocolContext;
     this.worldStateStorage = worldStateStorage;
   }
 
-  public static <T> Storage<T> initStorage(
+  public static <T> DataStores<T> initDataStores(
       final StorageProvider storageProvider,
       final GenesisState genesisState,
       final ProtocolSchedule<T> protocolSchedule,
@@ -52,7 +52,7 @@ public class Storage<T> {
     final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
     genesisState.writeStateTo(worldStateArchive.getMutable());
 
-    return new Storage<>(
+    return new DataStores<>(
         new ProtocolContext<>(
             blockchain,
             worldStateArchive,

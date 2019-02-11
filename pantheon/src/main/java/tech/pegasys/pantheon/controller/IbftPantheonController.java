@@ -68,7 +68,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
-import tech.pegasys.pantheon.ethereum.storage.Storage;
+import tech.pegasys.pantheon.ethereum.storage.DataStores;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
@@ -136,8 +136,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final IbftConfigOptions ibftConfig = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
 
-    final Storage<IbftContext> storage =
-        Storage.initStorage(
+    final DataStores<IbftContext> dataStores =
+        DataStores.initDataStores(
             storageProvider,
             genesisState,
             protocolSchedule,
@@ -151,7 +151,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
               return new IbftContext(voteTally, voteProposer);
             });
 
-    final ProtocolContext<IbftContext> protocolContext = storage.getProtocolContext();
+    final ProtocolContext<IbftContext> protocolContext = dataStores.getProtocolContext();
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
     final VoteTally voteTally = protocolContext.getConsensusState().getVoteTally();
 
@@ -176,7 +176,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             syncConfig,
             protocolSchedule,
             protocolContext,
-            storage.getWorldStateStorage(),
+            dataStores.getWorldStateStorage(),
             ethProtocolManager.ethContext(),
             syncState,
             dataDirectory,
