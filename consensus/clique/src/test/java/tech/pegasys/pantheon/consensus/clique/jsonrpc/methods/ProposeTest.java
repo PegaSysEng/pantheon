@@ -65,9 +65,9 @@ public class ProposeTest {
     final Propose propose = new Propose(proposer, new JsonRpcParameter());
     final Address a1 = Address.fromHexString("1");
 
-    final JsonRpcResponse response = propose.response(requestWithParams(a1, false));
+    final JsonRpcResponse response = propose.response(requestWithParams(a1, true));
 
-    assertThat(proposer.get(a1)).isEqualTo(Optional.of(VoteType.DROP));
+    assertThat(proposer.get(a1)).isEqualTo(Optional.of(VoteType.ADD));
     assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
     final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
     assertThat(successResponse.getResult()).isEqualTo(true);

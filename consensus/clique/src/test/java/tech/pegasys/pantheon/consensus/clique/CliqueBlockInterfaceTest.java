@@ -40,7 +40,7 @@ public class CliqueBlockInterfaceTest {
   private static final Address proposerAddress =
       Util.publicKeyToAddress(proposerKeys.getPublicKey());
   private static final List<Address> validatorList = singletonList(proposerAddress);
-  public static final int EPOCH_BLOCK = 10;
+  private static final int EPOCH_BLOCK = 10;
 
   private final CliqueBlockInterface blockInterface = new CliqueBlockInterface();
 
@@ -114,7 +114,21 @@ public class CliqueBlockInterfaceTest {
   }
 
   @Test
-  public void blendingVoteOnEpochResultsInCoinbaseOfZero() {
+  public void blendingAddVoteOnEpochResultsInNonceAndCoinbaseOfZero() {
+    final ValidatorVote vote =
+        new ValidatorVote(ADD, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final BlockHeaderBuilder builderWithVote =
+        CliqueBlockInterface.insertVoteToHeaderBuilder(
+            builder, epochManager, Optional.of(vote), EPOCH_BLOCK);
+
+    final BlockHeader header = builderWithVote.buildBlockHeader();
+
+    assertThat(header.getCoinbase()).isEqualTo(AddressHelpers.ofValue(0));
+    assertThat(header.getNonce()).isEqualTo(0x0L);
+  }
+
+  @Test
+  public void blendingDropVoteOnEpochResultsInNonceAndCoinbaseOfZero() {
     final ValidatorVote vote =
         new ValidatorVote(DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
