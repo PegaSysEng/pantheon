@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.consensus.clique.CliqueBlockHashing;
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
-import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -41,7 +40,6 @@ import java.util.function.Function;
 public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
 
   private final KeyPair nodeKeys;
-  private final EpochManager epochManager;
 
   public CliqueBlockCreator(
       final Address coinbase,
@@ -52,8 +50,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
       final Function<Long, Long> gasLimitCalculator,
       final KeyPair nodeKeys,
       final Wei minTransactionGasPrice,
-      final BlockHeader parentHeader,
-      final EpochManager epochManager) {
+      final BlockHeader parentHeader) {
     super(
         coinbase,
         extraDataCalculator,
@@ -65,7 +62,6 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
         Util.publicKeyToAddress(nodeKeys.getPublicKey()),
         parentHeader);
     this.nodeKeys = nodeKeys;
-    this.epochManager = epochManager;
   }
 
   /**
@@ -97,8 +93,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
             .getVoteProposer()
             .getVote(Util.publicKeyToAddress(nodeKeys.getPublicKey()), voteTally);
     final BlockHeaderBuilder builderIncludingProposedVotes =
-        CliqueBlockInterface.insertVoteToHeaderBuilder(
-            builder, epochManager, vote, sealableBlockHeader.getNumber());
+        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, vote);
 
     final CliqueExtraData sealedExtraData =
         constructSignedExtraData(builderIncludingProposedVotes.buildBlockHeader());

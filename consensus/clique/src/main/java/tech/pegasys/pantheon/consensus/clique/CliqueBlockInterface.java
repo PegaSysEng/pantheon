@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.consensus.clique;
 
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
-import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -60,17 +59,14 @@ public class CliqueBlockInterface implements BlockInterface {
   }
 
   public static BlockHeaderBuilder insertVoteToHeaderBuilder(
-      final BlockHeaderBuilder builder,
-      final EpochManager epochManager,
-      final Optional<ValidatorVote> vote,
-      final long block) {
-    if (epochManager.isEpochBlock(block) || !vote.isPresent()) {
-      builder.nonce(voteToValue.get(VoteType.DROP));
-      builder.coinbase(NO_VOTE_SUBJECT);
-    } else {
+      final BlockHeaderBuilder builder, final Optional<ValidatorVote> vote) {
+    if (vote.isPresent()) {
       final ValidatorVote voteToCast = vote.get();
       builder.nonce(voteToValue.get(voteToCast.getVotePolarity()));
       builder.coinbase(voteToCast.getRecipient());
+    } else {
+      builder.nonce(voteToValue.get(VoteType.DROP));
+      builder.coinbase(NO_VOTE_SUBJECT);
     }
     return builder;
   }
