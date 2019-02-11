@@ -185,7 +185,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -267,7 +267,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -345,7 +345,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -436,7 +436,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -570,7 +570,7 @@ public class WorldStateDownloaderTest {
     }
 
     // Check that all expected account data was downloaded
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
 

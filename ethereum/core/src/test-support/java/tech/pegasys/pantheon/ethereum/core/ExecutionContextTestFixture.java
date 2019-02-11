@@ -55,6 +55,7 @@ public class ExecutionContextTestFixture {
             new NoOpMetricsSystem());
     this.stateArchive =
         new WorldStateArchive(new KeyValueStorageWorldStateStorage(keyValueStorage));
+    genesisState.writeStateTo(stateArchive.getMutable());
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = new ProtocolContext<>(blockchain, stateArchive, null);
 
