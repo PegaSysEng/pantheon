@@ -12,19 +12,24 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.websocket;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.net.SocketAddress;
+import io.vertx.ext.web.Router;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,6 +38,7 @@ public class WebSocketService {
   private static final Logger LOG = LogManager.getLogger();
 
   private static final InetSocketAddress EMPTY_SOCKET_ADDRESS = new InetSocketAddress("0.0.0.0", 0);
+  private static final String APPLICATION_JSON = "application/json";
 
   private final Vertx vertx;
   private final WebSocketConfiguration configuration;
@@ -40,13 +46,28 @@ public class WebSocketService {
 
   private HttpServer httpServer;
 
+  @VisibleForTesting public final Optional<AuthenticationService> authenticationService;
+
   public WebSocketService(
       final Vertx vertx,
       final WebSocketConfiguration configuration,
       final WebSocketRequestHandler websocketRequestHandler) {
+    this(
+        vertx,
+        configuration,
+        websocketRequestHandler,
+        AuthenticationService.create(vertx, configuration));
+  }
+
+  private WebSocketService(
+      final Vertx vertx,
+      final WebSocketConfiguration configuration,
+      final WebSocketRequestHandler websocketRequestHandler,
+      final Optional<AuthenticationService> authenticationService) {
     this.vertx = vertx;
     this.configuration = configuration;
     this.websocketRequestHandler = websocketRequestHandler;
+    this.authenticationService = authenticationService;
   }
 
   public CompletableFuture<?> start() {
@@ -106,8 +127,29 @@ public class WebSocketService {
   }
 
   private Handler<HttpServerRequest> httpHandler() {
-    return http ->
-        http.response().setStatusCode(400).end("Websocket endpoint can't handle HTTP requests");
+    final Router router = Router.router(vertx);
+    if (authenticationService.isPresent()) {
+      router
+          .route("/login")
+          .method(HttpMethod.POST)
+          .produces(APPLICATION_JSON)
+          .handler(authenticationService.get()::handleLogin);
+    } else {
+      router
+          .route("/login")
+          .method(HttpMethod.POST)
+          .produces(APPLICATION_JSON)
+          .handler(AuthenticationService::handleDisabledLogin);
+    }
+
+    router
+        .route()
+        .handler(
+            http ->
+                http.response()
+                    .setStatusCode(400)
+                    .end("Websocket endpoint can't handle HTTP requests"));
+    return router;
   }
 
   private Handler<AsyncResult<HttpServer>> startHandler(final CompletableFuture<?> resultFuture) {
