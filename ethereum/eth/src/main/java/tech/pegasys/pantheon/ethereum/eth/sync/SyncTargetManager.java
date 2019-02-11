@@ -80,7 +80,9 @@ public abstract class SyncTargetManager<C> {
                     .run()
                     .handle(
                         (result, error) -> {
-                          LOG.debug("Failed to find common ancestor", error);
+                          if (error != null) {
+                            LOG.debug("Failed to find common ancestor", error);
+                          }
                           return result;
                         })
                     .thenCompose(
