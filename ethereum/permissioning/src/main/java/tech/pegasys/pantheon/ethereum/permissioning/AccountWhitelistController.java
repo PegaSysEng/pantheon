@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -22,7 +24,10 @@ import java.util.List;
 
 public class AccountWhitelistController {
 
+  private static final Logger LOG = LogManager.getLogger();
+
   private static final int ACCOUNT_BYTES_SIZE = 20;
+  private PermissioningConfiguration configuration;
   private List<String> accountWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
 
@@ -33,6 +38,10 @@ public class AccountWhitelistController {
   public AccountWhitelistController(
       final PermissioningConfiguration configuration, final WhitelistPersistor whitelistPersistor) {
     this.whitelistPersistor = whitelistPersistor;
+    readAccountsFromConfig(configuration);
+  }
+
+  private void readAccountsFromConfig(final PermissioningConfiguration configuration) {
     if (configuration != null && configuration.isAccountWhitelistEnabled()) {
       if (!configuration.getAccountWhitelist().isEmpty()) {
         addAccounts(configuration.getAccountWhitelist());
@@ -144,6 +153,25 @@ public class AccountWhitelistController {
       return bytesValue.size() == ACCOUNT_BYTES_SIZE;
     } catch (NullPointerException | IndexOutOfBoundsException | IllegalArgumentException e) {
       return false;
+    }
+  }
+
+  public synchronized void reload() throws RuntimeException {
+    final ArrayList<String> currentAccountsList = new ArrayList<>(accountWhitelist);
+    accountWhitelist.clear();
+
+    try {
+      final PermissioningConfiguration updatedConfig = PermissioningConfigurationBuilder
+          .permissioningConfigurationFromToml(configuration.getConfigurationFilePath(),
+              configuration.isNodeWhitelistEnabled(), configuration.isAccountWhitelistEnabled());
+      readAccountsFromConfig(updatedConfig);
+      this.configuration = updatedConfig;
+    } catch (Exception e) {
+      LOG.warn(
+          "Error reloading permissions file. In-memory whitelisted accounts will be reverted to previous valid configuration. "
+              + "Details: {}", e.getMessage());
+      this.accountWhitelist.addAll(currentAccountsList);
+      throw new RuntimeException(e);
     }
   }
 }

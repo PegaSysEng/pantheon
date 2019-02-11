@@ -14,6 +14,9 @@ package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -21,8 +24,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController.NodesWhitelistResult;
 
+import com.google.common.io.Resources;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistFileSyncException;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
@@ -264,5 +276,47 @@ public class NodeWhitelistControllerTest {
     verify(whitelistPersistor, times(3)).verifyConfigFileMatchesState(any(), any());
     verify(whitelistPersistor, times(2)).updateConfig(any(), any());
     verifyNoMoreInteractions(whitelistPersistor);
+  }
+
+  @Test
+  public void reloadNodeWhitelistWithValidConfigFileShouldUpdateWhitelist() throws Exception {
+    final String expectedEnodeURL = "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.9:4567";
+    final Path permissionsFile = createPermissionsFileWithNode(expectedEnodeURL);
+    final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
+
+    when(permissioningConfig.getConfigurationFilePath()).thenReturn(permissionsFile.toAbsolutePath().toString());
+    when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
+    when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(expectedEnodeURL)));
+    controller = new NodeWhitelistController(permissioningConfig);
+
+    controller.reload();
+
+    assertThat(controller.getNodesWhitelist()).containsExactly(DefaultPeer.fromURI(expectedEnodeURL));
+  }
+
+  @Test
+  public void reloadNodeWhitelistWithErrorReadingConfigFileShouldKeepOldWhitelist() {
+    final String expectedEnodeURI = "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.9:4567";
+    final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
+
+    when(permissioningConfig.getConfigurationFilePath()).thenReturn("foo");
+    when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
+    when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(expectedEnodeURI)));
+    controller = new NodeWhitelistController(permissioningConfig);
+
+    final Throwable thrown = catchThrowable(() -> controller.reload());
+
+    assertThat(thrown)
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("Unable to read permissions TOML config file");
+
+    assertThat(controller.getNodesWhitelist()).containsExactly(DefaultPeer.fromURI(expectedEnodeURI));
+  }
+
+  private Path createPermissionsFileWithNode(final String node) throws IOException {
+    final String nodePermissionsFileContent = "nodes-whitelist=[\"" + node + "\"]";
+    final Path permissionsFile = Files.createTempFile("node_permissions", "");
+    Files.write(permissionsFile, nodePermissionsFileContent.getBytes(StandardCharsets.UTF_8));
+    return permissionsFile;
   }
 }
