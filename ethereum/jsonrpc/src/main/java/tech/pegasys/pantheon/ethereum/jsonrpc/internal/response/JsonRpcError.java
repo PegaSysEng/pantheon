@@ -65,9 +65,17 @@ public enum JsonRpcError {
   NODE_WHITELIST_EXISTING_ENTRY(-32000, "Cannot add an existing node to whitelist"),
   NODE_WHITELIST_MISSING_ENTRY(-32000, "Cannot remove an absent node from whitelist"),
 
+  // Permissioning/persistence errors
+  WHITELIST_PERSIST_FAILURE(
+      -32000, "Unable to persist changes to whitelist configuration file. Changes reverted"),
+  WHITELIST_FILE_SYNC(
+      -32000,
+      "The permissioning whitelist configuration file is out of sync.  The changes have been applied, but not persisted to disk"),
+
   // Permissioning/Authorization errors
   UNAUTHORIZED(-40100, "Unauthorized"),
 
+  // Privacy errors
   ENCLAVE_IS_DOWN(-32000, "Enclave is down");
 
   private final int code;
