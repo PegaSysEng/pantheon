@@ -33,7 +33,7 @@ public class WorldStateArchive {
   }
 
   public Optional<MutableWorldState> getMutable(final Hash rootHash) {
-    if (!storage.contains(rootHash)) {
+    if (!storage.isWorldStateAvailable(rootHash)) {
       return Optional.empty();
     }
     return Optional.of(new DefaultMutableWorldState(rootHash, storage));

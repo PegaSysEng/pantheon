@@ -160,6 +160,7 @@ public class DefaultMutableWorldState implements MutableWorldState {
     updatedStorageTries.clear();
     updatedAccountCode.clear();
 
+    updater.markWorldStateAvailable(this.rootHash());
     // Push changes to underlying storage
     updater.commit();
   }

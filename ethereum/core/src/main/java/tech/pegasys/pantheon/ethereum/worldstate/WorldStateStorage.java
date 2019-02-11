@@ -28,6 +28,8 @@ public interface WorldStateStorage {
 
   Optional<BytesValue> getNodeData(Bytes32 hash);
 
+  boolean isWorldStateAvailable(Bytes32 rootHash);
+
   default boolean contains(final Bytes32 hash) {
     return getNodeData(hash).isPresent();
   }
@@ -47,6 +49,8 @@ public interface WorldStateStorage {
     Updater putAccountStateTrieNode(Bytes32 nodeHash, BytesValue node);
 
     Updater putAccountStorageTrieNode(Bytes32 nodeHash, BytesValue node);
+
+    void markWorldStateAvailable(Bytes32 rootHash);
 
     void commit();
 

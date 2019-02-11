@@ -68,6 +68,11 @@ public class KeyValueStorageWorldStateStorage implements WorldStateStorage {
   }
 
   @Override
+  public boolean isWorldStateAvailable(final Bytes32 rootHash) {
+    return contains(rootHash);
+  }
+
+  @Override
   public Updater updater() {
     return new Updater(keyValueStorage.startTransaction());
   }
@@ -109,6 +114,9 @@ public class KeyValueStorageWorldStateStorage implements WorldStateStorage {
       transaction.put(nodeHash, node);
       return this;
     }
+
+    @Override
+    public void markWorldStateAvailable(final Bytes32 rootHash) {}
 
     @Override
     public void commit() {
