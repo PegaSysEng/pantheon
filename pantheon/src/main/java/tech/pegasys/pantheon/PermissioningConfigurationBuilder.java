@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon;
 
-import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 
 import java.net.URI;
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 
 import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 public class PermissioningConfigurationBuilder {
 
@@ -81,7 +81,7 @@ public class PermissioningConfigurationBuilder {
                 .toList()
                 .parallelStream()
                 .map(Object::toString)
-                .map(EnodeToURIPropertyConverter::convertToURI)
+                .map(EnodeURL::asURI)
                 .collect(Collectors.toList());
         permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
       } else {
