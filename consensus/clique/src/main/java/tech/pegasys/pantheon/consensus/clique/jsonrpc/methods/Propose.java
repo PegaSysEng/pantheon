@@ -38,10 +38,12 @@ public class Propose implements JsonRpcMethod {
   public JsonRpcResponse response(final JsonRpcRequest request) {
     final Address address = parameters.required(request.getParams(), 0, Address.class);
     final Boolean auth = parameters.required(request.getParams(), 1, Boolean.class);
-    if (auth) {
-      proposer.auth(address);
-    } else {
-      proposer.drop(address);
+    if (!address.isZero()) {
+      if (auth) {
+        proposer.auth(address);
+      } else {
+        proposer.drop(address);
+      }
     }
     // Return true regardless, the vote is always recorded
     return new JsonRpcSuccessResponse(request.getId(), true);
