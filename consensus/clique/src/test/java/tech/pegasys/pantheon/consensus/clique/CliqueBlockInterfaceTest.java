@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.consensus.common.VoteType.ADD;
 import static tech.pegasys.pantheon.consensus.common.VoteType.DROP;
 
+import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -39,6 +40,7 @@ public class CliqueBlockInterfaceTest {
   private static final Address proposerAddress =
       Util.publicKeyToAddress(proposerKeys.getPublicKey());
   private static final List<Address> validatorList = singletonList(proposerAddress);
+  private static final int EPOCH_BLOCK = 10;
 
   private final CliqueBlockInterface blockInterface = new CliqueBlockInterface();
 
@@ -46,6 +48,8 @@ public class CliqueBlockInterfaceTest {
 
   private final BlockHeader header =
       TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
+
+  private final EpochManager epochManager = new EpochManager(10);
 
   private final BlockHeaderBuilder builder =
       BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
@@ -87,7 +91,7 @@ public class CliqueBlockInterfaceTest {
     final ValidatorVote vote =
         new ValidatorVote(ADD, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
-        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, Optional.of(vote));
+        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, epochManager, Optional.of(vote), 1);
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -101,7 +105,7 @@ public class CliqueBlockInterfaceTest {
     final ValidatorVote vote =
         new ValidatorVote(DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
     final BlockHeaderBuilder builderWithVote =
-        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, Optional.of(vote));
+        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, epochManager, Optional.of(vote), 1);
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
@@ -110,9 +114,37 @@ public class CliqueBlockInterfaceTest {
   }
 
   @Test
+  public void blendingAddVoteOnEpochResultsInNonceAndCoinbaseOfZero() {
+    final ValidatorVote vote =
+        new ValidatorVote(ADD, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final BlockHeaderBuilder builderWithVote =
+        CliqueBlockInterface.insertVoteToHeaderBuilder(
+            builder, epochManager, Optional.of(vote), EPOCH_BLOCK);
+
+    final BlockHeader header = builderWithVote.buildBlockHeader();
+
+    assertThat(header.getCoinbase()).isEqualTo(AddressHelpers.ofValue(0));
+    assertThat(header.getNonce()).isEqualTo(0x0L);
+  }
+
+  @Test
+  public void blendingDropVoteOnEpochResultsInNonceAndCoinbaseOfZero() {
+    final ValidatorVote vote =
+        new ValidatorVote(DROP, AddressHelpers.ofValue(1), AddressHelpers.ofValue(2));
+    final BlockHeaderBuilder builderWithVote =
+        CliqueBlockInterface.insertVoteToHeaderBuilder(
+            builder, epochManager, Optional.of(vote), EPOCH_BLOCK);
+
+    final BlockHeader header = builderWithVote.buildBlockHeader();
+
+    assertThat(header.getCoinbase()).isEqualTo(AddressHelpers.ofValue(0));
+    assertThat(header.getNonce()).isEqualTo(0x0L);
+  }
+
+  @Test
   public void nonVoteBlendedIntoHeaderResultsInACoinbaseOfZero() {
     final BlockHeaderBuilder builderWithVote =
-        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, Optional.empty());
+        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, epochManager, Optional.empty(), 1);
 
     final BlockHeader header = builderWithVote.buildBlockHeader();
 
