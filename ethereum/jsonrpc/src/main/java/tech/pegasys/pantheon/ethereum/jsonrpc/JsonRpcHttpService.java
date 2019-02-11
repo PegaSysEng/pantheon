@@ -308,6 +308,10 @@ public class JsonRpcHttpService {
     };
   }
 
+  private boolean requiresAuthentication(final RoutingContext routingContext) {
+    return (jwtAuthProvider.isPresent());
+  }
+
   @VisibleForTesting
   public boolean isPermitted(final Optional<User> optionalUser, final JsonRpcMethod jsonRpcMethod) {
 
@@ -345,20 +349,21 @@ public class JsonRpcHttpService {
   }
 
   private void getUser(final String token, final Handler<Optional<User>> handler) {
-
-    if (!jwtAuthProvider.isPresent()) {
+    try {
+      if (!jwtAuthProvider.isPresent()) {
+        handler.handle(Optional.empty());
+      } else {
+        jwtAuthProvider
+            .get()
+            .authenticate(
+                new JsonObject().put("jwt", token),
+                (r) -> {
+                  final User user = r.result();
+                  handler.handle(Optional.of(user));
+                });
+      }
+    } catch (Exception e) {
       handler.handle(Optional.empty());
-    }
-
-    if (jwtAuthProvider.isPresent()) {
-      jwtAuthProvider
-          .get()
-          .authenticate(
-              new JsonObject().put("jwt", token),
-              (r) -> {
-                final User user = r.result();
-                handler.handle(Optional.of(user));
-              });
     }
   }
 
@@ -413,35 +418,36 @@ public class JsonRpcHttpService {
   }
 
   private void handleJsonRPCRequest(final RoutingContext routingContext) {
-    // first check token if authentication is enabled
+    // first check token if authentication is required
     String token = getToken(routingContext);
-    if (jwtAuthProvider.isPresent() && token == null) {
-      handleJsonRpcError(routingContext, null, JsonRpcError.UNAUTHORIZED);
-    }
-
-    // Parse json
-    try {
-      final String json = routingContext.getBodyAsString().trim();
-      if (!json.isEmpty() && json.charAt(0) == '{') {
-        getUser(
-            token,
-            user -> {
-              handleJsonSingleRequest(routingContext, new JsonObject(json), user);
-            });
-      } else {
-        final JsonArray array = new JsonArray(json);
-        if (array.size() < 1) {
-          handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
-          return;
+    if (requiresAuthentication(routingContext) && token != null) {
+      // Parse json
+      try {
+        final String json = routingContext.getBodyAsString().trim();
+        if (!json.isEmpty() && json.charAt(0) == '{') {
+          getUser(
+              token,
+              user -> {
+                handleJsonSingleRequest(routingContext, new JsonObject(json), user);
+              });
+        } else {
+          final JsonArray array = new JsonArray(json);
+          if (array.size() < 1) {
+            handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
+            return;
+          }
+          getUser(
+              token,
+              user -> {
+                handleJsonBatchRequest(routingContext, array, user);
+              });
         }
-        getUser(
-            token,
-            user -> {
-              handleJsonBatchRequest(routingContext, array, user);
-            });
+      } catch (final DecodeException ex) {
+        handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
       }
-    } catch (final DecodeException ex) {
-      handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
+    } else {
+      // no auth token when auth required
+      handleJsonRpcError(routingContext, null, JsonRpcError.UNAUTHORIZED);
     }
   }
 
