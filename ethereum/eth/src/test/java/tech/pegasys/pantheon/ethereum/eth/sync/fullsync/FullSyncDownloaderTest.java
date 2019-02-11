@@ -530,7 +530,7 @@ public class FullSyncDownloaderTest {
     secondBestPeer.respondWhileOtherThreadsWork(
         secondBestResponder,
         () -> localBlockchain.getChainHeadBlockNumber() != secondBestPeerChainHead);
-    
+
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(secondBestPeerChainHead);
   }
 
