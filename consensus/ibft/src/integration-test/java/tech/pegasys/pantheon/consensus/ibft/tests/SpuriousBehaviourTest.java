@@ -13,14 +13,13 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommitPayload;
+import static tech.pegasys.pantheon.consensus.ibft.support.IntegrationTestHelpers.createSignedCommitPayload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.NodeParams;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
@@ -63,20 +62,19 @@ public class SpuriousBehaviourTest {
   private final RoundSpecificPeers peers = context.roundSpecificPeers(roundId);
 
   private Block proposedBlock = context.createBlockForProposalFromChainHead(0, 30);
-  private SignedData<PreparePayload> expectedPrepare;
-  private SignedData<CommitPayload> expectedCommit;
+  private Prepare expectedPrepare;
+  private Commit expectedCommit;
 
   @Before
   public void setup() {
     context.getController().start();
 
     expectedPrepare =
-        context
-            .getLocalNodeMessageFactory()
-            .createSignedPreparePayload(roundId, proposedBlock.getHash());
+        context.getLocalNodeMessageFactory().createPrepare(roundId, proposedBlock.getHash());
     expectedCommit =
-        createSignedCommitPayload(
-            roundId, proposedBlock, context.getLocalNodeParams().getNodeKeyPair());
+        new Commit(
+            createSignedCommitPayload(
+                roundId, proposedBlock, context.getLocalNodeParams().getNodeKeyPair()));
   }
 
   @Test

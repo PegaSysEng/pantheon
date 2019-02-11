@@ -32,7 +32,7 @@ dependencies {
   implementation project(':ethereum:trie')
   implementation project(':ethereum:permissioning')
   implementation project(':metrics')
-  implementation project(':orion')
+  implementation project(':enclave')
   implementation project(':services:kvstore')
 
   implementation 'com.fasterxml.jackson.core:jackson-databind'
@@ -55,6 +55,8 @@ dependencies {
   integrationTestImplementation 'junit:junit'
   integrationTestImplementation 'org.assertj:assertj-core'
   integrationTestImplementation 'org.mockito:mockito-core'
+  integrationTestImplementation project(':testutil')
+  integrationTestImplementation 'net.consensys:orion'
 
   testSupportImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   testSupportImplementation project(':testutil')

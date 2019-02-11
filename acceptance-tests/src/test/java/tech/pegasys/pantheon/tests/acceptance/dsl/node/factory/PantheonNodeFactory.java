@@ -111,6 +111,17 @@ public class PantheonNodeFactory {
             .build());
   }
 
+  public PantheonNode createArchiveNodeWithAuthentication(final String name)
+      throws IOException, URISyntaxException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .jsonRpcEnabled()
+            .jsonRpcAuthenticationEnabled()
+            .webSocketEnabled()
+            .build());
+  }
+
   public PantheonNode createNodeWithP2pDisabled(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
@@ -186,27 +197,6 @@ public class PantheonNodeFactory {
             .setName(name)
             .miningEnabled()
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
-            .setPermissioningConfiguration(permissioningConfiguration)
-            .build());
-  }
-
-  public PantheonNode createNodeWithNodesWhitelistAndPermRPC(
-      final String name, final List<URI> nodesWhitelist) throws IOException {
-    PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-
-    JsonRpcConfiguration rpcConfig = JsonRpcConfiguration.createDefault();
-
-    rpcConfig.setEnabled(true);
-    rpcConfig.setPort(0);
-    rpcConfig.setHostsWhitelist(singletonList("*"));
-    rpcConfig.addRpcApi(RpcApis.PERM);
-
-    return create(
-        new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setJsonRpcConfiguration(rpcConfig)
             .setPermissioningConfiguration(permissioningConfiguration)
             .build());
   }

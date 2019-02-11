@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 
 import java.util.Collection;
@@ -41,40 +40,45 @@ public class MessageValidatorFactory {
     this.protocolContext = protocolContext;
   }
 
-  public MessageValidator createMessageValidator(
-      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
+  private SignedDataValidator createSignedDataValidator(
+      final ConsensusRoundIdentifier roundIdentifier) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
 
-    return new MessageValidator(
+    return new SignedDataValidator(
         protocolContext.getConsensusState().getVoteTally().getValidators(),
         proposerSelector.selectProposerForRound(roundIdentifier),
         roundIdentifier,
         blockValidator,
-        protocolContext,
-        parentHeader);
+        protocolContext);
   }
 
-  public RoundChangeMessageValidator createRoundChangeMessageValidator(
-      final BlockHeader parentHeader) {
+  public MessageValidator createMessageValidator(final ConsensusRoundIdentifier roundIdentifier) {
+    return new MessageValidator(createSignedDataValidator(roundIdentifier));
+  }
+
+  public RoundChangeMessageValidator createRoundChangeMessageValidator(final long chainHeight) {
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
+
     return new RoundChangeMessageValidator(
-        roundIdentifier -> createMessageValidator(roundIdentifier, parentHeader),
-        validators,
-        prepareMessageCountForQuorum(
-            IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
-        parentHeader.getNumber() + 1);
+        new RoundChangePayloadValidator(
+            this::createSignedDataValidator,
+            validators,
+            prepareMessageCountForQuorum(
+                IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
+            chainHeight));
   }
 
-  public NewRoundMessageValidator createNewRoundValidator(final BlockHeader parentHeader) {
+  public NewRoundMessageValidator createNewRoundValidator(final long chainHeight) {
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
     return new NewRoundMessageValidator(
-        validators,
-        proposerSelector,
-        roundIdentifier -> createMessageValidator(roundIdentifier, parentHeader),
-        IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
-        parentHeader.getNumber() + 1);
+        new NewRoundPayloadValidator(
+            validators,
+            proposerSelector,
+            this::createSignedDataValidator,
+            IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
+            chainHeight));
   }
 }

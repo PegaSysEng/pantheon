@@ -12,10 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class CommitMessageData extends AbstractIbftMessageData {
@@ -31,13 +29,12 @@ public class CommitMessageData extends AbstractIbftMessageData {
         messageData, MESSAGE_CODE, CommitMessageData.class, CommitMessageData::new);
   }
 
-  public SignedData<CommitPayload> decode() {
-    return SignedData.readSignedCommitPayloadFrom(RLP.input(data));
+  public Commit decode() {
+    return Commit.decode(data);
   }
 
-  public static CommitMessageData create(final SignedData<CommitPayload> signedPayload) {
-
-    return new CommitMessageData(signedPayload.encode());
+  public static CommitMessageData create(final Commit commit) {
+    return new CommitMessageData(commit.encode());
   }
 
   @Override

@@ -15,11 +15,9 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -41,12 +39,12 @@ public class RoundState {
   private final MessageValidator validator;
   private final long quorum;
 
-  private Optional<SignedData<ProposalPayload>> proposalMessage = Optional.empty();
+  private Optional<Proposal> proposalMessage = Optional.empty();
 
   // Must track the actual Prepare message, not just the sender, as these may need to be reused
   // to send out in a PrepareCertificate.
-  private final Set<SignedData<PreparePayload>> preparePayloads = Sets.newLinkedHashSet();
-  private final Set<SignedData<CommitPayload>> commitPayloads = Sets.newLinkedHashSet();
+  private final Set<Prepare> prepareMessages = Sets.newLinkedHashSet();
+  private final Set<Commit> commitMessages = Sets.newLinkedHashSet();
 
   private boolean prepared = false;
   private boolean committed = false;
@@ -64,13 +62,13 @@ public class RoundState {
     return roundIdentifier;
   }
 
-  public boolean setProposedBlock(final SignedData<ProposalPayload> msg) {
+  public boolean setProposedBlock(final Proposal msg) {
 
     if (!proposalMessage.isPresent()) {
-      if (validator.addSignedProposalPayload(msg)) {
+      if (validator.validateProposal(msg)) {
         proposalMessage = Optional.of(msg);
-        preparePayloads.removeIf(p -> !validator.validatePrepareMessage(p));
-        commitPayloads.removeIf(p -> !validator.validateCommmitMessage(p));
+        prepareMessages.removeIf(p -> !validator.validatePrepare(p));
+        commitMessages.removeIf(p -> !validator.validateCommit(p));
         updateState();
         return true;
       }
@@ -79,17 +77,17 @@ public class RoundState {
     return false;
   }
 
-  public void addPrepareMessage(final SignedData<PreparePayload> msg) {
-    if (!proposalMessage.isPresent() || validator.validatePrepareMessage(msg)) {
-      preparePayloads.add(msg);
+  public void addPrepareMessage(final Prepare msg) {
+    if (!proposalMessage.isPresent() || validator.validatePrepare(msg)) {
+      prepareMessages.add(msg);
       LOG.debug("Round state added prepare message prepare={}", msg);
     }
     updateState();
   }
 
-  public void addCommitMessage(final SignedData<CommitPayload> msg) {
-    if (!proposalMessage.isPresent() || validator.validateCommmitMessage(msg)) {
-      commitPayloads.add(msg);
+  public void addCommitMessage(final Commit msg) {
+    if (!proposalMessage.isPresent() || validator.validateCommit(msg)) {
+      commitMessages.add(msg);
       LOG.debug("Round state added commit message commit={}", msg);
     }
 
@@ -100,8 +98,8 @@ public class RoundState {
     // NOTE: The quorum for Prepare messages is 1 less than the quorum size as the proposer
     // does not supply a prepare message
     final long prepareQuorum = prepareMessageCountForQuorum(quorum);
-    prepared = (preparePayloads.size() >= prepareQuorum) && proposalMessage.isPresent();
-    committed = (commitPayloads.size() >= quorum) && proposalMessage.isPresent();
+    prepared = (prepareMessages.size() >= prepareQuorum) && proposalMessage.isPresent();
+    committed = (commitMessages.size() >= quorum) && proposalMessage.isPresent();
     LOG.debug(
         "Round state updated prepared={} committed={} prepareQuorum={} quorum={}",
         prepared,
@@ -111,7 +109,7 @@ public class RoundState {
   }
 
   public Optional<Block> getProposedBlock() {
-    return proposalMessage.map(p -> p.getPayload().getBlock());
+    return proposalMessage.map(p -> p.getSignedPayload().getPayload().getBlock());
   }
 
   public boolean isPrepared() {
@@ -123,15 +121,14 @@ public class RoundState {
   }
 
   public Collection<Signature> getCommitSeals() {
-    return commitPayloads
-        .stream()
-        .map(cp -> cp.getPayload().getCommitSeal())
+    return commitMessages.stream()
+        .map(cp -> cp.getSignedPayload().getPayload().getCommitSeal())
         .collect(Collectors.toList());
   }
 
-  public Optional<PreparedCertificate> constructPreparedCertificate() {
+  public Optional<PreparedRoundArtifacts> constructPreparedRoundArtifacts() {
     if (isPrepared()) {
-      return Optional.of(new PreparedCertificate(proposalMessage.get(), preparePayloads));
+      return Optional.of(new PreparedRoundArtifacts(proposalMessage.get(), prepareMessages));
     }
     return Optional.empty();
   }

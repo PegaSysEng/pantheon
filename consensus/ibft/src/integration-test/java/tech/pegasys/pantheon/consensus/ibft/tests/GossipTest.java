@@ -19,14 +19,13 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -74,29 +73,27 @@ public class GossipTest {
 
   @Test
   public void gossipMessagesToPeers() {
-    SignedData<PreparePayload> localPrepare =
-        context.getLocalNodeMessageFactory().createSignedPreparePayload(roundId, block.getHash());
+    final Prepare localPrepare =
+        context.getLocalNodeMessageFactory().createPrepare(roundId, block.getHash());
     peers.verifyNoMessagesReceivedNonProposing();
 
-    final SignedData<ProposalPayload> proposal = sender.injectProposal(roundId, block);
+    final Proposal proposal = sender.injectProposal(roundId, block);
     // sender node will have a prepare message as an effect of the proposal being sent
     peers.verifyMessagesReceivedNonPropsing(proposal, localPrepare);
-    peers.verifyMessagesReceivedPropser(localPrepare);
+    peers.verifyMessagesReceivedProposer(localPrepare);
 
-    final SignedData<PreparePayload> prepare = sender.injectPrepare(roundId, block.getHash());
+    final Prepare prepare = sender.injectPrepare(roundId, block.getHash());
     peers.verifyMessagesReceivedNonPropsing(prepare);
     peers.verifyNoMessagesReceivedProposer();
 
-    final SignedData<CommitPayload> commit = sender.injectCommit(roundId, block.getHash());
+    final Commit commit = sender.injectCommit(roundId, block.getHash());
     peers.verifyMessagesReceivedNonPropsing(commit);
     peers.verifyNoMessagesReceivedProposer();
 
-    final SignedData<RoundChangePayload> roundChange =
-        msgFactory.createSignedRoundChangePayload(roundId, Optional.empty());
+    final RoundChange roundChange = msgFactory.createRoundChange(roundId, Optional.empty());
     final RoundChangeCertificate roundChangeCert =
-        new RoundChangeCertificate(singleton(roundChange));
-    SignedData<NewRoundPayload> newRound =
-        sender.injectNewRound(roundId, roundChangeCert, proposal);
+        new RoundChangeCertificate(singleton(roundChange.getSignedPayload()));
+    final NewRound newRound = sender.injectNewRound(roundId, roundChangeCert, proposal);
     peers.verifyMessagesReceivedNonPropsing(newRound);
     peers.verifyNoMessagesReceivedProposer();
 
@@ -107,7 +104,7 @@ public class GossipTest {
 
   @Test
   public void onlyGossipOnce() {
-    final SignedData<PreparePayload> prepare = sender.injectPrepare(roundId, block.getHash());
+    final Prepare prepare = sender.injectPrepare(roundId, block.getHash());
     peers.verifyMessagesReceivedNonPropsing(prepare);
 
     sender.injectPrepare(roundId, block.getHash());
@@ -121,10 +118,10 @@ public class GossipTest {
   public void messageWithUnknownValidatorIsNotGossiped() {
     final KeyPair unknownKeyPair = KeyPair.generate();
     final MessageFactory unknownMsgFactory = new MessageFactory(unknownKeyPair);
-    final SignedData<ProposalPayload> unknownProposal =
-        unknownMsgFactory.createSignedProposalPayload(roundId, block);
+    final Proposal unknownProposal = unknownMsgFactory.createProposal(roundId, block);
 
-    sender.injectMessage(ProposalMessageData.create(unknownProposal));
+    sender.injectMessage(
+        ProposalMessageData.create(new Proposal(unknownProposal.getSignedPayload())));
     peers.verifyNoMessagesReceived();
   }
 
@@ -132,8 +129,7 @@ public class GossipTest {
   public void messageIsNotGossipedToSenderOrCreator() {
     final ValidatorPeer msgCreator = peers.getFirstNonProposer();
     final MessageFactory peerMsgFactory = msgCreator.getMessageFactory();
-    final SignedData<ProposalPayload> proposalFromPeer =
-        peerMsgFactory.createSignedProposalPayload(roundId, block);
+    final Proposal proposalFromPeer = peerMsgFactory.createProposal(roundId, block);
 
     sender.injectMessage(ProposalMessageData.create(proposalFromPeer));
 
@@ -144,7 +140,7 @@ public class GossipTest {
   @Test
   public void futureMessageIsNotGossipedImmediately() {
     ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(2, 0);
-    msgFactory.createSignedProposalPayload(futureRoundId, block);
+    msgFactory.createProposal(futureRoundId, block);
 
     sender.injectProposal(futureRoundId, block);
     peers.verifyNoMessagesReceived();
@@ -163,7 +159,7 @@ public class GossipTest {
         IbftHelpers.createSealedBlock(block, peers.sign(block.getHash()));
 
     ConsensusRoundIdentifier futureRoundId = new ConsensusRoundIdentifier(2, 0);
-    SignedData<PreparePayload> futurePrepare = sender.injectPrepare(futureRoundId, block.getHash());
+    Prepare futurePrepare = sender.injectPrepare(futureRoundId, block.getHash());
     peers.verifyNoMessagesReceivedNonProposing();
     ;
 

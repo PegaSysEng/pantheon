@@ -54,10 +54,10 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -108,6 +108,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
       final boolean ottomanTestnetOperation,
       final int networkId,
       final KeyPair nodeKeys,
+      final Path dataDirectory,
       final MetricsSystem metricsSystem) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
         IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
@@ -121,7 +122,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
     final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
     genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
-    final IbftConfigOptions ibftConfig = genesisConfig.getConfigOptions().getIbftConfigOptions();
+    final IbftConfigOptions ibftConfig =
+        genesisConfig.getConfigOptions().getIbftLegacyConfigOptions();
     final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
 
     final VoteTally voteTally =
@@ -148,7 +150,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig.transactionsParallelism(),
+              syncConfig.computationParallelism());
     } else {
       ethSubProtocol = EthProtocol.get();
       ethProtocolManager =
@@ -158,7 +161,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
               networkId,
               fastSyncEnabled,
               syncConfig.downloaderParallelism(),
-              syncConfig.transactionsParallelism());
+              syncConfig.transactionsParallelism(),
+              syncConfig.computationParallelism());
     }
 
     final SyncState syncState =
@@ -172,8 +176,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem.createLabelledTimer(
-                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"));
+            dataDirectory,
+            metricsSystem);
 
     final Runnable closer =
         () -> {
@@ -238,7 +242,6 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
 
   @Override
   public PrivacyParameters getPrivacyParameters() {
-    LOG.warn("IbftLegacyPantheonController does not currently support private transactions.");
     return PrivacyParameters.noPrivacy();
   }
 

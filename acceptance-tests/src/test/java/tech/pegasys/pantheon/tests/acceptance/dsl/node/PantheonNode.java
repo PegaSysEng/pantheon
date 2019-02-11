@@ -25,6 +25,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.AdminJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.IbftJsonRpcRequestFactory;
@@ -78,13 +80,14 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
   private final MetricsConfiguration metricsConfiguration;
-  private final PermissioningConfiguration permissioningConfiguration;
+  private final Optional<PermissioningConfiguration> permissioningConfiguration;
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
   private final boolean discoveryEnabled;
 
   private List<String> bootnodes = new ArrayList<>();
   private JsonRequestFactories jsonRequestFactories;
+  private HttpRequestFactory httpRequestFactory;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
 
   public PantheonNode(
@@ -93,7 +96,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final PermissioningConfiguration permissioningConfiguration,
+      final Optional<PermissioningConfiguration> permissioningConfiguration,
       final boolean devMode,
       final GenesisConfigProvider genesisConfigProvider,
       final int p2pPort,
@@ -186,6 +189,14 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     }
 
     return jsonRequestFactories;
+  }
+
+  private HttpRequestFactory httpRequestFactory() {
+    if (httpRequestFactory == null) {
+      httpRequestFactory =
+          new HttpRequestFactory(jsonRpcBaseUrl().orElse("http://" + LOCALHOST + ":8545"));
+    }
+    return httpRequestFactory;
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
@@ -320,8 +331,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   List<URI> bootnodes() {
-    return bootnodes
-        .stream()
+    return bootnodes.stream()
         .filter(node -> !node.equals(this.enodeUrl()))
         .map(URI::create)
         .collect(Collectors.toList());
@@ -348,7 +358,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return discoveryEnabled;
   }
 
-  PermissioningConfiguration getPermissioningConfiguration() {
+  Optional<PermissioningConfiguration> getPermissioningConfiguration() {
     return permissioningConfiguration;
   }
 
@@ -400,6 +410,11 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   @Override
   public <T> T execute(final Transaction<T> transaction) {
     return transaction.execute(jsonRequestFactories());
+  }
+
+  @Override
+  public <T> T executeHttpTransaction(final HttpTransaction<T> transaction) {
+    return transaction.execute(httpRequestFactory());
   }
 
   @Override

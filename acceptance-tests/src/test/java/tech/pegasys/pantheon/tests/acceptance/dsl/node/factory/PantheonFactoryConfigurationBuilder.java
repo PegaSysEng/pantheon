@@ -22,6 +22,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class PantheonFactoryConfigurationBuilder {
@@ -32,8 +34,7 @@ public class PantheonFactoryConfigurationBuilder {
   private JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
   private WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
   private MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
-  private PermissioningConfiguration permissioningConfiguration =
-      PermissioningConfiguration.createDefault();
+  private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
   private boolean devMode = true;
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
   private Boolean p2pEnabled = true;
@@ -62,12 +63,23 @@ public class PantheonFactoryConfigurationBuilder {
   }
 
   public PantheonFactoryConfigurationBuilder jsonRpcEnabled() {
-    final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
-    config.setEnabled(true);
-    config.setPort(0);
-    config.setHostsWhitelist(singletonList("*"));
+    this.jsonRpcConfiguration.setEnabled(true);
+    this.jsonRpcConfiguration.setPort(0);
+    this.jsonRpcConfiguration.setHostsWhitelist(singletonList("*"));
 
-    this.jsonRpcConfiguration = config;
+    return this;
+  }
+
+  public PantheonFactoryConfigurationBuilder jsonRpcAuthenticationEnabled()
+      throws URISyntaxException {
+    final String authTomlPath =
+        Paths.get(ClassLoader.getSystemResource("authentication/auth.toml").toURI())
+            .toAbsolutePath()
+            .toString();
+
+    this.jsonRpcConfiguration.setAuthenticationEnabled(true);
+    this.jsonRpcConfiguration.setAuthenticationCredentialsFile(authTomlPath);
+
     return this;
   }
 
@@ -94,7 +106,7 @@ public class PantheonFactoryConfigurationBuilder {
 
   public PantheonFactoryConfigurationBuilder setPermissioningConfiguration(
       final PermissioningConfiguration permissioningConfiguration) {
-    this.permissioningConfiguration = permissioningConfiguration;
+    this.permissioningConfiguration = Optional.of(permissioningConfiguration);
     return this;
   }
 

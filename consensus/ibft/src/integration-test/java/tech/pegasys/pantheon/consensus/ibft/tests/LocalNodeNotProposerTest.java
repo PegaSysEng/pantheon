@@ -13,13 +13,12 @@
 package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSignedCommitPayload;
+import static tech.pegasys.pantheon.consensus.ibft.support.IntegrationTestHelpers.createSignedCommitPayload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -46,17 +45,17 @@ public class LocalNodeNotProposerTest {
 
   private final Block blockToPropose = context.createBlockForProposalFromChainHead(0, 15);
 
-  private SignedData<PreparePayload> expectedTxPrepare;
-  private SignedData<CommitPayload> expectedTxCommit;
+  private Prepare expectedTxPrepare;
+  private Commit expectedTxCommit;
 
   @Before
   public void setup() {
-    expectedTxPrepare =
-        localNodeMessageFactory.createSignedPreparePayload(roundId, blockToPropose.getHash());
+    expectedTxPrepare = localNodeMessageFactory.createPrepare(roundId, blockToPropose.getHash());
 
     expectedTxCommit =
-        createSignedCommitPayload(
-            roundId, blockToPropose, context.getLocalNodeParams().getNodeKeyPair());
+        new Commit(
+            createSignedCommitPayload(
+                roundId, blockToPropose, context.getLocalNodeParams().getNodeKeyPair()));
 
     context.getController().start();
   }
