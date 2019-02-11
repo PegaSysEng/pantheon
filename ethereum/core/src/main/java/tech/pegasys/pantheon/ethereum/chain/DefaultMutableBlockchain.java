@@ -363,9 +363,7 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
         });
     clearIndexedTransactionsForBlock(updater, removedTransactions);
 
-    if (!isFastSync) {
-      updateForksForReorg(updater, newChainHead, oldChainHead);
-    }
+    updateForksForReorg(updater, newChainHead, oldChainHead);
     return BlockAddedEvent.createForChainReorg(
         newChainHead,
         newTransactions.values().stream().flatMap(Collection::stream).collect(toList()),

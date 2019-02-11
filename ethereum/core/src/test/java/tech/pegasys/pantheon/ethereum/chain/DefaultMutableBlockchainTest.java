@@ -338,9 +338,9 @@ public class DefaultMutableBlockchainTest {
     }
 
     assertBlockIsFastSyncHead(blockchain, fork);
-    // Old chain head should not be tracked as a fork because we don't track fast sync forks
-    final Set<Hash> forks = blockchain.getForks();
-    assertThat(forks.size()).isEqualTo(0);
+    // Old chain head should be tracked as a fork
+    assertThat(blockchain.getForks()).containsExactlyInAnyOrder(originalHead.getHash());
+
     // Old chain should not be on canonical chain.
     for (int i = commonAncestor + 1; i < chainLength; i++) {
       assertThat(blockchain.blockIsOnCanonicalChain(chain.get(i).getHash())).isFalse();
@@ -513,15 +513,16 @@ public class DefaultMutableBlockchainTest {
     // Check that blockNumber index for previous chain head has been removed
     assertThat(blockchain.getBlockHashByNumber(originalChainLength - 1)).isNotPresent();
 
-    // Forks should not be tracked for fast sync
-    assertThat(blockchain.getForks().size()).isEqualTo(0);
+    // Old chain should now be tracked as fork
+    assertThat(blockchain.getForks()).containsExactlyInAnyOrder(originalHead.getHash());
 
     // Add second block
     blockchain.appendFastSyncBlock(forkBlocks.get(1), forkReceipts.get(1));
     assertBlockIsFastSyncHead(blockchain, forkBlocks.get(1));
 
-    // Old chain head should now be tracked as a fork.
-    assertThat(blockchain.getForks().size()).isEqualTo(0);
+    // Old chain head should still be tracked as a fork.
+    assertThat(blockchain.getForks()).containsExactlyInAnyOrder(originalHead.getHash());
+
     // Old chain should not be on canonical chain.
     for (int i = commonAncestor + 1; i < originalChainLength; i++) {
       assertThat(blockchain.blockIsOnCanonicalChain(chain.get(i).getHash())).isFalse();
