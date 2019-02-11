@@ -60,7 +60,7 @@ public class EnodeURL {
     this.discoveryPort = OptionalInt.empty();
   }
 
-  public EnodeURL(String value) {
+  public EnodeURL(final String value) {
     checkArgument(
         value != null && !value.isEmpty(), "Can't convert null/empty string to EnodeURLProperty.");
 
@@ -116,7 +116,7 @@ public class EnodeURL {
     }
   }
 
-  public static URI asURI(String url) {
+  public static URI asURI(final String url) {
     return new EnodeURL(url).toURI();
   }
 
