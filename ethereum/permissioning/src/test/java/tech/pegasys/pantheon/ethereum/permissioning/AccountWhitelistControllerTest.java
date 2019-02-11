@@ -14,12 +14,12 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -188,9 +188,11 @@ public class AccountWhitelistControllerTest {
     final String expectedAccount = "0x627306090abab3a6e1400e9345bc60c78a8bef57";
     final Path permissionsFile = createPermissionsFileWithAccount(expectedAccount);
 
-    when(permissioningConfig.getConfigurationFilePath()).thenReturn(permissionsFile.toAbsolutePath().toString());
+    when(permissioningConfig.getConfigurationFilePath())
+        .thenReturn(permissionsFile.toAbsolutePath().toString());
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
-    when(permissioningConfig.getAccountWhitelist()).thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
+    when(permissioningConfig.getAccountWhitelist())
+        .thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
     controller = new AccountWhitelistController(permissioningConfig);
 
     controller.reload();
@@ -212,7 +214,8 @@ public class AccountWhitelistControllerTest {
         .isInstanceOf(RuntimeException.class)
         .hasMessageContaining("Unable to read permissions TOML config file");
 
-    assertThat(controller.getAccountWhitelist()).containsExactly("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
+    assertThat(controller.getAccountWhitelist())
+        .containsExactly("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
   }
 
   private Path createPermissionsFileWithAccount(final String account) throws IOException {

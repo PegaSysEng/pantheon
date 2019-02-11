@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -21,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AccountWhitelistController {
 
@@ -161,15 +162,18 @@ public class AccountWhitelistController {
     accountWhitelist.clear();
 
     try {
-      final PermissioningConfiguration updatedConfig = PermissioningConfigurationBuilder
-          .permissioningConfigurationFromToml(configuration.getConfigurationFilePath(),
-              configuration.isNodeWhitelistEnabled(), configuration.isAccountWhitelistEnabled());
+      final PermissioningConfiguration updatedConfig =
+          PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+              configuration.getConfigurationFilePath(),
+              configuration.isNodeWhitelistEnabled(),
+              configuration.isAccountWhitelistEnabled());
       readAccountsFromConfig(updatedConfig);
       this.configuration = updatedConfig;
     } catch (Exception e) {
       LOG.warn(
           "Error reloading permissions file. In-memory whitelisted accounts will be reverted to previous valid configuration. "
-              + "Details: {}", e.getMessage());
+              + "Details: {}",
+          e.getMessage());
       this.accountWhitelist.addAll(currentAccountsList);
       throw new RuntimeException(e);
     }

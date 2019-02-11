@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import java.util.function.Function;
+
 import org.junit.Test;
 
 public class EnodeToURIPropertyConverterTest {

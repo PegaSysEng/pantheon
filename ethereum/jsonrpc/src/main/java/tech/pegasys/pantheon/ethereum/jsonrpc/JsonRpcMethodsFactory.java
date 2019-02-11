@@ -245,8 +245,8 @@ public class JsonRpcMethodsFactory {
           new PermGetAccountsWhitelist(accountsWhitelistController),
           new PermAddAccountsToWhitelist(accountsWhitelistController, parameter),
           new PermRemoveAccountsFromWhitelist(accountsWhitelistController, parameter),
-          new PermReloadPermissionsFromFile(accountsWhitelistController,
-              p2pNetwork.getNodeWhitelistController()));
+          new PermReloadPermissionsFromFile(
+              accountsWhitelistController, p2pNetwork.getNodeWhitelistController()));
     }
     if (rpcApis.contains(RpcApis.ADMIN)) {
       addMethods(enabledMethods, new AdminPeers(p2pNetwork));

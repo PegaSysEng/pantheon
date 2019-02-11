@@ -15,11 +15,12 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
 
-import com.google.common.io.Resources;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import com.google.common.io.Resources;
 import org.junit.Test;
 
 public class PermissioningConfigurationBuilderTest {

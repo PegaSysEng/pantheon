@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.cli.custom;
 
-import com.google.common.annotations.VisibleForTesting;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import java.net.URI;
 import java.util.function.Function;
+
+import com.google.common.annotations.VisibleForTesting;
 import picocli.CommandLine.ITypeConverter;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 public class EnodeToURIPropertyConverter implements ITypeConverter<URI> {
 

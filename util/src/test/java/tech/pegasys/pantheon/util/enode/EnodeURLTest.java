@@ -1,3 +1,15 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.util.enode;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -5,6 +17,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.net.URI;
 import java.util.OptionalInt;
+
 import org.junit.Test;
 
 public class EnodeURLTest {
@@ -20,12 +33,13 @@ public class EnodeURLTest {
 
   @Test
   public void createEnodeURLWithDiscoveryPortShouldBuildExpectedEnodeURLObject() {
-    final EnodeURL expectedEnodeURL = new EnodeURL(VALID_NODE_ID, IPV4_ADDRESS, P2P_PORT, OptionalInt.of(DISCOVERY_PORT));
+    final EnodeURL expectedEnodeURL =
+        new EnodeURL(VALID_NODE_ID, IPV4_ADDRESS, P2P_PORT, OptionalInt.of(DISCOVERY_PORT));
     final String enodeURLString =
         "enode://" + VALID_NODE_ID + "@" + IPV4_ADDRESS + ":" + P2P_PORT + "?" + DISCOVERY_QUERY;
 
     final EnodeURL enodeURL = new EnodeURL(enodeURLString);
-    
+
     assertThat(enodeURL).isEqualTo(expectedEnodeURL);
   }
 
@@ -41,7 +55,8 @@ public class EnodeURLTest {
 
   @Test
   public void createEnodeURLWithIPV6ShouldBuildExpectedEnodeURLObject() {
-    final EnodeURL expectedEnodeURL = new EnodeURL(VALID_NODE_ID, IPV6_FULL_ADDRESS, P2P_PORT, OptionalInt.of(DISCOVERY_PORT));
+    final EnodeURL expectedEnodeURL =
+        new EnodeURL(VALID_NODE_ID, IPV6_FULL_ADDRESS, P2P_PORT, OptionalInt.of(DISCOVERY_PORT));
     final String enodeURLString =
         "enode://"
             + VALID_NODE_ID
@@ -59,7 +74,8 @@ public class EnodeURLTest {
 
   @Test
   public void createEnodeURLWithIPV6InCompactFormShouldBuildExpectedEnodeURLObject() {
-    final EnodeURL expectedEnodeURL = new EnodeURL(VALID_NODE_ID, IPV6_COMPACT_ADDRESS, P2P_PORT, OptionalInt.of(DISCOVERY_PORT));
+    final EnodeURL expectedEnodeURL =
+        new EnodeURL(VALID_NODE_ID, IPV6_COMPACT_ADDRESS, P2P_PORT, OptionalInt.of(DISCOVERY_PORT));
     final String enodeURLString =
         "enode://"
             + VALID_NODE_ID
@@ -211,5 +227,4 @@ public class EnodeURLTest {
 
     assertThat(createdURI).isEqualTo(expectedURI);
   }
-
 }

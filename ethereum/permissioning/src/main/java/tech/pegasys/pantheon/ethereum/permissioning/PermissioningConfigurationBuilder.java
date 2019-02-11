@@ -12,14 +12,15 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import tech.pegasys.pantheon.ethereum.core.*;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
-import tech.pegasys.pantheon.ethereum.core.*;
 
 public class PermissioningConfigurationBuilder {
 

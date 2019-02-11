@@ -1,13 +1,27 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.util.enode;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Objects;
+import tech.pegasys.pantheon.util.NetworkUtility;
+
 import java.net.URI;
 import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import tech.pegasys.pantheon.util.NetworkUtility;
+
+import com.google.common.base.Objects;
 
 public class EnodeURL {
 
@@ -28,7 +42,10 @@ public class EnodeURL {
   private final Integer listeningPort;
   private final OptionalInt discoveryPort;
 
-  public EnodeURL(final String nodeId, final String ip, final Integer listeningPort,
+  public EnodeURL(
+      final String nodeId,
+      final String ip,
+      final Integer listeningPort,
       final OptionalInt discoveryPort) {
     this.nodeId = nodeId;
     this.ip = ip;
@@ -92,7 +109,8 @@ public class EnodeURL {
   public URI toURI() {
     if (discoveryPort.isPresent()) {
       return URI.create(
-          String.format("enode://%s@%s:%d?discport=%d", nodeId, ip, listeningPort, discoveryPort.getAsInt()));
+          String.format(
+              "enode://%s@%s:%d?discport=%d", nodeId, ip, listeningPort, discoveryPort.getAsInt()));
     } else {
       return URI.create(String.format("enode://%s@%s:%d", nodeId, ip, listeningPort));
     }
@@ -134,10 +152,10 @@ public class EnodeURL {
       return false;
     }
     EnodeURL enodeURL = (EnodeURL) o;
-    return Objects.equal(nodeId, enodeURL.nodeId) &&
-        Objects.equal(ip, enodeURL.ip) &&
-        Objects.equal(listeningPort, enodeURL.listeningPort) &&
-        Objects.equal(discoveryPort, enodeURL.discoveryPort);
+    return Objects.equal(nodeId, enodeURL.nodeId)
+        && Objects.equal(ip, enodeURL.ip)
+        && Objects.equal(listeningPort, enodeURL.listeningPort)
+        && Objects.equal(discoveryPort, enodeURL.discoveryPort);
   }
 
   @Override

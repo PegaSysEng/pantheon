@@ -15,12 +15,12 @@ package tech.pegasys.pantheon.ethereum.p2p.permissioning;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistFileSyncException;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 
 import java.io.IOException;
-import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,13 +29,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
-import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 
 public class NodeWhitelistController {
 
@@ -200,16 +196,19 @@ public class NodeWhitelistController {
     nodesWhitelist.clear();
 
     try {
-      final PermissioningConfiguration updatedConfig = PermissioningConfigurationBuilder
-          .permissioningConfigurationFromToml(configuration.getConfigurationFilePath(),
-              configuration.isNodeWhitelistEnabled(), configuration.isAccountWhitelistEnabled());
+      final PermissioningConfiguration updatedConfig =
+          PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+              configuration.getConfigurationFilePath(),
+              configuration.isNodeWhitelistEnabled(),
+              configuration.isAccountWhitelistEnabled());
 
       readNodesFromConfig(updatedConfig);
       this.configuration = updatedConfig;
     } catch (Exception e) {
       LOG.warn(
           "Error reloading permissions file. In-memory whitelisted nodes will be reverted to previous valid configuration. "
-              + "Details: {}", e.getMessage());
+              + "Details: {}",
+          e.getMessage());
       this.nodesWhitelist.addAll(currentAccountsList);
       throw new RuntimeException(e);
     }
