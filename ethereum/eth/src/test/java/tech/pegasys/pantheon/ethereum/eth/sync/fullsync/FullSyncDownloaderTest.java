@@ -402,7 +402,7 @@ public class FullSyncDownloaderTest {
     peerB
         .getEthPeer()
         .chainState()
-        .update(gen.header(), syncState.chainHeadTotalDifficulty().plus(300));
+        .updateForAnnouncedBlock(gen.header(), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
     final CompletableFuture<?> firstTask = downloader.getCurrentTask();
@@ -447,11 +447,11 @@ public class FullSyncDownloaderTest {
     bestPeer
         .getEthPeer()
         .chainState()
-        .update(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(201));
+        .updateForAnnouncedBlock(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(201));
     otherPeer
         .getEthPeer()
         .chainState()
-        .update(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(300));
+        .updateForAnnouncedBlock(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
     final CompletableFuture<?> firstTask = downloader.getCurrentTask();
