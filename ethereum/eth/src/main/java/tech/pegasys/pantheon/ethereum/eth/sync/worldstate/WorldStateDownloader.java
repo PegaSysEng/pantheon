@@ -134,6 +134,9 @@ public class WorldStateDownloader {
                   (res, error) -> {
                     if (outstandingRequests.decrementAndGet() == 0 && pendingRequests.isEmpty()) {
                       // We're done
+                      final Updater updater = worldStateStorage.updater();
+                      updater.markWorldStateAvailable(header.getStateRoot());
+                      updater.commit();
                       markDone();
                     } else {
                       // Send out additional requests
