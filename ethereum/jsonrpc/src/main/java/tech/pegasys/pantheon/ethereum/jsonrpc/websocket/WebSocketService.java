@@ -23,13 +23,13 @@ import com.google.common.annotations.VisibleForTesting;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -129,15 +129,14 @@ public class WebSocketService {
   private Handler<HttpServerRequest> httpHandler() {
     final Router router = Router.router(vertx);
     if (authenticationService.isPresent()) {
+      router.route("/login").handler(BodyHandler.create());
       router
-          .route("/login")
-          .method(HttpMethod.POST)
+          .post("/login")
           .produces(APPLICATION_JSON)
           .handler(authenticationService.get()::handleLogin);
     } else {
       router
-          .route("/login")
-          .method(HttpMethod.POST)
+          .post("/login")
           .produces(APPLICATION_JSON)
           .handler(AuthenticationService::handleDisabledLogin);
     }
