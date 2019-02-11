@@ -38,6 +38,7 @@ public class AccountWhitelistController {
 
   public AccountWhitelistController(
       final PermissioningConfiguration configuration, final WhitelistPersistor whitelistPersistor) {
+    this.configuration = configuration;
     this.whitelistPersistor = whitelistPersistor;
     readAccountsFromConfig(configuration);
   }

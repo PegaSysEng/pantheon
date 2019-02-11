@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -193,7 +194,7 @@ public class AccountWhitelistControllerTest {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
         .thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig);
+    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
 
     controller.reload();
 
@@ -206,7 +207,7 @@ public class AccountWhitelistControllerTest {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
         .thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig);
+    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
 
     final Throwable thrown = catchThrowable(() -> controller.reload());
 
