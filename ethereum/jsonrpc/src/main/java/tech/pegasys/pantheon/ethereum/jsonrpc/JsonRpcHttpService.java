@@ -98,36 +98,6 @@ public class JsonRpcHttpService {
   private HttpServer httpServer;
 
   /**
-   * Construct a JsonRpcHttpService handler that has authentication provided from outside the
-   * constructor
-   *
-   * @param vertx The vertx process that will be running this service
-   * @param dataDir The data directory where requests can be buffered
-   * @param config Configuration for the rpc methods being loaded
-   * @param metricsSystem The metrics service that activities should be reported to
-   * @param methods The json rpc methods that should be enabled
-   * @param jwtOptions The configuration for the jwt auth provider
-   * @param credentialAuthProvider An auth provider that is backed by a credentials store
-   */
-  public JsonRpcHttpService(
-      final Vertx vertx,
-      final Path dataDir,
-      final JsonRpcConfiguration config,
-      final MetricsSystem metricsSystem,
-      final Map<String, JsonRpcMethod> methods,
-      final JWTAuthOptions jwtOptions,
-      final AuthProvider credentialAuthProvider) {
-    this(
-        vertx,
-        dataDir,
-        config,
-        metricsSystem,
-        methods,
-        Optional.of(jwtOptions),
-        Optional.of(credentialAuthProvider));
-  }
-
-  /**
    * Construct a JsonRpcHttpService handler
    *
    * @param vertx The vertx process that will be running this service
