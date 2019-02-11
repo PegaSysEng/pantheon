@@ -28,9 +28,11 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.BlockchainSetupUtil;
@@ -82,7 +84,11 @@ public class FullSyncDownloaderTest {
     protocolSchedule = localBlockchainSetup.getProtocolSchedule();
     protocolContext = localBlockchainSetup.getProtocolContext();
     ethProtocolManager =
-        EthProtocolManagerTestUtil.create(localBlockchain, localBlockchainSetup.getWorldArchive());
+        EthProtocolManagerTestUtil.create(
+            localBlockchain,
+            localBlockchainSetup.getWorldArchive(),
+            DeterministicEthScheduler.TimeoutPolicy.NEVER,
+            new EthScheduler(1, 1, 1));
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
 
@@ -414,7 +420,7 @@ public class FullSyncDownloaderTest {
     peerB
         .getEthPeer()
         .chainState()
-        .update(gen.header(), syncState.chainHeadTotalDifficulty().plus(300));
+        .updateForAnnouncedBlock(gen.header(), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
     final CompletableFuture<?> firstTask = downloader.getCurrentTask();
@@ -461,11 +467,11 @@ public class FullSyncDownloaderTest {
     bestPeer
         .getEthPeer()
         .chainState()
-        .update(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(201));
+        .updateForAnnouncedBlock(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(201));
     otherPeer
         .getEthPeer()
         .chainState()
-        .update(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(300));
+        .updateForAnnouncedBlock(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
     final CompletableFuture<?> firstTask = downloader.getCurrentTask();
@@ -541,9 +547,10 @@ public class FullSyncDownloaderTest {
     ethProtocolManager.handleDisconnect(
         bestPeer.getPeerConnection(), DisconnectReason.TOO_MANY_PEERS, true);
 
-    // Downloader should recover and sync to next best peer
+    // Downloader should recover and sync to next best peer, but it may stall
+    // for 10 seconds first (by design).
     await()
-        .atMost(10, TimeUnit.SECONDS)
+        .atMost(30, TimeUnit.SECONDS)
         .untilAsserted(
             () -> {
               secondBestPeer.respond(secondBestResponder);
