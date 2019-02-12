@@ -42,15 +42,13 @@ public interface WorldStateStorage {
 
     default Updater putCode(final BytesValue code) {
       // Skip the hash calculation for empty code
-      Hash codeHash = code.size() == 0 ? Hash.EMPTY : Hash.hash(code);
+      final Hash codeHash = code.size() == 0 ? Hash.EMPTY : Hash.hash(code);
       return putCode(codeHash, code);
     }
 
     Updater putAccountStateTrieNode(Bytes32 nodeHash, BytesValue node);
 
     Updater putAccountStorageTrieNode(Bytes32 nodeHash, BytesValue node);
-
-    void markWorldStateAvailable(Bytes32 rootHash);
 
     void commit();
 

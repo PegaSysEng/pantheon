@@ -12,21 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 import java.util.Optional;
 
 public class KeyValueStorageWorldStateStorage implements WorldStateStorage {
-
-  private static final BytesValue AVAILABILITY_PREFIX = BytesValue.of("available".getBytes(UTF_8));
 
   private final KeyValueStorage keyValueStorage;
 
@@ -74,17 +69,12 @@ public class KeyValueStorageWorldStateStorage implements WorldStateStorage {
 
   @Override
   public boolean isWorldStateAvailable(final Bytes32 rootHash) {
-    return rootHash.equals(Hash.EMPTY_TRIE_HASH)
-        || keyValueStorage.get(getAvailabilityKey(rootHash)).isPresent();
+    return getAccountStateTrieNode(rootHash).isPresent();
   }
 
   @Override
   public Updater updater() {
     return new Updater(keyValueStorage.startTransaction());
-  }
-
-  private static BytesValue getAvailabilityKey(final Bytes32 rootHash) {
-    return BytesValues.concatenate(AVAILABILITY_PREFIX, rootHash);
   }
 
   public static class Updater implements WorldStateStorage.Updater {
@@ -123,11 +113,6 @@ public class KeyValueStorageWorldStateStorage implements WorldStateStorage {
       }
       transaction.put(nodeHash, node);
       return this;
-    }
-
-    @Override
-    public void markWorldStateAvailable(final Bytes32 rootHash) {
-      transaction.put(getAvailabilityKey(rootHash), BytesValue.of(1));
     }
 
     @Override
