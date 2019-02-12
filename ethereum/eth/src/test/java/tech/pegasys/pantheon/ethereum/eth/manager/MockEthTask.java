@@ -18,29 +18,33 @@ import java.util.concurrent.CountDownLatch;
 
 public class MockEthTask extends AbstractEthTask<Object> {
 
-  private CountDownLatch executionLatch = new CountDownLatch(1);
+  private CountDownLatch startedLatch = new CountDownLatch(1);
+  private CountDownLatch countdown;
+
+  MockEthTask(final int count) {
+    super(NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+    countdown = new CountDownLatch(count);
+  }
 
   MockEthTask() {
-    super(NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+    this(0);
   }
 
   @Override
   protected void executeTask() {
+    startedLatch.countDown();
     try {
-      // Mark task as started
-      executionLatch.countDown();
-      // Pause until we're interrupted.
-      new CountDownLatch(1).await();
+      countdown.await();
     } catch (final InterruptedException ignore) {
     }
   }
 
   boolean hasBeenStarted() {
-    return executionLatch.getCount() == 0;
+    return startedLatch.getCount() == 0;
   }
 
   void complete() {
-    if (hasBeenStarted()) {
+    if (hasBeenStarted() && countdown.getCount() == 0) {
       result.get().complete(null);
     }
   }
