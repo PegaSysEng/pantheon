@@ -168,7 +168,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> future = downloader.run(header);
     assertThat(future).isDone();
