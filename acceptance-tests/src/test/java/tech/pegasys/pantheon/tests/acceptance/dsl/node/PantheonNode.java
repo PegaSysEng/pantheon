@@ -251,7 +251,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     if (jsonRequestFactories != null) {
       jsonRequestFactories.shutdown();
-      jsonRequestFactories = null;
     }
 
     if (httpRequestFactory != null) {
@@ -267,7 +266,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     if (jsonRequestFactories != null) {
       jsonRequestFactories.shutdown();
-      jsonRequestFactories = null;
     }
 
     if (httpRequestFactory != null) {
