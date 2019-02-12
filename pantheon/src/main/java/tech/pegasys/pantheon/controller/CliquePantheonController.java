@@ -51,7 +51,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.storage.DataStores;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -119,8 +118,8 @@ public class CliquePantheonController implements PantheonController<CliqueContex
         CliqueProtocolSchedule.create(genesisConfig.getConfigOptions(), nodeKeys);
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
 
-    final DataStores<CliqueContext> dataStores =
-        DataStores.initDataStores(
+    final ProtocolContext<CliqueContext> protocolContext =
+        ProtocolContext.init(
             storageProvider,
             genesisState,
             protocolSchedule,
@@ -133,8 +132,6 @@ public class CliquePantheonController implements PantheonController<CliqueContex
                         epochManger),
                     new VoteProposer(),
                     epochManger));
-
-    final ProtocolContext<CliqueContext> protocolContext = dataStores.getProtocolContext();
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
     final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
@@ -155,7 +152,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
             syncConfig,
             protocolSchedule,
             protocolContext,
-            dataStores.getWorldStateStorage(),
+            protocolContext.getWorldStateArchive().getStorage(),
             ethProtocolManager.ethContext(),
             syncState,
             dataDirectory,
