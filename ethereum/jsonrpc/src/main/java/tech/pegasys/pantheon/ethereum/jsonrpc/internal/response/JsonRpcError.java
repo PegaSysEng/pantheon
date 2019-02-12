@@ -41,6 +41,7 @@ public enum JsonRpcError {
   EXCEEDS_BLOCK_GAS_LIMIT(-32005, "Transaction gas limit exceeds block gas limit"),
   INCORRECT_NONCE(-32006, "Incorrect nonce"),
   TX_SENDER_NOT_AUTHORIZED(-32007, "Sender account not authorized to send transactions"),
+  CHAIN_HEAD_WORLD_STATE_NOT_AVAILABLE(-32008, "Initial sync is still in progress"),
 
   // Miner failures
   COINBASE_NOT_SET(-32010, "Coinbase not set. Unable to start mining without a coinbase."),
@@ -71,6 +72,10 @@ public enum JsonRpcError {
   WHITELIST_FILE_SYNC(
       -32000,
       "The permissioning whitelist configuration file is out of sync.  The changes have been applied, but not persisted to disk"),
+  WHITELIST_RELOAD_ERROR(
+      -32000,
+      "Error reloading permissions file. Please use perm_getAccountsWhitelist and perm_getNodesWhitelist to review the current state of the whitelists."),
+  PERMISSIONING_NOT_ENABLED(-32000, "Node/Account whitelisting has not been enabled"),
 
   // Private transaction errors
   ENCLAVE_IS_DOWN(-32000, "Enclave is down");

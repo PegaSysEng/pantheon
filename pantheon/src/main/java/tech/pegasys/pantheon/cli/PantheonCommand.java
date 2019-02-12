@@ -25,7 +25,6 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFA
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
-import tech.pegasys.pantheon.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
@@ -47,6 +46,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -277,7 +277,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--rpc-http-authentication-credentials-file"},
-      paramLabel = MANDATORY_HOST_FORMAT_HELP,
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =
           "Storage file for rpc http authentication credentials (default: ${DEFAULT-VALUE})",
       arity = "1",
@@ -336,6 +336,22 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     this.rpcWsRefreshDelay = refreshDelay;
     return refreshDelay;
   }
+
+  @Option(
+      names = {"--rpc-ws-authentication-enabled"},
+      description =
+          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})",
+      hidden = true)
+  private final Boolean isRpcWsAuthenticationEnabled = false;
+
+  @Option(
+      names = {"--rpc-ws-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for rpc websocket authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1",
+      hidden = true)
+  private String rpcWsAuthenticationCredentialsFile = null;
 
   @Option(
       names = {"--metrics-enabled"},
@@ -677,7 +693,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--rpc-ws-apis",
             "--rpc-ws-refresh-delay",
             "--rpc-ws-host",
-            "--rpc-ws-port"));
+            "--rpc-ws-port",
+            "--rpc-ws-authentication-enabled",
+            "--rpc-ws-authentication-credentials-file"));
+
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--rpc-ws-authentication-enabled",
+        !isRpcWsAuthenticationEnabled,
+        Collections.singletonList("--rpc-ws-authentication-credentials-file"));
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(isRpcWsEnabled);
@@ -685,6 +710,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setPort(rpcWsPort);
     webSocketConfiguration.setRpcApis(rpcWsApis);
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
+    webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
+    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile);
     return webSocketConfiguration;
   }
 

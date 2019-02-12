@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.controller;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.config.IbftConfigOptions;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
@@ -61,7 +60,6 @@ import org.apache.logging.log4j.Logger;
 public class IbftLegacyPantheonController implements PantheonController<IbftContext> {
 
   private static final Logger LOG = getLogger();
-  private final GenesisConfigOptions genesisConfig;
   private final ProtocolSchedule<IbftContext> protocolSchedule;
   private final ProtocolContext<IbftContext> context;
   private final Synchronizer synchronizer;
@@ -70,10 +68,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
   private final KeyPair keyPair;
   private final TransactionPool transactionPool;
   private final Runnable closer;
-  private final MetricsSystem metricsStystem;
 
   IbftLegacyPantheonController(
-      final GenesisConfigOptions genesisConfig,
       final ProtocolSchedule<IbftContext> protocolSchedule,
       final ProtocolContext<IbftContext> context,
       final SubProtocol ethSubProtocol,
@@ -81,10 +77,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
       final Synchronizer synchronizer,
       final KeyPair keyPair,
       final TransactionPool transactionPool,
-      final Runnable closer,
-      final MetricsSystem metricsSystem) {
+      final Runnable closer) {
 
-    this.genesisConfig = genesisConfig;
     this.protocolSchedule = protocolSchedule;
     this.context = context;
     this.ethSubProtocol = ethSubProtocol;
@@ -93,7 +87,6 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
     this.keyPair = keyPair;
     this.transactionPool = transactionPool;
     this.closer = closer;
-    this.metricsStystem = metricsSystem;
   }
 
   public static PantheonController<IbftContext> init(
@@ -184,7 +177,6 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             protocolSchedule, protocolContext, ethProtocolManager.ethContext());
 
     return new IbftLegacyPantheonController(
-        genesisConfig.getConfigOptions(),
         protocolSchedule,
         protocolContext,
         ethSubProtocol,
@@ -192,8 +184,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
         synchronizer,
         nodeKeys,
         transactionPool,
-        closer,
-        metricsSystem);
+        closer
+    );
   }
 
   @Override
