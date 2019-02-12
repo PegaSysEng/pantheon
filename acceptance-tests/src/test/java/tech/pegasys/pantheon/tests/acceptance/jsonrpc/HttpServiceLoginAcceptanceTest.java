@@ -13,9 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
@@ -52,8 +50,7 @@ public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void jsonRpcMethodShouldSucceedWithAuthenticatedUserAndPermission() {
-    String token = node.executeHttpTransaction(new LoginTransaction("user", "pegasys"));
-    ((PantheonNode) node).useAuthenticationTokenInHeaderForJsonRpc(token);
+    node.verify(login.loginSucceedsAndSetsAuthenticationToken("user", "pegasys"));
     node.verify(net.awaitPeerCount(0));
     node.verify(net.netVersionUnauthorizedExceptional("Unauthorized"));
   }
