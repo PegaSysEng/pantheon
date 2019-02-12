@@ -19,6 +19,8 @@ import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponseType;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
@@ -46,7 +48,7 @@ public class ProposeTest {
   }
 
   @Test
-  public void testAuthWithAddressZeroIsIgnored() {
+  public void testAuthWithAddressZeroResultsInError() {
     final VoteProposer proposer = new VoteProposer();
     final Propose propose = new Propose(proposer, new JsonRpcParameter());
     final Address a0 = Address.fromHexString("0");
@@ -54,9 +56,9 @@ public class ProposeTest {
     final JsonRpcResponse response = propose.response(requestWithParams(a0, true));
 
     assertThat(proposer.get(a0)).isEqualTo(Optional.empty());
-    assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
-    final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
-    assertThat(successResponse.getResult()).isEqualTo(true);
+    assertThat(response.getType()).isEqualTo(JsonRpcResponseType.ERROR);
+    final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
+    assertThat(errorResponse.getError()).isEqualTo(JsonRpcError.INVALID_REQUEST);
   }
 
   @Test
@@ -74,7 +76,7 @@ public class ProposeTest {
   }
 
   @Test
-  public void testDropWithAddressZeroIsIgnored() {
+  public void testDropWithAddressZeroResultsInError() {
     final VoteProposer proposer = new VoteProposer();
     final Propose propose = new Propose(proposer, new JsonRpcParameter());
     final Address a0 = Address.fromHexString("0");
@@ -82,9 +84,9 @@ public class ProposeTest {
     final JsonRpcResponse response = propose.response(requestWithParams(a0, false));
 
     assertThat(proposer.get(a0)).isEqualTo(Optional.empty());
-    assertThat(response.getType()).isEqualTo(JsonRpcResponseType.SUCCESS);
-    final JsonRpcSuccessResponse successResponse = (JsonRpcSuccessResponse) response;
-    assertThat(successResponse.getResult()).isEqualTo(true);
+    assertThat(response.getType()).isEqualTo(JsonRpcResponseType.ERROR);
+    final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
+    assertThat(errorResponse.getError()).isEqualTo(JsonRpcError.INVALID_REQUEST);
   }
 
   @Test

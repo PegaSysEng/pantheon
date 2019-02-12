@@ -29,7 +29,6 @@ public class CliqueBlockInterface implements BlockInterface {
 
   public static final Address NO_VOTE_SUBJECT =
       Address.wrap(BytesValue.wrap(new byte[Address.SIZE]));
-  public static final Address NO_VOTE_ADDRESS = Address.fromHexString("0");
 
   public static final long ADD_NONCE = 0xFFFFFFFFFFFFFFFFL;
   public static final long DROP_NONCE = 0x0L;
