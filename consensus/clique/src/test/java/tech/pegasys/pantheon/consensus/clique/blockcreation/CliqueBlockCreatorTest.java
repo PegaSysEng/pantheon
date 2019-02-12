@@ -175,4 +175,33 @@ public class CliqueBlockCreatorTest {
     assertThat(createdBlock.getHeader().getNonce()).isEqualTo(CliqueBlockInterface.DROP_NONCE);
     assertThat(createdBlock.getHeader().getCoinbase()).isEqualTo(Address.fromHexString("0"));
   }
+
+  @Test
+  public void insertsNoVoteWhenAtEpoch() {
+    // ensure that the next block is epoch
+    epochManager = new EpochManager(1);
+
+    final CliqueExtraData extraData =
+        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validatorList);
+    final Address a1 = Address.fromHexString("5");
+    voteProposer.auth(a1);
+    final Address coinbase = AddressHelpers.ofValue(1);
+
+    final CliqueBlockCreator blockCreator =
+        new CliqueBlockCreator(
+            coinbase,
+            parent -> extraData.encode(),
+            new PendingTransactions(5),
+            protocolContext,
+            protocolSchedule,
+            gasLimit -> gasLimit,
+            proposerKeyPair,
+            Wei.ZERO,
+            blockchain.getChainHeadHeader(),
+            epochManager);
+
+    final Block createdBlock = blockCreator.createBlock(0L);
+    assertThat(createdBlock.getHeader().getNonce()).isEqualTo(CliqueBlockInterface.DROP_NONCE);
+    assertThat(createdBlock.getHeader().getCoinbase()).isEqualTo(Address.fromHexString("0"));
+  }
 }

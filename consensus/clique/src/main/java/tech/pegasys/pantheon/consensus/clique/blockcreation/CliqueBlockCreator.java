@@ -78,7 +78,6 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
    */
   @Override
   protected BlockHeader createFinalBlockHeader(final SealableBlockHeader sealableBlockHeader) {
-
     final BlockHashFunction blockHashFunction =
         ScheduleBasedBlockHashFunction.create(protocolSchedule);
 
@@ -86,25 +85,31 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
         BlockHeaderBuilder.create()
             .populateFrom(sealableBlockHeader)
             .mixHash(Hash.ZERO)
+            .nonce(0)
             .blockHashFunction(blockHashFunction);
 
-    final CliqueContext cliqueContext = protocolContext.getConsensusState();
-    final VoteTally voteTally =
-        cliqueContext.getVoteTallyCache().getVoteTallyAfterBlock(parentHeader);
-
-    final Optional<ValidatorVote> vote =
-        cliqueContext
-            .getVoteProposer()
-            .getVote(Util.publicKeyToAddress(nodeKeys.getPublicKey()), voteTally);
+    final Optional<ValidatorVote> vote = determineCliqueVote(sealableBlockHeader);
     final BlockHeaderBuilder builderIncludingProposedVotes =
-        CliqueBlockInterface.insertVoteToHeaderBuilder(
-            builder, epochManager, vote, sealableBlockHeader.getNumber());
-
+        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, vote);
     final CliqueExtraData sealedExtraData =
         constructSignedExtraData(builderIncludingProposedVotes.buildBlockHeader());
 
     // Replace the extraData in the BlockHeaderBuilder, and return header.
-    return builder.extraData(sealedExtraData.encode()).buildBlockHeader();
+    return builderIncludingProposedVotes.extraData(sealedExtraData.encode()).buildBlockHeader();
+  }
+
+  private Optional<ValidatorVote> determineCliqueVote(
+      final SealableBlockHeader sealableBlockHeader) {
+    if (epochManager.isEpochBlock(sealableBlockHeader.getNumber())) {
+      return Optional.empty();
+    } else {
+      final CliqueContext cliqueContext = protocolContext.getConsensusState();
+      final VoteTally voteTally =
+          cliqueContext.getVoteTallyCache().getVoteTallyAfterBlock(parentHeader);
+      return cliqueContext
+          .getVoteProposer()
+          .getVote(Util.publicKeyToAddress(nodeKeys.getPublicKey()), voteTally);
+    }
   }
 
   /**
