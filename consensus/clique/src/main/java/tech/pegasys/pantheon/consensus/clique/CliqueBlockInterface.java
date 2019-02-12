@@ -57,7 +57,7 @@ public class CliqueBlockInterface implements BlockInterface {
     return Optional.empty();
   }
 
-  public static BlockHeaderBuilder insertVoteToHeaderBuilder(
+  public static BlockHeaderBuilder createHeaderBuilderWithVoteHeaders(
       final BlockHeaderBuilder builder, final Optional<ValidatorVote> vote) {
     final BlockHeaderBuilder voteHeaderBuilder = BlockHeaderBuilder.fromBuilder(builder);
     if (vote.isPresent()) {

@@ -89,7 +89,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
 
     final Optional<ValidatorVote> vote = determineCliqueVote(sealableBlockHeader);
     final BlockHeaderBuilder builderIncludingProposedVotes =
-        CliqueBlockInterface.insertVoteToHeaderBuilder(builder, vote);
+        CliqueBlockInterface.createHeaderBuilderWithVoteHeaders(builder, vote);
     final CliqueExtraData sealedExtraData =
         constructSignedExtraData(builderIncludingProposedVotes.buildBlockHeader());
 
