@@ -55,6 +55,7 @@ public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
     String token = node.executeHttpTransaction(new LoginTransaction("user", "pegasys"));
     ((PantheonNode) node).useAuthenticationTokenInHeaderForJsonRpc(token);
     node.verify(net.awaitPeerCount(0));
+    node.verify(net.netVersionUnauthorizedExceptional("Unauthorized"));
   }
 
   @Override
