@@ -343,7 +343,10 @@ public class JsonRpcHttpService {
   private void handleJsonRPCRequest(final RoutingContext routingContext) {
     // first check token if authentication is required
     String token = getToken(routingContext);
-    if (requiresAuthentication(routingContext) && token != null) {
+    if (requiresAuthentication(routingContext) && token == null) {
+      // no auth token when auth required
+      handleJsonRpcError(routingContext, null, JsonRpcError.UNAUTHORIZED);
+    } else {
       // Parse json
       try {
         final String json = routingContext.getBodyAsString().trim();
@@ -368,9 +371,6 @@ public class JsonRpcHttpService {
       } catch (final DecodeException ex) {
         handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
       }
-    } else {
-      // no auth token when auth required
-      handleJsonRpcError(routingContext, null, JsonRpcError.UNAUTHORIZED);
     }
   }
 
