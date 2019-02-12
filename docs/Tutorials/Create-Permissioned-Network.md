@@ -119,6 +119,7 @@ Copy the following genesis definition to a file called `cliqueGenesis.json` and 
 {
   "config":{
     "chainId":1981,
+    "constantinopleBlock": 0,
     "clique":{
       "blockperiodseconds":15,
       "epochlength":30000
@@ -210,11 +211,11 @@ The nodes cannot be started while the previously generated data is in the `datab
 Start Node-1:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-1-data-path --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=*      
+pantheon --data-path=Node-1-data-path --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=*      
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-1-data-path --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=*    
+pantheon --data-path=Node-1-data-path --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=*    
 ```
 
 The command line specifies: 
@@ -222,7 +223,7 @@ The command line specifies:
 * Nodes and accounts permissions are enabled using the [`--permissions-nodes-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-enabled)
 and [`--permissions-accounts-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-enabled)
 * JSON-RPC API is enabled using the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option
-*  ETH,NET,PERM, and CLIQUE APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
+* ADMIN,ETH,NET,PERM, and CLIQUE APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
 * All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option 
 * All domains can access the node using the HTTP JSON-RPC API using the [`--rpc-http-cors-origins`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-cors-origins) option. 
 
@@ -234,11 +235,11 @@ You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Nod
 Start another terminal, change to the `Node-2` directory and start Node-2 replacing the public key in the enode URL with your bootonde:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-2-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30304 --rpc-http-port=8546    
+pantheon --data-path=Node-2-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30304 --rpc-http-port=8546    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30304 --rpc-http-port=8546   
+pantheon --data-path=Node-2-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30304 --rpc-http-port=8546   
 ```
 
 The command line specifies:
@@ -255,11 +256,11 @@ The command line specifies:
 Start another terminal, change to the `Node-3` directory and start Node-3 replacing the public key in the enode URL with your bootonde:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-3-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547    
+pantheon --data-path=Node-3-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-3-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547   
+pantheon --data-path=Node-3-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547   
 ```
 
 The command line specifies:
@@ -291,11 +292,11 @@ The result confirms Node-1 (the node running the JSON-RPC service) has two peers
 
 #### Send a Transaction from an Account in the Whitelist 
 
-Import the first account from the geneis file into MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask):
+Import the first account from the genesis file into MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask):
 
 !!! example "Account 1 (Miner Coinbase Account)"
     * Address: `0xfe3b557e8fb62b89f4916b721be55ceb828dbd73`
-    * Private key : ==0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63==
+    * Private key : `0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63`
     * Initial balance : `0xad78ebc5ac6200000` (200000000000000000000 in decimal)   
 
 !!! info 
@@ -307,29 +308,36 @@ Import the last account from the geneis file into MetaMask and try to send a tra
 
 !!! example "Account 3"
     * Address: `0xf17f52151EbEF6C7334FAD080c5704D77216b732`
-    * Private key : ==0xae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f==
+    * Private key : `0xae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f`
     * Initial balance : `0x90000000000000000000000` (2785365088392105618523029504 in decimal)
 
-### Remove Node-2 from the Nodes Whitelist 
+### Start a Node Not on the Nodes Whitelist   
 
-Call `perm_removeNodesFromWhitelist` replacing the public key as indicated with the [node public key for Node-2](#3-get-node-public-keys): 
+In your `Permissioned-Network` directory, create a `Node-4` directory and `Node-4-data-path` directory inside it. 
 
-```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"perm_removeNodesFromWhitelist","params":[["enode://<publicKeyNode2 ex 0x>@127.0.0.1:30304"]], "id":1}' 127.0.0.1:8545
+Change to the `Node-4` directory and start Node-4 replacing the public key in the enode URL with your bootnode as when
+starting Node-1 and Node-2:
+
+```bash tab="MacOS"
+pantheon --data-path=Node-4-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
 ```
 
-Call [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount): 
-
-```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' 127.0.0.1:8545
+```bash tab="Windows"
+pantheon --data-path=Node-4-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
 ```
 
-The result confirms Node-1 now only has one peer (Node-3):
+Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm Node-4 has no peers: 
+
+```bash
+curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' 127.0.0.1:8548
+```
+
+The result confirms Node-4 has no peers even though it specifies Node-1 as a bootnode:
 ```json
 {
   "jsonrpc" : "2.0",
   "id" : 1,
-  "result" : "0x2"
+  "result" : "0x0"
 }
 ```
 
