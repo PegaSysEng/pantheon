@@ -184,8 +184,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
         synchronizer,
         nodeKeys,
         transactionPool,
-        closer
-    );
+        closer);
   }
 
   @Override
