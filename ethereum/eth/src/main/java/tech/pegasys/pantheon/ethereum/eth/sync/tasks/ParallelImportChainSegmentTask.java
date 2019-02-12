@@ -129,10 +129,17 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
               maxActiveChunks,
               ethContext,
               ethTasksTimer);
+      final ParallelExtractTxSignaturesTask<B> extractTxSignaturesTask =
+          new ParallelExtractTxSignaturesTask<>(
+              blockHandler,
+              downloadBodiesTask.getOutboundQueue(),
+              maxActiveChunks,
+              ethContext,
+              ethTasksTimer);
       final ParallelValidateAndImportBodiesTask<B> validateAndImportBodiesTask =
           new ParallelValidateAndImportBodiesTask<>(
               blockHandler,
-              downloadBodiesTask.getOutboundQueue(),
+              extractTxSignaturesTask.getOutboundQueue(),
               Integer.MAX_VALUE,
               ethContext,
               ethTasksTimer);
@@ -148,15 +155,19 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
       final CompletableFuture<?> downloadBodiesFuture =
           scheduler.scheduleServiceTask(downloadBodiesTask);
       registerSubTask(downloadBodiesFuture);
+      final CompletableFuture<?> extractTxSignaturesFuture =
+          scheduler.scheduleServiceTask(extractTxSignaturesTask);
+      registerSubTask(extractTxSignaturesFuture);
       final CompletableFuture<AbstractPeerTask.PeerTaskResult<List<List<B>>>> validateBodiesFuture =
           scheduler.scheduleServiceTask(validateAndImportBodiesTask);
       registerSubTask(validateBodiesFuture);
 
       // Hook in pipeline completion signaling.
       downloadHeadersTask.shutdown();
-      downloadHeaderFuture.thenRun(() -> validateHeadersTask.shutdown());
-      validateHeaderFuture.thenRun(() -> downloadBodiesTask.shutdown());
-      downloadBodiesFuture.thenRun(() -> validateAndImportBodiesTask.shutdown());
+      downloadHeaderFuture.thenRun(validateHeadersTask::shutdown);
+      validateHeaderFuture.thenRun(downloadBodiesTask::shutdown);
+      downloadBodiesFuture.thenRun(extractTxSignaturesTask::shutdown);
+      extractTxSignaturesFuture.thenRun(validateAndImportBodiesTask::shutdown);
 
       final BiConsumer<? super Object, ? super Throwable> cancelOnException =
           (s, e) -> {
@@ -164,6 +175,7 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
               downloadHeadersTask.cancel();
               validateHeadersTask.cancel();
               downloadBodiesTask.cancel();
+              extractTxSignaturesTask.cancel();
               validateAndImportBodiesTask.cancel();
               result.get().completeExceptionally(e);
             }
@@ -172,6 +184,7 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
       downloadHeaderFuture.whenComplete(cancelOnException);
       validateHeaderFuture.whenComplete(cancelOnException);
       downloadBodiesFuture.whenComplete(cancelOnException);
+      extractTxSignaturesFuture.whenComplete(cancelOnException);
       validateBodiesFuture.whenComplete(
           (r, e) -> {
             if (e != null) {

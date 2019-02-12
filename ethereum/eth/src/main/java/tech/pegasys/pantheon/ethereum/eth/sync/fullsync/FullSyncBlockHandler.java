@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockHandler;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.CompleteBlocksTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PersistBlockTask;
@@ -25,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -89,5 +91,17 @@ public class FullSyncBlockHandler<C> implements BlockHandler<Block> {
       }
     }
     return CompletableFuture.completedFuture(blocks);
+  }
+
+  @Override
+  public CompletableFuture<Void> executeParallelCalculations(final List<Block> blocks) {
+    final EthScheduler ethScheduler = ethContext.getScheduler();
+    final List<CompletableFuture<?>> calculations = new ArrayList<>();
+    for (final Block block : blocks) {
+      for (final Transaction tx : block.getBody().getTransactions()) {
+        calculations.add(ethScheduler.scheduleComputationTask(tx::getSender));
+      }
+    }
+    return CompletableFuture.allOf(calculations.toArray(new CompletableFuture<?>[0]));
   }
 }
