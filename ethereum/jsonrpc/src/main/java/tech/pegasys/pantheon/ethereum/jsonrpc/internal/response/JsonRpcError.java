@@ -79,7 +79,7 @@ public enum JsonRpcError {
   // Permissioning/Authorization errors
   UNAUTHORIZED(-40100, "Unauthorized"),
 
-  // Privacy errors
+  // Private transaction errors
   ENCLAVE_IS_DOWN(-32000, "Enclave is down");
 
   private final int code;

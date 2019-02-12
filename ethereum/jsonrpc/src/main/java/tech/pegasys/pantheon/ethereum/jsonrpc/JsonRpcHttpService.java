@@ -256,7 +256,7 @@ public class JsonRpcHttpService {
             });
       }
     } else {
-      // no user means auth provider configured thus anything is permitted
+      // no user means no auth provider configured thus anything is permitted
       foundMatchingPermission.set(true);
     }
 
