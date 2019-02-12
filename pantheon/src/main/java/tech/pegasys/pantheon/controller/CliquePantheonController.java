@@ -106,7 +106,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   public static PantheonController<CliqueContext> init(
       final StorageProvider storageProvider,
       final GenesisConfigFile genesisConfig,
-      final SynchronizerConfiguration taintedSyncConfig,
+      final SynchronizerConfiguration syncConfig,
       final MiningParameters miningParams,
       final int networkId,
       final KeyPair nodeKeys,
@@ -143,7 +143,6 @@ public class CliquePantheonController implements PantheonController<CliqueContex
                 new VoteProposer(),
                 epochManger));
 
-    final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
