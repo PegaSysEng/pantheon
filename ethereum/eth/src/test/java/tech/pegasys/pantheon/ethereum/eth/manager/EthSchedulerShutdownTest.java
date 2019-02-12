@@ -55,9 +55,7 @@ public class EthSchedulerShutdownTest {
     ethScheduler.stop();
 
     assertThat(syncWorkerExecutor.isShutdown()).isTrue();
-    assertThat(syncWorkerExecutor.isTerminated()).isFalse();
 
-    task.countDown();
     ethScheduler.awaitStop();
 
     assertThat(syncWorkerExecutor.isShutdown()).isTrue();
@@ -72,9 +70,7 @@ public class EthSchedulerShutdownTest {
     ethScheduler.stop();
 
     assertThat(scheduledExecutor.isShutdown()).isTrue();
-    assertThat(scheduledExecutor.isTerminated()).isFalse();
 
-    task.countDown();
     ethScheduler.awaitStop();
 
     assertThat(scheduledExecutor.isShutdown()).isTrue();
@@ -89,9 +85,7 @@ public class EthSchedulerShutdownTest {
     ethScheduler.stop();
 
     assertThat(txWorkerExecutor.isShutdown()).isTrue();
-    assertThat(txWorkerExecutor.isTerminated()).isFalse();
 
-    task.countDown();
     ethScheduler.awaitStop();
 
     assertThat(txWorkerExecutor.isShutdown()).isTrue();
@@ -106,9 +100,7 @@ public class EthSchedulerShutdownTest {
     ethScheduler.stop();
 
     assertThat(servicesExecutor.isShutdown()).isTrue();
-    assertThat(servicesExecutor.isTerminated()).isFalse();
 
-    task.countDown();
     ethScheduler.awaitStop();
 
     assertThat(servicesExecutor.isShutdown()).isTrue();
@@ -127,9 +119,7 @@ public class EthSchedulerShutdownTest {
     ethScheduler.stop();
 
     assertThat(computationExecutor.isShutdown()).isTrue();
-    assertThat(computationExecutor.isTerminated()).isFalse();
 
-    task.countDown();
     ethScheduler.awaitStop();
 
     assertThat(computationExecutor.isShutdown()).isTrue();
