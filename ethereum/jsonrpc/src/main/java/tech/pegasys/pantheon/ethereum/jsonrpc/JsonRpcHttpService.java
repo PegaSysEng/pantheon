@@ -347,27 +347,27 @@ public class JsonRpcHttpService {
       // no auth token when auth required
       handleJsonRpcUnauthorizedError(routingContext, null, JsonRpcError.UNAUTHORIZED);
     } else {
-        // Parse json
-        try {
-          final String json = routingContext.getBodyAsString().trim();
-          if (!json.isEmpty() && json.charAt(0) == '{') {
-            getUser(
-                token,
-                user -> {
-                  handleJsonSingleRequest(routingContext, new JsonObject(json), user);
-                });
-          } else {
-            final JsonArray array = new JsonArray(json);
-            if (array.size() < 1) {
-              handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
-              return;
-            }
-            getUser(
-                token,
-                user -> {
-                  handleJsonBatchRequest(routingContext, array, user);
-                });
+      // Parse json
+      try {
+        final String json = routingContext.getBodyAsString().trim();
+        if (!json.isEmpty() && json.charAt(0) == '{') {
+          getUser(
+              token,
+              user -> {
+                handleJsonSingleRequest(routingContext, new JsonObject(json), user);
+              });
+        } else {
+          final JsonArray array = new JsonArray(json);
+          if (array.size() < 1) {
+            handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
+            return;
           }
+          getUser(
+              token,
+              user -> {
+                handleJsonBatchRequest(routingContext, array, user);
+              });
+        }
       } catch (final DecodeException ex) {
         handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
       }
