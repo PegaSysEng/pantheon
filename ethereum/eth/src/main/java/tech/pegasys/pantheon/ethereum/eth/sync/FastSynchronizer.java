@@ -96,7 +96,8 @@ class FastSynchronizer<C> {
             stateQueue,
             syncConfig.getWorldStateHashCountPerRequest(),
             syncConfig.getWorldStateRequestParallelism(),
-            ethTasksTimer);
+            ethTasksTimer,
+            metricsSystem);
     final FastSyncDownloader<C> fastSyncDownloader =
         new FastSyncDownloader<>(
             new FastSyncActions<>(

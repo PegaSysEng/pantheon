@@ -123,12 +123,58 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> future = downloader.run(header);
     assertThat(future).isDone();
 
     // Peers should not have been queried
+    for (RespondingEthPeer peer : peers) {
+      assertThat(peer.hasOutstandingRequests()).isFalse();
+    }
+  }
+
+  @Test
+  public void downloadAlreadyAvailableWorldState() {
+    BlockDataGenerator dataGen = new BlockDataGenerator(1);
+    final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
+
+    // Setup existing state
+    final WorldStateStorage storage =
+        new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
+    final WorldStateArchive worldStateArchive = new WorldStateArchive(storage);
+    final MutableWorldState worldState = worldStateArchive.getMutable();
+
+    // Generate accounts and save corresponding state root
+    dataGen.createRandomAccounts(worldState, 20);
+    final Hash stateRoot = worldState.rootHash();
+    assertThat(stateRoot).isNotEqualTo(EMPTY_TRIE_ROOT); // Sanity check
+    final BlockHeader header =
+        dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
+
+    // Create some peers
+    List<RespondingEthPeer> peers =
+        Stream.generate(
+                () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
+            .limit(5)
+            .collect(Collectors.toList());
+
+    BigQueue<NodeDataRequest> queue = new InMemoryBigQueue<>();
+    WorldStateDownloader downloader =
+        new WorldStateDownloader(
+            ethProtocolManager.ethContext(),
+            storage,
+            queue,
+            10,
+            10,
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
+
+    CompletableFuture<Void> future = downloader.run(header);
+    assertThat(future).isDone();
+
+    // Peers should not have been queried because we already had the state
     for (RespondingEthPeer peer : peers) {
       assertThat(peer.hasOutstandingRequests()).isFalse();
     }
@@ -170,7 +216,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -185,7 +232,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -238,7 +285,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -267,7 +315,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -316,7 +364,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -345,7 +394,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -407,7 +456,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -419,10 +469,14 @@ public class WorldStateDownloaderTest {
         RespondingEthPeer.wrapResponderWithCollector(blockChainResponder, sentMessages);
 
     while (!result.isDone()) {
+      // World state should not be available until the entire state is downloaded
+      assertThat(localStorage.isWorldStateAvailable(stateRoot)).isFalse();
       for (RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
+    // World state should be available by the time the result is complete
+    assertThat(localStorage.isWorldStateAvailable(stateRoot)).isTrue();
 
     // Check that known trie nodes were requested
     List<Bytes32> requestedHashes =
@@ -436,7 +490,7 @@ public class WorldStateDownloaderTest {
 
     // Check that all expected account data was downloaded
     WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
   }
@@ -532,7 +586,8 @@ public class WorldStateDownloaderTest {
             queue,
             hashesPerRequest,
             maxOutstandingRequests,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     // Create some peers that can respond
     List<RespondingEthPeer> usefulPeers =
@@ -570,7 +625,7 @@ public class WorldStateDownloaderTest {
     }
 
     // Check that all expected account data was downloaded
-    final WorldState localWorldState = localWorldStateArchive.get(stateRoot);
+    final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
 
