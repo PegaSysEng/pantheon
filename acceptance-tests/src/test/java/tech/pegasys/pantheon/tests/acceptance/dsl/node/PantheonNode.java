@@ -90,7 +90,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private HttpRequestFactory httpRequestFactory;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
   private boolean useWsForJsonRpc = false;
-  private boolean useAuthenticationTokenInHeaderForJsonRpc = false;
   private String token = null;
 
   public PantheonNode(
@@ -203,7 +202,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
               .map(url -> new HttpService(url))
               .orElse(new HttpService("http://" + LOCALHOST + ":" + port));
 
-      if (useAuthenticationTokenInHeaderForJsonRpc) {
+      if (token != null) {
         ((HttpService) web3jService).addHeader("Bearer", token);
       }
 
@@ -252,6 +251,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     if (jsonRequestFactories != null) {
       jsonRequestFactories.shutdown();
+      jsonRequestFactories = null;
     }
 
     if (httpRequestFactory != null) {
@@ -267,13 +267,13 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     if (jsonRequestFactories != null) {
       jsonRequestFactories.shutdown();
+      jsonRequestFactories = null;
     }
 
     if (httpRequestFactory != null) {
       httpRequestFactory = null;
     }
 
-    useAuthenticationTokenInHeaderForJsonRpc = true;
     this.token = token;
   }
 
