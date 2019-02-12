@@ -15,6 +15,8 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.login.AwaitLoginResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginResponds;
 import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginUnauthorizedTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -42,5 +44,9 @@ public class Login {
       assertThat(token).isNotBlank();
       ((PantheonNode) n).useAuthenticationTokenInHeaderForJsonRpc(token);
     };
+  }
+
+  public Condition awaitLoginResponse(final String username, final String password) {
+    return new AwaitLoginResponse(new LoginResponds(username, password));
   }
 }
