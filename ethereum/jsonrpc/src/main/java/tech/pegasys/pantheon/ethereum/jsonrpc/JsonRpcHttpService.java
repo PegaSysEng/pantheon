@@ -231,7 +231,7 @@ public class JsonRpcHttpService {
   }
 
   private boolean requiresAuthentication(final RoutingContext routingContext) {
-    return (authenticationService.isPresent());
+    return authenticationService.isPresent();
   }
 
   @VisibleForTesting
@@ -345,29 +345,29 @@ public class JsonRpcHttpService {
     String token = getToken(routingContext);
     if (requiresAuthentication(routingContext) && token == null) {
       // no auth token when auth required
-      handleJsonRpcError(routingContext, null, JsonRpcError.UNAUTHORIZED);
+      handleJsonRpcUnauthorizedError(routingContext, null, JsonRpcError.UNAUTHORIZED);
     } else {
-      // Parse json
-      try {
-        final String json = routingContext.getBodyAsString().trim();
-        if (!json.isEmpty() && json.charAt(0) == '{') {
-          getUser(
-              token,
-              user -> {
-                handleJsonSingleRequest(routingContext, new JsonObject(json), user);
-              });
-        } else {
-          final JsonArray array = new JsonArray(json);
-          if (array.size() < 1) {
-            handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
-            return;
+        // Parse json
+        try {
+          final String json = routingContext.getBodyAsString().trim();
+          if (!json.isEmpty() && json.charAt(0) == '{') {
+            getUser(
+                token,
+                user -> {
+                  handleJsonSingleRequest(routingContext, new JsonObject(json), user);
+                });
+          } else {
+            final JsonArray array = new JsonArray(json);
+            if (array.size() < 1) {
+              handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
+              return;
+            }
+            getUser(
+                token,
+                user -> {
+                  handleJsonBatchRequest(routingContext, array, user);
+                });
           }
-          getUser(
-              token,
-              user -> {
-                handleJsonBatchRequest(routingContext, array, user);
-              });
-        }
       } catch (final DecodeException ex) {
         handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
       }
@@ -515,6 +515,14 @@ public class JsonRpcHttpService {
     routingContext
         .response()
         .setStatusCode(HttpResponseStatus.BAD_REQUEST.code())
+        .end(Json.encode(new JsonRpcErrorResponse(id, error)));
+  }
+
+  private void handleJsonRpcUnauthorizedError(
+      final RoutingContext routingContext, final Object id, final JsonRpcError error) {
+    routingContext
+        .response()
+        .setStatusCode(HttpResponseStatus.UNAUTHORIZED.code())
         .end(Json.encode(new JsonRpcErrorResponse(id, error)));
   }
 
