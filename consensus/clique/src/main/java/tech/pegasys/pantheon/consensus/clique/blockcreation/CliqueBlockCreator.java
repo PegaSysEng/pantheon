@@ -85,7 +85,6 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
         BlockHeaderBuilder.create()
             .populateFrom(sealableBlockHeader)
             .mixHash(Hash.ZERO)
-            .nonce(0)
             .blockHashFunction(blockHashFunction);
 
     final Optional<ValidatorVote> vote = determineCliqueVote(sealableBlockHeader);
