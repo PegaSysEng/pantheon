@@ -123,7 +123,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> future = downloader.run(header);
     assertThat(future).isDone();
@@ -214,7 +215,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -282,7 +284,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -360,7 +363,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -451,7 +455,8 @@ public class WorldStateDownloaderTest {
             queue,
             10,
             10,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     CompletableFuture<Void> result = downloader.run(header);
 
@@ -580,7 +585,8 @@ public class WorldStateDownloaderTest {
             queue,
             hashesPerRequest,
             maxOutstandingRequests,
-            NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+            NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
+            new NoOpMetricsSystem());
 
     // Create some peers that can respond
     List<RespondingEthPeer> usefulPeers =
