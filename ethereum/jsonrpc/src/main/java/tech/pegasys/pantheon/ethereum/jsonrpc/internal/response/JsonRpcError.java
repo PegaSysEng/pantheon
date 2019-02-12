@@ -74,6 +74,7 @@ public enum JsonRpcError {
   WHITELIST_RELOAD_ERROR(
       -32000,
       "Error reloading permissions file. Please use perm_getAccountsWhitelist and perm_getNodesWhitelist to review the current state of the whitelists."),
+  PERMISSIONING_NOT_ENABLED(-32000, "Node/Account whitelisting has not been enabled"),
 
   // Private transaction errors
   ENCLAVE_IS_DOWN(-32000, "Enclave is down");

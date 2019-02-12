@@ -42,6 +42,10 @@ public class PermReloadPermissionsFromFile implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
+    if (!accountWhitelistController.isPresent() && !nodesWhitelistController.isPresent()) {
+      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.PERMISSIONING_NOT_ENABLED);
+    }
+
     try {
       accountWhitelistController.ifPresent(AccountWhitelistController::reload);
       nodesWhitelistController.ifPresent(NodeWhitelistController::reload);

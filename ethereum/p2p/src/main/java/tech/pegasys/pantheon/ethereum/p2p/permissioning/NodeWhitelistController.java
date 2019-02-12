@@ -203,13 +203,14 @@ public class NodeWhitelistController {
               configuration.isAccountWhitelistEnabled());
 
       readNodesFromConfig(updatedConfig);
-      this.configuration = updatedConfig;
+      configuration = updatedConfig;
     } catch (Exception e) {
       LOG.warn(
           "Error reloading permissions file. In-memory whitelisted nodes will be reverted to previous valid configuration. "
               + "Details: {}",
           e.getMessage());
-      this.nodesWhitelist.addAll(currentAccountsList);
+      nodesWhitelist.clear();
+      nodesWhitelist.addAll(currentAccountsList);
       throw new RuntimeException(e);
     }
   }

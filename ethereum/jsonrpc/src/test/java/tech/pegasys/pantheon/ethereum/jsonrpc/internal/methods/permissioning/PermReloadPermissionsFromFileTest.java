@@ -52,12 +52,15 @@ public class PermReloadPermissionsFromFileTest {
   }
 
   @Test
-  public void whenControllersAreNotPresentMethodShouldDoNothingAndReturnSuccess() {
+  public void whenBothControllersAreNotPresentMethodShouldReturnPermissioningDisabled() {
+    JsonRpcResponse expectedErrorResponse =
+        new JsonRpcErrorResponse(null, JsonRpcError.PERMISSIONING_NOT_ENABLED);
+
     method = new PermReloadPermissionsFromFile(Optional.empty(), Optional.empty());
 
     JsonRpcResponse response = method.response(reloadRequest());
 
-    assertThat(response).isEqualToComparingFieldByField(successResponse());
+    assertThat(response).isEqualToComparingFieldByField(expectedErrorResponse);
   }
 
   @Test
