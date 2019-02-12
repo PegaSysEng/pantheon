@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.websocket;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 
@@ -27,6 +28,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.WebSocketBase;
 import io.vertx.ext.unit.Async;
@@ -157,5 +159,20 @@ public class WebSocketServiceTest {
         .end();
 
     async.awaitSuccess(VERTX_AWAIT_TIMEOUT_MILLIS);
+  }
+
+  @Test
+  public void handleLoginRequestWithAuthDisabled() {
+    final HttpClientRequest request =
+        httpClient.post(
+            websocketConfiguration.getPort(),
+            websocketConfiguration.getHost(),
+            "/login",
+            response -> {
+              assertThat(response.statusCode()).isEqualTo(400);
+              assertThat(response.statusMessage()).isEqualTo("Authentication not enabled");
+            });
+    request.putHeader("Content-Type", "application/json; charset=utf-8");
+    request.end("{\"username\":\"user\",\"password\":\"pass\"}");
   }
 }
