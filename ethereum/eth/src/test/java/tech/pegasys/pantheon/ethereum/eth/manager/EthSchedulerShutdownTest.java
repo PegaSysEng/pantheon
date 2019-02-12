@@ -49,9 +49,11 @@ public class EthSchedulerShutdownTest {
 
   @Test
   public void shutdown_syncWorkerShutsDown() throws InterruptedException {
-    final MockEthTask task = new MockEthTask(1);
+    final MockEthTask task1 = new MockEthTask();
+    final MockEthTask task2 = new MockEthTask();
 
-    ethScheduler.scheduleSyncWorkerTask(task::executeTask);
+    ethScheduler.scheduleSyncWorkerTask(task1::executeTask);
+    ethScheduler.scheduleSyncWorkerTask(task2::executeTask);
     ethScheduler.stop();
 
     assertThat(syncWorkerExecutor.isShutdown()).isTrue();
@@ -60,13 +62,14 @@ public class EthSchedulerShutdownTest {
 
     assertThat(syncWorkerExecutor.isShutdown()).isTrue();
     assertThat(syncWorkerExecutor.isTerminated()).isTrue();
+    assertThat(task2.hasBeenStarted()).isFalse();
   }
 
   @Test
   public void shutdown_scheduledWorkerShutsDown() throws InterruptedException {
-    final MockEthTask task = new MockEthTask(1);
+    final MockEthTask task = new MockEthTask();
 
-    ethScheduler.scheduleFutureTask(task::executeTask, Duration.ofMillis(1));
+    ethScheduler.scheduleFutureTask(task::executeTask, Duration.ofMillis(0));
     ethScheduler.stop();
 
     assertThat(scheduledExecutor.isShutdown()).isTrue();
@@ -79,7 +82,7 @@ public class EthSchedulerShutdownTest {
 
   @Test
   public void shutdown_txWorkerShutsDown() throws InterruptedException {
-    final MockEthTask task = new MockEthTask(1);
+    final MockEthTask task = new MockEthTask();
 
     ethScheduler.scheduleTxWorkerTask(task::executeTask);
     ethScheduler.stop();
@@ -94,7 +97,7 @@ public class EthSchedulerShutdownTest {
 
   @Test
   public void shutdown_servicesShutsDown() throws InterruptedException {
-    final MockEthTask task = new MockEthTask(1);
+    final MockEthTask task = new MockEthTask();
 
     ethScheduler.scheduleServiceTask(task);
     ethScheduler.stop();
@@ -109,7 +112,7 @@ public class EthSchedulerShutdownTest {
 
   @Test
   public void shutdown_computationShutsDown() throws InterruptedException {
-    final MockEthTask task = new MockEthTask(1);
+    final MockEthTask task = new MockEthTask();
 
     ethScheduler.scheduleComputationTask(
         () -> {
