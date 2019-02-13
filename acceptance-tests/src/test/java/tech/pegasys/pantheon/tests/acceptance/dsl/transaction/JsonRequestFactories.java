@@ -13,8 +13,8 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
 import java.util.Optional;
+
 import org.web3j.protocol.core.JsonRpc2_0Web3j;
-import org.web3j.protocol.websocket.WebSocketClient;
 import org.web3j.protocol.websocket.WebSocketService;
 
 public class JsonRequestFactories {
@@ -32,8 +32,7 @@ public class JsonRequestFactories {
       final IbftJsonRpcRequestFactory ibft,
       final PermissioningJsonRpcRequestFactory perm,
       final AdminJsonRpcRequestFactory admin,
-      final Optional<WebSocketService> websocketService
-  ) {
+      final Optional<WebSocketService> websocketService) {
     this.netEth = netEth;
     this.clique = clique;
     this.ibft = ibft;

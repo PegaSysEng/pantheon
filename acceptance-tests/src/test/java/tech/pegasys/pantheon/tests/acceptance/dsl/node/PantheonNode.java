@@ -14,10 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import com.google.common.collect.Maps;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -47,7 +43,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -213,9 +211,9 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         websocketService = Optional.of((WebSocketService) web3jService);
       } else {
         web3jService =
-          jsonRpcBaseUrl()
-              .map(HttpService::new)
-              .orElse(new HttpService("http://" + LOCALHOST + ":" + 8545));
+            jsonRpcBaseUrl()
+                .map(HttpService::new)
+                .orElse(new HttpService("http://" + LOCALHOST + ":" + 8545));
         if (token != null) {
           ((HttpService) web3jService).addHeader("Bearer", token);
         }
@@ -228,8 +226,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
               new IbftJsonRpcRequestFactory(web3jService),
               new PermissioningJsonRpcRequestFactory(web3jService),
               new AdminJsonRpcRequestFactory(web3jService),
-              websocketService
-          );
+              websocketService);
     }
 
     return jsonRequestFactories;
