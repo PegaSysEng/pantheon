@@ -81,7 +81,7 @@ public class IbftRound {
   public void createAndSendProposalMessage(final long headerTimeStampSeconds) {
     final Block block = blockCreator.createBlock(headerTimeStampSeconds);
     final IbftExtraData extraData = IbftExtraData.decode(block.getHeader().getExtraData());
-    LOG.info(
+    LOG.debug(
         "Creating proposed block. round={} extraData={} blockHeader={}",
         roundState.getRoundIdentifier(),
         extraData,
@@ -98,11 +98,11 @@ public class IbftRound {
 
     Proposal proposal;
     if (!bestBlockFromRoundChange.isPresent()) {
-      LOG.trace("Multicasting NewRound with new block. round={}", roundState.getRoundIdentifier());
+      LOG.debug("Multicasting NewRound with new block. round={}", roundState.getRoundIdentifier());
       final Block block = blockCreator.createBlock(headerTimestamp);
       proposal = messageFactory.createProposal(getRoundIdentifier(), block);
     } else {
-      LOG.trace(
+      LOG.debug(
           "Multicasting NewRound from PreparedCertificate. round={}",
           roundState.getRoundIdentifier());
       proposal = createProposalAroundBlock(bestBlockFromRoundChange.get());
@@ -110,7 +110,8 @@ public class IbftRound {
     transmitter.multicastNewRound(
         getRoundIdentifier(),
         roundChangeArtifacts.getRoundChangeCertificate(),
-        proposal.getSignedPayload());
+        proposal.getSignedPayload(),
+        proposal.getBlock());
     updateStateWithProposedBlock(proposal);
   }
 
@@ -124,7 +125,7 @@ public class IbftRound {
   }
 
   public void handleProposalMessage(final Proposal msg) {
-    LOG.info("Handling a Proposal message.");
+    LOG.debug("Handling a Proposal message.");
 
     if (getRoundIdentifier().getRoundNumber() != 0) {
       LOG.error("Illegally received a Proposal message when not in Round 0.");
@@ -134,20 +135,20 @@ public class IbftRound {
   }
 
   public void handleProposalFromNewRound(final NewRound msg) {
-    LOG.info("Handling a New Round Proposal.");
+    LOG.debug("Handling a New Round Proposal.");
 
     if (getRoundIdentifier().getRoundNumber() == 0) {
       LOG.error("Illegally received a NewRound message when in Round 0.");
       return;
     }
-    actionReceivedProposal(new Proposal(msg.getProposalPayload()));
+    actionReceivedProposal(new Proposal(msg.getProposalPayload(), msg.getBlock()));
   }
 
   private void actionReceivedProposal(final Proposal msg) {
     final Block block = msg.getBlock();
 
     if (updateStateWithProposedBlock(msg)) {
-      LOG.info("Sending prepare message.");
+      LOG.debug("Sending prepare message.");
       transmitter.multicastPrepare(getRoundIdentifier(), block.getHash());
       final Prepare localPrepareMessage =
           messageFactory.createPrepare(roundState.getRoundIdentifier(), block.getHash());
@@ -220,7 +221,11 @@ public class IbftRound {
 
     final long blockNumber = blockToImport.getHeader().getNumber();
     final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader().getExtraData());
-    LOG.info("Importing block to chain. block={} extraData={}", blockNumber, extraData);
+    LOG.info(
+        "Importing block to chain. round={}, hash={}",
+        getRoundIdentifier(),
+        blockToImport.getHash());
+    LOG.debug("ExtraData = {}", extraData);
     final boolean result =
         blockImporter.importBlock(protocolContext, blockToImport, HeaderValidationMode.FULL);
     if (!result) {

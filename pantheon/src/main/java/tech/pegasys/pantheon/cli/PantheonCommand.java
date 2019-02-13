@@ -25,12 +25,12 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFA
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
-import tech.pegasys.pantheon.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
+import tech.pegasys.pantheon.cli.custom.RpcAuthConverter;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -47,6 +47,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -74,6 +75,7 @@ import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.DecodeException;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
@@ -271,17 +273,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-http-authentication-enabled"},
       description =
-          "Set if the JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})",
-      hidden = true)
+          "Set if the JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpAuthenticationEnabled = false;
 
   @Option(
       names = {"--rpc-http-authentication-credentials-file"},
-      paramLabel = MANDATORY_HOST_FORMAT_HELP,
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =
           "Storage file for rpc http authentication credentials (default: ${DEFAULT-VALUE})",
       arity = "1",
-      hidden = true)
+      converter = RpcAuthConverter.class)
   private String rpcHttpAuthenticationCredentialsFile = null;
 
   @Option(
@@ -336,6 +337,22 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     this.rpcWsRefreshDelay = refreshDelay;
     return refreshDelay;
   }
+
+  @Option(
+      names = {"--rpc-ws-authentication-enabled"},
+      description =
+          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})",
+      hidden = true)
+  private final Boolean isRpcWsAuthenticationEnabled = false;
+
+  @Option(
+      names = {"--rpc-ws-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for rpc websocket authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1",
+      hidden = true)
+  private String rpcWsAuthenticationCredentialsFile = null;
 
   @Option(
       names = {"--metrics-enabled"},
@@ -677,7 +694,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--rpc-ws-apis",
             "--rpc-ws-refresh-delay",
             "--rpc-ws-host",
-            "--rpc-ws-port"));
+            "--rpc-ws-port",
+            "--rpc-ws-authentication-enabled",
+            "--rpc-ws-authentication-credentials-file"));
+
+    CommandLineUtils.checkOptionDependencies(
+        logger,
+        commandLine,
+        "--rpc-ws-authentication-enabled",
+        !isRpcWsAuthenticationEnabled,
+        Collections.singletonList("--rpc-ws-authentication-credentials-file"));
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(isRpcWsEnabled);
@@ -685,6 +711,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setPort(rpcWsPort);
     webSocketConfiguration.setRpcApis(rpcWsApis);
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
+    webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
+    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile);
     return webSocketConfiguration;
   }
 
@@ -816,8 +844,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
                 () -> {
                   try {
                     runner.close();
+
+                    LogManager.shutdown();
                   } catch (final Exception e) {
-                    throw new RuntimeException(e);
+                    logger.error("Failed to stop Pantheon");
                   }
                 }));
   }

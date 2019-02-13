@@ -20,6 +20,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -42,6 +43,20 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   public final CompletableFuture<T> run() {
     if (result.compareAndSet(null, new CompletableFuture<>())) {
       executeTaskTimed();
+      result
+          .get()
+          .whenComplete(
+              (r, t) -> {
+                cleanup();
+              });
+    }
+    return result.get();
+  }
+
+  @Override
+  public final CompletableFuture<T> runAsync(final ExecutorService executor) {
+    if (result.compareAndSet(null, new CompletableFuture<>())) {
+      executor.submit(this::executeTaskTimed);
       result
           .get()
           .whenComplete(
@@ -88,6 +103,31 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
     synchronized (result) {
       if (!isCancelled()) {
         final CompletableFuture<S> subTaskFuture = subTask.get();
+        subTaskFutures.add(subTaskFuture);
+        subTaskFuture.whenComplete(
+            (r, t) -> {
+              subTaskFutures.remove(subTaskFuture);
+            });
+        return subTaskFuture;
+      } else {
+        final CompletableFuture<S> future = new CompletableFuture<>();
+        future.completeExceptionally(new CancellationException());
+        return future;
+      }
+    }
+  }
+
+  /**
+   * Utility for registring completable futures for cleanup if this EthTask is cancelled.
+   *
+   * @param subTaskFuture the future to be reigstered.
+   * @param <S> the type of data returned from the CompletableFuture
+   * @return The completableFuture that was executed
+   */
+  protected final <S> CompletableFuture<S> registerSubTask(
+      final CompletableFuture<S> subTaskFuture) {
+    synchronized (result) {
+      if (!isCancelled()) {
         subTaskFutures.add(subTaskFuture);
         subTaskFuture.whenComplete(
             (r, t) -> {
