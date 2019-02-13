@@ -141,7 +141,7 @@ public class WorldStateDownloader {
 
           // Collect data to be requested
           List<NodeDataRequest> toRequest = new ArrayList<>();
-          for (int i = 0; i < hashCountPerRequest; i++) {
+          while (toRequest.size() < hashCountPerRequest) {
             NodeDataRequest pendingRequest = pendingRequests.dequeue();
             if (pendingRequest == null) {
               break;
