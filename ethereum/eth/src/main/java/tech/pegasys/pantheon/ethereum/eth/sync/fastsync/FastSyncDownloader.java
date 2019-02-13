@@ -40,12 +40,13 @@ public class FastSyncDownloader<C> {
         .waitForSuitablePeers(fastSyncState)
         .thenCompose(fastSyncActions::selectPivotBlock)
         .thenCompose(fastSyncActions::downloadPivotBlockHeader)
-        .thenApply(
-            state -> {
-              fastSyncStateStorage.storeState(state);
-              return state;
-            })
+        .thenApply(this::storeState)
         .thenCompose(this::downloadChainAndWorldState);
+  }
+
+  private FastSyncState storeState(final FastSyncState state) {
+    fastSyncStateStorage.storeState(state);
+    return state;
   }
 
   private CompletableFuture<FastSyncState> downloadChainAndWorldState(
