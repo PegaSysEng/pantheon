@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
-import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
+import tech.pegasys.pantheon.consensus.ibft.EthSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -112,7 +112,7 @@ public class IbftControllerTest {
             ibftGossip,
             futureMessages,
             messageTracker,
-            mock(SynchronizerUpdater.class));
+            mock(EthSynchronizerUpdater.class));
 
     when(chainHeadBlockHeader.getNumber()).thenReturn(1L);
     when(chainHeadBlockHeader.getHash()).thenReturn(Hash.ZERO);

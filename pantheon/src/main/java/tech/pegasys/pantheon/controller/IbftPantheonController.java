@@ -30,7 +30,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
-import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
+import tech.pegasys.pantheon.consensus.ibft.EthSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
@@ -48,12 +48,9 @@ import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
-import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
@@ -74,8 +71,6 @@ import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
@@ -253,7 +248,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 messageValidatorFactory),
             gossiper,
             ibftConfig.getDuplicateMessageLimit(),
-            new SynchronizerUpdater(ethContext.getEthPeers()));
+            new EthSynchronizerUpdater(ethContext.getEthPeers()));
     ibftController.start();
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);

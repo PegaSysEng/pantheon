@@ -12,34 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 
-import org.apache.logging.log4j.Logger;
+public interface SynchronizerUpdater {
 
-public class SynchronizerUpdater implements BaseSynchronizerUpdater {
-
-  private static final Logger LOG = getLogger();
-  private final EthPeers ethPeers;
-
-  public SynchronizerUpdater(final EthPeers ethPeers) {
-    this.ethPeers = ethPeers;
-  }
-
-  @Override
-  public void updatePeerChainState(
-      final long knownBlockNumber, final PeerConnection peerConnection) {
-    final EthPeer ethPeer = ethPeers.peer(peerConnection);
-    if (ethPeer == null) {
-      LOG.warn("Received message from a peer with no corresponding EthPeer.");
-      return;
-    }
-
-    if (ethPeer.chainState().getEstimatedHeight() < knownBlockNumber) {
-      ethPeer.chainState().updateHeightEstimate(knownBlockNumber);
-    }
-  }
+  void updatePeerChainState(long knownBlockNumber, PeerConnection peerConnection);
 }

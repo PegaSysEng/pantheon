@@ -49,7 +49,7 @@ public class SynchronizerUpdaterTest {
   public void ethPeerIsMissingResultInNoUpdate() {
     when(ethPeers.peer(any())).thenReturn(null);
 
-    final SynchronizerUpdater updater = new SynchronizerUpdater(ethPeers);
+    final EthSynchronizerUpdater updater = new EthSynchronizerUpdater(ethPeers);
 
     updater.updatePeerChainState(1, createAnonymousPeerConnection());
 
@@ -64,7 +64,7 @@ public class SynchronizerUpdaterTest {
     when(ethPeer.chainState()).thenReturn(chainState);
     when(chainState.getEstimatedHeight()).thenReturn(knownChainHeight);
 
-    final SynchronizerUpdater updater = new SynchronizerUpdater(ethPeers);
+    final EthSynchronizerUpdater updater = new EthSynchronizerUpdater(ethPeers);
 
     updater.updatePeerChainState(suppliedChainHeight, createAnonymousPeerConnection());
 
@@ -79,7 +79,7 @@ public class SynchronizerUpdaterTest {
     when(ethPeer.chainState()).thenReturn(chainState);
     when(chainState.getEstimatedHeight()).thenReturn(knownChainHeight);
 
-    final SynchronizerUpdater updater = new SynchronizerUpdater(ethPeers);
+    final EthSynchronizerUpdater updater = new EthSynchronizerUpdater(ethPeers);
 
     updater.updatePeerChainState(suppliedChainHeight, createAnonymousPeerConnection());
 
