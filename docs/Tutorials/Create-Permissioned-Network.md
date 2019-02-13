@@ -83,9 +83,9 @@ pantheon --data-path=Node-3-data-path public-key export --to=Node-3-data-path/pu
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path public-key export --to=Node-2-data-path\publicKeyNode1
+pantheon --data-path=Node-2-data-path public-key export --to=Node-2-data-path\publicKeyNode2
 
-pantheon --data-path=Node-3-data-path public-key export --to=Node-3-data-path\publicKeyNode1
+pantheon --data-path=Node-3-data-path public-key export --to=Node-3-data-path\publicKeyNode3
 ``` 
 
 ### 3. Get Address of Node-1 
@@ -199,7 +199,7 @@ The permissions configuration file includes:
     file must be saved in the data directory for each node. 
     
     On-chain permissioning is under development. On-chain permissioning will use one on-chain 
-    nodes whitelist. 
+    nodes whitelist and accounts whitelist. 
 
 ### 6. Delete Database Directories
 
