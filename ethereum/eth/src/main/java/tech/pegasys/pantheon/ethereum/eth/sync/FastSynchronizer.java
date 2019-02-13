@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.NodeDataRequest;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -51,16 +52,19 @@ class FastSynchronizer<C> {
   private final Path fastSyncDataDirectory;
   private final BigQueue<NodeDataRequest> stateQueue;
   private final WorldStateDownloader worldStateDownloader;
+  private final FastSyncState initialSyncState;
 
   private FastSynchronizer(
       final FastSyncDownloader<C> fastSyncDownloader,
       final Path fastSyncDataDirectory,
       final BigQueue<NodeDataRequest> stateQueue,
-      final WorldStateDownloader worldStateDownloader) {
+      final WorldStateDownloader worldStateDownloader,
+      final FastSyncState initialSyncState) {
     this.fastSyncDownloader = fastSyncDownloader;
     this.fastSyncDataDirectory = fastSyncDataDirectory;
     this.stateQueue = stateQueue;
     this.worldStateDownloader = worldStateDownloader;
+    this.initialSyncState = initialSyncState;
   }
 
   public static <C> Optional<FastSynchronizer<C>> create(
@@ -79,7 +83,10 @@ class FastSynchronizer<C> {
 
     final Path fastSyncDataDirectory = getFastSyncDataDirectory(dataDirectory);
     final PivotHeaderStorage pivotHeaderStorage = new PivotHeaderStorage(fastSyncDataDirectory);
-    if (!pivotHeaderStorage.isFastSyncInProgress()
+    final FastSyncState fastSyncState =
+        FastSyncState.load(
+            pivotHeaderStorage, ScheduleBasedBlockHashFunction.create(protocolSchedule));
+    if (!fastSyncState.getPivotBlockHeader().isPresent()
         && protocolContext.getBlockchain().getChainHeadBlockNumber()
             != BlockHeader.GENESIS_BLOCK_NUMBER) {
       LOG.info(
@@ -106,21 +113,25 @@ class FastSynchronizer<C> {
                 protocolContext,
                 ethContext,
                 syncState,
-                pivotHeaderStorage,
                 ethTasksTimer,
                 metricsSystem.createLabelledCounter(
                     MetricCategory.SYNCHRONIZER,
                     "fast_sync_validation_mode",
                     "Number of blocks validated using light vs full validation during fast sync",
                     "validationMode")),
-            worldStateDownloader);
+            worldStateDownloader,
+            pivotHeaderStorage);
     return Optional.of(
         new FastSynchronizer<>(
-            fastSyncDownloader, fastSyncDataDirectory, stateQueue, worldStateDownloader));
+            fastSyncDownloader,
+            fastSyncDataDirectory,
+            stateQueue,
+            worldStateDownloader,
+            fastSyncState));
   }
 
   public CompletableFuture<FastSyncState> start() {
-    return fastSyncDownloader.start();
+    return fastSyncDownloader.start(initialSyncState);
   }
 
   public void deleteFastSyncState() {
