@@ -29,7 +29,6 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.time.Duration;
-import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
@@ -148,7 +147,7 @@ public class FastSyncActions<C> {
                 throw new FastSyncException(CHAIN_TOO_SHORT);
               } else {
                 LOG.info("Selecting block number {} as fast sync pivot block.", pivotBlockNumber);
-                return completedFuture(new FastSyncState(OptionalLong.of(pivotBlockNumber)));
+                return completedFuture(new FastSyncState(pivotBlockNumber));
               }
             })
         .orElseGet(this::retrySelectPivotBlockAfterDelay);

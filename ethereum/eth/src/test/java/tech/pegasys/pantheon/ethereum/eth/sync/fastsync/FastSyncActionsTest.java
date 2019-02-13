@@ -41,7 +41,6 @@ import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -137,8 +136,7 @@ public class FastSyncActionsTest {
 
     final CompletableFuture<FastSyncState> result =
         fastSyncActions.selectPivotBlock(new FastSyncState(pivotHeader));
-    final FastSyncState expected =
-        new FastSyncState(OptionalLong.of(pivotHeader.getNumber()), Optional.of(pivotHeader));
+    final FastSyncState expected = new FastSyncState(pivotHeader);
     assertThat(result).isCompletedWithValue(expected);
   }
 
@@ -148,7 +146,7 @@ public class FastSyncActionsTest {
 
     final CompletableFuture<FastSyncState> result =
         fastSyncActions.selectPivotBlock(EMPTY_SYNC_STATE);
-    final FastSyncState expected = new FastSyncState(OptionalLong.of(4000));
+    final FastSyncState expected = new FastSyncState(4000);
     assertThat(result).isCompletedWithValue(expected);
   }
 
@@ -159,7 +157,7 @@ public class FastSyncActionsTest {
     assertThat(result).isNotDone();
 
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 5000);
-    final FastSyncState expected = new FastSyncState(OptionalLong.of(4000));
+    final FastSyncState expected = new FastSyncState(4000);
     assertThat(result).isCompletedWithValue(expected);
   }
 
@@ -183,8 +181,7 @@ public class FastSyncActionsTest {
   @Test
   public void downloadPivotBlockHeaderShouldUseExistingPivotBlockHeaderIfPresent() {
     final BlockHeader pivotHeader = new BlockHeaderTestFixture().number(1024).buildHeader();
-    final FastSyncState expected =
-        new FastSyncState(OptionalLong.of(pivotHeader.getNumber()), Optional.of(pivotHeader));
+    final FastSyncState expected = new FastSyncState(pivotHeader);
     assertThat(fastSyncActions.downloadPivotBlockHeader(expected)).isCompletedWithValue(expected);
   }
 
@@ -192,14 +189,13 @@ public class FastSyncActionsTest {
   public void downloadPivotBlockHeaderShouldRetrievePivotBlockHeader() {
     final RespondingEthPeer peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1001);
     final CompletableFuture<FastSyncState> result =
-        fastSyncActions.downloadPivotBlockHeader(new FastSyncState(OptionalLong.of(1)));
+        fastSyncActions.downloadPivotBlockHeader(new FastSyncState(1));
     assertThat(result).isNotCompleted();
 
     final Responder responder = RespondingEthPeer.blockchainResponder(blockchain);
     peer.respond(responder);
 
-    assertThat(result)
-        .isCompletedWithValue(new FastSyncState(OptionalLong.of(1), blockchain.getBlockHeader(1)));
+    assertThat(result).isCompletedWithValue(new FastSyncState(blockchain.getBlockHeader(1).get()));
   }
 
   private void assertThrowsFastSyncException(
