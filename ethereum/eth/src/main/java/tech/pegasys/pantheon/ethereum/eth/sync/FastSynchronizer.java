@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncActions;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState;
-import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.PivotHeaderStorage;
+import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncStateStorage;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.NodeDataRequest;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
@@ -82,10 +82,10 @@ class FastSynchronizer<C> {
     }
 
     final Path fastSyncDataDirectory = getFastSyncDataDirectory(dataDirectory);
-    final PivotHeaderStorage pivotHeaderStorage = new PivotHeaderStorage(fastSyncDataDirectory);
+    final FastSyncStateStorage fastSyncStateStorage =
+        new FastSyncStateStorage(fastSyncDataDirectory);
     final FastSyncState fastSyncState =
-        FastSyncState.load(
-            pivotHeaderStorage, ScheduleBasedBlockHashFunction.create(protocolSchedule));
+        fastSyncStateStorage.loadState(ScheduleBasedBlockHashFunction.create(protocolSchedule));
     if (!fastSyncState.getPivotBlockHeader().isPresent()
         && protocolContext.getBlockchain().getChainHeadBlockNumber()
             != BlockHeader.GENESIS_BLOCK_NUMBER) {
@@ -120,7 +120,7 @@ class FastSynchronizer<C> {
                     "Number of blocks validated using light vs full validation during fast sync",
                     "validationMode")),
             worldStateDownloader,
-            pivotHeaderStorage);
+            fastSyncStateStorage);
     return Optional.of(
         new FastSynchronizer<>(
             fastSyncDownloader,

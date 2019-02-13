@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.util.Objects;
@@ -41,18 +40,6 @@ public class FastSyncState {
       final OptionalLong pivotBlockNumber, final Optional<BlockHeader> pivotBlockHeader) {
     this.pivotBlockNumber = pivotBlockNumber;
     this.pivotBlockHeader = pivotBlockHeader;
-  }
-
-  public static FastSyncState load(
-      final PivotHeaderStorage storage, final BlockHashFunction blockHashFunction) {
-    return storage
-        .loadPivotBlockHeader(blockHashFunction)
-        .map(header -> new FastSyncState(OptionalLong.of(header.getNumber()), Optional.of(header)))
-        .orElse(EMPTY_SYNC_STATE);
-  }
-
-  public void store(final PivotHeaderStorage storage) {
-    pivotBlockHeader.ifPresent(storage::storePivotBlockHeader);
   }
 
   public OptionalLong getPivotBlockNumber() {

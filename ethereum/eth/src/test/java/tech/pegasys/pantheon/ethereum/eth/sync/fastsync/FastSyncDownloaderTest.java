@@ -40,7 +40,7 @@ public class FastSyncDownloaderTest {
   private final FastSyncActions<Void> fastSyncActions = mock(FastSyncActions.class);
 
   private final WorldStateDownloader worldStateDownloader = mock(WorldStateDownloader.class);
-  private final PivotHeaderStorage storage = mock(PivotHeaderStorage.class);
+  private final FastSyncStateStorage storage = mock(FastSyncStateStorage.class);
 
   private final FastSyncDownloader<Void> downloader =
       new FastSyncDownloader<>(fastSyncActions, worldStateDownloader, storage);
@@ -63,7 +63,7 @@ public class FastSyncDownloaderTest {
     verify(fastSyncActions).waitForSuitablePeers(EMPTY_SYNC_STATE);
     verify(fastSyncActions).selectPivotBlock(EMPTY_SYNC_STATE);
     verify(fastSyncActions).downloadPivotBlockHeader(selectPivotBlockState);
-    verify(storage).storePivotBlockHeader(pivotBlockHeader);
+    verify(storage).storeState(downloadPivotBlockHeaderState);
     verify(fastSyncActions).downloadChain(downloadPivotBlockHeaderState);
     verify(worldStateDownloader).run(pivotBlockHeader);
     verifyNoMoreInteractions(fastSyncActions, worldStateDownloader, storage);
@@ -86,7 +86,7 @@ public class FastSyncDownloaderTest {
     verify(fastSyncActions).waitForSuitablePeers(fastSyncState);
     verify(fastSyncActions).selectPivotBlock(fastSyncState);
     verify(fastSyncActions).downloadPivotBlockHeader(fastSyncState);
-    verify(storage).storePivotBlockHeader(pivotBlockHeader);
+    verify(storage).storeState(fastSyncState);
     verify(fastSyncActions).downloadChain(fastSyncState);
     verify(worldStateDownloader).run(pivotBlockHeader);
     verifyNoMoreInteractions(fastSyncActions, worldStateDownloader, storage);
@@ -141,7 +141,7 @@ public class FastSyncDownloaderTest {
     verify(fastSyncActions).waitForSuitablePeers(EMPTY_SYNC_STATE);
     verify(fastSyncActions).selectPivotBlock(EMPTY_SYNC_STATE);
     verify(fastSyncActions).downloadPivotBlockHeader(selectPivotBlockState);
-    verify(storage).storePivotBlockHeader(pivotBlockHeader);
+    verify(storage).storeState(downloadPivotBlockHeaderState);
     verify(fastSyncActions).downloadChain(downloadPivotBlockHeaderState);
     verify(worldStateDownloader).run(pivotBlockHeader);
     verifyNoMoreInteractions(fastSyncActions, worldStateDownloader, storage);

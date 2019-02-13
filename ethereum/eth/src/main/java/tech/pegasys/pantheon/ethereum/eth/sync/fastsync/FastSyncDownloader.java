@@ -23,15 +23,15 @@ public class FastSyncDownloader<C> {
   private static final Logger LOG = LogManager.getLogger();
   private final FastSyncActions<C> fastSyncActions;
   private final WorldStateDownloader worldStateDownloader;
-  private final PivotHeaderStorage pivotHeaderStorage;
+  private final FastSyncStateStorage fastSyncStateStorage;
 
   public FastSyncDownloader(
       final FastSyncActions<C> fastSyncActions,
       final WorldStateDownloader worldStateDownloader,
-      final PivotHeaderStorage pivotHeaderStorage) {
+      final FastSyncStateStorage fastSyncStateStorage) {
     this.fastSyncActions = fastSyncActions;
     this.worldStateDownloader = worldStateDownloader;
-    this.pivotHeaderStorage = pivotHeaderStorage;
+    this.fastSyncStateStorage = fastSyncStateStorage;
   }
 
   public CompletableFuture<FastSyncState> start(final FastSyncState fastSyncState) {
@@ -42,7 +42,7 @@ public class FastSyncDownloader<C> {
         .thenCompose(fastSyncActions::downloadPivotBlockHeader)
         .thenApply(
             state -> {
-              state.store(pivotHeaderStorage);
+              fastSyncStateStorage.storeState(state);
               return state;
             })
         .thenCompose(this::downloadChainAndWorldState);

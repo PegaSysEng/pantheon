@@ -40,7 +40,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,7 +55,7 @@ public class FastSyncActionsTest {
           .fastSyncPivotDistance(1000)
           .build();
 
-  private final PivotHeaderStorage pivotHeaderStorage = mock(PivotHeaderStorage.class);
+  private final FastSyncStateStorage fastSyncStateStorage = mock(FastSyncStateStorage.class);
   private final LabelledMetric<OperationTimer> ethTasksTimer = NO_OP_LABELLED_TIMER;
   private final AtomicInteger timeoutCount = new AtomicInteger(0);
   private FastSyncActions<Void> fastSyncActions;
@@ -130,8 +129,8 @@ public class FastSyncActionsTest {
   @Test
   public void selectPivotBlockShouldUseExistingPivotBlockIfAvailable() {
     final BlockHeader pivotHeader = new BlockHeaderTestFixture().number(1024).buildHeader();
-    when(pivotHeaderStorage.loadPivotBlockHeader(any(BlockHashFunction.class)))
-        .thenReturn(Optional.of(pivotHeader));
+    when(fastSyncStateStorage.loadState(any(BlockHashFunction.class)))
+        .thenReturn(new FastSyncState(pivotHeader));
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 5000);
 
     final CompletableFuture<FastSyncState> result =
