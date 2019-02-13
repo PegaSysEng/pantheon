@@ -34,7 +34,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.OptionalInt;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -137,100 +136,62 @@ public class NodeWhitelistControllerTest {
 
   @Test
   public void whenNodeIdsAreDifferentItShouldNotBePermitted() {
-    EnodeURL peer1 =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30303);
+    String peer1 =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30303";
+    String peer2 =
+        "enode://bbbb80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30303";
 
-    EnodeURL peer2 =
-        new EnodeURL(
-            "bbbb80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30303);
+    controller.addNodes(Arrays.asList(peer1));
 
-    controller.addNodes(Arrays.asList(peer1.toString()));
-
-    assertThat(controller.isPermitted(peer2.toString())).isFalse();
+    assertThat(controller.isPermitted(peer2)).isFalse();
   }
 
   @Test
   public void whenNodesHostsAreDifferentItShouldNotBePermitted() {
-    EnodeURL peer1 =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30303);
+    String peer1 =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30303";
+    String peer2 =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.2:30303";
 
-    EnodeURL peer2 =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.2",
-            30303);
+    controller.addNodes(Arrays.asList(peer1));
 
-    controller.addNodes(Arrays.asList(peer1.toString()));
-
-    assertThat(controller.isPermitted(peer2.toString())).isFalse();
+    assertThat(controller.isPermitted(peer2)).isFalse();
   }
 
   @Test
   public void whenNodesUdpPortsAreDifferentItShouldNotBePermitted() {
-    EnodeURL peer1 =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30301);
+    String peer1 =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30301";
+    String peer2 =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30302";
 
-    EnodeURL peer2 =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30302);
+    controller.addNodes(Arrays.asList(peer1));
 
-    controller.addNodes(Arrays.asList(peer1.toString()));
-
-    assertThat(controller.isPermitted(peer2.toString())).isFalse();
+    assertThat(controller.isPermitted(peer2)).isFalse();
   }
 
   @Test
   public void whenCheckingIfNodeIsPermittedTcpPortShouldNotBeConsideredIfAbsent() {
-    EnodeURL peerWithTcpPortSet =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30303,
-            OptionalInt.of(10001));
+    String peerWithTcpPortSet =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30303?discport=10001";
+    String peerWithoutTcpPortSet =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30303";
 
-    EnodeURL peerWithoutTcpPortSet =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30303);
+    controller.addNodes(Arrays.asList(peerWithTcpPortSet));
 
-    controller.addNodes(Arrays.asList(peerWithoutTcpPortSet.toString()));
-
-    assertThat(controller.isPermitted(peerWithTcpPortSet.toString())).isTrue();
+    assertThat(controller.isPermitted(peerWithoutTcpPortSet)).isTrue();
   }
 
   @Test
   public void whenCheckingIfNodeIsPermittedTcpPortShouldBeConsideredIfPresent() {
-    EnodeURL peerWithTcpPortSet =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30303,
-            OptionalInt.of(10001));
+    String peerWithTcpPortSet =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30303?discport=10001";
+    String peerWithDifferentTcpPortSet =
+        "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@127.0.0.1:30303?discport=10002";
 
-    EnodeURL peerWithDifferentTcpPortSet =
-        new EnodeURL(
-            "aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0",
-            "127.0.0.1",
-            30303,
-            OptionalInt.of(10002));
+    controller.addNodes(Arrays.asList(peerWithDifferentTcpPortSet));
 
-    controller.addNodes(Arrays.asList(peerWithDifferentTcpPortSet.toString()));
-
-    assertThat(controller.isPermitted(peerWithTcpPortSet.toString())).isFalse();
+    assertThat(controller.isPermitted(peerWithTcpPortSet)).isFalse();
   }
 
   @Test
