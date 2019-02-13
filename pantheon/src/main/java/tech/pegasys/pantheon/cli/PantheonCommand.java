@@ -25,7 +25,6 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFA
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
-import tech.pegasys.pantheon.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
@@ -47,6 +46,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -74,6 +74,7 @@ import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.DecodeException;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
@@ -843,8 +844,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
                 () -> {
                   try {
                     runner.close();
+
+                    LogManager.shutdown();
                   } catch (final Exception e) {
-                    throw new RuntimeException(e);
+                    logger.error("Failed to stop Pantheon");
                   }
                 }));
   }
