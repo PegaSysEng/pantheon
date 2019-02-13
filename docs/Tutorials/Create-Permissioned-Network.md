@@ -326,7 +326,7 @@ pantheon --data-path=Node-4-data-path --bootnodes="enode://<publicKeyNode1 ex 0x
 pantheon --data-path=Node-4-data-path --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
 ```
 
-Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm Node-4 has no peers: 
+Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method: 
 
 ```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' 127.0.0.1:8548
