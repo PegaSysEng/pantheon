@@ -3,7 +3,7 @@ description: Pantheon Create a Permissioned network
 
 # Creating a Permissioned Network
 
-The following steps set up a permissioned network with nodes and accounts permissions. The network uses the 
+The following steps set up a permissioned network with node and account permissions. The network uses the 
 [Clique Proof of Authority consensus protocol](../Consensus-Protocols/Clique.md). 
 
 !!!important 
@@ -22,7 +22,7 @@ To create a permissoned network:
 
 1. [Create Folders](#1-create-folders)
 1. [Get Node Public Keys](#2-get-node-public-keys)
-1. [Get Address of Node 1](#3-get-address-of-node-1)
+1. [Get Address of Node-1](#3-get-address-of-node-1)
 1. [Create Genesis File](#4-create-genesis-file)
 1. [Create Permissions Configuration File](#5-create-permissions-configuration-file)
 1. [Delete Database Directories](#6-delete-database-directories)
@@ -52,7 +52,7 @@ Permissioned-Network/
 
 The [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) of each node is needed for the nodes whitelist.
 
-In the `Node-1` directory, use the [`public-key` subcommand](../Reference/Pantheon-CLI-Syntax.md#public-key) to write 
+In the `Node-1` directory, use the [`public-key`](../Reference/Pantheon-CLI-Syntax.md#public-key) subcommand to write 
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
 
 ```bash tab="MacOS"
@@ -169,7 +169,7 @@ In `extraData`, replace `<Node 1 Address>` with the [address for Node-1](#3-get-
     ```
 
 !!! warning 
-    Do not use the accounts in `alloc` in the genesis file on mainnet or any public network except for testing.
+    Do not use the accounts in the genesis file on MainNet or any public network except for testing.
         
     The private keys are displayed which means the accounts are not secure.  
 
@@ -187,19 +187,19 @@ Copy the following permissions configuration to a file called `permissions_confi
     nodes-whitelist=["enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303","enode://<publicKeyNode2 ex 0x>@127.0.0.1:30304","enode://<publicKeyNode3 ex 0x>@127.0.0.1:30305"]
     ```
 
-Replace the public key as indicated for each enode URL with the [node public keys](#3-get-node-public-keys). 
+Replace the public key as indicated for each enode URL with the [node public keys](#2-get-node-public-keys). 
 
 The permissions configuration file includes: 
 
-* Two accounts from the genesis file.
+* First two accounts from the genesis file.
 * Enode URLs for each node. 
 
 !!! note
-    Permissions are specified at the node level. The `permissions_config.toml` file must be saved in the 
-    data directory for each node. 
+    Permissions are specified at the node level. The [`permissions_config.toml`](../Permissions/Permissioning.md#permissions-configuration-file) 
+    file must be saved in the data directory for each node. 
     
-    On-chain permissioning is under development. On-chain permissioning will use one onchain 
-    node whitelist. 
+    On-chain permissioning is under development. On-chain permissioning will use one on-chain 
+    nodes whitelist. 
 
 ### 6. Delete Database Directories
 
@@ -302,9 +302,9 @@ Import the first account from the genesis file into MetaMask and send transactio
 !!! info 
     Pantheon does not implement [private key management](../Using-Pantheon/Account-Management.md).
 
-### Try Sending a Transaction from an Account Not in the Account Whitelist 
+### Try Sending a Transaction from an Account Not in the Accounts Whitelist 
 
-Import the last account from the geneis file into MetaMask and try to send a transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask):
+Import the last account from the genesis file into MetaMask and try to send a transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask):
 
 !!! example "Account 3"
     * Address: `0xf17f52151EbEF6C7334FAD080c5704D77216b732`
