@@ -14,6 +14,10 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import com.google.common.collect.Maps;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -187,23 +191,34 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   private JsonRequestFactories jsonRequestFactories() {
+    Optional<WebSocketService> websocketService = Optional.empty();
     if (jsonRequestFactories == null) {
-      final Optional<String> baseUrl;
-      final String port;
-      if (useWsForJsonRpc) {
-        baseUrl = wsRpcBaseUrl();
-        port = "8546";
-      } else {
-        baseUrl = jsonRpcBaseUrl();
-        port = "8545";
-      }
-      final Web3jService web3jService =
-          baseUrl
-              .map(url -> new HttpService(url))
-              .orElse(new HttpService("http://" + LOCALHOST + ":" + port));
+      final Web3jService web3jService;
 
-      if (token != null) {
-        ((HttpService) web3jService).addHeader("Bearer", token);
+      if (useWsForJsonRpc) {
+        final String url = wsRpcBaseUrl().orElse("ws://" + LOCALHOST + ":" + 8546);
+        final Map<String, String> headers = new HashMap<>();
+        if (token != null) {
+          headers.put("Bearer", token);
+        }
+        final WebSocketClient wsClient = new WebSocketClient(URI.create(url), headers);
+
+        web3jService = new WebSocketService(wsClient, false);
+        try {
+          ((WebSocketService) web3jService).connect();
+        } catch (ConnectException e) {
+          throw new RuntimeException(e);
+        }
+
+        websocketService = Optional.of((WebSocketService) web3jService);
+      } else {
+        web3jService =
+          jsonRpcBaseUrl()
+              .map(HttpService::new)
+              .orElse(new HttpService("http://" + LOCALHOST + ":" + 8545));
+        if (token != null) {
+          ((HttpService) web3jService).addHeader("Bearer", token);
+        }
       }
 
       jsonRequestFactories =
@@ -212,7 +227,9 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
               new CliqueJsonRpcRequestFactory(web3jService),
               new IbftJsonRpcRequestFactory(web3jService),
               new PermissioningJsonRpcRequestFactory(web3jService),
-              new AdminJsonRpcRequestFactory(web3jService));
+              new AdminJsonRpcRequestFactory(web3jService),
+              websocketService
+          );
     }
 
     return jsonRequestFactories;
@@ -242,22 +259,16 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     checkIfWebSocketEndpointIsAvailable(url);
 
-    final WebSocketService webSocketService = new WebSocketService(url, true);
-    try {
-      webSocketService.connect();
-    } catch (final ConnectException e) {
-      throw new RuntimeException("Error connection to WebSocket endpoint", e);
-    }
+    useWsForJsonRpc = true;
 
     if (jsonRequestFactories != null) {
       jsonRequestFactories.shutdown();
+      jsonRequestFactories = null;
     }
 
     if (httpRequestFactory != null) {
       httpRequestFactory = null;
     }
-
-    useWsForJsonRpc = true;
   }
 
   /** All future JSON-RPC calls will include the authentication token. */
@@ -266,6 +277,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     if (jsonRequestFactories != null) {
       jsonRequestFactories.shutdown();
+      jsonRequestFactories = null;
     }
 
     if (httpRequestFactory != null) {
