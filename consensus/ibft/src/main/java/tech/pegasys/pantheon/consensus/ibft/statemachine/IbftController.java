@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 
+import tech.pegasys.pantheon.consensus.ibft.BaseSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
@@ -53,20 +54,23 @@ public class IbftController {
   private BlockHeightManager currentHeightManager;
   private final Gossiper gossiper;
   private final MessageTracker duplicateMessageTracker;
+  private final BaseSynchronizerUpdater sychronizerUpdater;
 
   public IbftController(
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
-      final int duplicateMessageLimit) {
+      final int duplicateMessageLimit,
+      final BaseSynchronizerUpdater sychronizerUpdater) {
     this(
         blockchain,
         ibftFinalState,
         ibftBlockHeightManagerFactory,
         gossiper,
         Maps.newHashMap(),
-        new MessageTracker(duplicateMessageLimit));
+        new MessageTracker(duplicateMessageLimit),
+        sychronizerUpdater);
   }
 
   @VisibleForTesting
@@ -76,13 +80,15 @@ public class IbftController {
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
       final Map<Long, List<Message>> futureMessages,
-      final MessageTracker duplicateMessageTracker) {
+      final MessageTracker duplicateMessageTracker,
+      final BaseSynchronizerUpdater sychronizerUpdater) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessages = futureMessages;
     this.gossiper = gossiper;
     this.duplicateMessageTracker = duplicateMessageTracker;
+    this.sychronizerUpdater = sychronizerUpdater;
   }
 
   public void start() {
@@ -248,5 +254,9 @@ public class IbftController {
       futureMessages.put(chainHeight, Lists.newArrayList());
     }
     futureMessages.get(chainHeight).add(rawMsg);
+
+    // Notify the synchroniser the transmitting peer must have the parent block to the received
+    // message's target height.
+    sychronizerUpdater.updatePeerChainState(chainHeight - 1L, rawMsg.getConnection());
   }
 }

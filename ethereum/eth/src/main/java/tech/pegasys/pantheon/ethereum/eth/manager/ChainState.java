@@ -88,7 +88,7 @@ public class ChainState {
     }
   }
 
-  private void updateHeightEstimate(final long blockNumber) {
+  public void updateHeightEstimate(final long blockNumber) {
     estimatedHeightKnown = true;
     if (blockNumber > estimatedHeight) {
       estimatedHeight = blockNumber;
