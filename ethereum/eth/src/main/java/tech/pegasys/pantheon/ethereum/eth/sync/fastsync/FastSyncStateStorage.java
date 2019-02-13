@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import com.google.common.io.Files;
 import org.apache.logging.log4j.LogManager;
@@ -54,10 +53,8 @@ public class FastSyncStateStorage {
         return FastSyncState.EMPTY_SYNC_STATE;
       }
       final BytesValue rlp = BytesValue.wrap(Files.toByteArray(pivotBlockHeaderFile));
-      return Optional.of(
-              BlockHeader.readFrom(new BytesValueRLPInput(rlp, false), blockHashFunction))
-          .map(FastSyncState::new)
-          .orElse(FastSyncState.EMPTY_SYNC_STATE);
+      return new FastSyncState(
+          BlockHeader.readFrom(new BytesValueRLPInput(rlp, false), blockHashFunction));
     } catch (final IOException e) {
       throw new IllegalStateException(
           "Unable to read fast sync status file: " + pivotBlockHeaderFile.getAbsolutePath());
