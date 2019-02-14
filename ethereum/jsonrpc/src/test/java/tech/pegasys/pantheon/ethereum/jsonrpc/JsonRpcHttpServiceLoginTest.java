@@ -55,6 +55,7 @@ import java.util.Set;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.KeyStoreOptions;
 import io.vertx.ext.auth.PubSecKeyOptions;
@@ -381,6 +382,48 @@ public class JsonRpcHttpServiceLoginTest {
   public void checkPermissionsWithEmptyUser() {
     JsonRpcMethod ethAccounts = new EthAccounts();
 
-    assertThat(service.isPermitted(Optional.empty(), ethAccounts)).isTrue();
+    assertThat(service.isPermitted(Optional.empty(), ethAccounts)).isFalse();
+  }
+
+  @Test
+  public void netVersionUnsuccessfulBeforeLogin() throws Exception {
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body)).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  @Test
+  public void netVersionUnsuccessfulWithBadBearer() throws Exception {
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_version\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body, "badtoken")).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  private Request buildPostRequest(final RequestBody body) {
+    return buildPostRequest(body, Optional.empty());
+  }
+
+  private Request buildPostRequest(final RequestBody body, final String token) {
+    return buildPostRequest(body, Optional.of(token));
+  }
+
+  private Request buildPostRequest(final RequestBody body, final Optional<String> token) {
+    final Request.Builder request = new Request.Builder().post(body).url(baseUrl);
+    token.ifPresent(t -> request.addHeader("Bearer", t));
+    return request.build();
   }
 }
