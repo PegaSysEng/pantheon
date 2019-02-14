@@ -161,6 +161,10 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     if (!blockIsAlreadyTracked(newChainHead.getHash())) {
       throw new IllegalArgumentException("Attempt to re-org to unknown block");
     }
+    if (getChainHeadHash().equals(newChainHead.getHash())) {
+      // Already chain head so nothing to do.
+      return;
+    }
     final BlockBody body =
         getBlockBody(newChainHead.getHash())
             .orElseThrow(
@@ -328,12 +332,14 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
 
     // Update tracked forks
     final Collection<Hash> forks = blockchainStorage.getForkHeads();
-    // Old head is now a fork
-    forks.add(oldChainHead);
-    // Remove new chain head's parent if it was tracked as a fork
-    final Optional<Hash> parentFork =
-        forks.stream().filter(f -> f.equals(newChainHead.getHeader().getParentHash())).findAny();
-    parentFork.ifPresent(forks::remove);
+    // Old head is now a fork unless the common ancestor was the old head
+    // in which case we must be doing a forced re-org forward on the canonical chain.
+    if (!oldChain.getHash().equals(oldChainHead)) {
+      forks.add(oldChainHead);
+    }
+    // Remove new chain head and its parent if either was tracked as a fork
+    forks.remove(newChainHead.getHeader().getParentHash());
+    forks.remove(newChainHead.getHash());
     updater.setForkHeads(forks);
     return BlockAddedEvent.createForChainReorg(
         newChainHead,

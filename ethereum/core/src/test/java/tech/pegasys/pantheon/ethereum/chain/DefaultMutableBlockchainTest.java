@@ -456,6 +456,166 @@ public class DefaultMutableBlockchainTest {
   }
 
   @Test
+  public void forceReorgToEarlierBlockInChain() {
+    final BlockDataGenerator gen = new BlockDataGenerator(1);
+
+    // Setup an initial blockchain
+    final int chainLength = 5;
+    final List<Block> chain = gen.blockSequence(chainLength);
+    final List<List<TransactionReceipt>> blockReceipts =
+        chain.stream().map(gen::receipts).collect(Collectors.toList());
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
+    for (int i = 1; i < chain.size(); i++) {
+      blockchain.appendBlock(chain.get(i), blockReceipts.get(i));
+    }
+
+    final int reorgToIndex = 2;
+    final Block newHead = chain.get(reorgToIndex);
+    blockchain.forceReorgTo(newHead.getHeader());
+
+    assertBlockIsHead(blockchain, newHead);
+
+    // Check the blocks from newHead and earlier are still on the chain.
+    for (int i = 0; i <= reorgToIndex; i++) {
+      assertBlockDataIsStored(blockchain, chain.get(i), blockReceipts.get(i));
+    }
+    for (int i = reorgToIndex + 1; i < chainLength; i++) {
+      chain
+          .get(i)
+          .getBody()
+          .getTransactions()
+          .forEach(
+              removedTransaction ->
+                  assertThat(blockchain.getTransactionByHash(removedTransaction.hash())).isEmpty());
+    }
+
+    assertThat(blockchain.getForks())
+        .containsExactlyInAnyOrder(chain.get(chainLength - 1).getHash());
+  }
+
+  @Test
+  public void forceReorgBackToLaterBlockInChain() {
+    final BlockDataGenerator gen = new BlockDataGenerator(1);
+
+    // Setup an initial blockchain
+    final int chainLength = 6;
+    final List<Block> chain = gen.blockSequence(chainLength);
+    final List<List<TransactionReceipt>> blockReceipts =
+        chain.stream().map(gen::receipts).collect(Collectors.toList());
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
+    for (int i = 1; i < chain.size(); i++) {
+      blockchain.appendBlock(chain.get(i), blockReceipts.get(i));
+    }
+
+    // Reorg back to 1 then forward to 3
+    blockchain.forceReorgTo(chain.get(1).getHeader());
+    assertBlockIsHead(blockchain, chain.get(1));
+    assertThat(blockchain.getForks())
+        .containsExactlyInAnyOrder(chain.get(chainLength - 1).getHash());
+
+    final int reorgToIndex = 3;
+    blockchain.forceReorgTo(chain.get(reorgToIndex).getHeader());
+    final Block newHead = chain.get(reorgToIndex);
+    blockchain.forceReorgTo(newHead.getHeader());
+
+    assertBlockIsHead(blockchain, newHead);
+
+    // Check the blocks from newHead and earlier are still on the chain.
+    for (int i = 0; i <= reorgToIndex; i++) {
+      assertBlockDataIsStored(blockchain, chain.get(i), blockReceipts.get(i));
+    }
+    for (int i = reorgToIndex + 1; i < chainLength; i++) {
+      chain
+          .get(i)
+          .getBody()
+          .getTransactions()
+          .forEach(
+              removedTransaction ->
+                  assertThat(blockchain.getTransactionByHash(removedTransaction.hash())).isEmpty());
+    }
+
+    assertThat(blockchain.getForks())
+        .containsExactlyInAnyOrder(chain.get(chainLength - 1).getHash());
+  }
+
+  @Test
+  public void forceReorgToShorterFork() {
+    final BlockDataGenerator gen = new BlockDataGenerator(1);
+
+    // Setup an initial blockchain
+    final int chainLength = 6;
+    final List<Block> chain = gen.blockSequence(chainLength);
+    final List<List<TransactionReceipt>> blockReceipts =
+        chain.stream().map(gen::receipts).collect(Collectors.toList());
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
+    for (int i = 1; i < chain.size(); i++) {
+      blockchain.appendBlock(chain.get(i), blockReceipts.get(i));
+    }
+
+    final Block shorterForkChainHead = chain.get(chainLength - 1);
+
+    // Add blocks until the chain re-orgs to our longer fork
+    final BlockOptions blockOptions =
+        gen.nextBlockOptions(chain.get(chainLength - 2))
+            .setDifficulty(shorterForkChainHead.getHeader().getDifficulty().minus(1));
+    final Block longerForkBlock1 = gen.block(blockOptions);
+    blockchain.appendBlock(longerForkBlock1, gen.receipts(longerForkBlock1));
+    assertBlockIsHead(blockchain, shorterForkChainHead);
+    final Block longerForkChainHead = gen.nextBlock(longerForkBlock1);
+    blockchain.appendBlock(longerForkChainHead, gen.receipts(longerForkChainHead));
+    assertBlockIsHead(blockchain, longerForkChainHead);
+
+    blockchain.forceReorgTo(shorterForkChainHead.getHeader());
+
+    assertBlockIsHead(blockchain, shorterForkChainHead);
+    assertThat(blockchain.getForks()).containsExactlyInAnyOrder(longerForkChainHead.getHash());
+  }
+
+  @Test
+  public void forceReorgToLongerFork() {
+    final BlockDataGenerator gen = new BlockDataGenerator(1);
+
+    // Setup an initial blockchain
+    final int chainLength = 6;
+    final List<Block> chain = gen.blockSequence(chainLength);
+    final List<List<TransactionReceipt>> blockReceipts =
+        chain.stream().map(gen::receipts).collect(Collectors.toList());
+    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, chain.get(0));
+    for (int i = 1; i < chain.size(); i++) {
+      blockchain.appendBlock(chain.get(i), blockReceipts.get(i));
+    }
+
+    final Block shorterForkChainHead = chain.get(chainLength - 1);
+
+    // Add blocks on a fork that becomes longer than the canonical chain but still not head
+    final BlockOptions blockOptions =
+        gen.nextBlockOptions(chain.get(chainLength - 2))
+            .setDifficulty(shorterForkChainHead.getHeader().getDifficulty().minus(5));
+    final Block longerForkBlock1 = gen.block(blockOptions);
+    final List<TransactionReceipt> longerForkBlock1Receipts = gen.receipts(longerForkBlock1);
+    blockchain.appendBlock(longerForkBlock1, longerForkBlock1Receipts);
+    assertBlockIsHead(blockchain, shorterForkChainHead);
+    final Block longerForkChainHead =
+        gen.block(gen.nextBlockOptions(longerForkBlock1).setDifficulty(UInt256.ONE));
+    final List<TransactionReceipt> longerForkChainHeadReceipts = gen.receipts(longerForkChainHead);
+    blockchain.appendBlock(longerForkChainHead, longerForkChainHeadReceipts);
+    assertBlockIsHead(blockchain, shorterForkChainHead);
+
+    // Force re-org to the longer chain
+    blockchain.forceReorgTo(longerForkChainHead.getHeader());
+
+    assertBlockIsHead(blockchain, longerForkChainHead);
+
+    assertBlockDataIsStored(blockchain, longerForkBlock1, longerForkBlock1Receipts);
+    assertBlockDataIsStored(blockchain, longerForkChainHead, longerForkChainHeadReceipts);
+    assertThat(blockchain.getForks()).containsExactlyInAnyOrder(shorterForkChainHead.getHash());
+  }
+
+  @Test
   public void appendBlockForFork() {
     final BlockDataGenerator gen = new BlockDataGenerator(2);
 
@@ -689,6 +849,7 @@ public class DefaultMutableBlockchainTest {
     assertEquals(head.getHash(), blockchain.getChainHeadHash());
     assertEquals(head.getHeader().getNumber(), blockchain.getChainHeadBlockNumber());
     assertEquals(head.getHash(), blockchain.getChainHead().getHash());
+    assertEquals(head.getHeader(), blockchain.getChainHeadHeader());
   }
 
   private void assertTotalDifficultiesAreConsistent(final Blockchain blockchain, final Block head) {
