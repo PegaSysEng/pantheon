@@ -76,6 +76,16 @@ Properties that have specific values in IBFT 2.0 genesis files are:
 
 To start a node on an IBFT 2.0 private network, use the [`--genesis-file`](../Reference/Pantheon-CLI-Syntax.md#genesis-file`) option to specify the custom genesis file. 
 
+### Optional Configuration Options 
+
+Optional configuration options that can be specified in the genesis file are:  
+
+* `messageQueueLimit` - Default is 1000. In very large networks with insufficient resources increasing the message queue limit 
+   may help to deal with message activity surges.  
+   
+* `duplicateMesageLimit` - Default is 100. If seeing messages being retransmitted by the same node, increasing the duplicate message limit 
+   may reduce the number of retransmissions. A value of 2 to 3 times the number of validators is generally sufficient.  
+
 ## Adding and Removing Validators
 
 To propose adding or removing validators using the JSON-RPC methods, enable the HTTP interface 
