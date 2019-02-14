@@ -650,7 +650,7 @@ public final class NettyP2PNetworkTest {
     final Endpoint endpoint = new Endpoint("127.0.0.1", 30303, OptionalInt.of(30303));
     final String enodeURL =
         String.format(
-            "enode://%s@127.0.0.1:30303?discport=30303",
+            "enode://%s@%s:%d?discport=%d",
             id.toString().substring(2),
             endpoint.getHost(),
             endpoint.getUdpPort(),
