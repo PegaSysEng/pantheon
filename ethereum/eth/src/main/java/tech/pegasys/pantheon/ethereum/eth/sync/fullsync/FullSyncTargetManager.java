@@ -67,7 +67,7 @@ class FullSyncTargetManager<C> extends SyncTargetManager<C> {
       return Optional.of(syncTarget);
     } else {
       LOG.warn(
-          "Disconnecting {} because common ancestor at block {} is prior to our fast sync pivot block",
+          "Disconnecting {} because world state is not available at common ancestor at block {}",
           syncTarget.peer(),
           commonAncestor.getNumber());
       syncTarget.peer().disconnect(DisconnectReason.USELESS_PEER);
