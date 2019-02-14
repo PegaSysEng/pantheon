@@ -392,14 +392,29 @@ public class JsonRpcHttpServiceLoginTest {
             assertThat(r.succeeded()).isTrue();
             final User user = r.result();
             // single eth/blockNumber method permitted
-            assertThat(AuthenticationUtils.isPermitted(service.authenticationService, Optional.of(user), ethBlockNumber)).isTrue();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), ethBlockNumber))
+                .isTrue();
             // eth/accounts not permitted
-            assertThat(AuthenticationUtils.isPermitted(service.authenticationService, Optional.of(user), ethAccounts)).isFalse();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), ethAccounts))
+                .isFalse();
             // allowed by web3/*
-            assertThat(AuthenticationUtils.isPermitted(service.authenticationService, Optional.of(user), web3ClientVersion)).isTrue();
-            assertThat(AuthenticationUtils.isPermitted(service.authenticationService, Optional.of(user), web3Sha3)).isTrue();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), web3ClientVersion))
+                .isTrue();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), web3Sha3))
+                .isTrue();
             // no net permissions
-            assertThat(AuthenticationUtils.isPermitted(service.authenticationService, Optional.of(user), netVersion)).isFalse();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), netVersion))
+                .isFalse();
           });
     }
   }
@@ -408,7 +423,10 @@ public class JsonRpcHttpServiceLoginTest {
   public void checkPermissionsWithEmptyUser() {
     JsonRpcMethod ethAccounts = new EthAccounts();
 
-    assertThat(AuthenticationUtils.isPermitted(service.authenticationService, Optional.empty(), ethAccounts)).isFalse();
+    assertThat(
+            AuthenticationUtils.isPermitted(
+                service.authenticationService, Optional.empty(), ethAccounts))
+        .isFalse();
   }
 
   @Test
