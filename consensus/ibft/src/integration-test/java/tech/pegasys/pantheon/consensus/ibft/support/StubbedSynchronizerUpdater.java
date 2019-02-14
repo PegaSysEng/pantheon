@@ -12,11 +12,12 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
+import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
+import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
-import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 
 public class StubbedSynchronizerUpdater implements SynchronizerUpdater {
 

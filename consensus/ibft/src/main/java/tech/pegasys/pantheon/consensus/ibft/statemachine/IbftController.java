@@ -14,10 +14,10 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import static java.util.Collections.emptyList;
 
-import tech.pegasys.pantheon.consensus.ibft.BaseSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
+import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -54,7 +54,7 @@ public class IbftController {
   private BlockHeightManager currentHeightManager;
   private final Gossiper gossiper;
   private final MessageTracker duplicateMessageTracker;
-  private final BaseSynchronizerUpdater sychronizerUpdater;
+  private final SynchronizerUpdater sychronizerUpdater;
 
   public IbftController(
       final Blockchain blockchain,
@@ -62,7 +62,7 @@ public class IbftController {
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
       final int duplicateMessageLimit,
-      final BaseSynchronizerUpdater sychronizerUpdater) {
+      final SynchronizerUpdater sychronizerUpdater) {
     this(
         blockchain,
         ibftFinalState,
@@ -81,7 +81,7 @@ public class IbftController {
       final Gossiper gossiper,
       final Map<Long, List<Message>> futureMessages,
       final MessageTracker duplicateMessageTracker,
-      final BaseSynchronizerUpdater sychronizerUpdater) {
+      final SynchronizerUpdater sychronizerUpdater) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
