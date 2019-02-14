@@ -61,8 +61,8 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    if (!validateProposalMessageMatchesLatestPrepareCertificate(
-        msg.getSignedPayload().getPayload(), msg.getBlock())) {
+    if (!RoundChangeCertificateValidator.validateProposalMessageMatchesLatestPrepareCertificate(
+        msg.getRoundChangeCertificate(), msg.getBlock())) {
       LOG.debug(
           "Illegal NewRound message, piggybacked block does not match latest PrepareCertificate");
       return false;
@@ -83,46 +83,6 @@ public class NewRoundMessageValidator {
 
     if (!validationResult.isPresent()) {
       LOG.info("Invalid Proposal message, block did not pass validation.");
-      return false;
-    }
-
-    return true;
-  }
-
-  private boolean validateProposalMessageMatchesLatestPrepareCertificate(
-      final NewRoundPayload payload, final Block proposedBlock) {
-
-    final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
-    final Collection<SignedData<RoundChangePayload>> roundChangePayloads =
-        roundChangeCert.getRoundChangePayloads();
-
-    final Optional<PreparedCertificate> latestPreparedCertificate =
-        findLatestPreparedCertificate(roundChangePayloads);
-
-    if (!latestPreparedCertificate.isPresent()) {
-      LOG.trace(
-          "No round change messages have a preparedCertificate, any valid block may be proposed.");
-      return true;
-    }
-
-    // Need to check that if we substitute the LatestPrepareCert round number into the supplied
-    // block that we get the SAME hash as PreparedCert.
-    final Block currentBlockWithOldRound =
-        IbftBlockInterface.replaceRoundInBlock(
-            proposedBlock,
-            latestPreparedCertificate
-                .get()
-                .getProposalPayload()
-                .getPayload()
-                .getRoundIdentifier()
-                .getRoundNumber(),
-            IbftBlockHashing::calculateDataHashForCommittedSeal);
-
-    if (!currentBlockWithOldRound
-        .getHash()
-        .equals(latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest())) {
-      LOG.info(
-          "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
       return false;
     }
 

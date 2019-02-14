@@ -1,0 +1,115 @@
+package tech.pegasys.pantheon.consensus.ibft.validation;
+
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPreparedCertificate;
+import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
+
+import java.util.Collection;
+import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
+import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangePayloadValidator.MessageValidatorForHeightFactory;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Block;
+
+public class RoundChangeCertificateValidator {
+
+  private static final Logger LOG = LogManager.getLogger();
+
+  private final Collection<Address> validators;
+  private final MessageValidatorForHeightFactory messageValidatorFactory;
+  private final long quorum;
+  private final long chainHeight;
+
+  public RoundChangeCertificateValidator(
+      final Collection<Address> validators,
+      final MessageValidatorForHeightFactory messageValidatorFactory,
+      final long chainHeight) {
+    this.validators = validators;
+    this.messageValidatorFactory = messageValidatorFactory;
+    this.quorum = IbftHelpers.calculateRequiredValidatorQuorum(validators.size());
+    this.chainHeight = chainHeight;
+  }
+
+  public boolean validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
+      final ConsensusRoundIdentifier expectedRound, final RoundChangeCertificate roundChangeCert) {
+
+    final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
+        roundChangeCert.getRoundChangePayloads();
+
+    if (roundChangeMsgs.size() < quorum) {
+      LOG.info("Invalid RoundChangeCertificate, insufficient RoundChange messages.");
+      return false;
+    }
+
+    if (!roundChangeCert.getRoundChangePayloads().stream()
+        .allMatch(p -> p.getPayload().getRoundIdentifier().equals(expectedRound))) {
+      LOG.info("Invalid RoundChangeCertificate, not all embedded RoundChange messages have a "
+              + "matching target round.");
+      return false;
+    }
+
+    for (final SignedData<RoundChangePayload> roundChangeMsg :
+        roundChangeCert.getRoundChangePayloads()) {
+      final RoundChangePayloadValidator roundChangeValidator =
+          new RoundChangePayloadValidator(
+              messageValidatorFactory,
+              validators,
+              prepareMessageCountForQuorum(quorum),
+              chainHeight);
+
+      if (!roundChangeValidator.validateRoundChange(roundChangeMsg)) {
+        LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static boolean validateProposalMessageMatchesLatestPrepareCertificate(
+      final RoundChangeCertificate roundChangeCert, final Block proposedBlock) {
+
+    final Collection<SignedData<RoundChangePayload>> roundChangePayloads =
+        roundChangeCert.getRoundChangePayloads();
+
+    final Optional<PreparedCertificate> latestPreparedCertificate =
+        findLatestPreparedCertificate(roundChangePayloads);
+
+    if (!latestPreparedCertificate.isPresent()) {
+      LOG.trace(
+          "No round change messages have a preparedCertificate, any valid block may be proposed.");
+      return true;
+    }
+
+    // Need to check that if we substitute the LatestPrepareCert round number into the supplied
+    // block that we get the SAME hash as PreparedCert.
+    final Block currentBlockWithOldRound =
+        IbftBlockInterface.replaceRoundInBlock(
+            proposedBlock,
+            latestPreparedCertificate
+                .get()
+                .getProposalPayload()
+                .getPayload()
+                .getRoundIdentifier()
+                .getRoundNumber(),
+            IbftBlockHashing::calculateDataHashForCommittedSeal);
+
+    if (!currentBlockWithOldRound
+        .getHash()
+        .equals(latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest())) {
+      LOG.info(
+          "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
+      return false;
+    }
+
+    return true;
+  }
+}
