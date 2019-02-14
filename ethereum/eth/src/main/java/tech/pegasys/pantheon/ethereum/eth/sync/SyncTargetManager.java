@@ -112,9 +112,7 @@ public abstract class SyncTargetManager<C> {
             });
   }
 
-  protected Optional<SyncTarget> finalizeSelectedSyncTarget(final SyncTarget syncTarget) {
-    return Optional.of(syncTarget);
-  }
+  protected abstract Optional<SyncTarget> finalizeSelectedSyncTarget(final SyncTarget syncTarget);
 
   protected abstract CompletableFuture<Optional<EthPeer>> selectBestAvailableSyncTarget();
 

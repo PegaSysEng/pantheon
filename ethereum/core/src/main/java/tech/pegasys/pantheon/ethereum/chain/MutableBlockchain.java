@@ -32,5 +32,5 @@ public interface MutableBlockchain extends Blockchain {
    */
   void appendBlock(Block block, List<TransactionReceipt> receipts);
 
-  void forceReorgTo(BlockHeader newChainHead);
+  void forceReorganizationTo(BlockHeader newChainHead);
 }

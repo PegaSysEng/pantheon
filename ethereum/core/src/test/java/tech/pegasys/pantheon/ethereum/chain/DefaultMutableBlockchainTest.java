@@ -472,7 +472,7 @@ public class DefaultMutableBlockchainTest {
 
     final int reorgToIndex = 2;
     final Block newHead = chain.get(reorgToIndex);
-    blockchain.forceReorgTo(newHead.getHeader());
+    blockchain.forceReorganizationTo(newHead.getHeader());
 
     assertBlockIsHead(blockchain, newHead);
 
@@ -510,15 +510,15 @@ public class DefaultMutableBlockchainTest {
     }
 
     // Reorg back to 1 then forward to 3
-    blockchain.forceReorgTo(chain.get(1).getHeader());
+    blockchain.forceReorganizationTo(chain.get(1).getHeader());
     assertBlockIsHead(blockchain, chain.get(1));
     assertThat(blockchain.getForks())
         .containsExactlyInAnyOrder(chain.get(chainLength - 1).getHash());
 
     final int reorgToIndex = 3;
-    blockchain.forceReorgTo(chain.get(reorgToIndex).getHeader());
+    blockchain.forceReorganizationTo(chain.get(reorgToIndex).getHeader());
     final Block newHead = chain.get(reorgToIndex);
-    blockchain.forceReorgTo(newHead.getHeader());
+    blockchain.forceReorganizationTo(newHead.getHeader());
 
     assertBlockIsHead(blockchain, newHead);
 
@@ -568,7 +568,7 @@ public class DefaultMutableBlockchainTest {
     blockchain.appendBlock(longerForkChainHead, gen.receipts(longerForkChainHead));
     assertBlockIsHead(blockchain, longerForkChainHead);
 
-    blockchain.forceReorgTo(shorterForkChainHead.getHeader());
+    blockchain.forceReorganizationTo(shorterForkChainHead.getHeader());
 
     assertBlockIsHead(blockchain, shorterForkChainHead);
     assertThat(blockchain.getForks()).containsExactlyInAnyOrder(longerForkChainHead.getHash());
@@ -606,7 +606,7 @@ public class DefaultMutableBlockchainTest {
     assertBlockIsHead(blockchain, shorterForkChainHead);
 
     // Force re-org to the longer chain
-    blockchain.forceReorgTo(longerForkChainHead.getHeader());
+    blockchain.forceReorganizationTo(longerForkChainHead.getHeader());
 
     assertBlockIsHead(blockchain, longerForkChainHead);
 

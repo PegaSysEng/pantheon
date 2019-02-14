@@ -62,15 +62,11 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
   }
 
   @Override
-  public CompletableFuture<SyncTarget> findSyncTarget() {
-    return super.findSyncTarget()
-        .thenApply(
-            syncTarget -> {
-              final BlockHeader commonAncestor = syncTarget.commonAncestor();
-              LOG.info("Forcing reorg to " + commonAncestor);
-              protocolContext.getBlockchain().forceReorgTo(commonAncestor);
-              return syncTarget;
-            });
+  protected Optional<SyncTarget> finalizeSelectedSyncTarget(final SyncTarget syncTarget) {
+    final BlockHeader commonAncestor = syncTarget.commonAncestor();
+    LOG.info("Forcing reorganization to " + commonAncestor);
+    protocolContext.getBlockchain().forceReorganizationTo(commonAncestor);
+    return Optional.of(syncTarget);
   }
 
   @Override

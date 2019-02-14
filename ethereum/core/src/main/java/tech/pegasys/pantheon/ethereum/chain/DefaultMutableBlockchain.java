@@ -157,9 +157,9 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   }
 
   @Override
-  public void forceReorgTo(final BlockHeader newChainHead) {
+  public void forceReorganizationTo(final BlockHeader newChainHead) {
     if (!blockIsAlreadyTracked(newChainHead.getHash())) {
-      throw new IllegalArgumentException("Attempt to re-org to unknown block");
+      throw new IllegalArgumentException("Attempt to reorganize to unknown block");
     }
     if (getChainHeadHash().equals(newChainHead.getHash())) {
       // Already chain head so nothing to do.
@@ -168,19 +168,21 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     final BlockBody body =
         getBlockBody(newChainHead.getHash())
             .orElseThrow(
-                () -> new IllegalArgumentException("Attempt to re-org to block with missing body"));
+                () ->
+                    new IllegalArgumentException(
+                        "Attempt to reorganize to block with missing body"));
     final Block block = new Block(newChainHead, body);
 
     final Updater updater = blockchainStorage.updater();
     try {
       handleChainReorg(updater, block);
+      updater.commit();
     } catch (final NoSuchElementException e) {
       // Any Optional.get() calls in this block should be present, missing data means data
       // corruption or a bug.
       updater.rollback();
       throw new IllegalStateException("Blockchain is missing data that should be present.", e);
     }
-    updater.commit();
   }
 
   private BlockAddedEvent appendBlockHelper(
