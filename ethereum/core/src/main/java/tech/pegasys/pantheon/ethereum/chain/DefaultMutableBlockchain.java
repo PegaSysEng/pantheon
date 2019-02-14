@@ -166,10 +166,16 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
             .orElseThrow(
                 () -> new IllegalArgumentException("Attempt to re-org to block with missing body"));
     final Block block = new Block(newChainHead, body);
-    final UInt256 totalDifficulty = calculateTotalDifficulty(block);
 
     final Updater updater = blockchainStorage.updater();
-    updateCanonicalChainData(updater, block, totalDifficulty);
+    try {
+      handleChainReorg(updater, block);
+    } catch (final NoSuchElementException e) {
+      // Any Optional.get() calls in this block should be present, missing data means data
+      // corruption or a bug.
+      updater.rollback();
+      throw new IllegalStateException("Blockchain is missing data that should be present.", e);
+    }
     updater.commit();
   }
 

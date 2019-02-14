@@ -67,6 +67,7 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
         .thenApply(
             syncTarget -> {
               final BlockHeader commonAncestor = syncTarget.commonAncestor();
+              LOG.info("Forcing reorg to " + commonAncestor);
               protocolContext.getBlockchain().forceReorgTo(commonAncestor);
               return syncTarget;
             });
