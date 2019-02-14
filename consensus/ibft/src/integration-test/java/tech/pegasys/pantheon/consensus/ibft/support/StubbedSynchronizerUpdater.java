@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
+import static java.util.function.Function.identity;
+
 import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 
@@ -31,7 +33,6 @@ public class StubbedSynchronizerUpdater implements SynchronizerUpdater {
 
   public void addNetworkPeers(final Collection<ValidatorPeer> nodes) {
     validatorNodes =
-        nodes.stream()
-            .collect(Collectors.toMap(ValidatorPeer::getPeerConnection, validator -> validator));
+        nodes.stream().collect(Collectors.toMap(ValidatorPeer::getPeerConnection, identity()));
   }
 }

@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,7 +37,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SynchronizerUpdaterTest {
+public class EthSynchronizerUpdaterTest {
 
   @Mock private EthPeers ethPeers;
   @Mock private EthPeer ethPeer;
@@ -57,32 +56,14 @@ public class SynchronizerUpdaterTest {
   }
 
   @Test
-  public void chainStateIsNotUpdatedIfItIsAheadOfRequestedHeight() {
-    final long knownChainHeight = 5L;
-    final long suppliedChainHeight = 4L;
+  public void chainStateUpdateIsAttemptedIfEthPeerExists() {
     when(ethPeers.peer(any())).thenReturn(ethPeer);
     when(ethPeer.chainState()).thenReturn(chainState);
-    when(chainState.getEstimatedHeight()).thenReturn(knownChainHeight);
 
     final EthSynchronizerUpdater updater = new EthSynchronizerUpdater(ethPeers);
 
-    updater.updatePeerChainState(suppliedChainHeight, createAnonymousPeerConnection());
-
-    verify(chainState, times(0)).updateHeightEstimate(anyLong());
-  }
-
-  @Test
-  public void chainStateIsUpdatedIfItIsBehindSuppliedChainHeight() {
-    final long knownChainHeight = 5L;
     final long suppliedChainHeight = 6L;
-    when(ethPeers.peer(any())).thenReturn(ethPeer);
-    when(ethPeer.chainState()).thenReturn(chainState);
-    when(chainState.getEstimatedHeight()).thenReturn(knownChainHeight);
-
-    final EthSynchronizerUpdater updater = new EthSynchronizerUpdater(ethPeers);
-
     updater.updatePeerChainState(suppliedChainHeight, createAnonymousPeerConnection());
-
     verify(chainState, times(1)).updateHeightEstimate(eq(suppliedChainHeight));
   }
 

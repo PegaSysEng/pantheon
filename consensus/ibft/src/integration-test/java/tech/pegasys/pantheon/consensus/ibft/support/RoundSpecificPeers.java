@@ -127,7 +127,7 @@ public class RoundSpecificPeers {
   }
 
   public void forNonProposing(final Consumer<ValidatorPeer> assertion) {
-    nonProposingPeers.forEach(peer -> assertion.accept(peer));
+    nonProposingPeers.forEach(assertion);
   }
 
   public Collection<SignedData<PreparePayload>> createSignedPreparePayloadOfNonProposing(
