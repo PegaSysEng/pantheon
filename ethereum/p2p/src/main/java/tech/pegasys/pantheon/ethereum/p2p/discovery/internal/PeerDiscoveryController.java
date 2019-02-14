@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.Outcome;
+import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -282,7 +282,7 @@ public class PeerDiscoveryController {
 
   private boolean addToPeerTable(final DiscoveryPeer peer) {
     final PeerTable.AddResult result = peerTable.tryAdd(peer);
-    if (result.getOutcome() == Outcome.SELF) {
+    if (result.getOutcome() == AddOutcome.SELF) {
       return false;
     }
 
@@ -298,11 +298,11 @@ public class PeerDiscoveryController {
       notifyPeerBonded(peer, now);
     }
 
-    if (result.getOutcome() == Outcome.ALREADY_EXISTED) {
+    if (result.getOutcome() == AddOutcome.ALREADY_EXISTED) {
       // Bump peer.
       peerTable.evict(peer);
       peerTable.tryAdd(peer);
-    } else if (result.getOutcome() == Outcome.BUCKET_FULL) {
+    } else if (result.getOutcome() == AddOutcome.BUCKET_FULL) {
       peerTable.evict(result.getEvictionCandidate());
       peerTable.tryAdd(peer);
     }

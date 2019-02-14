@@ -20,6 +20,7 @@ import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDistance
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerId;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -103,7 +104,7 @@ public class PeerTable {
    *   <li>the operation failed because the peer already existed.
    * </ul>
    *
-   * @see AddResult.Outcome
+   * @see AddOutcome
    * @param peer The peer to add.
    * @return An object indicating the outcome of the operation.
    */
@@ -206,7 +207,7 @@ public class PeerTable {
   /** A class that encapsulates the result of a peer addition to the table. */
   public static class AddResult {
     /** The outcome of the operation. */
-    public enum Outcome {
+    public enum AddOutcome {
 
       /** The peer was added successfully to its corresponding k-bucket. */
       ADDED,
@@ -221,31 +222,31 @@ public class PeerTable {
       SELF
     }
 
-    private final Outcome outcome;
+    private final AddOutcome outcome;
     private final Peer evictionCandidate;
 
-    private AddResult(final Outcome outcome, final Peer evictionCandidate) {
+    private AddResult(final AddOutcome outcome, final Peer evictionCandidate) {
       this.outcome = outcome;
       this.evictionCandidate = evictionCandidate;
     }
 
     static AddResult added() {
-      return new AddResult(Outcome.ADDED, null);
+      return new AddResult(AddOutcome.ADDED, null);
     }
 
     static AddResult bucketFull(final Peer evictionCandidate) {
-      return new AddResult(Outcome.BUCKET_FULL, evictionCandidate);
+      return new AddResult(AddOutcome.BUCKET_FULL, evictionCandidate);
     }
 
     static AddResult existed() {
-      return new AddResult(Outcome.ALREADY_EXISTED, null);
+      return new AddResult(AddOutcome.ALREADY_EXISTED, null);
     }
 
     static AddResult self() {
-      return new AddResult(Outcome.SELF, null);
+      return new AddResult(AddOutcome.SELF, null);
     }
 
-    public Outcome getOutcome() {
+    public AddOutcome getOutcome() {
       return outcome;
     }
 
