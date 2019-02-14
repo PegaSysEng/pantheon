@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
+import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage.Updater;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -144,7 +145,7 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     checkArgument(
         block.getBody().getTransactions().size() == receipts.size(),
         "Supplied receipts do not match block transactions.");
-    if (blockIsAlreadyTracked(block)) {
+    if (blockIsAlreadyTracked(block.getHash())) {
       return;
     }
     if (!blockIsConnected(block)) {
@@ -153,6 +154,23 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
 
     final BlockAddedEvent blockAddedEvent = appendBlockHelper(block, receipts);
     notifyBlockAdded(blockAddedEvent);
+  }
+
+  @Override
+  public void forceReorgTo(final BlockHeader newChainHead) {
+    if (!blockIsAlreadyTracked(newChainHead.getHash())) {
+      throw new IllegalArgumentException("Attempt to re-org to unknown block");
+    }
+    final BlockBody body =
+        getBlockBody(newChainHead.getHash())
+            .orElseThrow(
+                () -> new IllegalArgumentException("Attempt to re-org to block with missing body"));
+    final Block block = new Block(newChainHead, body);
+    final UInt256 totalDifficulty = calculateTotalDifficulty(block);
+
+    final Updater updater = blockchainStorage.updater();
+    updateCanonicalChainData(updater, block, totalDifficulty);
+    updater.commit();
   }
 
   private BlockAddedEvent appendBlockHelper(
@@ -368,12 +386,12 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     }
   }
 
-  protected boolean blockIsAlreadyTracked(final Block block) {
-    return blockchainStorage.getBlockHeader(block.getHash()).isPresent();
+  private boolean blockIsAlreadyTracked(final Hash hash) {
+    return blockchainStorage.getBlockHeader(hash).isPresent();
   }
 
-  protected boolean blockIsConnected(final Block block) {
-    return blockchainStorage.getBlockHeader(block.getHeader().getParentHash()).isPresent();
+  private boolean blockIsConnected(final Block block) {
+    return blockIsAlreadyTracked(block.getHeader().getParentHash());
   }
 
   @Override

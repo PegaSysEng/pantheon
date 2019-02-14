@@ -62,6 +62,17 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
   }
 
   @Override
+  public CompletableFuture<SyncTarget> findSyncTarget() {
+    return super.findSyncTarget()
+        .thenApply(
+            syncTarget -> {
+              final BlockHeader commonAncestor = syncTarget.commonAncestor();
+              protocolContext.getBlockchain().forceReorgTo(commonAncestor);
+              return syncTarget;
+            });
+  }
+
+  @Override
   protected CompletableFuture<Optional<EthPeer>> selectBestAvailableSyncTarget() {
     final Optional<EthPeer> maybeBestPeer = ethContext.getEthPeers().bestPeer();
     if (!maybeBestPeer.isPresent()) {

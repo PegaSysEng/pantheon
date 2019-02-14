@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.chain;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface MutableBlockchain extends Blockchain {
    * @param receipts The list of receipts associated with this block's transactions.
    */
   void appendBlock(Block block, List<TransactionReceipt> receipts);
+
+  void forceReorgTo(BlockHeader newChainHead);
 }
