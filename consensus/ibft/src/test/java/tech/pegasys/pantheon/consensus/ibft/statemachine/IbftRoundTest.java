@@ -132,7 +132,8 @@ public class IbftRoundTest {
             messageFactory,
             transmitter);
 
-    round.handleProposalMessage(messageFactory.createProposal(roundIdentifier, proposedBlock));
+    round.handleProposalMessage(
+        messageFactory.createProposal(roundIdentifier, proposedBlock, Optional.empty()));
     verify(transmitter, times(1)).multicastPrepare(roundIdentifier, proposedBlock.getHash());
     verify(transmitter, never()).multicastCommit(any(), any(), any());
   }
@@ -152,7 +153,8 @@ public class IbftRoundTest {
             transmitter);
 
     round.createAndSendProposalMessage(15);
-    verify(transmitter, times(1)).multicastProposal(roundIdentifier, proposedBlock);
+    verify(transmitter, times(1))
+        .multicastProposal(roundIdentifier, proposedBlock, Optional.empty());
     verify(transmitter, never()).multicastPrepare(any(), any());
     verify(transmitter, never()).multicastCommit(any(), any(), any());
   }
@@ -171,7 +173,8 @@ public class IbftRoundTest {
             messageFactory,
             transmitter);
     round.createAndSendProposalMessage(15);
-    verify(transmitter, times(1)).multicastProposal(roundIdentifier, proposedBlock);
+    verify(transmitter, times(1))
+        .multicastProposal(roundIdentifier, proposedBlock, Optional.empty());
     verify(transmitter, never()).multicastPrepare(any(), any());
     verify(transmitter, times(1)).multicastCommit(any(), any(), any());
     verify(blockImporter, times(1)).importBlock(any(), any(), any());
@@ -197,7 +200,8 @@ public class IbftRoundTest {
     final Signature localCommitSeal = SECP256K1.sign(commitSealHash, localNodeKeys);
 
     // Receive Proposal Message
-    round.handleProposalMessage(messageFactory.createProposal(roundIdentifier, proposedBlock));
+    round.handleProposalMessage(
+        messageFactory.createProposal(roundIdentifier, proposedBlock, Optional.empty()));
     verify(transmitter, times(1)).multicastPrepare(roundIdentifier, proposedBlock.getHash());
     verify(transmitter, times(1))
         .multicastCommit(roundIdentifier, proposedBlock.getHash(), localCommitSeal);
@@ -254,7 +258,7 @@ public class IbftRoundTest {
   }
 
   @Test
-  public void aNewRoundMessageWithAnewBlockIsSentUponReceptionOfARoundChangeWithNoCertificate() {
+  public void aProposalWithAnewBlockIsSentUponReceptionOfARoundChangeWithNoCertificate() {
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(
@@ -271,7 +275,7 @@ public class IbftRoundTest {
 
     round.startRoundWith(new RoundChangeArtifacts(empty(), emptyList()), 15);
     verify(transmitter, times(1))
-        .multicastNewRound(eq(roundIdentifier), eq(roundChangeCertificate), any(), any());
+        .multicastProposal(eq(roundIdentifier), any(), eq(Optional.of(roundChangeCertificate)));
   }
 
   @Test
@@ -296,18 +300,18 @@ public class IbftRoundTest {
                     roundIdentifier,
                     Optional.of(
                         new PreparedRoundArtifacts(
-                            messageFactory.createProposal(priorRoundChange, proposedBlock),
+                            messageFactory.createProposal(
+                                priorRoundChange, proposedBlock, Optional.empty()),
                             emptyList())))));
 
     // NOTE: IbftRound assumes the prepare's are valid
 
     round.startRoundWith(roundChangeArtifacts, 15);
     verify(transmitter, times(1))
-        .multicastNewRound(
+        .multicastProposal(
             eq(roundIdentifier),
-            eq(roundChangeArtifacts.getRoundChangeCertificate()),
-            any(),
-            blockCaptor.capture());
+            blockCaptor.capture(),
+            eq(Optional.of(roundChangeArtifacts.getRoundChangeCertificate())));
 
     final IbftExtraData proposedExtraData =
         IbftExtraData.decode(blockCaptor.getValue().getHeader().getExtraData());
@@ -340,11 +344,10 @@ public class IbftRoundTest {
 
     round.startRoundWith(roundChangeArtifacts, 15);
     verify(transmitter, times(1))
-        .multicastNewRound(
+        .multicastProposal(
             eq(roundIdentifier),
-            eq(roundChangeArtifacts.getRoundChangeCertificate()),
-            payloadArgCaptor.capture(),
-            blockCaptor.capture());
+            blockCaptor.capture(),
+            eq(Optional.of(roundChangeArtifacts.getRoundChangeCertificate())));
 
     // Inject a single Prepare message, and confirm the roundState has gone to Prepared (which
     // indicates the block has entered the roundState (note: all msgs are deemed valid due to mocks)
@@ -389,7 +392,8 @@ public class IbftRoundTest {
     round.handleCommitMessage(
         messageFactory.createCommit(roundIdentifier, proposedBlock.getHash(), remoteCommitSeal));
 
-    round.handleProposalMessage(messageFactory.createProposal(roundIdentifier, proposedBlock));
+    round.handleProposalMessage(
+        messageFactory.createProposal(roundIdentifier, proposedBlock, Optional.empty()));
 
     verify(blockImporter, times(1)).importBlock(any(), any(), any());
   }
@@ -412,7 +416,8 @@ public class IbftRoundTest {
     round.handleCommitMessage(
         messageFactory.createCommit(roundIdentifier, proposedBlock.getHash(), remoteCommitSeal));
 
-    round.handleProposalMessage(messageFactory.createProposal(roundIdentifier, proposedBlock));
+    round.handleProposalMessage(
+        messageFactory.createProposal(roundIdentifier, proposedBlock, Optional.empty()));
 
     verify(blockImporter, times(1)).importBlock(any(), any(), any());
   }

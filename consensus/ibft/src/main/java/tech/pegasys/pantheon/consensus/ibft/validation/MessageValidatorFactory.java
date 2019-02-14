@@ -52,12 +52,16 @@ public class MessageValidatorFactory {
   public MessageValidator createMessageValidator(final ConsensusRoundIdentifier roundIdentifier) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
+    final Collection<Address> validators =
+        protocolContext.getConsensusState().getVoteTally().getValidators();
 
     return new MessageValidator(
         createSignedDataValidator(roundIdentifier),
         new ProposalBlockConsistencyValidator(),
         blockValidator,
-        protocolContext);
+        protocolContext,
+        new RoundChangeCertificateValidator(
+            validators, this::createSignedDataValidator, roundIdentifier.getSequenceNumber()));
   }
 
   public RoundChangeMessageValidator createRoundChangeMessageValidator(final long chainHeight) {
@@ -74,26 +78,9 @@ public class MessageValidatorFactory {
         new ProposalBlockConsistencyValidator());
   }
 
-  public NewRoundMessageValidator createNewRoundValidator(final long chainHeight) {
-    final Collection<Address> validators =
-        protocolContext.getConsensusState().getVoteTally().getValidators();
+  public FutureRoundProposalMessageValidator createFutureRoundProposalMessageValidator(
+      final long chainHeight) {
 
-    final BlockValidator<IbftContext> blockValidator =
-        protocolSchedule.getByBlockNumber(chainHeight).getBlockValidator();
-
-    final RoundChangeCertificateValidator roundChangeCertificateValidator =
-        new RoundChangeCertificateValidator(
-            validators, this::createSignedDataValidator, chainHeight);
-
-    return new NewRoundMessageValidator(
-        new NewRoundPayloadValidator(
-            proposerSelector,
-            this::createSignedDataValidator,
-            chainHeight,
-            roundChangeCertificateValidator),
-        new ProposalBlockConsistencyValidator(),
-        blockValidator,
-        protocolContext,
-        roundChangeCertificateValidator);
+    return new FutureRoundProposalMessageValidator(this, chainHeight);
   }
 }

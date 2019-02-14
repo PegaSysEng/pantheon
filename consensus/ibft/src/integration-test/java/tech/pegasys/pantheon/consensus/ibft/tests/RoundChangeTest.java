@@ -19,7 +19,6 @@ import static tech.pegasys.pantheon.consensus.ibft.support.IntegrationTestHelper
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
@@ -149,19 +148,17 @@ public class RoundChangeTest {
     final RoundChange rc3 = peers.getNonProposing(2).injectRoundChange(targetRound, empty());
     final RoundChange rc4 = peers.getProposer().injectRoundChange(targetRound, empty());
 
-    final NewRound expectedNewRound =
-        localNodeMessageFactory.createNewRound(
+    final Proposal expectedNewRound =
+        localNodeMessageFactory.createProposal(
             targetRound,
-            new RoundChangeCertificate(
-                Lists.newArrayList(
-                    rc1.getSignedPayload(),
-                    rc2.getSignedPayload(),
-                    rc3.getSignedPayload(),
-                    rc4.getSignedPayload())),
-            localNodeMessageFactory
-                .createProposal(targetRound, locallyProposedBlock)
-                .getSignedPayload(),
-            locallyProposedBlock);
+            locallyProposedBlock,
+            Optional.of(
+                new RoundChangeCertificate(
+                    Lists.newArrayList(
+                        rc1.getSignedPayload(),
+                        rc2.getSignedPayload(),
+                        rc3.getSignedPayload(),
+                        rc4.getSignedPayload()))));
 
     peers.verifyMessagesReceived(expectedNewRound);
   }
@@ -204,21 +201,19 @@ public class RoundChangeTest {
         context.createBlockForProposalFromChainHead(
             targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
 
-    final NewRound expectedNewRound =
-        localNodeMessageFactory.createNewRound(
+    final Proposal expectedProposal =
+        localNodeMessageFactory.createProposal(
             targetRound,
-            new RoundChangeCertificate(
-                Lists.newArrayList(
-                    rc1.getSignedPayload(),
-                    rc2.getSignedPayload(),
-                    rc3.getSignedPayload(),
-                    rc4.getSignedPayload())),
-            localNodeMessageFactory
-                .createProposal(targetRound, expectedBlockToPropose)
-                .getSignedPayload(),
-            expectedBlockToPropose);
+            expectedBlockToPropose,
+            Optional.of(
+                new RoundChangeCertificate(
+                    Lists.newArrayList(
+                        rc1.getSignedPayload(),
+                        rc2.getSignedPayload(),
+                        rc3.getSignedPayload(),
+                        rc4.getSignedPayload()))));
 
-    peers.verifyMessagesReceived(expectedNewRound);
+    peers.verifyMessagesReceived(expectedProposal);
   }
 
   @Test
@@ -234,16 +229,13 @@ public class RoundChangeTest {
     final Block locallyProposedBlock =
         context.createBlockForProposalFromChainHead(futureRound.getRoundNumber(), blockTimeStamp);
 
-    final NewRound expectedNewRound =
-        localNodeMessageFactory.createNewRound(
+    final Proposal expectedProposal =
+        localNodeMessageFactory.createProposal(
             futureRound,
-            new RoundChangeCertificate(roundChangeMessages),
-            localNodeMessageFactory
-                .createProposal(futureRound, locallyProposedBlock)
-                .getSignedPayload(),
-            locallyProposedBlock);
+            locallyProposedBlock,
+            Optional.of(new RoundChangeCertificate(roundChangeMessages)));
 
-    peers.verifyMessagesReceived(expectedNewRound);
+    peers.verifyMessagesReceived(expectedProposal);
   }
 
   @Test
@@ -289,16 +281,13 @@ public class RoundChangeTest {
         context.createBlockForProposalFromChainHead(
             targetRound.getRoundNumber(), ARBITRARY_BLOCKTIME);
 
-    final NewRound expectedNewRound =
-        localNodeMessageFactory.createNewRound(
+    final Proposal expectedProposal =
+        localNodeMessageFactory.createProposal(
             targetRound,
-            new RoundChangeCertificate(Lists.newArrayList(roundChangeMessages)),
-            localNodeMessageFactory
-                .createProposal(targetRound, expectedBlockToPropose)
-                .getSignedPayload(),
-            expectedBlockToPropose);
+            expectedBlockToPropose,
+            Optional.of(new RoundChangeCertificate(Lists.newArrayList(roundChangeMessages))));
 
-    peers.verifyMessagesReceived(expectedNewRound);
+    peers.verifyMessagesReceived(expectedProposal);
   }
 
   @Test
@@ -335,7 +324,10 @@ public class RoundChangeTest {
     // create illegal RoundChangeMessage
     final PreparedRoundArtifacts illegalPreparedRoundArtifacts =
         new PreparedRoundArtifacts(
-            peers.getNonProposing(0).getMessageFactory().createProposal(roundId, blockToPropose),
+            peers
+                .getNonProposing(0)
+                .getMessageFactory()
+                .createProposal(roundId, blockToPropose, Optional.empty()),
             emptyList());
 
     peers
