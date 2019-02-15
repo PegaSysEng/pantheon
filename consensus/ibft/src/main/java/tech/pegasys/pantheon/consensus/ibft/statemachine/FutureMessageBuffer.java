@@ -27,7 +27,7 @@ import com.google.common.annotations.VisibleForTesting;
  * Buffer which holds future IBFT messages.
  *
  * <p>This buffer only allows messages to be added which have a chain height greater than current
- * height and less the futureMessagesMaxDistance from the current chain height.
+ * height and up to chain futureMessagesMaxDistance from the current chain height.
  *
  * <p>When the total number of messages is greater futureMessagesLimit then messages are evicted.
  *
@@ -61,8 +61,8 @@ public class FutureMessageBuffer {
   }
 
   public void addMessage(final long msgChainHeight, final Message rawMsg) {
-    long chainHeight = currentChainHeight.get();
-    if (!validMessageHeight(msgChainHeight, chainHeight)) {
+    final long currentHeight = currentChainHeight.get();
+    if (!validMessageHeight(msgChainHeight, currentHeight)) {
       return;
     }
 
@@ -77,10 +77,11 @@ public class FutureMessageBuffer {
     totalMessages += 1;
   }
 
-  private boolean validMessageHeight(final long msgChainHeight, final long chainHeight) {
-    boolean isFutureMsg = msgChainHeight > chainHeight;
-    boolean isLessThanMaxChainHeight = msgChainHeight <= chainHeight + futureMessagesMaxDistance;
-    return isFutureMsg && isLessThanMaxChainHeight;
+  private boolean validMessageHeight(final long msgChainHeight, final long currentHeight) {
+    final boolean isFutureMsg = msgChainHeight > currentHeight;
+    final boolean withinMaxChainHeight =
+        msgChainHeight <= currentHeight + futureMessagesMaxDistance;
+    return isFutureMsg && withinMaxChainHeight;
   }
 
   private void evictMessages() {
