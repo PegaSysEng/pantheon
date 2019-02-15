@@ -22,6 +22,7 @@ import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
@@ -75,7 +76,7 @@ public class FutureUtilsTest {
 
   @Test
   public void shouldComposeExceptionallyWhenErrorOccurs() {
-    final Function<Throwable, CompletableFuture<String>> errorHandler = mockFunction();
+    final Function<Throwable, CompletionStage<String>> errorHandler = mockFunction();
     final CompletableFuture<String> input = new CompletableFuture<>();
     final CompletableFuture<String> afterException = new CompletableFuture<>();
     when(errorHandler.apply(ERROR)).thenReturn(afterException);
@@ -97,7 +98,7 @@ public class FutureUtilsTest {
   @Test
   public void shouldComposeExceptionallyWhenErrorOccursAndComposedFutureFails() {
     final RuntimeException secondError = new RuntimeException("Again?");
-    final Function<Throwable, CompletableFuture<String>> errorHandler = mockFunction();
+    final Function<Throwable, CompletionStage<String>> errorHandler = mockFunction();
     final CompletableFuture<String> input = new CompletableFuture<>();
     final CompletableFuture<String> afterException = new CompletableFuture<>();
     when(errorHandler.apply(ERROR)).thenReturn(afterException);
@@ -118,7 +119,7 @@ public class FutureUtilsTest {
 
   @Test
   public void shouldNotCallErrorHandlerWhenFutureCompletesSuccessfully() {
-    final Function<Throwable, CompletableFuture<String>> errorHandler = mockFunction();
+    final Function<Throwable, CompletionStage<String>> errorHandler = mockFunction();
     final CompletableFuture<String> input = new CompletableFuture<>();
     final CompletableFuture<String> afterException = new CompletableFuture<>();
     when(errorHandler.apply(ERROR)).thenReturn(afterException);
