@@ -558,9 +558,25 @@ The default is `false`.
 !!!note
     Permissions is under development and will be available in v1.0. 
     
-### permissions-config-path=<permissionsConfigPath>    
+### permissions-config-file    
 
+```bash tab="Syntax"
+--permissions-config-file=<FILE>
+```
 
+```bash tab="Example Command Line"
+--permissions-config-file=/home/me/me_configFiles/myPermissionsFile
+```
+
+```bash tab="Example Configuration File"
+permissions-config-file="/home/me/me_configFiles/myPermissionsFile"
+```
+
+Path to the [permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file).
+The default is the `permissions_config.toml` file in the [data directory](#data-path).
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md).
 
 ### permissions-nodes-enabled
 
