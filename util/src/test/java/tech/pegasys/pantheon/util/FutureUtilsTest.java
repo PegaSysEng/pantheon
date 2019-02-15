@@ -118,6 +118,25 @@ public class FutureUtilsTest {
   }
 
   @Test
+  public void shouldComposeExceptionallyWhenErrorOccursAndErrorHandlerThrowsException() {
+    final Function<Throwable, CompletionStage<String>> errorHandler = mockFunction();
+    final CompletableFuture<String> input = new CompletableFuture<>();
+    final IllegalStateException thrownException = new IllegalStateException("Oops");
+    when(errorHandler.apply(ERROR)).thenThrow(thrownException);
+
+    final CompletableFuture<String> result = exceptionallyCompose(input, errorHandler);
+
+    verifyZeroInteractions(errorHandler);
+    assertThat(result).isNotDone();
+
+    // Completing input should trigger our error handler but not complete the result yet.
+    input.completeExceptionally(ERROR);
+    verify(errorHandler).apply(ERROR);
+
+    assertCompletedExceptionally(result, thrownException);
+  }
+
+  @Test
   public void shouldNotCallErrorHandlerWhenFutureCompletesSuccessfully() {
     final Function<Throwable, CompletionStage<String>> errorHandler = mockFunction();
     final CompletableFuture<String> input = new CompletableFuture<>();

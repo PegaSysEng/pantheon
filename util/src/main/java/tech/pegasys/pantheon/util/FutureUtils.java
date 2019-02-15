@@ -51,9 +51,13 @@ public class FutureUtils {
     final CompletableFuture<T> result = new CompletableFuture<>();
     future.whenComplete(
         (value, error) -> {
-          final CompletionStage<T> nextStep =
-              error != null ? errorHandler.apply(error) : completedFuture(value);
-          propagateResult(nextStep, result);
+          try {
+            final CompletionStage<T> nextStep =
+                error != null ? errorHandler.apply(error) : completedFuture(value);
+            propagateResult(nextStep, result);
+          } catch (final Throwable t) {
+            result.completeExceptionally(t);
+          }
         });
     return result;
   }
