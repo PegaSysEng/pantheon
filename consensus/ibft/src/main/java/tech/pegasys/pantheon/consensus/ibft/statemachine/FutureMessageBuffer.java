@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -71,7 +71,7 @@ public class FutureMessageBuffer {
     }
 
     if (!buffer.containsKey(msgChainHeight)) {
-      buffer.put(msgChainHeight, new LinkedList<>());
+      buffer.put(msgChainHeight, new ArrayList<>());
     }
     buffer.get(msgChainHeight).add(rawMsg);
     totalMessages += 1;
