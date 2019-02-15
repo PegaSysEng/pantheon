@@ -71,20 +71,16 @@ public class RoundChangeCertificateValidator {
       return false;
     }
 
-    for (final SignedData<RoundChangePayload> roundChangeMsg :
-        roundChangeCert.getRoundChangePayloads()) {
-      final RoundChangePayloadValidator roundChangeValidator =
-          new RoundChangePayloadValidator(
-              messageValidatorFactory,
-              validators,
-              prepareMessageCountForQuorum(quorum),
-              chainHeight);
+    final RoundChangePayloadValidator roundChangeValidator =
+        new RoundChangePayloadValidator(
+            messageValidatorFactory, validators, prepareMessageCountForQuorum(quorum), chainHeight);
 
-      if (!roundChangeValidator.validateRoundChange(roundChangeMsg)) {
-        LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");
-        return false;
-      }
+    if (!roundChangeCert.getRoundChangePayloads().stream()
+        .allMatch(roundChangeValidator::validateRoundChange)) {
+      LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");
+      return false;
     }
+
     return true;
   }
 
