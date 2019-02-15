@@ -23,6 +23,17 @@ import java.util.function.Supplier;
 
 import com.google.common.annotations.VisibleForTesting;
 
+/**
+ * Buffer which holds future IBFT messages.
+ *
+ * <p>This buffer only allows messages to be added which have a chain height greater than current
+ * height and less the futureMessagesMaxDistance from the current chain height.
+ *
+ * <p>When the total number of messages is greater futureMessagesLimit then messages are evicted.
+ *
+ * <p>If there is more than one height in the buffer then all messages for the highest chain height
+ * are removed. Otherwise if there is only one height the oldest inserted message is removed.
+ */
 public class FutureMessageBuffer {
   private final NavigableMap<Long, List<Message>> buffer;
   private final long futureMessagesMaxDistance;
