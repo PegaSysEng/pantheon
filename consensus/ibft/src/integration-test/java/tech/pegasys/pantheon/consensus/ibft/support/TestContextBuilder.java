@@ -114,6 +114,8 @@ public class TestContextBuilder {
   public static final int MESSAGE_QUEUE_LIMIT = 1000;
   public static final int GOSSIPED_HISTORY_LIMIT = 100;
   public static final int DUPLICATE_MESSAGE_LIMIT = 100;
+  public static final int FUTURE_MESSAGES_MAX_DISTANCE = 10;
+  public static final int FUTURE_MESSAGES_LIMIT = 1000;
 
   private Clock clock = Clock.fixed(Instant.MIN, ZoneId.of("UTC"));
   private IbftEventQueue ibftEventQueue = new IbftEventQueue(MESSAGE_QUEUE_LIMIT);
@@ -307,7 +309,9 @@ public class TestContextBuilder {
                     messageValidatorFactory),
                 messageValidatorFactory),
             gossiper,
-            DUPLICATE_MESSAGE_LIMIT);
+            DUPLICATE_MESSAGE_LIMIT,
+            FUTURE_MESSAGES_MAX_DISTANCE,
+            FUTURE_MESSAGES_LIMIT);
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     //////////////////////////// END IBFT PantheonController ////////////////////////////

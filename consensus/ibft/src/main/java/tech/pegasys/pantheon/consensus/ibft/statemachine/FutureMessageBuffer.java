@@ -25,26 +25,26 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class FutureMessageBuffer {
   private final NavigableMap<Long, List<Message>> buffer;
-  private final long chainHeightDistance;
-  private final long messagesLimit;
+  private final long futureMessagesMaxDistance;
+  private final long futureMessagesLimit;
   private final Supplier<Long> currentChainHeight;
   private long totalMessages;
 
   public FutureMessageBuffer(
-      final long chainHeightDistance,
-      final long messagesLimit,
+      final long futureMessagesMaxDistance,
+      final long futureMessagesLimit,
       final Supplier<Long> currentChainHeight) {
-    this(chainHeightDistance, messagesLimit, currentChainHeight, new TreeMap<>());
+    this(futureMessagesMaxDistance, futureMessagesLimit, currentChainHeight, new TreeMap<>());
   }
 
   @VisibleForTesting
   FutureMessageBuffer(
-      final long chainHeightDistance,
-      final long totalMessagesLimit,
+      final long futureMessagesMaxDistance,
+      final long futureMessagesLimit,
       final Supplier<Long> currentChainHeight,
       final NavigableMap<Long, List<Message>> buffer) {
-    this.chainHeightDistance = chainHeightDistance;
-    this.messagesLimit = totalMessagesLimit;
+    this.futureMessagesMaxDistance = futureMessagesMaxDistance;
+    this.futureMessagesLimit = futureMessagesLimit;
     this.currentChainHeight = currentChainHeight;
     this.buffer = buffer;
   }
@@ -55,7 +55,7 @@ public class FutureMessageBuffer {
       return;
     }
 
-    if (totalMessages >= messagesLimit) {
+    if (totalMessages >= futureMessagesLimit) {
       evictMessages();
     }
 
@@ -68,8 +68,8 @@ public class FutureMessageBuffer {
 
   private boolean validMessageHeight(final long msgChainHeight, final long chainHeight) {
     boolean isFutureMsg = msgChainHeight > chainHeight;
-    boolean isLessThanMaxHeight = msgChainHeight <= chainHeight + chainHeightDistance;
-    return isFutureMsg && isLessThanMaxHeight;
+    boolean isLessThanMaxChainHeight = msgChainHeight <= chainHeight + futureMessagesMaxDistance;
+    return isFutureMsg && isLessThanMaxChainHeight;
   }
 
   private void evictMessages() {

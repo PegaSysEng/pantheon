@@ -245,7 +245,9 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                     messageValidatorFactory),
                 messageValidatorFactory),
             gossiper,
-            ibftConfig.getDuplicateMessageLimit());
+            ibftConfig.getDuplicateMessageLimit(),
+            ibftConfig.getFutureMessagesMaxDistance(),
+            ibftConfig.getFutureMessagesLimit());
     ibftController.start();
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);

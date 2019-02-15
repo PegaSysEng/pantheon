@@ -53,14 +53,19 @@ public class IbftController {
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
-      final int duplicateMessageLimit) {
+      final int duplicateMessageLimit,
+      final int futureMessagesMaxDistance,
+      final int futureMessagesLimit) {
     // Assigning fields instead of using other constructor so that a reference to height manager can
     // be used for the future message buffer
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessageBuffer =
-        new FutureMessageBuffer(10, 1000, () -> currentHeightManager.getChainHeight());
+        new FutureMessageBuffer(
+            futureMessagesMaxDistance,
+            futureMessagesLimit,
+            () -> currentHeightManager.getChainHeight());
     this.gossiper = gossiper;
     this.duplicateMessageTracker = new MessageTracker(duplicateMessageLimit);
   }
