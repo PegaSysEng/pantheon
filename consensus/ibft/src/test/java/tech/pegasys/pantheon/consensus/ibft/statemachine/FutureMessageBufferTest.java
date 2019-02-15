@@ -49,8 +49,10 @@ public class FutureMessageBufferTest {
 
   @Test
   public void addsFutureMessages() {
+    buffer.addMessage(1, message);
     buffer.addMessage(2, message);
-    assertThat(map).hasSize(1);
+    assertThat(map).hasSize(2);
+    assertThat(map.get(1L)).containsExactly(message);
     assertThat(map.get(2L)).containsExactly(message);
   }
 
@@ -114,13 +116,14 @@ public class FutureMessageBufferTest {
   }
 
   @Test
-  public void doNotAddMessageWhenLessThanCurrentChainHeight() {
+  public void doNotAddMessageLessThanOrEqualToCurrentChainHeight() {
     currentHeight = 2;
     buffer.addMessage(0, message);
     buffer.addMessage(1, message);
+    buffer.addMessage(2, message);
     assertThat(map).isEmpty();
 
-    buffer.addMessage(2, message);
+    buffer.addMessage(3, message);
     assertThat(map).hasSize(1);
   }
 
