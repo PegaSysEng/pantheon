@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.websocket;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationService;
+import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 
 import java.net.InetSocketAddress;
@@ -94,6 +95,8 @@ public class WebSocketService {
     return websocket -> {
       final SocketAddress socketAddress = websocket.remoteAddress();
       final String connectionId = websocket.textHandlerID();
+      String token = getToken(websocket);
+      LOG.trace("token {}", token);
 
       LOG.debug("Websocket Connected ({})", socketAddressAsString(socketAddress));
 
@@ -104,7 +107,12 @@ public class WebSocketService {
                 buffer.toString(),
                 socketAddressAsString(socketAddress));
 
-            websocketRequestHandler.handle(connectionId, buffer);
+            AuthenticationUtils.getUser(
+                authenticationService,
+                token,
+                user ->
+                    websocketRequestHandler.handle(
+                        authenticationService, connectionId, buffer, user));
           });
 
       websocket.closeHandler(
@@ -196,5 +204,9 @@ public class WebSocketService {
 
   private String socketAddressAsString(final SocketAddress socketAddress) {
     return String.format("host=%s, port=%d", socketAddress.host(), socketAddress.port());
+  }
+
+  private String getToken(final ServerWebSocket websocket) {
+    return websocket.headers().get("Bearer");
   }
 }

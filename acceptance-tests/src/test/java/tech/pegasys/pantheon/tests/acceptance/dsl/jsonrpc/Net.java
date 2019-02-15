@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersion
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersionConnectionExceptionWithCause;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersionIsNotBlank;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersionPermissionException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.net.ExpectNetVersionPermissionJsonRpcUnauthorizedResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
 
 import java.math.BigInteger;
@@ -49,6 +50,11 @@ public class Net {
 
   public Condition netVersionUnauthorizedExceptional(final String expectedMessage) {
     return new ExpectNetVersionPermissionException(transactions.netVersion(), expectedMessage);
+  }
+
+  public Condition netVersionUnauthorizedResponse(final String expectedMessage) {
+    return new ExpectNetVersionPermissionJsonRpcUnauthorizedResponse(
+        transactions.netVersion(), expectedMessage);
   }
 
   public Condition awaitPeerCountExceptional() {
