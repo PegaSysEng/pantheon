@@ -146,10 +146,19 @@ public class PeerTable {
    * @param peer The peer to evict.
    * @return Whether the peer existed, and hence the eviction took place.
    */
-  public boolean evict(final PeerId peer) {
+  public EvictResult evict(final PeerId peer) {
     final BytesValue id = peer.getId();
     final int distance = distanceFrom(peer);
+
+    if (distance == 0) {
+      return EvictResult.self();
+    }
+
     distanceCache.remove(id);
+
+    if (table[distance].peers().isEmpty() || !table[distance].peers().contains(peer)) {
+      return EvictResult.absent();
+    }
 
     final boolean evicted = table[distance].evict(peer);
     evictionCnt += evicted ? 1 : 0;
@@ -159,7 +168,7 @@ public class PeerTable {
       ForkJoinPool.commonPool().execute(this::buildBloomFilter);
     }
 
-    return evicted;
+    return EvictResult.evicted();
   }
 
   private void buildBloomFilter() {
@@ -252,6 +261,36 @@ public class PeerTable {
 
     public Peer getEvictionCandidate() {
       return evictionCandidate;
+    }
+  }
+
+  static class EvictResult {
+    public enum EvictOutcome {
+      EVICTED,
+      ABSENT,
+      SELF
+    }
+
+    private final EvictOutcome outcome;
+
+    private EvictResult(final EvictOutcome outcome) {
+      this.outcome = outcome;
+    }
+
+    static EvictResult evicted() {
+      return new EvictResult(EvictOutcome.EVICTED);
+    }
+
+    static EvictResult absent() {
+      return new EvictResult(EvictOutcome.ABSENT);
+    }
+
+    static EvictResult self() {
+      return new EvictResult(EvictOutcome.SELF);
+    }
+
+    EvictOutcome getOutcome() {
+      return outcome;
     }
   }
 }
