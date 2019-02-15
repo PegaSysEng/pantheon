@@ -1,0 +1,137 @@
+package tech.pegasys.pantheon.util;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
+import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+
+import org.junit.Test;
+
+public class FutureUtilsTest {
+
+  private static final RuntimeException ERROR = new RuntimeException("Oh no!");
+
+  @Test
+  public void shouldCreateExceptionallyCompletedFuture() {
+    final CompletableFuture<Void> future = FutureUtils.completedExceptionally(ERROR);
+    assertCompletedExceptionally(future, ERROR);
+  }
+
+  @Test
+  public void shouldPropagateSuccessfulResult() {
+    final CompletableFuture<String> input = new CompletableFuture<>();
+    final CompletableFuture<String> output = new CompletableFuture<>();
+    propagateResult(input, output);
+    assertThat(output).isNotDone();
+
+    input.complete("Yay");
+
+    assertThat(output).isCompletedWithValue("Yay");
+  }
+
+  @Test
+  public void shouldPropagateSuccessfulNullResult() {
+    final CompletableFuture<String> input = new CompletableFuture<>();
+    final CompletableFuture<String> output = new CompletableFuture<>();
+    propagateResult(input, output);
+    assertThat(output).isNotDone();
+
+    input.complete(null);
+
+    assertThat(output).isCompletedWithValue(null);
+  }
+
+  @Test
+  public void shouldPropagateExceptionalResult() {
+    final CompletableFuture<String> input = new CompletableFuture<>();
+    final CompletableFuture<String> output = new CompletableFuture<>();
+    propagateResult(input, output);
+    assertThat(output).isNotDone();
+
+    input.completeExceptionally(ERROR);
+
+    assertCompletedExceptionally(output, ERROR);
+  }
+
+  @Test
+  public void shouldComposeExceptionallyWhenErrorOccurs() {
+    final Function<Throwable, CompletableFuture<String>> errorHandler = mockFunction();
+    final CompletableFuture<String> input = new CompletableFuture<>();
+    final CompletableFuture<String> afterException = new CompletableFuture<>();
+    when(errorHandler.apply(ERROR)).thenReturn(afterException);
+
+    final CompletableFuture<String> result = exceptionallyCompose(input, errorHandler);
+
+    verifyZeroInteractions(errorHandler);
+    assertThat(result).isNotDone();
+
+    // Completing input should trigger our error handler but not complete the result yet.
+    input.completeExceptionally(ERROR);
+    verify(errorHandler).apply(ERROR);
+    assertThat(result).isNotDone();
+
+    afterException.complete("Done");
+    assertThat(result).isCompletedWithValue("Done");
+  }
+
+  @Test
+  public void shouldComposeExceptionallyWhenErrorOccursAndComposedFutureFails() {
+    final RuntimeException secondError = new RuntimeException("Again?");
+    final Function<Throwable, CompletableFuture<String>> errorHandler = mockFunction();
+    final CompletableFuture<String> input = new CompletableFuture<>();
+    final CompletableFuture<String> afterException = new CompletableFuture<>();
+    when(errorHandler.apply(ERROR)).thenReturn(afterException);
+
+    final CompletableFuture<String> result = exceptionallyCompose(input, errorHandler);
+
+    verifyZeroInteractions(errorHandler);
+    assertThat(result).isNotDone();
+
+    // Completing input should trigger our error handler but not complete the result yet.
+    input.completeExceptionally(ERROR);
+    verify(errorHandler).apply(ERROR);
+    assertThat(result).isNotDone();
+
+    afterException.completeExceptionally(secondError);
+    assertCompletedExceptionally(result, secondError);
+  }
+
+  @Test
+  public void shouldNotCallErrorHandlerWhenFutureCompletesSuccessfully() {
+    final Function<Throwable, CompletableFuture<String>> errorHandler = mockFunction();
+    final CompletableFuture<String> input = new CompletableFuture<>();
+    final CompletableFuture<String> afterException = new CompletableFuture<>();
+    when(errorHandler.apply(ERROR)).thenReturn(afterException);
+
+    final CompletableFuture<String> result = exceptionallyCompose(input, errorHandler);
+
+    verifyZeroInteractions(errorHandler);
+    assertThat(result).isNotDone();
+
+    input.complete("Done");
+    verifyZeroInteractions(errorHandler);
+    assertThat(result).isCompletedWithValue("Done");
+  }
+
+  private void assertCompletedExceptionally(
+      final CompletableFuture<?> future, final RuntimeException expectedError) {
+    assertThat(future).isCompletedExceptionally();
+    assertThatThrownBy(future::get)
+        .isInstanceOf(ExecutionException.class)
+        .extracting(Throwable::getCause)
+        .isSameAs(expectedError);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <I, O> Function<I, O> mockFunction() {
+    return mock(Function.class);
+  }
+}
