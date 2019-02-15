@@ -296,7 +296,6 @@ public class FastSyncDownloaderTest {
     assertThat(result).isNotDone();
     assertThat(chainFuture).isCancelled();
 
-    verify(storage).storeState(EMPTY_SYNC_STATE);
     verify(fastSyncActions, times(2)).waitForSuitablePeers(EMPTY_SYNC_STATE);
     verify(fastSyncActions, times(2)).selectPivotBlock(EMPTY_SYNC_STATE);
     verify(fastSyncActions).downloadPivotBlockHeader(secondSelectPivotBlockState);

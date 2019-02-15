@@ -54,7 +54,6 @@ public class FastSyncDownloader<C> {
     if (ExceptionUtils.rootCause(error) instanceof WorldStateUnavailableException) {
       LOG.warn(
           "Fast sync was unable to download the world state. Retrying with a new pivot block.");
-      fastSyncStateStorage.storeState(FastSyncState.EMPTY_SYNC_STATE);
       return start(FastSyncState.EMPTY_SYNC_STATE);
     } else {
       return completedExceptionally(error);
