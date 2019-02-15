@@ -47,9 +47,10 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -89,7 +90,7 @@ public class IbftControllerTest {
   @Mock private RoundChangeMessageData roundChangeMessageData;
 
   @Mock private MessageTracker messageTracker;
-  private final Map<Long, List<Message>> futureMessages = new HashMap<>();
+  private final NavigableMap<Long, List<Message>> futureMessages = new TreeMap<>();
   private final Address validator = Address.fromHexString("0x0");
   private final Address unknownValidator = Address.fromHexString("0x2");
   private final ConsensusRoundIdentifier futureRoundIdentifier = new ConsensusRoundIdentifier(2, 0);
@@ -102,14 +103,17 @@ public class IbftControllerTest {
     when(blockChain.getChainHeadHeader()).thenReturn(chainHeadBlockHeader);
     when(blockHeightManagerFactory.create(any())).thenReturn(blockHeightManager);
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
+    final FutureMessageBuffer futureMessageBuffer =
+        new FutureMessageBuffer(10, 10,
+            () -> blockHeightManager.getChainHeight(), futureMessages);
     ibftController =
         new IbftController(
             blockChain,
             ibftFinalState,
             blockHeightManagerFactory,
             ibftGossip,
-            futureMessages,
-            messageTracker);
+            messageTracker,
+            futureMessageBuffer);
 
     when(chainHeadBlockHeader.getNumber()).thenReturn(1L);
     when(chainHeadBlockHeader.getHash()).thenReturn(Hash.ZERO);
