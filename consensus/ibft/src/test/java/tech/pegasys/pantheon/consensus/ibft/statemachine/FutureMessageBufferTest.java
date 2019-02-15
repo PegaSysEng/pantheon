@@ -38,12 +38,13 @@ public class FutureMessageBufferTest {
   private NavigableMap<Long, List<Message>> map;
   private FutureMessageBuffer buffer;
   private PeerConnection peerConnection = MockPeerFactory.create(AddressHelpers.ofValue(9));
+  private long currentHeight = 0;
 
   @Before
   public void setup() {
     message = createMessage("0x10");
     map = new TreeMap<>();
-    buffer = new FutureMessageBuffer(5, 5, () -> 0L, map);
+    buffer = new FutureMessageBuffer(5, 5, () -> currentHeight, map);
   }
 
   @Test
@@ -74,10 +75,17 @@ public class FutureMessageBufferTest {
 
   @Test
   public void doNotAddFutureMessagesWhenBeyondMaxDistanceFromCurrentHeight() {
+    buffer.addMessage(6, message);
     buffer.addMessage(7, message);
-    buffer.addMessage(8, message);
-    buffer.addMessage(10, message);
     assertThat(map).isEmpty();
+
+    buffer.addMessage(1, message);
+    buffer.addMessage(4, message);
+    buffer.addMessage(5, message);
+    assertThat(map).hasSize(3);
+    assertThat(map.get(1L)).containsExactly(message);
+    assertThat(map.get(4L)).containsExactly(message);
+    assertThat(map.get(5L)).containsExactly(message);
   }
 
   @Test
@@ -107,8 +115,13 @@ public class FutureMessageBufferTest {
 
   @Test
   public void doNotAddMessageWhenLessThanCurrentChainHeight() {
+    currentHeight = 2;
     buffer.addMessage(0, message);
+    buffer.addMessage(1, message);
     assertThat(map).isEmpty();
+
+    buffer.addMessage(2, message);
+    assertThat(map).hasSize(1);
   }
 
   private DefaultMessage[] addMessages(final int count, final long height) {
