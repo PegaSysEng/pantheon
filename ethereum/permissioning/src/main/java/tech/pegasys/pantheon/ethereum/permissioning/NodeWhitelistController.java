@@ -12,6 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import java.util.Collections;
+import java.util.function.Consumer;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.IOException;
@@ -34,6 +38,7 @@ public class NodeWhitelistController {
   private PermissioningConfiguration configuration;
   private List<EnodeURL> nodesWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
+  private final Subscribers<Consumer<NodeWhitelistUpdatedEvent>> nodeWhitelistUpdatedObservers = new Subscribers<>();
 
   public NodeWhitelistController(final PermissioningConfiguration permissioningConfiguration) {
     this(
@@ -73,6 +78,7 @@ public class NodeWhitelistController {
 
     final List<EnodeURL> oldWhitelist = new ArrayList<>(this.nodesWhitelist);
     peers.forEach(this::addNode);
+    notifyListUpdatedSubscribers(new NodeWhitelistUpdatedEvent(peers, Collections.emptyList()));
 
     final NodesWhitelistResult updateConfigFileResult = updateWhitelistInConfigFile(oldWhitelist);
     if (updateConfigFileResult.result() != WhitelistOperationResult.SUCCESS) {
@@ -103,6 +109,7 @@ public class NodeWhitelistController {
 
     final List<EnodeURL> oldWhitelist = new ArrayList<>(this.nodesWhitelist);
     peers.forEach(this::removeNode);
+    notifyListUpdatedSubscribers(new NodeWhitelistUpdatedEvent(Collections.emptyList(), peers));
 
     final NodesWhitelistResult updateConfigFileResult = updateWhitelistInConfigFile(oldWhitelist);
     if (updateConfigFileResult.result() != WhitelistOperationResult.SUCCESS) {
@@ -206,6 +213,8 @@ public class NodeWhitelistController {
 
       readNodesFromConfig(updatedConfig);
       configuration = updatedConfig;
+
+      createNodeWhitelistModifiedEventAfterReload(currentAccountsList, nodesWhitelist);
     } catch (Exception e) {
       LOG.warn(
           "Error reloading permissions file. In-memory whitelisted nodes will be reverted to previous valid configuration. "
@@ -215,6 +224,28 @@ public class NodeWhitelistController {
       nodesWhitelist.addAll(currentAccountsList);
       throw new RuntimeException(e);
     }
+  }
+
+  private void createNodeWhitelistModifiedEventAfterReload(final List<EnodeURL> previousNodeWhitelist, final List<EnodeURL> currentNodesList) {
+    final List<EnodeURL> removedNodes = previousNodeWhitelist.stream()
+        .filter(n -> !currentNodesList.contains(n))
+        .collect(Collectors.toList());
+
+    final List<EnodeURL> addedNodes = currentNodesList.stream()
+        .filter(n -> !previousNodeWhitelist.contains(n))
+        .collect(Collectors.toList());
+
+    if (!removedNodes.isEmpty() || !addedNodes.isEmpty()) {
+      notifyListUpdatedSubscribers(new NodeWhitelistUpdatedEvent(addedNodes, removedNodes));
+    }
+  }
+
+  public long subscribeToListUpdatedEvent(Consumer<NodeWhitelistUpdatedEvent> subscriber) {
+    return nodeWhitelistUpdatedObservers.subscribe(subscriber);
+  }
+
+  private void notifyListUpdatedSubscribers(NodeWhitelistUpdatedEvent event) {
+    nodeWhitelistUpdatedObservers.forEach(c -> c.accept(event));
   }
 
   public static class NodesWhitelistResult {
