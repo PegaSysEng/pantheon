@@ -20,6 +20,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
@@ -28,15 +35,6 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 public class PeerDiscoveryTableRefreshTest {
   private final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
@@ -64,6 +62,7 @@ public class PeerDiscoveryTableRefreshTest {
                 () -> true,
                 new PeerBlacklist(),
                 Optional.empty(),
+                new Subscribers<>(),
                 new Subscribers<>()));
     controller.start();
 

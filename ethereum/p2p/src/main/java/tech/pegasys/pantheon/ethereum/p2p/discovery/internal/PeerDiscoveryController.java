@@ -16,21 +16,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult.EvictOutcome;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
-import tech.pegasys.pantheon.util.Subscribers;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +28,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult.EvictOutcome;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import tech.pegasys.pantheon.util.Subscribers;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 /**
  * This component is the entrypoint for managing the lifecycle of peers.
@@ -126,6 +125,7 @@ public class PeerDiscoveryController {
 
   // Observers for "peer bonded" discovery events.
   private final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers;
+  private final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers;
 
   private RecursivePeerRefreshState recursivePeerRefreshState;
 
@@ -140,7 +140,8 @@ public class PeerDiscoveryController {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final Optional<NodeWhitelistController> nodeWhitelistController,
-      final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers) {
+      final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers,
+      final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers) {
     this.timerUtil = timerUtil;
     this.keypair = keypair;
     this.localPeer = localPeer;
@@ -152,6 +153,7 @@ public class PeerDiscoveryController {
     this.nodeWhitelistController = nodeWhitelistController;
     this.outboundMessageHandler = outboundMessageHandler;
     this.peerBondedObservers = peerBondedObservers;
+    this.peerDroppedObservers = peerDroppedObservers;
   }
 
   public CompletableFuture<?> start() {
@@ -322,9 +324,11 @@ public class PeerDiscoveryController {
         .forEach(this::dropFromPeerTable);
   }
 
-  private boolean dropFromPeerTable(final DiscoveryPeer peer) {
+  @VisibleForTesting
+  boolean dropFromPeerTable(final DiscoveryPeer peer) {
     final EvictResult evictResult = peerTable.evict(peer);
     if (evictResult.getOutcome() == EvictOutcome.EVICTED) {
+      notifyPeerDropped(peer, System.currentTimeMillis());
       return true;
     } else {
       return false;
@@ -334,6 +338,11 @@ public class PeerDiscoveryController {
   private void notifyPeerBonded(final DiscoveryPeer peer, final long now) {
     final PeerBondedEvent event = new PeerBondedEvent(peer, now);
     dispatchEvent(peerBondedObservers, event);
+  }
+
+  private void notifyPeerDropped(final DiscoveryPeer peer, final long now) {
+    final PeerDroppedEvent event = new PeerDroppedEvent(peer, now);
+    dispatchEvent(peerDroppedObservers, event);
   }
 
   private Optional<PeerInteractionState> matchInteraction(final Packet packet) {

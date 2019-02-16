@@ -16,6 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import org.junit.Test;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.MockPeerDiscoveryAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.MockTimerUtil;
@@ -27,14 +33,6 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PingPacketData;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.util.Subscribers;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.junit.Test;
 
 public class PeerDiscoveryTimestampsTest {
   private final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
@@ -62,6 +60,7 @@ public class PeerDiscoveryTimestampsTest {
             () -> true,
             new PeerBlacklist(),
             Optional.empty(),
+            new Subscribers<>(),
             new Subscribers<>());
     controller.start();
 
