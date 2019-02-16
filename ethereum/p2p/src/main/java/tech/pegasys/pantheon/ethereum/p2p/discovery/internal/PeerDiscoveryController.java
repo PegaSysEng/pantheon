@@ -250,14 +250,14 @@ public class PeerDiscoveryController {
 
     switch (packet.getType()) {
       case PING:
-        LOG.trace("Received PING packet from {}", sender.getEnodeURI());
+        LOG.trace("<<< Received PING packet from {}", sender.getEnodeURI());
         if (!peerBlacklisted && addToPeerTable(peer)) {
           final PingPacketData ping = packet.getPacketData(PingPacketData.class).get();
           respondToPing(ping, packet.getHash(), peer);
         }
         break;
       case PONG:
-        LOG.trace("Received PONG packet from {}", sender.getEnodeURI());
+        LOG.trace("<<< Received PONG packet from {}", sender.getEnodeURI());
         matchInteraction(packet)
             .ifPresent(
                 interaction -> {
@@ -269,7 +269,7 @@ public class PeerDiscoveryController {
                 });
         break;
       case NEIGHBORS:
-        LOG.trace("Received NEIGHBORS packet from {}", sender.getEnodeURI());
+        LOG.trace("<<< Received NEIGHBORS packet from {}", sender.getEnodeURI());
         matchInteraction(packet)
             .ifPresent(
                 interaction ->
@@ -277,7 +277,7 @@ public class PeerDiscoveryController {
                         peer, packet.getPacketData(NeighborsPacketData.class).orElse(null)));
         break;
       case FIND_NEIGHBORS:
-        LOG.trace("Received FIND_NEIGHBORS packet from {}", sender.getEnodeURI());
+        LOG.trace("<<< Received FIND_NEIGHBORS packet from {}", sender.getEnodeURI());
         if (!peerKnown || peerBlacklisted) {
           break;
         }
@@ -408,6 +408,7 @@ public class PeerDiscoveryController {
                       .orElse(false);
           interaction.updateFilter(newFilter);
 
+          LOG.trace(">>> Sending PING packet to {}", peer.getEnodeURI());
           sendPacket(peer, pingPacket);
         };
 
@@ -441,6 +442,7 @@ public class PeerDiscoveryController {
     final Consumer<PeerInteractionState> action =
         (interaction) -> {
           final FindNeighborsPacketData data = FindNeighborsPacketData.create(target);
+          LOG.trace(">>> Sending FIND_NEIGHBORS packet to {}", peer.getEnodeURI());
           sendPacket(peer, PacketType.FIND_NEIGHBORS, data);
         };
     final PeerInteractionState interaction =
@@ -468,6 +470,7 @@ public class PeerDiscoveryController {
   private void respondToPing(
       final PingPacketData packetData, final BytesValue pingHash, final DiscoveryPeer sender) {
     final PongPacketData data = PongPacketData.create(packetData.getFrom(), pingHash);
+    LOG.trace(">>> Sending PONG packet to {}", sender.getEnodeURI());
     sendPacket(sender, PacketType.PONG, data);
   }
 
@@ -477,6 +480,7 @@ public class PeerDiscoveryController {
     // peers they can fit in a 1280-byte payload.
     final List<DiscoveryPeer> peers = peerTable.nearestPeers(packetData.getTarget(), 16);
     final PacketData data = NeighborsPacketData.create(peers);
+    LOG.trace(">>> Sending NEIGHBORS packet to {}", sender.getEnodeURI());
     sendPacket(sender, PacketType.NEIGHBORS, data);
   }
 
