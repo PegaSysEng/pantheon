@@ -27,11 +27,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Lists;
+import java.net.URI;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
@@ -41,6 +44,7 @@ import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
@@ -1025,6 +1029,31 @@ public class PeerDiscoveryControllerTest {
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
     controller.onMessage(pingPacket, peers.get(0));
     assertThat(controller.getPeers()).doesNotContain(peers.get(0));
+  }
+
+  @Test
+  public void whenObservingNodeWhitelistAndNodeIsRemovedShouldEvictPeerFromPeerTable()
+      throws IOException {
+    final PeerTable peerTableSpy = spy(peerTable);
+    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
+    final DiscoveryPeer peer = peers.get(0);
+    peerTableSpy.tryAdd(peer);
+
+    final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
+    final URI peerURI = URI.create(peer.getEnodeURI());
+    config.setNodeWhitelist(Lists.newArrayList(peerURI));
+    final NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+
+    controller =
+        getControllerBuilder()
+            .whitelist(nodeWhitelistController)
+            .peerTable(peerTableSpy)
+            .build();
+
+    controller.start();
+    nodeWhitelistController.removeNodes(Lists.newArrayList(peerURI.toString()));
+
+    verify(peerTableSpy).evict(eq(DiscoveryPeer.fromURI(peerURI)));
   }
 
   private static Packet mockPingPacket(final Peer from, final Peer to) {

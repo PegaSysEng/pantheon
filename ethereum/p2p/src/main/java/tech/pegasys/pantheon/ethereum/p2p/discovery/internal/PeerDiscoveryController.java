@@ -22,9 +22,12 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult.EvictOutcome;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -184,6 +187,9 @@ public class PeerDiscoveryController {
             this::refreshTableIfRequired);
     tableRefreshTimerId = OptionalLong.of(timerId);
 
+    nodeWhitelistController
+        .ifPresent(c -> c.subscribeToListUpdatedEvent(this::handleNodeWhitelistUpdatedEvent));
+
     return CompletableFuture.completedFuture(null);
   }
 
@@ -308,6 +314,21 @@ public class PeerDiscoveryController {
     }
 
     return true;
+  }
+
+  private void handleNodeWhitelistUpdatedEvent(NodeWhitelistUpdatedEvent event) {
+    event.getRemovedNodes().stream()
+        .map(e -> new DiscoveryPeer(DiscoveryPeer.fromURI(e.toURI())))
+        .forEach(this::dropFromPeerTable);
+  }
+
+  private boolean dropFromPeerTable(final DiscoveryPeer peer) {
+    final EvictResult evictResult = peerTable.evict(peer);
+    if (evictResult.getOutcome() == EvictOutcome.EVICTED) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   private void notifyPeerBonded(final DiscoveryPeer peer, final long now) {
