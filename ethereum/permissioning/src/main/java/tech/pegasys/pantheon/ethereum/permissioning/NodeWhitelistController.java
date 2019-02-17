@@ -245,6 +245,9 @@ public class NodeWhitelistController {
   }
 
   private void notifyListUpdatedSubscribers(NodeWhitelistUpdatedEvent event) {
+    LOG.trace("Sending NodeWhitelistUpdatedEvent (added: {}, removed {})",
+        event.getAddedNodes().size(), event.getRemovedNodes().size());
+
     nodeWhitelistUpdatedObservers.forEach(c -> c.accept(event));
   }
 
