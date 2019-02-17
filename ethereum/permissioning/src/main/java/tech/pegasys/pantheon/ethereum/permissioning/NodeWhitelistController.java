@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
-import java.util.Collections;
-import java.util.function.Consumer;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -22,9 +20,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -38,7 +38,8 @@ public class NodeWhitelistController {
   private PermissioningConfiguration configuration;
   private List<EnodeURL> nodesWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
-  private final Subscribers<Consumer<NodeWhitelistUpdatedEvent>> nodeWhitelistUpdatedObservers = new Subscribers<>();
+  private final Subscribers<Consumer<NodeWhitelistUpdatedEvent>> nodeWhitelistUpdatedObservers =
+      new Subscribers<>();
 
   public NodeWhitelistController(final PermissioningConfiguration permissioningConfiguration) {
     this(
@@ -226,27 +227,32 @@ public class NodeWhitelistController {
     }
   }
 
-  private void createNodeWhitelistModifiedEventAfterReload(final List<EnodeURL> previousNodeWhitelist, final List<EnodeURL> currentNodesList) {
-    final List<EnodeURL> removedNodes = previousNodeWhitelist.stream()
-        .filter(n -> !currentNodesList.contains(n))
-        .collect(Collectors.toList());
+  private void createNodeWhitelistModifiedEventAfterReload(
+      final List<EnodeURL> previousNodeWhitelist, final List<EnodeURL> currentNodesList) {
+    final List<EnodeURL> removedNodes =
+        previousNodeWhitelist.stream()
+            .filter(n -> !currentNodesList.contains(n))
+            .collect(Collectors.toList());
 
-    final List<EnodeURL> addedNodes = currentNodesList.stream()
-        .filter(n -> !previousNodeWhitelist.contains(n))
-        .collect(Collectors.toList());
+    final List<EnodeURL> addedNodes =
+        currentNodesList.stream()
+            .filter(n -> !previousNodeWhitelist.contains(n))
+            .collect(Collectors.toList());
 
     if (!removedNodes.isEmpty() || !addedNodes.isEmpty()) {
       notifyListUpdatedSubscribers(new NodeWhitelistUpdatedEvent(addedNodes, removedNodes));
     }
   }
 
-  public long subscribeToListUpdatedEvent(Consumer<NodeWhitelistUpdatedEvent> subscriber) {
+  public long subscribeToListUpdatedEvent(final Consumer<NodeWhitelistUpdatedEvent> subscriber) {
     return nodeWhitelistUpdatedObservers.subscribe(subscriber);
   }
 
-  private void notifyListUpdatedSubscribers(NodeWhitelistUpdatedEvent event) {
-    LOG.trace("Sending NodeWhitelistUpdatedEvent (added: {}, removed {})",
-        event.getAddedNodes().size(), event.getRemovedNodes().size());
+  private void notifyListUpdatedSubscribers(final NodeWhitelistUpdatedEvent event) {
+    LOG.trace(
+        "Sending NodeWhitelistUpdatedEvent (added: {}, removed {})",
+        event.getAddedNodes().size(),
+        event.getRemovedNodes().size());
 
     nodeWhitelistUpdatedObservers.forEach(c -> c.accept(event));
   }

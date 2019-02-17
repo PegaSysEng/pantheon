@@ -435,10 +435,10 @@ public class NettyP2PNetwork implements P2PNetwork {
   public void run() {
     try {
       peerDiscoveryAgent.start().join();
-      peerBondedObserverId = OptionalLong
-          .of(peerDiscoveryAgent.observePeerBondedEvents(handlePeerBondedEvent()));
-      peerDroppedObserverId = OptionalLong
-          .of(peerDiscoveryAgent.observePeerDroppedEvents(handlePeerDroppedEvents()));
+      peerBondedObserverId =
+          OptionalLong.of(peerDiscoveryAgent.observePeerBondedEvents(handlePeerBondedEvent()));
+      peerDroppedObserverId =
+          OptionalLong.of(peerDiscoveryAgent.observePeerDroppedEvents(handlePeerDroppedEvents()));
     } catch (final Exception ex) {
       throw new IllegalStateException(ex);
     }
@@ -481,7 +481,7 @@ public class NettyP2PNetwork implements P2PNetwork {
     peerBondedObserverId.ifPresent(peerDiscoveryAgent::removePeerBondedObserver);
     peerBondedObserverId = OptionalLong.empty();
     peerDroppedObserverId.ifPresent(peerDiscoveryAgent::removePeerDroppedObserver);
-    peerDroppedObserverId= OptionalLong.empty();
+    peerDroppedObserverId = OptionalLong.empty();
     peerDiscoveryAgent.stop().join();
     workers.shutdownGracefully();
     boss.shutdownGracefully();

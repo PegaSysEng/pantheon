@@ -26,7 +26,9 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController.NodesWhitelistResult;
 
-import com.google.common.collect.Lists;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -37,13 +39,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NodeWhitelistControllerTest {
@@ -272,8 +274,9 @@ public class NodeWhitelistControllerTest {
   @SuppressWarnings("unchecked")
   public void whenAddingNodeShouldNotifyWhitelistModifiedSubscribers() {
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
-    final NodeWhitelistUpdatedEvent expectedEvent = new NodeWhitelistUpdatedEvent(
-        Lists.newArrayList(new EnodeURL(enode1)), Collections.emptyList());
+    final NodeWhitelistUpdatedEvent expectedEvent =
+        new NodeWhitelistUpdatedEvent(
+            Lists.newArrayList(new EnodeURL(enode1)), Collections.emptyList());
 
     controller.subscribeToListUpdatedEvent(consumer);
     controller.addNodes(Lists.newArrayList(enode1));
@@ -284,12 +287,12 @@ public class NodeWhitelistControllerTest {
   @Test
   @SuppressWarnings("unchecked")
   public void whenAddingNodeDoesNotAddShouldNotNotifyWhitelistModifiedSubscribers() {
-    //adding node before subscribing to whitelist modified events
+    // adding node before subscribing to whitelist modified events
     controller.addNodes(Lists.newArrayList(enode1));
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
 
     controller.subscribeToListUpdatedEvent(consumer);
-    //won't add duplicate node
+    // won't add duplicate node
     controller.addNodes(Lists.newArrayList(enode1));
 
     verifyZeroInteractions(consumer);
@@ -298,12 +301,13 @@ public class NodeWhitelistControllerTest {
   @Test
   @SuppressWarnings("unchecked")
   public void whenRemovingNodeShouldNotifyWhitelistModifiedSubscribers() {
-    //adding node before subscribing to whitelist modified events
+    // adding node before subscribing to whitelist modified events
     controller.addNodes(Lists.newArrayList(enode1));
 
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
-    final NodeWhitelistUpdatedEvent expectedEvent = new NodeWhitelistUpdatedEvent(
-        Collections.emptyList(), Lists.newArrayList(new EnodeURL(enode1)));
+    final NodeWhitelistUpdatedEvent expectedEvent =
+        new NodeWhitelistUpdatedEvent(
+            Collections.emptyList(), Lists.newArrayList(new EnodeURL(enode1)));
 
     controller.subscribeToListUpdatedEvent(consumer);
     controller.removeNodes(Lists.newArrayList(enode1));
@@ -317,7 +321,7 @@ public class NodeWhitelistControllerTest {
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
 
     controller.subscribeToListUpdatedEvent(consumer);
-    //won't remove absent node
+    // won't remove absent node
     controller.removeNodes(Lists.newArrayList(enode1));
 
     verifyZeroInteractions(consumer);
@@ -329,14 +333,14 @@ public class NodeWhitelistControllerTest {
     final Path permissionsFile = createPermissionsFileWithNode(enode2);
     final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
-    final NodeWhitelistUpdatedEvent expectedEvent = new NodeWhitelistUpdatedEvent(
-        Lists.newArrayList(new EnodeURL(enode2)), Lists.newArrayList(new EnodeURL(enode1)));
+    final NodeWhitelistUpdatedEvent expectedEvent =
+        new NodeWhitelistUpdatedEvent(
+            Lists.newArrayList(new EnodeURL(enode2)), Lists.newArrayList(new EnodeURL(enode1)));
 
     when(permissioningConfig.getConfigurationFilePath())
         .thenReturn(permissionsFile.toAbsolutePath().toString());
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
-    when(permissioningConfig.getNodeWhitelist())
-        .thenReturn(Arrays.asList(URI.create(enode1)));
+    when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(enode1)));
     controller = new NodeWhitelistController(permissioningConfig);
     controller.subscribeToListUpdatedEvent(consumer);
 
@@ -347,7 +351,8 @@ public class NodeWhitelistControllerTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void whenReloadingWhitelistAndNothingChangesShouldNotNotifyWhitelistModifiedSubscribers() throws Exception {
+  public void whenReloadingWhitelistAndNothingChangesShouldNotNotifyWhitelistModifiedSubscribers()
+      throws Exception {
     final Path permissionsFile = createPermissionsFileWithNode(enode1);
     final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
@@ -355,8 +360,7 @@ public class NodeWhitelistControllerTest {
     when(permissioningConfig.getConfigurationFilePath())
         .thenReturn(permissionsFile.toAbsolutePath().toString());
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
-    when(permissioningConfig.getNodeWhitelist())
-        .thenReturn(Arrays.asList(URI.create(enode1)));
+    when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(enode1)));
     controller = new NodeWhitelistController(permissioningConfig);
     controller.subscribeToListUpdatedEvent(consumer);
 

@@ -28,27 +28,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Lists;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
@@ -68,6 +47,29 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
+
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class PeerDiscoveryControllerTest {
 
@@ -1046,10 +1048,7 @@ public class PeerDiscoveryControllerTest {
     final NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
 
     controller =
-        getControllerBuilder()
-            .whitelist(nodeWhitelistController)
-            .peerTable(peerTableSpy)
-            .build();
+        getControllerBuilder().whitelist(nodeWhitelistController).peerTable(peerTableSpy).build();
 
     controller.start();
     nodeWhitelistController.removeNodes(Lists.newArrayList(peerURI.toString()));
@@ -1104,10 +1103,7 @@ public class PeerDiscoveryControllerTest {
 
     doReturn(EvictResult.absent()).when(peerTableSpy).evict(any());
 
-    controller =
-        getControllerBuilder()
-            .peerDroppedObservers(peerDroppedSubscribers)
-            .build();
+    controller = getControllerBuilder().peerDroppedObservers(peerDroppedSubscribers).build();
 
     controller.start();
     boolean dropped = controller.dropFromPeerTable(peer);

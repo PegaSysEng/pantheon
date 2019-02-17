@@ -18,20 +18,6 @@ import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.DiscoveryPro
 import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.DiscoveryProtocolLogger.logSendingPacket;
 import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
 
-import com.google.common.annotations.VisibleForTesting;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalLong;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
@@ -47,6 +33,22 @@ import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This component is the entrypoint for managing the lifecycle of peers.
@@ -191,8 +193,8 @@ public class PeerDiscoveryController {
             this::refreshTableIfRequired);
     tableRefreshTimerId = OptionalLong.of(timerId);
 
-    nodeWhitelistController
-        .ifPresent(c -> c.subscribeToListUpdatedEvent(this::handleNodeWhitelistUpdatedEvent));
+    nodeWhitelistController.ifPresent(
+        c -> c.subscribeToListUpdatedEvent(this::handleNodeWhitelistUpdatedEvent));
 
     return CompletableFuture.completedFuture(null);
   }
@@ -311,7 +313,7 @@ public class PeerDiscoveryController {
     return true;
   }
 
-  private void handleNodeWhitelistUpdatedEvent(NodeWhitelistUpdatedEvent event) {
+  private void handleNodeWhitelistUpdatedEvent(final NodeWhitelistUpdatedEvent event) {
     event.getRemovedNodes().stream()
         .map(e -> new DiscoveryPeer(DiscoveryPeer.fromURI(e.toURI())))
         .forEach(this::dropFromPeerTable);
