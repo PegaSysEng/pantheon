@@ -156,12 +156,16 @@ public class PeerTable {
 
     distanceCache.remove(id);
 
-    if (table[distance].peers().isEmpty() || !table[distance].peers().contains(peer)) {
+    if (table[distance].peers().isEmpty()) {
       return EvictResult.absent();
     }
 
     final boolean evicted = table[distance].evict(peer);
-    evictionCnt += evicted ? 1 : 0;
+    if (evicted) {
+      evictionCnt++;
+    } else {
+      return EvictResult.absent();
+    }
 
     // Trigger the bloom filter regeneration if needed.
     if (evictionCnt >= BLOOM_FILTER_REGENERATION_THRESHOLD) {
