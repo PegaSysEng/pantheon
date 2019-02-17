@@ -146,7 +146,7 @@ public class PeerTable {
    * @param peer The peer to evict.
    * @return Whether the peer existed, and hence the eviction took place.
    */
-  public EvictResult evict(final PeerId peer) {
+  public EvictResult tryEvict(final PeerId peer) {
     final BytesValue id = peer.getId();
     final int distance = distanceFrom(peer);
 

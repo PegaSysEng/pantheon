@@ -1053,7 +1053,7 @@ public class PeerDiscoveryControllerTest {
     controller.start();
     nodeWhitelistController.removeNodes(Lists.newArrayList(peerURI.toString()));
 
-    verify(peerTableSpy).evict(eq(DiscoveryPeer.fromURI(peerURI)));
+    verify(peerTableSpy).tryEvict(eq(DiscoveryPeer.fromURI(peerURI)));
   }
 
   @Test
@@ -1074,7 +1074,7 @@ public class PeerDiscoveryControllerTest {
     final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
     peerDroppedSubscribers.subscribe(peerDroppedEventConsumer);
 
-    doReturn(EvictResult.evicted()).when(peerTableSpy).evict(any());
+    doReturn(EvictResult.evicted()).when(peerTableSpy).tryEvict(any());
 
     controller =
         getControllerBuilder()
@@ -1101,7 +1101,7 @@ public class PeerDiscoveryControllerTest {
     final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
     peerDroppedSubscribers.subscribe(peerDroppedEventConsumer);
 
-    doReturn(EvictResult.absent()).when(peerTableSpy).evict(any());
+    doReturn(EvictResult.absent()).when(peerTableSpy).tryEvict(any());
 
     controller = getControllerBuilder().peerDroppedObservers(peerDroppedSubscribers).build();
 

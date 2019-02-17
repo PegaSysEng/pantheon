@@ -73,7 +73,7 @@ public class PeerTableTest {
 
     table.tryAdd(peer);
 
-    EvictResult evictResult = table.evict(peer);
+    EvictResult evictResult = table.tryEvict(peer);
     assertThat(evictResult.getOutcome()).isEqualTo(EvictOutcome.EVICTED);
   }
 
@@ -82,7 +82,7 @@ public class PeerTableTest {
     final PeerTable table = new PeerTable(Peer.randomId(), 16);
     final DiscoveryPeer peer = helper.createDiscoveryPeer();
 
-    EvictResult evictResult = table.evict(peer);
+    EvictResult evictResult = table.tryEvict(peer);
     assertThat(evictResult.getOutcome()).isEqualTo(EvictOutcome.ABSENT);
   }
 
@@ -93,7 +93,7 @@ public class PeerTableTest {
     final List<DiscoveryPeer> otherPeers = helper.createDiscoveryPeers(5);
     otherPeers.forEach(table::tryAdd);
 
-    EvictResult evictResult = table.evict(peer);
+    EvictResult evictResult = table.tryEvict(peer);
     assertThat(evictResult.getOutcome()).isEqualTo(EvictOutcome.ABSENT);
   }
 
@@ -102,7 +102,7 @@ public class PeerTableTest {
     final DiscoveryPeer peer = helper.createDiscoveryPeer();
     final PeerTable table = new PeerTable(peer.getId(), 16);
 
-    EvictResult evictResult = table.evict(peer);
+    EvictResult evictResult = table.tryEvict(peer);
     assertThat(evictResult.getOutcome()).isEqualTo(EvictOutcome.SELF);
   }
 }

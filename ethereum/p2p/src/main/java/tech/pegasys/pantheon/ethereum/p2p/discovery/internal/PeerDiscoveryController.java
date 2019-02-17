@@ -303,10 +303,10 @@ public class PeerDiscoveryController {
 
     if (result.getOutcome() == AddOutcome.ALREADY_EXISTED) {
       // Bump peer.
-      peerTable.evict(peer);
+      peerTable.tryEvict(peer);
       peerTable.tryAdd(peer);
     } else if (result.getOutcome() == AddOutcome.BUCKET_FULL) {
-      peerTable.evict(result.getEvictionCandidate());
+      peerTable.tryEvict(result.getEvictionCandidate());
       peerTable.tryAdd(peer);
     }
 
@@ -321,7 +321,7 @@ public class PeerDiscoveryController {
 
   @VisibleForTesting
   boolean dropFromPeerTable(final DiscoveryPeer peer) {
-    final EvictResult evictResult = peerTable.evict(peer);
+    final EvictResult evictResult = peerTable.tryEvict(peer);
     if (evictResult.getOutcome() == EvictOutcome.EVICTED) {
       notifyPeerDropped(peer, System.currentTimeMillis());
       return true;
