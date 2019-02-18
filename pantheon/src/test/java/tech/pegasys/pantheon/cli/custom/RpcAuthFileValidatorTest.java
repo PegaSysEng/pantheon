@@ -19,9 +19,9 @@ import com.google.common.io.Resources;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RpcAuthConverterTest {
+public class RpcAuthFileValidatorTest {
 
-  private RpcAuthConverter rpcAuthConverter;
+  private RpcAuthFileValidator rpcAuthFileValidator;
   private static final String CORRECT_TOML = "auth_correct.toml";
   private static final String DUPLICATE_USER_TOML = "auth_duplicate_user.toml";
   private static final String INVALID_TOML = "auth_invalid.toml";
@@ -30,39 +30,39 @@ public class RpcAuthConverterTest {
 
   @Before
   public void setUp() {
-    rpcAuthConverter = new RpcAuthConverter();
+    rpcAuthFileValidator = new RpcAuthFileValidator();
   }
 
   @Test
   public void shouldPassWhenCorrectTOML() {
-    assertThatCode(() -> rpcAuthConverter.convert(getFilePath(CORRECT_TOML)))
+    assertThatCode(() -> rpcAuthFileValidator.validate(getFilePath(CORRECT_TOML)))
         .doesNotThrowAnyException();
   }
 
   @Test
   public void shouldFailWhenInvalidTOML() {
-    assertThatThrownBy(() -> rpcAuthConverter.convert(getFilePath(INVALID_TOML)))
+    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(INVALID_TOML)))
         .isInstanceOf(Exception.class)
         .hasMessageContaining("Invalid TOML configuration");
   }
 
   @Test
   public void shouldFailWhenMissingPassword() {
-    assertThatThrownBy(() -> rpcAuthConverter.convert(getFilePath(NO_PASSWORD_TOML)))
+    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(NO_PASSWORD_TOML)))
         .isInstanceOf(Exception.class)
         .hasMessage("RPC user specified without password.");
   }
 
   @Test
   public void shouldFailWhenInvalidKeyValue() {
-    assertThatThrownBy(() -> rpcAuthConverter.convert(getFilePath(INVALID_VALUE_TOML)))
+    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(INVALID_VALUE_TOML)))
         .isInstanceOf(Exception.class)
         .hasMessage("RPC authentication configuration file contains invalid values.");
   }
 
   @Test
   public void shouldFailWhenDuplicateUser() {
-    assertThatThrownBy(() -> rpcAuthConverter.convert(getFilePath(DUPLICATE_USER_TOML)))
+    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(DUPLICATE_USER_TOML)))
         .isInstanceOf(Exception.class)
         .hasMessageContaining("Invalid TOML configuration");
   }

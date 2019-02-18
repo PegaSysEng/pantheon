@@ -30,7 +30,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
-import tech.pegasys.pantheon.cli.custom.RpcAuthConverter;
+import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -979,7 +979,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       if (authFile.exists()) {
         final String path = authFile.getAbsolutePath();
         try {
-          new RpcAuthConverter().convert(path);
+          new RpcAuthFileValidator().validate(path);
         } catch (Exception e) {
           throw new ParameterException(
               commandLine, "Invalid RPC HTTP authentication credentials file: " + e.getMessage());
@@ -1001,7 +1001,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       if (authFile.exists()) {
         final String path = authFile.getAbsolutePath();
         try {
-          new RpcAuthConverter().convert(path);
+          new RpcAuthFileValidator().validate(path);
         } catch (Exception e) {
           throw new ParameterException(
               commandLine, "Invalid RPC WS authentication credentials file: " + e.getMessage());

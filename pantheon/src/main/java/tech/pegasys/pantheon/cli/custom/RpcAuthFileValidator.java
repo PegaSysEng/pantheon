@@ -21,10 +21,9 @@ import com.google.common.base.Strings;
 import net.consensys.cava.toml.TomlParseResult;
 import picocli.CommandLine;
 
-public class RpcAuthConverter implements CommandLine.ITypeConverter<String> {
+public class RpcAuthFileValidator {
 
-  @Override
-  public String convert(final String value) throws Exception {
+  public static String validate(final String value) throws Exception {
     TomlParseResult tomlParseResult;
     try {
       tomlParseResult = TomlConfigFileParser.loadConfigurationFromFile(value);
@@ -50,7 +49,7 @@ public class RpcAuthConverter implements CommandLine.ITypeConverter<String> {
     return value;
   }
 
-  private boolean verifyAllUsersHavePassword(final TomlParseResult tomlParseResult) {
+  private static boolean verifyAllUsersHavePassword(final TomlParseResult tomlParseResult) {
     int configuredUsers = tomlParseResult.getTable("Users").keySet().size();
 
     int usersWithPasswords =
@@ -68,7 +67,7 @@ public class RpcAuthConverter implements CommandLine.ITypeConverter<String> {
     return configuredUsers == usersWithPasswords;
   }
 
-  private boolean verifyAllEntriesHaveValues(final TomlParseResult tomlParseResult) {
+  private static boolean verifyAllEntriesHaveValues(final TomlParseResult tomlParseResult) {
     return tomlParseResult
         .dottedKeySet()
         .parallelStream()
@@ -76,7 +75,7 @@ public class RpcAuthConverter implements CommandLine.ITypeConverter<String> {
         .allMatch(dottedKey -> verifyArray(dottedKey, tomlParseResult));
   }
 
-  private boolean verifyArray(final String key, final TomlParseResult tomlParseResult) {
+  private static boolean verifyArray(final String key, final TomlParseResult tomlParseResult) {
     return tomlParseResult.isArray(key) && !tomlParseResult.getArrayOrEmpty(key).isEmpty();
   }
 }
