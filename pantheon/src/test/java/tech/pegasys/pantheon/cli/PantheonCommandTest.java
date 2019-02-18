@@ -1934,7 +1934,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final Path path = Paths.get(".");
     parseCommand("--privacy-public-key-file", path.toString());
-    assertThat(commandErrorOutput.toString()).startsWith("Unknown options: --privacy-public-key-file, .");
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --privacy-public-key-file, .");
     assertThat(commandOutput.toString()).isEmpty();
   }
 
@@ -1946,7 +1947,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final Path path = Paths.get(".");
     parseCommand("--rpc-http-authentication-credentials-file", path.toString());
-    assertThat(commandErrorOutput.toString()).startsWith("Unknown options: --rpc-http-authentication-credentials-file, .");
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --rpc-http-authentication-credentials-file, .");
     assertThat(commandOutput.toString()).isEmpty();
   }
 
@@ -1958,7 +1960,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final Path path = Paths.get(".");
     parseCommand("--rpc-ws-authentication-credentials-file", path.toString());
-    assertThat(commandErrorOutput.toString()).startsWith("Unknown options: --rpc-ws-authentication-credentials-file, .");
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --rpc-ws-authentication-credentials-file, .");
     assertThat(commandOutput.toString()).isEmpty();
   }
 }
