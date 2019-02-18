@@ -34,11 +34,13 @@ import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
+import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.FutureMessageBuffer;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
@@ -295,6 +297,10 @@ public class TestContextBuilder {
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
 
+    final MessageTracker duplicateMessageTracker = new MessageTracker(DUPLICATE_MESSAGE_LIMIT);
+    final FutureMessageBuffer futureMessageBuffer =
+        new FutureMessageBuffer(FUTURE_MESSAGES_MAX_DISTANCE, FUTURE_MESSAGES_LIMIT);
+
     final IbftController ibftController =
         new IbftController(
             blockChain,
@@ -309,9 +315,8 @@ public class TestContextBuilder {
                     messageValidatorFactory),
                 messageValidatorFactory),
             gossiper,
-            DUPLICATE_MESSAGE_LIMIT,
-            FUTURE_MESSAGES_MAX_DISTANCE,
-            FUTURE_MESSAGES_LIMIT);
+            duplicateMessageTracker,
+            futureMessageBuffer);
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     //////////////////////////// END IBFT PantheonController ////////////////////////////

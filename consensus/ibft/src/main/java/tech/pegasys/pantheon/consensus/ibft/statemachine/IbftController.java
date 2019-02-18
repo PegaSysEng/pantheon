@@ -34,7 +34,6 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.function.Consumer;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,26 +47,6 @@ public class IbftController {
   private final Gossiper gossiper;
   private final MessageTracker duplicateMessageTracker;
 
-  public IbftController(
-      final Blockchain blockchain,
-      final IbftFinalState ibftFinalState,
-      final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
-      final Gossiper gossiper,
-      final int duplicateMessageLimit,
-      final int futureMessagesMaxDistance,
-      final int futureMessagesLimit) {
-    // Assigning fields instead of using other constructor so that a reference to height manager can
-    // be used for the future message buffer
-    this.blockchain = blockchain;
-    this.ibftFinalState = ibftFinalState;
-    this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
-    this.futureMessageBuffer =
-        new FutureMessageBuffer(futureMessagesMaxDistance, futureMessagesLimit);
-    this.gossiper = gossiper;
-    this.duplicateMessageTracker = new MessageTracker(duplicateMessageLimit);
-  }
-
-  @VisibleForTesting
   public IbftController(
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
