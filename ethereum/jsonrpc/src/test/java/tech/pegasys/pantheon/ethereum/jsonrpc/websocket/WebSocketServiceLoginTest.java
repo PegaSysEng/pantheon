@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 
-import org.junit.Ignore;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.methods.WebSocketMethodsFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
@@ -43,6 +42,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
