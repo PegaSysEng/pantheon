@@ -18,7 +18,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.io.Resources;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import picocli.CommandLine;
+import picocli.CommandLine.ParameterException;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RpcAuthFileValidatorTest {
 
   private RpcAuthFileValidator rpcAuthFileValidator;
@@ -27,6 +33,7 @@ public class RpcAuthFileValidatorTest {
   private static final String INVALID_TOML = "auth_invalid.toml";
   private static final String INVALID_VALUE_TOML = "auth_invalid_value.toml";
   private static final String NO_PASSWORD_TOML = "auth_no_password.toml";
+  @Mock CommandLine commandLine;
 
   @Before
   public void setUp() {
@@ -35,35 +42,52 @@ public class RpcAuthFileValidatorTest {
 
   @Test
   public void shouldPassWhenCorrectTOML() {
-    assertThatCode(() -> rpcAuthFileValidator.validate(getFilePath(CORRECT_TOML)))
+    assertThatCode(
+            () -> rpcAuthFileValidator.validate(commandLine, getFilePath(CORRECT_TOML), "HTTP"))
         .doesNotThrowAnyException();
   }
 
   @Test
   public void shouldFailWhenInvalidTOML() {
-    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(INVALID_TOML)))
-        .isInstanceOf(Exception.class)
+    assertThatThrownBy(
+            () -> rpcAuthFileValidator.validate(commandLine, getFilePath(INVALID_TOML), "HTTP"))
+        .isInstanceOf(ParameterException.class)
         .hasMessageContaining("Invalid TOML configuration");
   }
 
   @Test
+  public void shouldFailWhenMissingTOML() {
+    assertThatThrownBy(
+            () -> rpcAuthFileValidator.validate(commandLine, "thisshouldntexist", "HTTP"))
+        .isInstanceOf(ParameterException.class)
+        .hasMessage(
+            "The specified RPC HTTP authentication credential file 'thisshouldntexist' does not exist");
+  }
+
+  @Test
   public void shouldFailWhenMissingPassword() {
-    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(NO_PASSWORD_TOML)))
-        .isInstanceOf(Exception.class)
+    assertThatThrownBy(
+            () -> rpcAuthFileValidator.validate(commandLine, getFilePath(NO_PASSWORD_TOML), "HTTP"))
+        .isInstanceOf(ParameterException.class)
         .hasMessage("RPC user specified without password.");
   }
 
   @Test
   public void shouldFailWhenInvalidKeyValue() {
-    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(INVALID_VALUE_TOML)))
-        .isInstanceOf(Exception.class)
+    assertThatThrownBy(
+            () ->
+                rpcAuthFileValidator.validate(commandLine, getFilePath(INVALID_VALUE_TOML), "HTTP"))
+        .isInstanceOf(ParameterException.class)
         .hasMessage("RPC authentication configuration file contains invalid values.");
   }
 
   @Test
   public void shouldFailWhenDuplicateUser() {
-    assertThatThrownBy(() -> rpcAuthFileValidator.validate(getFilePath(DUPLICATE_USER_TOML)))
-        .isInstanceOf(Exception.class)
+    assertThatThrownBy(
+            () ->
+                rpcAuthFileValidator.validate(
+                    commandLine, getFilePath(DUPLICATE_USER_TOML), "HTTP"))
+        .isInstanceOf(ParameterException.class)
         .hasMessageContaining("Invalid TOML configuration");
   }
 

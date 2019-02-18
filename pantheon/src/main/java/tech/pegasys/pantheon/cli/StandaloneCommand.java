@@ -14,8 +14,6 @@ package tech.pegasys.pantheon.cli;
 
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 
-import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
-
 import java.io.File;
 import java.nio.file.Path;
 
