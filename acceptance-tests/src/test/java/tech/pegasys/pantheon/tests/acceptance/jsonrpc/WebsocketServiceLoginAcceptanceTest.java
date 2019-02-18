@@ -45,6 +45,6 @@ public class WebsocketServiceLoginAcceptanceTest extends AcceptanceTestBase {
   public void jsonRpcMethodShouldSucceedWithAuthenticatedUserAndPermission() {
     node.verify(login.loginSucceedsAndSetsAuthenticationToken("user", "pegasys"));
     node.verify(net.awaitPeerCount(0));
-    node.verify(net.netVersionUnauthorizedResponse("Unauthorized"));
+    node.verify(net.netVersionUnauthorizedResponse());
   }
 }

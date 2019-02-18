@@ -52,9 +52,9 @@ public class Net {
     return new ExpectNetVersionPermissionException(transactions.netVersion(), expectedMessage);
   }
 
-  public Condition netVersionUnauthorizedResponse(final String expectedMessage) {
+  public Condition netVersionUnauthorizedResponse() {
     return new ExpectNetVersionPermissionJsonRpcUnauthorizedResponse(
-        transactions.netVersion(), expectedMessage);
+        transactions.netVersion());
   }
 
   public Condition awaitPeerCountExceptional() {

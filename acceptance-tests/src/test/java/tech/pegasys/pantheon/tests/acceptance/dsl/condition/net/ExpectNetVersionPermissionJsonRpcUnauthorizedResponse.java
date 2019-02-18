@@ -19,18 +19,14 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetVersionTran
 public class ExpectNetVersionPermissionJsonRpcUnauthorizedResponse implements Condition {
 
   private final NetVersionTransaction transaction;
-  private final String expectedMessage;
 
   public ExpectNetVersionPermissionJsonRpcUnauthorizedResponse(
-      final NetVersionTransaction transaction, final String expectedMessage) {
+      final NetVersionTransaction transaction) {
     this.transaction = transaction;
-    this.expectedMessage = expectedMessage;
   }
 
   @Override
   public void verify(final Node node) {
-    String netVersion = node.execute(transaction);
-    System.out.println(netVersion);
-    // TODO assert that the message contains unauthorized
+    node.execute(transaction);
   }
 }
