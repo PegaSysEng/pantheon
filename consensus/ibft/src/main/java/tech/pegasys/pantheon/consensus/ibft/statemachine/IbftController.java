@@ -16,7 +16,7 @@ import static java.util.Collections.emptyList;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
-import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
+import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
@@ -45,7 +45,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IbftController {
-
   private static final Logger LOG = LogManager.getLogger();
   private final Blockchain blockchain;
   private final IbftFinalState ibftFinalState;
@@ -53,13 +52,21 @@ public class IbftController {
   private final Map<Long, List<Message>> futureMessages;
   private BlockHeightManager currentHeightManager;
   private final Gossiper gossiper;
+  private final MessageTracker duplicateMessageTracker;
 
   public IbftController(
       final Blockchain blockchain,
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
-      final IbftGossip gossiper) {
-    this(blockchain, ibftFinalState, ibftBlockHeightManagerFactory, gossiper, Maps.newHashMap());
+      final Gossiper gossiper,
+      final int duplicateMessageLimit) {
+    this(
+        blockchain,
+        ibftFinalState,
+        ibftBlockHeightManagerFactory,
+        gossiper,
+        Maps.newHashMap(),
+        new MessageTracker(duplicateMessageLimit));
   }
 
   @VisibleForTesting
@@ -68,12 +75,14 @@ public class IbftController {
       final IbftFinalState ibftFinalState,
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
-      final Map<Long, List<Message>> futureMessages) {
+      final Map<Long, List<Message>> futureMessages,
+      final MessageTracker duplicateMessageTracker) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessages = futureMessages;
     this.gossiper = gossiper;
+    this.duplicateMessageTracker = duplicateMessageTracker;
   }
 
   public void start() {
@@ -81,7 +90,11 @@ public class IbftController {
   }
 
   public void handleMessageEvent(final IbftReceivedMessageEvent msg) {
-    handleMessage(msg.getMessage());
+    final MessageData data = msg.getMessage().getData();
+    if (!duplicateMessageTracker.hasSeenMessage(data)) {
+      duplicateMessageTracker.addSeenMessage(data);
+      handleMessage(msg.getMessage());
+    }
   }
 
   private void handleMessage(final Message message) {
@@ -145,8 +158,9 @@ public class IbftController {
   public void handleNewBlockEvent(final NewChainHead newChainHead) {
     final BlockHeader newBlockHeader = newChainHead.getNewChainHeadHeader();
     final BlockHeader currentMiningParent = currentHeightManager.getParentBlockHeader();
+    LOG.debug("Handling New Chain head event, chain height = {}", currentMiningParent.getNumber());
     if (newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
-      LOG.debug(
+      LOG.trace(
           "Discarding NewChainHead event, was for previous block height. chainHeight={} eventHeight={}",
           currentMiningParent.getNumber(),
           newBlockHeader.getNumber());
@@ -155,7 +169,7 @@ public class IbftController {
 
     if (newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
       if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
-        LOG.debug(
+        LOG.trace(
             "Discarding duplicate NewChainHead event. chainHeight={} newBlockHash={} parentBlockHash",
             newBlockHeader.getNumber(),
             newBlockHeader.getHash(),
@@ -175,7 +189,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundIndentifier)) {
       currentHeightManager.handleBlockTimerExpiry(roundIndentifier);
     } else {
-      LOG.debug(
+      LOG.trace(
           "Block timer event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundIndentifier.getSequenceNumber());
@@ -186,7 +200,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundExpiry.getView())) {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
-      LOG.debug(
+      LOG.trace(
           "Round expiry event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundExpiry.getView().getSequenceNumber());

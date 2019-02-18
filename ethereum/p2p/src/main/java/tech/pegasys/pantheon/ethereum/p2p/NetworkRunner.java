@@ -90,7 +90,8 @@ public class NetworkRunner implements AutoCloseable {
       LOG.info("Starting Network.");
       setupHandlers();
       networkExecutor.submit(network);
-      networkCheckExecutor.schedule(network::checkMaintainedConnectionPeers, 60, TimeUnit.SECONDS);
+      networkCheckExecutor.scheduleWithFixedDelay(
+          network::checkMaintainedConnectionPeers, 60, 60, TimeUnit.SECONDS);
     } else {
       LOG.error("Attempted to start already running network.");
     }
@@ -196,8 +197,7 @@ public class NetworkRunner implements AutoCloseable {
         subProtocolMap.put(subProtocol.getName(), subProtocol);
       }
       final List<Capability> caps =
-          protocolManagers
-              .stream()
+          protocolManagers.stream()
               .flatMap(p -> p.getSupportedCapabilities().stream())
               .collect(Collectors.toList());
       for (final Capability cap : caps) {

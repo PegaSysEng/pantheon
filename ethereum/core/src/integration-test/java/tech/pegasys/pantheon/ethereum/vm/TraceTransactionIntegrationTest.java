@@ -82,7 +82,7 @@ public class TraceTransactionIntegrationTest {
             .signAndBuild(keyPair);
 
     final MutableWorldState worldState =
-        worldStateArchive.getMutable(genesisBlock.getHeader().getStateRoot());
+        worldStateArchive.getMutable(genesisBlock.getHeader().getStateRoot()).get();
     final WorldUpdater createTransactionUpdater = worldState.updater();
     Result result =
         transactionProcessor.processTransaction(
@@ -94,9 +94,7 @@ public class TraceTransactionIntegrationTest {
             blockHashLookup);
     assertThat(result.isSuccessful()).isTrue();
     final Account createdContract =
-        createTransactionUpdater
-            .getTouchedAccounts()
-            .stream()
+        createTransactionUpdater.getTouchedAccounts().stream()
             .filter(account -> !account.getCode().isEmpty())
             .findAny()
             .get();
@@ -154,7 +152,7 @@ public class TraceTransactionIntegrationTest {
             new BytesValueRLPInput(BytesValue.fromHexString(CONTRACT_CREATION_TX), false));
     transactionProcessor.processTransaction(
         blockchain,
-        worldStateArchive.getMutable(genesisBlock.getHeader().getStateRoot()).updater(),
+        worldStateArchive.getMutable(genesisBlock.getHeader().getStateRoot()).get().updater(),
         genesisBlock.getHeader(),
         transaction,
         genesisBlock.getHeader().getCoinbase(),

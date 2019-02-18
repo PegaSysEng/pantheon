@@ -16,21 +16,20 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncActions;
-import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncException;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.fullsync.FullSyncDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
-import tech.pegasys.pantheon.services.queue.InMemoryBigQueue;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,7 +46,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final BlockPropagationManager<C> blockPropagationManager;
   private final FullSyncDownloader<C> fullSyncDownloader;
-  private final Optional<FastSyncDownloader<C>> fastSyncDownloader;
+  private final Optional<FastSynchronizer<C>> fastSynchronizer;
 
   public DefaultSynchronizer(
       final SynchronizerConfiguration syncConfig,
@@ -56,10 +55,15 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       final WorldStateStorage worldStateStorage,
       final EthContext ethContext,
       final SyncState syncState,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final Path dataDirectory,
+      final MetricsSystem metricsSystem) {
     this.syncConfig = syncConfig;
     this.ethContext = ethContext;
     this.syncState = syncState;
+
+    final LabelledMetric<OperationTimer> ethTasksTimer =
+        metricsSystem.createLabelledTimer(
+            MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
     this.blockPropagationManager =
         new BlockPropagationManager<>(
             syncConfig,
@@ -69,43 +73,32 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             syncState,
             new PendingBlocks(),
             ethTasksTimer);
+
+    ChainHeadTracker.trackChainHeadForPeers(
+        ethContext, protocolSchedule, protocolContext.getBlockchain(), syncConfig, ethTasksTimer);
+
     this.fullSyncDownloader =
         new FullSyncDownloader<>(
             syncConfig, protocolSchedule, protocolContext, ethContext, syncState, ethTasksTimer);
 
-    ChainHeadTracker.trackChainHeadForPeers(
-        ethContext, protocolSchedule, protocolContext.getBlockchain(), syncConfig, ethTasksTimer);
-    if (syncConfig.syncMode() == SyncMode.FAST) {
-      LOG.info("Fast sync enabled.");
-      final WorldStateDownloader worldStateDownloader =
-          new WorldStateDownloader(
-              ethContext,
-              worldStateStorage,
-              new InMemoryBigQueue<>(),
-              syncConfig.getWorldStateHashCountPerRequest(),
-              syncConfig.getWorldStateRequestParallelism(),
-              ethTasksTimer);
-      this.fastSyncDownloader =
-          Optional.of(
-              new FastSyncDownloader<>(
-                  new FastSyncActions<>(
-                      syncConfig,
-                      protocolSchedule,
-                      protocolContext,
-                      ethContext,
-                      syncState,
-                      ethTasksTimer),
-                  worldStateDownloader));
-    } else {
-      this.fastSyncDownloader = Optional.empty();
-    }
+    fastSynchronizer =
+        FastSynchronizer.create(
+            syncConfig,
+            dataDirectory,
+            protocolSchedule,
+            protocolContext,
+            metricsSystem,
+            ethContext,
+            worldStateStorage,
+            ethTasksTimer,
+            syncState);
   }
 
   @Override
   public void start() {
     if (started.compareAndSet(false, true)) {
-      if (fastSyncDownloader.isPresent()) {
-        fastSyncDownloader.get().start().whenComplete(this::handleFastSyncResult);
+      if (fastSynchronizer.isPresent()) {
+        fastSynchronizer.get().start().whenComplete(this::handleFastSyncResult);
       } else {
         startFullSync();
       }
@@ -115,7 +108,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   }
 
   private void handleFastSyncResult(final FastSyncState result, final Throwable error) {
-
     final Throwable rootCause = ExceptionUtils.rootCause(error);
     if (rootCause instanceof FastSyncException) {
       LOG.error(
@@ -128,6 +120,8 @@ public class DefaultSynchronizer<C> implements Synchronizer {
           "Fast sync completed successfully with pivot block {}",
           result.getPivotBlockNumber().getAsLong());
     }
+    fastSynchronizer.ifPresent(FastSynchronizer::deleteFastSyncState);
+
     startFullSync();
   }
 
@@ -148,7 +142,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   @Override
   public boolean hasSufficientPeers() {
     final int requiredPeerCount =
-        fastSyncDownloader.isPresent() ? syncConfig.getFastSyncMinimumPeerCount() : 1;
+        fastSynchronizer.isPresent() ? syncConfig.getFastSyncMinimumPeerCount() : 1;
     return ethContext.getEthPeers().availablePeerCount() >= requiredPeerCount;
   }
 }

@@ -31,12 +31,9 @@ import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
-import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
@@ -55,12 +52,10 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Map;
@@ -106,10 +101,11 @@ public class CliquePantheonController implements PantheonController<CliqueContex
   public static PantheonController<CliqueContext> init(
       final StorageProvider storageProvider,
       final GenesisConfigFile genesisConfig,
-      final SynchronizerConfiguration taintedSyncConfig,
+      final SynchronizerConfiguration syncConfig,
       final MiningParameters miningParams,
       final int networkId,
       final KeyPair nodeKeys,
+      final Path dataDirectory,
       final MetricsSystem metricsSystem) {
     final Address localAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
     final CliqueConfigOptions cliqueConfig =
@@ -121,50 +117,45 @@ public class CliquePantheonController implements PantheonController<CliqueContex
     final ProtocolSchedule<CliqueContext> protocolSchedule =
         CliqueProtocolSchedule.create(genesisConfig.getConfigOptions(), nodeKeys);
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
-    final BlockchainStorage blockchainStorage =
-        storageProvider.createBlockchainStorage(protocolSchedule);
-    final MutableBlockchain blockchain =
-        new DefaultMutableBlockchain(genesisState.getBlock(), blockchainStorage, metricsSystem);
-
-    final WorldStateStorage worldStateStorage = storageProvider.createWorldStateStorage();
-    final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
-    genesisState.writeStateTo(worldStateArchive.getMutable(Hash.EMPTY_TRIE_HASH));
 
     final ProtocolContext<CliqueContext> protocolContext =
-        new ProtocolContext<>(
-            blockchain,
-            worldStateArchive,
-            new CliqueContext(
-                new VoteTallyCache(
-                    blockchain,
-                    new VoteTallyUpdater(epochManger, new CliqueBlockInterface()),
-                    epochManger),
-                new VoteProposer(),
-                epochManger));
+        ProtocolContext.init(
+            storageProvider,
+            genesisState,
+            protocolSchedule,
+            metricsSystem,
+            (blockchain, worldStateArchive) ->
+                new CliqueContext(
+                    new VoteTallyCache(
+                        blockchain,
+                        new VoteTallyUpdater(epochManger, new CliqueBlockInterface()),
+                        epochManger),
+                    new VoteProposer(),
+                    epochManger));
+    final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
-    final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
-            protocolContext.getBlockchain(),
+            blockchain,
             protocolContext.getWorldStateArchive(),
             networkId,
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism());
+            syncConfig.transactionsParallelism(),
+            syncConfig.computationParallelism());
     final SyncState syncState =
-        new SyncState(
-            protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
+        new SyncState(blockchain, ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
             syncConfig,
             protocolSchedule,
             protocolContext,
-            worldStateStorage,
+            protocolContext.getWorldStateArchive().getStorage(),
             ethProtocolManager.ethContext(),
             syncState,
-            metricsSystem.createLabelledTimer(
-                MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName"));
+            dataDirectory,
+            metricsSystem);
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
@@ -257,7 +248,6 @@ public class CliquePantheonController implements PantheonController<CliqueContex
 
   @Override
   public PrivacyParameters getPrivacyParameters() {
-    LOG.warn("CliquePantheonController does not currently support private transactions.");
     return PrivacyParameters.noPrivacy();
   }
 

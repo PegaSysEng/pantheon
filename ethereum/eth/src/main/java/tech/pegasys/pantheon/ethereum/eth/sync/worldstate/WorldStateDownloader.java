@@ -14,84 +14,128 @@ package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask.PeerTaskResult;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetNodeDataFromPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeerTask;
-import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
+import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
-import tech.pegasys.pantheon.services.queue.BigQueue;
+import tech.pegasys.pantheon.services.queue.TaskQueue;
+import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class WorldStateDownloader {
+  private static final Logger LOG = LogManager.getLogger();
+  private final Counter completedRequestsCounter;
+  private final Counter retriedRequestsTotal;
 
   private enum Status {
     IDLE,
     RUNNING,
-    DONE
+    CANCELLED,
+    COMPLETED
   }
 
   private final EthContext ethContext;
-  private final BigQueue<NodeDataRequest> pendingRequests;
-  private final WorldStateStorage.Updater worldStateStorageUpdater;
+  private final TaskQueue<NodeDataRequest> pendingRequests;
   private final int hashCountPerRequest;
   private final int maxOutstandingRequests;
-  private final AtomicInteger outstandingRequests = new AtomicInteger(0);
+  private final Set<EthTask<?>> outstandingRequests =
+      Collections.newSetFromMap(new ConcurrentHashMap<>());
   private final LabelledMetric<OperationTimer> ethTasksTimer;
   private final WorldStateStorage worldStateStorage;
   private final AtomicBoolean sendingRequests = new AtomicBoolean(false);
   private volatile CompletableFuture<Void> future;
   private volatile Status status = Status.IDLE;
+  private volatile BytesValue rootNode;
 
   public WorldStateDownloader(
       final EthContext ethContext,
       final WorldStateStorage worldStateStorage,
-      final BigQueue<NodeDataRequest> pendingRequests,
+      final TaskQueue<NodeDataRequest> pendingRequests,
       final int hashCountPerRequest,
       final int maxOutstandingRequests,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final LabelledMetric<OperationTimer> ethTasksTimer,
+      final MetricsSystem metricsSystem) {
     this.ethContext = ethContext;
     this.worldStateStorage = worldStateStorage;
     this.pendingRequests = pendingRequests;
     this.hashCountPerRequest = hashCountPerRequest;
     this.maxOutstandingRequests = maxOutstandingRequests;
     this.ethTasksTimer = ethTasksTimer;
-    this.worldStateStorageUpdater = worldStateStorage.updater();
+    metricsSystem.createGauge(
+        MetricCategory.SYNCHRONIZER,
+        "world_state_pending_requests_current",
+        "Number of pending requests for fast sync world state download",
+        () -> (double) pendingRequests.size());
+
+    completedRequestsCounter =
+        metricsSystem.createCounter(
+            MetricCategory.SYNCHRONIZER,
+            "world_state_completed_requests_total",
+            "Total number of node data requests completed as part of fast sync world state download");
+    retriedRequestsTotal =
+        metricsSystem.createCounter(
+            MetricCategory.SYNCHRONIZER,
+            "world_state_retried_requests_total",
+            "Total number of node data requests repeated as part of fast sync world state download");
   }
 
   public CompletableFuture<Void> run(final BlockHeader header) {
+    LOG.info(
+        "Begin downloading world state from peers for block {} ({})",
+        header.getNumber(),
+        header.getHash());
     synchronized (this) {
-      if (status == Status.DONE || status == Status.RUNNING) {
-        return future;
+      if (status == Status.RUNNING) {
+        CompletableFuture<Void> failed = new CompletableFuture<>();
+        failed.completeExceptionally(
+            new IllegalStateException(
+                "Cannot run an already running " + this.getClass().getSimpleName()));
+        return failed;
       }
       status = Status.RUNNING;
-      future = new CompletableFuture<>();
+      future = createFuture();
+
+      Hash stateRoot = header.getStateRoot();
+      if (worldStateStorage.isWorldStateAvailable(stateRoot)) {
+        // If we're requesting data for an existing world state, we're already done
+        markDone();
+      } else {
+        pendingRequests.enqueue(NodeDataRequest.createAccountDataRequest(stateRoot));
+      }
     }
 
-    Hash stateRoot = header.getStateRoot();
-    if (stateRoot.equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH)) {
-      // If we're requesting data for an empty world state, we're already done
-      markDone();
-    } else {
-      pendingRequests.enqueue(NodeDataRequest.createAccountDataRequest(stateRoot));
-      requestNodeData(header);
-    }
-
+    requestNodeData(header);
     return future;
+  }
+
+  public void cancel() {
+    getFuture().cancel(true);
   }
 
   private void requestNodeData(final BlockHeader header) {
@@ -107,23 +151,41 @@ public class WorldStateDownloader {
           EthPeer peer = maybePeer.get();
 
           // Collect data to be requested
-          List<NodeDataRequest> toRequest = new ArrayList<>();
-          for (int i = 0; i < hashCountPerRequest; i++) {
-            NodeDataRequest pendingRequest = pendingRequests.dequeue();
-            if (pendingRequest == null) {
+          List<Task<NodeDataRequest>> toRequest = new ArrayList<>();
+          while (toRequest.size() < hashCountPerRequest) {
+            Task<NodeDataRequest> pendingRequestTask = pendingRequests.dequeue();
+            if (pendingRequestTask == null) {
               break;
             }
-            toRequest.add(pendingRequest);
+            NodeDataRequest pendingRequest = pendingRequestTask.getData();
+            final Optional<BytesValue> existingData =
+                pendingRequest.getExistingData(worldStateStorage);
+            if (existingData.isPresent()) {
+              pendingRequest.setData(existingData.get());
+              queueChildRequests(pendingRequest);
+              pendingRequestTask.markCompleted();
+              continue;
+            }
+            toRequest.add(pendingRequestTask);
           }
 
           // Request and process node data
-          outstandingRequests.incrementAndGet();
-          sendAndProcessRequests(peer, toRequest)
+          sendAndProcessRequests(peer, toRequest, header)
               .whenComplete(
-                  (res, error) -> {
-                    if (outstandingRequests.decrementAndGet() == 0 && pendingRequests.isEmpty()) {
+                  (task, error) -> {
+                    boolean done;
+                    synchronized (this) {
+                      outstandingRequests.remove(task);
+                      done =
+                          status == Status.RUNNING
+                              && outstandingRequests.size() == 0
+                              && pendingRequests.allTasksCompleted();
+                    }
+                    if (done) {
                       // We're done
-                      worldStateStorageUpdater.commit();
+                      final Updater updater = worldStateStorage.updater();
+                      updater.putAccountStateTrieNode(header.getStateRoot(), rootNode);
+                      updater.commit();
                       markDone();
                     } else {
                       // Send out additional requests
@@ -136,18 +198,9 @@ public class WorldStateDownloader {
     }
   }
 
-  private synchronized void markDone() {
-    if (future == null) {
-      future = CompletableFuture.completedFuture(null);
-    } else {
-      future.complete(null);
-    }
-    status = Status.DONE;
-  }
-
   private boolean shouldRequestNodeData() {
     return !future.isDone()
-        && outstandingRequests.get() < maxOutstandingRequests
+        && outstandingRequests.size() < maxOutstandingRequests
         && !pendingRequests.isEmpty();
   }
 
@@ -157,35 +210,96 @@ public class WorldStateDownloader {
         .timeout(WaitForPeerTask.create(ethContext, ethTasksTimer), Duration.ofSeconds(5));
   }
 
-  private CompletableFuture<?> sendAndProcessRequests(
-      final EthPeer peer, final List<NodeDataRequest> requests) {
+  private CompletableFuture<AbstractPeerTask<List<BytesValue>>> sendAndProcessRequests(
+      final EthPeer peer,
+      final List<Task<NodeDataRequest>> requestTasks,
+      final BlockHeader blockHeader) {
     List<Hash> hashes =
-        requests.stream().map(NodeDataRequest::getHash).distinct().collect(Collectors.toList());
-    return GetNodeDataFromPeerTask.forHashes(ethContext, hashes, ethTasksTimer)
-        .assignPeer(peer)
+        requestTasks.stream()
+            .map(Task::getData)
+            .map(NodeDataRequest::getHash)
+            .distinct()
+            .collect(Collectors.toList());
+    AbstractPeerTask<List<BytesValue>> ethTask =
+        GetNodeDataFromPeerTask.forHashes(ethContext, hashes, ethTasksTimer).assignPeer(peer);
+    outstandingRequests.add(ethTask);
+    return ethTask
         .run()
         .thenApply(PeerTaskResult::getResult)
         .thenApply(this::mapNodeDataByHash)
-        .whenComplete(
+        .handle(
             (data, err) -> {
               boolean requestFailed = err != null;
-              for (NodeDataRequest request : requests) {
+              Updater storageUpdater = worldStateStorage.updater();
+              for (Task<NodeDataRequest> task : requestTasks) {
+                NodeDataRequest request = task.getData();
                 BytesValue matchingData = requestFailed ? null : data.get(request.getHash());
                 if (matchingData == null) {
-                  pendingRequests.enqueue(request);
+                  retriedRequestsTotal.inc();
+                  task.markFailed();
                 } else {
+                  completedRequestsCounter.inc();
                   // Persist request data
                   request.setData(matchingData);
-                  request.persist(worldStateStorageUpdater);
+                  if (isRootState(blockHeader, request)) {
+                    rootNode = request.getData();
+                  } else {
+                    request.persist(storageUpdater);
+                  }
 
-                  // Queue child requests
-                  request
-                      .getChildRequests()
-                      .filter(n -> !worldStateStorage.contains(n.getHash()))
-                      .forEach(pendingRequests::enqueue);
+                  queueChildRequests(request);
+                  task.markCompleted();
                 }
               }
+              storageUpdater.commit();
+              return ethTask;
             });
+  }
+
+  private synchronized void queueChildRequests(final NodeDataRequest request) {
+    if (status == Status.RUNNING) {
+      request.getChildRequests().forEach(pendingRequests::enqueue);
+    }
+  }
+
+  private synchronized CompletableFuture<Void> getFuture() {
+    if (future == null) {
+      future = createFuture();
+    }
+    return future;
+  }
+
+  private CompletableFuture<Void> createFuture() {
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    future.whenComplete(
+        (res, err) -> {
+          // Handle cancellations
+          if (future.isCancelled()) {
+            handleCancellation();
+          }
+        });
+    return future;
+  }
+
+  private synchronized void handleCancellation() {
+    LOG.info("World state download cancelled");
+    status = Status.CANCELLED;
+    pendingRequests.clear();
+    for (EthTask<?> outstandingRequest : outstandingRequests) {
+      outstandingRequest.cancel();
+    }
+  }
+
+  private synchronized void markDone() {
+    final boolean completed = getFuture().complete(null);
+    if (completed) {
+      LOG.info("Finished downloading world state from peers");
+      status = Status.COMPLETED;
+    }
+  }
+
+  private boolean isRootState(final BlockHeader blockHeader, final NodeDataRequest request) {
+    return request.getHash().equals(blockHeader.getStateRoot());
   }
 
   private Map<Hash, BytesValue> mapNodeDataByHash(final List<BytesValue> data) {

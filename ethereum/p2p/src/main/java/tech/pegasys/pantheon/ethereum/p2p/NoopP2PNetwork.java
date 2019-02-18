@@ -17,9 +17,9 @@ import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -85,7 +85,7 @@ public class NoopP2PNetwork implements P2PNetwork {
 
   @Override
   public Optional<NodeWhitelistController> getNodeWhitelistController() {
-    throw new P2pDisabledException("P2P networking disabled.  Node whitelist unavailable.");
+    return Optional.empty();
   }
 
   @Override

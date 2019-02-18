@@ -302,7 +302,6 @@ to make the documentation coherent and the user experience as pleasant as possib
 [search-label-requires-changes]: https://github.com/PegaSysEng/pantheon/pulls?q=is%3Aopen+is%3Apr+label%3A%22requires%20changes%22
 [search-label-needs-engineering-approval]: https://github.com/PegaSysEng/pantheon/pulls?q=is%3Aopen+is%3Apr+label%3A%22needs+engineering+approval%22
 
-
 [private@pegasys.tech]: mailto:private@pegasys.tech
 [Gitter]: https://gitter.im/PegaSysEng/pantheon
 [Pantheon documentation]: https://docs.pantheon.pegasys.tech/

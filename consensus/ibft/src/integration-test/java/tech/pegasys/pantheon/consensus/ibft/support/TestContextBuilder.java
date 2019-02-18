@@ -69,7 +69,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -112,9 +111,12 @@ public class TestContextBuilder {
   public static final int EPOCH_LENGTH = 10_000;
   public static final int BLOCK_TIMER_SEC = 3;
   public static final int ROUND_TIMER_SEC = 12;
+  public static final int MESSAGE_QUEUE_LIMIT = 1000;
+  public static final int GOSSIPED_HISTORY_LIMIT = 100;
+  public static final int DUPLICATE_MESSAGE_LIMIT = 100;
 
   private Clock clock = Clock.fixed(Instant.MIN, ZoneId.of("UTC"));
-  private IbftEventQueue ibftEventQueue = new IbftEventQueue();
+  private IbftEventQueue ibftEventQueue = new IbftEventQueue(MESSAGE_QUEUE_LIMIT);
   private int validatorCount = 4;
   private int indexOfFirstLocallyProposedBlock = 0; // Meaning first block is from remote peer.
   private boolean useGossip = false;
@@ -157,8 +159,8 @@ public class TestContextBuilder {
 
     // Use a stubbed version of the multicaster, to prevent creating PeerConnections etc.
     final StubValidatorMulticaster multicaster = new StubValidatorMulticaster();
-
-    final UniqueMessageMulticaster uniqueMulticaster = new UniqueMessageMulticaster(multicaster);
+    final UniqueMessageMulticaster uniqueMulticaster =
+        new UniqueMessageMulticaster(multicaster, GOSSIPED_HISTORY_LIMIT);
 
     final Gossiper gossiper = useGossip ? new IbftGossip(uniqueMulticaster) : mock(Gossiper.class);
 
@@ -170,9 +172,7 @@ public class TestContextBuilder {
     // NOTE: the remotePeers needs to be ordered based on Address (as this is used to determine
     // the proposer order which must be managed in test).
     final Map<Address, ValidatorPeer> remotePeers =
-        networkNodes
-            .getRemotePeers()
-            .stream()
+        networkNodes.getRemotePeers().stream()
             .collect(
                 Collectors.toMap(
                     NodeParams::getAddress,
@@ -300,10 +300,14 @@ public class TestContextBuilder {
             new IbftBlockHeightManagerFactory(
                 finalState,
                 new IbftRoundFactory(
-                    finalState, protocolContext, protocolSchedule, minedBlockObservers),
+                    finalState,
+                    protocolContext,
+                    protocolSchedule,
+                    minedBlockObservers,
+                    messageValidatorFactory),
                 messageValidatorFactory),
             gossiper,
-            new HashMap<>());
+            DUPLICATE_MESSAGE_LIMIT);
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     //////////////////////////// END IBFT PantheonController ////////////////////////////

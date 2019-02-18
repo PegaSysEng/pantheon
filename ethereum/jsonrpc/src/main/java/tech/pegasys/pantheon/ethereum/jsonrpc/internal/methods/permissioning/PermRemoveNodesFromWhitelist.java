@@ -22,11 +22,9 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
 
@@ -51,15 +49,9 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
     try {
       if (p2pNetwork.getNodeWhitelistController().isPresent()) {
         try {
-          List<DefaultPeer> peers =
-              enodeListParam
-                  .getStringList()
-                  .parallelStream()
-                  .map(this::parsePeer)
-                  .collect(Collectors.toList());
-
-          NodeWhitelistController.NodesWhitelistResult nodesWhitelistResult =
-              p2pNetwork.getNodeWhitelistController().get().removeNodes(peers);
+          final List<String> enodeURLs = enodeListParam.getStringList();
+          final NodeWhitelistController.NodesWhitelistResult nodesWhitelistResult =
+              p2pNetwork.getNodeWhitelistController().get().removeNodes(enodeURLs);
 
           switch (nodesWhitelistResult.result()) {
             case SUCCESS:
@@ -72,6 +64,10 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
             case ERROR_DUPLICATED_ENTRY:
               return new JsonRpcErrorResponse(
                   req.getId(), JsonRpcError.NODE_WHITELIST_DUPLICATED_ENTRY);
+            case ERROR_WHITELIST_PERSIST_FAIL:
+              return new JsonRpcErrorResponse(req.getId(), JsonRpcError.WHITELIST_PERSIST_FAILURE);
+            case ERROR_WHITELIST_FILE_SYNC:
+              return new JsonRpcErrorResponse(req.getId(), JsonRpcError.WHITELIST_FILE_SYNC);
             default:
               throw new Exception();
           }
@@ -86,9 +82,5 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
     } catch (P2pDisabledException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
     }
-  }
-
-  private DefaultPeer parsePeer(final String enodeURI) {
-    return DefaultPeer.fromURI(enodeURI);
   }
 }

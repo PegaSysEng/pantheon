@@ -17,7 +17,7 @@ import java.util.Optional;
 /** Provides an interface to block synchronization processes. */
 public interface Synchronizer {
 
-  public void start();
+  void start();
 
   /**
    * @return the status, based on SyncingResult When actively synchronizing blocks, alternatively

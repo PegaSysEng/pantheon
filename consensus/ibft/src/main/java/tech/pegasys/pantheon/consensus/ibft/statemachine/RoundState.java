@@ -65,10 +65,10 @@ public class RoundState {
   public boolean setProposedBlock(final Proposal msg) {
 
     if (!proposalMessage.isPresent()) {
-      if (validator.addSignedProposalPayload(msg)) {
+      if (validator.validateProposal(msg)) {
         proposalMessage = Optional.of(msg);
-        prepareMessages.removeIf(p -> !validator.validatePrepareMessage(p));
-        commitMessages.removeIf(p -> !validator.validateCommitMessage(p));
+        prepareMessages.removeIf(p -> !validator.validatePrepare(p));
+        commitMessages.removeIf(p -> !validator.validateCommit(p));
         updateState();
         return true;
       }
@@ -78,7 +78,7 @@ public class RoundState {
   }
 
   public void addPrepareMessage(final Prepare msg) {
-    if (!proposalMessage.isPresent() || validator.validatePrepareMessage(msg)) {
+    if (!proposalMessage.isPresent() || validator.validatePrepare(msg)) {
       prepareMessages.add(msg);
       LOG.debug("Round state added prepare message prepare={}", msg);
     }
@@ -86,7 +86,7 @@ public class RoundState {
   }
 
   public void addCommitMessage(final Commit msg) {
-    if (!proposalMessage.isPresent() || validator.validateCommitMessage(msg)) {
+    if (!proposalMessage.isPresent() || validator.validateCommit(msg)) {
       commitMessages.add(msg);
       LOG.debug("Round state added commit message commit={}", msg);
     }
@@ -109,7 +109,7 @@ public class RoundState {
   }
 
   public Optional<Block> getProposedBlock() {
-    return proposalMessage.map(p -> p.getSignedPayload().getPayload().getBlock());
+    return proposalMessage.map(Proposal::getBlock);
   }
 
   public boolean isPrepared() {
@@ -121,15 +121,14 @@ public class RoundState {
   }
 
   public Collection<Signature> getCommitSeals() {
-    return commitMessages
-        .stream()
+    return commitMessages.stream()
         .map(cp -> cp.getSignedPayload().getPayload().getCommitSeal())
         .collect(Collectors.toList());
   }
 
-  public Optional<TerminatedRoundArtefacts> constructTerminatedRoundArtefacts() {
+  public Optional<PreparedRoundArtifacts> constructPreparedRoundArtifacts() {
     if (isPrepared()) {
-      return Optional.of(new TerminatedRoundArtefacts(proposalMessage.get(), prepareMessages));
+      return Optional.of(new PreparedRoundArtifacts(proposalMessage.get(), prepareMessages));
     }
     return Optional.empty();
   }

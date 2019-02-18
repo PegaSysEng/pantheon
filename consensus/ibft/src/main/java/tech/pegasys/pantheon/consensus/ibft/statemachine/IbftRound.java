@@ -81,7 +81,7 @@ public class IbftRound {
   public void createAndSendProposalMessage(final long headerTimeStampSeconds) {
     final Block block = blockCreator.createBlock(headerTimeStampSeconds);
     final IbftExtraData extraData = IbftExtraData.decode(block.getHeader().getExtraData());
-    LOG.info(
+    LOG.debug(
         "Creating proposed block. round={} extraData={} blockHeader={}",
         roundState.getRoundIdentifier(),
         extraData,
@@ -89,28 +89,29 @@ public class IbftRound {
     transmitter.multicastProposal(roundState.getRoundIdentifier(), block);
 
     updateStateWithProposedBlock(
-        messageFactory.createSignedProposalPayload(roundState.getRoundIdentifier(), block));
+        messageFactory.createProposal(roundState.getRoundIdentifier(), block));
   }
 
   public void startRoundWith(
-      final RoundChangeArtefacts roundChangeArtefacts, final long headerTimestamp) {
-    final Optional<Block> bestBlockFromRoundChange = roundChangeArtefacts.getBlock();
+      final RoundChangeArtifacts roundChangeArtifacts, final long headerTimestamp) {
+    final Optional<Block> bestBlockFromRoundChange = roundChangeArtifacts.getBlock();
 
     Proposal proposal;
     if (!bestBlockFromRoundChange.isPresent()) {
-      LOG.trace("Multicasting NewRound with new block. round={}", roundState.getRoundIdentifier());
+      LOG.debug("Multicasting NewRound with new block. round={}", roundState.getRoundIdentifier());
       final Block block = blockCreator.createBlock(headerTimestamp);
-      proposal = messageFactory.createSignedProposalPayload(getRoundIdentifier(), block);
+      proposal = messageFactory.createProposal(getRoundIdentifier(), block);
     } else {
-      LOG.trace(
+      LOG.debug(
           "Multicasting NewRound from PreparedCertificate. round={}",
           roundState.getRoundIdentifier());
       proposal = createProposalAroundBlock(bestBlockFromRoundChange.get());
     }
     transmitter.multicastNewRound(
         getRoundIdentifier(),
-        roundChangeArtefacts.getRoundChangeCertificate(),
-        proposal.getSignedPayload());
+        roundChangeArtifacts.getRoundChangeCertificate(),
+        proposal.getSignedPayload(),
+        proposal.getBlock());
     updateStateWithProposedBlock(proposal);
   }
 
@@ -120,11 +121,11 @@ public class IbftRound {
             block,
             getRoundIdentifier().getRoundNumber(),
             IbftBlockHashing::calculateDataHashForCommittedSeal);
-    return messageFactory.createSignedProposalPayload(getRoundIdentifier(), blockToPublish);
+    return messageFactory.createProposal(getRoundIdentifier(), blockToPublish);
   }
 
   public void handleProposalMessage(final Proposal msg) {
-    LOG.info("Handling a Proposal message.");
+    LOG.debug("Handling a Proposal message.");
 
     if (getRoundIdentifier().getRoundNumber() != 0) {
       LOG.error("Illegally received a Proposal message when not in Round 0.");
@@ -134,24 +135,23 @@ public class IbftRound {
   }
 
   public void handleProposalFromNewRound(final NewRound msg) {
-    LOG.info("Handling a New Round Proposal.");
+    LOG.debug("Handling a New Round Proposal.");
 
     if (getRoundIdentifier().getRoundNumber() == 0) {
       LOG.error("Illegally received a NewRound message when in Round 0.");
       return;
     }
-    actionReceivedProposal(new Proposal(msg.getProposalPayload()));
+    actionReceivedProposal(new Proposal(msg.getProposalPayload(), msg.getBlock()));
   }
 
   private void actionReceivedProposal(final Proposal msg) {
     final Block block = msg.getBlock();
 
     if (updateStateWithProposedBlock(msg)) {
-      LOG.info("Sending prepare message.");
+      LOG.debug("Sending prepare message.");
       transmitter.multicastPrepare(getRoundIdentifier(), block.getHash());
       final Prepare localPrepareMessage =
-          messageFactory.createSignedPreparePayload(
-              roundState.getRoundIdentifier(), block.getHash());
+          messageFactory.createPrepare(roundState.getRoundIdentifier(), block.getHash());
       peerIsPrepared(localPrepareMessage);
     }
   }
@@ -166,8 +166,8 @@ public class IbftRound {
     peerIsCommitted(msg);
   }
 
-  public Optional<TerminatedRoundArtefacts> constructTerminatedRoundArtefacts() {
-    return roundState.constructTerminatedRoundArtefacts();
+  public Optional<PreparedRoundArtifacts> constructPreparedRoundArtifacts() {
+    return roundState.constructPreparedRoundArtifacts();
   }
 
   private boolean updateStateWithProposedBlock(final Proposal msg) {
@@ -186,7 +186,7 @@ public class IbftRound {
       }
 
       final Commit localCommitMessage =
-          messageFactory.createSignedCommitPayload(
+          messageFactory.createCommit(
               roundState.getRoundIdentifier(),
               msg.getBlock().getHash(),
               createCommitSeal(roundState.getProposedBlock().get()));
@@ -221,7 +221,11 @@ public class IbftRound {
 
     final long blockNumber = blockToImport.getHeader().getNumber();
     final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader().getExtraData());
-    LOG.info("Importing block to chain. block={} extraData={}", blockNumber, extraData);
+    LOG.info(
+        "Importing block to chain. round={}, hash={}",
+        getRoundIdentifier(),
+        blockToImport.getHash());
+    LOG.debug("ExtraData = {}", extraData);
     final boolean result =
         blockImporter.importBlock(protocolContext, blockToImport, HeaderValidationMode.FULL);
     if (!result) {

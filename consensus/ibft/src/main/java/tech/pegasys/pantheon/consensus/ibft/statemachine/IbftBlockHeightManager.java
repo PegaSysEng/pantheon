@@ -69,7 +69,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   private final Function<ConsensusRoundIdentifier, RoundState> roundStateCreator;
   private final IbftFinalState finalState;
 
-  private Optional<TerminatedRoundArtefacts> latesteTerminatedRoundArtefacts = Optional.empty();
+  private Optional<PreparedRoundArtifacts> latestPreparedRoundArtifacts = Optional.empty();
 
   private IbftRound currentRound;
 
@@ -90,7 +90,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     this.roundChangeManager = roundChangeManager;
     this.finalState = finalState;
 
-    newRoundMessageValidator = messageValidatorFactory.createNewRoundValidator(parentHeader);
+    newRoundMessageValidator = messageValidatorFactory.createNewRoundValidator(getChainHeight());
 
     roundStateCreator =
         (roundIdentifier) ->
@@ -113,7 +113,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     if (roundIdentifier.equals(currentRound.getRoundIdentifier())) {
       currentRound.createAndSendProposalMessage(clock.millis() / 1000);
     } else {
-      LOG.info(
+      LOG.trace(
           "Block timer expired for a round ({}) other than current ({})",
           roundIdentifier,
           currentRound.getRoundIdentifier());
@@ -123,30 +123,30 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   @Override
   public void roundExpired(final RoundExpiry expire) {
     if (!expire.getView().equals(currentRound.getRoundIdentifier())) {
-      LOG.info(
+      LOG.trace(
           "Ignoring Round timer expired which does not match current round. round={}, timerRound={}",
           currentRound.getRoundIdentifier(),
           expire.getView());
       return;
     }
 
-    LOG.info(
+    LOG.debug(
         "Round has expired, creating PreparedCertificate and notifying peers. round={}",
         currentRound.getRoundIdentifier());
-    final Optional<TerminatedRoundArtefacts> terminatedRoundArtefats =
-        currentRound.constructTerminatedRoundArtefacts();
+    final Optional<PreparedRoundArtifacts> preparedRoundArtifacts =
+        currentRound.constructPreparedRoundArtifacts();
 
-    if (terminatedRoundArtefats.isPresent()) {
-      latesteTerminatedRoundArtefacts = terminatedRoundArtefats;
+    if (preparedRoundArtifacts.isPresent()) {
+      latestPreparedRoundArtifacts = preparedRoundArtifacts;
     }
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
     final RoundChange localRoundChange =
-        messageFactory.createSignedRoundChangePayload(
-            currentRound.getRoundIdentifier(), latesteTerminatedRoundArtefacts);
+        messageFactory.createRoundChange(
+            currentRound.getRoundIdentifier(), latestPreparedRoundArtifacts);
     transmitter.multicastRoundChange(
-        currentRound.getRoundIdentifier(), latesteTerminatedRoundArtefacts);
+        currentRound.getRoundIdentifier(), latestPreparedRoundArtifacts);
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
     // message - so it must be handled accordingly.
@@ -155,21 +155,21 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
   @Override
   public void handleProposalPayload(final Proposal proposal) {
-    LOG.debug("Received a Proposal Payload.");
+    LOG.trace("Received a Proposal Payload.");
     actionOrBufferMessage(
         proposal, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
   @Override
   public void handlePreparePayload(final Prepare prepare) {
-    LOG.debug("Received a Prepare Payload.");
+    LOG.trace("Received a Prepare Payload.");
     actionOrBufferMessage(
         prepare, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
   @Override
   public void handleCommitPayload(final Commit commit) {
-    LOG.debug("Received a Commit Payload.");
+    LOG.trace("Received a Commit Payload.");
     actionOrBufferMessage(commit, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
@@ -193,33 +193,36 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   @Override
   public void handleRoundChangePayload(final RoundChange message) {
     final ConsensusRoundIdentifier targetRound = message.getRoundIdentifier();
-    LOG.info("Received a RoundChange Payload for {}", targetRound.toString());
+    LOG.trace("Received a RoundChange Payload for {}", targetRound);
 
     final MessageAge messageAge =
         determineAgeOfPayload(message.getRoundIdentifier().getRoundNumber());
     if (messageAge == PRIOR_ROUND) {
-      LOG.debug("Received RoundChange Payload for a prior round. targetRound={}", targetRound);
+      LOG.trace("Received RoundChange Payload for a prior round. targetRound={}", targetRound);
       return;
     }
 
     final Optional<Collection<RoundChange>> result =
         roundChangeManager.appendRoundChangeMessage(message);
     if (result.isPresent()) {
+      LOG.debug(
+          "Received sufficient RoundChange messages to change round to targetRound={}",
+          targetRound);
       if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
       }
 
-      final RoundChangeArtefacts roundChangeArtefacts = RoundChangeArtefacts.create(result.get());
+      final RoundChangeArtifacts roundChangeArtifacts = RoundChangeArtifacts.create(result.get());
 
       if (finalState.isLocalNodeProposerForRound(targetRound)) {
         currentRound.startRoundWith(
-            roundChangeArtefacts, TimeUnit.MILLISECONDS.toSeconds(clock.millis()));
+            roundChangeArtifacts, TimeUnit.MILLISECONDS.toSeconds(clock.millis()));
       }
     }
   }
 
   private void startNewRound(final int roundNumber) {
-    LOG.info("Starting new round {}", roundNumber);
+    LOG.debug("Starting new round {}", roundNumber);
     if (futureRoundStateBuffer.containsKey(roundNumber)) {
       currentRound =
           roundFactory.createNewRoundWithState(
@@ -240,10 +243,10 @@ public class IbftBlockHeightManager implements BlockHeightManager {
         determineAgeOfPayload(newRound.getRoundIdentifier().getRoundNumber());
 
     if (messageAge == PRIOR_ROUND) {
-      LOG.info("Received NewRound Payload for a prior round={}", newRound.getRoundIdentifier());
+      LOG.trace("Received NewRound Payload for a prior round={}", newRound.getRoundIdentifier());
       return;
     }
-    LOG.info("Received NewRound Payload for {}", newRound.getRoundIdentifier());
+    LOG.trace("Received NewRound Payload for {}", newRound.getRoundIdentifier());
 
     if (newRoundMessageValidator.validateNewRoundMessage(newRound)) {
       if (messageAge == FUTURE_ROUND) {
@@ -255,7 +258,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
   @Override
   public long getChainHeight() {
-    return currentRound.getRoundIdentifier().getSequenceNumber();
+    return parentHeader.getNumber() + 1;
   }
 
   @Override

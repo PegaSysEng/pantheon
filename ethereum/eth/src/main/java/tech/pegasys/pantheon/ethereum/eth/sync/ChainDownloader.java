@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeersTask;
@@ -105,6 +106,10 @@ public class ChainDownloader<C> {
                       LOG.trace("Download cancelled", t);
                     } else if (rootCause instanceof InvalidBlockException) {
                       LOG.debug("Invalid block downloaded", t);
+                    } else if (rootCause instanceof EthTaskException) {
+                      LOG.debug(rootCause.toString());
+                    } else if (rootCause instanceof InterruptedException) {
+                      LOG.trace("Interrupted while downloading chain", rootCause);
                     } else {
                       LOG.error("Error encountered while downloading", t);
                     }
@@ -208,7 +213,14 @@ public class ChainDownloader<C> {
             clearSyncTarget();
           } else if (t != null || r.isEmpty()) {
             if (t != null) {
-              LOG.error("Encountered error importing blocks", t);
+              final Throwable rootCause = ExceptionUtils.rootCause(t);
+              if (rootCause instanceof EthTaskException) {
+                LOG.debug(rootCause.toString());
+              } else if (rootCause instanceof InterruptedException) {
+                LOG.trace("Interrupted while importing blocks", rootCause);
+              } else {
+                LOG.error("Encountered error importing blocks", t);
+              }
             }
             if (checkpointHeaderManager.clearImportedCheckpointHeaders()) {
               chainSegmentTimeouts = 0;

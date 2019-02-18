@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.jsonrpc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
@@ -24,7 +23,12 @@ import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthAccounts;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthBlockNumber;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3Sha3;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -32,26 +36,36 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.KeyStoreOptions;
 import io.vertx.ext.auth.PubSecKeyOptions;
+import io.vertx.ext.auth.SecretOptions;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
+import io.vertx.ext.auth.jwt.impl.JWTAuthProviderImpl;
+import io.vertx.ext.jwt.JWK;
+import io.vertx.ext.jwt.JWT;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -83,46 +97,12 @@ public class JsonRpcHttpServiceLoginTest {
   protected static Synchronizer synchronizer;
   protected static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.ADMIN);
-  private static StubAuthProvider stubCredentialProvider;
-  private static final JWTAuthOptions jwtOptions =
-      new JWTAuthOptions()
-          .setPermissionsClaimKey("permissions")
-          .addPubSecKey(
-              new PubSecKeyOptions()
-                  .setAlgorithm("HS256")
-                  .setPublicKey("keyboard cat")
-                  .setSymmetric(true));
-
-  private static class StubAuthProvider implements AuthProvider {
-    private Optional<User> respondUser = Optional.empty();
-    private Optional<String> respondError = Optional.empty();
-
-    @Override
-    public void authenticate(
-        final JsonObject authInfo, final Handler<AsyncResult<User>> resultHandler) {
-      if (respondUser.isPresent()) {
-        resultHandler.handle(Future.succeededFuture(respondUser.get()));
-      } else if (respondError.isPresent()) {
-        resultHandler.handle(Future.failedFuture(respondError.get()));
-      } else {
-        throw new IllegalStateException("Setup your auth provider stub");
-      }
-    }
-
-    public void setRespondUser(final User respondUser) {
-      this.respondError = Optional.empty();
-      this.respondUser = Optional.of(respondUser);
-    }
-
-    public void setRespondError(final String respondError) {
-      this.respondUser = Optional.empty();
-      this.respondError = Optional.of(respondError);
-    }
-  }
+  protected static JWTAuth jwtAuth;
+  protected static String authPermissionsConfigFilePath = "JsonRpcHttpService/auth.toml";
+  protected final JsonRpcTestHelper testHelper = new JsonRpcTestHelper();
 
   @BeforeClass
   public static void initServerAndClient() throws Exception {
-    stubCredentialProvider = new StubAuthProvider();
     peerDiscoveryMock = mock(P2PNetwork.class);
     blockchainQueries = mock(BlockchainQueries.class);
     synchronizer = mock(Synchronizer.class);
@@ -151,6 +131,7 @@ public class JsonRpcHttpServiceLoginTest {
                     JSON_RPC_APIS,
                     mock(PrivateTransactionHandler.class)));
     service = createJsonRpcHttpService();
+    jwtAuth = service.authenticationService.get().getJwtAuthProvider();
     service.start().join();
 
     // Build an OkHttp client.
@@ -159,14 +140,17 @@ public class JsonRpcHttpServiceLoginTest {
   }
 
   private static JsonRpcHttpService createJsonRpcHttpService() throws Exception {
+    final String authTomlPath =
+        Paths.get(ClassLoader.getSystemResource(authPermissionsConfigFilePath).toURI())
+            .toAbsolutePath()
+            .toString();
+
+    final JsonRpcConfiguration config = createJsonRpcConfig();
+    config.setAuthenticationEnabled(true);
+    config.setAuthenticationCredentialsFile(authTomlPath);
+
     return new JsonRpcHttpService(
-        vertx,
-        folder.newFolder().toPath(),
-        createJsonRpcConfig(),
-        new NoOpMetricsSystem(),
-        rpcMethods,
-        jwtOptions,
-        stubCredentialProvider);
+        vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
   }
 
   private static JsonRpcConfiguration createJsonRpcConfig() {
@@ -184,10 +168,8 @@ public class JsonRpcHttpServiceLoginTest {
 
   @Test
   public void loginWithBadCredentials() throws IOException {
-    stubCredentialProvider.setRespondError("Invalid password");
-
     final RequestBody body =
-        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"badpass\"}");
     final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(401);
@@ -197,12 +179,8 @@ public class JsonRpcHttpServiceLoginTest {
 
   @Test
   public void loginWithGoodCredentials() throws IOException {
-    final User mockUser = mock(User.class);
-    stubCredentialProvider.setRespondUser(mockUser);
-    when(mockUser.principal()).thenReturn(new JsonObject());
-
     final RequestBody body =
-        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
     final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(200);
@@ -218,9 +196,7 @@ public class JsonRpcHttpServiceLoginTest {
       final String token = respBody.getString("token");
       assertThat(token).isNotNull();
 
-      final JWTAuth auth = JWTAuth.create(vertx, jwtOptions);
-
-      auth.authenticate(
+      jwtAuth.authenticate(
           new JsonObject().put("jwt", token),
           (r) -> {
             assertThat(r.succeeded()).isTrue();
@@ -237,15 +213,8 @@ public class JsonRpcHttpServiceLoginTest {
 
   @Test
   public void loginWithGoodCredentialsAndPermissions() throws IOException {
-    final User mockUser = mock(User.class);
-    stubCredentialProvider.setRespondUser(mockUser);
-    when(mockUser.principal())
-        .thenReturn(
-            new JsonObject()
-                .put("permissions", new JsonArray(Collections.singletonList("fakePermission"))));
-
     final RequestBody body =
-        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pass\"}");
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
     final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
     try (final Response resp = client.newCall(request).execute()) {
       assertThat(resp.code()).isEqualTo(200);
@@ -261,9 +230,7 @@ public class JsonRpcHttpServiceLoginTest {
       final String token = respBody.getString("token");
       assertThat(token).isNotNull();
 
-      final JWTAuth auth = JWTAuth.create(vertx, jwtOptions);
-
-      auth.authenticate(
+      jwtAuth.authenticate(
           new JsonObject().put("jwt", token),
           (r) -> {
             assertThat(r.succeeded()).isTrue();
@@ -282,5 +249,250 @@ public class JsonRpcHttpServiceLoginTest {
                 });
           });
     }
+  }
+
+  private JWT makeJwt(final JWTAuthOptions config)
+      throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+    final KeyStoreOptions keyStoreOptions = config.getKeyStore();
+    if (keyStoreOptions != null) {
+      final KeyStore ks = KeyStore.getInstance(keyStoreOptions.getType());
+
+      // synchronize on the class to avoid the case where multiple file accesses will overlap
+      synchronized (JWTAuthProviderImpl.class) {
+        final Buffer keystore = vertx.fileSystem().readFileBlocking(keyStoreOptions.getPath());
+
+        try (InputStream in = new ByteArrayInputStream(keystore.getBytes())) {
+          ks.load(in, keyStoreOptions.getPassword().toCharArray());
+        }
+      }
+
+      return new JWT(ks, keyStoreOptions.getPassword().toCharArray());
+    } else {
+      // no key file attempt to load pem keys
+      final JWT jwt = new JWT();
+
+      final List<PubSecKeyOptions> keys = config.getPubSecKeys();
+
+      if (keys != null) {
+        for (final PubSecKeyOptions pubSecKey : config.getPubSecKeys()) {
+          if (pubSecKey.isSymmetric()) {
+            jwt.addJWK(new JWK(pubSecKey.getAlgorithm(), pubSecKey.getPublicKey()));
+          } else {
+            jwt.addJWK(
+                new JWK(
+                    pubSecKey.getAlgorithm(),
+                    pubSecKey.isCertificate(),
+                    pubSecKey.getPublicKey(),
+                    pubSecKey.getSecretKey()));
+          }
+        }
+      }
+
+      // TODO: remove once the deprecation ends!
+      final List<SecretOptions> secrets = config.getSecrets();
+
+      if (secrets != null) {
+        for (final SecretOptions secret : secrets) {
+          jwt.addSecret(secret.getType(), secret.getSecret());
+        }
+      }
+
+      final List<JsonObject> jwks = config.getJwks();
+
+      if (jwks != null) {
+        for (final JsonObject jwk : jwks) {
+          jwt.addJWK(new JWK(jwk));
+        }
+      }
+      return jwt;
+    }
+  }
+
+  @Test
+  public void loginDoesntPopulateJWTPayloadWithPassword()
+      throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
+    final RequestBody body =
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
+    try (final Response resp = client.newCall(request).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+      assertThat(resp.message()).isEqualTo("OK");
+      assertThat(resp.body().contentType()).isNotNull();
+      assertThat(resp.body().contentType().type()).isEqualTo("application");
+      assertThat(resp.body().contentType().subtype()).isEqualTo("json");
+      final String bodyString = resp.body().string();
+      assertThat(bodyString).isNotNull();
+      assertThat(bodyString).isNotBlank();
+
+      final JsonObject respBody = new JsonObject(bodyString);
+      final String token = respBody.getString("token");
+      assertThat(token).isNotNull();
+      final JWT jwt = makeJwt(service.authenticationService.get().jwtAuthOptions);
+
+      final JsonObject jwtPayload = jwt.decode(token);
+      final String jwtPayloadString = jwtPayload.encode();
+      assertThat(jwtPayloadString.contains("password")).isFalse();
+      assertThat(jwtPayloadString.contains("pegasys")).isFalse();
+    }
+  }
+
+  private String login(final String username, final String password) throws IOException {
+    final RequestBody loginBody =
+        RequestBody.create(
+            JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
+    final Request loginRequest =
+        new Request.Builder().post(loginBody).url(baseUrl + "/login").build();
+    final String token;
+    try (final Response loginResp = client.newCall(loginRequest).execute()) {
+      assertThat(loginResp.code()).isEqualTo(200);
+      assertThat(loginResp.message()).isEqualTo("OK");
+      assertThat(loginResp.body().contentType()).isNotNull();
+      assertThat(loginResp.body().contentType().type()).isEqualTo("application");
+      assertThat(loginResp.body().contentType().subtype()).isEqualTo("json");
+      final String bodyString = loginResp.body().string();
+      assertThat(bodyString).isNotNull();
+      assertThat(bodyString).isNotBlank();
+
+      final JsonObject respBody = new JsonObject(bodyString);
+      token = respBody.getString("token");
+      assertThat(token).isNotNull();
+    }
+    return token;
+  }
+
+  @Test
+  public void checkJsonRpcMethodsAvailableWithGoodCredentialsAndPermissions() throws IOException {
+    final RequestBody body =
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
+    try (final Response resp = client.newCall(request).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+      assertThat(resp.message()).isEqualTo("OK");
+      assertThat(resp.body().contentType()).isNotNull();
+      assertThat(resp.body().contentType().type()).isEqualTo("application");
+      assertThat(resp.body().contentType().subtype()).isEqualTo("json");
+      final String bodyString = resp.body().string();
+      assertThat(bodyString).isNotNull();
+      assertThat(bodyString).isNotBlank();
+
+      final JsonObject respBody = new JsonObject(bodyString);
+      final String token = respBody.getString("token");
+      assertThat(token).isNotNull();
+
+      JsonRpcMethod ethAccounts = new EthAccounts();
+      JsonRpcMethod netVersion = new NetVersion(123);
+      JsonRpcMethod ethBlockNumber = new EthBlockNumber(blockchainQueries);
+      JsonRpcMethod web3Sha3 = new Web3Sha3();
+      JsonRpcMethod web3ClientVersion = new Web3ClientVersion("777");
+
+      jwtAuth.authenticate(
+          new JsonObject().put("jwt", token),
+          (r) -> {
+            assertThat(r.succeeded()).isTrue();
+            final User user = r.result();
+            // single eth/blockNumber method permitted
+            assertThat(service.isPermitted(Optional.of(user), ethBlockNumber)).isTrue();
+            // eth/accounts not permitted
+            assertThat(service.isPermitted(Optional.of(user), ethAccounts)).isFalse();
+            // allowed by web3/*
+            assertThat(service.isPermitted(Optional.of(user), web3ClientVersion)).isTrue();
+            assertThat(service.isPermitted(Optional.of(user), web3Sha3)).isTrue();
+            // no net permissions
+            assertThat(service.isPermitted(Optional.of(user), netVersion)).isFalse();
+          });
+    }
+  }
+
+  @Test
+  public void checkPermissionsWithEmptyUser() {
+    JsonRpcMethod ethAccounts = new EthAccounts();
+
+    assertThat(service.isPermitted(Optional.empty(), ethAccounts)).isFalse();
+  }
+
+  @Test
+  public void web3ClientVersionUnsuccessfulBeforeLogin() throws Exception {
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"web3_clientVersion\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body)).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  @Test
+  public void web3ClientVersionUnsuccessfulWithBadBearer() throws Exception {
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"web3_clientVersion\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body, "badtoken")).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  @Test
+  public void web3ClientVersionSuccessfulAfterLogin() throws Exception {
+    final String token = login("user", "pegasys");
+
+    final String id = "123";
+    final RequestBody web3ClientVersionBody =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"web3_clientVersion\"}");
+
+    try (final Response web3ClientVersionResp =
+        client.newCall(buildPostRequest(web3ClientVersionBody, token)).execute()) {
+      assertThat(web3ClientVersionResp.code()).isEqualTo(200);
+      // Check general format of result
+      final JsonObject json = new JsonObject(web3ClientVersionResp.body().string());
+      testHelper.assertValidJsonRpcResult(json, id);
+      // Check result
+      final String result = json.getString("result");
+      assertThat(result).isEqualTo("TestClientVersion/0.1.0");
+    }
+  }
+
+  @Test
+  public void ethSyncingUnauthorisedWithoutPermission() throws Exception {
+    final String token = login("user", "pegasys");
+
+    final String id = "007";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"eth_syncing\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body, token)).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  private Request buildPostRequest(final RequestBody body) {
+    return buildPostRequest(body, Optional.empty());
+  }
+
+  private Request buildPostRequest(final RequestBody body, final String token) {
+    return buildPostRequest(body, Optional.of(token));
+  }
+
+  private Request buildPostRequest(final RequestBody body, final Optional<String> token) {
+    final Request.Builder request = new Request.Builder().post(body).url(baseUrl);
+    token.ifPresent(t -> request.addHeader("Bearer", t));
+    return request.build();
   }
 }

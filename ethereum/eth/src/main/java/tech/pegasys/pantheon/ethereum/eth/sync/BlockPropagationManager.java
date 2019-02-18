@@ -144,14 +144,24 @@ public class BlockPropagationManager<C> {
     }
   }
 
-  private void handleNewBlockFromNetwork(final EthMessage message) {
+  void broadcastBlock(final Block block, final UInt256 difficulty) {
+    ethContext
+        .getEthPeers()
+        .availablePeers()
+        .forEach(ethPeer -> ethPeer.propagateBlock(block, difficulty));
+  }
+
+  void handleNewBlockFromNetwork(final EthMessage message) {
     final Blockchain blockchain = protocolContext.getBlockchain();
     final NewBlockMessage newBlockMessage = NewBlockMessage.readFrom(message.getData());
     try {
       final Block block = newBlockMessage.block(protocolSchedule);
       final UInt256 totalDifficulty = newBlockMessage.totalDifficulty(protocolSchedule);
 
-      message.getPeer().chainState().update(block.getHeader(), totalDifficulty);
+      // TODO: Extract broadcast functionality to independent class.
+      // broadcastBlock(block, totalDifficulty);
+
+      message.getPeer().chainState().updateForAnnouncedBlock(block.getHeader(), totalDifficulty);
 
       // Return early if we don't care about this block
       final long localChainHeight = protocolContext.getBlockchain().getChainHeadBlockNumber();
@@ -190,8 +200,7 @@ public class BlockPropagationManager<C> {
       final long localChainHeight = protocolContext.getBlockchain().getChainHeadBlockNumber();
       final long bestChainHeight = syncState.bestChainHeight(localChainHeight);
       final List<NewBlockHash> relevantAnnouncements =
-          announcedBlocks
-              .stream()
+          announcedBlocks.stream()
               .filter(a -> shouldImportBlockAtHeight(a.number(), localChainHeight, bestChainHeight))
               .collect(Collectors.toList());
 

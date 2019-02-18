@@ -13,19 +13,19 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static java.util.Collections.emptyList;
+import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask.PeerTaskResult;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
+import tech.pegasys.pantheon.ethereum.eth.sync.BlockHandler;
+import tech.pegasys.pantheon.ethereum.eth.sync.ValidationPolicy;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.CompleteBlocksTask;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetReceiptsFromPeerTask;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PipelinedImportChainSegmentTask.BlockHandler;
+import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetReceiptsForHeadersTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -46,16 +46,19 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
   private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
   private final LabelledMetric<OperationTimer> ethTasksTimer;
+  private final ValidationPolicy validationPolicy;
 
   public FastSyncBlockHandler(
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final LabelledMetric<OperationTimer> ethTasksTimer,
+      final ValidationPolicy validationPolicy) {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
     this.ethTasksTimer = ethTasksTimer;
+    this.validationPolicy = validationPolicy;
   }
 
   @Override
@@ -72,15 +75,12 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
 
   private CompletableFuture<Map<BlockHeader, List<TransactionReceipt>>> downloadReceipts(
       final List<BlockHeader> headers) {
-    return GetReceiptsFromPeerTask.forHeaders(ethContext, headers, ethTasksTimer)
-        .run()
-        .thenApply(PeerTaskResult::getResult);
+    return GetReceiptsForHeadersTask.forHeaders(ethContext, headers, ethTasksTimer).run();
   }
 
   private List<BlockWithReceipts> combineBlocksAndReceipts(
       final List<Block> blocks, final Map<BlockHeader, List<TransactionReceipt>> receiptsByHeader) {
-    return blocks
-        .stream()
+    return blocks.stream()
         .map(
             block -> {
               final List<TransactionReceipt> receipts =
@@ -105,7 +105,7 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
           protocolContext,
           block,
           blockWithReceipt.getReceipts(),
-          HeaderValidationMode.LIGHT_SKIP_DETACHED)) {
+          validationPolicy.getValidationModeForNextBlock())) {
         return invalidBlockFailure(block);
       }
     }
@@ -113,11 +113,9 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
   }
 
   private CompletableFuture<List<BlockWithReceipts>> invalidBlockFailure(final Block block) {
-    final CompletableFuture<List<BlockWithReceipts>> result = new CompletableFuture<>();
-    result.completeExceptionally(
+    return completedExceptionally(
         new InvalidBlockException(
             "Failed to import block", block.getHeader().getNumber(), block.getHash()));
-    return result;
   }
 
   private BlockImporter<C> getBlockImporter(final BlockWithReceipts blockWithReceipt) {
@@ -125,5 +123,10 @@ public class FastSyncBlockHandler<C> implements BlockHandler<BlockWithReceipts> 
         protocolSchedule.getByBlockNumber(blockWithReceipt.getHeader().getNumber());
 
     return protocolSpec.getBlockImporter();
+  }
+
+  @Override
+  public long extractBlockNumber(final BlockWithReceipts blockWithReceipt) {
+    return blockWithReceipt.getHeader().getNumber();
   }
 }

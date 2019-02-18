@@ -12,20 +12,25 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
-import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.Outcome;
+import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.DiscoveryProtocolLogger.logReceivedPacket;
+import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.DiscoveryProtocolLogger.logSendingPacket;
+import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult.EvictOutcome;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -39,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
@@ -92,6 +98,7 @@ public class PeerDiscoveryController {
 
   private static final Logger LOG = LogManager.getLogger();
   private static final long REFRESH_CHECK_INTERVAL_MILLIS = MILLISECONDS.convert(30, SECONDS);
+  private static final int PEER_REFRESH_ROUND_TIMEOUT_IN_SECONDS = 5;
   protected final TimerUtil timerUtil;
   private final PeerTable peerTable;
 
@@ -122,6 +129,9 @@ public class PeerDiscoveryController {
 
   // Observers for "peer bonded" discovery events.
   private final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers;
+  private final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers;
+
+  private RecursivePeerRefreshState recursivePeerRefreshState;
 
   public PeerDiscoveryController(
       final KeyPair keypair,
@@ -134,7 +144,8 @@ public class PeerDiscoveryController {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final Optional<NodeWhitelistController> nodeWhitelistController,
-      final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers) {
+      final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers,
+      final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers) {
     this.timerUtil = timerUtil;
     this.keypair = keypair;
     this.localPeer = localPeer;
@@ -146,6 +157,7 @@ public class PeerDiscoveryController {
     this.nodeWhitelistController = nodeWhitelistController;
     this.outboundMessageHandler = outboundMessageHandler;
     this.peerBondedObservers = peerBondedObservers;
+    this.peerDroppedObservers = peerDroppedObservers;
   }
 
   public CompletableFuture<?> start() {
@@ -153,17 +165,36 @@ public class PeerDiscoveryController {
       throw new IllegalStateException("The peer table had already been started");
     }
 
-    bootstrapNodes
-        .stream()
-        .filter(node -> peerTable.tryAdd(node).getOutcome() == Outcome.ADDED)
-        .filter(node -> whitelistIfPresentIsNodePermitted(node))
-        .forEach(node -> bond(node, true));
+    bootstrapNodes.stream()
+        .filter(this::whitelistIfPresentIsNodePermitted)
+        .forEach(peerTable::tryAdd);
+
+    recursivePeerRefreshState =
+        new RecursivePeerRefreshState(
+            peerBlacklist,
+            nodeWhitelistController,
+            this::bond,
+            this::findNodes,
+            timerUtil,
+            localPeer.getId(),
+            peerTable,
+            PEER_REFRESH_ROUND_TIMEOUT_IN_SECONDS,
+            100);
+
+    final List<DiscoveryPeer> initialDiscoveryPeers =
+        bootstrapNodes.stream()
+            .filter(this::whitelistIfPresentIsNodePermitted)
+            .collect(Collectors.toList());
+    recursivePeerRefreshState.start(initialDiscoveryPeers, localPeer.getId());
 
     final long timerId =
         timerUtil.setPeriodic(
             Math.min(REFRESH_CHECK_INTERVAL_MILLIS, tableRefreshIntervalMs),
-            () -> refreshTableIfRequired());
+            this::refreshTableIfRequired);
     tableRefreshTimerId = OptionalLong.of(timerId);
+
+    nodeWhitelistController.ifPresent(
+        c -> c.subscribeToListUpdatedEvent(this::handleNodeWhitelistUpdatedEvent));
 
     return CompletableFuture.completedFuture(null);
   }
@@ -182,7 +213,7 @@ public class PeerDiscoveryController {
 
   private boolean whitelistIfPresentIsNodePermitted(final DiscoveryPeer sender) {
     return nodeWhitelistController
-        .map(nodeWhitelistController1 -> nodeWhitelistController1.isPermitted(sender))
+        .map(nodeWhitelistController -> nodeWhitelistController.isPermitted(sender.getEnodeURI()))
         .orElse(true);
   }
 
@@ -198,12 +229,7 @@ public class PeerDiscoveryController {
    * @param sender The sender.
    */
   public void onMessage(final Packet packet, final DiscoveryPeer sender) {
-    LOG.trace(
-        "<<< Received {} discovery packet from {} ({}): {}",
-        packet.getType(),
-        sender.getEndpoint(),
-        sender.getId().slice(0, 16),
-        packet);
+    logReceivedPacket(sender, packet);
 
     // Message from self. This should not happen.
     if (sender.getId().equals(localPeer.getId())) {
@@ -223,59 +249,30 @@ public class PeerDiscoveryController {
 
     switch (packet.getType()) {
       case PING:
-        LOG.trace("Received PING packet from {}", sender.getEnodeURI());
         if (!peerBlacklisted && addToPeerTable(peer)) {
           final PingPacketData ping = packet.getPacketData(PingPacketData.class).get();
           respondToPing(ping, packet.getHash(), peer);
         }
-
         break;
       case PONG:
-        {
-          LOG.trace("Received PONG packet from {}", sender.getEnodeURI());
-          matchInteraction(packet)
-              .ifPresent(
-                  interaction -> {
-                    if (peerBlacklisted) {
-                      return;
-                    }
-                    addToPeerTable(peer);
-
-                    // If this was a bootstrap peer, let's ask it for nodes near to us.
-                    if (interaction.isBootstrap()) {
-                      findNodes(peer, localPeer.getId());
-                    }
-                  });
-          break;
-        }
-      case NEIGHBORS:
-        LOG.trace("Received NEIGHBORS packet from {}", sender.getEnodeURI());
         matchInteraction(packet)
             .ifPresent(
                 interaction -> {
-                  // Extract the peers from the incoming packet.
-                  final List<DiscoveryPeer> neighbors =
-                      packet
-                          .getPacketData(NeighborsPacketData.class)
-                          .map(NeighborsPacketData::getNodes)
-                          .orElse(emptyList());
-
-                  for (final DiscoveryPeer neighbor : neighbors) {
-                    // If the peer is not whitelisted, is blacklisted, is already known, or
-                    // represents this node, skip bonding
-                    if (!whitelistIfPresentIsNodePermitted(neighbor)
-                        || peerBlacklist.contains(neighbor)
-                        || peerTable.get(neighbor).isPresent()
-                        || neighbor.getId().equals(localPeer.getId())) {
-                      continue;
-                    }
-                    bond(neighbor, false);
+                  if (peerBlacklisted) {
+                    return;
                   }
+                  addToPeerTable(peer);
+                  recursivePeerRefreshState.onBondingComplete(peer);
                 });
         break;
-
+      case NEIGHBORS:
+        matchInteraction(packet)
+            .ifPresent(
+                interaction ->
+                    recursivePeerRefreshState.onNeighboursPacketReceived(
+                        peer, packet.getPacketData(NeighborsPacketData.class).orElse(null)));
+        break;
       case FIND_NEIGHBORS:
-        LOG.trace("Received FIND_NEIGHBORS packet from {}", sender.getEnodeURI());
         if (!peerKnown || peerBlacklisted) {
           break;
         }
@@ -288,7 +285,7 @@ public class PeerDiscoveryController {
 
   private boolean addToPeerTable(final DiscoveryPeer peer) {
     final PeerTable.AddResult result = peerTable.tryAdd(peer);
-    if (result.getOutcome() == Outcome.SELF) {
+    if (result.getOutcome() == AddOutcome.SELF) {
       return false;
     }
 
@@ -304,21 +301,43 @@ public class PeerDiscoveryController {
       notifyPeerBonded(peer, now);
     }
 
-    if (result.getOutcome() == Outcome.ALREADY_EXISTED) {
+    if (result.getOutcome() == AddOutcome.ALREADY_EXISTED) {
       // Bump peer.
-      peerTable.evict(peer);
+      peerTable.tryEvict(peer);
       peerTable.tryAdd(peer);
-    } else if (result.getOutcome() == Outcome.BUCKET_FULL) {
-      peerTable.evict(result.getEvictionCandidate());
+    } else if (result.getOutcome() == AddOutcome.BUCKET_FULL) {
+      peerTable.tryEvict(result.getEvictionCandidate());
       peerTable.tryAdd(peer);
     }
 
     return true;
   }
 
+  private void handleNodeWhitelistUpdatedEvent(final NodeWhitelistUpdatedEvent event) {
+    event.getRemovedNodes().stream()
+        .map(e -> new DiscoveryPeer(DiscoveryPeer.fromURI(e.toURI())))
+        .forEach(this::dropFromPeerTable);
+  }
+
+  @VisibleForTesting
+  boolean dropFromPeerTable(final DiscoveryPeer peer) {
+    final EvictResult evictResult = peerTable.tryEvict(peer);
+    if (evictResult.getOutcome() == EvictOutcome.EVICTED) {
+      notifyPeerDropped(peer, System.currentTimeMillis());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private void notifyPeerBonded(final DiscoveryPeer peer, final long now) {
     final PeerBondedEvent event = new PeerBondedEvent(peer, now);
     dispatchEvent(peerBondedObservers, event);
+  }
+
+  private void notifyPeerDropped(final DiscoveryPeer peer, final long now) {
+    final PeerDroppedEvent event = new PeerDroppedEvent(peer, now);
+    dispatchEvent(peerDroppedObservers, event);
   }
 
   private Optional<PeerInteractionState> matchInteraction(final Packet packet) {
@@ -342,13 +361,19 @@ public class PeerDiscoveryController {
     }
   }
 
+  @VisibleForTesting
+  RecursivePeerRefreshState getRecursivePeerRefreshState() {
+    return recursivePeerRefreshState;
+  }
+
   /**
    * Refreshes the peer table by generating a random ID and interrogating the closest nodes for it.
    * Currently the refresh process is NOT recursive.
    */
   private void refreshTable() {
     final BytesValue target = Peer.randomId();
-    peerTable.nearestPeers(Peer.randomId(), 16).forEach((peer) -> findNodes(peer, target));
+    final List<DiscoveryPeer> initialPeers = peerTable.nearestPeers(Peer.randomId(), 16);
+    recursivePeerRefreshState.start(initialPeers, target);
     lastRefreshTime = System.currentTimeMillis();
   }
 
@@ -356,10 +381,9 @@ public class PeerDiscoveryController {
    * Initiates a bonding PING-PONG cycle with a peer.
    *
    * @param peer The targeted peer.
-   * @param bootstrap Whether this is a bootstrap interaction.
    */
   @VisibleForTesting
-  void bond(final DiscoveryPeer peer, final boolean bootstrap) {
+  void bond(final DiscoveryPeer peer) {
     peer.setFirstDiscovered(System.currentTimeMillis());
     peer.setStatus(PeerDiscoveryStatus.BONDING);
 
@@ -384,16 +408,18 @@ public class PeerDiscoveryController {
 
     // The filter condition will be updated as soon as the action is performed.
     final PeerInteractionState ping =
-        new PeerInteractionState(action, PacketType.PONG, (packet) -> false, true, bootstrap);
+        new PeerInteractionState(action, PacketType.PONG, (packet) -> false, true);
     dispatchInteraction(peer, ping);
   }
 
   private void sendPacket(final DiscoveryPeer peer, final PacketType type, final PacketData data) {
     Packet packet = createPacket(type, data);
+    logSendingPacket(peer, packet);
     outboundMessageHandler.send(peer, packet);
   }
 
   private void sendPacket(final DiscoveryPeer peer, final Packet packet) {
+    logSendingPacket(peer, packet);
     outboundMessageHandler.send(peer, packet);
   }
 
@@ -415,7 +441,7 @@ public class PeerDiscoveryController {
           sendPacket(peer, PacketType.FIND_NEIGHBORS, data);
         };
     final PeerInteractionState interaction =
-        new PeerInteractionState(action, PacketType.NEIGHBORS, packet -> true, true, false);
+        new PeerInteractionState(action, PacketType.NEIGHBORS, packet -> true, true);
     dispatchInteraction(peer, interaction);
   }
 
@@ -484,8 +510,6 @@ public class PeerDiscoveryController {
     private Predicate<Packet> filter;
     /** Whether the action associated to this state is retryable or not. */
     private final boolean retryable;
-    /** Whether this is an entry for a bootstrap peer. */
-    private final boolean bootstrap;
     /** Timers associated with this entry. */
     private OptionalLong timerId = OptionalLong.empty();
 
@@ -493,13 +517,11 @@ public class PeerDiscoveryController {
         final Consumer<PeerInteractionState> action,
         final PacketType expectedType,
         final Predicate<Packet> filter,
-        final boolean retryable,
-        final boolean bootstrap) {
+        final boolean retryable) {
       this.action = action;
       this.expectedType = expectedType;
       this.filter = filter;
       this.retryable = retryable;
-      this.bootstrap = bootstrap;
     }
 
     @Override
@@ -509,10 +531,6 @@ public class PeerDiscoveryController {
 
     void updateFilter(final Predicate<Packet> filter) {
       this.filter = filter;
-    }
-
-    boolean isBootstrap() {
-      return bootstrap;
     }
 
     /**

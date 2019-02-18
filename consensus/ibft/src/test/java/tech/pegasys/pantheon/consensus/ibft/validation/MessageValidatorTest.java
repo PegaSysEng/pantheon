@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
@@ -26,16 +28,26 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.BlockValidator;
+import tech.pegasys.pantheon.ethereum.BlockValidator.BlockProcessingOutputs;
+import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MessageValidatorTest {
 
   private KeyPair keyPair = KeyPair.generate();
@@ -43,8 +55,13 @@ public class MessageValidatorTest {
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 1);
 
   private SignedDataValidator signedDataValidator = mock(SignedDataValidator.class);
+  private ProposalBlockConsistencyValidator proposalBlockConsistencyValidator =
+      mock(ProposalBlockConsistencyValidator.class);
 
-  private MessageValidator messageValidator = new MessageValidator(signedDataValidator);
+  @Mock private BlockValidator<IbftContext> blockValidator;
+  private ProtocolContext<IbftContext> protocolContext;
+
+  private MessageValidator messageValidator;
 
   private final List<Address> validators =
       Lists.newArrayList(
@@ -53,34 +70,70 @@ public class MessageValidatorTest {
           AddressHelpers.ofValue(2),
           AddressHelpers.ofValue(3));
 
-  private final Block block =
-      TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber());
+  private final Block block = TestHelpers.createProposalBlock(validators, roundIdentifier);
 
   @Before
   public void setup() {
-    when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(signedDataValidator.validatePrepareMessage(any())).thenReturn(true);
-    when(signedDataValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(signedDataValidator.validateProposal(any())).thenReturn(true);
+    when(signedDataValidator.validatePrepare(any())).thenReturn(true);
+    when(signedDataValidator.validateCommit(any())).thenReturn(true);
+
+    when(proposalBlockConsistencyValidator.validateProposalMatchesBlock(any(), any()))
+        .thenReturn(true);
+
+    protocolContext =
+        new ProtocolContext<>(
+            mock(MutableBlockchain.class), mock(WorldStateArchive.class), mock(IbftContext.class));
+
+    when(blockValidator.validateAndProcessBlock(any(), any(), any(), any()))
+        .thenReturn(Optional.of(new BlockProcessingOutputs(null, null)));
+
+    messageValidator =
+        new MessageValidator(
+            signedDataValidator,
+            proposalBlockConsistencyValidator,
+            blockValidator,
+            protocolContext);
   }
 
   @Test
   public void messageValidatorDefersToUnderlyingSignedDataValidator() {
-    final Proposal proposal = messageFactory.createSignedProposalPayload(roundIdentifier, block);
+    final Proposal proposal = messageFactory.createProposal(roundIdentifier, block);
 
-    final Prepare prepare =
-        messageFactory.createSignedPreparePayload(roundIdentifier, block.getHash());
+    final Prepare prepare = messageFactory.createPrepare(roundIdentifier, block.getHash());
 
     final Commit commit =
-        messageFactory.createSignedCommitPayload(
+        messageFactory.createCommit(
             roundIdentifier, block.getHash(), SECP256K1.sign(block.getHash(), keyPair));
 
-    messageValidator.addSignedProposalPayload(proposal);
-    verify(signedDataValidator, times(1)).addSignedProposalPayload(proposal.getSignedPayload());
+    assertThat(messageValidator.validateProposal(proposal)).isTrue();
+    verify(signedDataValidator, times(1)).validateProposal(proposal.getSignedPayload());
 
-    messageValidator.validatePrepareMessage(prepare);
-    verify(signedDataValidator, times(1)).validatePrepareMessage(prepare.getSignedPayload());
+    messageValidator.validatePrepare(prepare);
+    verify(signedDataValidator, times(1)).validatePrepare(prepare.getSignedPayload());
 
-    messageValidator.validateCommitMessage(commit);
-    verify(signedDataValidator, times(1)).validateCommmitMessage(commit.getSignedPayload());
+    messageValidator.validateCommit(commit);
+    verify(signedDataValidator, times(1)).validateCommit(commit.getSignedPayload());
+  }
+
+  @Test
+  public void ifProposalConsistencyChecksFailProposalIsIllegal() {
+    final Proposal proposal = messageFactory.createProposal(roundIdentifier, block);
+    when(proposalBlockConsistencyValidator.validateProposalMatchesBlock(any(), any()))
+        .thenReturn(false);
+
+    assertThat(messageValidator.validateProposal(proposal)).isFalse();
+    verify(proposalBlockConsistencyValidator, times(1))
+        .validateProposalMatchesBlock(proposal.getSignedPayload(), proposal.getBlock());
+  }
+
+  @Test
+  public void blockValidationFailureFailsValidation() {
+    when(blockValidator.validateAndProcessBlock(any(), any(), any(), any()))
+        .thenReturn(Optional.empty());
+
+    final Proposal proposalMsg = messageFactory.createProposal(roundIdentifier, block);
+
+    assertThat(messageValidator.validateProposal(proposalMsg)).isFalse();
   }
 }

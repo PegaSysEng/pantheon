@@ -41,13 +41,18 @@ rpc-http-port=5678
 rpc-http-api=["DEBUG","ETH"]
 rpc-http-apis=["DEBUG","ETH"]
 rpc-http-cors-origins=["none"]
+rpc-http-authentication-enabled=false
+rpc-http-authentication-credentials-file="none"
 
 # WebSockets API
 rpc-ws-enabled=false
 rpc-ws-api=["DEBUG","ETH"]
+rpc-ws-apis=["DEBUG","ETH"]
 rpc-ws-host="9.10.11.12"
 rpc-ws-port=9101
 rpc-ws-refresh-delay=500
+rpc-ws-authentication-enabled=false
+rpc-ws-authentication-credentials-file="none"
 
 # Prometheus Metrics Endpoint
 metrics-enabled=false
@@ -68,7 +73,7 @@ min-gas-price="1"
 # Permissioning
 permissions-nodes-enabled=false
 permissions-accounts-enabled=false
-permissions-config-path="./permissions_config.toml"
+permissions-config-file="./permissions_config.toml"
 
 # Privacy
 privacy-url="http://127.0.0.1:8888"

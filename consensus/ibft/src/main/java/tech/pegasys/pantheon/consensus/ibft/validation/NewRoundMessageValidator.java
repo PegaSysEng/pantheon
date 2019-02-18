@@ -12,17 +12,73 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
+import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
+import tech.pegasys.pantheon.ethereum.BlockValidator;
+import tech.pegasys.pantheon.ethereum.BlockValidator.BlockProcessingOutputs;
+import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
+
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class NewRoundMessageValidator {
 
-  private final NewRoundPayloadValidator payloadValidator;
+  private static final Logger LOG = LogManager.getLogger();
 
-  public NewRoundMessageValidator(final NewRoundPayloadValidator payloadValidator) {
+  private final NewRoundPayloadValidator payloadValidator;
+  private final ProposalBlockConsistencyValidator proposalConsistencyValidator;
+  private final BlockValidator<IbftContext> blockValidator;
+  private final ProtocolContext<IbftContext> protocolContext;
+  private final RoundChangeCertificateValidator roundChangeCertificateValidator;
+
+  public NewRoundMessageValidator(
+      final NewRoundPayloadValidator payloadValidator,
+      final ProposalBlockConsistencyValidator proposalConsistencyValidator,
+      final BlockValidator<IbftContext> blockValidator,
+      final ProtocolContext<IbftContext> protocolContext,
+      final RoundChangeCertificateValidator roundChangeCertificateValidator) {
     this.payloadValidator = payloadValidator;
+    this.proposalConsistencyValidator = proposalConsistencyValidator;
+    this.blockValidator = blockValidator;
+    this.protocolContext = protocolContext;
+    this.roundChangeCertificateValidator = roundChangeCertificateValidator;
   }
 
   public boolean validateNewRoundMessage(final NewRound msg) {
-    return payloadValidator.validateNewRoundMessage(msg.getSignedPayload());
+    if (!payloadValidator.validateNewRoundMessage(msg.getSignedPayload())) {
+      LOG.debug("Illegal NewRound message, embedded signed data failed validation.");
+      return false;
+    }
+
+    if (!roundChangeCertificateValidator.validateProposalMessageMatchesLatestPrepareCertificate(
+        msg.getRoundChangeCertificate(), msg.getBlock())) {
+      LOG.debug(
+          "Illegal NewRound message, piggybacked block does not match latest PrepareCertificate");
+      return false;
+    }
+
+    if (!validateBlock(msg.getBlock())) {
+      return false;
+    }
+
+    return proposalConsistencyValidator.validateProposalMatchesBlock(
+        msg.getProposalPayload(), msg.getBlock());
+  }
+
+  private boolean validateBlock(final Block block) {
+    final Optional<BlockProcessingOutputs> validationResult =
+        blockValidator.validateAndProcessBlock(
+            protocolContext, block, HeaderValidationMode.LIGHT, HeaderValidationMode.FULL);
+
+    if (!validationResult.isPresent()) {
+      LOG.info("Invalid Proposal message, block did not pass validation.");
+      return false;
+    }
+
+    return true;
   }
 }

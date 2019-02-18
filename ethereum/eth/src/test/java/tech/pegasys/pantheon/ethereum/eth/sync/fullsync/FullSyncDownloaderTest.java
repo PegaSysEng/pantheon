@@ -28,9 +28,11 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.BlockchainSetupUtil;
@@ -82,7 +84,11 @@ public class FullSyncDownloaderTest {
     protocolSchedule = localBlockchainSetup.getProtocolSchedule();
     protocolContext = localBlockchainSetup.getProtocolContext();
     ethProtocolManager =
-        EthProtocolManagerTestUtil.create(localBlockchain, localBlockchainSetup.getWorldArchive());
+        EthProtocolManagerTestUtil.create(
+            localBlockchain,
+            localBlockchainSetup.getWorldArchive(),
+            DeterministicEthScheduler.TimeoutPolicy.NEVER,
+            new EthScheduler(1, 1, 1));
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
 
@@ -95,8 +101,7 @@ public class FullSyncDownloaderTest {
   }
 
   private FullSyncDownloader<?> downloader() {
-    final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder().build().validated(localBlockchain);
+    final SynchronizerConfiguration syncConfig = SynchronizerConfiguration.builder().build();
     return downloader(syncConfig);
   }
 
@@ -112,22 +117,16 @@ public class FullSyncDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
-            .downloaderChainSegmentSize(10)
-            .build()
-            .validated(localBlockchain);
+        SynchronizerConfiguration.builder().downloaderChainSegmentSize(10).build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
-    while (!syncState.syncTarget().isPresent()) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(peer.getEthPeer());
 
-    while (localBlockchain.getChainHeadBlockNumber() < targetBlock) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(
+        responder, () -> localBlockchain.getChainHeadBlockNumber() < targetBlock);
 
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(targetBlock);
   }
@@ -144,22 +143,16 @@ public class FullSyncDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
-            .downloaderChainSegmentSize(10)
-            .build()
-            .validated(localBlockchain);
+        SynchronizerConfiguration.builder().downloaderChainSegmentSize(10).build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
-    while (!syncState.syncTarget().isPresent()) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(peer.getEthPeer());
 
-    while (localBlockchain.getChainHeadBlockNumber() < targetBlock) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(
+        responder, () -> localBlockchain.getChainHeadBlockNumber() < targetBlock);
 
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(targetBlock);
   }
@@ -176,22 +169,16 @@ public class FullSyncDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
-            .downloaderChainSegmentSize(4)
-            .build()
-            .validated(localBlockchain);
+        SynchronizerConfiguration.builder().downloaderChainSegmentSize(4).build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
-    while (!syncState.syncTarget().isPresent()) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(peer.getEthPeer());
 
-    while (localBlockchain.getChainHeadBlockNumber() < targetBlock) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(
+        responder, () -> localBlockchain.getChainHeadBlockNumber() < targetBlock);
 
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(targetBlock);
   }
@@ -213,9 +200,7 @@ public class FullSyncDownloaderTest {
     peer.respond(responder);
     assertThat(syncState.syncTarget()).isNotPresent();
 
-    while (peer.hasOutstandingRequests()) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(responder, peer::hasOutstandingRequests);
 
     assertThat(syncState.syncTarget()).isNotPresent();
     verify(localBlockchain, times(0)).appendBlock(any(), any());
@@ -243,16 +228,12 @@ public class FullSyncDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
-            .downloaderChainSegmentSize(10)
-            .build()
-            .validated(localBlockchain);
+        SynchronizerConfiguration.builder().downloaderChainSegmentSize(10).build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
-    while (localBlockchain.getChainHeadBlockNumber() < targetBlock) {
-      peer.respond(responder);
-    }
+    peer.respondWhileOtherThreadsWork(
+        responder, () -> localBlockchain.getChainHeadBlockNumber() < targetBlock);
 
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(peer.getEthPeer());
@@ -318,15 +299,12 @@ public class FullSyncDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByHeight(10)
-            .build()
-            .validated(localBlockchain);
+            .build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
     // Process until the sync target is selected
-    while (!syncState.syncTarget().isPresent()) {
-      peerA.respond(responder);
-    }
+    peerA.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(peerA.getEthPeer());
 
@@ -358,15 +336,12 @@ public class FullSyncDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByHeight(1000)
-            .build()
-            .validated(localBlockchain);
+            .build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
     // Process until the sync target is selected
-    while (!syncState.syncTarget().isPresent()) {
-      bestPeer.respond(responder);
-    }
+    bestPeer.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(bestPeer.getEthPeer());
 
@@ -398,15 +373,12 @@ public class FullSyncDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByTd(UInt256.of(10))
-            .build()
-            .validated(localBlockchain);
+            .build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
     // Process until the sync target is selected
-    while (!syncState.syncTarget().isPresent()) {
-      peerA.respond(responder);
-    }
+    peerA.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(peerA.getEthPeer());
 
@@ -414,7 +386,7 @@ public class FullSyncDownloaderTest {
     peerB
         .getEthPeer()
         .chainState()
-        .update(gen.header(), syncState.chainHeadTotalDifficulty().plus(300));
+        .updateForAnnouncedBlock(gen.header(), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
     final CompletableFuture<?> firstTask = downloader.getCurrentTask();
@@ -445,15 +417,12 @@ public class FullSyncDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByTd(UInt256.of(100_000_000L))
-            .build()
-            .validated(localBlockchain);
+            .build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
     downloader.start();
 
     // Process until the sync target is selected
-    while (!syncState.syncTarget().isPresent()) {
-      bestPeer.respond(responder);
-    }
+    bestPeer.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(bestPeer.getEthPeer());
 
@@ -461,11 +430,11 @@ public class FullSyncDownloaderTest {
     bestPeer
         .getEthPeer()
         .chainState()
-        .update(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(201));
+        .updateForAnnouncedBlock(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(201));
     otherPeer
         .getEthPeer()
         .chainState()
-        .update(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(300));
+        .updateForAnnouncedBlock(gen.header(1000), syncState.chainHeadTotalDifficulty().plus(300));
 
     // Process through first task cycle
     final CompletableFuture<?> firstTask = downloader.getCurrentTask();
@@ -490,8 +459,7 @@ public class FullSyncDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderHeadersRequestSize(3)
-            .build()
-            .validated(localBlockchain);
+            .build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
 
     final long bestPeerChainHead = otherBlockchain.getChainHeadBlockNumber();
@@ -506,13 +474,7 @@ public class FullSyncDownloaderTest {
     downloader.start();
 
     // Process through sync target selection
-    await()
-        .atMost(10, TimeUnit.SECONDS)
-        .untilAsserted(
-            () -> {
-              bestPeer.respond(bestResponder);
-              assertThat(syncState.syncTarget()).isNotEmpty();
-            });
+    bestPeer.respondWhileOtherThreadsWork(bestResponder, () -> !syncState.syncTarget().isPresent());
 
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(bestPeer.getEthPeer());
@@ -528,6 +490,7 @@ public class FullSyncDownloaderTest {
     // Process through the first import
     await()
         .atMost(10, TimeUnit.SECONDS)
+        .pollInterval(100, TimeUnit.MILLISECONDS)
         .untilAsserted(
             () -> {
               if (!bestPeer.respond(bestResponder)) {
@@ -537,19 +500,20 @@ public class FullSyncDownloaderTest {
                   .isNotEqualTo(localChainHeadAtStart);
             });
 
+    // Sanity check that we haven't already passed the second best peer
+    assertThat(localBlockchain.getChainHeadBlockNumber()).isLessThan(secondBestPeerChainHead);
+
     // Disconnect peer
     ethProtocolManager.handleDisconnect(
         bestPeer.getPeerConnection(), DisconnectReason.TOO_MANY_PEERS, true);
 
-    // Downloader should recover and sync to next best peer
-    await()
-        .atMost(10, TimeUnit.SECONDS)
-        .untilAsserted(
-            () -> {
-              secondBestPeer.respond(secondBestResponder);
-              assertThat(localBlockchain.getChainHeadBlockNumber())
-                  .isEqualTo(secondBestPeerChainHead);
-            });
+    // Downloader should recover and sync to next best peer, but it may stall
+    // for 10 seconds first (by design).
+    secondBestPeer.respondWhileOtherThreadsWork(
+        secondBestResponder,
+        () -> localBlockchain.getChainHeadBlockNumber() != secondBestPeerChainHead);
+
+    assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(secondBestPeerChainHead);
   }
 
   @Test
@@ -564,8 +528,7 @@ public class FullSyncDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderHeadersRequestSize(3)
-            .build()
-            .validated(localBlockchain);
+            .build();
     final FullSyncDownloader<?> downloader = downloader(syncConfig);
 
     // Setup the best peer we should use as our sync target
@@ -603,8 +566,7 @@ public class FullSyncDownloaderTest {
     while (localBlockchain.getChainHeadBlockNumber() < bestPeerChainHead) {
       // Check that any requests for checkpoint headers are only sent to the best peer
       final long checkpointRequestsToOtherPeers =
-          otherPeers
-              .stream()
+          otherPeers.stream()
               .map(RespondingEthPeer::pendingOutgoingRequests)
               .flatMap(Function.identity())
               .filter(m -> m.getCode() == EthPV62.GET_BLOCK_HEADERS)
