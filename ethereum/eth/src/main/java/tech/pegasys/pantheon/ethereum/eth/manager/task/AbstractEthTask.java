@@ -10,8 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.eth.manager;
+package tech.pegasys.pantheon.ethereum.eth.manager.task;
 
+import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
+
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 
@@ -110,9 +113,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
             });
         return subTaskFuture;
       } else {
-        final CompletableFuture<S> future = new CompletableFuture<>();
-        future.completeExceptionally(new CancellationException());
-        return future;
+        return completedExceptionally(new CancellationException());
       }
     }
   }
@@ -135,9 +136,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
             });
         return subTaskFuture;
       } else {
-        final CompletableFuture<S> future = new CompletableFuture<>();
-        future.completeExceptionally(new CancellationException());
-        return future;
+        return completedExceptionally(new CancellationException());
       }
     }
   }
