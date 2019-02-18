@@ -3,11 +3,6 @@ description: Pantheon JSON-RPC API methods reference
 
 # JSON-RPC API Methods
 
-!!! danger "Breaking Change in v0.8.3"
-    From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](../JSON-RPC-API/Using-JSON-RPC-API.md) option. 
-
-The following lists the Pantheon JSON-RPC API commands:
-
 ## Admin Methods
 
 !!! note

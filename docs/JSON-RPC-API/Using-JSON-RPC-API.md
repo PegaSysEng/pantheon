@@ -67,7 +67,7 @@ Send individual requests as a JSON data package at each prompt:
 The [RPC Pub/Sub methods](../Using-Pantheon/RPC-PubSub.md) can also be used over WebSockets.
 
 !!! note 
-    `wscat` does not support headers. Authentication requires an authentication token to be passed in the 
+    `wscat` does not support headers. [Authentication](Authentication.md) requires an authentication token to be passed in the 
     request header. To use authentication with WebSockets, an app that supports headers is required. 
 
 ## API Methods Enabled by Default
