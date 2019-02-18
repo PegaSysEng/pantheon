@@ -127,6 +127,56 @@ public class FutureMessageBufferTest {
     assertThat(map).hasSize(1);
   }
 
+  @Test
+  public void doNotAddMessagesWhenLimitIsZero() {
+    buffer = new FutureMessageBuffer(1, 0, () -> 0L, map);
+    buffer.addMessage(1, message);
+    assertThat(map).isEmpty();
+  }
+
+  @Test
+  public void totalMessagesSizeUpdatedWhenMessagesAdded() {
+    buffer = new FutureMessageBuffer(5, 10, () -> 0L, map);
+    addMessages(2, 1);
+    assertThat(buffer.totalMessagesSize()).isEqualTo(2);
+
+    addMessages(3, 2);
+    assertThat(buffer.totalMessagesSize()).isEqualTo(5);
+
+    addMessages(3, 1);
+    assertThat(buffer.totalMessagesSize()).isEqualTo(8);
+  }
+
+  @Test
+  public void totalMessagesSizeUpdatedWhenMessagesPolled() {
+    buffer = new FutureMessageBuffer(5, 10, () -> 0L, map);
+    addMessages(2, 1);
+    addMessages(3, 2);
+    addMessages(3, 1);
+
+    buffer.poll(2);
+    assertThat(buffer.totalMessagesSize()).isEqualTo(5);
+
+    buffer.poll(1);
+    assertThat(buffer.totalMessagesSize()).isZero();
+  }
+
+  @Test
+  public void totalSizeUpdatedWhenMessagesAreEvicted() {
+    buffer = new FutureMessageBuffer(5, 5, () -> 0L, map);
+    addMessages(2, 1);
+    addMessages(3, 2);
+
+    // height 2 will be evicted
+    buffer.addMessage(1, message);
+    assertThat(buffer.totalMessagesSize()).isEqualTo(3);
+
+    for (int i = 0; i <= 5; i++) {
+      buffer.addMessage(1, message);
+    }
+    assertThat(buffer.totalMessagesSize()).isEqualTo(5);
+  }
+
   private DefaultMessage[] addMessages(final int count, final long height) {
     return IntStream.range(0, count)
         .mapToObj(

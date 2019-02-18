@@ -39,7 +39,6 @@ public class FutureMessageBuffer {
   private final long futureMessagesMaxDistance;
   private final long futureMessagesLimit;
   private final Supplier<Long> currentChainHeight;
-  private long totalMessages;
 
   public FutureMessageBuffer(
       final long futureMessagesMaxDistance,
@@ -62,19 +61,22 @@ public class FutureMessageBuffer {
 
   public void addMessage(final long msgChainHeight, final Message rawMsg) {
     final long currentHeight = currentChainHeight.get();
-    if (!validMessageHeight(msgChainHeight, currentHeight)) {
+    if (futureMessagesLimit == 0 || !validMessageHeight(msgChainHeight, currentHeight)) {
       return;
     }
 
-    if (totalMessages >= futureMessagesLimit) {
+    if (totalMessagesSize() >= futureMessagesLimit) {
       evictMessages();
     }
 
+    addMessageToBuffer(msgChainHeight, rawMsg);
+  }
+
+  private void addMessageToBuffer(final long msgChainHeight, final Message rawMsg) {
     if (!buffer.containsKey(msgChainHeight)) {
       buffer.put(msgChainHeight, new ArrayList<>());
     }
     buffer.get(msgChainHeight).add(rawMsg);
-    totalMessages += 1;
   }
 
   private boolean validMessageHeight(final long msgChainHeight, final long currentHeight) {
@@ -87,7 +89,7 @@ public class FutureMessageBuffer {
   private void evictMessages() {
     if (buffer.size() > 1) {
       buffer.remove(buffer.lastKey());
-    } else {
+    } else if (buffer.size() == 1) {
       List<Message> messages = buffer.firstEntry().getValue();
       messages.remove(0);
     }
@@ -97,5 +99,9 @@ public class FutureMessageBuffer {
     final List<Message> messages = buffer.getOrDefault(chainHeight, Collections.emptyList());
     buffer.remove(chainHeight);
     return messages;
+  }
+
+  long totalMessagesSize() {
+    return buffer.values().stream().map(List::size).reduce(0, Integer::sum).longValue();
   }
 }
