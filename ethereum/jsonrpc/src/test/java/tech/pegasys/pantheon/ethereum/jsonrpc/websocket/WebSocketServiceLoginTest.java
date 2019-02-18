@@ -225,7 +225,6 @@ public class WebSocketServiceLoginTest {
     options.setHost(websocketConfiguration.getHost());
     options.setPort(websocketConfiguration.getPort());
     final MultiMap headers = new VertxHttpHeaders();
-    System.out.println("good token " + goodToken);
     if (goodToken != null) {
       headers.add("Bearer", goodToken);
     }

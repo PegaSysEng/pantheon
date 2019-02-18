@@ -95,8 +95,8 @@ public class WebSocketService {
     return websocket -> {
       final SocketAddress socketAddress = websocket.remoteAddress();
       final String connectionId = websocket.textHandlerID();
-      String token = getToken(websocket);
-      LOG.trace("token {}", token);
+      final String token = getAuthToken(websocket);
+      LOG.trace("Authentication token {}", token);
 
       LOG.debug("Websocket Connected ({})", socketAddressAsString(socketAddress));
 
@@ -206,7 +206,7 @@ public class WebSocketService {
     return String.format("host=%s, port=%d", socketAddress.host(), socketAddress.port());
   }
 
-  private String getToken(final ServerWebSocket websocket) {
+  private String getAuthToken(final ServerWebSocket websocket) {
     return websocket.headers().get("Bearer");
   }
 }

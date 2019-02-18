@@ -231,7 +231,7 @@ public class JsonRpcHttpService {
     };
   }
 
-  private String getToken(final RoutingContext routingContext) {
+  private String getAuthToken(final RoutingContext routingContext) {
     return routingContext.request().getHeader("Bearer");
   }
 
@@ -287,7 +287,7 @@ public class JsonRpcHttpService {
 
   private void handleJsonRPCRequest(final RoutingContext routingContext) {
     // first check token if authentication is required
-    String token = getToken(routingContext);
+    String token = getAuthToken(routingContext);
     if (authenticationService.isPresent() && token == null) {
       // no auth token when auth required
       handleJsonRpcUnauthorizedError(routingContext, null, JsonRpcError.UNAUTHORIZED);
