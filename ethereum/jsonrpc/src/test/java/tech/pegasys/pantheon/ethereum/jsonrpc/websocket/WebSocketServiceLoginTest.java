@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 
+import com.google.common.collect.Lists;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.methods.WebSocketMethodsFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
@@ -208,13 +209,12 @@ public class WebSocketServiceLoginTest {
   }
 
   @Test
-  @Ignore
   public void websocketServiceWithGoodHeaderAuthenticationToken(final TestContext context) {
     final Async async = context.async();
 
     final JWTOptions jwtOptions = new JWTOptions().setExpiresInMinutes(5).setAlgorithm("RS256");
     final JsonObject jwtContents =
-        new JsonObject().put("permissions", "eth:subscribe").put("username", "user");
+        new JsonObject().put("permissions", Lists.newArrayList("eth:*")).put("username", "user");
     final String goodToken = jwtAuth.generateToken(jwtContents, jwtOptions);
 
     final String requestSub =
