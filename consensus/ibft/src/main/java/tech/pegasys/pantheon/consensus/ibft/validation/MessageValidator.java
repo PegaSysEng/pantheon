@@ -88,22 +88,24 @@ public class MessageValidator {
   private boolean validateProposalAndRoundChangeAreConsistent(final Proposal proposal) {
     final ConsensusRoundIdentifier proposalRoundIdentifier = proposal.getRoundIdentifier();
 
-    ;
-
     if (proposalRoundIdentifier.getRoundNumber() == 0) {
-      if (proposal.getRoundChangeCertificate().isPresent()) {
-        LOG.debug(
-            "Illegal Proposal message, round-0 proposal must not contain a round change certificate.");
-        return false;
-      }
+      return validateRoundZeroProposalHasNoRoundChangeCertificate(proposal);
     } else {
-      validateRoundChangeExistsAndMatchesProposedBlock(proposal);
+      return validateRoundChangeCertificateIsValidAndMatchesProposedBlock(proposal);
     }
+  }
 
+  private boolean validateRoundZeroProposalHasNoRoundChangeCertificate(final Proposal proposal) {
+    if (proposal.getRoundChangeCertificate().isPresent()) {
+      LOG.debug(
+          "Illegal Proposal message, round-0 proposal must not contain a round change certificate.");
+      return false;
+    }
     return true;
   }
 
-  private boolean validateRoundChangeExistsAndMatchesProposedBlock(final Proposal proposal) {
+  private boolean validateRoundChangeCertificateIsValidAndMatchesProposedBlock(
+      final Proposal proposal) {
 
     final Optional<RoundChangeCertificate> roundChangeCertificate =
         proposal.getRoundChangeCertificate();
@@ -116,11 +118,9 @@ public class MessageValidator {
 
     final RoundChangeCertificate roundChangeCert = roundChangeCertificate.get();
 
-    if (!roundChangeCertificateValidator
-        .validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
-            proposal.getRoundIdentifier(), roundChangeCert)) {
-      LOG.debug(
-          "Illegal Proposal message, embedded RoundChangeCertificate is not self-consistent");
+    if (!roundChangeCertificateValidator.validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
+        proposal.getRoundIdentifier(), roundChangeCert)) {
+      LOG.debug("Illegal Proposal message, embedded RoundChangeCertificate is not self-consistent");
       return false;
     }
 
@@ -130,6 +130,8 @@ public class MessageValidator {
           "Illegal Proposal message, piggybacked block does not match latest PrepareCertificate");
       return false;
     }
+
+    return true;
   }
 
   public boolean validatePrepare(final Prepare msg) {

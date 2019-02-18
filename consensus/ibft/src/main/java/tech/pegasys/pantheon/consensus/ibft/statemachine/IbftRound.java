@@ -132,8 +132,8 @@ public class IbftRound {
       LOG.debug("Sending prepare message.");
       final Prepare localPrepareMessage =
           messageFactory.createPrepare(getRoundIdentifier(), block.getHash());
-      transmitter.multicastPrepare(localPrepareMessage.getRoundIdentifier(),
-          localPrepareMessage.getDigest());
+      transmitter.multicastPrepare(
+          localPrepareMessage.getRoundIdentifier(), localPrepareMessage.getDigest());
       peerIsPrepared(localPrepareMessage);
     }
   }

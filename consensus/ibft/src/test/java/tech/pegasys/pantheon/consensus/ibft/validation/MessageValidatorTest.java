@@ -195,7 +195,7 @@ public class MessageValidatorTest {
   }
 
   @Test
-  public void proposalForRoundsGreaterThanZeroFailIfNoRoundCHangeCertificateAvailable() {
+  public void proposalForRoundsGreaterThanZeroFailIfNoRoundChangeCertificateAvailable() {
     final ConsensusRoundIdentifier nonZeroRound = new ConsensusRoundIdentifier(1, 1);
     final Proposal proposal = messageFactory.createProposal(nonZeroRound, block, Optional.empty());
 
