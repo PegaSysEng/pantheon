@@ -12,29 +12,12 @@
  */
 package tech.pegasys.pantheon.services.queue;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public class InMemoryBigQueue<T> implements BigQueue<T> {
-  private final Queue<T> internalQueue = new ConcurrentLinkedQueue<>();
+public class InMemoryTaskQueueTest extends AbstractTaskQueueTest<InMemoryTaskQueue<BytesValue>> {
 
   @Override
-  public void enqueue(final T value) {
-    internalQueue.add(value);
-  }
-
-  @Override
-  public T dequeue() {
-    return internalQueue.poll();
-  }
-
-  @Override
-  public long size() {
-    return internalQueue.size();
-  }
-
-  @Override
-  public void close() {
-    internalQueue.clear();
+  protected InMemoryTaskQueue<BytesValue> createQueue() throws Exception {
+    return new InMemoryTaskQueue<>();
   }
 }

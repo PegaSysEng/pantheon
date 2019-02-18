@@ -10,8 +10,6 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.queue;
+package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-
-public interface BytesQueue extends BigQueue<BytesValue> {}
+public class WorldStateUnavailableException extends RuntimeException {}

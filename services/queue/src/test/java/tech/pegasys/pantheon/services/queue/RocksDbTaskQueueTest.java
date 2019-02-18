@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,22 +12,19 @@
  */
 package tech.pegasys.pantheon.services.queue;
 
-import java.io.Closeable;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
-/**
- * Represents a very large thread-safe queue that may exceed memory limits.
- *
- * @param <T> the type of data held in the queue
- */
-public interface BigQueue<T> extends Closeable {
+import java.io.IOException;
 
-  void enqueue(T value);
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
-  T dequeue();
+public class RocksDbTaskQueueTest extends AbstractTaskQueueTest<RocksDbTaskQueue> {
 
-  long size();
+  @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
-  default boolean isEmpty() {
-    return size() == 0;
+  @Override
+  protected RocksDbTaskQueue createQueue() throws IOException {
+    return RocksDbTaskQueue.create(folder.newFolder().toPath(), new NoOpMetricsSystem());
   }
 }
