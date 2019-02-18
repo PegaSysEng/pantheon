@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newCachedThreadPool;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newFixedThreadPool;
+import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -62,8 +63,7 @@ public class EthScheduler {
     this(
         newFixedThreadPool(
             EthScheduler.class.getSimpleName() + "-Workers", syncWorkerCount, metricsSystem),
-        MonitoredExecutors.newScheduledThreadPool(
-            EthScheduler.class.getSimpleName() + "-Timer", 1, metricsSystem),
+        newScheduledThreadPool(EthScheduler.class.getSimpleName() + "-Timer", 1, metricsSystem),
         newFixedThreadPool(
             EthScheduler.class.getSimpleName() + "-Transactions", txWorkerCount, metricsSystem),
         newCachedThreadPool(EthScheduler.class.getSimpleName() + "-Services", metricsSystem),

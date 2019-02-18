@@ -22,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
@@ -34,13 +35,34 @@ public class MonitoredExecutors {
 
   public static ExecutorService newFixedThreadPool(
       final String name, final int workerCount, final MetricsSystem metricsSystem) {
-    return newThreadPoolExecutor(
-        name, workerCount, workerCount, metricsSystem, 0L, TimeUnit.MILLISECONDS);
+    return newMonitoredExecutor(
+        name,
+        metricsSystem,
+        (rejectedExecutionHandler, threadFactory) ->
+            new ThreadPoolExecutor(
+                workerCount,
+                workerCount,
+                0L,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(),
+                threadFactory,
+                rejectedExecutionHandler));
   }
 
   public static ExecutorService newCachedThreadPool(
       final String name, final MetricsSystem metricsSystem) {
-    return newThreadPoolExecutor(name, 0, Integer.MAX_VALUE, metricsSystem, 60L, TimeUnit.SECONDS);
+    return newMonitoredExecutor(
+        name,
+        metricsSystem,
+        (rejectedExecutionHandler, threadFactory) ->
+            new ThreadPoolExecutor(
+                0,
+                Integer.MAX_VALUE,
+                60L,
+                TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>(),
+                threadFactory,
+                rejectedExecutionHandler));
   }
 
   public static ScheduledExecutorService newScheduledThreadPool(
@@ -50,27 +72,6 @@ public class MonitoredExecutors {
         metricsSystem,
         (rejectedExecutionHandler, threadFactory) ->
             new ScheduledThreadPoolExecutor(corePoolSize, threadFactory, rejectedExecutionHandler));
-  }
-
-  private static ExecutorService newThreadPoolExecutor(
-      final String name,
-      final int corePoolSize,
-      final int maximumPoolSize,
-      final MetricsSystem metricsSystem,
-      final long keepAliveTime,
-      final TimeUnit keepAliveTimeUnit) {
-    return newMonitoredExecutor(
-        name,
-        metricsSystem,
-        (rejectedExecutionHandler, threadFactory) ->
-            new ThreadPoolExecutor(
-                corePoolSize,
-                maximumPoolSize,
-                keepAliveTime,
-                keepAliveTimeUnit,
-                new LinkedBlockingQueue<>(),
-                threadFactory,
-                rejectedExecutionHandler));
   }
 
   private static <T extends ThreadPoolExecutor> T newMonitoredExecutor(
