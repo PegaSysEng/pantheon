@@ -43,6 +43,7 @@ public interface MetricsSystem {
       final Supplier<Integer> valueSupplier) {
     createGauge(category, name, help, () -> (double) valueSupplier.get());
   }
+
   default void createLongGauge(
       final MetricCategory category,
       final String name,
