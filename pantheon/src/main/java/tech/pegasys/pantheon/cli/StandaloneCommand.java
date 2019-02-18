@@ -71,4 +71,9 @@ class StandaloneCommand implements DefaultCommandValues {
       arity = "1",
       converter = RpcAuthConverter.class)
   String rpcWsAuthenticationCredentialsFile = null;
+
+  @CommandLine.Option(
+      names = {"--privacy-public-key-file"},
+      description = "the path to the enclave's public key ")
+  final File privacyPublicKeyFile = null;
 }

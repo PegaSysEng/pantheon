@@ -460,11 +460,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final URI privacyUrl = PrivacyParameters.DEFAULT_ENCLAVE_URL;
 
   @Option(
-      names = {"--privacy-public-key-file"},
-      description = "the path to the enclave's public key ")
-  private final File privacyPublicKeyFile = null;
-
-  @Option(
       names = {"--privacy-precompiled-address"},
       description =
           "The address to which the privacy pre-compiled contract will be mapped to (default: ${DEFAULT-VALUE})")
@@ -764,10 +759,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (privacyEnabled) {
       privacyParameters.setEnabled(privacyEnabled);
       privacyParameters.setUrl(privacyUrl.toString());
-      if (privacyPublicKeyFile != null) {
-        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile);
+      if (privacyPublicKeyFile() != null) {
+        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
       } else {
-        throw new IOException("Please specify Enclave public Key file path to Enable Privacy");
+        throw new ParameterException(
+            commandLine, "Please specify Enclave public Key file path to Enable Privacy");
       }
       privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
     }
@@ -960,6 +956,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return nodePrivateKeyFile != null
         ? nodePrivateKeyFile
         : KeyPairUtil.getDefaultKeyFile(dataDir());
+  }
+
+  private File privacyPublicKeyFile() {
+    if (isDocker) {
+      final File keyFile = new File(DOCKER_PRIVACY_PUBLIC_KEY_FILE);
+      if (keyFile.exists()) {
+        return keyFile;
+      } else {
+        return null;
+      }
+    } else {
+      return standaloneCommands.privacyPublicKeyFile;
+    }
   }
 
   private String rpcHttpAuthenticationCredentialsFile() throws Exception {
