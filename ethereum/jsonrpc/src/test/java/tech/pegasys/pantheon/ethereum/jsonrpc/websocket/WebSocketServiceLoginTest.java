@@ -135,7 +135,6 @@ public class WebSocketServiceLoginTest {
                     final JsonObject respBody = new JsonObject(body);
                     final String token = respBody.getString("token");
                     assertThat(token).isNotNull();
-                    System.out.println("token " + token);
 
                     websocketService
                         .authenticationService

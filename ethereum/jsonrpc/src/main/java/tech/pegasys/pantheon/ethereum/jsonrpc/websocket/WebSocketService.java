@@ -96,7 +96,9 @@ public class WebSocketService {
       final SocketAddress socketAddress = websocket.remoteAddress();
       final String connectionId = websocket.textHandlerID();
       final String token = getAuthToken(websocket);
-      LOG.trace("Authentication token {}", token);
+      if (token != null) {
+        LOG.trace("Websocket authentication token {}", token);
+      }
 
       LOG.debug("Websocket Connected ({})", socketAddressAsString(socketAddress));
 

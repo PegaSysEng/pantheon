@@ -53,8 +53,7 @@ public class Net {
   }
 
   public Condition netVersionUnauthorizedResponse() {
-    return new ExpectNetVersionPermissionJsonRpcUnauthorizedResponse(
-        transactions.netVersion());
+    return new ExpectNetVersionPermissionJsonRpcUnauthorizedResponse(transactions.netVersion());
   }
 
   public Condition awaitPeerCountExceptional() {
