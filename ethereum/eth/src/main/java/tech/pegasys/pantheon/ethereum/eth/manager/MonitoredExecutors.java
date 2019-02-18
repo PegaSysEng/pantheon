@@ -1,0 +1,127 @@
+package tech.pegasys.pantheon.ethereum.eth.manager;
+
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+public class MonitoredExecutors {
+
+  public static ExecutorService newFixedThreadPool(
+      final String name, final int workerCount, final MetricsSystem metricsSystem) {
+    return newThreadPoolExecutor(
+        name, workerCount, workerCount, metricsSystem, 0L, TimeUnit.MILLISECONDS);
+  }
+
+  public static ExecutorService newCachedThreadPool(
+      final String name, final MetricsSystem metricsSystem) {
+    return newThreadPoolExecutor(name, 0, Integer.MAX_VALUE, metricsSystem, 60L, TimeUnit.SECONDS);
+  }
+
+  public static ScheduledExecutorService newScheduledThreadPool(
+      final String name, final int corePoolSize, final MetricsSystem metricsSystem) {
+    return newMonitoredExecutor(
+        name,
+        metricsSystem,
+        (rejectedExecutionHandler, threadFactory) ->
+            new ScheduledThreadPoolExecutor(corePoolSize, threadFactory, rejectedExecutionHandler));
+  }
+
+  private static ExecutorService newThreadPoolExecutor(
+      final String name,
+      final int corePoolSize,
+      final int maximumPoolSize,
+      final MetricsSystem metricsSystem,
+      final long keepAliveTime,
+      final TimeUnit keepAliveTimeUnit) {
+    return newMonitoredExecutor(
+        name,
+        metricsSystem,
+        (rejectedExecutionHandler, threadFactory) ->
+            new ThreadPoolExecutor(
+                corePoolSize,
+                maximumPoolSize,
+                keepAliveTime,
+                keepAliveTimeUnit,
+                new LinkedBlockingQueue<>(),
+                threadFactory,
+                rejectedExecutionHandler));
+  }
+
+  private static <T extends ThreadPoolExecutor> T newMonitoredExecutor(
+      final String name,
+      final MetricsSystem metricsSystem,
+      final BiFunction<RejectedExecutionHandler, ThreadFactory, T> creator) {
+
+    final String metricName = name.toLowerCase(Locale.US).replace('-', '_');
+
+    final T executor =
+        creator.apply(
+            new CountingAbortPolicy(metricName, metricsSystem),
+            new ThreadFactoryBuilder().setNameFormat(name + "-%d").build());
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.EXECUTORS,
+        metricName + "_queue_length_current",
+        "Current number of tasks awaiting execution",
+        executor.getQueue()::size);
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.EXECUTORS,
+        metricName + "_active_threads_current",
+        "Current number of threads executing tasks",
+        executor::getActiveCount);
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.EXECUTORS,
+        metricName + "_pool_size_current",
+        "Current number of threads in the thread pool",
+        executor::getPoolSize);
+
+    metricsSystem.createLongGauge(
+        MetricCategory.EXECUTORS,
+        metricName + "_completed_tasks_total",
+        "Total number of tasks executed",
+        executor::getCompletedTaskCount);
+
+    metricsSystem.createLongGauge(
+        MetricCategory.EXECUTORS,
+        metricName + "_submitted_tasks_total",
+        "Total number of tasks executed",
+        executor::getTaskCount);
+
+    return executor;
+  }
+
+  private static class CountingAbortPolicy extends AbortPolicy {
+
+    private final Counter rejectedTaskCounter;
+
+    public CountingAbortPolicy(final String metricName, final MetricsSystem metricsSystem) {
+      this.rejectedTaskCounter =
+          metricsSystem.createCounter(
+              MetricCategory.EXECUTORS,
+              metricName + "_rejected_tasks_total",
+              "Total number of tasks rejected by this executor");
+    }
+
+    @Override
+    public void rejectedExecution(final Runnable r, final ThreadPoolExecutor e) {
+      rejectedTaskCounter.inc();
+      super.rejectedExecution(r, e);
+    }
+  }
+}
