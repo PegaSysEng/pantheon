@@ -8,5 +8,5 @@ The Pantheon JSON-RPC API uses the [JSON](http://json.org/) (RFC 4627) data form
 RPC is the remote procedure call protocol (RFC 1831), which is stateless and transport agnostic in that the concepts can be used within the same process, over sockets, over HTTP, or in many various message passing environments.
 
 * [Using the Pantheon JSON-RPC API](Using-JSON-RPC-API.md)
-* [JSON-RPC API Methods](JSON-RPC-API-Methods.md)
-* [JSON-RPC API Objects](JSON-RPC-API-Objects.md)
+* [JSON-RPC API Methods](../Reference/JSON-RPC-API-Methods.md)
+* [JSON-RPC API Objects](../Reference/JSON-RPC-API-Objects.md)
