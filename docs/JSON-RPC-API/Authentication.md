@@ -28,8 +28,12 @@ Each user requiring JSON-RPC access is listed with:
 * Hash of user password. Use the [`password`](../Reference/Pantheon-CLI-Syntax.md#password) subcommand to generate the hash. 
 * JSON-RPC permissions. 
 
-
-
+!!! example "password Subcommand"
+    ```bash
+    
+    ```
+    
+    
 ## JSON-RPC Permissions 
 
 Each user has a list of permissions strings defining the methods they can access. To give access to: 
@@ -61,7 +65,7 @@ To obtain an authentication token, make a request to the `/login` endpoint with 
     $ curl -X POST --data '{"username":"user","password":"pegasys"}' <JSON-RPC-https-endpoint:port>/login
     ```
     
-    ```bash tab="wscat WS request" <WHERE IS THE ENDPOINT HERE> 
+    ```bash tab="wscat WS request" 
     {"username":"user","password":"pegasys"}
     ```
     
