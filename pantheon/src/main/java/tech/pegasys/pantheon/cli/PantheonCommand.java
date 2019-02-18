@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
+import tech.pegasys.pantheon.cli.custom.RpcAuthConverter;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -559,6 +560,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     try {
+      final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
+      final WebSocketConfiguration webSocketConfiguration = webSocketConfiguration();
       final Optional<PermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
       permissioningConfiguration.ifPresent(
@@ -572,8 +575,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           maxPeers,
           p2pHost,
           p2pPort,
-          jsonRpcConfiguration(),
-          webSocketConfiguration(),
+          jsonRpcConfiguration,
+          webSocketConfiguration,
           metricsConfiguration(),
           permissioningConfiguration);
     } catch (Exception e) {
@@ -627,7 +630,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
-  private JsonRpcConfiguration jsonRpcConfiguration() {
+  private JsonRpcConfiguration jsonRpcConfiguration() throws Exception {
 
     CommandLineUtils.checkOptionDependencies(
         logger,
@@ -959,13 +962,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         : KeyPairUtil.getDefaultKeyFile(dataDir());
   }
 
-  private String rpcHttpAuthenticationCredentialsFile() {
+  private String rpcHttpAuthenticationCredentialsFile() throws Exception {
     if (isFullInstantiation()) {
       return standaloneCommands.rpcHttpAuthenticationCredentialsFile;
     } else if (isDocker) {
       final File authFile = new File(DOCKER_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
       if (authFile.exists()) {
-        return authFile.getAbsolutePath();
+        final String path = authFile.getAbsolutePath();
+        try {
+          new RpcAuthConverter().convert(path);
+        } catch (Exception e) {
+          throw new ParameterException(
+              commandLine, "Invalid RPC HTTP authentication credentials file: " + e.getMessage());
+        }
+        return path;
       } else {
         return null;
       }
@@ -980,7 +990,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } else if (isDocker) {
       final File authFile = new File(DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
       if (authFile.exists()) {
-        return authFile.getAbsolutePath();
+        final String path = authFile.getAbsolutePath();
+        try {
+          new RpcAuthConverter().convert(path);
+        } catch (Exception e) {
+          throw new ParameterException(
+              commandLine, "Invalid RPC WS authentication credentials file: " + e.getMessage());
+        }
+        return path;
       } else {
         return null;
       }
