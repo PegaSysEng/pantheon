@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.time.Duration;
@@ -245,7 +246,7 @@ public class EthScheduler {
     return promise;
   }
 
-  <T> void failAfterTimeout(final CompletableFuture<T> promise) {
+  public <T> void failAfterTimeout(final CompletableFuture<T> promise) {
     failAfterTimeout(promise, defaultTimeout);
   }
 
