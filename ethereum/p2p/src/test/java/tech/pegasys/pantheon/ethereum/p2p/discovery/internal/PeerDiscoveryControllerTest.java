@@ -1057,7 +1057,7 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void whenObservingNodeWhitelistAndNodeIsRemovedShouldNotifyPeerDroppedObservers()
       throws IOException {
     final PeerTable peerTableSpy = spy(peerTable);
