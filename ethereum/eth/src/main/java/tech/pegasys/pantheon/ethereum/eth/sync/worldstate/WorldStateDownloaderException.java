@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -10,24 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.queue;
+package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
-import java.io.Closeable;
+public class WorldStateDownloaderException extends RuntimeException {
 
-/**
- * Represents a very large thread-safe queue that may exceed memory limits.
- *
- * @param <T> the type of data held in the queue
- */
-public interface BigQueue<T> extends Closeable {
-
-  void enqueue(T value);
-
-  T dequeue();
-
-  long size();
-
-  default boolean isEmpty() {
-    return size() == 0;
+  public WorldStateDownloaderException(final String message) {
+    super(message);
   }
 }

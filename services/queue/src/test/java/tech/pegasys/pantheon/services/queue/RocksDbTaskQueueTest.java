@@ -12,29 +12,19 @@
  */
 package tech.pegasys.pantheon.services.queue;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
-public class InMemoryBigQueue<T> implements BigQueue<T> {
-  private final Queue<T> internalQueue = new ConcurrentLinkedQueue<>();
+import java.io.IOException;
 
-  @Override
-  public void enqueue(final T value) {
-    internalQueue.add(value);
-  }
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
-  @Override
-  public T dequeue() {
-    return internalQueue.poll();
-  }
+public class RocksDbTaskQueueTest extends AbstractTaskQueueTest<RocksDbTaskQueue> {
+
+  @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Override
-  public long size() {
-    return internalQueue.size();
-  }
-
-  @Override
-  public void close() {
-    internalQueue.clear();
+  protected RocksDbTaskQueue createQueue() throws IOException {
+    return RocksDbTaskQueue.create(folder.newFolder().toPath(), new NoOpMetricsSystem());
   }
 }

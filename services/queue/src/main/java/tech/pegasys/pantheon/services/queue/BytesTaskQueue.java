@@ -14,4 +14,4 @@ package tech.pegasys.pantheon.services.queue;
 
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public interface BytesQueue extends BigQueue<BytesValue> {}
+public interface BytesTaskQueue extends TaskQueue<BytesValue> {}

@@ -10,21 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.queue;
+package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+public class StalledDownloadException extends WorldStateDownloaderException {
 
-import java.io.IOException;
-
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-
-public class RocksDbQueueTest extends AbstractBigQueueTest<RocksDbQueue> {
-
-  @Rule public final TemporaryFolder folder = new TemporaryFolder();
-
-  @Override
-  protected RocksDbQueue createQueue() throws IOException {
-    return RocksDbQueue.create(folder.newFolder().toPath(), new NoOpMetricsSystem());
+  public StalledDownloadException(final String message) {
+    super(message);
   }
 }

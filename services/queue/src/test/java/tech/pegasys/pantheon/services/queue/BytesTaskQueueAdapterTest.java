@@ -12,12 +12,22 @@
  */
 package tech.pegasys.pantheon.services.queue;
 
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public class InMemoryBigQueueTest extends AbstractBigQueueTest<InMemoryBigQueue<BytesValue>> {
+import java.util.function.Function;
+
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+
+public class BytesTaskQueueAdapterTest extends AbstractTaskQueueTest<TaskQueue<BytesValue>> {
+
+  @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Override
-  protected InMemoryBigQueue<BytesValue> createQueue() throws Exception {
-    return new InMemoryBigQueue<>();
+  protected TaskQueue<BytesValue> createQueue() throws Exception {
+    BytesTaskQueue queue =
+        RocksDbTaskQueue.create(folder.newFolder().toPath(), new NoOpMetricsSystem());
+    return new BytesTaskQueueAdapter<>(queue, Function.identity(), Function.identity());
   }
 }
