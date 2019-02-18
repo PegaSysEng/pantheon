@@ -1245,7 +1245,8 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder peerDroppedObservers(final Subscribers<Consumer<PeerDroppedEvent>> observers) {
+    ControllerBuilder peerDroppedObservers(
+        final Subscribers<Consumer<PeerDroppedEvent>> observers) {
       this.peerDroppedObservers = observers;
       return this;
     }
