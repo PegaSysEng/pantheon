@@ -43,14 +43,14 @@ public class RpcAuthFileValidatorTest {
   @Test
   public void shouldPassWhenCorrectTOML() {
     assertThatCode(
-            () -> rpcAuthFileValidator.validate(commandLine, getFilePath(CORRECT_TOML), "HTTP"))
+            () -> RpcAuthFileValidator.validate(commandLine, getFilePath(CORRECT_TOML), "HTTP"))
         .doesNotThrowAnyException();
   }
 
   @Test
   public void shouldFailWhenInvalidTOML() {
     assertThatThrownBy(
-            () -> rpcAuthFileValidator.validate(commandLine, getFilePath(INVALID_TOML), "HTTP"))
+            () -> RpcAuthFileValidator.validate(commandLine, getFilePath(INVALID_TOML), "HTTP"))
         .isInstanceOf(ParameterException.class)
         .hasMessageContaining("Invalid TOML configuration");
   }
@@ -58,7 +58,7 @@ public class RpcAuthFileValidatorTest {
   @Test
   public void shouldFailWhenMissingTOML() {
     assertThatThrownBy(
-            () -> rpcAuthFileValidator.validate(commandLine, "thisshouldntexist", "HTTP"))
+            () -> RpcAuthFileValidator.validate(commandLine, "thisshouldntexist", "HTTP"))
         .isInstanceOf(ParameterException.class)
         .hasMessage(
             "The specified RPC HTTP authentication credential file 'thisshouldntexist' does not exist");
@@ -67,7 +67,7 @@ public class RpcAuthFileValidatorTest {
   @Test
   public void shouldFailWhenMissingPassword() {
     assertThatThrownBy(
-            () -> rpcAuthFileValidator.validate(commandLine, getFilePath(NO_PASSWORD_TOML), "HTTP"))
+            () -> RpcAuthFileValidator.validate(commandLine, getFilePath(NO_PASSWORD_TOML), "HTTP"))
         .isInstanceOf(ParameterException.class)
         .hasMessage("RPC user specified without password.");
   }
@@ -76,7 +76,7 @@ public class RpcAuthFileValidatorTest {
   public void shouldFailWhenInvalidKeyValue() {
     assertThatThrownBy(
             () ->
-                rpcAuthFileValidator.validate(commandLine, getFilePath(INVALID_VALUE_TOML), "HTTP"))
+                RpcAuthFileValidator.validate(commandLine, getFilePath(INVALID_VALUE_TOML), "HTTP"))
         .isInstanceOf(ParameterException.class)
         .hasMessage("RPC authentication configuration file contains invalid values.");
   }
@@ -85,7 +85,7 @@ public class RpcAuthFileValidatorTest {
   public void shouldFailWhenDuplicateUser() {
     assertThatThrownBy(
             () ->
-                rpcAuthFileValidator.validate(
+                RpcAuthFileValidator.validate(
                     commandLine, getFilePath(DUPLICATE_USER_TOML), "HTTP"))
         .isInstanceOf(ParameterException.class)
         .hasMessageContaining("Invalid TOML configuration");
