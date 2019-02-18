@@ -1092,7 +1092,7 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void whenPeerIsNotEvictedDropFromTableShouldReturnFalseAndNotifyZeroObservers() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
     final DiscoveryPeer peer = peers.get(0);
@@ -1240,12 +1240,12 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder peerBondedObservers(Subscribers<Consumer<PeerBondedEvent>> observers) {
+    ControllerBuilder peerBondedObservers(final Subscribers<Consumer<PeerBondedEvent>> observers) {
       this.peerBondedObservers = observers;
       return this;
     }
 
-    ControllerBuilder peerDroppedObservers(Subscribers<Consumer<PeerDroppedEvent>> observers) {
+    ControllerBuilder peerDroppedObservers(final Subscribers<Consumer<PeerDroppedEvent>> observers) {
       this.peerDroppedObservers = observers;
       return this;
     }
