@@ -103,8 +103,7 @@ public class IbftControllerTest {
     when(blockChain.getChainHeadHeader()).thenReturn(chainHeadBlockHeader);
     when(blockHeightManagerFactory.create(any())).thenReturn(blockHeightManager);
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
-    final FutureMessageBuffer futureMessageBuffer =
-        new FutureMessageBuffer(10, 10, () -> blockHeightManager.getChainHeight(), futureMessages);
+    final FutureMessageBuffer futureMessageBuffer = new FutureMessageBuffer(10, 10, futureMessages);
     ibftController =
         new IbftController(
             blockChain,

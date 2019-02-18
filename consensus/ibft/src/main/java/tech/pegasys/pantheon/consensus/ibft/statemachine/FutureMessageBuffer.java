@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import java.util.function.Supplier;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -38,30 +37,23 @@ public class FutureMessageBuffer {
   private final NavigableMap<Long, List<Message>> buffer;
   private final long futureMessagesMaxDistance;
   private final long futureMessagesLimit;
-  private final Supplier<Long> currentChainHeight;
 
-  public FutureMessageBuffer(
-      final long futureMessagesMaxDistance,
-      final long futureMessagesLimit,
-      final Supplier<Long> currentChainHeight) {
-    this(futureMessagesMaxDistance, futureMessagesLimit, currentChainHeight, new TreeMap<>());
+  public FutureMessageBuffer(final long futureMessagesMaxDistance, final long futureMessagesLimit) {
+    this(futureMessagesMaxDistance, futureMessagesLimit, new TreeMap<>());
   }
 
   @VisibleForTesting
   FutureMessageBuffer(
       final long futureMessagesMaxDistance,
       final long futureMessagesLimit,
-      final Supplier<Long> currentChainHeight,
       final NavigableMap<Long, List<Message>> buffer) {
     this.futureMessagesMaxDistance = futureMessagesMaxDistance;
     this.futureMessagesLimit = futureMessagesLimit;
-    this.currentChainHeight = currentChainHeight;
     this.buffer = buffer;
   }
 
-  public void addMessage(final long msgChainHeight, final Message rawMsg) {
-    final long currentHeight = currentChainHeight.get();
-    if (futureMessagesLimit == 0 || !validMessageHeight(msgChainHeight, currentHeight)) {
+  public void addMessage(final long chainHeight, final long msgChainHeight, final Message rawMsg) {
+    if (futureMessagesLimit == 0 || !validMessageHeight(msgChainHeight, chainHeight)) {
       return;
     }
 

@@ -62,10 +62,7 @@ public class IbftController {
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessageBuffer =
-        new FutureMessageBuffer(
-            futureMessagesMaxDistance,
-            futureMessagesLimit,
-            () -> currentHeightManager.getChainHeight());
+        new FutureMessageBuffer(futureMessagesMaxDistance, futureMessagesLimit);
     this.gossiper = gossiper;
     this.duplicateMessageTracker = new MessageTracker(duplicateMessageLimit);
   }
@@ -220,7 +217,8 @@ public class IbftController {
     if (isMsgForCurrentHeight(msgRoundIdentifier)) {
       return isMsgFromKnownValidator(msg) && ibftFinalState.isLocalNodeValidator();
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
-      futureMessageBuffer.addMessage(msgRoundIdentifier.getSequenceNumber(), rawMsg);
+      futureMessageBuffer.addMessage(
+          currentHeightManager.getChainHeight(), msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
       LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
