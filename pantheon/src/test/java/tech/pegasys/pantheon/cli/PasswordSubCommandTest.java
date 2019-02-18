@@ -13,13 +13,26 @@
 package tech.pegasys.pantheon.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.cli.PasswordSubCommand.COMMAND_NAME;
 
 import org.junit.Test;
+import picocli.CommandLine.Model.CommandSpec;
 
 public class PasswordSubCommandTest extends CommandTestAbstract {
 
   @Test
+  public void passwordSubCommandExistAnbHaveSubCommands() {
+    CommandSpec spec = parseCommand();
+    assertThat(spec.subcommands()).containsKeys("password");
+    assertThat(spec.subcommands().get("password").getSubcommands())
+        .containsKeys("hash");
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void passwordSubCommandExists() {
+    CommandSpec spec = parseCommand();
     parseCommand("password");
 
     assertThat(commandOutput.toString()).contains("This command provides password related actions");
