@@ -939,5 +939,5 @@ $ pantheon password hash --password=<my-password>
 ```
 
 ```bash tab="Example"
-$ pantheon password hash --password="password123"
+$ pantheon password hash --password=myPassword123
 ```
