@@ -30,7 +30,6 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
-import tech.pegasys.pantheon.cli.custom.RpcAuthConverter;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -277,15 +276,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isRpcHttpAuthenticationEnabled = false;
 
   @Option(
-      names = {"--rpc-http-authentication-credentials-file"},
-      paramLabel = MANDATORY_FILE_FORMAT_HELP,
-      description =
-          "Storage file for rpc http authentication credentials (default: ${DEFAULT-VALUE})",
-      arity = "1",
-      converter = RpcAuthConverter.class)
-  private String rpcHttpAuthenticationCredentialsFile = null;
-
-  @Option(
       names = {"--rpc-ws-enabled"},
       description =
           "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})")
@@ -341,18 +331,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
-          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})",
-      hidden = true)
+          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsAuthenticationEnabled = false;
-
-  @Option(
-      names = {"--rpc-ws-authentication-credentials-file"},
-      paramLabel = MANDATORY_FILE_FORMAT_HELP,
-      description =
-          "Storage file for rpc websocket authentication credentials (default: ${DEFAULT-VALUE})",
-      arity = "1",
-      hidden = true)
-  private String rpcWsAuthenticationCredentialsFile = null;
 
   @Option(
       names = {"--metrics-enabled"},
@@ -678,7 +658,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setRpcApis(rpcHttpApis);
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     jsonRpcConfiguration.setAuthenticationEnabled(isRpcHttpAuthenticationEnabled);
-    jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile);
+    jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile());
     return jsonRpcConfiguration;
   }
 
@@ -712,7 +692,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setRpcApis(rpcWsApis);
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
-    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile);
+    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile());
     return webSocketConfiguration;
   }
 
@@ -977,6 +957,36 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return nodePrivateKeyFile != null
         ? nodePrivateKeyFile
         : KeyPairUtil.getDefaultKeyFile(dataDir());
+  }
+
+  private String rpcHttpAuthenticationCredentialsFile() {
+    if (isFullInstantiation()) {
+      return standaloneCommands.rpcHttpAuthenticationCredentialsFile;
+    } else if (isDocker) {
+      final File authFile = new File(DOCKER_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
+      if (authFile.exists()) {
+        return authFile.getAbsolutePath();
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  private String rpcWsAuthenticationCredentialsFile() {
+    if (isFullInstantiation()) {
+      return standaloneCommands.rpcWsAuthenticationCredentialsFile;
+    } else if (isDocker) {
+      final File authFile = new File(DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
+      if (authFile.exists()) {
+        return authFile.getAbsolutePath();
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   private boolean isFullInstantiation() {
