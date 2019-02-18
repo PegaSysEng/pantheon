@@ -69,7 +69,7 @@ public class RoundChangeCertificateValidatorTest {
   }
 
   @Test
-  public void newRoundWithEmptyRoundChangeCertificateFails() {
+  public void proposalWithEmptyRoundChangeCertificateFails() {
     final RoundChangeCertificate cert = new RoundChangeCertificate(Collections.emptyList());
 
     assertThat(

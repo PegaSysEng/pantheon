@@ -137,7 +137,7 @@ public class RoundChangeTest {
   }
 
   @Test
-  public void whenSufficientRoundChangeMessagesAreReceivedForNewRoundLocalNodeCreatesNewRoundMsg() {
+  public void whenSufficientRoundChangeMessagesAreReceivedForNewRoundLocalNodeCreatesProposalMsg() {
     // Note: Round-4 is the next round for which the local node is Proposer
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
     final Block locallyProposedBlock =
@@ -148,7 +148,7 @@ public class RoundChangeTest {
     final RoundChange rc3 = peers.getNonProposing(2).injectRoundChange(targetRound, empty());
     final RoundChange rc4 = peers.getProposer().injectRoundChange(targetRound, empty());
 
-    final Proposal expectedNewRound =
+    final Proposal expectedProposal =
         localNodeMessageFactory.createProposal(
             targetRound,
             locallyProposedBlock,
@@ -160,11 +160,11 @@ public class RoundChangeTest {
                         rc3.getSignedPayload(),
                         rc4.getSignedPayload()))));
 
-    peers.verifyMessagesReceived(expectedNewRound);
+    peers.verifyMessagesReceived(expectedProposal);
   }
 
   @Test
-  public void newRoundMessageContainsBlockOnWhichPeerPrepared() {
+  public void proposalMessageContainsBlockOnWhichPeerPrepared() {
     final long ARBITRARY_BLOCKTIME = 1500;
 
     final PreparedRoundArtifacts earlierPrepCert =
@@ -334,7 +334,7 @@ public class RoundChangeTest {
         .getNonProposing(2)
         .injectRoundChange(targetRound, Optional.of(illegalPreparedRoundArtifacts));
 
-    // Ensure no NewRound message is sent.
+    // Ensure no Proposal message is sent.
     peers.verifyNoMessagesReceived();
   }
 }

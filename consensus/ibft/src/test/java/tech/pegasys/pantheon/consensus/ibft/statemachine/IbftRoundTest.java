@@ -279,7 +279,7 @@ public class IbftRoundTest {
   }
 
   @Test
-  public void aNewRoundMessageWithTheSameBlockIsSentUponReceptionOfARoundChangeWithCertificate() {
+  public void aProposalMessageWithTheSameBlockIsSentUponReceptionOfARoundChangeWithCertificate() {
     final ConsensusRoundIdentifier priorRoundChange = new ConsensusRoundIdentifier(1, 0);
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =

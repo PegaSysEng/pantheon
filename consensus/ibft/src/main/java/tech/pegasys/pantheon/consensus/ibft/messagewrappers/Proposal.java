@@ -74,6 +74,14 @@ public class Proposal extends IbftMessage<ProposalPayload> {
     final Block proposedBlock =
         Block.readFrom(rlpIn, IbftBlockHashing::calculateDataHashForCommittedSeal);
 
+    final Optional<RoundChangeCertificate> roundChangeCertificate =
+        readRoundChangeCertificate(rlpIn);
+
+    rlpIn.leaveList();
+    return new Proposal(payload, proposedBlock, roundChangeCertificate);
+  }
+
+  private static Optional<RoundChangeCertificate> readRoundChangeCertificate(final RLPInput rlpIn) {
     RoundChangeCertificate roundChangeCertificate = null;
     if (!rlpIn.nextIsNull()) {
       roundChangeCertificate = RoundChangeCertificate.readFrom(rlpIn);
@@ -81,7 +89,6 @@ public class Proposal extends IbftMessage<ProposalPayload> {
       rlpIn.skipNext();
     }
 
-    rlpIn.leaveList();
-    return new Proposal(payload, proposedBlock, Optional.ofNullable(roundChangeCertificate));
+    return Optional.ofNullable(roundChangeCertificate);
   }
 }

@@ -63,7 +63,7 @@ public class MessageValidator {
       return false;
     }
 
-    if (!validateRoundChangeCertificate(msg, msg.getRoundChangeCertificate())) {
+    if (!validateProposalAndRoundChangeAreConsistent(msg)) {
       LOG.debug("Illegal Proposal message, embedded roundChange does not match proposal.");
       return false;
     }
@@ -85,42 +85,51 @@ public class MessageValidator {
     return true;
   }
 
-  private boolean validateRoundChangeCertificate(
-      final Proposal proposal, final Optional<RoundChangeCertificate> roundChangeCertificate) {
+  private boolean validateProposalAndRoundChangeAreConsistent(final Proposal proposal) {
     final ConsensusRoundIdentifier proposalRoundIdentifier = proposal.getRoundIdentifier();
 
+    ;
+
     if (proposalRoundIdentifier.getRoundNumber() == 0) {
-      if (roundChangeCertificate.isPresent()) {
+      if (proposal.getRoundChangeCertificate().isPresent()) {
         LOG.debug(
             "Illegal Proposal message, round-0 proposal must not contain a round change certificate.");
         return false;
       }
     } else {
-      if (!roundChangeCertificate.isPresent()) {
-        LOG.debug(
-            "Illegal Proposal message, rounds other than 0 must contain a round change certificate.");
-        return false;
-      }
-
-      final RoundChangeCertificate roundChangeCert = roundChangeCertificate.get();
-
-      if (!roundChangeCertificateValidator
-          .validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
-              proposal.getRoundIdentifier(), roundChangeCert)) {
-        LOG.debug(
-            "Illegal Proposal message, embedded RoundChangeCertificate is not self-consistent");
-        return false;
-      }
-
-      if (!roundChangeCertificateValidator.validateProposalMessageMatchesLatestPrepareCertificate(
-          roundChangeCert, proposal.getBlock())) {
-        LOG.debug(
-            "Illegal Proposal message, piggybacked block does not match latest PrepareCertificate");
-        return false;
-      }
+      validateRoundChangeExistsAndMatchesProposedBlock(proposal);
     }
 
     return true;
+  }
+
+  private boolean validateRoundChangeExistsAndMatchesProposedBlock(final Proposal proposal) {
+
+    final Optional<RoundChangeCertificate> roundChangeCertificate =
+        proposal.getRoundChangeCertificate();
+
+    if (!roundChangeCertificate.isPresent()) {
+      LOG.debug(
+          "Illegal Proposal message, rounds other than 0 must contain a round change certificate.");
+      return false;
+    }
+
+    final RoundChangeCertificate roundChangeCert = roundChangeCertificate.get();
+
+    if (!roundChangeCertificateValidator
+        .validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
+            proposal.getRoundIdentifier(), roundChangeCert)) {
+      LOG.debug(
+          "Illegal Proposal message, embedded RoundChangeCertificate is not self-consistent");
+      return false;
+    }
+
+    if (!roundChangeCertificateValidator.validateProposalMessageMatchesLatestPrepareCertificate(
+        roundChangeCert, proposal.getBlock())) {
+      LOG.debug(
+          "Illegal Proposal message, piggybacked block does not match latest PrepareCertificate");
+      return false;
+    }
   }
 
   public boolean validatePrepare(final Prepare msg) {
