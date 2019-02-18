@@ -101,7 +101,7 @@ public class EthScheduler {
       final Supplier<CompletableFuture<T>> future) {
     final CompletableFuture<T> promise = new CompletableFuture<>();
     final Future<?> workerFuture =
-        syncWorkerExecutor.submit(() -> propagateResult(future.get(), promise));
+        syncWorkerExecutor.submit(() -> propagateResult(future, promise));
     // If returned promise is cancelled, cancel the worker future
     promise.whenComplete(
         (r, t) -> {
@@ -140,8 +140,8 @@ public class EthScheduler {
               try {
                 command.run();
                 promise.complete(null);
-              } catch (final Exception e) {
-                promise.completeExceptionally(e);
+              } catch (final Throwable t) {
+                promise.completeExceptionally(t);
               }
             },
             duration.toMillis(),
@@ -161,9 +161,7 @@ public class EthScheduler {
     final CompletableFuture<T> promise = new CompletableFuture<>();
     final ScheduledFuture<?> scheduledFuture =
         scheduler.schedule(
-            () -> propagateResult(future.get(), promise),
-            duration.toMillis(),
-            TimeUnit.MILLISECONDS);
+            () -> propagateResult(future, promise), duration.toMillis(), TimeUnit.MILLISECONDS);
     // If returned promise is cancelled, cancel scheduled task
     promise.whenComplete(
         (r, t) -> {
