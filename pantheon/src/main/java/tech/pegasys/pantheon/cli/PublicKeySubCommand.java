@@ -17,9 +17,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.PublicKeySubCommand.COMMAND_NAME;
 
+import tech.pegasys.pantheon.cli.PublicKeySubCommand.AddressSubCommand;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.ExportSubCommand;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,7 +44,7 @@ import picocli.CommandLine.Spec;
     name = COMMAND_NAME,
     description = "This command provides node public key related actions.",
     mixinStandardHelpOptions = true,
-    subcommands = {ExportSubCommand.class})
+    subcommands = {ExportSubCommand.class, AddressSubCommand.class})
 class PublicKeySubCommand implements Runnable {
   private static final Logger LOG = LogManager.getLogger();
 
@@ -107,6 +110,53 @@ class PublicKeySubCommand implements Runnable {
         fileWriter.write(keyPair.getPublicKey().toString());
       } catch (final IOException e) {
         LOG.error("An error occurred while trying to write the public key", e);
+      }
+    }
+  }
+
+  /**
+   * Public key address export sub-command
+   *
+   * <p>Export of the public key address takes a file as parameter to export directly by writing the
+   * address in the file. A direct output of the address to standard out is not done because we
+   * don't want the address value to be polluted by other information like logs that are in
+   * KeyPairUtil that is inevitable.
+   */
+  @Command(
+      name = "export-address",
+      description = "This command exports the node's public key address to a file.",
+      mixinStandardHelpOptions = true)
+  static class AddressSubCommand implements Runnable {
+
+    @Option(
+        names = "--to",
+        required = true,
+        paramLabel = MANDATORY_FILE_FORMAT_HELP,
+        description = "File to write address to",
+        arity = "1..1")
+    private final File addressExportFile = null;
+
+    @SuppressWarnings("unused")
+    @ParentCommand
+    private PublicKeySubCommand parentCommand; // Picocli injects reference to parent command
+
+    @Override
+    public void run() {
+      checkNotNull(parentCommand);
+      checkNotNull(parentCommand.parentCommand);
+
+      final PantheonController<?> controller = parentCommand.parentCommand.buildController();
+      final KeyPair keyPair = controller.getLocalNodeKeyPair();
+      final Address address = Util.publicKeyToAddress(keyPair.getPublicKey());
+
+      // this publicKeyExportFile can never be null because of Picocli arity requirement
+      //noinspection ConstantConditions
+      final Path path = addressExportFile.toPath();
+
+      try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, UTF_8)) {
+        fileWriter.write(address.toString());
+      } catch (final IOException e) {
+        LOG.error("An error occurred while trying to write the public key address", e);
       }
     }
   }
