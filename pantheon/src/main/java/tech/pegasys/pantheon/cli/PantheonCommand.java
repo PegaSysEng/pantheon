@@ -688,6 +688,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
     webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile());
+    webSocketConfiguration.setHostsWhitelist(hostsWhitelist);
     return webSocketConfiguration;
   }
 
@@ -932,7 +933,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private Path dataDir() {
     if (isFullInstantiation()) {
-      return standaloneCommands.dataPath;
+      return standaloneCommands.dataPath.toAbsolutePath();
     } else if (isDocker) {
       return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {
