@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.services.queue.TaskQueue;
 import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
+import tech.pegasys.pantheon.util.ExceptionUtils;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.time.Duration;
@@ -43,6 +44,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -73,6 +75,7 @@ public class WorldStateDownloader {
   private volatile CompletableFuture<Void> future;
   private volatile Status status = Status.IDLE;
   private volatile BytesValue rootNode;
+  private final AtomicInteger highestRetryCount = new AtomicInteger(0);
 
   public WorldStateDownloader(
       final EthContext ethContext,
@@ -112,6 +115,12 @@ public class WorldStateDownloader {
             MetricCategory.SYNCHRONIZER,
             "world_state_retried_requests_total",
             "Total number of node data requests repeated as part of fast sync world state download");
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.SYNCHRONIZER,
+        "world_state_node_request_failures_max",
+        "Highest number of times a node data request has been retried in this download",
+        highestRetryCount::get);
   }
 
   public CompletableFuture<Void> run(final BlockHeader header) {
@@ -121,7 +130,7 @@ public class WorldStateDownloader {
         header.getHash());
     synchronized (this) {
       if (status == Status.RUNNING) {
-        CompletableFuture<Void> failed = new CompletableFuture<>();
+        final CompletableFuture<Void> failed = new CompletableFuture<>();
         failed.completeExceptionally(
             new IllegalStateException(
                 "Cannot run an already running " + this.getClass().getSimpleName()));
@@ -129,8 +138,9 @@ public class WorldStateDownloader {
       }
       status = Status.RUNNING;
       future = createFuture();
+      highestRetryCount.set(0);
 
-      Hash stateRoot = header.getStateRoot();
+      final Hash stateRoot = header.getStateRoot();
       if (worldStateStorage.isWorldStateAvailable(stateRoot)) {
         // If we're requesting data for an existing world state, we're already done
         markDone();
@@ -157,16 +167,16 @@ public class WorldStateDownloader {
           waitForNewPeer().whenComplete((r, t) -> requestNodeData(header));
           break;
         } else {
-          EthPeer peer = maybePeer.get();
+          final EthPeer peer = maybePeer.get();
 
           // Collect data to be requested
-          List<Task<NodeDataRequest>> toRequest = new ArrayList<>();
+          final List<Task<NodeDataRequest>> toRequest = new ArrayList<>();
           while (toRequest.size() < hashCountPerRequest) {
-            Task<NodeDataRequest> pendingRequestTask = pendingRequests.dequeue();
+            final Task<NodeDataRequest> pendingRequestTask = pendingRequests.dequeue();
             if (pendingRequestTask == null) {
               break;
             }
-            NodeDataRequest pendingRequest = pendingRequestTask.getData();
+            final NodeDataRequest pendingRequest = pendingRequestTask.getData();
             final Optional<BytesValue> existingData =
                 pendingRequest.getExistingData(worldStateStorage);
             if (existingData.isPresent()) {
@@ -182,7 +192,7 @@ public class WorldStateDownloader {
           sendAndProcessRequests(peer, toRequest, header)
               .whenComplete(
                   (task, error) -> {
-                    boolean done;
+                    final boolean done;
                     synchronized (this) {
                       outstandingRequests.remove(task);
                       done =
@@ -223,13 +233,13 @@ public class WorldStateDownloader {
       final EthPeer peer,
       final List<Task<NodeDataRequest>> requestTasks,
       final BlockHeader blockHeader) {
-    List<Hash> hashes =
+    final List<Hash> hashes =
         requestTasks.stream()
             .map(Task::getData)
             .map(NodeDataRequest::getHash)
             .distinct()
             .collect(Collectors.toList());
-    AbstractPeerTask<List<BytesValue>> ethTask =
+    final AbstractPeerTask<List<BytesValue>> ethTask =
         GetNodeDataFromPeerTask.forHashes(ethContext, hashes, ethTasksTimer).assignPeer(peer);
     outstandingRequests.add(ethTask);
     return ethTask
@@ -238,14 +248,15 @@ public class WorldStateDownloader {
         .thenApply(this::mapNodeDataByHash)
         .handle(
             (data, err) -> {
-              boolean requestFailed = err != null;
-              Updater storageUpdater = worldStateStorage.updater();
-              for (Task<NodeDataRequest> task : requestTasks) {
-                NodeDataRequest request = task.getData();
-                BytesValue matchingData = requestFailed ? null : data.get(request.getHash());
+              final boolean requestFailed = err != null;
+              final Updater storageUpdater = worldStateStorage.updater();
+              for (final Task<NodeDataRequest> task : requestTasks) {
+                final NodeDataRequest request = task.getData();
+                final BytesValue matchingData = requestFailed ? null : data.get(request.getHash());
                 if (matchingData == null) {
                   retriedRequestsTotal.inc();
-                  int requestFailures = request.trackFailure();
+                  final int requestFailures = request.trackFailure();
+                  updateHighestRetryCount(requestFailures);
                   if (requestFailures > maxNodeRequestRetries) {
                     handleStalledDownload();
                   }
@@ -269,6 +280,14 @@ public class WorldStateDownloader {
             });
   }
 
+  private void updateHighestRetryCount(final int requestFailures) {
+    int previousHighestRetry = highestRetryCount.get();
+    while (requestFailures > previousHighestRetry) {
+      highestRetryCount.compareAndSet(previousHighestRetry, requestFailures);
+      previousHighestRetry = highestRetryCount.get();
+    }
+  }
+
   private synchronized void queueChildRequests(final NodeDataRequest request) {
     if (status == Status.RUNNING) {
       request.getChildRequests().forEach(pendingRequests::enqueue);
@@ -283,7 +302,7 @@ public class WorldStateDownloader {
   }
 
   private CompletableFuture<Void> createFuture() {
-    CompletableFuture<Void> future = new CompletableFuture<>();
+    final CompletableFuture<Void> future = new CompletableFuture<>();
     future.whenComplete(
         (res, err) -> {
           // Handle cancellations
@@ -291,7 +310,9 @@ public class WorldStateDownloader {
             LOG.info("World state download cancelled");
             doCancelDownload();
           } else if (err != null) {
-            LOG.info("World state download failed. ", err);
+            if (!(ExceptionUtils.rootCause(err) instanceof StalledDownloadException)) {
+              LOG.info("World state download failed. ", err);
+            }
             doCancelDownload();
           }
         });
@@ -303,14 +324,14 @@ public class WorldStateDownloader {
         "Download stalled due to too many failures to retrieve node data (>"
             + maxNodeRequestRetries
             + " failures)";
-    WorldStateDownloaderException e = new StalledDownloadException(message);
+    final WorldStateDownloaderException e = new StalledDownloadException(message);
     future.completeExceptionally(e);
   }
 
   private synchronized void doCancelDownload() {
     status = Status.CANCELLED;
     pendingRequests.clear();
-    for (EthTask<?> outstandingRequest : outstandingRequests) {
+    for (final EthTask<?> outstandingRequest : outstandingRequests) {
       outstandingRequest.cancel();
     }
   }
@@ -329,7 +350,7 @@ public class WorldStateDownloader {
 
   private Map<Hash, BytesValue> mapNodeDataByHash(final List<BytesValue> data) {
     // Map data by hash
-    Map<Hash, BytesValue> dataByHash = new HashMap<>();
+    final Map<Hash, BytesValue> dataByHash = new HashMap<>();
     data.stream().forEach(d -> dataByHash.put(Hash.hash(d), d));
     return dataByHash;
   }
