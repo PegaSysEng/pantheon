@@ -88,6 +88,8 @@ nav:
           - Using the JSON-RPC API: Reference/Using-JSON-RPC-API.md
           - JSON-RPC API Methods: Reference/JSON-RPC-API-Methods.md
           - JSON-RPC API Objects: Reference/JSON-RPC-API-Objects.md
+    - Resources:
+        - Blog Posts and Webinars: Resources/Resources.md
 
 markdown_extensions:
     - toc:

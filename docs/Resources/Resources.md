@@ -17,5 +17,4 @@ description: Pantheon resources including blog posts, webinars, and meetup recor
 
 [Getting Started with Pantheon](https://www.youtube.com/watch?v=OKWBr94J9rY&t=1s)
 
-## Meetup and Conference Recordings 
 
