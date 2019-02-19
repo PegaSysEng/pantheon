@@ -932,7 +932,7 @@ This command provides password related actions.
 
 #### hash
 
-This command generates the hash of a given password. The hash is specified in the [credentials file](../JSON-RPC-API/Authentication.md#credentials-file)
+This command generates the hash of a given password. Include the hash in the [credentials file](../JSON-RPC-API/Authentication.md#credentials-file)
  for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
 
 ```bash tab="Syntax"
