@@ -2196,7 +2196,7 @@ Proposes [adding or removing a validator](../Consensus-Protocols/IBFT.md#adding-
 
 ### perm_addAccountsToWhitelist
 
-Adds accounts (participants) to the accounts whitelist. 
+Adds accounts (participants) to the [accounts whitelist](../Permissions/Permissioning.md#account-whitelisting). 
 
 **Parameters** 
 
@@ -2229,7 +2229,7 @@ including invalid account addresses.
     
 ### perm_getAccountsWhitelist
 
-Lists accounts (participants) in the accounts whitelist. 
+Lists accounts (participants) in the [accounts whitelist](../Permissions/Permissioning.md#account-whitelisting). 
 
 **Parameters** 
 
@@ -2261,7 +2261,7 @@ None
     
 ### perm_removeAccountsFromWhitelist
 
-Removes accounts (participants) from the accounts whitelist. 
+Removes accounts (participants) from the [accounts whitelist](../Permissions/Permissioning.md#account-whitelisting). 
 
 **Parameters** 
 
@@ -2293,7 +2293,7 @@ including invalid account addresses.
     ```
 ### perm_addNodesToWhitelist
 
-Adds nodes to the nodes whitelist. 
+Adds nodes to the [nodes whitelist](../Permissions/Permissioning.md#node-whitelisting). 
 
 **Parameters** 
 
@@ -2326,7 +2326,7 @@ including invalid enode URLs.
     
 ### perm_getNodesWhitelist
 
-Lists nodes in the nodes whitelist. 
+Lists nodes in the [nodes whitelist](../Permissions/Permissioning.md#node-whitelisting). 
 
 **Parameters** 
 
@@ -2358,7 +2358,7 @@ None
     
 ### perm_removeNodesFromWhitelist
 
-Removes nodes from the nodes whitelist. 
+Removes nodes from the [nodes whitelist](../Permissions/Permissioning.md#node-whitelisting). 
 
 **Parameters** 
 
@@ -2379,6 +2379,35 @@ including invalid enode URLs.
     
     ```bash tab="wscat WS request"
     {"jsonrpc":"2.0","method":"perm_removeNodesFromWhitelist","params":[["enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304"]], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "Success"
+    }
+    ```
+    
+### perm_reloadPermissionsFromFile
+
+Reloads the accounts and nodes whitelists from the [permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file). 
+
+**Parameters** 
+
+None
+
+**Returns** 
+
+`result` - `Success` or `error` if the permissions configuration file is not valid.
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_reloadPermissionsFromFile","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"perm_reloadPermissionsFromFile","params":[], "id":1}
     ```
     
     ```json tab="JSON result"
