@@ -555,7 +555,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (permissionsConfigFile != null) {
       if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
         throw new ParameterException(
-            this.commandLine, "Permissions config file set " + permissionsConfigFile + " but no permissions enabled");
+            this.commandLine,
+            "Permissions config file set " + permissionsConfigFile + " but no permissions enabled");
       }
     }
 
