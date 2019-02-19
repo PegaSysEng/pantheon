@@ -50,26 +50,9 @@ public class IbftExtraDataValidationRule implements AttachedBlockHeaderValidatio
       final BlockHeader header,
       final BlockHeader parent,
       final ProtocolContext<IbftContext> context) {
-    return validateExtraData(header, context);
-  }
-
-  /**
-   * Responsible for determining the validity of the extra data field. Ensures:
-   *
-   * <ul>
-   *   <li>Bytes in the extra data field can be decoded as per IBFT specification
-   *   <li>Proposer (derived from the proposerSeal) is a member of the validators
-   *   <li>Committers (derived from committerSeals) are all members of the validators
-   * </ul>
-   *
-   * @param header the block header containing the extraData to be validated.
-   * @return True if the extraData successfully produces an IstanbulExtraData object, false
-   *     otherwise
-   */
-  private boolean validateExtraData(
-      final BlockHeader header, final ProtocolContext<IbftContext> context) {
     try {
-      final ValidatorProvider validatorProvider = context.getConsensusState().getVoteTally();
+      final ValidatorProvider validatorProvider =
+          context.getConsensusState().getVoteTallyCache().getVoteTallyAfterBlock(parent);
       final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
 
       final Address proposer = IbftBlockHashing.recoverProposerAddress(header, ibftExtraData);

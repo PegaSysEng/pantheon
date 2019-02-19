@@ -92,7 +92,7 @@ public class ProposerSelectorTest {
     final LinkedList<Address> validatorList = createValidatorList(localAddr, 0, 4);
     final VoteTally voteTally = new VoteTally(validatorList);
 
-    final ProposerSelector uut = new ProposerSelector(blockchain, voteTally, blockInterface, true);
+    final ProposerSelector uut = new ProposerSelector(blockchain, blockInterface, true);
 
     final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(PREV_BLOCK_NUMBER + 1, 0);
 
@@ -110,7 +110,7 @@ public class ProposerSelectorTest {
     final LinkedList<Address> validatorList = createValidatorList(localAddr, 4, 0);
     final VoteTally voteTally = new VoteTally(validatorList);
 
-    final ProposerSelector uut = new ProposerSelector(blockchain, voteTally, blockInterface, true);
+    final ProposerSelector uut = new ProposerSelector(blockchain, blockInterface, true);
 
     final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(PREV_BLOCK_NUMBER + 1, 0);
 
@@ -129,7 +129,7 @@ public class ProposerSelectorTest {
     final LinkedList<Address> validatorList = createValidatorList(localAddr, 4, 0);
     final VoteTally voteTally = new VoteTally(validatorList);
 
-    final ProposerSelector uut = new ProposerSelector(blockchain, voteTally, blockInterface, false);
+    final ProposerSelector uut = new ProposerSelector(blockchain, blockInterface, false);
     final Address nextProposer = uut.selectProposerForRound(roundId);
 
     assertThat(nextProposer).isEqualTo(localAddr);
@@ -146,7 +146,7 @@ public class ProposerSelectorTest {
     final LinkedList<Address> validatorList = createValidatorList(localAddr, 4, 0);
     final VoteTally voteTally = new VoteTally(validatorList);
 
-    final ProposerSelector uut = new ProposerSelector(blockchain, voteTally, blockInterface, false);
+    final ProposerSelector uut = new ProposerSelector(blockchain, blockInterface, false);
     assertThat(uut.selectProposerForRound(roundId)).isEqualTo(localAddr);
 
     roundId = new ConsensusRoundIdentifier(PREV_BLOCK_NUMBER + 1, 1);
@@ -172,7 +172,7 @@ public class ProposerSelectorTest {
     // Note the signer of the Previous block was not included.
     final VoteTally voteTally = new VoteTally(validatorList);
 
-    final ProposerSelector uut = new ProposerSelector(blockchain, voteTally, blockInterface, false);
+    final ProposerSelector uut = new ProposerSelector(blockchain, blockInterface, false);
 
     assertThat(uut.selectProposerForRound(roundId)).isEqualTo(validatorList.get(2));
   }
@@ -193,7 +193,7 @@ public class ProposerSelectorTest {
     // Note the signer of the Previous block was not included.
     final VoteTally voteTally = new VoteTally(validatorList);
 
-    final ProposerSelector uut = new ProposerSelector(blockchain, voteTally, blockInterface, true);
+    final ProposerSelector uut = new ProposerSelector(blockchain, blockInterface, true);
 
     assertThat(uut.selectProposerForRound(roundId)).isEqualTo(validatorList.get(2));
   }
@@ -214,7 +214,7 @@ public class ProposerSelectorTest {
     // Note the signer of the Previous block was not included.
     final VoteTally voteTally = new VoteTally(validatorList);
 
-    final ProposerSelector uut = new ProposerSelector(blockchain, voteTally, blockInterface, false);
+    final ProposerSelector uut = new ProposerSelector(blockchain, blockInterface, false);
 
     assertThat(uut.selectProposerForRound(roundId)).isEqualTo(validatorList.get(0));
   }
