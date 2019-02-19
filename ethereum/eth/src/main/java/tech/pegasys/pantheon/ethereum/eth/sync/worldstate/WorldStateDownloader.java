@@ -90,11 +90,17 @@ public class WorldStateDownloader {
     this.maxOutstandingRequests = maxOutstandingRequests;
     this.maxNodeRequestRetries = maxNodeRequestRetries;
     this.ethTasksTimer = ethTasksTimer;
-    metricsSystem.createGauge(
+    metricsSystem.createLongGauge(
         MetricCategory.SYNCHRONIZER,
         "world_state_pending_requests_current",
         "Number of pending requests for fast sync world state download",
-        () -> (double) pendingRequests.size());
+        pendingRequests::size);
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.SYNCHRONIZER,
+        "world_state_inflight_requests_current",
+        "Number of requests currently in flight for fast sync world state download",
+        outstandingRequests::size);
 
     completedRequestsCounter =
         metricsSystem.createCounter(
@@ -144,7 +150,7 @@ public class WorldStateDownloader {
   private void requestNodeData(final BlockHeader header) {
     if (sendingRequests.compareAndSet(false, true)) {
       while (shouldRequestNodeData()) {
-        Optional<EthPeer> maybePeer = ethContext.getEthPeers().idlePeer(header.getNumber());
+        final Optional<EthPeer> maybePeer = ethContext.getEthPeers().idlePeer(header.getNumber());
 
         if (!maybePeer.isPresent()) {
           // If no peer is available, wait and try again
