@@ -113,6 +113,17 @@ public class FutureMessageBufferTest {
   }
 
   @Test
+  public void doNotMessageWhenMessageHeightIsHighestAndOverLimit() {
+    DefaultMessage[] height1Msgs = addMessages(0, 1, 4);
+    DefaultMessage[] height2Msgs = addMessages(0, 2, 1);
+    futureMsgBuffer.addMessage(0, 3, message);
+
+    assertThat(futureMsgBuffer.poll(1)).containsExactly(height1Msgs);
+    assertThat(futureMsgBuffer.poll(2)).containsExactly(height2Msgs);
+    assertThat(futureMsgBuffer.poll(3)).isEmpty();
+  }
+
+  @Test
   public void totalMessagesSizeUpdatedWhenMessagesAdded() {
     futureMsgBuffer = new FutureMessageBuffer(5, 10);
 

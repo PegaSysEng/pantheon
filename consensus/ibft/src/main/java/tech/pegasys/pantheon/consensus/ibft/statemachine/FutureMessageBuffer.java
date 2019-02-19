@@ -48,11 +48,11 @@ public class FutureMessageBuffer {
       return;
     }
 
-    if (totalMessagesSize() >= futureMessagesLimit) {
+    addMessageToBuffer(msgChainHeight, rawMsg);
+
+    if (totalMessagesSize() > futureMessagesLimit) {
       evictMessages();
     }
-
-    addMessageToBuffer(msgChainHeight, rawMsg);
   }
 
   private void addMessageToBuffer(final long msgChainHeight, final Message rawMsg) {
