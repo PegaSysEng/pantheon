@@ -96,6 +96,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   private final IbftProtocolManager ibftProtocolManager;
   private final KeyPair keyPair;
   private final TransactionPool transactionPool;
+  private MiningCoordinator ibftMiningCoordinator;
   private final Runnable closer;
 
   IbftPantheonController(
@@ -107,8 +108,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final Synchronizer synchronizer,
       final KeyPair keyPair,
       final TransactionPool transactionPool,
+      final MiningCoordinator ibftMiningCoordinator,
       final Runnable closer) {
-
     this.protocolSchedule = protocolSchedule;
     this.context = context;
     this.ethSubProtocol = ethSubProtocol;
@@ -117,6 +118,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     this.synchronizer = synchronizer;
     this.keyPair = keyPair;
     this.transactionPool = transactionPool;
+    this.ibftMiningCoordinator = ibftMiningCoordinator;
     this.closer = closer;
   }
 
@@ -287,6 +289,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         synchronizer,
         nodeKeys,
         transactionPool,
+        ibftMiningCoordinator,
         closer);
   }
 
@@ -324,7 +327,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
   @Override
   public MiningCoordinator getMiningCoordinator() {
-    return null;
+    return ibftMiningCoordinator;
   }
 
   @Override
