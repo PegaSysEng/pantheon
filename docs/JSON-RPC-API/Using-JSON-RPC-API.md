@@ -64,6 +64,7 @@ Send individual requests as a JSON data package at each prompt:
 > {"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":53}
 ```
 
+<<<<<<< HEAD:docs/JSON-RPC-API/Using-JSON-RPC-API.md
 The [RPC Pub/Sub methods](../Using-Pantheon/RPC-PubSub.md) can also be used over WebSockets.
 
 !!! note 
@@ -71,6 +72,9 @@ The [RPC Pub/Sub methods](../Using-Pantheon/RPC-PubSub.md) can also be used over
     request header. To use authentication with WebSockets, an app that supports headers is required. 
 
 ## API Methods Enabled by Default
+=======
+### API Methods Enabled by Default
+>>>>>>> 149c0c24631231f8a96f5740534d309774e99ff5:docs/Reference/Using-JSON-RPC-API.md
 
 The `ETH`, `NET`, and `WEB3` API methods are enabled by default. 
 
