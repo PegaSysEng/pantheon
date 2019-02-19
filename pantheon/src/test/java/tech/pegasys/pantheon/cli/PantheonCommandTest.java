@@ -337,6 +337,31 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void permissionsTomlFileWithNoPermissionsEnabledMustError() throws IOException {
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final Path permToml = Files.createTempFile("toml", "");
+    Files.write(permToml, Resources.toByteArray(configFile));
+    parseCommand("--permissions-config-file", permToml.toString());
+    permToml.toFile().deleteOnExit();
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).contains("no permissions enabled");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void defaultPermissionsTomlFileWithNoPermissionsEnabledMustError() throws IOException {
+    parseCommand("--p2p-enabled", "false");
+
+    verify(mockRunnerBuilder).build();
+
+    assertThat(commandErrorOutput.toString()).doesNotContain("no permissions enabled");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void permissionsTomlPathMustUseOption() throws IOException {
 
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
