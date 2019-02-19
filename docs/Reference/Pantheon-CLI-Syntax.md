@@ -926,6 +926,18 @@ $ pantheon public-key export --to=/home/me/me_project/not_precious_pub_key
 
 Exports node public key to the specified file. 
 
+#### export-address
+
+```bash tab="Syntax"
+$ pantheon public-key export-address --to=<address-file>
+```
+
+```bash tab="Example"
+$ pantheon public-key export-address --to=/home/me/me_project/me_node_address
+```
+
+Exports node public key address to the specified file. 
+
 ### password
 
 This command provides password related actions.
