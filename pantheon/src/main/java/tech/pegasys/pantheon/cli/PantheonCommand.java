@@ -690,7 +690,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setRpcApis(rpcWsApis);
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
-    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile());
+    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile);
     return webSocketConfiguration;
   }
 
@@ -956,63 +956,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return nodePrivateKeyFile != null
         ? nodePrivateKeyFile
         : KeyPairUtil.getDefaultKeyFile(dataDir());
-  }
-
-  private File privacyPublicKeyFile() {
-    if (isDocker) {
-      final File keyFile = new File(DOCKER_PRIVACY_PUBLIC_KEY_FILE);
-      if (keyFile.exists()) {
-        return keyFile;
-      } else {
-        return null;
-      }
-    } else {
-      return standaloneCommands.privacyPublicKeyFile;
-    }
-  }
-
-  private String rpcHttpAuthenticationCredentialsFile() throws Exception {
-    if (isFullInstantiation()) {
-      return standaloneCommands.rpcHttpAuthenticationCredentialsFile;
-    } else if (isDocker) {
-      final File authFile = new File(DOCKER_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
-      if (authFile.exists()) {
-        final String path = authFile.getAbsolutePath();
-        try {
-          new RpcAuthConverter().convert(path);
-        } catch (Exception e) {
-          throw new ParameterException(
-              commandLine, "Invalid RPC HTTP authentication credentials file: " + e.getMessage());
-        }
-        return path;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }
-
-  private String rpcWsAuthenticationCredentialsFile() {
-    if (isFullInstantiation()) {
-      return standaloneCommands.rpcWsAuthenticationCredentialsFile;
-    } else if (isDocker) {
-      final File authFile = new File(DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
-      if (authFile.exists()) {
-        final String path = authFile.getAbsolutePath();
-        try {
-          new RpcAuthConverter().convert(path);
-        } catch (Exception e) {
-          throw new ParameterException(
-              commandLine, "Invalid RPC WS authentication credentials file: " + e.getMessage());
-        }
-        return path;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
   }
 
   private boolean isFullInstantiation() {
