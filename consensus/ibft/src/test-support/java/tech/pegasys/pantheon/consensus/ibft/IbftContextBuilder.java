@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
@@ -25,10 +26,10 @@ import java.util.Collection;
 
 public class IbftContextBuilder {
 
-  public static IbftContext setupContextWithValidators(Collection<Address> validators) {
-    final IbftContext ibftContext = mock(IbftContext.class);
-    final VoteTallyCache mockCache = mock(VoteTallyCache.class);
-    final VoteTally mockVoteTally = mock(VoteTally.class);
+  public static IbftContext setupContextWithValidators(final Collection<Address> validators) {
+    final IbftContext ibftContext = mock(IbftContext.class, withSettings().lenient());
+    final VoteTallyCache mockCache = mock(VoteTallyCache.class, withSettings().lenient());
+    final VoteTally mockVoteTally = mock(VoteTally.class, withSettings().lenient());
     when(ibftContext.getVoteTallyCache()).thenReturn(mockCache);
     when(mockCache.getVoteTallyAfterBlock(any())).thenReturn(mockVoteTally);
     when(mockVoteTally.getValidators()).thenReturn(validators);

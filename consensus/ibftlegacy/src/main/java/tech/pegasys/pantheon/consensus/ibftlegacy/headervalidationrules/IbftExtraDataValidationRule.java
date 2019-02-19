@@ -25,6 +25,8 @@ import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.google.common.collect.Iterables;
 import org.apache.logging.log4j.LogManager;
@@ -72,6 +74,17 @@ public class IbftExtraDataValidationRule implements AttachedBlockHeaderValidatio
         }
       }
 
+      final SortedSet<Address> sortedReportedValidators =
+          new TreeSet<>(ibftExtraData.getValidators());
+
+      if (!Iterables.elementsEqual(ibftExtraData.getValidators(), sortedReportedValidators)) {
+        LOG.trace(
+            "Validators are not sorted in ascending order. Expected {} but got {}.",
+            sortedReportedValidators,
+            ibftExtraData.getValidators());
+        return false;
+      }
+
       if (!Iterables.elementsEqual(ibftExtraData.getValidators(), storedValidators)) {
         LOG.trace(
             "Incorrect validators. Expected {} but got {}.",
@@ -85,6 +98,9 @@ public class IbftExtraDataValidationRule implements AttachedBlockHeaderValidatio
       return false;
     } catch (final IllegalArgumentException ex) {
       LOG.trace("Failed to verify extra data", ex);
+      return false;
+    } catch (final RuntimeException ex) {
+      LOG.trace("Failed to find validators at parent");
       return false;
     }
 

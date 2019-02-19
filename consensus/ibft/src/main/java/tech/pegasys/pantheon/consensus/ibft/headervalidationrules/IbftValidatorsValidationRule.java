@@ -22,6 +22,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.AttachedBlockHeaderValidationRule;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 
 import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.google.common.collect.Iterables;
 import org.apache.logging.log4j.LogManager;
@@ -46,8 +48,18 @@ public class IbftValidatorsValidationRule
           context.getConsensusState().getVoteTallyCache().getVoteTallyAfterBlock(parent);
       final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
 
-      final Collection<Address> storedValidators = validatorProvider.getValidators();
+      final SortedSet<Address> sortedReportedValidators =
+          new TreeSet<>(ibftExtraData.getValidators());
 
+      if (!Iterables.elementsEqual(ibftExtraData.getValidators(), sortedReportedValidators)) {
+        LOGGER.trace(
+            "Validators are not sorted in ascending order. Expected {} but got {}.",
+            sortedReportedValidators,
+            ibftExtraData.getValidators());
+        return false;
+      }
+
+      final Collection<Address> storedValidators = validatorProvider.getValidators();
       if (!Iterables.elementsEqual(ibftExtraData.getValidators(), storedValidators)) {
         LOGGER.trace(
             "Incorrect validators. Expected {} but got {}.",

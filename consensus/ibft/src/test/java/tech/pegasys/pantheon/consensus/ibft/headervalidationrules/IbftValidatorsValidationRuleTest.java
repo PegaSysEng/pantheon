@@ -52,12 +52,13 @@ public class IbftValidatorsValidationRuleTest {
 
     final List<Address> validators =
         Lists.newArrayList(
-            AddressHelpers.ofValue(3), AddressHelpers.ofValue(2), AddressHelpers.ofValue(1));
+            AddressHelpers.ofValue(1), AddressHelpers.ofValue(2), AddressHelpers.ofValue(3));
 
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
-    final BlockHeader header = createProposedBlockHeader(validators, emptyList(), false);
+    final BlockHeader header =
+        createProposedBlockHeader(Lists.reverse(validators), emptyList(), false);
 
     assertThat(validatorsValidationRule.validate(header, null, context)).isFalse();
   }

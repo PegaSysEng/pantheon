@@ -37,7 +37,7 @@ import org.junit.Test;
 
 public class IbftBlockHeaderValidationRulesetFactoryTest {
 
-  private final ProtocolContext<IbftContext> protocolContext(Collection<Address> validators) {
+  private final ProtocolContext<IbftContext> protocolContext(final Collection<Address> validators) {
     return new ProtocolContext<>(null, null, setupContextWithValidators(validators));
   }
 

@@ -43,7 +43,8 @@ import org.junit.Test;
 
 public class IbftBlockHeaderValidationRulesetFactoryTest {
 
-  private ProtocolContext<IbftContext> setupContextWithValidators(Collection<Address> validators) {
+  private ProtocolContext<IbftContext> setupContextWithValidators(
+      final Collection<Address> validators) {
     final IbftContext ibftContext = mock(IbftContext.class);
     final VoteTallyCache mockCache = mock(VoteTallyCache.class);
     final VoteTally mockVoteTally = mock(VoteTally.class);
