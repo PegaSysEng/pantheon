@@ -345,9 +345,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--permissions-config-file", permToml.toString());
     permToml.toFile().deleteOnExit();
 
-    verifyZeroInteractions(mockRunnerBuilder);
+    verify(mockRunnerBuilder).build();
 
-    assertThat(commandErrorOutput.toString()).contains("no permissions enabled");
+    assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
   }
 
