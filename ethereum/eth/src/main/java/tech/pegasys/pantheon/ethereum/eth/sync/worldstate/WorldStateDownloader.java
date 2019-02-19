@@ -145,8 +145,7 @@ public class WorldStateDownloader {
         pendingRequests.enqueue(NodeDataRequest.createAccountDataRequest(stateRoot));
       }
     }
-
-    requestNodeData(header);
+    ethContext.getScheduler().scheduleSyncWorkerTask(() -> requestNodeData(header));
     return future;
   }
 
