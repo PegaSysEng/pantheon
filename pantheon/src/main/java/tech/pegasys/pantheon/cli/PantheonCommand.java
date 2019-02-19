@@ -30,7 +30,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
-import tech.pegasys.pantheon.cli.custom.RpcAuthConverter;
+import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -65,7 +65,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -319,7 +318,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Long configureRefreshDelay(final Long refreshDelay) {
     if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
       throw new ParameterException(
-          new CommandLine(this),
+          this.commandLine,
           String.format(
               "Refresh delay must be a positive integer between %s and %s",
               String.valueOf(DEFAULT_MIN_REFRESH_DELAY),
@@ -548,7 +547,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
       throw new ParameterException(
-          new CommandLine(this),
+          this.commandLine,
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
@@ -575,7 +574,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           metricsConfiguration(),
           permissioningConfiguration);
     } catch (Exception e) {
-      throw new ParameterException(new CommandLine(this), e.getMessage());
+      throw new ParameterException(this.commandLine, e.getMessage());
     }
   }
 
@@ -591,7 +590,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
           ethNetworkConfig, permissioningConfiguration);
     } catch (final Exception e) {
-      throw new ParameterException(new CommandLine(this), e.getMessage());
+      throw new ParameterException(this.commandLine, e.getMessage());
     }
   }
 
@@ -610,9 +609,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .privacyParameters(privacyParameters())
           .build();
     } catch (final InvalidConfigurationException e) {
-      throw new ExecutionException(new CommandLine(this), e.getMessage());
+      throw new ExecutionException(this.commandLine, e.getMessage());
     } catch (final IOException e) {
-      throw new ExecutionException(new CommandLine(this), "Invalid path", e);
+      throw new ExecutionException(this.commandLine, "Invalid path", e);
     }
   }
 
@@ -641,12 +640,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--rpc-http-authentication-enabled",
             "--rpc-http-authentication-credentials-file"));
 
-    CommandLineUtils.checkOptionDependencies(
-        logger,
-        commandLine,
-        "--rpc-http-authentication-enabled",
-        !isRpcHttpAuthenticationEnabled,
-        Collections.singletonList("--rpc-http-authentication-credentials-file"));
+    if (isRpcHttpAuthenticationEnabled && rpcHttpAuthenticationCredentialsFile() == null) {
+      throw new ParameterException(
+          commandLine,
+          "Unable to authenticate RPC HTTP endpoint without a supplied credentials file");
+    }
 
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     jsonRpcConfiguration.setEnabled(isRpcHttpEnabled);
@@ -676,12 +674,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--rpc-ws-authentication-enabled",
             "--rpc-ws-authentication-credentials-file"));
 
-    CommandLineUtils.checkOptionDependencies(
-        logger,
-        commandLine,
-        "--rpc-ws-authentication-enabled",
-        !isRpcWsAuthenticationEnabled,
-        Collections.singletonList("--rpc-ws-authentication-credentials-file"));
+    if (isRpcWsAuthenticationEnabled && rpcWsAuthenticationCredentialsFile() == null) {
+      throw new ParameterException(
+          commandLine,
+          "Unable to authenticate RPC WS endpoint without a supplied credentials file");
+    }
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(isRpcWsEnabled);
@@ -691,13 +688,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
     webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile());
+    webSocketConfiguration.setHostsWhitelist(hostsWhitelist);
     return webSocketConfiguration;
   }
 
   MetricsConfiguration metricsConfiguration() {
     if (isMetricsEnabled && isMetricsPushEnabled) {
       throw new ParameterException(
-          new CommandLine(this),
+          this.commandLine,
           "--metrics-enabled option and --metrics-push-enabled option can't be used at the same "
               + "time.  Please refer to CLI reference for more details about this constraint.");
     }
@@ -861,7 +859,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         // if user provided it and provided the genesis file option at the same time, it raises a
         // conflict error
         throw new ParameterException(
-            new CommandLine(this),
+            this.commandLine,
             "--network option and --genesis-file option can't be used at the same time.  Please "
                 + "refer to CLI reference for more details about this constraint.");
       }
@@ -885,9 +883,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
                   .orElse(EthNetworkConfig.getNetworkConfig(MAINNET).getNetworkId()));
         } catch (final DecodeException e) {
           throw new ParameterException(
-              new CommandLine(this),
-              String.format("Unable to parse genesis file %s.", genesisFile),
-              e);
+              this.commandLine, String.format("Unable to parse genesis file %s.", genesisFile), e);
         }
       }
 
@@ -916,9 +912,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Resources.toString(genesisFile().toURI().toURL(), UTF_8);
     } catch (final IOException e) {
       throw new ParameterException(
-          new CommandLine(this),
-          String.format("Unable to load genesis file %s.", genesisFile()),
-          e);
+          this.commandLine, String.format("Unable to load genesis file %s.", genesisFile()), e);
     }
   }
 
@@ -939,7 +933,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private Path dataDir() {
     if (isFullInstantiation()) {
-      return standaloneCommands.dataPath;
+      return standaloneCommands.dataPath.toAbsolutePath();
     } else if (isDocker) {
       return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {
@@ -972,47 +966,37 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private String rpcHttpAuthenticationCredentialsFile() throws Exception {
+    String filename = null;
     if (isFullInstantiation()) {
-      return standaloneCommands.rpcHttpAuthenticationCredentialsFile;
+      filename = standaloneCommands.rpcHttpAuthenticationCredentialsFile;
     } else if (isDocker) {
       final File authFile = new File(DOCKER_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
       if (authFile.exists()) {
-        final String path = authFile.getAbsolutePath();
-        try {
-          new RpcAuthConverter().convert(path);
-        } catch (Exception e) {
-          throw new ParameterException(
-              commandLine, "Invalid RPC HTTP authentication credentials file: " + e.getMessage());
-        }
-        return path;
-      } else {
-        return null;
+        filename = authFile.getAbsolutePath();
       }
-    } else {
-      return null;
     }
+
+    if (filename != null) {
+      RpcAuthFileValidator.validate(commandLine, filename, "HTTP");
+    }
+    return filename;
   }
 
   private String rpcWsAuthenticationCredentialsFile() {
+    String filename = null;
     if (isFullInstantiation()) {
-      return standaloneCommands.rpcWsAuthenticationCredentialsFile;
+      filename = standaloneCommands.rpcWsAuthenticationCredentialsFile;
     } else if (isDocker) {
       final File authFile = new File(DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
       if (authFile.exists()) {
-        final String path = authFile.getAbsolutePath();
-        try {
-          new RpcAuthConverter().convert(path);
-        } catch (Exception e) {
-          throw new ParameterException(
-              commandLine, "Invalid RPC WS authentication credentials file: " + e.getMessage());
-        }
-        return path;
-      } else {
-        return null;
+        filename = authFile.getAbsolutePath();
       }
-    } else {
-      return null;
     }
+
+    if (filename != null) {
+      RpcAuthFileValidator.validate(commandLine, filename, "WS");
+    }
+    return filename;
   }
 
   private boolean isFullInstantiation() {
