@@ -648,11 +648,11 @@ rpc-http-api=["ETH","NET","WEB3"]
 
 Comma-separated APIs to enable on the HTTP JSON-RPC channel.
 When you use this option, the `--rpc-http-enabled` option must also be specified.
-The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, and `MINER`.
+The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `PERM`, `DEBUG`, `MINER`, and `EEA`.
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    IBFT 2.0 is under development and will be available in v1.0.  
+    EEA methods are for privacy features. Privacy features are under development and will be available in v1.1.  
 
 !!!tip
     The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are just two
@@ -807,11 +807,11 @@ rpc-ws-api=["ETH","NET","WEB3"]
 
 Comma-separated APIs to enable on WebSockets channel.
 When you use this option, the `--rpc-ws-enabled` option must also be specified.
-The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, and `MINER`.
+The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `PERM', DEBUG`, `MINER` and `EEA`.
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    IBFT 2.0 is under development and will be available in v1.0.  
+    EEA methods are for privacy features. Privacy features are under development and will be available in v1.1.  
 
 !!!tip
     The singular `--rpc-ws-api` and plural `--rpc-ws-apis` are available and are just two
