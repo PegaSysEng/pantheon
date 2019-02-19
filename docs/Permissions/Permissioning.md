@@ -10,7 +10,7 @@ account permissions enabled, or both.
 ## Node Whitelisting 
 
 Node whitelisting is specified by the nodes whitelist in the [permissions configuration file](#permissions-configuration-file) file. 
-A node with node whitelisting enabled communicates only with nodes in the nodes whitelist. 
+When node whitelisting is enabled, communication is restricted to only nodes in the whitelist. 
 
 !!! example "Nodes Whitelist in Permissions Configuration File"
     `nodes-whitelist=["enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.9:4567","enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.169.0.9:4568"]`
@@ -45,7 +45,7 @@ To view or update the nodes whitelist when the node is running, use the JSON-RPC
 The bootnodes must be included in the nodes whitelist or Pantheon does not start when node permissions are enabled. 
 
 !!! example 
-    If you start Pantheon with:
+    If you start Pantheon with specified bootnodes and have node permissions enabled:
     
      ```bash
      --bootnodes="enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304","enode://7b61d5ee4b44335873e6912cb5dd3e3877c860ba21417c9b9ef1f7e500a82213737d4b269046d0669fb2299a234ca03443f25fe5f706b693b3669e5c92478ade@127.0.0.1:30305" 
