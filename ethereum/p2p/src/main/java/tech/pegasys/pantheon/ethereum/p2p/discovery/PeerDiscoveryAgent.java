@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.DisconnectCallback;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.Packet;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDiscoveryController;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
@@ -86,6 +87,7 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
   /* Is discovery enabled? */
   private boolean isActive = false;
   private final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers = new Subscribers<>();
+  private final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers = new Subscribers<>();
 
   public PeerDiscoveryAgent(
       final SECP256K1.KeyPair keyPair,
@@ -121,13 +123,12 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
   public abstract CompletableFuture<?> stop();
 
   public CompletableFuture<?> start() {
-    final CompletableFuture<?> future = new CompletableFuture<>();
     if (config.isActive()) {
       final String host = config.getBindHost();
       final int port = config.getBindPort();
       LOG.info("Starting peer discovery agent on host={}, port={}", host, port);
 
-      listenForConnections()
+      return listenForConnections()
           .thenAccept(
               (InetSocketAddress localAddress) -> {
                 // Once listener is set up, finish initializing
@@ -140,21 +141,11 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
                         localAddress.getPort());
                 isActive = true;
                 startController();
-              })
-          .whenComplete(
-              (res, err) -> {
-                // Finalize future
-                if (err != null) {
-                  future.completeExceptionally(err);
-                } else {
-                  future.complete(null);
-                }
               });
     } else {
       this.isActive = false;
-      future.complete(null);
+      return CompletableFuture.completedFuture(null);
     }
-    return future;
   }
 
   private void startController() {
@@ -175,7 +166,8 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
         peerRequirement,
         peerBlacklist,
         nodeWhitelistController,
-        peerBondedObservers);
+        peerBondedObservers,
+        peerDroppedObservers);
   }
 
   protected boolean validatePacketSize(final int packetSize) {
@@ -273,6 +265,29 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
   }
 
   /**
+   * Adds an observer that will get called when a peer is dropped from the peer table.
+   *
+   * <p><i>No guarantees are made about the order in which observers are invoked.</i>
+   *
+   * @param observer The observer to call.
+   * @return A unique ID identifying this observer, to that it can be removed later.
+   */
+  public long observePeerDroppedEvents(final Consumer<PeerDroppedEvent> observer) {
+    checkNotNull(observer);
+    return peerDroppedObservers.subscribe(observer);
+  }
+
+  /**
+   * Removes an previously added peer dropped observer.
+   *
+   * @param observerId The unique ID identifying the observer to remove.
+   * @return Whether the observer was located and removed.
+   */
+  public boolean removePeerDroppedObserver(final long observerId) {
+    return peerDroppedObservers.unsubscribe(observerId);
+  }
+
+  /**
    * Returns the count of observers that are registered on this controller.
    *
    * @return The observer count.
@@ -303,7 +318,7 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
       final DisconnectMessage.DisconnectReason reason,
       final boolean initiatedByPeer) {
     final BytesValue nodeId = connection.getPeer().getNodeId();
-    peerTable.evict(new DefaultPeerId(nodeId));
+    peerTable.tryEvict(new DefaultPeerId(nodeId));
   }
 
   /**
