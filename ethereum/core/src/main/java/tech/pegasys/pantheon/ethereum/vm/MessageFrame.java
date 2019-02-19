@@ -183,10 +183,8 @@ public class MessageFrame {
 
   // Global data fields.
   private final WorldUpdater worldState;
+  private final HashMap<Integer, WorldUpdater> privateWorldStates;
   private final Blockchain blockchain;
-
-  // Private Global data fields
-  private HashMap<Integer, WorldUpdater> privateWorldStates;
 
   // Metadata fields.
   private final Type type;
@@ -237,6 +235,7 @@ public class MessageFrame {
       final Blockchain blockchain,
       final Deque<MessageFrame> messageFrameStack,
       final WorldUpdater worldState,
+      final HashMap<Integer, WorldUpdater> privateWorldStates,
       final Gas initialGas,
       final Address recipient,
       final Address originator,
@@ -257,6 +256,7 @@ public class MessageFrame {
     this.blockchain = blockchain;
     this.messageFrameStack = messageFrameStack;
     this.worldState = worldState;
+    this.privateWorldStates = privateWorldStates;
     this.gasRemaining = initialGas;
     this.blockHashLookup = blockHashLookup;
     this.pc = 0;
@@ -653,26 +653,28 @@ public class MessageFrame {
   }
 
   /**
+   * Return the private world states
+   *
+   * @return the private world states
+   */
+  public HashMap<Integer, WorldUpdater> getPrivateWorldStates() {
+    return privateWorldStates;
+  }
+
+  /**
    * Return the private world state for the corresponding privacyGroupId.
    *
    * @param privacyGroupId Identifier for the privacy group
    * @return the private world state for that privacy group
    */
   public WorldUpdater getPrivateWorldState(final Integer privacyGroupId) {
-    PrivateMutableWorldState privateMutableWorldState =
-        new PrivateMutableWorldState(
-            new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage()));
-    return privateWorldStates.getOrDefault(privacyGroupId, privateMutableWorldState.updater());
+    return privateWorldStates.getOrDefault(privacyGroupId, createInitialPrivateWorldState());
   }
 
-  /**
-   * Set the private world state for the privacyGroupId.
-   *
-   * @param privacyGroupId Identifier for the privacy group
-   * @param worldState Private world state for the given privacy group
-   */
-  public void setPrivateWorldStates(final Integer privacyGroupId, final WorldUpdater worldState) {
-    privateWorldStates.put(privacyGroupId, worldState);
+  private WorldUpdater createInitialPrivateWorldState() {
+    return new PrivateMutableWorldState(
+            new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage()))
+        .updater();
   }
 
   /**
@@ -846,6 +848,7 @@ public class MessageFrame {
     private Blockchain blockchain;
     private Deque<MessageFrame> messageFrameStack;
     private WorldUpdater worldState;
+    private HashMap<Integer, WorldUpdater> privateWorldStates;
     private Gas initialGas;
     private Address address;
     private Address originator;
@@ -880,6 +883,11 @@ public class MessageFrame {
 
     public Builder worldState(final WorldUpdater worldState) {
       this.worldState = worldState;
+      return this;
+    }
+
+    public Builder privateWorldStates(final HashMap<Integer, WorldUpdater> privateWorldStates) {
+      this.privateWorldStates = privateWorldStates;
       return this;
     }
 
@@ -968,6 +976,7 @@ public class MessageFrame {
       checkState(blockchain != null, "Missing message frame blockchain");
       checkState(messageFrameStack != null, "Missing message frame message frame stack");
       checkState(worldState != null, "Missing message frame world state");
+      checkState(privateWorldStates != null, "Missing message frame private world states");
       checkState(initialGas != null, "Missing message frame initial getGasRemaining");
       checkState(address != null, "Missing message frame recipient");
       checkState(originator != null, "Missing message frame originator");
@@ -993,6 +1002,7 @@ public class MessageFrame {
           blockchain,
           messageFrameStack,
           worldState,
+          privateWorldStates,
           initialGas,
           address,
           originator,

@@ -33,6 +33,7 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
 import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
+import tech.pegasys.pantheon.ethereum.vm.OperationTracer;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -79,13 +80,14 @@ public class PrivacyPrecompiledContractIntegrationTest {
     PrivateTransactionProcessor.Result result =
         PrivateTransactionProcessor.Result.successful(
             null, 0, BytesValue.fromHexString(DEFAULT_OUTPUT), null);
-    when(mockPrivateTransactionProcessor.processPrivateTransaction(
+    when(mockPrivateTransactionProcessor.processTransaction(
             nullable(Blockchain.class),
             nullable(WorldUpdater.class),
             nullable(WorldUpdater.class),
             nullable(ProcessableBlockHeader.class),
             nullable(PrivateTransaction.class),
             nullable(Address.class),
+            nullable(OperationTracer.class),
             nullable(BlockHashLookup.class)))
         .thenReturn(result);
 

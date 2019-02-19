@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
+import tech.pegasys.pantheon.ethereum.vm.OperationTracer;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -76,18 +77,19 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
           new BytesValueRLPInput(
               BytesValue.wrap(Base64.getDecoder().decode(receiveResponse.getPayload())), false);
 
-      PrivateTransaction transaction = PrivateTransaction.readFrom(bytesValueRLPInput);
+      PrivateTransaction privateTransaction = PrivateTransaction.readFrom(bytesValueRLPInput);
 
       WorldUpdater privateWorldState = messageFrame.getPrivateWorldState(DEFAULT_PRIVACY_GROUP_ID);
       WorldUpdater publicWorldState = messageFrame.getWorldState();
       TransactionProcessor.Result result =
-          privateTransactionProcessor.processPrivateTransaction(
+          privateTransactionProcessor.processTransaction(
               messageFrame.getBlockchain(),
-              privateWorldState,
               publicWorldState,
+              privateWorldState,
               messageFrame.getBlockHeader(),
-              transaction,
+              privateTransaction,
               messageFrame.getMiningBeneficiary(),
+              OperationTracer.NO_TRACING,
               messageFrame.getBlockHashLookup());
 
       return result.getOutput();

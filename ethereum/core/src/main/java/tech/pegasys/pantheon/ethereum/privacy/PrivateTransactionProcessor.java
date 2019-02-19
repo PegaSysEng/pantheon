@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
-import static tech.pegasys.pantheon.ethereum.vm.OperationTracer.NO_TRACING;
-
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -22,7 +20,6 @@ import tech.pegasys.pantheon.ethereum.core.LogSeries;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
 import tech.pegasys.pantheon.ethereum.core.ProcessableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractMessageProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
@@ -38,12 +35,12 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.OptionalLong;
+import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class PrivateTransactionProcessor implements TransactionProcessor {
+public class PrivateTransactionProcessor {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -54,9 +51,6 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
   private final AbstractMessageProcessor contractCreationProcessor;
 
   private final AbstractMessageProcessor messageCallProcessor;
-
-  private MutableAccount sender;
-  private Address senderAddress;
 
   public static class Result implements TransactionProcessor.Result {
 
@@ -144,96 +138,31 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
     this.clearEmptyAccounts = clearEmptyAccounts;
   }
 
-  public TransactionProcessor.Result processPrivateTransaction(
-      final Blockchain blockchain,
-      final WorldUpdater privateWorldState,
-      final WorldUpdater publicWorldState,
-      final ProcessableBlockHeader blockHeader,
-      final PrivateTransaction privateTransaction,
-      final Address miningBeneficiary,
-      final BlockHashLookup blockHashLookup) {
-    Transaction transaction =
-        new Transaction(
-            privateTransaction.getNonce(),
-            privateTransaction.getGasPrice(),
-            privateTransaction.getGasLimit(),
-            privateTransaction.getTo(),
-            privateTransaction.getValue(),
-            privateTransaction.getSignature(),
-            privateTransaction.getPayload(),
-            privateTransaction.getSender(),
-            privateTransaction.getChainId().getAsInt());
-
-    final Address senderAddress = transaction.getSender();
-    this.senderAddress = senderAddress;
-    Account sender = privateWorldState.get(senderAddress);
-    if (sender == null) {
-      sender = publicWorldState.get(senderAddress);
-      this.sender = privateWorldState.createAccount(sender.getAddress(), 0, sender.getBalance());
-    } else {
-      this.sender = privateWorldState.getMutable(senderAddress);
-    }
-
-    return processTransaction(
-        blockchain,
-        privateWorldState,
-        blockHeader,
-        transaction,
-        miningBeneficiary,
-        NO_TRACING,
-        blockHashLookup);
-  }
-
-  @Override
   public Result processTransaction(
       final Blockchain blockchain,
-      final WorldUpdater worldState,
+      final WorldUpdater publicWorldState,
+      final WorldUpdater privateWorldState,
       final ProcessableBlockHeader blockHeader,
-      final Transaction transaction,
+      final PrivateTransaction transaction,
       final Address miningBeneficiary,
       final OperationTracer operationTracer,
       final BlockHashLookup blockHashLookup) {
-    LOG.trace("Starting execution of {}", transaction);
+    LOG.trace("Starting private execution of {}", transaction);
 
-    ValidationResult<TransactionInvalidReason> validationResult =
-        transactionValidator.validate(transaction);
-    // Make sure the transaction is intrinsically valid before trying to
-    // compare against a sender account (because the transaction may not
-    // be signed correctly to extract the sender).
-    if (!validationResult.isValid()) {
-      LOG.warn("Invalid transaction: {}", validationResult.getErrorMessage());
-      return Result.invalid(validationResult);
-    }
+    final Address senderAddress = transaction.getSender();
+    final MutableAccount privateStateSender = privateWorldState.getOrCreate(senderAddress);
+    final Account sender = publicWorldState.getOrCreate(senderAddress);
 
-    validationResult =
-        transactionValidator.validateForSender(transaction, sender, OptionalLong.empty());
-    if (!validationResult.isValid()) {
-      LOG.warn("Invalid transaction: {}", validationResult.getErrorMessage());
-      return Result.invalid(validationResult);
-    }
-
-    final long previousNonce = sender.incrementNonce();
+    final long previousNonce = privateStateSender.incrementNonce();
     LOG.trace(
-        "Incremented sender {} nonce ({} -> {})", senderAddress, previousNonce, sender.getNonce());
-
-    final Wei upfrontGasCost = transaction.getUpfrontGasCost();
-    final Wei previousBalance = sender.decrementBalance(upfrontGasCost);
-    LOG.trace(
-        "Deducted sender {} upfront gas cost {} ({} -> {})",
+        "Incremented private sender {} nonce ({} -> {})",
         senderAddress,
-        upfrontGasCost,
-        previousBalance,
-        sender.getBalance());
+        previousNonce,
+        sender.getNonce());
 
-    final Gas intrinsicGas = gasCalculator.transactionIntrinsicGasCost(transaction);
-    final Gas gasAvailable = Gas.of(transaction.getGasLimit()).minus(intrinsicGas);
-    LOG.trace(
-        "Gas available for execution {} = {} - {} (limit - intrinsic)",
-        gasAvailable,
-        transaction.getGasLimit(),
-        intrinsicGas);
-
-    final WorldUpdater worldUpdater = worldState.updater();
+    final WorldUpdater publicWorldUpdater = publicWorldState.updater();
+    final HashMap<Integer, WorldUpdater> privateWorldUpdaters = new HashMap<>();
+    privateWorldUpdaters.put(0, privateWorldState.updater());
     final MessageFrame initialFrame;
     final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
     if (transaction.isContractCreation()) {
@@ -245,11 +174,12 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
               .type(MessageFrame.Type.CONTRACT_CREATION)
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
-              .worldState(worldUpdater.updater())
-              .initialGas(gasAvailable)
+              .worldState(publicWorldUpdater.updater())
+              .privateWorldStates(privateWorldUpdaters)
               .address(contractAddress)
               .originator(senderAddress)
               .contract(contractAddress)
+              .initialGas(Gas.MAX_VALUE)
               .gasPrice(transaction.getGasPrice())
               .inputData(BytesValue.EMPTY)
               .sender(senderAddress)
@@ -265,18 +195,19 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
 
     } else {
       final Address to = transaction.getTo().get();
-      final Account contract = worldState.get(to);
+      final Account contract = privateWorldState.get(to);
 
       initialFrame =
           MessageFrame.builder()
               .type(MessageFrame.Type.MESSAGE_CALL)
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
-              .worldState(worldUpdater.updater())
-              .initialGas(gasAvailable)
+              .worldState(publicWorldUpdater.updater())
+              .privateWorldStates(privateWorldUpdaters)
               .address(to)
               .originator(senderAddress)
               .contract(to)
+              .initialGas(Gas.MAX_VALUE)
               .gasPrice(transaction.getGasPrice())
               .inputData(transaction.getPayload())
               .sender(senderAddress)
@@ -298,44 +229,16 @@ public class PrivateTransactionProcessor implements TransactionProcessor {
     }
 
     if (initialFrame.getState() == MessageFrame.State.COMPLETED_SUCCESS) {
-      worldUpdater.commit();
-    }
-
-    if (LOG.isTraceEnabled()) {
-      LOG.trace(
-          "Gas used by transaction: {}, by message call/contract creation: {}",
-          () -> Gas.of(transaction.getGasLimit()).minus(initialFrame.getRemainingGas()),
-          () -> gasAvailable.minus(initialFrame.getRemainingGas()));
-    }
-
-    // Refund the sender by what we should and pay the miner fee (note that we're doing them one
-    // after the other so that if it is the same account somehow, we end up with the right result)
-    final Gas selfDestructRefund =
-        gasCalculator.getSelfDestructRefundAmount().times(initialFrame.getSelfDestructs().size());
-    final Gas refundGas = initialFrame.getGasRefund().plus(selfDestructRefund);
-    final Gas refunded = refunded(transaction, initialFrame.getRemainingGas(), refundGas);
-    final Wei refundedWei = refunded.priceFor(transaction.getGasPrice());
-    sender.incrementBalance(refundedWei);
-
-    final MutableAccount coinbase = worldState.getOrCreate(miningBeneficiary);
-    final Gas coinbaseFee = Gas.of(transaction.getGasLimit()).minus(refunded);
-    final Wei coinbaseWei = coinbaseFee.priceFor(transaction.getGasPrice());
-    coinbase.incrementBalance(coinbaseWei);
-
-    initialFrame.getSelfDestructs().forEach(worldState::deleteAccount);
-
-    if (clearEmptyAccounts) {
-      clearEmptyAccounts(worldState);
+      publicWorldState.commit();
+      privateWorldState.commit();
     }
 
     if (initialFrame.getState() == MessageFrame.State.COMPLETED_SUCCESS) {
       return Result.successful(
-          initialFrame.getLogs(),
-          refunded.toLong(),
-          initialFrame.getOutputData(),
-          validationResult);
+          initialFrame.getLogs(), 0, initialFrame.getOutputData(), ValidationResult.valid());
     } else {
-      return Result.failed(refunded.toLong(), validationResult);
+      return Result.failed(
+          0, ValidationResult.invalid(TransactionInvalidReason.PRIVATE_TRANSACTION_FAILED));
     }
   }
 
