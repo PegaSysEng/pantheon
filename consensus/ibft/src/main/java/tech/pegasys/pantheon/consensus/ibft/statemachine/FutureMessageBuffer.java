@@ -34,22 +34,13 @@ import com.google.common.annotations.VisibleForTesting;
  * are removed. Otherwise if there is only one height the oldest inserted message is removed.
  */
 public class FutureMessageBuffer {
-  private final NavigableMap<Long, List<Message>> buffer;
+  private final NavigableMap<Long, List<Message>> buffer = new TreeMap<>();
   private final long futureMessagesMaxDistance;
   private final long futureMessagesLimit;
 
   public FutureMessageBuffer(final long futureMessagesMaxDistance, final long futureMessagesLimit) {
-    this(futureMessagesMaxDistance, futureMessagesLimit, new TreeMap<>());
-  }
-
-  @VisibleForTesting
-  FutureMessageBuffer(
-      final long futureMessagesMaxDistance,
-      final long futureMessagesLimit,
-      final NavigableMap<Long, List<Message>> buffer) {
     this.futureMessagesMaxDistance = futureMessagesMaxDistance;
     this.futureMessagesLimit = futureMessagesLimit;
-    this.buffer = buffer;
   }
 
   public void addMessage(final long chainHeight, final long msgChainHeight, final Message rawMsg) {
@@ -93,6 +84,7 @@ public class FutureMessageBuffer {
     return messages;
   }
 
+  @VisibleForTesting
   long totalMessagesSize() {
     return buffer.values().stream().map(List::size).reduce(0, Integer::sum).longValue();
   }
