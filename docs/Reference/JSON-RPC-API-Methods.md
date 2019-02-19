@@ -3,9 +3,6 @@ description: Pantheon JSON-RPC API methods reference
 
 # JSON-RPC API Methods
 
-!!! danger "Breaking Change in v0.8.3"
-    From v0.8.3, incoming HTTP requests are only accepted from hostnames specified using the [`--host-whitelist`](Using-JSON-RPC-API.md) option. 
-
 The following lists the Pantheon JSON-RPC API commands:
 
 ## Admin Methods
@@ -2023,9 +2020,6 @@ None
 
 ## IBFT 2.0 Methods 
 
-!!! note 
-    IBFT 2.0 is under development and will be available in v1.0. 
-
 !!! note
     The `IBFT` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `IBFT` API methods.
@@ -2161,7 +2155,7 @@ Lists the validators defined in the specified block.
     
 ### ibft_proposeValidatorVote
 
-Proposes [adding or removing a validator](../Consensus-Protocols/IBFT.md#adding-and-removing-validators)) with the specified address. 
+Proposes [adding or removing a validator](../Consensus-Protocols/IBFT.md#adding-and-removing-validators) with the specified address. 
 
 **Parameters**
 
@@ -2191,9 +2185,6 @@ Proposes [adding or removing a validator](../Consensus-Protocols/IBFT.md#adding-
     ```
 
 ## Permissioning Methods
-
-!!! note 
-    Permissioning is under development and will be available in v1.0. 
 
 !!! note
     The `PERM` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 

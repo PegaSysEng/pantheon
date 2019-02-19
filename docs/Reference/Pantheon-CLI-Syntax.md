@@ -555,9 +555,6 @@ permissions-accounts-enabled=true
 Set to enable account level permissions.
 The default is `false`.
 
-!!!note
-    Permissions is under development and will be available in v1.0. 
-    
 ### permissions-config-file    
 
 ```bash tab="Syntax"
@@ -594,9 +591,6 @@ permissions-nodes-enabled=true
 
 Set to enable node level permissions.
 The default is `false`.
-
-!!!note
-    Permissions is under development and will be available in v1.0.
 
 ### privacy-enabled
 
