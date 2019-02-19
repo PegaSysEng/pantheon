@@ -3,8 +3,6 @@ description: Pantheon JSON-RPC API methods reference
 
 # JSON-RPC API Methods
 
-The following lists the Pantheon JSON-RPC API commands:
-
 ## Admin Methods
 
 !!! note
@@ -479,7 +477,7 @@ None
 Returns a list of account addresses that the client owns.
 
 !!!note
-    This method returns an empty object because Pantheon [does not support account management](Using-JSON-RPC-API.md#account-management).
+    This method returns an empty object because Pantheon [does not support account management](../JSON-RPC-API/Using-JSON-RPC-API.md#account-management).
 
 **Parameters**
 
@@ -544,7 +542,7 @@ Returns the account balance of the specified address.
 
 `DATA` - 20-byte account address from which to retrieve the balance.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
@@ -577,7 +575,7 @@ Returns the value of a storage position at a specified address.
 
 `QUANTITY` - Integer index of the storage position.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
@@ -610,7 +608,7 @@ Returns the number of transactions sent from a specified address.
 
 `DATA` - 20-byte account address.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
@@ -668,7 +666,7 @@ Returns the number of transactions in a block matching the specified block numbe
 
 **Parameters**
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
@@ -726,7 +724,7 @@ Returns the number of uncles in a block matching the specified block number.
 
 **Parameters**
 
-`QUANTITY|TAG` - Integer representing either the 0-based index of the block within the blockchain, or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing either the 0-based index of the block within the blockchain, or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
@@ -757,7 +755,7 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 `DATA` - 20-byte contract address.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
@@ -789,7 +787,7 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 To avoid exposing your private key, create signed transactions offline and send the signed transaction data using `eth_sendRawTransaction`. 
 
 !!!important
-    Pantheon does not implement [eth_sendTransaction](Using-JSON-RPC-API.md#account-management).
+    Pantheon does not implement [eth_sendTransaction](../JSON-RPC-API/Using-JSON-RPC-API.md#account-management).
 
 **Parameters**
 
@@ -831,7 +829,7 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 *OBJECT* - [Transaction call object](JSON-RPC-API-Objects.md#transaction-call-object).
 
-*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+*QUANTITY|TAG* - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
@@ -983,7 +981,7 @@ Returns information about a block by block number.
 
 **Parameters**
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 `Boolean` - If `true`, returns the full [transaction objects](JSON-RPC-API-Objects.md#transaction-object); if `false`, returns only the hashes of the transactions.
 
@@ -1124,7 +1122,7 @@ Returns transaction information for the specified block number and transaction i
 
 **Parameters**
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter).
+`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 `QUANTITY` - The transaction index position.
 
@@ -1606,7 +1604,7 @@ Lists signers for the specified block.
 
 **Parameters** 
 
-`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter). 
+`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter). 
 
 **Returns**
 
@@ -2126,7 +2124,7 @@ Lists the validators defined in the specified block.
 
 **Parameters** 
 
-`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](Using-JSON-RPC-API.md#block-parameter). 
+`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter). 
 
 **Returns**
 
