@@ -333,7 +333,7 @@ public class NodeWhitelistControllerTest {
   @Test
   public void whenRemovingBootnodeShouldReturnRemoveBootnodeError() {
     NodesWhitelistResult expected =
-        new NodesWhitelistResult(WhitelistOperationResult.ERROR_CANT_REMOVE_BOOTNODE);
+        new NodesWhitelistResult(WhitelistOperationResult.ERROR_BOOTNODE_CANNOT_BE_REMOVED);
     bootnodesList.add(new EnodeURL(enode1));
     controller.addNodes(Lists.newArrayList(enode1, enode2));
 

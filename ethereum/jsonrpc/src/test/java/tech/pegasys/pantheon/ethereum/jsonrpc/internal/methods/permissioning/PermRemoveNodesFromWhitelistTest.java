@@ -177,10 +177,12 @@ public class PermRemoveNodesFromWhitelistTest {
   public void shouldReturnCantRemoveBootnodeWhenRemovingBootnode() {
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1));
     final JsonRpcResponse expected =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.NODE_WHITELIST_CANT_REMOVE_BOOTNODE);
+        new JsonRpcErrorResponse(
+            request.getId(), JsonRpcError.NODE_WHITELIST_BOOTNODE_CANNOT_BE_REMOVED);
 
     when(nodeWhitelistController.removeNodes(any()))
-        .thenReturn(new NodesWhitelistResult(WhitelistOperationResult.ERROR_CANT_REMOVE_BOOTNODE));
+        .thenReturn(
+            new NodesWhitelistResult(WhitelistOperationResult.ERROR_BOOTNODE_CANNOT_BE_REMOVED));
 
     final JsonRpcResponse actual = method.response(request);
 

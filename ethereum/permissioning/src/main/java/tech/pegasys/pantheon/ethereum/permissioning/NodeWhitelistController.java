@@ -108,7 +108,7 @@ public class NodeWhitelistController {
 
     boolean anyBootnode = peers.stream().anyMatch(bootnodes::contains);
     if (anyBootnode) {
-      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_CANT_REMOVE_BOOTNODE);
+      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_BOOTNODE_CANNOT_BE_REMOVED);
     }
 
     for (EnodeURL peer : peers) {
