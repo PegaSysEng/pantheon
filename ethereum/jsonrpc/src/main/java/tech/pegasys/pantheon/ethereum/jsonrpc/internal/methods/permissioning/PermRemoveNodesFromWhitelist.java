@@ -68,6 +68,9 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
               return new JsonRpcErrorResponse(req.getId(), JsonRpcError.WHITELIST_PERSIST_FAILURE);
             case ERROR_WHITELIST_FILE_SYNC:
               return new JsonRpcErrorResponse(req.getId(), JsonRpcError.WHITELIST_FILE_SYNC);
+            case ERROR_CANT_REMOVE_BOOTNODE:
+              return new JsonRpcErrorResponse(
+                  req.getId(), JsonRpcError.NODE_WHITELIST_CANT_REMOVE_BOOTNODE);
             default:
               throw new Exception();
           }
