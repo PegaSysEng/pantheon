@@ -51,4 +51,25 @@ class StandaloneCommand implements DefaultCommandValues {
       description =
           "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)")
   final File nodePrivateKeyFile = null;
+
+  @CommandLine.Option(
+      names = {"--rpc-http-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for rpc http authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  String rpcHttpAuthenticationCredentialsFile = null;
+
+  @CommandLine.Option(
+      names = {"--rpc-ws-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for rpc websocket authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  String rpcWsAuthenticationCredentialsFile = null;
+
+  @CommandLine.Option(
+      names = {"--privacy-public-key-file"},
+      description = "the path to the enclave's public key ")
+  final File privacyPublicKeyFile = null;
 }
