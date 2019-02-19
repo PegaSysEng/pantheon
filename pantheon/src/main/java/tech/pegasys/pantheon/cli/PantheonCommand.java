@@ -30,7 +30,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
-import tech.pegasys.pantheon.cli.custom.RpcAuthConverter;
+import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -65,7 +65,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -277,15 +276,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isRpcHttpAuthenticationEnabled = false;
 
   @Option(
-      names = {"--rpc-http-authentication-credentials-file"},
-      paramLabel = MANDATORY_FILE_FORMAT_HELP,
-      description =
-          "Storage file for rpc http authentication credentials (default: ${DEFAULT-VALUE})",
-      arity = "1",
-      converter = RpcAuthConverter.class)
-  private String rpcHttpAuthenticationCredentialsFile = null;
-
-  @Option(
       names = {"--rpc-ws-enabled"},
       description =
           "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})")
@@ -341,18 +331,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
-          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})",
-      hidden = true)
+          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsAuthenticationEnabled = false;
-
-  @Option(
-      names = {"--rpc-ws-authentication-credentials-file"},
-      paramLabel = MANDATORY_FILE_FORMAT_HELP,
-      description =
-          "Storage file for rpc websocket authentication credentials (default: ${DEFAULT-VALUE})",
-      arity = "1",
-      hidden = true)
-  private String rpcWsAuthenticationCredentialsFile = null;
 
   @Option(
       names = {"--metrics-enabled"},
@@ -463,10 +443,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean permissionsAccountsEnabled = false;
 
   @Option(
-      names = {"--permissions-config-path"},
+      names = {"--permissions-config-file"},
       description =
           "Path to permissions config TOML file (default:  a file named \"permissions_config.toml\" in the Pantheon data folder)")
-  private String permissionsConfigPath = null;
+  private String permissionsConfigFile = null;
 
   @Option(
       names = {"--privacy-enabled"},
@@ -477,11 +457,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--privacy-url"},
       description = "The URL on which enclave is running ")
   private final URI privacyUrl = PrivacyParameters.DEFAULT_ENCLAVE_URL;
-
-  @Option(
-      names = {"--privacy-public-key-file"},
-      description = "the path to the enclave's public key ")
-  private final File privacyPublicKeyFile = null;
 
   @Option(
       names = {"--privacy-precompiled-address"},
@@ -579,6 +554,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     try {
+      final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
+      final WebSocketConfiguration webSocketConfiguration = webSocketConfiguration();
       final Optional<PermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
       permissioningConfiguration.ifPresent(
@@ -592,8 +569,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           maxPeers,
           p2pHost,
           p2pPort,
-          jsonRpcConfiguration(),
-          webSocketConfiguration(),
+          jsonRpcConfiguration,
+          webSocketConfiguration,
           metricsConfiguration(),
           permissioningConfiguration);
     } catch (Exception e) {
@@ -638,16 +615,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private String getPermissionsConfigPath() {
+  private String getPermissionsConfigFile() {
 
-    return permissionsConfigPath != null
-        ? permissionsConfigPath
+    return permissionsConfigFile != null
+        ? permissionsConfigFile
         : dataDir().toAbsolutePath()
             + System.getProperty("file.separator")
             + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
-  private JsonRpcConfiguration jsonRpcConfiguration() {
+  private JsonRpcConfiguration jsonRpcConfiguration() throws Exception {
 
     CommandLineUtils.checkOptionDependencies(
         logger,
@@ -663,12 +640,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--rpc-http-authentication-enabled",
             "--rpc-http-authentication-credentials-file"));
 
-    CommandLineUtils.checkOptionDependencies(
-        logger,
-        commandLine,
-        "--rpc-http-authentication-enabled",
-        !isRpcHttpAuthenticationEnabled,
-        Collections.singletonList("--rpc-http-authentication-credentials-file"));
+    if (isRpcHttpAuthenticationEnabled && rpcHttpAuthenticationCredentialsFile() == null) {
+      throw new ParameterException(
+          commandLine,
+          "Unable to authenticate RPC HTTP endpoint without a supplied credentials file");
+    }
 
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     jsonRpcConfiguration.setEnabled(isRpcHttpEnabled);
@@ -678,7 +654,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setRpcApis(rpcHttpApis);
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     jsonRpcConfiguration.setAuthenticationEnabled(isRpcHttpAuthenticationEnabled);
-    jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile);
+    jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile());
     return jsonRpcConfiguration;
   }
 
@@ -698,12 +674,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--rpc-ws-authentication-enabled",
             "--rpc-ws-authentication-credentials-file"));
 
-    CommandLineUtils.checkOptionDependencies(
-        logger,
-        commandLine,
-        "--rpc-ws-authentication-enabled",
-        !isRpcWsAuthenticationEnabled,
-        Collections.singletonList("--rpc-ws-authentication-credentials-file"));
+    if (isRpcWsAuthenticationEnabled && rpcWsAuthenticationCredentialsFile() == null) {
+      throw new ParameterException(
+          commandLine,
+          "Unable to authenticate RPC WS endpoint without a supplied credentials file");
+    }
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     webSocketConfiguration.setEnabled(isRpcWsEnabled);
@@ -712,7 +687,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setRpcApis(rpcWsApis);
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
-    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile);
+    webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile());
     return webSocketConfiguration;
   }
 
@@ -763,7 +738,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
-            getPermissionsConfigPath(), permissionsNodesEnabled, permissionsAccountsEnabled);
+            getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
     return Optional.of(permissioningConfiguration);
   }
 
@@ -781,10 +756,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (privacyEnabled) {
       privacyParameters.setEnabled(privacyEnabled);
       privacyParameters.setUrl(privacyUrl.toString());
-      if (privacyPublicKeyFile != null) {
-        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile);
+      if (privacyPublicKeyFile() != null) {
+        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
       } else {
-        throw new IOException("Please specify Enclave public Key file path to Enable Privacy");
+        throw new ParameterException(
+            commandLine, "Please specify Enclave public Key file path to Enable Privacy");
       }
       privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
     }
@@ -977,6 +953,53 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return nodePrivateKeyFile != null
         ? nodePrivateKeyFile
         : KeyPairUtil.getDefaultKeyFile(dataDir());
+  }
+
+  private File privacyPublicKeyFile() {
+    if (isDocker) {
+      final File keyFile = new File(DOCKER_PRIVACY_PUBLIC_KEY_FILE);
+      if (keyFile.exists()) {
+        return keyFile;
+      } else {
+        return null;
+      }
+    } else {
+      return standaloneCommands.privacyPublicKeyFile;
+    }
+  }
+
+  private String rpcHttpAuthenticationCredentialsFile() throws Exception {
+    String filename = null;
+    if (isFullInstantiation()) {
+      filename = standaloneCommands.rpcHttpAuthenticationCredentialsFile;
+    } else if (isDocker) {
+      final File authFile = new File(DOCKER_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
+      if (authFile.exists()) {
+        filename = authFile.getAbsolutePath();
+      }
+    }
+
+    if (filename != null) {
+      RpcAuthFileValidator.validate(commandLine, filename, "HTTP");
+    }
+    return filename;
+  }
+
+  private String rpcWsAuthenticationCredentialsFile() {
+    String filename = null;
+    if (isFullInstantiation()) {
+      filename = standaloneCommands.rpcWsAuthenticationCredentialsFile;
+    } else if (isDocker) {
+      final File authFile = new File(DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION);
+      if (authFile.exists()) {
+        filename = authFile.getAbsolutePath();
+      }
+    }
+
+    if (filename != null) {
+      RpcAuthFileValidator.validate(commandLine, filename, "WS");
+    }
+    return filename;
   }
 
   private boolean isFullInstantiation() {
