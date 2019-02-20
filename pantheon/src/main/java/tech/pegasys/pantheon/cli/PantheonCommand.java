@@ -145,10 +145,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // CLI options defined by user at runtime.
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
-  // Completely disables p2p within Pantheon.
+  // Completely disables P2P within Pantheon.
   @Option(
       names = {"--p2p-enabled"},
-      description = "Enable/disable all p2p functionality (default: ${DEFAULT-VALUE})",
+      description = "Enable/disable all P2P functionality (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Boolean p2pEnabled = true;
 
@@ -163,7 +163,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // meaning that it's probably the right way to handle disabling options.
   @Option(
       names = {"--discovery-enabled"},
-      description = "Enable p2p peer discovery (default: ${DEFAULT-VALUE})",
+      description = "Enable P2P peer discovery (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Boolean peerDiscoveryEnabled = true;
 
@@ -185,13 +185,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--max-peers"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
-          "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})")
+          "Maximum P2P peer connections that can be established (default: ${DEFAULT-VALUE})")
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
   @Option(
       names = {"--banned-node-ids", "--banned-node-id"},
       paramLabel = MANDATORY_NODE_ID_FORMAT_HELP,
-      description = "A list of node IDs to ban from the p2p network.",
+      description = "A list of node IDs to ban from the P2P network.",
       split = ",",
       arity = "1..*")
   private final Collection<String> bannedNodeIds = new ArrayList<>();
@@ -215,14 +215,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--p2p-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
-      description = "Host for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
+      description = "Host for P2P peers discovery to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private String p2pHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
       names = {"--p2p-port"},
       paramLabel = MANDATORY_PORT_FORMAT_HELP,
-      description = "Port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
+      description = "Port for P2P peers discovery to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer p2pPort = DEFAULT_PORT;
 
@@ -523,7 +523,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
-    // Check that p2p options are able to work or send an error
+    // Check that P2P options are able to work or send an error
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
