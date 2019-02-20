@@ -90,9 +90,9 @@ public class FutureMessageBuffer {
     }
   }
 
-  public List<Message> poll(final long chainHeight) {
-    final List<Message> messages = buffer.getOrDefault(chainHeight, Collections.emptyList());
-    buffer.remove(chainHeight);
+  public List<Message> poll(final long msgChainHeight) {
+    final List<Message> messages = buffer.getOrDefault(msgChainHeight, Collections.emptyList());
+    buffer.remove(msgChainHeight);
     return messages;
   }
 
