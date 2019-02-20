@@ -148,7 +148,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Completely disables P2P within Pantheon.
   @Option(
       names = {"--p2p-enabled"},
-      description = "Enable/disable all P2P functionality (default: ${DEFAULT-VALUE})",
+      description = "Enable P2P functionality (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Boolean p2pEnabled = true;
 
@@ -237,7 +237,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-http-enabled"},
       description =
-          "Set if the JSON-RPC HTTP service should be started (default: ${DEFAULT-VALUE})")
+          "Set to start the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpEnabled = false;
 
   @Option(
@@ -268,19 +268,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1..*",
       converter = RpcApisConverter.class,
       description =
-          "Comma separated APIs to enable on JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
+          "Comma separated list of APIs to enable on JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcHttpApis = DEFAULT_JSON_RPC_APIS;
 
   @Option(
       names = {"--rpc-http-authentication-enabled"},
       description =
-          "Set if the JSON-RPC HTTP service should require authentication (default: ${DEFAULT-VALUE})")
+          "Require authentication for the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpAuthenticationEnabled = false;
 
   @Option(
       names = {"--rpc-ws-enabled"},
       description =
-          "Set if the JSON-RPC WebSocket service should be started (default: ${DEFAULT-VALUE})")
+          "Set to start the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsEnabled = false;
 
   @Option(
@@ -304,7 +304,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1..*",
       converter = RpcApisConverter.class,
       description =
-          "Comma separated APIs to enable on JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
+          "Comma separated list of APIs to enable on JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcWsApis = DEFAULT_JSON_RPC_APIS;
 
   private Long rpcWsRefreshDelay;
@@ -333,12 +333,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
-          "Set if the JSON-RPC WebSocket service should require authentication (default: ${DEFAULT-VALUE})")
+          "Require authentication for the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsAuthenticationEnabled = false;
 
   @Option(
       names = {"--metrics-enabled"},
-      description = "Set if the metrics exporter should be started (default: ${DEFAULT-VALUE})")
+      description = "Set to start the metrics exporter (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsEnabled = false;
 
   @Option(
@@ -358,7 +358,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--metrics-push-enabled"},
       description =
-          "Set if the metrics push gateway integration should be started (default: ${DEFAULT-VALUE})")
+          "Enable the metrics push gateway integration (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsPushEnabled = false;
 
   @Option(
@@ -406,7 +406,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--miner-enabled"},
-      description = "Set if node should perform mining (default: ${DEFAULT-VALUE})")
+      description = "Set if node will perform mining (default: ${DEFAULT-VALUE})")
   private final Boolean isMiningEnabled = false;
 
   @Option(
@@ -435,13 +435,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--permissions-nodes-enabled"},
-      description = "Set if node level permissions should be enabled (default: ${DEFAULT-VALUE})")
+      description = "Enable node level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsNodesEnabled = false;
 
   @Option(
       names = {"--permissions-accounts-enabled"},
       description =
-          "Set if account level permissions should be enabled (default: ${DEFAULT-VALUE})")
+          "Enable account level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsAccountsEnabled = false;
 
   @Option(
@@ -452,7 +452,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--privacy-enabled"},
-      description = "Set if private transaction should be enabled (default: ${DEFAULT-VALUE})")
+      description = "Enable private transactions (default: ${DEFAULT-VALUE})")
   private final Boolean privacyEnabled = false;
 
   @Option(
@@ -774,7 +774,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
       } else {
         throw new ParameterException(
-            commandLine, "Please specify Enclave public Key file path to Enable Privacy");
+            commandLine, "Please specify Enclave public key file path to enable privacy");
       }
       privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
     }
