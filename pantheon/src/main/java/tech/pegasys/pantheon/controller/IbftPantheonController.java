@@ -19,9 +19,10 @@ import tech.pegasys.pantheon.config.IbftConfigOptions;
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteTally;
+import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
+import tech.pegasys.pantheon.consensus.ibft.EthSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
@@ -58,6 +59,7 @@ import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
@@ -96,6 +98,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   private final IbftProtocolManager ibftProtocolManager;
   private final KeyPair keyPair;
   private final TransactionPool transactionPool;
+  private MiningCoordinator ibftMiningCoordinator;
   private final Runnable closer;
 
   IbftPantheonController(
@@ -107,8 +110,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final Synchronizer synchronizer,
       final KeyPair keyPair,
       final TransactionPool transactionPool,
+      final MiningCoordinator ibftMiningCoordinator,
       final Runnable closer) {
-
     this.protocolSchedule = protocolSchedule;
     this.context = context;
     this.ethSubProtocol = ethSubProtocol;
@@ -117,6 +120,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     this.synchronizer = synchronizer;
     this.keyPair = keyPair;
     this.transactionPool = transactionPool;
+    this.ibftMiningCoordinator = ibftMiningCoordinator;
     this.closer = closer;
   }
 
@@ -145,14 +149,15 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             metricsSystem,
             (blockchain, worldStateArchive) -> {
               final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
-              final VoteTally voteTally =
-                  new VoteTallyUpdater(epochManager, blockInterface)
-                      .buildVoteTallyFromBlockchain(blockchain);
-              final VoteProposer voteProposer = new VoteProposer();
-              return new IbftContext(voteTally, voteProposer);
+              return new IbftContext(
+                  new VoteTallyCache(
+                      blockchain,
+                      new VoteTallyUpdater(epochManager, new IbftBlockInterface()),
+                      epochManager,
+                      new IbftBlockInterface()),
+                  new VoteProposer());
             });
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
-    final VoteTally voteTally = protocolContext.getConsensusState().getVoteTally();
 
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager =
@@ -167,9 +172,10 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             metricsSystem);
     final SubProtocol ethSubProtocol = EthProtocol.get();
 
+    final EthContext ethContext = ethProtocolManager.ethContext();
+
     final SyncState syncState =
-        new SyncState(
-            protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
+        new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
             syncConfig,
@@ -182,8 +188,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             metricsSystem);
 
     final TransactionPool transactionPool =
-        TransactionPoolFactory.createTransactionPool(
-            protocolSchedule, protocolContext, ethProtocolManager.ethContext());
+        TransactionPoolFactory.createTransactionPool(protocolSchedule, protocolContext, ethContext);
 
     final IbftEventQueue ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
 
@@ -197,11 +202,12 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             Util.publicKeyToAddress(nodeKeys.getPublicKey()));
 
     final ProposerSelector proposerSelector =
-        new ProposerSelector(blockchain, voteTally, blockInterface, true);
+        new ProposerSelector(blockchain, blockInterface, true);
 
     // NOTE: peers should not be used for accessing the network as it does not enforce the
     // "only send once" filter applied by the UniqueMessageMulticaster.
-    final ValidatorPeers peers = new ValidatorPeers(voteTally);
+    final VoteTallyCache voteTallyCache = protocolContext.getConsensusState().getVoteTallyCache();
+    final ValidatorPeers peers = new ValidatorPeers(voteTallyCache);
 
     final UniqueMessageMulticaster uniqueMessageMulticaster =
         new UniqueMessageMulticaster(peers, ibftConfig.getGossipedHistoryLimit());
@@ -210,7 +216,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final IbftFinalState finalState =
         new IbftFinalState(
-            voteTally,
+            voteTallyCache,
             nodeKeys,
             Util.publicKeyToAddress(nodeKeys.getPublicKey()),
             proposerSelector,
@@ -255,7 +261,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 messageValidatorFactory),
             gossiper,
             duplicateMessageTracker,
-            futureMessageBuffer);
+            futureMessageBuffer,
+            new EthSynchronizerUpdater(ethContext.getEthPeers()));
     ibftController.start();
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
@@ -293,6 +300,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         synchronizer,
         nodeKeys,
         transactionPool,
+        ibftMiningCoordinator,
         closer);
   }
 
@@ -330,7 +338,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
   @Override
   public MiningCoordinator getMiningCoordinator() {
-    return null;
+    return ibftMiningCoordinator;
   }
 
   @Override

@@ -17,6 +17,7 @@ import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.EthSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
@@ -32,12 +34,10 @@ import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
@@ -78,10 +78,6 @@ public class IbftControllerTest {
   private Message commitMessage;
   @Mock private CommitMessageData commitMessageData;
 
-  @Mock private NewRound newRound;
-  private Message newRoundMessage;
-  @Mock private NewRoundMessageData newRoundMessageData;
-
   @Mock private RoundChange roundChange;
   private Message roundChangeMessage;
   @Mock private RoundChangeMessageData roundChangeMessageData;
@@ -107,7 +103,9 @@ public class IbftControllerTest {
             blockHeightManagerFactory,
             ibftGossip,
             messageTracker,
-            futureMessageBuffer);
+            futureMessageBuffer,
+            mock(EthSynchronizerUpdater.class)
+        );
 
     when(chainHeadBlockHeader.getNumber()).thenReturn(1L);
     when(chainHeadBlockHeader.getHash()).thenReturn(Hash.ZERO);
@@ -134,7 +132,6 @@ public class IbftControllerTest {
     setupProposal(roundIdentifierHeight3, validator);
     setupCommit(futureRoundIdentifier, validator);
     setupRoundChange(futureRoundIdentifier, validator);
-    setupNewRound(roundIdentifierHeight3, validator);
 
     final List<Message> height2Msgs =
         newArrayList(prepareMessage, commitMessage, roundChangeMessage);
@@ -155,7 +152,6 @@ public class IbftControllerTest {
     verify(ibftGossip).send(commitMessage);
     verify(blockHeightManager).handleRoundChangePayload(roundChange);
     verify(ibftGossip).send(roundChangeMessage);
-    verify(blockHeightManager, never()).handleNewRoundPayload(newRound);
   }
 
   @Test
@@ -164,7 +160,6 @@ public class IbftControllerTest {
     setupProposal(futureRoundIdentifier, validator);
     setupCommit(futureRoundIdentifier, validator);
     setupRoundChange(futureRoundIdentifier, validator);
-    setupNewRound(futureRoundIdentifier, validator);
 
     when(futureMessageBuffer.poll(2L))
         .thenReturn(
@@ -172,8 +167,7 @@ public class IbftControllerTest {
                 prepareMessage,
                 proposalMessage,
                 commitMessage,
-                roundChangeMessage,
-                newRoundMessage))
+                roundChangeMessage))
         .thenReturn(emptyList());
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
 
@@ -193,8 +187,6 @@ public class IbftControllerTest {
     verify(ibftGossip).send(commitMessage);
     verify(blockHeightManager).handleRoundChangePayload(roundChange);
     verify(ibftGossip).send(roundChangeMessage);
-    verify(blockHeightManager).handleNewRoundPayload(newRound);
-    verify(ibftGossip).send(newRoundMessage);
   }
 
   @Test
@@ -279,21 +271,6 @@ public class IbftControllerTest {
   }
 
   @Test
-  public void newRoundForCurrentHeightIsPassedToBlockHeightManager() {
-    roundIdentifier = new ConsensusRoundIdentifier(0, 1);
-    setupNewRound(roundIdentifier, validator);
-    ibftController.start();
-    ibftController.handleMessageEvent(new IbftReceivedMessageEvent(newRoundMessage));
-
-    verify(futureMessageBuffer, never()).addMessage(anyLong(), any());
-    verify(blockHeightManager).handleNewRoundPayload(newRound);
-    verify(ibftGossip).send(newRoundMessage);
-    verify(blockHeightManager, atLeastOnce()).getChainHeight();
-    verify(blockHeightManager).start();
-    verifyNoMoreInteractions(blockHeightManager);
-  }
-
-  @Test
   public void roundChangeForCurrentHeightIsPassedToBlockHeightManager() {
     roundIdentifier = new ConsensusRoundIdentifier(0, 1);
     setupRoundChange(roundIdentifier, validator);
@@ -327,13 +304,6 @@ public class IbftControllerTest {
     setupCommit(roundIdentifier, validator);
     when(blockHeightManager.getChainHeight()).thenReturn(1L);
     verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(commitMessage));
-  }
-
-  @Test
-  public void newRoundForPastHeightIsDiscarded() {
-    setupNewRound(roundIdentifier, validator);
-    when(blockHeightManager.getChainHeight()).thenReturn(1L);
-    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(newRoundMessage));
   }
 
   @Test
@@ -382,12 +352,6 @@ public class IbftControllerTest {
   }
 
   @Test
-  public void newRoundForUnknownValidatorIsDiscarded() {
-    setupNewRound(roundIdentifier, unknownValidator);
-    verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(newRoundMessage));
-  }
-
-  @Test
   public void roundChangeForUnknownValidatorIsDiscarded() {
     setupRoundChange(roundIdentifier, unknownValidator);
     verifyNotHandledAndNoFutureMsgs(new IbftReceivedMessageEvent(roundChangeMessage));
@@ -409,12 +373,6 @@ public class IbftControllerTest {
   public void commitForFutureHeightIsBuffered() {
     setupCommit(futureRoundIdentifier, validator);
     verifyHasFutureMessages(2L, commitMessage);
-  }
-
-  @Test
-  public void newRoundForFutureHeightIsBuffered() {
-    setupNewRound(futureRoundIdentifier, validator);
-    verifyHasFutureMessages(2L, newRoundMessage);
   }
 
   @Test
@@ -486,15 +444,6 @@ public class IbftControllerTest {
     when(commitMessageData.getCode()).thenReturn(IbftV2.COMMIT);
     when(commitMessageData.decode()).thenReturn(commit);
     commitMessage = new DefaultMessage(null, commitMessageData);
-  }
-
-  private void setupNewRound(
-      final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(newRound.getAuthor()).thenReturn(validator);
-    when(newRound.getRoundIdentifier()).thenReturn(roundIdentifier);
-    when(newRoundMessageData.getCode()).thenReturn(IbftV2.NEW_ROUND);
-    when(newRoundMessageData.decode()).thenReturn(newRound);
-    newRoundMessage = new DefaultMessage(null, newRoundMessageData);
   }
 
   private void setupRoundChange(

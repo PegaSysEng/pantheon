@@ -21,7 +21,7 @@ import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteTally;
+import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
@@ -36,6 +36,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
+import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
@@ -168,9 +169,17 @@ public class TestContextBuilder {
 
     final Gossiper gossiper = useGossip ? new IbftGossip(uniqueMulticaster) : mock(Gossiper.class);
 
+    final StubbedSynchronizerUpdater synchronizerUpdater = new StubbedSynchronizerUpdater();
+
     final ControllerAndState controllerAndState =
         createControllerAndFinalState(
-            blockChain, multicaster, nodeKeys, clock, ibftEventQueue, gossiper);
+            blockChain,
+            multicaster,
+            nodeKeys,
+            clock,
+            ibftEventQueue,
+            gossiper,
+            synchronizerUpdater);
 
     // Add each networkNode to the Multicaster (such that each can receive msgs from local node).
     // NOTE: the remotePeers needs to be ordered based on Address (as this is used to determine
@@ -191,6 +200,7 @@ public class TestContextBuilder {
                     LinkedHashMap::new));
 
     multicaster.addNetworkPeers(remotePeers.values());
+    synchronizerUpdater.addNetworkPeers(remotePeers.values());
 
     return new TestContext(
         remotePeers,
@@ -231,7 +241,8 @@ public class TestContextBuilder {
       final KeyPair nodeKeys,
       final Clock clock,
       final IbftEventQueue ibftEventQueue,
-      final Gossiper gossiper) {
+      final Gossiper gossiper,
+      final SynchronizerUpdater synchronizerUpdater) {
 
     final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
 
@@ -253,14 +264,19 @@ public class TestContextBuilder {
     final EpochManager epochManager = new EpochManager(EPOCH_LENGTH);
 
     final BlockInterface blockInterface = new IbftBlockInterface();
-    final VoteTally voteTally =
-        new VoteTallyUpdater(epochManager, blockInterface).buildVoteTallyFromBlockchain(blockChain);
+
+    final VoteTallyCache voteTallyCache =
+        new VoteTallyCache(
+            blockChain,
+            new VoteTallyUpdater(epochManager, blockInterface),
+            epochManager,
+            new IbftBlockInterface());
 
     final VoteProposer voteProposer = new VoteProposer();
 
     final ProtocolContext<IbftContext> protocolContext =
         new ProtocolContext<>(
-            blockChain, worldStateArchive, new IbftContext(voteTally, voteProposer));
+            blockChain, worldStateArchive, new IbftContext(voteTallyCache, voteProposer));
 
     final IbftBlockCreatorFactory blockCreatorFactory =
         new IbftBlockCreatorFactory(
@@ -272,11 +288,11 @@ public class TestContextBuilder {
             Util.publicKeyToAddress(nodeKeys.getPublicKey()));
 
     final ProposerSelector proposerSelector =
-        new ProposerSelector(blockChain, voteTally, blockInterface, true);
+        new ProposerSelector(blockChain, blockInterface, true);
 
     final IbftFinalState finalState =
         new IbftFinalState(
-            voteTally,
+            protocolContext.getConsensusState().getVoteTallyCache(),
             nodeKeys,
             Util.publicKeyToAddress(nodeKeys.getPublicKey()),
             proposerSelector,
@@ -316,7 +332,8 @@ public class TestContextBuilder {
                 messageValidatorFactory),
             gossiper,
             duplicateMessageTracker,
-            futureMessageBuffer);
+            futureMessageBuffer,
+            synchronizerUpdater);
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     //////////////////////////// END IBFT PantheonController ////////////////////////////

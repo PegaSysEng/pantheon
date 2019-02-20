@@ -15,13 +15,13 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
+import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
@@ -38,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IbftController {
+
   private static final Logger LOG = LogManager.getLogger();
   private final Blockchain blockchain;
   private final IbftFinalState ibftFinalState;
@@ -46,6 +47,7 @@ public class IbftController {
   private BlockHeightManager currentHeightManager;
   private final Gossiper gossiper;
   private final MessageTracker duplicateMessageTracker;
+  private final SynchronizerUpdater sychronizerUpdater;
 
   public IbftController(
       final Blockchain blockchain,
@@ -53,13 +55,15 @@ public class IbftController {
       final IbftBlockHeightManagerFactory ibftBlockHeightManagerFactory,
       final Gossiper gossiper,
       final MessageTracker duplicateMessageTracker,
-      final FutureMessageBuffer futureMessageBuffer) {
+      final FutureMessageBuffer futureMessageBuffer,
+      final SynchronizerUpdater sychronizerUpdater) {
     this.blockchain = blockchain;
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessageBuffer = futureMessageBuffer;
     this.gossiper = gossiper;
     this.duplicateMessageTracker = duplicateMessageTracker;
+    this.sychronizerUpdater = sychronizerUpdater;
   }
 
   public void start() {
@@ -103,13 +107,6 @@ public class IbftController {
             message,
             RoundChangeMessageData.fromMessageData(messageData).decode(),
             currentHeightManager::handleRoundChangePayload);
-        break;
-
-      case IbftV2.NEW_ROUND:
-        consumeMessage(
-            message,
-            NewRoundMessageData.fromMessageData(messageData).decode(),
-            currentHeightManager::handleNewRoundPayload);
         break;
 
       default:
@@ -198,6 +195,10 @@ public class IbftController {
       return isMsgFromKnownValidator(msg) && ibftFinalState.isLocalNodeValidator();
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       futureMessageBuffer.addMessage(msgRoundIdentifier.getSequenceNumber(), rawMsg);
+      // Notify the synchronizer the transmitting peer must have the parent block to the received
+      // message's target height.
+      sychronizerUpdater.updatePeerChainState(
+          msgRoundIdentifier.getSequenceNumber() - 1L, rawMsg.getConnection());
     } else {
       LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
