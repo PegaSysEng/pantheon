@@ -51,6 +51,7 @@ import tech.pegasys.pantheon.util.uint.UInt256Value;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -986,7 +987,8 @@ public class PeerDiscoveryControllerTest {
 
     final PeerBlacklist blacklist = new PeerBlacklist();
     final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    final NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
 
     // Whitelist peers
     nodeWhitelistController.addNodes(Arrays.asList(discoPeer.getEnodeURI()));
@@ -1055,7 +1057,8 @@ public class PeerDiscoveryControllerTest {
     // don't add disco peer to whitelist
     PermissioningConfiguration config = permissioningConfigurationWithTempFile();
     config.setNodeWhitelist(new ArrayList<>());
-    NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
 
     controller =
         getControllerBuilder()
@@ -1080,7 +1083,8 @@ public class PeerDiscoveryControllerTest {
     final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
     final URI peerURI = URI.create(peer.getEnodeURI());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    final NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
 
     controller =
         getControllerBuilder().whitelist(nodeWhitelistController).peerTable(peerTableSpy).build();
@@ -1103,7 +1107,8 @@ public class PeerDiscoveryControllerTest {
     final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
     final URI peerURI = URI.create(peer.getEnodeURI());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    final NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
 
     final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
     final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
@@ -1208,8 +1213,9 @@ public class PeerDiscoveryControllerTest {
 
   private PermissioningConfiguration permissioningConfigurationWithTempFile() throws IOException {
     final PermissioningConfiguration config = PermissioningConfiguration.createDefault();
-    config.setConfigurationFilePath(
-        Files.createTempFile("test", "test").toAbsolutePath().toString());
+    Path tempFile = Files.createTempFile("test", "test");
+    tempFile.toFile().deleteOnExit();
+    config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
     return config;
   }
 

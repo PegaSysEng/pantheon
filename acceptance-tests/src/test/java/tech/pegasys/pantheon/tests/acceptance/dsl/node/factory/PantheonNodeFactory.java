@@ -64,7 +64,8 @@ public class PantheonNodeFactory {
             config.getGenesisConfigProvider(),
             serverSocket.getLocalPort(),
             config.getP2pEnabled(),
-            config.isDiscoveryEnabled());
+            config.isDiscoveryEnabled(),
+            config.isBootnode());
     serverSocket.close();
 
     return node;
@@ -101,6 +102,16 @@ public class PantheonNodeFactory {
             .setName(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
+            .build());
+  }
+
+  public PantheonNode createNonBootnodeArchiveNode(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .jsonRpcEnabled()
+            .webSocketEnabled()
+            .setIsBootnode(false)
             .build());
   }
 
@@ -212,6 +223,7 @@ public class PantheonNodeFactory {
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
     File tempFile = createTempPermissioningConfigurationFile();
+    tempFile.deleteOnExit();
     permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
     initPermissioningConfigurationFile(
         WhitelistPersistor.WHITELIST_TYPE.NODES,

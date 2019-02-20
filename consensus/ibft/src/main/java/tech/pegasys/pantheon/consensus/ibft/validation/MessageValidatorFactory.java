@@ -40,23 +40,31 @@ public class MessageValidatorFactory {
     this.protocolContext = protocolContext;
   }
 
+  private Collection<Address> getValidatorsAfterBlock(final BlockHeader parentHeader) {
+    return protocolContext
+        .getConsensusState()
+        .getVoteTallyCache()
+        .getVoteTallyAfterBlock(parentHeader)
+        .getValidators();
+  }
+
   private SignedDataValidator createSignedDataValidator(
       final ConsensusRoundIdentifier roundIdentifier) {
 
     return new SignedDataValidator(
-        protocolContext.getConsensusState().getVoteTally().getValidators(),
+        getValidatorsAfterBlock(parentHeader),
         proposerSelector.selectProposerForRound(roundIdentifier),
         roundIdentifier);
   }
 
-  public MessageValidator createMessageValidator(final ConsensusRoundIdentifier roundIdentifier) {
+  public MessageValidator createMessageValidator(
+      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
-    final Collection<Address> validators =
-        protocolContext.getConsensusState().getVoteTally().getValidators();
+    final Collection<Address> validators = getValidatorsAfterBlock(parentHeader);
 
     return new MessageValidator(
-        createSignedDataValidator(roundIdentifier),
+        createSignedDataValidator(roundIdentifier, parentHeader),
         new ProposalBlockConsistencyValidator(),
         blockValidator,
         protocolContext,
@@ -64,13 +72,13 @@ public class MessageValidatorFactory {
             validators, this::createSignedDataValidator, roundIdentifier.getSequenceNumber()));
   }
 
-  public RoundChangeMessageValidator createRoundChangeMessageValidator(final long chainHeight) {
-    final Collection<Address> validators =
-        protocolContext.getConsensusState().getVoteTally().getValidators();
+  public RoundChangeMessageValidator createRoundChangeMessageValidator(
+      final long chainHeight, final BlockHeader parentHeader) {
+    final Collection<Address> validators = getValidatorsAfterBlock(parentHeader);
 
     return new RoundChangeMessageValidator(
         new RoundChangePayloadValidator(
-            this::createSignedDataValidator,
+            (roundIdentifier) -> createSignedDataValidator(roundIdentifier, parentHeader),
             validators,
             prepareMessageCountForQuorum(
                 IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
