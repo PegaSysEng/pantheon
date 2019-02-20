@@ -222,8 +222,8 @@ public class IbftController {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
       // Notify the synchronizer the transmitting peer must have the parent block to the received
       // message's target height.
-      sychronizerUpdater.updatePeerChainState(msgRoundIdentifier.getSequenceNumber() - 1L,
-          rawMsg.getConnection());
+      sychronizerUpdater.updatePeerChainState(
+          msgRoundIdentifier.getSequenceNumber() - 1L, rawMsg.getConnection());
     } else {
       LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
