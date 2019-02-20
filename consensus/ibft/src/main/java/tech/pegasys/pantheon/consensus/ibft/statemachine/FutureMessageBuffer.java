@@ -40,7 +40,9 @@ public class FutureMessageBuffer {
   private long chainHeight;
 
   public FutureMessageBuffer(
-      final long futureMessagesMaxDistance, final long futureMessagesLimit, final int chainHeight) {
+      final long futureMessagesMaxDistance,
+      final long futureMessagesLimit,
+      final long chainHeight) {
     this.futureMessagesMaxDistance = futureMessagesMaxDistance;
     this.futureMessagesLimit = futureMessagesLimit;
     this.chainHeight = chainHeight;

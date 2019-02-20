@@ -104,8 +104,7 @@ public class IbftControllerTest {
             ibftGossip,
             messageTracker,
             futureMessageBuffer,
-            mock(EthSynchronizerUpdater.class)
-        );
+            mock(EthSynchronizerUpdater.class));
 
     when(chainHeadBlockHeader.getNumber()).thenReturn(1L);
     when(chainHeadBlockHeader.getHash()).thenReturn(Hash.ZERO);
@@ -163,11 +162,7 @@ public class IbftControllerTest {
 
     when(futureMessageBuffer.poll(2L))
         .thenReturn(
-            ImmutableList.of(
-                prepareMessage,
-                proposalMessage,
-                commitMessage,
-                roundChangeMessage))
+            ImmutableList.of(prepareMessage, proposalMessage, commitMessage, roundChangeMessage))
         .thenReturn(emptyList());
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
 

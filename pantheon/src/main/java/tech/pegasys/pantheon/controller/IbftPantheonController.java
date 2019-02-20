@@ -242,7 +242,9 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final FutureMessageBuffer futureMessageBuffer =
         new FutureMessageBuffer(
-            ibftConfig.getFutureMessagesMaxDistance(), ibftConfig.getFutureMessagesLimit(), 0);
+            ibftConfig.getFutureMessagesMaxDistance(),
+            ibftConfig.getFutureMessagesLimit(),
+            blockchain.getChainHeadBlockNumber());
     final MessageTracker duplicateMessageTracker =
         new MessageTracker(ibftConfig.getDuplicateMessageLimit());
 
