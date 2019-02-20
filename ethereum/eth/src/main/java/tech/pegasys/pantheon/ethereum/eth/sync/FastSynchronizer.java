@@ -103,6 +103,7 @@ class FastSynchronizer<C> {
             stateQueue,
             syncConfig.getWorldStateHashCountPerRequest(),
             syncConfig.getWorldStateRequestParallelism(),
+            syncConfig.getWorldStateRequestMaxRetries(),
             ethTasksTimer,
             metricsSystem);
     final FastSyncDownloader<C> fastSyncDownloader =
@@ -131,6 +132,7 @@ class FastSynchronizer<C> {
   }
 
   public CompletableFuture<FastSyncState> start() {
+    LOG.info("Fast sync enabled");
     return fastSyncDownloader.start(initialSyncState);
   }
 
