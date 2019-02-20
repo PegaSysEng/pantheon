@@ -56,9 +56,7 @@ public class FutureMessageBuffer {
   }
 
   private void addMessageToBuffer(final long msgChainHeight, final Message rawMsg) {
-    if (!buffer.containsKey(msgChainHeight)) {
-      buffer.put(msgChainHeight, new ArrayList<>());
-    }
+    buffer.putIfAbsent(msgChainHeight, new ArrayList<>());
     buffer.get(msgChainHeight).add(rawMsg);
   }
 
