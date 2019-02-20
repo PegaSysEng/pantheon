@@ -56,7 +56,7 @@ class StandaloneCommand implements DefaultCommandValues {
       names = {"--rpc-http-authentication-credentials-file"},
       paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =
-          "Storage file for rpc http authentication credentials (default: ${DEFAULT-VALUE})",
+          "Storage file for RPC HTTP authentication credentials (default: ${DEFAULT-VALUE})",
       arity = "1")
   String rpcHttpAuthenticationCredentialsFile = null;
 
@@ -64,7 +64,7 @@ class StandaloneCommand implements DefaultCommandValues {
       names = {"--rpc-ws-authentication-credentials-file"},
       paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =
-          "Storage file for rpc websocket authentication credentials (default: ${DEFAULT-VALUE})",
+          "Storage file for RPC websocket authentication credentials (default: ${DEFAULT-VALUE})",
       arity = "1")
   String rpcWsAuthenticationCredentialsFile = null;
 
