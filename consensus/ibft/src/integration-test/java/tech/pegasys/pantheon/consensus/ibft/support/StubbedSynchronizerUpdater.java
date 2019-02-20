@@ -18,12 +18,13 @@ import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StubbedSynchronizerUpdater implements SynchronizerUpdater {
 
-  private Map<PeerConnection, ValidatorPeer> validatorNodes;
+  private Map<PeerConnection, ValidatorPeer> validatorNodes = new HashMap<>();
 
   @Override
   public void updatePeerChainState(
@@ -32,7 +33,7 @@ public class StubbedSynchronizerUpdater implements SynchronizerUpdater {
   }
 
   public void addNetworkPeers(final Collection<ValidatorPeer> nodes) {
-    validatorNodes =
-        nodes.stream().collect(Collectors.toMap(ValidatorPeer::getPeerConnection, identity()));
+    validatorNodes.putAll(
+        nodes.stream().collect(Collectors.toMap(ValidatorPeer::getPeerConnection, identity())));
   }
 }
