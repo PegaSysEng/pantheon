@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,13 +25,17 @@ public class FutureRoundProposalMessageValidator {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private MessageValidatorFactory messageValidatorFactory;
-  private long chainHeight;
+  private final MessageValidatorFactory messageValidatorFactory;
+  private final long chainHeight;
+  private final BlockHeader parentHeader;
 
   public FutureRoundProposalMessageValidator(
-      final MessageValidatorFactory messageValidatorFactory, final long chainHeight) {
+      final MessageValidatorFactory messageValidatorFactory,
+      final long chainHeight,
+      final BlockHeader parentHeader) {
     this.messageValidatorFactory = messageValidatorFactory;
     this.chainHeight = chainHeight;
+    this.parentHeader = parentHeader;
   }
 
   public boolean validateProposalMessage(final Proposal msg) {
@@ -41,7 +46,7 @@ public class FutureRoundProposalMessageValidator {
     }
 
     final MessageValidator messageValidator =
-        messageValidatorFactory.createMessageValidator(msg.getRoundIdentifier());
+        messageValidatorFactory.createMessageValidator(msg.getRoundIdentifier(), parentHeader);
 
     return messageValidator.validateProposal(msg);
   }

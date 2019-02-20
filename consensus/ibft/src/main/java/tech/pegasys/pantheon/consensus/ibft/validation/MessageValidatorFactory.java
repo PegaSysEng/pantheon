@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 
 import java.util.Collection;
@@ -49,7 +50,7 @@ public class MessageValidatorFactory {
   }
 
   private SignedDataValidator createSignedDataValidator(
-      final ConsensusRoundIdentifier roundIdentifier) {
+      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
 
     return new SignedDataValidator(
         getValidatorsAfterBlock(parentHeader),
@@ -69,7 +70,9 @@ public class MessageValidatorFactory {
         blockValidator,
         protocolContext,
         new RoundChangeCertificateValidator(
-            validators, this::createSignedDataValidator, roundIdentifier.getSequenceNumber()));
+            validators,
+            (ri) -> createSignedDataValidator(ri, parentHeader),
+            roundIdentifier.getSequenceNumber()));
   }
 
   public RoundChangeMessageValidator createRoundChangeMessageValidator(
@@ -87,8 +90,8 @@ public class MessageValidatorFactory {
   }
 
   public FutureRoundProposalMessageValidator createFutureRoundProposalMessageValidator(
-      final long chainHeight) {
+      final long chainHeight, final BlockHeader parentHeader) {
 
-    return new FutureRoundProposalMessageValidator(this, chainHeight);
+    return new FutureRoundProposalMessageValidator(this, chainHeight, parentHeader);
   }
 }

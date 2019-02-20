@@ -21,12 +21,13 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.consensus.ibft.IbftContextBuilder.setupContextWithValidators;
 import static tech.pegasys.pantheon.consensus.ibft.TestHelpers.createFrom;
 
-import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
@@ -35,15 +36,15 @@ import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.validation.FutureRoundProposalMessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -136,9 +137,9 @@ public class IbftBlockHeightManagerTest {
     when(blockCreator.createBlock(anyLong())).thenReturn(createdBlock);
 
     when(futureRoundProposalMessageValidator.validateProposalMessage(any())).thenReturn(true);
-    when(messageValidatorFactory.createFutureRoundProposalMessageValidator(anyLong()))
+    when(messageValidatorFactory.createFutureRoundProposalMessageValidator(anyLong(), any()))
         .thenReturn(futureRoundProposalMessageValidator);
-    when(messageValidatorFactory.createMessageValidator(any())).thenReturn(messageValidator);
+    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(messageValidator);
 
     protocolContext = new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 

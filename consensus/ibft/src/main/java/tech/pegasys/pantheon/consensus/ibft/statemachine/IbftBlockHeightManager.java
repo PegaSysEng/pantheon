@@ -22,15 +22,14 @@ import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.IbftMessage;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
+import tech.pegasys.pantheon.consensus.ibft.validation.FutureRoundProposalMessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.time.Clock;
@@ -91,14 +90,15 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     this.finalState = finalState;
 
     futureRoundProposalMessageValidator =
-        messageValidatorFactory.createFutureRoundProposalMessageValidator(getChainHeight());
+        messageValidatorFactory.createFutureRoundProposalMessageValidator(
+            getChainHeight(), parentHeader);
 
     roundStateCreator =
         (roundIdentifier) ->
             new RoundState(
                 roundIdentifier,
                 finalState.getQuorum(),
-                messageValidatorFactory.createMessageValidator(roundIdentifier));
+                messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
   }
 
   @Override

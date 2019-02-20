@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.util.Optional;
 
@@ -49,12 +50,14 @@ public class FutureRoundProposalMessageValidatorTest {
   @Before
   public void setup() {
 
-    when(messageValidatorFactory.createMessageValidator(any())).thenReturn(messageValidator);
+    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(messageValidator);
     when(messageValidator.validateProposal(any())).thenReturn(true);
+
+    final BlockHeader parentHeader = mock(BlockHeader.class);
 
     validator =
         new FutureRoundProposalMessageValidator(
-            messageValidatorFactory, roundIdentifier.getSequenceNumber());
+            messageValidatorFactory, roundIdentifier.getSequenceNumber(), parentHeader);
   }
 
   @Test
