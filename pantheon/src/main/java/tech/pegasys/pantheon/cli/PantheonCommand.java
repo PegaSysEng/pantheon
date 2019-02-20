@@ -272,26 +272,26 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-http-authentication-enabled"},
       description =
-          "Set if the RPC HTTP service should require authentication (default: ${DEFAULT-VALUE})")
+          "Set if the JSON-RPC HTTP service should require authentication (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpAuthenticationEnabled = false;
 
   @Option(
       names = {"--rpc-ws-enabled"},
       description =
-          "Set if the RPC WebSocket service should be started (default: ${DEFAULT-VALUE})")
+          "Set if the JSON-RPC WebSocket service should be started (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsEnabled = false;
 
   @Option(
       names = {"--rpc-ws-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
-      description = "Host for WebSocket JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Host for JSON-RPC WebSocket service to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private String rpcWsHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
       names = {"--rpc-ws-port"},
       paramLabel = MANDATORY_PORT_FORMAT_HELP,
-      description = "Port for WebSocket JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Port for JSON-RPC WebSocket service to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer rpcWsPort = DEFAULT_WEBSOCKET_PORT;
 
@@ -331,7 +331,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
-          "Set if the RPC WebSocket service should require authentication (default: ${DEFAULT-VALUE})")
+          "Set if the JSON-RPC WebSocket service should require authentication (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsAuthenticationEnabled = false;
 
   @Option(
@@ -391,7 +391,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--host-whitelist"},
       paramLabel = "<hostname>[,<hostname>...]... or * or all",
       description =
-          "Comma separated list of hostnames to whitelist for RPC access or * or all to accept any host (default: ${DEFAULT-VALUE})",
+          "Comma separated list of hostnames to whitelist for JSON-RPC access, or * or all to accept any host (default: ${DEFAULT-VALUE})",
       defaultValue = "localhost")
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
