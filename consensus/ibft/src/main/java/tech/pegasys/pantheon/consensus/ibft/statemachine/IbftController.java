@@ -196,8 +196,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(msgRoundIdentifier)) {
       return isMsgFromKnownValidator(msg) && ibftFinalState.isLocalNodeValidator();
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
-      futureMessageBuffer.addMessage(
-          currentHeightManager.getChainHeight(), msgRoundIdentifier.getSequenceNumber(), rawMsg);
+      futureMessageBuffer.addMessage(msgRoundIdentifier.getSequenceNumber(), rawMsg);
     } else {
       LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",

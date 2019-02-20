@@ -39,13 +39,13 @@ public class FutureMessageBufferTest {
   @Before
   public void setup() {
     message = createMessage("0x10");
-    futureMsgBuffer = new FutureMessageBuffer(5, 5);
+    futureMsgBuffer = new FutureMessageBuffer(5, 5, 0);
   }
 
   @Test
   public void addsFutureMessages() {
-    futureMsgBuffer.addMessage(0, 1, message);
-    futureMsgBuffer.addMessage(0, 2, message);
+    futureMsgBuffer.addMessage(1, message);
+    futureMsgBuffer.addMessage(2, message);
     assertThat(futureMsgBuffer.poll(1)).containsExactly(message);
     assertThat(futureMsgBuffer.poll(2)).containsExactly(message);
     assertThat(futureMsgBuffer.poll(2)).isEmpty();
@@ -58,14 +58,14 @@ public class FutureMessageBufferTest {
 
   @Test
   public void doNotAddFutureMessagesWhenBeyondMaxDistanceFromCurrentHeight() {
-    futureMsgBuffer.addMessage(0, 6, message);
-    futureMsgBuffer.addMessage(0, 7, message);
+    futureMsgBuffer.addMessage(6, message);
+    futureMsgBuffer.addMessage(7, message);
     assertThat(futureMsgBuffer.poll(6)).isEmpty();
     assertThat(futureMsgBuffer.poll(7)).isEmpty();
 
-    futureMsgBuffer.addMessage(0, 1, message);
-    futureMsgBuffer.addMessage(0, 4, message);
-    futureMsgBuffer.addMessage(0, 5, message);
+    futureMsgBuffer.addMessage(1, message);
+    futureMsgBuffer.addMessage(4, message);
+    futureMsgBuffer.addMessage(5, message);
     assertThat(futureMsgBuffer.poll(1)).containsExactly(message);
     assertThat(futureMsgBuffer.poll(4)).containsExactly(message);
     assertThat(futureMsgBuffer.poll(5)).containsExactly(message);
@@ -73,9 +73,9 @@ public class FutureMessageBufferTest {
 
   @Test
   public void removeHighestChainHeightWhenOverMessageLimit() {
-    DefaultMessage[] height1Msgs = addMessages(0, 1, 4);
-    addMessages(0, 2, 1);
-    futureMsgBuffer.addMessage(0, 1, message);
+    DefaultMessage[] height1Msgs = addMessages(1, 4);
+    addMessages(2, 1);
+    futureMsgBuffer.addMessage(1, message);
 
     List<Message> actualHeight1Msgs = futureMsgBuffer.poll(1);
     assertThat(actualHeight1Msgs).contains(height1Msgs);
@@ -85,8 +85,8 @@ public class FutureMessageBufferTest {
 
   @Test
   public void removeOldestMessageWhenOverLimitAndSingleHeightInBuffer() {
-    DefaultMessage[] messages = addMessages(0, 1, 5);
-    futureMsgBuffer.addMessage(0, 1, message);
+    DefaultMessage[] messages = addMessages(1, 5);
+    futureMsgBuffer.addMessage(1, message);
 
     final DefaultMessage[] messagesExcludingFirst = copyOfRange(messages, 1, messages.length);
     final List<Message> actualHeight1Msgs = futureMsgBuffer.poll(1L);
@@ -96,27 +96,28 @@ public class FutureMessageBufferTest {
 
   @Test
   public void doNotAddMessageLessThanOrEqualToCurrentChainHeight() {
-    futureMsgBuffer.addMessage(2, 0, message);
-    futureMsgBuffer.addMessage(2, 1, message);
-    futureMsgBuffer.addMessage(2, 2, message);
+    futureMsgBuffer.updateChainHeight(2);
+    futureMsgBuffer.addMessage(0, message);
+    futureMsgBuffer.addMessage(1, message);
+    futureMsgBuffer.addMessage(2, message);
     assertThat(futureMsgBuffer.poll(2)).isEmpty();
 
-    futureMsgBuffer.addMessage(2, 3, message);
+    futureMsgBuffer.addMessage(3, message);
     assertThat(futureMsgBuffer.poll(3)).containsExactly(message);
   }
 
   @Test
   public void doNotAddMessagesWhenLimitIsZero() {
-    futureMsgBuffer = new FutureMessageBuffer(1, 0);
-    futureMsgBuffer.addMessage(0, 1, message);
+    futureMsgBuffer = new FutureMessageBuffer(1, 0, 0);
+    futureMsgBuffer.addMessage(1, message);
     assertThat(futureMsgBuffer.poll(0)).isEmpty();
   }
 
   @Test
   public void doNotMessageWhenMessageHeightIsHighestAndOverLimit() {
-    DefaultMessage[] height1Msgs = addMessages(0, 1, 4);
-    DefaultMessage[] height2Msgs = addMessages(0, 2, 1);
-    futureMsgBuffer.addMessage(0, 3, message);
+    DefaultMessage[] height1Msgs = addMessages(1, 4);
+    DefaultMessage[] height2Msgs = addMessages(2, 1);
+    futureMsgBuffer.addMessage(3, message);
 
     assertThat(futureMsgBuffer.poll(1)).containsExactly(height1Msgs);
     assertThat(futureMsgBuffer.poll(2)).containsExactly(height2Msgs);
@@ -125,24 +126,24 @@ public class FutureMessageBufferTest {
 
   @Test
   public void totalMessagesSizeUpdatedWhenMessagesAdded() {
-    futureMsgBuffer = new FutureMessageBuffer(5, 10);
+    futureMsgBuffer = new FutureMessageBuffer(5, 10, 0);
 
-    addMessages(0, 1, 2);
+    addMessages(1, 2);
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(2);
 
-    addMessages(0, 2, 3);
+    addMessages(2, 3);
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(5);
 
-    addMessages(0, 1, 3);
+    addMessages(1, 3);
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(8);
   }
 
   @Test
   public void totalMessagesSizeUpdatedWhenMessagesPolled() {
-    futureMsgBuffer = new FutureMessageBuffer(5, 10);
-    addMessages(0, 1, 2);
-    addMessages(0, 2, 3);
-    addMessages(0, 1, 3);
+    futureMsgBuffer = new FutureMessageBuffer(5, 10, 0);
+    addMessages(1, 2);
+    addMessages(2, 3);
+    addMessages(1, 3);
 
     futureMsgBuffer.poll(2);
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(5);
@@ -153,26 +154,26 @@ public class FutureMessageBufferTest {
 
   @Test
   public void totalSizeUpdatedWhenMessagesAreEvicted() {
-    futureMsgBuffer = new FutureMessageBuffer(5, 5);
-    addMessages(0, 1, 2);
-    addMessages(0, 2, 3);
+    futureMsgBuffer = new FutureMessageBuffer(5, 5, 0);
+    addMessages(1, 2);
+    addMessages(2, 3);
 
     // height 2 will be evicted
-    futureMsgBuffer.addMessage(0, 1, message);
+    futureMsgBuffer.addMessage(1, message);
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(3);
 
     for (int i = 0; i <= 5; i++) {
-      futureMsgBuffer.addMessage(0, 1, message);
+      futureMsgBuffer.addMessage(1, message);
     }
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(5);
   }
 
-  private DefaultMessage[] addMessages(final int chainHeight, final long height, final int count) {
+  private DefaultMessage[] addMessages(final long height, final int count) {
     return IntStream.range(0, count)
         .mapToObj(
             i -> {
               final DefaultMessage message = createMessage("0x0" + i);
-              futureMsgBuffer.addMessage(chainHeight, height, message);
+              futureMsgBuffer.addMessage(height, message);
               return message;
             })
         .collect(Collectors.toList())

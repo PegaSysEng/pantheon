@@ -299,7 +299,7 @@ public class TestContextBuilder {
 
     final MessageTracker duplicateMessageTracker = new MessageTracker(DUPLICATE_MESSAGE_LIMIT);
     final FutureMessageBuffer futureMessageBuffer =
-        new FutureMessageBuffer(FUTURE_MESSAGES_MAX_DISTANCE, FUTURE_MESSAGES_LIMIT);
+        new FutureMessageBuffer(FUTURE_MESSAGES_MAX_DISTANCE, FUTURE_MESSAGES_LIMIT, 0);
 
     final IbftController ibftController =
         new IbftController(

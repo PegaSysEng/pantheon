@@ -37,13 +37,20 @@ public class FutureMessageBuffer {
   private final NavigableMap<Long, List<Message>> buffer = new TreeMap<>();
   private final long futureMessagesMaxDistance;
   private final long futureMessagesLimit;
+  private long chainHeight;
 
-  public FutureMessageBuffer(final long futureMessagesMaxDistance, final long futureMessagesLimit) {
+  public FutureMessageBuffer(
+      final long futureMessagesMaxDistance, final long futureMessagesLimit, final int chainHeight) {
     this.futureMessagesMaxDistance = futureMessagesMaxDistance;
     this.futureMessagesLimit = futureMessagesLimit;
+    this.chainHeight = chainHeight;
   }
 
-  public void addMessage(final long chainHeight, final long msgChainHeight, final Message rawMsg) {
+  public void updateChainHeight(final long chainHeight) {
+    this.chainHeight = chainHeight;
+  }
+
+  public void addMessage(final long msgChainHeight, final Message rawMsg) {
     if (futureMessagesLimit == 0 || !validMessageHeight(msgChainHeight, chainHeight)) {
       return;
     }

@@ -236,7 +236,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final FutureMessageBuffer futureMessageBuffer =
         new FutureMessageBuffer(
-            ibftConfig.getFutureMessagesMaxDistance(), ibftConfig.getFutureMessagesLimit());
+            ibftConfig.getFutureMessagesMaxDistance(), ibftConfig.getFutureMessagesLimit(), 0);
     final MessageTracker duplicateMessageTracker =
         new MessageTracker(ibftConfig.getDuplicateMessageLimit());
 
