@@ -168,6 +168,33 @@ public class FutureMessageBufferTest {
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(5);
   }
 
+  @Test
+  public void updatesChainHeight() {
+    futureMsgBuffer.addMessage(1, message);
+    assertThat(futureMsgBuffer.poll(1)).containsExactly(message);
+
+    futureMsgBuffer.updateChainHeight(2);
+    futureMsgBuffer.addMessage(1, message);
+    futureMsgBuffer.addMessage(2, message);
+    futureMsgBuffer.addMessage(3, message);
+    assertThat(futureMsgBuffer.poll(1)).isEmpty();
+    assertThat(futureMsgBuffer.poll(2)).isEmpty();
+    assertThat(futureMsgBuffer.poll(3)).containsExactly(message);
+  }
+
+  @Test
+  public void updateChainHeightDiscardsOldHeights() {
+    futureMsgBuffer.addMessage(0, message);
+    futureMsgBuffer.addMessage(1, message);
+    futureMsgBuffer.addMessage(3, message);
+    futureMsgBuffer.addMessage(4, message);
+
+    futureMsgBuffer.updateChainHeight(3);
+    assertThat(futureMsgBuffer.poll(1)).isEmpty();
+    assertThat(futureMsgBuffer.poll(2)).isEmpty();
+    assertThat(futureMsgBuffer.poll(3)).isEmpty();
+  }
+
   private DefaultMessage[] addMessages(final long height, final int count) {
     return IntStream.range(0, count)
         .mapToObj(

@@ -48,6 +48,11 @@ public class FutureMessageBuffer {
 
   public void updateChainHeight(final long chainHeight) {
     this.chainHeight = chainHeight;
+    if (!buffer.isEmpty()) {
+      for (long height = buffer.firstKey(); height <= chainHeight; height++) {
+        buffer.remove(height);
+      }
+    }
   }
 
   public void addMessage(final long msgChainHeight, final Message rawMsg) {

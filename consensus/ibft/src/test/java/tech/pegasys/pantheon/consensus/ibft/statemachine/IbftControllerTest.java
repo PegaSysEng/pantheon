@@ -143,6 +143,7 @@ public class IbftControllerTest {
 
     ibftController.start();
     verify(futureMessageBuffer).poll(2L);
+    verify(futureMessageBuffer).updateChainHeight(2L);
     verify(futureMessageBuffer, never()).poll(3L);
     verify(blockHeightManagerFactory).create(chainHeadBlockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
@@ -183,6 +184,7 @@ public class IbftControllerTest {
     verify(blockHeightManagerFactory).create(nextBlock);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager, times(2)).start(); // once at beginning, and again on newChainHead.
+    verify(futureMessageBuffer, times(2)).updateChainHeight(2L);
     verify(blockHeightManager).handleProposalPayload(proposal);
     verify(ibftGossip).send(proposalMessage);
     verify(blockHeightManager).handlePreparePayload(prepare);
