@@ -523,7 +523,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
-    // Check that p2p options are able top work or send an error
+    // Check that p2p options are able to work or send an error
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
@@ -536,7 +536,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--banned-node-id",
             "--banned-node-ids"));
 
-    // Check that mining options are able top work or send an error
+    // Check that mining options are able to work or send an error
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
@@ -550,6 +550,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           this.commandLine,
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
+    }
+
+    if (permissionsConfigFile != null) {
+      if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+        logger.warn(
+            "Permissions config file set {} but no permissions enabled", permissionsConfigFile);
+      }
     }
 
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
@@ -688,6 +695,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
     webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile());
+    webSocketConfiguration.setHostsWhitelist(hostsWhitelist);
     return webSocketConfiguration;
   }
 
@@ -733,6 +741,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
 
     if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+      if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
+        logger.warn(
+            "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
+      }
       return Optional.empty();
     }
 
@@ -932,7 +944,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private Path dataDir() {
     if (isFullInstantiation()) {
-      return standaloneCommands.dataPath;
+      return standaloneCommands.dataPath.toAbsolutePath();
     } else if (isDocker) {
       return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {

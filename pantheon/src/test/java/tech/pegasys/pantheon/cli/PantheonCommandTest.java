@@ -28,6 +28,7 @@ import static tech.pegasys.pantheon.cli.NetworkName.RINKEBY;
 import static tech.pegasys.pantheon.cli.NetworkName.ROPSTEN;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.ETH;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.NET;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.PERM;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.WEB3;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
@@ -303,7 +304,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             .setGenesisConfig(encodeJsonGenesis(GENESIS_VALID_JSON))
             .setBootNodes(nodes)
             .build();
-    verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata")));
+    verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata").toAbsolutePath()));
     verify(mockControllerBuilder).ethNetworkConfig(eq(networkConfig));
     verify(mockControllerBuilder).syncWithOttoman(eq(false));
 
@@ -333,6 +334,31 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verifyZeroInteractions(mockRunnerBuilder);
 
     assertThat(commandErrorOutput.toString()).contains("Configuration file does not exist");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsTomlFileWithNoPermissionsEnabledMustError() throws IOException {
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final Path permToml = Files.createTempFile("toml", "");
+    Files.write(permToml, Resources.toByteArray(configFile));
+    parseCommand("--permissions-config-file", permToml.toString());
+    permToml.toFile().deleteOnExit();
+
+    verify(mockRunnerBuilder).build();
+
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void defaultPermissionsTomlFileWithNoPermissionsEnabledMustError() throws IOException {
+    parseCommand("--p2p-enabled", "false");
+
+    verify(mockRunnerBuilder).build();
+
+    assertThat(commandErrorOutput.toString()).doesNotContain("no permissions enabled");
     assertThat(commandOutput.toString()).isEmpty();
   }
 
@@ -505,10 +531,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockControllerBuilder).homePath(pathArgumentCaptor.capture());
     verify(mockControllerBuilder).syncWithOttoman(eq(false));
-    verify(mockControllerBuilder).nodePrivateKeyFile(eq(path.resolve("key").toFile()));
+    verify(mockControllerBuilder)
+        .nodePrivateKeyFile(eq(path.resolve("key").toAbsolutePath().toFile()));
     verify(mockControllerBuilder).build();
 
-    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(path);
+    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(path.toAbsolutePath());
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -921,13 +948,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void rpcApisPropertyMustBeUsed() {
-    parseCommand("--rpc-http-api", "ETH,NET", "--rpc-http-enabled");
+    parseCommand("--rpc-http-api", "ETH,NET,PERM", "--rpc-http-enabled");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
+    verify(mockLogger)
+        .warn("Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().getRpcApis())
-        .containsExactlyInAnyOrder(ETH, NET);
+        .containsExactlyInAnyOrder(ETH, NET, PERM);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
