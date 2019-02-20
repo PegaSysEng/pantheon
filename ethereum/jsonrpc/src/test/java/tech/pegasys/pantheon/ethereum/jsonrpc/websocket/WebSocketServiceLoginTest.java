@@ -22,15 +22,25 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.Subscriptio
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.RequestOptions;
+import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.jwt.JWTOptions;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -46,6 +56,7 @@ public class WebSocketServiceLoginTest {
   private WebSocketRequestHandler webSocketRequestHandlerSpy;
   private WebSocketService websocketService;
   private HttpClient httpClient;
+  protected static JWTAuth jwtAuth;
 
   @Before
   public void before() throws URISyntaxException {
@@ -60,6 +71,7 @@ public class WebSocketServiceLoginTest {
     websocketConfiguration.setPort(0);
     websocketConfiguration.setAuthenticationEnabled(true);
     websocketConfiguration.setAuthenticationCredentialsFile(authTomlPath);
+    websocketConfiguration.setHostsWhitelist(Collections.singleton("*"));
 
     final Map<String, JsonRpcMethod> websocketMethods =
         new WebSocketMethodsFactory(new SubscriptionManager(), new HashMap<>()).methods();
@@ -68,6 +80,7 @@ public class WebSocketServiceLoginTest {
     websocketService =
         new WebSocketService(vertx, websocketConfiguration, webSocketRequestHandlerSpy);
     websocketService.start().join();
+    jwtAuth = websocketService.authenticationService.get().getJwtAuthProvider();
 
     websocketConfiguration.setPort(websocketService.socketAddress().getPort());
 
@@ -86,7 +99,8 @@ public class WebSocketServiceLoginTest {
   }
 
   @Test
-  public void loginWithBadCredentials() {
+  public void loginWithBadCredentials(final TestContext context) {
+    final Async async = context.async();
     final HttpClientRequest request =
         httpClient.post(
             websocketConfiguration.getPort(),
@@ -95,13 +109,16 @@ public class WebSocketServiceLoginTest {
             response -> {
               assertThat(response.statusCode()).isEqualTo(401);
               assertThat(response.statusMessage()).isEqualTo("Unauthorized");
+              async.complete();
             });
     request.putHeader("Content-Type", "application/json; charset=utf-8");
     request.end("{\"username\":\"user\",\"password\":\"pass\"}");
+    async.awaitSuccess(VERTX_AWAIT_TIMEOUT_MILLIS);
   }
 
   @Test
-  public void loginWithGoodCredentials() {
+  public void loginWithGoodCredentials(final TestContext context) {
+    final Async async = context.async();
     final HttpClientRequest request =
         httpClient.post(
             websocketConfiguration.getPort(),
@@ -142,10 +159,89 @@ public class WebSocketServiceLoginTest {
                                     assertThat(authed.succeeded()).isTrue();
                                     assertThat(authed.result()).isTrue();
                                   });
+                              user.isAuthorized(
+                                  "eth:subscribe",
+                                  (authed) -> {
+                                    assertThat(authed.succeeded()).isTrue();
+                                    assertThat(authed.result()).isTrue();
+                                    async.complete();
+                                  });
                             });
                   });
             });
     request.putHeader("Content-Type", "application/json; charset=utf-8");
     request.end("{\"username\":\"user\",\"password\":\"pegasys\"}");
+
+    async.awaitSuccess(VERTX_AWAIT_TIMEOUT_MILLIS);
+  }
+
+  @Test
+  public void websocketServiceWithBadHeaderAuthenticationToken(final TestContext context) {
+    final Async async = context.async();
+
+    final String request = "{\"id\": 1, \"method\": \"eth_subscribe\", \"params\": [\"syncing\"]}";
+    final String expectedResponse =
+        "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-40100,\"message\":\"Unauthorized\"}}";
+
+    RequestOptions options = new RequestOptions();
+    options.setURI("/");
+    options.setHost(websocketConfiguration.getHost());
+    options.setPort(websocketConfiguration.getPort());
+    final MultiMap headers = new VertxHttpHeaders();
+    String badtoken = "badtoken";
+    if (badtoken != null) {
+      headers.add("Authorization", "Bearer " + badtoken);
+    }
+    httpClient.websocket(
+        options,
+        headers,
+        webSocket -> {
+          webSocket.write(Buffer.buffer(request));
+
+          webSocket.handler(
+              buffer -> {
+                context.assertEquals(expectedResponse, buffer.toString());
+                async.complete();
+              });
+        });
+
+    async.awaitSuccess(VERTX_AWAIT_TIMEOUT_MILLIS);
+  }
+
+  @Test
+  public void websocketServiceWithGoodHeaderAuthenticationToken(final TestContext context) {
+    final Async async = context.async();
+
+    final JWTOptions jwtOptions = new JWTOptions().setExpiresInMinutes(5).setAlgorithm("RS256");
+    final JsonObject jwtContents =
+        new JsonObject().put("permissions", Lists.newArrayList("eth:*")).put("username", "user");
+    final String goodToken = jwtAuth.generateToken(jwtContents, jwtOptions);
+
+    final String requestSub =
+        "{\"id\": 1, \"method\": \"eth_subscribe\", \"params\": [\"syncing\"]}";
+    final String expectedResponse = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x1\"}";
+
+    RequestOptions options = new RequestOptions();
+    options.setURI("/");
+    options.setHost(websocketConfiguration.getHost());
+    options.setPort(websocketConfiguration.getPort());
+    final MultiMap headers = new VertxHttpHeaders();
+    if (goodToken != null) {
+      headers.add("Authorization", "Bearer " + goodToken);
+    }
+    httpClient.websocket(
+        options,
+        headers,
+        webSocket -> {
+          webSocket.write(Buffer.buffer(requestSub));
+
+          webSocket.handler(
+              buffer -> {
+                context.assertEquals(expectedResponse, buffer.toString());
+                async.complete();
+              });
+        });
+
+    async.awaitSuccess(VERTX_AWAIT_TIMEOUT_MILLIS);
   }
 }

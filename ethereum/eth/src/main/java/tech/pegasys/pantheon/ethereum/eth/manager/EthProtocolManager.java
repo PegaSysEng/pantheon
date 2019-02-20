@@ -20,8 +20,8 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
-import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
+import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
@@ -31,12 +31,12 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -63,6 +63,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
   private final boolean fastSyncEnabled;
   private List<Capability> supportedCapabilities;
   private final Blockchain blockchain;
+  private final BlockBroadcaster blockBroadcaster;
 
   EthProtocolManager(
       final Blockchain blockchain,
@@ -72,7 +73,6 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int requestLimit,
       final EthScheduler scheduler) {
     this.networkId = networkId;
-
     this.scheduler = scheduler;
     this.blockchain = blockchain;
     this.fastSyncEnabled = fastSyncEnabled;
@@ -83,6 +83,8 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     ethPeers = new EthPeers(getSupportedProtocol());
     ethMessages = new EthMessages();
     ethContext = new EthContext(getSupportedProtocol(), ethPeers, ethMessages, scheduler);
+
+    this.blockBroadcaster = new BlockBroadcaster(ethContext);
 
     // Set up request handlers
     new EthServer(blockchain, worldStateArchive, ethMessages, requestLimit);
@@ -96,14 +98,15 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int syncWorkers,
       final int txWorkers,
       final int computationWorkers,
-      final int requestLimit) {
+      final int requestLimit,
+      final MetricsSystem metricsSystem) {
     this(
         blockchain,
         worldStateArchive,
         networkId,
         fastSyncEnabled,
         requestLimit,
-        new EthScheduler(syncWorkers, txWorkers, computationWorkers));
+        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem));
   }
 
   public EthProtocolManager(
@@ -113,7 +116,8 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final boolean fastSyncEnabled,
       final int syncWorkers,
       final int txWorkers,
-      final int computationWorkers) {
+      final int computationWorkers,
+      final MetricsSystem metricsSystem) {
     this(
         blockchain,
         worldStateArchive,
@@ -122,7 +126,8 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         syncWorkers,
         txWorkers,
         computationWorkers,
-        DEFAULT_REQUEST_LIMIT);
+        DEFAULT_REQUEST_LIMIT,
+        metricsSystem);
   }
 
   public EthContext ethContext() {
@@ -267,24 +272,13 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
   @Override
   public void blockMined(final Block block) {
     // This assumes the block has already been included in the chain
-
-    final Optional<UInt256> totalDifficulty = blockchain.getTotalDifficultyByHash(block.getHash());
-    if (!totalDifficulty.isPresent()) {
-      throw new IllegalStateException(
-          "Unable to get total difficulty from blockchain for mined block.");
-    }
-
-    final NewBlockMessage newBlockMessage = NewBlockMessage.create(block, totalDifficulty.get());
-
-    ethPeers
-        .availablePeers()
-        .forEach(
-            peer -> {
-              try {
-                peer.send(newBlockMessage);
-              } catch (final PeerNotConnected ex) {
-                // Peers may disconnect while traversing the list, this is a normal occurrence.
-              }
-            });
+    final UInt256 totalDifficulty =
+        blockchain
+            .getTotalDifficultyByHash(block.getHash())
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        "Unable to get total difficulty from blockchain for mined block."));
+    blockBroadcaster.propagate(block, totalDifficulty);
   }
 }

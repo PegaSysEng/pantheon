@@ -21,9 +21,9 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.WaitForPeersTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeersTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -119,7 +119,7 @@ public class FastSyncActions<C> {
   private CompletableFuture<FastSyncState> selectPivotBlockFromPeers() {
     return ethContext
         .getEthPeers()
-        .bestPeer()
+        .highestTotalDifficultyPeer()
         .filter(peer -> peer.chainState().hasEstimatedHeight())
         .map(
             peer -> {

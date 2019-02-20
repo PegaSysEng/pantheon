@@ -86,6 +86,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
   private final boolean discoveryEnabled;
+  private final boolean isBootnode;
 
   private List<String> bootnodes = new ArrayList<>();
   private JsonRequestFactories jsonRequestFactories;
@@ -105,7 +106,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final GenesisConfigProvider genesisConfigProvider,
       final int p2pPort,
       final Boolean p2pEnabled,
-      final boolean discoveryEnabled)
+      final boolean discoveryEnabled,
+      final boolean isBootnode)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
@@ -120,6 +122,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.devMode = devMode;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
+    this.isBootnode = isBootnode;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -202,7 +205,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         final String url = wsRpcBaseUrl().orElse("ws://" + LOCALHOST + ":" + 8546);
         final Map<String, String> headers = new HashMap<>();
         if (token != null) {
-          headers.put("Bearer", token);
+          headers.put("Authorization", "Bearer " + token);
         }
         final WebSocketClient wsClient = new WebSocketClient(URI.create(url), headers);
 
@@ -220,7 +223,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
                 .map(HttpService::new)
                 .orElse(new HttpService("http://" + LOCALHOST + ":" + 8545));
         if (token != null) {
-          ((HttpService) web3jService).addHeader("Bearer", token);
+          ((HttpService) web3jService).addHeader("Authorization", "Bearer " + token);
         }
       }
 
@@ -427,6 +430,11 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   public boolean isDiscoveryEnabled() {
     return discoveryEnabled;
+  }
+
+  @Override
+  public boolean isBootnode() {
+    return isBootnode;
   }
 
   Optional<PermissioningConfiguration> getPermissioningConfiguration() {
