@@ -45,6 +45,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IbftController {
+
   private static final Logger LOG = LogManager.getLogger();
   private final Blockchain blockchain;
   private final IbftFinalState ibftFinalState;
@@ -219,6 +220,10 @@ public class IbftController {
       return isMsgFromKnownValidator(msg) && ibftFinalState.isLocalNodeValidator();
     } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
       addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
+      // Notify the synchronizer the transmitting peer must have the parent block to the received
+      // message's target height.
+      sychronizerUpdater.updatePeerChainState(msgRoundIdentifier.getSequenceNumber() - 1L,
+          rawMsg.getConnection());
     } else {
       LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
@@ -246,9 +251,5 @@ public class IbftController {
       futureMessages.put(chainHeight, Lists.newArrayList());
     }
     futureMessages.get(chainHeight).add(rawMsg);
-
-    // Notify the synchroniser the transmitting peer must have the parent block to the received
-    // message's target height.
-    sychronizerUpdater.updatePeerChainState(chainHeight - 1L, rawMsg.getConnection());
   }
 }
