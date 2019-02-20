@@ -48,15 +48,6 @@ public class FutureMessageBuffer {
     this.chainHeight = chainHeight;
   }
 
-  public void updateChainHeight(final long chainHeight) {
-    this.chainHeight = chainHeight;
-    if (!buffer.isEmpty()) {
-      for (long height = buffer.firstKey(); height <= chainHeight; height++) {
-        buffer.remove(height);
-      }
-    }
-  }
-
   public void addMessage(final long msgChainHeight, final Message rawMsg) {
     if (futureMessagesLimit == 0 || !validMessageHeight(msgChainHeight, chainHeight)) {
       return;
@@ -90,10 +81,19 @@ public class FutureMessageBuffer {
     }
   }
 
-  public List<Message> poll(final long msgChainHeight) {
-    final List<Message> messages = buffer.getOrDefault(msgChainHeight, Collections.emptyList());
-    buffer.remove(msgChainHeight);
+  public List<Message> retrieveMessagesForHeight(final long height) {
+    this.chainHeight = height;
+    final List<Message> messages = buffer.getOrDefault(height, Collections.emptyList());
+    discardPreviousHeightMessages();
     return messages;
+  }
+
+  private void discardPreviousHeightMessages() {
+    if (!buffer.isEmpty()) {
+      for (long h = buffer.firstKey(); h <= chainHeight; h++) {
+        buffer.remove(h);
+      }
+    }
   }
 
   @VisibleForTesting

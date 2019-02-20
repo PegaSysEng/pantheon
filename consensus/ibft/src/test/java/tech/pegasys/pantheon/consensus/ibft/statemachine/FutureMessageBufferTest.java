@@ -38,7 +38,7 @@ public class FutureMessageBufferTest {
 
   @Before
   public void setup() {
-    message = createMessage("0x10");
+    message = createMessage(10);
     futureMsgBuffer = new FutureMessageBuffer(5, 5, 0);
   }
 
@@ -46,29 +46,44 @@ public class FutureMessageBufferTest {
   public void addsFutureMessages() {
     futureMsgBuffer.addMessage(1, message);
     futureMsgBuffer.addMessage(2, message);
-    assertThat(futureMsgBuffer.poll(1)).containsExactly(message);
-    assertThat(futureMsgBuffer.poll(2)).containsExactly(message);
-    assertThat(futureMsgBuffer.poll(2)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(1)).containsExactly(message);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(2)).containsExactly(message);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(2)).isEmpty();
   }
 
   @Test
-  public void pollOnHeightWithNoMessagesReturnsEmptySet() {
-    assertThat(futureMsgBuffer.poll(3)).isEmpty();
+  public void retrieveMessagesOnHeightWithNoMessagesReturnsEmptySet() {
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(3)).isEmpty();
+  }
+
+  @Test
+  public void retrieveMessagesDiscardsOldHeights() {
+    final Message msg1 = createMessage(1);
+    final Message msg2 = createMessage(2);
+    final Message msg3 = createMessage(3);
+    futureMsgBuffer.addMessage(1, msg1);
+    futureMsgBuffer.addMessage(2, msg2);
+    futureMsgBuffer.addMessage(3, msg3);
+
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(2)).containsExactly(msg2);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(1)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(3)).containsExactly(msg3);
   }
 
   @Test
   public void doNotAddFutureMessagesWhenBeyondMaxDistanceFromCurrentHeight() {
     futureMsgBuffer.addMessage(6, message);
     futureMsgBuffer.addMessage(7, message);
-    assertThat(futureMsgBuffer.poll(6)).isEmpty();
-    assertThat(futureMsgBuffer.poll(7)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(6)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(7)).isEmpty();
 
+    futureMsgBuffer.retrieveMessagesForHeight(0);
     futureMsgBuffer.addMessage(1, message);
     futureMsgBuffer.addMessage(4, message);
     futureMsgBuffer.addMessage(5, message);
-    assertThat(futureMsgBuffer.poll(1)).containsExactly(message);
-    assertThat(futureMsgBuffer.poll(4)).containsExactly(message);
-    assertThat(futureMsgBuffer.poll(5)).containsExactly(message);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(1)).containsExactly(message);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(4)).containsExactly(message);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(5)).containsExactly(message);
   }
 
   @Test
@@ -77,10 +92,10 @@ public class FutureMessageBufferTest {
     addMessages(2, 1);
     futureMsgBuffer.addMessage(1, message);
 
-    List<Message> actualHeight1Msgs = futureMsgBuffer.poll(1);
+    List<Message> actualHeight1Msgs = futureMsgBuffer.retrieveMessagesForHeight(1);
     assertThat(actualHeight1Msgs).contains(height1Msgs);
     assertThat(actualHeight1Msgs).contains(message);
-    assertThat(futureMsgBuffer.poll(2)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(2)).isEmpty();
   }
 
   @Test
@@ -89,28 +104,28 @@ public class FutureMessageBufferTest {
     futureMsgBuffer.addMessage(1, message);
 
     final DefaultMessage[] messagesExcludingFirst = copyOfRange(messages, 1, messages.length);
-    final List<Message> actualHeight1Msgs = futureMsgBuffer.poll(1L);
+    final List<Message> actualHeight1Msgs = futureMsgBuffer.retrieveMessagesForHeight(1L);
     assertThat(actualHeight1Msgs).contains(messagesExcludingFirst);
     assertThat(actualHeight1Msgs).contains(message);
   }
 
   @Test
   public void doNotAddMessageLessThanOrEqualToCurrentChainHeight() {
-    futureMsgBuffer.updateChainHeight(2);
+    futureMsgBuffer = new FutureMessageBuffer(5, 5, 2);
     futureMsgBuffer.addMessage(0, message);
     futureMsgBuffer.addMessage(1, message);
     futureMsgBuffer.addMessage(2, message);
-    assertThat(futureMsgBuffer.poll(2)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(2)).isEmpty();
 
     futureMsgBuffer.addMessage(3, message);
-    assertThat(futureMsgBuffer.poll(3)).containsExactly(message);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(3)).containsExactly(message);
   }
 
   @Test
   public void doNotAddMessagesWhenLimitIsZero() {
     futureMsgBuffer = new FutureMessageBuffer(1, 0, 0);
     futureMsgBuffer.addMessage(1, message);
-    assertThat(futureMsgBuffer.poll(0)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(0)).isEmpty();
   }
 
   @Test
@@ -119,9 +134,9 @@ public class FutureMessageBufferTest {
     DefaultMessage[] height2Msgs = addMessages(2, 1);
     futureMsgBuffer.addMessage(3, message);
 
-    assertThat(futureMsgBuffer.poll(1)).containsExactly(height1Msgs);
-    assertThat(futureMsgBuffer.poll(2)).containsExactly(height2Msgs);
-    assertThat(futureMsgBuffer.poll(3)).isEmpty();
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(1)).containsExactly(height1Msgs);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(2)).containsExactly(height2Msgs);
+    assertThat(futureMsgBuffer.retrieveMessagesForHeight(3)).isEmpty();
   }
 
   @Test
@@ -139,16 +154,19 @@ public class FutureMessageBufferTest {
   }
 
   @Test
-  public void totalMessagesSizeUpdatedWhenMessagesPolled() {
-    futureMsgBuffer = new FutureMessageBuffer(5, 10, 0);
+  public void totalMessagesSizeUpdatedWhenMessagesAreRetrieved() {
+    futureMsgBuffer = new FutureMessageBuffer(10, 10, 0);
     addMessages(1, 2);
     addMessages(2, 3);
-    addMessages(1, 3);
+    addMessages(3, 4);
 
-    futureMsgBuffer.poll(2);
-    assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(5);
+    futureMsgBuffer.retrieveMessagesForHeight(1);
+    assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(7);
 
-    futureMsgBuffer.poll(1);
+    futureMsgBuffer.retrieveMessagesForHeight(2);
+    assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(4);
+
+    futureMsgBuffer.retrieveMessagesForHeight(3);
     assertThat(futureMsgBuffer.totalMessagesSize()).isZero();
   }
 
@@ -168,44 +186,11 @@ public class FutureMessageBufferTest {
     assertThat(futureMsgBuffer.totalMessagesSize()).isEqualTo(5);
   }
 
-  @Test
-  public void updatesChainHeight() {
-    futureMsgBuffer.addMessage(1, message);
-    assertThat(futureMsgBuffer.poll(1)).containsExactly(message);
-
-    futureMsgBuffer.updateChainHeight(2);
-    futureMsgBuffer.addMessage(1, message);
-    futureMsgBuffer.addMessage(2, message);
-    futureMsgBuffer.addMessage(3, message);
-    assertThat(futureMsgBuffer.poll(1)).isEmpty();
-    assertThat(futureMsgBuffer.poll(2)).isEmpty();
-    assertThat(futureMsgBuffer.poll(3)).containsExactly(message);
-
-    futureMsgBuffer.addMessage(4, message);
-    futureMsgBuffer.addMessage(5, message);
-    futureMsgBuffer.updateChainHeight(3);
-    assertThat(futureMsgBuffer.poll(4)).containsExactly(message);
-    assertThat(futureMsgBuffer.poll(5)).containsExactly(message);
-  }
-
-  @Test
-  public void updateChainHeightDiscardsOldHeights() {
-    futureMsgBuffer.addMessage(0, message);
-    futureMsgBuffer.addMessage(1, message);
-    futureMsgBuffer.addMessage(3, message);
-    futureMsgBuffer.addMessage(4, message);
-
-    futureMsgBuffer.updateChainHeight(3);
-    assertThat(futureMsgBuffer.poll(1)).isEmpty();
-    assertThat(futureMsgBuffer.poll(2)).isEmpty();
-    assertThat(futureMsgBuffer.poll(3)).isEmpty();
-  }
-
   private DefaultMessage[] addMessages(final long height, final int count) {
     return IntStream.range(0, count)
         .mapToObj(
             i -> {
-              final DefaultMessage message = createMessage("0x0" + i);
+              final DefaultMessage message = createMessage(i);
               futureMsgBuffer.addMessage(height, message);
               return message;
             })
@@ -213,8 +198,8 @@ public class FutureMessageBufferTest {
         .toArray(new DefaultMessage[] {});
   }
 
-  private DefaultMessage createMessage(final String s) {
-    final MessageData messageData = new RawMessage(0, BytesValue.fromHexString(s));
+  private DefaultMessage createMessage(final int i) {
+    final MessageData messageData = new RawMessage(0, BytesValue.fromHexStringLenient("0x" + i));
     return new DefaultMessage(peerConnection, messageData);
   }
 }

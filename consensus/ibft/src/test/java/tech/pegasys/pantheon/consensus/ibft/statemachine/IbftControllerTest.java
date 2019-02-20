@@ -17,7 +17,6 @@ import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -55,7 +54,6 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -137,13 +135,11 @@ public class IbftControllerTest {
     final List<Message> height2Msgs =
         newArrayList(prepareMessage, commitMessage, roundChangeMessage);
     when(blockHeightManager.getChainHeight()).thenReturn(2L);
-    when(futureMessageBuffer.poll(2L)).thenReturn(height2Msgs);
+    when(futureMessageBuffer.retrieveMessagesForHeight(2L)).thenReturn(height2Msgs);
 
     ibftController.start();
-    InOrder inOrder = inOrder(futureMessageBuffer);
-    inOrder.verify(futureMessageBuffer).poll(2L);
-    inOrder.verify(futureMessageBuffer).updateChainHeight(2L);
-    verify(futureMessageBuffer, never()).poll(3L);
+    verify(futureMessageBuffer).retrieveMessagesForHeight(2L);
+    verify(futureMessageBuffer, never()).retrieveMessagesForHeight(3L);
     verify(blockHeightManagerFactory).create(chainHeadBlockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager).start();
@@ -163,7 +159,7 @@ public class IbftControllerTest {
     setupCommit(futureRoundIdentifier, validator);
     setupRoundChange(futureRoundIdentifier, validator);
 
-    when(futureMessageBuffer.poll(2L))
+    when(futureMessageBuffer.retrieveMessagesForHeight(2L))
         .thenReturn(
             ImmutableList.of(prepareMessage, proposalMessage, commitMessage, roundChangeMessage))
         .thenReturn(emptyList());
@@ -176,7 +172,7 @@ public class IbftControllerTest {
     verify(blockHeightManagerFactory).create(nextBlock);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();
     verify(blockHeightManager, times(2)).start(); // once at beginning, and again on newChainHead.
-    verify(futureMessageBuffer, times(2)).updateChainHeight(2L);
+    verify(futureMessageBuffer, times(2)).retrieveMessagesForHeight(2L);
     verify(blockHeightManager).handleProposalPayload(proposal);
     verify(ibftGossip).send(proposalMessage);
     verify(blockHeightManager).handlePreparePayload(prepare);

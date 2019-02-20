@@ -185,8 +185,7 @@ public class IbftController {
     currentHeightManager = ibftBlockHeightManagerFactory.create(parentHeader);
     currentHeightManager.start();
     final long newChainHeight = currentHeightManager.getChainHeight();
-    futureMessageBuffer.poll(newChainHeight).forEach(this::handleMessage);
-    futureMessageBuffer.updateChainHeight(newChainHeight);
+    futureMessageBuffer.retrieveMessagesForHeight(newChainHeight).forEach(this::handleMessage);
   }
 
   private boolean processMessage(final IbftMessage<?> msg, final Message rawMsg) {
