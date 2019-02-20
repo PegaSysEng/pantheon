@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 
 import java.util.Collection;
@@ -40,33 +41,47 @@ public class MessageValidatorFactory {
     this.protocolContext = protocolContext;
   }
 
+  private Collection<Address> getValidatorsAfterBlock(final BlockHeader parentHeader) {
+    return protocolContext
+        .getConsensusState()
+        .getVoteTallyCache()
+        .getVoteTallyAfterBlock(parentHeader)
+        .getValidators();
+  }
+
   private SignedDataValidator createSignedDataValidator(
-      final ConsensusRoundIdentifier roundIdentifier) {
+      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
 
     return new SignedDataValidator(
-        protocolContext.getConsensusState().getVoteTally().getValidators(),
+        getValidatorsAfterBlock(parentHeader),
         proposerSelector.selectProposerForRound(roundIdentifier),
         roundIdentifier);
   }
 
-  public MessageValidator createMessageValidator(final ConsensusRoundIdentifier roundIdentifier) {
+  public MessageValidator createMessageValidator(
+      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
+    final Collection<Address> validators = getValidatorsAfterBlock(parentHeader);
 
     return new MessageValidator(
-        createSignedDataValidator(roundIdentifier),
+        createSignedDataValidator(roundIdentifier, parentHeader),
         new ProposalBlockConsistencyValidator(),
         blockValidator,
-        protocolContext);
+        protocolContext,
+        new RoundChangeCertificateValidator(
+            validators,
+            (ri) -> createSignedDataValidator(ri, parentHeader),
+            roundIdentifier.getSequenceNumber()));
   }
 
-  public RoundChangeMessageValidator createRoundChangeMessageValidator(final long chainHeight) {
-    final Collection<Address> validators =
-        protocolContext.getConsensusState().getVoteTally().getValidators();
+  public RoundChangeMessageValidator createRoundChangeMessageValidator(
+      final long chainHeight, final BlockHeader parentHeader) {
+    final Collection<Address> validators = getValidatorsAfterBlock(parentHeader);
 
     return new RoundChangeMessageValidator(
         new RoundChangePayloadValidator(
-            this::createSignedDataValidator,
+            (roundIdentifier) -> createSignedDataValidator(roundIdentifier, parentHeader),
             validators,
             prepareMessageCountForQuorum(
                 IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
@@ -74,22 +89,9 @@ public class MessageValidatorFactory {
         new ProposalBlockConsistencyValidator());
   }
 
-  public NewRoundMessageValidator createNewRoundValidator(final long chainHeight) {
-    final Collection<Address> validators =
-        protocolContext.getConsensusState().getVoteTally().getValidators();
+  public FutureRoundProposalMessageValidator createFutureRoundProposalMessageValidator(
+      final long chainHeight, final BlockHeader parentHeader) {
 
-    final BlockValidator<IbftContext> blockValidator =
-        protocolSchedule.getByBlockNumber(chainHeight).getBlockValidator();
-
-    return new NewRoundMessageValidator(
-        new NewRoundPayloadValidator(
-            validators,
-            proposerSelector,
-            this::createSignedDataValidator,
-            IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
-            chainHeight),
-        new ProposalBlockConsistencyValidator(),
-        blockValidator,
-        protocolContext);
+    return new FutureRoundProposalMessageValidator(this, chainHeight, parentHeader);
   }
 }

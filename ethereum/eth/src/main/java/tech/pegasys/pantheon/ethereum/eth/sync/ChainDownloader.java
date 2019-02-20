@@ -19,9 +19,9 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.WaitForPeersTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.WaitForPeersTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -90,7 +90,10 @@ public class ChainDownloader<C> {
     return currentTask;
   }
 
-  private CompletableFuture<?> executeDownload() {
+  private void executeDownload() {
+    if (downloadFuture.isDone()) {
+      return;
+    }
     // Find target, pull checkpoint headers, import, repeat
     currentTask =
         waitForPeers()
@@ -124,7 +127,6 @@ public class ChainDownloader<C> {
                     downloadFuture.complete(null);
                   }
                 });
-    return currentTask;
   }
 
   private CompletableFuture<List<BlockHeader>> pullCheckpointHeaders(final SyncTarget syncTarget) {

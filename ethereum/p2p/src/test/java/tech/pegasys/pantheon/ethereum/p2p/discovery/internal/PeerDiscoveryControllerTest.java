@@ -25,17 +25,21 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -45,7 +49,9 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,8 +63,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -185,16 +193,51 @@ public class PeerDiscoveryControllerTest {
     controller.onMessage(packet, peers.get(0));
 
     // Invoke timers again
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 2; i++) {
       timer.runTimerHandlers();
     }
 
     // Ensure we receive no more PING packets for peer[0].
     // Assert PING packet was sent for peer[0] 4 times.
     for (final DiscoveryPeer peer : peers) {
-      final int expectedCount = peer.equals(peers.get(0)) ? 4 : 8;
+      final int expectedCount = peer.equals(peers.get(0)) ? 4 : 6;
       verify(outboundMessageHandler, times(expectedCount))
           .send(eq(peer), matchPacketOfType(PacketType.PING));
+    }
+  }
+
+  @Test
+  public void shouldStopRetryingInteractionWhenLimitIsReached() {
+    // Create peers.
+    final List<SECP256K1.KeyPair> keyPairs = PeerDiscoveryTestHelper.generateKeyPairs(3);
+    final List<DiscoveryPeer> peers = helper.createDiscoveryPeers(keyPairs);
+
+    final MockTimerUtil timer = new MockTimerUtil();
+    final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
+    controller =
+        getControllerBuilder()
+            .peers(peers)
+            .timerUtil(timer)
+            .outboundMessageHandler(outboundMessageHandler)
+            .build();
+
+    // Mock the creation of the PING packet, so that we can control the hash,
+    // which gets validated when receiving the PONG.
+    final PingPacketData mockPing =
+        PingPacketData.create(localPeer.getEndpoint(), peers.get(0).getEndpoint());
+    final Packet mockPacket = Packet.create(PacketType.PING, mockPing, keyPairs.get(0));
+    doReturn(mockPacket).when(controller).createPacket(eq(PacketType.PING), any());
+
+    controller.start();
+
+    // Invoke timers several times so that ping to peers should be resent
+    for (int i = 0; i < 10; i++) {
+      timer.runTimerHandlers();
+    }
+
+    // Assert PING packet was sent only 6 times (initial attempt plus 5 retries)
+    for (final DiscoveryPeer peer : peers) {
+      verify(outboundMessageHandler, times(6)).send(eq(peer), matchPacketOfType(PacketType.PING));
     }
   }
 
@@ -944,11 +987,12 @@ public class PeerDiscoveryControllerTest {
 
     final PeerBlacklist blacklist = new PeerBlacklist();
     final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    final NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
 
     // Whitelist peers
-    nodeWhitelistController.addNode(discoPeer);
-    nodeWhitelistController.addNode(otherPeer2);
+    nodeWhitelistController.addNodes(Arrays.asList(discoPeer.getEnodeURI()));
+    nodeWhitelistController.addNodes(Arrays.asList(otherPeer2.getEnodeURI()));
 
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     controller =
@@ -1013,7 +1057,8 @@ public class PeerDiscoveryControllerTest {
     // don't add disco peer to whitelist
     PermissioningConfiguration config = permissioningConfigurationWithTempFile();
     config.setNodeWhitelist(new ArrayList<>());
-    NodeWhitelistController nodeWhitelistController = new NodeWhitelistController(config);
+    NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
 
     controller =
         getControllerBuilder()
@@ -1025,6 +1070,86 @@ public class PeerDiscoveryControllerTest {
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
     controller.onMessage(pingPacket, peers.get(0));
     assertThat(controller.getPeers()).doesNotContain(peers.get(0));
+  }
+
+  @Test
+  public void whenObservingNodeWhitelistAndNodeIsRemovedShouldEvictPeerFromPeerTable()
+      throws IOException {
+    final PeerTable peerTableSpy = spy(peerTable);
+    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
+    final DiscoveryPeer peer = peers.get(0);
+    peerTableSpy.tryAdd(peer);
+
+    final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
+    final URI peerURI = URI.create(peer.getEnodeURI());
+    config.setNodeWhitelist(Lists.newArrayList(peerURI));
+    final NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
+
+    controller =
+        getControllerBuilder().whitelist(nodeWhitelistController).peerTable(peerTableSpy).build();
+
+    controller.start();
+    nodeWhitelistController.removeNodes(Lists.newArrayList(peerURI.toString()));
+
+    verify(peerTableSpy).tryEvict(eq(DiscoveryPeer.fromURI(peerURI)));
+  }
+
+  @Test
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public void whenObservingNodeWhitelistAndNodeIsRemovedShouldNotifyPeerDroppedObservers()
+      throws IOException {
+    final PeerTable peerTableSpy = spy(peerTable);
+    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
+    final DiscoveryPeer peer = peers.get(0);
+    peerTableSpy.tryAdd(peer);
+
+    final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
+    final URI peerURI = URI.create(peer.getEnodeURI());
+    config.setNodeWhitelist(Lists.newArrayList(peerURI));
+    final NodeWhitelistController nodeWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
+
+    final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
+    final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
+    peerDroppedSubscribers.subscribe(peerDroppedEventConsumer);
+
+    doReturn(EvictResult.evicted()).when(peerTableSpy).tryEvict(any());
+
+    controller =
+        getControllerBuilder()
+            .whitelist(nodeWhitelistController)
+            .peerTable(peerTableSpy)
+            .peerDroppedObservers(peerDroppedSubscribers)
+            .build();
+
+    controller.start();
+    nodeWhitelistController.removeNodes(Lists.newArrayList(peerURI.toString()));
+
+    ArgumentCaptor<PeerDroppedEvent> captor = ArgumentCaptor.forClass(PeerDroppedEvent.class);
+    verify(peerDroppedEventConsumer).accept(captor.capture());
+    assertThat(captor.getValue().getPeer()).isEqualTo(DiscoveryPeer.fromURI(peer.getEnodeURI()));
+  }
+
+  @Test
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public void whenPeerIsNotEvictedDropFromTableShouldReturnFalseAndNotifyZeroObservers() {
+    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
+    final DiscoveryPeer peer = peers.get(0);
+    final PeerTable peerTableSpy = spy(peerTable);
+    final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
+    final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
+    peerDroppedSubscribers.subscribe(peerDroppedEventConsumer);
+
+    doReturn(EvictResult.absent()).when(peerTableSpy).tryEvict(any());
+
+    controller = getControllerBuilder().peerDroppedObservers(peerDroppedSubscribers).build();
+
+    controller.start();
+    boolean dropped = controller.dropFromPeerTable(peer);
+
+    assertThat(dropped).isFalse();
+    verifyZeroInteractions(peerDroppedEventConsumer);
   }
 
   private static Packet mockPingPacket(final Peer from, final Peer to) {
@@ -1088,8 +1213,9 @@ public class PeerDiscoveryControllerTest {
 
   private PermissioningConfiguration permissioningConfigurationWithTempFile() throws IOException {
     final PermissioningConfiguration config = PermissioningConfiguration.createDefault();
-    config.setConfigurationFilePath(
-        Files.createTempFile("test", "test").toAbsolutePath().toString());
+    Path tempFile = Files.createTempFile("test", "test");
+    tempFile.toFile().deleteOnExit();
+    config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
     return config;
   }
 
@@ -1103,6 +1229,8 @@ public class PeerDiscoveryControllerTest {
     private PeerTable peerTable;
     private OutboundMessageHandler outboundMessageHandler = OutboundMessageHandler.NOOP;
     private static final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
+    private Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers = new Subscribers<>();
+    private Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers = new Subscribers<>();
 
     public static ControllerBuilder create() {
       return new ControllerBuilder();
@@ -1153,6 +1281,17 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
+    ControllerBuilder peerBondedObservers(final Subscribers<Consumer<PeerBondedEvent>> observers) {
+      this.peerBondedObservers = observers;
+      return this;
+    }
+
+    ControllerBuilder peerDroppedObservers(
+        final Subscribers<Consumer<PeerDroppedEvent>> observers) {
+      this.peerDroppedObservers = observers;
+      return this;
+    }
+
     PeerDiscoveryController build() {
       checkNotNull(keypair);
       if (localPeer == null) {
@@ -1173,7 +1312,8 @@ public class PeerDiscoveryControllerTest {
               PEER_REQUIREMENT,
               blacklist,
               whitelist,
-              new Subscribers<>()));
+              peerBondedObservers,
+              peerDroppedObservers));
     }
   }
 }

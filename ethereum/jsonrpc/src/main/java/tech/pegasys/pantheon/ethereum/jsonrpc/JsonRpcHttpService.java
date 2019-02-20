@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationService;
+import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequestId;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
@@ -27,6 +28,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcNoResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponseType;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -59,6 +61,7 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.User;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -228,6 +231,11 @@ public class JsonRpcHttpService {
     };
   }
 
+  private String getAuthToken(final RoutingContext routingContext) {
+    return AuthenticationUtils.getJwtTokenFromAuthorizationHeaderValue(
+        routingContext.request().getHeader("Authorization"));
+  }
+
   private Optional<String> getAndValidateHostHeader(final RoutingContext event) {
     final Iterable<String> splitHostHeader = Splitter.on(':').split(event.request().host());
     final long hostPieces = stream(splitHostHeader).count();
@@ -279,21 +287,38 @@ public class JsonRpcHttpService {
   }
 
   private void handleJsonRPCRequest(final RoutingContext routingContext) {
-    // Parse json
-    try {
-      final String json = routingContext.getBodyAsString().trim();
-      if (!json.isEmpty() && json.charAt(0) == '{') {
-        handleJsonSingleRequest(routingContext, new JsonObject(json));
-      } else {
-        final JsonArray array = new JsonArray(json);
-        if (array.size() < 1) {
-          handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
-          return;
+    // first check token if authentication is required
+    String token = getAuthToken(routingContext);
+    if (authenticationService.isPresent() && token == null) {
+      // no auth token when auth required
+      handleJsonRpcUnauthorizedError(routingContext, null, JsonRpcError.UNAUTHORIZED);
+    } else {
+      // Parse json
+      try {
+        final String json = routingContext.getBodyAsString().trim();
+        if (!json.isEmpty() && json.charAt(0) == '{') {
+          AuthenticationUtils.getUser(
+              authenticationService,
+              token,
+              user -> {
+                handleJsonSingleRequest(routingContext, new JsonObject(json), user);
+              });
+        } else {
+          final JsonArray array = new JsonArray(json);
+          if (array.size() < 1) {
+            handleJsonRpcError(routingContext, null, JsonRpcError.INVALID_REQUEST);
+            return;
+          }
+          AuthenticationUtils.getUser(
+              authenticationService,
+              token,
+              user -> {
+                handleJsonBatchRequest(routingContext, array, user);
+              });
         }
-        handleJsonBatchRequest(routingContext, array);
+      } catch (final DecodeException ex) {
+        handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
       }
-    } catch (final DecodeException ex) {
-      handleJsonRpcError(routingContext, null, JsonRpcError.PARSE_ERROR);
     }
   }
 
@@ -303,11 +328,11 @@ public class JsonRpcHttpService {
   }
 
   private void handleJsonSingleRequest(
-      final RoutingContext routingContext, final JsonObject request) {
+      final RoutingContext routingContext, final JsonObject request, final Optional<User> user) {
     final HttpServerResponse response = routingContext.response();
     vertx.executeBlocking(
         future -> {
-          final JsonRpcResponse jsonRpcResponse = process(request);
+          final JsonRpcResponse jsonRpcResponse = process(request, user);
           future.complete(jsonRpcResponse);
         },
         false,
@@ -327,6 +352,8 @@ public class JsonRpcHttpService {
   private HttpResponseStatus status(final JsonRpcResponse response) {
 
     switch (response.getType()) {
+      case UNAUTHORIZED:
+        return HttpResponseStatus.UNAUTHORIZED;
       case ERROR:
         return HttpResponseStatus.BAD_REQUEST;
       case SUCCESS:
@@ -347,7 +374,7 @@ public class JsonRpcHttpService {
 
   @SuppressWarnings("rawtypes")
   private void handleJsonBatchRequest(
-      final RoutingContext routingContext, final JsonArray jsonArray) {
+      final RoutingContext routingContext, final JsonArray jsonArray, final Optional<User> user) {
     // Interpret json as rpc request
     final List<Future> responses =
         jsonArray.stream()
@@ -361,7 +388,7 @@ public class JsonRpcHttpService {
                   final JsonObject req = (JsonObject) obj;
                   final Future<JsonRpcResponse> fut = Future.future();
                   vertx.executeBlocking(
-                      future -> future.complete(process(req)),
+                      future -> future.complete(process(req, user)),
                       false,
                       ar -> {
                         if (ar.failed()) {
@@ -398,7 +425,7 @@ public class JsonRpcHttpService {
     return result.getType() != JsonRpcResponseType.NONE;
   }
 
-  private JsonRpcResponse process(final JsonObject requestJson) {
+  private JsonRpcResponse process(final JsonObject requestJson, final Optional<User> user) {
     final JsonRpcRequest request;
     Object id = null;
     try {
@@ -420,12 +447,16 @@ public class JsonRpcHttpService {
       return errorResponse(id, JsonRpcError.METHOD_NOT_FOUND);
     }
 
-    // Generate response
-    try (final TimingContext ignored = requestTimer.labels(request.getMethod()).startTimer()) {
-      return method.response(request);
-    } catch (final InvalidJsonRpcParameters e) {
-      LOG.debug(e);
-      return errorResponse(id, JsonRpcError.INVALID_PARAMS);
+    if (AuthenticationUtils.isPermitted(authenticationService, user, method)) {
+      // Generate response
+      try (final TimingContext ignored = requestTimer.labels(request.getMethod()).startTimer()) {
+        return method.response(request);
+      } catch (final InvalidJsonRpcParameters e) {
+        LOG.debug(e);
+        return errorResponse(id, JsonRpcError.INVALID_PARAMS);
+      }
+    } else {
+      return unauthorizedResponse(id, JsonRpcError.UNAUTHORIZED);
     }
   }
 
@@ -437,8 +468,20 @@ public class JsonRpcHttpService {
         .end(Json.encode(new JsonRpcErrorResponse(id, error)));
   }
 
+  private void handleJsonRpcUnauthorizedError(
+      final RoutingContext routingContext, final Object id, final JsonRpcError error) {
+    routingContext
+        .response()
+        .setStatusCode(HttpResponseStatus.UNAUTHORIZED.code())
+        .end(Json.encode(new JsonRpcErrorResponse(id, error)));
+  }
+
   private JsonRpcResponse errorResponse(final Object id, final JsonRpcError error) {
     return new JsonRpcErrorResponse(id, error);
+  }
+
+  private JsonRpcResponse unauthorizedResponse(final Object id, final JsonRpcError error) {
+    return new JsonRpcUnauthorizedResponse(id, error);
   }
 
   private String buildCorsRegexFromConfig() {

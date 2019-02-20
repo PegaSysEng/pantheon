@@ -23,7 +23,7 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.TimerUtil;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.VertxTimerUtil;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.util.NetworkUtility;
 import tech.pegasys.pantheon.util.Preconditions;
 
@@ -189,7 +189,7 @@ public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
       final Endpoint endpoint = new Endpoint(host, port, OptionalInt.empty());
       handleIncomingPacket(endpoint, packet);
     } catch (final PeerDiscoveryPacketDecodingException e) {
-      LOG.debug("Discarding invalid peer discovery packet", e);
+      LOG.debug("Discarding invalid peer discovery packet: {}", e.getMessage());
     } catch (final Throwable t) {
       LOG.error("Encountered error while handling packet", t);
     }

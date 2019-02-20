@@ -25,6 +25,8 @@ public interface NodeConfiguration {
 
   void useWebSocketsForJsonRpc();
 
+  void useAuthenticationTokenInHeaderForJsonRpc(String token);
+
   Optional<Integer> jsonRpcWebSocketPort();
 
   String hostName();
@@ -36,4 +38,6 @@ public interface NodeConfiguration {
   Optional<EthNetworkConfig> ethNetworkConfig();
 
   void ethNetworkConfig(Optional<EthNetworkConfig> ethNetworkConfig);
+
+  boolean isBootnode();
 }

@@ -90,7 +90,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final StorageProvider storageProvider,
       final GenesisConfigFile genesisConfig,
       final ProtocolSchedule<Void> protocolSchedule,
-      final SynchronizerConfiguration taintedSyncConfig,
+      final SynchronizerConfiguration syncConfig,
       final MiningParameters miningParams,
       final KeyPair nodeKeys,
       final PrivacyParameters privacyParameters,
@@ -103,7 +103,6 @@ public class MainnetPantheonController implements PantheonController<Void> {
             storageProvider, genesisState, protocolSchedule, metricsSystem, (a, b) -> null);
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
-    final SynchronizerConfiguration syncConfig = taintedSyncConfig.validated(blockchain);
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager =
         new EthProtocolManager(
@@ -116,7 +115,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
             fastSyncEnabled,
             syncConfig.downloaderParallelism(),
             syncConfig.transactionsParallelism(),
-            syncConfig.computationParallelism());
+            syncConfig.computationParallelism(),
+            metricsSystem);
     final SyncState syncState =
         new SyncState(blockchain, ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =

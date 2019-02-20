@@ -69,7 +69,7 @@ public class FastSyncChainDownloaderTest {
             localBlockchain,
             localBlockchainSetup.getWorldArchive(),
             DeterministicEthScheduler.TimeoutPolicy.NEVER,
-            new EthScheduler(1, 1, 1));
+            new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
   }
@@ -100,8 +100,7 @@ public class FastSyncChainDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderHeadersRequestSize(3)
-            .build()
-            .validated(localBlockchain);
+            .build();
     final long pivotBlockNumber = 25;
     final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
@@ -123,8 +122,7 @@ public class FastSyncChainDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final long pivotBlockNumber = 5;
-    final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder().build().validated(localBlockchain);
+    final SynchronizerConfiguration syncConfig = SynchronizerConfiguration.builder().build();
     final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
 
@@ -155,8 +153,7 @@ public class FastSyncChainDownloaderTest {
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderHeadersRequestSize(3)
-            .build()
-            .validated(localBlockchain);
+            .build();
     final long pivotBlockNumber = 25;
     final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();

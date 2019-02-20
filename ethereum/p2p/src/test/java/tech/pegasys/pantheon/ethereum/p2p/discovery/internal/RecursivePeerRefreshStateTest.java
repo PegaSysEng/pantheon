@@ -27,11 +27,13 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.BondingAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.FindNeighbourDispatcher;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.p2p.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -479,14 +481,15 @@ public class RecursivePeerRefreshStateTest {
     final DiscoveryPeer peerA = new DiscoveryPeer(createId(1), "127.0.0.1", 1, 1);
     final DiscoveryPeer peerB = new DiscoveryPeer(createId(2), "127.0.0.2", 2, 2);
 
+    final Path tempFile = Files.createTempFile("test", "test");
+    tempFile.toFile().deleteOnExit();
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setConfigurationFilePath(
-        Files.createTempFile("test", "test").toAbsolutePath().toString());
+    permissioningConfiguration.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
 
     final NodeWhitelistController peerWhitelist =
-        new NodeWhitelistController(permissioningConfiguration);
-    peerWhitelist.addNode(peerA);
+        new NodeWhitelistController(permissioningConfiguration, Collections.emptyList());
+    peerWhitelist.addNodes(Arrays.asList(peerA.getEnodeURI()));
 
     recursivePeerRefreshState =
         new RecursivePeerRefreshState(

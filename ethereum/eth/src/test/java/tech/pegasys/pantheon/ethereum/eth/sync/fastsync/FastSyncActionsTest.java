@@ -14,12 +14,19 @@ package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.CHAIN_TOO_SHORT;
+import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState.EMPTY_SYNC_STATE;
 import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_COUNTER;
 import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
+import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -32,8 +39,8 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,6 +56,7 @@ public class FastSyncActionsTest {
           .fastSyncPivotDistance(1000)
           .build();
 
+  private final FastSyncStateStorage fastSyncStateStorage = mock(FastSyncStateStorage.class);
   private final LabelledMetric<OperationTimer> ethTasksTimer = NO_OP_LABELLED_TIMER;
   private final AtomicInteger timeoutCount = new AtomicInteger(0);
   private FastSyncActions<Void> fastSyncActions;
@@ -84,43 +92,84 @@ public class FastSyncActionsTest {
     for (int i = 0; i < syncConfig.getFastSyncMinimumPeerCount(); i++) {
       EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
     }
-    final CompletableFuture<Void> result = fastSyncActions.waitForSuitablePeers();
-    assertThat(result).isCompleted();
+    final CompletableFuture<FastSyncState> result =
+        fastSyncActions.waitForSuitablePeers(EMPTY_SYNC_STATE);
+    assertThat(result).isCompletedWithValue(EMPTY_SYNC_STATE);
   }
 
   @Test
   public void waitForPeersShouldReportSuccessWhenTimeLimitReachedAndAPeerIsAvailable() {
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
     timeoutCount.set(Integer.MAX_VALUE);
-    assertThat(fastSyncActions.waitForSuitablePeers()).isCompleted();
+    assertThat(fastSyncActions.waitForSuitablePeers(EMPTY_SYNC_STATE))
+        .isCompletedWithValue(EMPTY_SYNC_STATE);
   }
 
   @Test
   public void waitForPeersShouldContinueWaitingUntilAtLeastOnePeerIsAvailable() {
     timeoutCount.set(1);
-    final CompletableFuture<Void> result = fastSyncActions.waitForSuitablePeers();
+    final CompletableFuture<FastSyncState> result =
+        fastSyncActions.waitForSuitablePeers(EMPTY_SYNC_STATE);
     assertThat(result).isNotCompleted();
 
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
-    assertThat(result).isCompleted();
+    assertThat(result).isCompletedWithValue(EMPTY_SYNC_STATE);
+  }
+
+  @Test
+  public void waitForPeersShouldOnlyRequireOnePeerWhenPivotBlockIsAlreadySelected() {
+    final BlockHeader pivotHeader = new BlockHeaderTestFixture().number(1024).buildHeader();
+    final FastSyncState fastSyncState = new FastSyncState(pivotHeader);
+    final CompletableFuture<FastSyncState> result =
+        fastSyncActions.waitForSuitablePeers(fastSyncState);
+    assertThat(result).isNotDone();
+
+    EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
+    assertThat(result).isCompletedWithValue(fastSyncState);
+  }
+
+  @Test
+  public void selectPivotBlockShouldUseExistingPivotBlockIfAvailable() {
+    final BlockHeader pivotHeader = new BlockHeaderTestFixture().number(1024).buildHeader();
+    when(fastSyncStateStorage.loadState(any(BlockHashFunction.class)))
+        .thenReturn(new FastSyncState(pivotHeader));
+    EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 5000);
+
+    final CompletableFuture<FastSyncState> result =
+        fastSyncActions.selectPivotBlock(new FastSyncState(pivotHeader));
+    final FastSyncState expected = new FastSyncState(pivotHeader);
+    assertThat(result).isCompletedWithValue(expected);
   }
 
   @Test
   public void selectPivotBlockShouldSelectBlockPivotDistanceFromBestPeer() {
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 5000);
 
-    final CompletableFuture<FastSyncState> result = fastSyncActions.selectPivotBlock();
-    final FastSyncState expected = new FastSyncState(OptionalLong.of(4000));
+    final CompletableFuture<FastSyncState> result =
+        fastSyncActions.selectPivotBlock(EMPTY_SYNC_STATE);
+    final FastSyncState expected = new FastSyncState(4000);
+    assertThat(result).isCompletedWithValue(expected);
+  }
+
+  @Test
+  public void selectPivotBlockShouldConsiderTotalDifficultyWhenSelectingBestPeer() {
+    EthProtocolManagerTestUtil.createPeer(ethProtocolManager, UInt256.of(1000), 5500);
+    EthProtocolManagerTestUtil.createPeer(ethProtocolManager, UInt256.of(2000), 4000);
+
+    final CompletableFuture<FastSyncState> result =
+        fastSyncActions.selectPivotBlock(EMPTY_SYNC_STATE);
+    final FastSyncState expected = new FastSyncState(3000);
     assertThat(result).isCompletedWithValue(expected);
   }
 
   @Test
   public void selectPivotBlockShouldWaitAndRetryIfNoPeersAreAvailable() {
-    final CompletableFuture<FastSyncState> result = fastSyncActions.selectPivotBlock();
+    final CompletableFuture<FastSyncState> result =
+        fastSyncActions.selectPivotBlock(EMPTY_SYNC_STATE);
     assertThat(result).isNotDone();
 
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 5000);
-    final FastSyncState expected = new FastSyncState(OptionalLong.of(4000));
+    final FastSyncState expected = new FastSyncState(4000);
     assertThat(result).isCompletedWithValue(expected);
   }
 
@@ -129,28 +178,36 @@ public class FastSyncActionsTest {
     EthProtocolManagerTestUtil.createPeer(
         ethProtocolManager, syncConfig.fastSyncPivotDistance() - 1);
 
-    assertThrowsFastSyncException(CHAIN_TOO_SHORT, fastSyncActions::selectPivotBlock);
+    assertThrowsFastSyncException(
+        CHAIN_TOO_SHORT, () -> fastSyncActions.selectPivotBlock(EMPTY_SYNC_STATE));
   }
 
   @Test
   public void selectPivotBlockShouldFailIfBestPeerChainIsEqualToPivotDistance() {
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager, syncConfig.fastSyncPivotDistance());
 
-    assertThrowsFastSyncException(CHAIN_TOO_SHORT, fastSyncActions::selectPivotBlock);
+    assertThrowsFastSyncException(
+        CHAIN_TOO_SHORT, () -> fastSyncActions.selectPivotBlock(EMPTY_SYNC_STATE));
+  }
+
+  @Test
+  public void downloadPivotBlockHeaderShouldUseExistingPivotBlockHeaderIfPresent() {
+    final BlockHeader pivotHeader = new BlockHeaderTestFixture().number(1024).buildHeader();
+    final FastSyncState expected = new FastSyncState(pivotHeader);
+    assertThat(fastSyncActions.downloadPivotBlockHeader(expected)).isCompletedWithValue(expected);
   }
 
   @Test
   public void downloadPivotBlockHeaderShouldRetrievePivotBlockHeader() {
     final RespondingEthPeer peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1001);
     final CompletableFuture<FastSyncState> result =
-        fastSyncActions.downloadPivotBlockHeader(new FastSyncState(OptionalLong.of(1)));
+        fastSyncActions.downloadPivotBlockHeader(new FastSyncState(1));
     assertThat(result).isNotCompleted();
 
     final Responder responder = RespondingEthPeer.blockchainResponder(blockchain);
     peer.respond(responder);
 
-    assertThat(result)
-        .isCompletedWithValue(new FastSyncState(OptionalLong.of(1), blockchain.getBlockHeader(1)));
+    assertThat(result).isCompletedWithValue(new FastSyncState(blockchain.getBlockHeader(1).get()));
   }
 
   private void assertThrowsFastSyncException(

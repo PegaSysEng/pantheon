@@ -22,8 +22,14 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthAccounts;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthBlockNumber;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3Sha3;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -50,6 +56,7 @@ import java.util.Set;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.KeyStoreOptions;
 import io.vertx.ext.auth.PubSecKeyOptions;
@@ -91,7 +98,9 @@ public class JsonRpcHttpServiceLoginTest {
   protected static Synchronizer synchronizer;
   protected static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3, RpcApis.ADMIN);
-  private static JWTAuth jwtAuth;
+  protected static JWTAuth jwtAuth;
+  protected static String authPermissionsConfigFilePath = "JsonRpcHttpService/auth.toml";
+  protected final JsonRpcTestHelper testHelper = new JsonRpcTestHelper();
 
   @BeforeClass
   public static void initServerAndClient() throws Exception {
@@ -133,7 +142,7 @@ public class JsonRpcHttpServiceLoginTest {
 
   private static JsonRpcHttpService createJsonRpcHttpService() throws Exception {
     final String authTomlPath =
-        Paths.get(ClassLoader.getSystemResource("JsonRpcHttpService/auth.toml").toURI())
+        Paths.get(ClassLoader.getSystemResource(authPermissionsConfigFilePath).toURI())
             .toAbsolutePath()
             .toString();
 
@@ -326,5 +335,183 @@ public class JsonRpcHttpServiceLoginTest {
       assertThat(jwtPayloadString.contains("password")).isFalse();
       assertThat(jwtPayloadString.contains("pegasys")).isFalse();
     }
+  }
+
+  private String login(final String username, final String password) throws IOException {
+    final RequestBody loginBody =
+        RequestBody.create(
+            JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
+    final Request loginRequest =
+        new Request.Builder().post(loginBody).url(baseUrl + "/login").build();
+    final String token;
+    try (final Response loginResp = client.newCall(loginRequest).execute()) {
+      assertThat(loginResp.code()).isEqualTo(200);
+      assertThat(loginResp.message()).isEqualTo("OK");
+      assertThat(loginResp.body().contentType()).isNotNull();
+      assertThat(loginResp.body().contentType().type()).isEqualTo("application");
+      assertThat(loginResp.body().contentType().subtype()).isEqualTo("json");
+      final String bodyString = loginResp.body().string();
+      assertThat(bodyString).isNotNull();
+      assertThat(bodyString).isNotBlank();
+
+      final JsonObject respBody = new JsonObject(bodyString);
+      token = respBody.getString("token");
+      assertThat(token).isNotNull();
+    }
+    return token;
+  }
+
+  @Test
+  public void checkJsonRpcMethodsAvailableWithGoodCredentialsAndPermissions() throws IOException {
+    final RequestBody body =
+        RequestBody.create(JSON, "{\"username\":\"user\",\"password\":\"pegasys\"}");
+    final Request request = new Request.Builder().post(body).url(baseUrl + "/login").build();
+    try (final Response resp = client.newCall(request).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+      assertThat(resp.message()).isEqualTo("OK");
+      assertThat(resp.body().contentType()).isNotNull();
+      assertThat(resp.body().contentType().type()).isEqualTo("application");
+      assertThat(resp.body().contentType().subtype()).isEqualTo("json");
+      final String bodyString = resp.body().string();
+      assertThat(bodyString).isNotNull();
+      assertThat(bodyString).isNotBlank();
+
+      final JsonObject respBody = new JsonObject(bodyString);
+      final String token = respBody.getString("token");
+      assertThat(token).isNotNull();
+
+      JsonRpcMethod ethAccounts = new EthAccounts();
+      JsonRpcMethod netVersion = new NetVersion(123);
+      JsonRpcMethod ethBlockNumber = new EthBlockNumber(blockchainQueries);
+      JsonRpcMethod web3Sha3 = new Web3Sha3();
+      JsonRpcMethod web3ClientVersion = new Web3ClientVersion("777");
+
+      jwtAuth.authenticate(
+          new JsonObject().put("jwt", token),
+          (r) -> {
+            assertThat(r.succeeded()).isTrue();
+            final User user = r.result();
+            // single eth/blockNumber method permitted
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), ethBlockNumber))
+                .isTrue();
+            // eth/accounts not permitted
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), ethAccounts))
+                .isFalse();
+            // allowed by web3/*
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), web3ClientVersion))
+                .isTrue();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), web3Sha3))
+                .isTrue();
+            // no net permissions
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), netVersion))
+                .isFalse();
+          });
+    }
+  }
+
+  @Test
+  public void checkPermissionsWithEmptyUser() {
+    JsonRpcMethod ethAccounts = new EthAccounts();
+
+    assertThat(
+            AuthenticationUtils.isPermitted(
+                service.authenticationService, Optional.empty(), ethAccounts))
+        .isFalse();
+  }
+
+  @Test
+  public void web3ClientVersionUnsuccessfulBeforeLogin() throws Exception {
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"web3_clientVersion\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body)).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  @Test
+  public void web3ClientVersionUnsuccessfulWithBadBearer() throws Exception {
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"web3_clientVersion\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body, "badtoken")).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  @Test
+  public void web3ClientVersionSuccessfulAfterLogin() throws Exception {
+    final String token = login("user", "pegasys");
+
+    final String id = "123";
+    final RequestBody web3ClientVersionBody =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"web3_clientVersion\"}");
+
+    try (final Response web3ClientVersionResp =
+        client.newCall(buildPostRequest(web3ClientVersionBody, token)).execute()) {
+      assertThat(web3ClientVersionResp.code()).isEqualTo(200);
+      // Check general format of result
+      final JsonObject json = new JsonObject(web3ClientVersionResp.body().string());
+      testHelper.assertValidJsonRpcResult(json, id);
+      // Check result
+      final String result = json.getString("result");
+      assertThat(result).isEqualTo("TestClientVersion/0.1.0");
+    }
+  }
+
+  @Test
+  public void ethSyncingUnauthorisedWithoutPermission() throws Exception {
+    final String token = login("user", "pegasys");
+
+    final String id = "007";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"eth_syncing\"}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body, token)).execute()) {
+      assertThat(resp.code()).isEqualTo(401);
+      assertThat(resp.message()).isEqualTo("Unauthorized");
+    }
+  }
+
+  private Request buildPostRequest(final RequestBody body) {
+    return buildPostRequest(body, Optional.empty());
+  }
+
+  private Request buildPostRequest(final RequestBody body, final String token) {
+    return buildPostRequest(body, Optional.of(token));
+  }
+
+  private Request buildPostRequest(final RequestBody body, final Optional<String> token) {
+    final Request.Builder request = new Request.Builder().post(body).url(baseUrl);
+    token.ifPresent(t -> request.addHeader("Authorization", "Bearer " + t));
+    return request.build();
   }
 }

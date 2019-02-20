@@ -12,9 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPipelinedPeerTask;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPipelinedTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockHandler;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.OperationTimer;
@@ -27,7 +25,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ParallelExtractTxSignaturesTask<B> extends AbstractPipelinedPeerTask<List<B>, List<B>> {
+class ParallelExtractTxSignaturesTask<B> extends AbstractPipelinedTask<List<B>, List<B>> {
   private static final Logger LOG = LogManager.getLogger();
 
   private final BlockHandler<B> blockHandler;
@@ -36,15 +34,14 @@ class ParallelExtractTxSignaturesTask<B> extends AbstractPipelinedPeerTask<List<
       final BlockHandler<B> blockHandler,
       final BlockingQueue<List<B>> inboundQueue,
       final int outboundBacklogSize,
-      final EthContext ethContext,
       final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(inboundQueue, outboundBacklogSize, ethContext, ethTasksTimer);
+    super(inboundQueue, outboundBacklogSize, ethTasksTimer);
     this.blockHandler = blockHandler;
   }
 
   @Override
   protected Optional<List<B>> processStep(
-      final List<B> bodies, final Optional<List<B>> previousBodies, final EthPeer peer) {
+      final List<B> bodies, final Optional<List<B>> previousBodies) {
     LOG.trace(
         "Calculating fields for transactions between {} to {}",
         blockHandler.extractBlockNumber(bodies.get(0)),

@@ -6,9 +6,6 @@ description: Pantheon IBFT 2.0 Proof-of-Authority (PoA) consensus protocol imple
 
 # IBFT 2.0
 
-!!! note 
-    IBFT 2.0 is under development and will be available in v1.0. 
-
 Pantheon implements the IBFT 2.0 Proof-of-Authority (PoA) consensus protocol. IBFT 2.0 can be used for private networks. 
 
 In IBFT 2.0 networks, transactions and blocks are validated by approved accounts, known as validators. 
@@ -23,7 +20,7 @@ To use IBFT 2.0 requires an IBFT 2.0 genesis file. The genesis file defines prop
       {
         "config": {
           ...
-          "revisedibft": {
+          "ibft2": {
             "blockperiodseconds": 2,
             "epochlength": 30000,
             "requesttimeoutseconds": 10
@@ -75,6 +72,16 @@ Properties that have specific values in IBFT 2.0 genesis files are:
 * `mixHash` - `0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365` for Istanbul block identification.
 
 To start a node on an IBFT 2.0 private network, use the [`--genesis-file`](../Reference/Pantheon-CLI-Syntax.md#genesis-file`) option to specify the custom genesis file. 
+
+### Optional Configuration Options 
+
+Optional configuration options that can be specified in the genesis file are:  
+
+* `messageQueueLimit` - Default is 1000. In very large networks with insufficient resources increasing the message queue limit 
+   may help to deal with message activity surges.  
+   
+* `duplicateMesageLimit` - Default is 100. If seeing messages being retransmitted by the same node, increasing the duplicate message limit 
+   may reduce the number of retransmissions. A value of 2 to 3 times the number of validators is generally sufficient.  
 
 ## Adding and Removing Validators
 

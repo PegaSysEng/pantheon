@@ -12,7 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
+import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
+import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
+
+import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.StalledDownloadException;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
+import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,27 +28,49 @@ public class FastSyncDownloader<C> {
   private static final Logger LOG = LogManager.getLogger();
   private final FastSyncActions<C> fastSyncActions;
   private final WorldStateDownloader worldStateDownloader;
+  private final FastSyncStateStorage fastSyncStateStorage;
 
   public FastSyncDownloader(
-      final FastSyncActions<C> fastSyncActions, final WorldStateDownloader worldStateDownloader) {
+      final FastSyncActions<C> fastSyncActions,
+      final WorldStateDownloader worldStateDownloader,
+      final FastSyncStateStorage fastSyncStateStorage) {
     this.fastSyncActions = fastSyncActions;
     this.worldStateDownloader = worldStateDownloader;
+    this.fastSyncStateStorage = fastSyncStateStorage;
   }
 
-  public CompletableFuture<FastSyncState> start() {
-    LOG.info("Fast sync enabled");
-    return fastSyncActions
-        .waitForSuitablePeers()
-        .thenCompose(state -> fastSyncActions.selectPivotBlock())
-        .thenCompose(fastSyncActions::downloadPivotBlockHeader)
-        .thenCompose(this::downloadChainAndWorldState);
+  public CompletableFuture<FastSyncState> start(final FastSyncState fastSyncState) {
+    return exceptionallyCompose(
+        fastSyncActions
+            .waitForSuitablePeers(fastSyncState)
+            .thenCompose(fastSyncActions::selectPivotBlock)
+            .thenCompose(fastSyncActions::downloadPivotBlockHeader)
+            .thenApply(this::storeState)
+            .thenCompose(this::downloadChainAndWorldState),
+        this::handleWorldStateUnavailable);
+  }
+
+  private CompletableFuture<FastSyncState> handleWorldStateUnavailable(final Throwable error) {
+    if (ExceptionUtils.rootCause(error) instanceof StalledDownloadException) {
+      LOG.warn(
+          "Fast sync was unable to download the world state. Retrying with a new pivot block.");
+      return start(FastSyncState.EMPTY_SYNC_STATE);
+    } else {
+      return completedExceptionally(error);
+    }
+  }
+
+  private FastSyncState storeState(final FastSyncState state) {
+    fastSyncStateStorage.storeState(state);
+    return state;
   }
 
   private CompletableFuture<FastSyncState> downloadChainAndWorldState(
       final FastSyncState currentState) {
     final CompletableFuture<Void> worldStateFuture =
         worldStateDownloader.run(currentState.getPivotBlockHeader().get());
-    final CompletableFuture<Void> chainFuture = fastSyncActions.downloadChain(currentState);
+    final CompletableFuture<FastSyncState> chainFuture =
+        fastSyncActions.downloadChain(currentState);
 
     // If either download fails, cancel the other one.
     chainFuture.exceptionally(

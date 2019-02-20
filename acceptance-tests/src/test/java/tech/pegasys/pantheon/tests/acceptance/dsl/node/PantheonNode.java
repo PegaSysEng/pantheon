@@ -43,7 +43,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -84,12 +86,14 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
   private final boolean discoveryEnabled;
+  private final boolean isBootnode;
 
   private List<String> bootnodes = new ArrayList<>();
   private JsonRequestFactories jsonRequestFactories;
   private HttpRequestFactory httpRequestFactory;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
   private boolean useWsForJsonRpc = false;
+  private String token = null;
 
   public PantheonNode(
       final String name,
@@ -102,7 +106,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final GenesisConfigProvider genesisConfigProvider,
       final int p2pPort,
       final Boolean p2pEnabled,
-      final boolean discoveryEnabled)
+      final boolean discoveryEnabled,
+      final boolean isBootnode)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
@@ -117,6 +122,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.devMode = devMode;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
+    this.isBootnode = isBootnode;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -135,7 +141,12 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public String enodeUrl() {
-    return "enode://" + keyPair.getPublicKey().toString() + "@" + LOCALHOST + ":" + p2pPort;
+    return "enode://"
+        + keyPair.getPublicKey().toString().substring(2)
+        + "@"
+        + LOCALHOST
+        + ":"
+        + p2pPort;
   }
 
   private Optional<String> jsonRpcBaseUrl() {
@@ -186,20 +197,35 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   }
 
   private JsonRequestFactories jsonRequestFactories() {
+    Optional<WebSocketService> websocketService = Optional.empty();
     if (jsonRequestFactories == null) {
-      final Optional<String> baseUrl;
-      final String port;
+      final Web3jService web3jService;
+
       if (useWsForJsonRpc) {
-        baseUrl = wsRpcBaseUrl();
-        port = "8546";
+        final String url = wsRpcBaseUrl().orElse("ws://" + LOCALHOST + ":" + 8546);
+        final Map<String, String> headers = new HashMap<>();
+        if (token != null) {
+          headers.put("Authorization", "Bearer " + token);
+        }
+        final WebSocketClient wsClient = new WebSocketClient(URI.create(url), headers);
+
+        web3jService = new WebSocketService(wsClient, false);
+        try {
+          ((WebSocketService) web3jService).connect();
+        } catch (ConnectException e) {
+          throw new RuntimeException(e);
+        }
+
+        websocketService = Optional.of((WebSocketService) web3jService);
       } else {
-        baseUrl = jsonRpcBaseUrl();
-        port = "8545";
+        web3jService =
+            jsonRpcBaseUrl()
+                .map(HttpService::new)
+                .orElse(new HttpService("http://" + LOCALHOST + ":" + 8545));
+        if (token != null) {
+          ((HttpService) web3jService).addHeader("Authorization", "Bearer " + token);
+        }
       }
-      final Web3jService web3jService =
-          baseUrl
-              .map(url -> new HttpService(url))
-              .orElse(new HttpService("http://" + LOCALHOST + ":" + port));
 
       jsonRequestFactories =
           new JsonRequestFactories(
@@ -207,7 +233,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
               new CliqueJsonRpcRequestFactory(web3jService),
               new IbftJsonRpcRequestFactory(web3jService),
               new PermissioningJsonRpcRequestFactory(web3jService),
-              new AdminJsonRpcRequestFactory(web3jService));
+              new AdminJsonRpcRequestFactory(web3jService),
+              websocketService);
     }
 
     return jsonRequestFactories;
@@ -237,22 +264,32 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
     checkIfWebSocketEndpointIsAvailable(url);
 
-    final WebSocketService webSocketService = new WebSocketService(url, true);
-    try {
-      webSocketService.connect();
-    } catch (final ConnectException e) {
-      throw new RuntimeException("Error connection to WebSocket endpoint", e);
-    }
+    useWsForJsonRpc = true;
 
     if (jsonRequestFactories != null) {
       jsonRequestFactories.shutdown();
+      jsonRequestFactories = null;
+    }
+
+    if (httpRequestFactory != null) {
+      httpRequestFactory = null;
+    }
+  }
+
+  /** All future JSON-RPC calls will include the authentication token. */
+  @Override
+  public void useAuthenticationTokenInHeaderForJsonRpc(final String token) {
+
+    if (jsonRequestFactories != null) {
+      jsonRequestFactories.shutdown();
+      jsonRequestFactories = null;
     }
 
     if (httpRequestFactory != null) {
       httpRequestFactory = null;
     }
 
-    useWsForJsonRpc = true;
+    this.token = token;
   }
 
   private void checkIfWebSocketEndpointIsAvailable(final String url) {
@@ -393,6 +430,11 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   public boolean isDiscoveryEnabled() {
     return discoveryEnabled;
+  }
+
+  @Override
+  public boolean isBootnode() {
+    return isBootnode;
   }
 
   Optional<PermissioningConfiguration> getPermissioningConfiguration() {
