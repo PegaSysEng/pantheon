@@ -42,14 +42,14 @@ class StandaloneCommand implements DefaultCommandValues {
       names = {"--genesis-file"},
       paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =
-          "The path to genesis file. Setting this option makes --network option ignored and requires --network-id to be set.")
+          "Genesis file. Setting this option makes --network option ignored and requires --network-id to be set.")
   final File genesisFile = null;
 
   @CommandLine.Option(
       names = {"--node-private-key-file"},
       paramLabel = MANDATORY_PATH_FORMAT_HELP,
       description =
-          "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)")
+          "The node's private key file (default: a file named \"key\" in the Pantheon data folder)")
   final File nodePrivateKeyFile = null;
 
   @CommandLine.Option(
@@ -70,6 +70,6 @@ class StandaloneCommand implements DefaultCommandValues {
 
   @CommandLine.Option(
       names = {"--privacy-public-key-file"},
-      description = "the path to the enclave's public key ")
+      description = "The enclave's public key")
   final File privacyPublicKeyFile = null;
 }
