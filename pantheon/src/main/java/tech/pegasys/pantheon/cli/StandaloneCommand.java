@@ -64,12 +64,12 @@ class StandaloneCommand implements DefaultCommandValues {
       names = {"--rpc-ws-authentication-credentials-file"},
       paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =
-          "Storage file for RPC websocket authentication credentials (default: ${DEFAULT-VALUE})",
+          "Storage file for RPC WebSocket authentication credentials (default: ${DEFAULT-VALUE})",
       arity = "1")
   String rpcWsAuthenticationCredentialsFile = null;
 
   @CommandLine.Option(
       names = {"--privacy-public-key-file"},
-      description = "The enclave's public key")
+      description = "The enclave's public key file")
   final File privacyPublicKeyFile = null;
 }

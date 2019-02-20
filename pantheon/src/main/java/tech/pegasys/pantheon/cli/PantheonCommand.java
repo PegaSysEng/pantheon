@@ -272,13 +272,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-http-authentication-enabled"},
       description =
-          "Set if the JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})")
+          "Set if the RPC HTTP service should require authentication (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpAuthenticationEnabled = false;
 
   @Option(
       names = {"--rpc-ws-enabled"},
       description =
-          "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})")
+          "Set if the RPC WebSocket service should be started (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsEnabled = false;
 
   @Option(
@@ -312,7 +312,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       paramLabel = "<refresh delay>",
       arity = "1",
       description =
-          "Refresh delay of websocket subscription sync in milliseconds "
+          "Refresh delay of WebSocket subscription sync in milliseconds "
               + "(default: ${DEFAULT-VALUE})",
       defaultValue = "" + DEFAULT_WEBSOCKET_REFRESH_DELAY)
   private Long configureRefreshDelay(final Long refreshDelay) {
@@ -331,7 +331,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
-          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})")
+          "Set if the RPC WebSocket service should require authentication (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsAuthenticationEnabled = false;
 
   @Option(
