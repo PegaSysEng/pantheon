@@ -650,7 +650,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isRpcHttpAuthenticationEnabled && rpcHttpAuthenticationCredentialsFile() == null) {
       throw new ParameterException(
           commandLine,
-          "Unable to authenticate RPC HTTP endpoint without a supplied credentials file");
+          "Unable to authenticate JSON-RPC HTTP endpoint without a supplied credentials file");
     }
 
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
@@ -684,7 +684,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isRpcWsAuthenticationEnabled && rpcWsAuthenticationCredentialsFile() == null) {
       throw new ParameterException(
           commandLine,
-          "Unable to authenticate RPC WS endpoint without a supplied credentials file");
+          "Unable to authenticate JSON-RPC WebSocket endpoint without a supplied credentials file");
     }
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
