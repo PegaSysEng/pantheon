@@ -17,6 +17,7 @@ import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -54,6 +55,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -138,8 +140,9 @@ public class IbftControllerTest {
     when(futureMessageBuffer.poll(2L)).thenReturn(height2Msgs);
 
     ibftController.start();
-    verify(futureMessageBuffer).poll(2L);
-    verify(futureMessageBuffer).updateChainHeight(2L);
+    InOrder inOrder = inOrder(futureMessageBuffer);
+    inOrder.verify(futureMessageBuffer).poll(2L);
+    inOrder.verify(futureMessageBuffer).updateChainHeight(2L);
     verify(futureMessageBuffer, never()).poll(3L);
     verify(blockHeightManagerFactory).create(chainHeadBlockHeader);
     verify(blockHeightManager, atLeastOnce()).getChainHeight();

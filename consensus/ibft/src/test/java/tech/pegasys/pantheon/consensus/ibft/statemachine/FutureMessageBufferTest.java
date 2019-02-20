@@ -180,6 +180,12 @@ public class FutureMessageBufferTest {
     assertThat(futureMsgBuffer.poll(1)).isEmpty();
     assertThat(futureMsgBuffer.poll(2)).isEmpty();
     assertThat(futureMsgBuffer.poll(3)).containsExactly(message);
+
+    futureMsgBuffer.addMessage(4, message);
+    futureMsgBuffer.addMessage(5, message);
+    futureMsgBuffer.updateChainHeight(3);
+    assertThat(futureMsgBuffer.poll(4)).containsExactly(message);
+    assertThat(futureMsgBuffer.poll(5)).containsExactly(message);
   }
 
   @Test
