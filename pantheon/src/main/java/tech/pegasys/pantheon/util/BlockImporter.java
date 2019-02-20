@@ -81,7 +81,7 @@ public class BlockImporter {
         if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
           continue;
         }
-        if (header.getNumber() % 1 == 0) {
+        if (header.getNumber() % 100 == 0) {
           LOG.info("Import at block {}", header.getNumber());
         }
         if (blockchain.contains(header.getHash())) {
