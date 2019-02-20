@@ -237,20 +237,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-http-enabled"},
       description =
-          "Set if the HTTP JSON-RPC service should be started (default: ${DEFAULT-VALUE})")
+          "Set if the JSON-RPC HTTP service should be started (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpEnabled = false;
 
   @Option(
       names = {"--rpc-http-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
-      description = "Host for HTTP JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Host for JSON-RPC HTTP to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private String rpcHttpHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
       names = {"--rpc-http-port"},
       paramLabel = MANDATORY_PORT_FORMAT_HELP,
-      description = "Port for HTTP JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Port for JSON-RPC HTTP to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer rpcHttpPort = DEFAULT_JSON_RPC_PORT;
 
@@ -268,7 +268,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1..*",
       converter = RpcApisConverter.class,
       description =
-          "Comma separated APIs to enable on HTTP JSON-RPC channel (default: ${DEFAULT-VALUE})")
+          "Comma separated APIs to enable on JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcHttpApis = DEFAULT_JSON_RPC_APIS;
 
   @Option(
@@ -304,7 +304,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1..*",
       converter = RpcApisConverter.class,
       description =
-          "Comma separated APIs to enable on WebSocket JSON-RPC channel (default: ${DEFAULT-VALUE})")
+          "Comma separated APIs to enable on JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcWsApis = DEFAULT_JSON_RPC_APIS;
 
   private Long rpcWsRefreshDelay;
