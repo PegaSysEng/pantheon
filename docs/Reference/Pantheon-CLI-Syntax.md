@@ -533,7 +533,7 @@ p2p-port="1789"
 ```
 
 Specifies the port on which P2P peer discovery listens.
-The default is 30303.
+The default is 30303. The peer discovery port must be open on both TCP and UDP.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -801,7 +801,7 @@ rpc-http-port="3435"
 ```
 
 Specifies the port on which HTTP JSON-RPC listens.
-The default is 8545.
+The default is 8545. The HTTP JSON-RPC port must be open to the intended users of the JSON-RPC API on TCP. 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -884,16 +884,16 @@ The default is `false`.
 ### rpc-ws-host
 
 ```bash tab="Syntax"
---ws-host=<HOST>
+--rpc-ws-host=<HOST>
 ```
 
 ```bash tab="Example Command Line"
 # to listen on all interfaces
---ws-host=0.0.0.0
+--rpc-ws-host=0.0.0.0
 ```
 
 ```bash tab="Example Configuration File"
-ws-host="0.0.0.0"
+rpc-ws-host="0.0.0.0"
 ```
 
 Host for Websocket WS-RPC to listen on.
@@ -907,20 +907,20 @@ To allow remote connections, set to `0.0.0.0`
 ### rpc-ws-port
 
 ```bash tab="Syntax"
---ws-port=<PORT>
+--rpc-ws-port=<PORT>
 ```
 
 ```bash tab="Example Command Line"
 # to listen on port 6174
---ws-port=6174
+--rpc-ws-port=6174
 ```
 
 ```bash tab="Example Configuration File"
-ws-port="6174"
+rpc-ws-port="6174"
 ```
 
 Port for Websocket WS-RPC to listen on.
-The default is 8546.
+The default is 8546. The WebSockets JSON-RPC port must be open to the intended users of the JSON-RPC API on TCP.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
