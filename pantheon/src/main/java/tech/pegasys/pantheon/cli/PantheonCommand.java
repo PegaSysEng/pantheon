@@ -236,8 +236,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--rpc-http-enabled"},
-      description =
-          "Set to start the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
+      description = "Set to start the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpEnabled = false;
 
   @Option(
@@ -279,8 +278,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--rpc-ws-enabled"},
-      description =
-          "Set to start the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
+      description = "Set to start the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsEnabled = false;
 
   @Option(
@@ -357,8 +355,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--metrics-push-enabled"},
-      description =
-          "Enable the metrics push gateway integration (default: ${DEFAULT-VALUE})")
+      description = "Enable the metrics push gateway integration (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsPushEnabled = false;
 
   @Option(
@@ -440,8 +437,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--permissions-accounts-enabled"},
-      description =
-          "Enable account level permissions (default: ${DEFAULT-VALUE})")
+      description = "Enable account level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsAccountsEnabled = false;
 
   @Option(
