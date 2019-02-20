@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,17 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteTally;
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 
-import java.util.List;
+public interface SynchronizerUpdater {
 
-public class IbftProtocolContextFixture {
-
-  public static ProtocolContext<IbftContext> protocolContext(final List<Address> validators) {
-    return new ProtocolContext<>(
-        null, null, new IbftContext(new VoteTally(validators), new VoteProposer()));
-  }
+  void updatePeerChainState(long knownBlockNumber, PeerConnection peerConnection);
 }
