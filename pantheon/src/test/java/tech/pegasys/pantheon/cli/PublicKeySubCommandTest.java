@@ -37,17 +37,21 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
           + System.lineSeparator()
           + "Commands:"
           + System.lineSeparator()
-          + "  export          This command exports the node public key to a file."
+          + "  export          This command outputs the node public key. Default output is"
           + System.lineSeparator()
-          + "  export-address  This command exports the node's public key address to a file."
+          + "                    standard output."
+          + System.lineSeparator()
+          + "  export-address  This command outputs the node's public key address. Default"
+          + System.lineSeparator()
+          + "                    output is standard output."
           + System.lineSeparator();
 
   private static final String EXPECTED_PUBLIC_KEY_EXPORT_USAGE =
-      "Usage: pantheon public-key export [-hV] --to=<FILE>"
+      "Usage: pantheon public-key export [-hV] [--to=<FILE>]"
           + System.lineSeparator()
-          + "This command exports the node public key to a file."
+          + "This command outputs the node public key. Default output is standard output."
           + System.lineSeparator()
-          + "      --to=<FILE>   File to write public key to"
+          + "      --to=<FILE>   File to write public key to instead of standard output"
           + System.lineSeparator()
           + "  -h, --help        Show this help message and exit."
           + System.lineSeparator()
@@ -55,11 +59,13 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
           + System.lineSeparator();
 
   private static final String EXPECTED_PUBLIC_KEY_EXPORT_ADDRESS_USAGE =
-      "Usage: pantheon public-key export-address [-hV] --to=<FILE>"
+      "Usage: pantheon public-key export-address [-hV] [--to=<FILE>]"
           + System.lineSeparator()
-          + "This command exports the node's public key address to a file."
+          + "This command outputs the node's public key address. Default output is standard"
           + System.lineSeparator()
-          + "      --to=<FILE>   File to write address to"
+          + "output."
+          + System.lineSeparator()
+          + "      --to=<FILE>   File to write address to instead of standard output"
           + System.lineSeparator()
           + "  -h, --help        Show this help message and exit."
           + System.lineSeparator()
@@ -70,7 +76,7 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
   private static final String PUBLIC_KEY_EXPORT_SUBCOMMAND_NAME = "export";
   private static final String PUBLIC_KEY_EXPORT_ADDRESS_SUBCOMMAND_NAME = "export-address";
 
-  // bublic-key sub-command
+  // public-key sub-command
   @Test
   public void publicKeySubCommandExistAnbHaveSubCommands() {
     CommandSpec spec = parseCommand();
@@ -96,12 +102,17 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
-  // Export sub-sub-command
+  // Export public key sub-sub-command
   @Test
-  public void callingPublicKeyExportSubCommandWithoutPathMustDisplayErrorAndUsage() {
+  public void callingPublicKeyExportSubCommandWithoutPathMustWriteKeyToStandardOutput() {
+    final KeyPair keyPair = KeyPair.generate();
+    when(mockController.getLocalNodeKeyPair()).thenReturn(keyPair);
+
     parseCommand(PUBLIC_KEY_SUBCOMMAND_NAME, PUBLIC_KEY_EXPORT_SUBCOMMAND_NAME);
-    final String expectedErrorOutputStart = "Missing required option '--to=<FILE>'";
-    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
+
+    final String expectedOutputStart = keyPair.getPublicKey().toString();
+    assertThat(commandOutput.toString()).startsWith(expectedOutputStart);
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -132,12 +143,17 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
-  // Export sub-sub-command
+  // Export address sub-sub-command
   @Test
-  public void callingPublicKeyExportAddressSubCommandWithoutPathMustDisplayErrorAndUsage() {
+  public void callingPublicKeyExportAddressSubCommandWithoutPathMustWriteAddressToStandardOutput() {
+    final KeyPair keyPair = KeyPair.generate();
+    when(mockController.getLocalNodeKeyPair()).thenReturn(keyPair);
+
     parseCommand(PUBLIC_KEY_SUBCOMMAND_NAME, PUBLIC_KEY_EXPORT_ADDRESS_SUBCOMMAND_NAME);
-    final String expectedErrorOutputStart = "Missing required option '--to=<FILE>'";
-    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
+
+    final String expectedOutputStart = Util.publicKeyToAddress(keyPair.getPublicKey()).toString();
+    assertThat(commandOutput.toString()).startsWith(expectedOutputStart);
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test

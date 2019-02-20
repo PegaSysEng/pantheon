@@ -72,23 +72,23 @@ class PublicKeySubCommand implements Runnable {
   /**
    * Public key export sub-command
    *
-   * <p>Export of the public key takes a file as parameter to export directly by writing the key in
-   * the file. A direct output of the key to standard out is not done because we don't want the key
-   * value to be polluted by other information like logs that are in KeyPairUtil that is inevitable.
+   * <p>Export of the public key is writing the key to the standard output by default. An option
+   * enables to write it in a file. Indeed, a direct output of the value to standard out is not
+   * always recommended as reading can be made difficult as the value can be mixed with other
+   * information like logs that are in KeyPairUtil that is inevitable.
    */
   @Command(
       name = "export",
-      description = "This command exports the node public key to a file.",
+      description = "This command outputs the node public key. Default output is standard output.",
       mixinStandardHelpOptions = true)
   static class ExportSubCommand implements Runnable {
 
     @Option(
         names = "--to",
-        required = true,
         paramLabel = MANDATORY_FILE_FORMAT_HELP,
-        description = "File to write public key to",
+        description = "File to write public key to instead of standard output",
         arity = "1..1")
-    private final File publicKeyExportFile = null;
+    private File publicKeyExportFile = null;
 
     @SuppressWarnings("unused")
     @ParentCommand
@@ -102,14 +102,18 @@ class PublicKeySubCommand implements Runnable {
       final PantheonController<?> controller = parentCommand.parentCommand.buildController();
       final KeyPair keyPair = controller.getLocalNodeKeyPair();
 
-      // this publicKeyExportFile can never be null because of Picocli arity requirement
-      //noinspection ConstantConditions
-      final Path path = publicKeyExportFile.toPath();
+      // if we have an output file defined, print to it
+      // otherwise print to standard output.
+      if (publicKeyExportFile != null) {
+        final Path path = publicKeyExportFile.toPath();
 
-      try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, UTF_8)) {
-        fileWriter.write(keyPair.getPublicKey().toString());
-      } catch (final IOException e) {
-        LOG.error("An error occurred while trying to write the public key", e);
+        try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, UTF_8)) {
+          fileWriter.write(keyPair.getPublicKey().toString());
+        } catch (final IOException e) {
+          LOG.error("An error occurred while trying to write the public key", e);
+        }
+      } else {
+        parentCommand.out.println(keyPair.getPublicKey().toString());
       }
     }
   }
@@ -117,24 +121,25 @@ class PublicKeySubCommand implements Runnable {
   /**
    * Public key address export sub-command
    *
-   * <p>Export of the public key address takes a file as parameter to export directly by writing the
-   * address in the file. A direct output of the address to standard out is not done because we
-   * don't want the address value to be polluted by other information like logs that are in
-   * KeyPairUtil that is inevitable.
+   * <p>Export of the public key address is writing the address to the standard output by default.
+   * An option enables to write it in a file. Indeed, a direct output of the value to standard out
+   * is not always recommended as reading can be made difficult as the value can be mixed with other
+   * information like logs that are in KeyPairUtil that is inevitable.
    */
   @Command(
       name = "export-address",
-      description = "This command exports the node's public key address to a file.",
+      description =
+          "This command outputs the node's public key address. "
+              + "Default output is standard output.",
       mixinStandardHelpOptions = true)
   static class AddressSubCommand implements Runnable {
 
     @Option(
         names = "--to",
-        required = true,
         paramLabel = MANDATORY_FILE_FORMAT_HELP,
-        description = "File to write address to",
+        description = "File to write address to instead of standard output",
         arity = "1..1")
-    private final File addressExportFile = null;
+    private File addressExportFile = null;
 
     @SuppressWarnings("unused")
     @ParentCommand
@@ -149,14 +154,18 @@ class PublicKeySubCommand implements Runnable {
       final KeyPair keyPair = controller.getLocalNodeKeyPair();
       final Address address = Util.publicKeyToAddress(keyPair.getPublicKey());
 
-      // this publicKeyExportFile can never be null because of Picocli arity requirement
-      //noinspection ConstantConditions
-      final Path path = addressExportFile.toPath();
+      // if we have an output file defined, print to it
+      // otherwise print to standard output.
+      if (addressExportFile != null) {
+        final Path path = addressExportFile.toPath();
 
-      try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, UTF_8)) {
-        fileWriter.write(address.toString());
-      } catch (final IOException e) {
-        LOG.error("An error occurred while trying to write the public key address", e);
+        try (final BufferedWriter fileWriter = Files.newBufferedWriter(path, UTF_8)) {
+          fileWriter.write(address.toString());
+        } catch (final IOException e) {
+          LOG.error("An error occurred while trying to write the public key address", e);
+        }
+      } else {
+        parentCommand.out.println(address.toString());
       }
     }
   }
