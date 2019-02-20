@@ -82,7 +82,7 @@ public class FutureMessageBuffer {
   }
 
   public List<Message> retrieveMessagesForHeight(final long height) {
-    this.chainHeight = height;
+    chainHeight = height;
     final List<Message> messages = buffer.getOrDefault(height, Collections.emptyList());
     discardPreviousHeightMessages();
     return messages;
