@@ -236,7 +236,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--rpc-http-enabled"},
-      description = "Set if the HTTP JSON-RPC service should be started (default: ${DEFAULT-VALUE})")
+      description =
+          "Set if the HTTP JSON-RPC service should be started (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpEnabled = false;
 
   @Option(
@@ -266,7 +267,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       split = ",",
       arity = "1..*",
       converter = RpcApisConverter.class,
-      description = "Comma separated APIs to enable on HTTP JSON-RPC channel (default: ${DEFAULT-VALUE})")
+      description =
+          "Comma separated APIs to enable on HTTP JSON-RPC channel (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcHttpApis = DEFAULT_JSON_RPC_APIS;
 
   @Option(
