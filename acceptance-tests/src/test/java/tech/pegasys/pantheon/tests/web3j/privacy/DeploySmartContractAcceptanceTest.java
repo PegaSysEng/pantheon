@@ -78,7 +78,7 @@ public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
           .privateFor(
               Lists.newArrayList(
                   BytesValue.wrap("Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs=".getBytes(UTF_8))))
-          .restriction(BytesValue.wrap("restricted".getBytes(UTF_8)))
+          .restriction(BytesValue.wrap("unrestricted".getBytes(UTF_8)))
           .signAndBuild(
               SECP256K1.KeyPair.create(
                   SECP256K1.PrivateKey.create(
@@ -104,7 +104,7 @@ public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
           .privateFor(
               Lists.newArrayList(
                   BytesValue.wrap("Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs=".getBytes(UTF_8))))
-          .restriction(BytesValue.wrap("restricted".getBytes(UTF_8)))
+          .restriction(BytesValue.wrap("unrestricted".getBytes(UTF_8)))
           .signAndBuild(
               SECP256K1.KeyPair.create(
                   SECP256K1.PrivateKey.create(
