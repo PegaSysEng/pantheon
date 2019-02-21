@@ -73,6 +73,10 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
     }
 
+    if (!privateTransaction.getValue().isZero()) {
+      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
+    }
+
     final Transaction transaction;
     try {
       transaction = handlePrivateTransaction(privateTransaction);

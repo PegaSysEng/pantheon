@@ -49,16 +49,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class EeaSendRawTransactionTest {
 
   private static final String VALID_PRIVATE_TRANSACTION_RLP =
-      "0xf90113800182520894095e7baea6a6c7c4c2dfeb977efac326af552d87"
-          + "a0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-          + "ffff801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d"
-          + "495a36649353a01fffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab94"
-          + "9f53faa07bd2c804ac41316156744d784c4355486d425648586f5a7a7a4267"
-          + "5062572f776a3561784470573958386c393153476f3df85aac41316156744d"
-          + "784c4355486d425648586f5a7a7a42675062572f776a356178447057395838"
-          + "6c393153476f3dac4b6f32625671442b6e4e6c4e594c35454537793349644f"
-          + "6e766966746a69697a706a52742b4854754642733d8a726573747269637465"
-          + "64";
+      "0xf8f3800182520894095e7baea6a6c7c4c2dfeb977efac326af552d8780"
+          + "801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a"
+          + "36649353a01fffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f"
+          + "53faa07bd2c804ac41316156744d784c4355486d425648586f5a7a7a4267"
+          + "5062572f776a3561784470573958386c393153476f3df85aac4131615674"
+          + "4d784c4355486d425648586f5a7a7a42675062572f776a35617844705739"
+          + "58386c393153476f3dac4b6f32625671442b6e4e6c4e594c354545377933"
+          + "49644f6e766966746a69697a706a52742b4854754642733d8a7265737472"
+          + "6963746564";
 
   private static final Transaction PUBLIC_TRANSACTION =
       new Transaction(
@@ -67,9 +66,7 @@ public class EeaSendRawTransactionTest {
           21000L,
           Optional.of(
               Address.wrap(BytesValue.fromHexString("0x095e7baea6a6c7c4c2dfeb977efac326af552d87"))),
-          Wei.of(
-              new BigInteger(
-                  "115792089237316195423570985008687907853269984665640564039457584007913129639935")),
+          Wei.ZERO,
           SECP256K1.Signature.create(
               new BigInteger(
                   "32886959230931919120748662916110619501838190146643992583529828535682419954515"),
@@ -161,7 +158,7 @@ public class EeaSendRawTransactionTest {
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcSuccessResponse(
-            request.getId(), "0xa86e8a2324e3abccd52afd6913c4c8a5d91f5d1855c0aa075568416c0a3ff7b2");
+            request.getId(), "0x221e930a2c18d91fca4d509eaa3512f3e01fef266f660e32473de67474b36c15");
 
     final JsonRpcResponse actualResponse = method.response(request);
 
