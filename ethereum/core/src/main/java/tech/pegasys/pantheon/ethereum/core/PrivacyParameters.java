@@ -33,7 +33,12 @@ public class PrivacyParameters {
     return publicKey;
   }
 
+  public File getPublicKeyFile() {
+    return publicKeyFile;
+  }
+
   public void setPublicKeyUsingFile(final File publicKeyFile) throws IOException {
+    this.publicKeyFile = publicKeyFile;
     this.publicKey = Files.asCharSource(publicKeyFile, UTF_8).read();
   }
 
