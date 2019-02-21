@@ -53,8 +53,8 @@ pantheon --help
     We recommend that you also remove any 32-bit JDK/JRE installations.
     
 !!! note "Linux Open File Limit"
-    If synchronizing to MainNet on Linux, increase the maximum number of open files allowed using `ulimit`. 
-    If the open files limit is not high enough, a `Too many open files` RocksDB exception occurs. 
+    If synchronizing to MainNet on Linux or other chains with large data requirements, increase the maximum 
+    number of open files allowed using `ulimit`. If the open files limit is not high enough, a `Too many open files` RocksDB exception occurs. 
 
 ### Install from Packaged Binaries
 
