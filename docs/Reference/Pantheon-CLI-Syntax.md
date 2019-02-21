@@ -106,7 +106,7 @@ data-path="/home/me/me_node"
 The path to the Pantheon data directory. The default is the `/build/distributions/pantheon-<version>` directory in the Pantheon installation directory.
 
 !!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#persisting-data). 
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#data-directory). 
 
 ### discovery-enabled
 
@@ -163,7 +163,8 @@ The path to the genesis file.
 host-whitelist=["medomain.com", "meotherdomain.com"]
 ```
 
-Comma-separated list of hostnames to allow access to the HTTP JSON-RPC API. Default is `localhost`. 
+Comma-separated list of hostnames to allow [access to the JSON-RPC API](../JSON-RPC-API/Using-JSON-RPC-API.md#host-whitelist). 
+Default is `localhost`. 
 
 !!!tip
     To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
@@ -234,8 +235,8 @@ The default is `127.0.0.1`.
 metrics-port="6174"
 ```
 
-Specifies the port on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
-The default is `9545`. 
+Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
+The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 ### metrics-push-enabled 
 
@@ -308,8 +309,8 @@ Interval in seconds to push metrics when in `push` mode. The default is 15.
 metrics-push-port="6174"
 ```
 
-Port of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
-The default is `9001`. 
+Port (TCP) of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
+The default is `9001`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 ### metrics-push-prometheus-job
 
@@ -511,7 +512,7 @@ The default is true.
 p2p-host="0.0.0.0"
 ```
 
-Specifies the host on which P2P peer discovery listens.
+Specifies the host on which P2P listens.
 The default is 127.0.0.1.
 
 !!!note
@@ -532,8 +533,8 @@ The default is 127.0.0.1.
 p2p-port="1789"
 ```
 
-Specifies the port on which P2P peer discovery listens.
-The default is 30303.
+Specifies the P2P listening ports (UDP and TCP).
+The default is 30303. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -553,6 +554,7 @@ permissions-accounts-enabled=true
 ```
 
 Set to enable account level permissions.
+
 The default is `false`. 
     
 ### permissions-config-file    
@@ -635,6 +637,9 @@ Path to the public key for the enclave.
 !!!note
     Privacy is under development and will be available in v1.1.
 
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#privacy-public-key-file).
+
 ### privacy-url
 
 ```bash tab="Syntax"
@@ -687,6 +692,9 @@ rpc-http-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
 [Credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files).
 
 ### rpc-http-authentication-enabled
 
@@ -799,8 +807,8 @@ To allow remote connections, set to `0.0.0.0`
 rpc-http-port="3435"
 ```
 
-Specifies the port on which HTTP JSON-RPC listens.
-The default is 8545.
+Specifies HTTP JSON-RPC listening port (TCP).
+The default is 8545. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration). 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -845,7 +853,10 @@ The default is: `ETH`, `NET`, `WEB3`.
 rpc-ws-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
-[Credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
+[Credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md).
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files). 
 
 ### rpc-ws-authentication-enabled
 
@@ -883,16 +894,16 @@ The default is `false`.
 ### rpc-ws-host
 
 ```bash tab="Syntax"
---ws-host=<HOST>
+--rpc-ws-host=<HOST>
 ```
 
 ```bash tab="Example Command Line"
 # to listen on all interfaces
---ws-host=0.0.0.0
+--rpc-ws-host=0.0.0.0
 ```
 
 ```bash tab="Example Configuration File"
-ws-host="0.0.0.0"
+rpc-ws-host="0.0.0.0"
 ```
 
 Host for Websocket WS-RPC to listen on.
@@ -906,20 +917,20 @@ To allow remote connections, set to `0.0.0.0`
 ### rpc-ws-port
 
 ```bash tab="Syntax"
---ws-port=<PORT>
+--rpc-ws-port=<PORT>
 ```
 
 ```bash tab="Example Command Line"
 # to listen on port 6174
---ws-port=6174
+--rpc-ws-port=6174
 ```
 
 ```bash tab="Example Configuration File"
-ws-port="6174"
+rpc-ws-port="6174"
 ```
 
-Port for Websocket WS-RPC to listen on.
-The default is 8546.
+Specifies Websockets JSON-RPC listening port (TCP).
+The default is 8546. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 

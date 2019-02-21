@@ -145,10 +145,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // CLI options defined by user at runtime.
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
-  // Completely disables p2p within Pantheon.
+  // Completely disables P2P within Pantheon.
   @Option(
       names = {"--p2p-enabled"},
-      description = "Enable/disable all p2p functionality (default: ${DEFAULT-VALUE})",
+      description = "Enable P2P functionality (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Boolean p2pEnabled = true;
 
@@ -163,7 +163,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // meaning that it's probably the right way to handle disabling options.
   @Option(
       names = {"--discovery-enabled"},
-      description = "Enable p2p peer discovery (default: ${DEFAULT-VALUE})",
+      description = "Enable P2P peer discovery (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Boolean peerDiscoveryEnabled = true;
 
@@ -185,13 +185,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--max-peers"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
-          "Maximum p2p peer connections that can be established (default: ${DEFAULT-VALUE})")
+          "Maximum P2P peer connections that can be established (default: ${DEFAULT-VALUE})")
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
   @Option(
       names = {"--banned-node-ids", "--banned-node-id"},
       paramLabel = MANDATORY_NODE_ID_FORMAT_HELP,
-      description = "A list of node IDs to ban from the p2p network.",
+      description = "A list of node IDs to ban from the P2P network.",
       split = ",",
       arity = "1..*")
   private final Collection<String> bannedNodeIds = new ArrayList<>();
@@ -201,7 +201,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--sync-mode"},
       paramLabel = MANDATORY_MODE_FORMAT_HELP,
       description =
-          "Synchronization mode (Value can be one of ${COMPLETION-CANDIDATES}, default: ${DEFAULT-VALUE})")
+          "Synchronization mode, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
   @Option(
@@ -215,14 +215,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--p2p-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
-      description = "Host for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
+      description = "Host for P2P peer discovery to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private String p2pHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
       names = {"--p2p-port"},
       paramLabel = MANDATORY_PORT_FORMAT_HELP,
-      description = "Port for p2p peers discovery to listen on (default: ${DEFAULT-VALUE})",
+      description = "Port for P2P peer discovery to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer p2pPort = DEFAULT_PORT;
 
@@ -236,20 +236,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--rpc-http-enabled"},
-      description = "Set if the JSON-RPC service should be started (default: ${DEFAULT-VALUE})")
+      description = "Set to start the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpEnabled = false;
 
   @Option(
       names = {"--rpc-http-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
-      description = "Host for HTTP JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Host for JSON-RPC HTTP to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private String rpcHttpHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
       names = {"--rpc-http-port"},
       paramLabel = MANDATORY_PORT_FORMAT_HELP,
-      description = "Port for HTTP JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Port for JSON-RPC HTTP to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer rpcHttpPort = DEFAULT_JSON_RPC_PORT;
 
@@ -266,32 +266,32 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       split = ",",
       arity = "1..*",
       converter = RpcApisConverter.class,
-      description = "Comma separated APIs to enable on JSON-RPC channel. default: ${DEFAULT-VALUE}")
+      description =
+          "Comma separated list of APIs to enable on JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcHttpApis = DEFAULT_JSON_RPC_APIS;
 
   @Option(
       names = {"--rpc-http-authentication-enabled"},
       description =
-          "Set if the JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})")
+          "Require authentication for the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpAuthenticationEnabled = false;
 
   @Option(
       names = {"--rpc-ws-enabled"},
-      description =
-          "Set if the WS-RPC (WebSocket) service should be started (default: ${DEFAULT-VALUE})")
+      description = "Set to start the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsEnabled = false;
 
   @Option(
       names = {"--rpc-ws-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
-      description = "Host for WebSocket JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Host for JSON-RPC WebSocket service to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private String rpcWsHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
       names = {"--rpc-ws-port"},
       paramLabel = MANDATORY_PORT_FORMAT_HELP,
-      description = "Port for WebSocket JSON-RPC to listen on (default: ${DEFAULT-VALUE})",
+      description = "Port for JSON-RPC WebSocket service to listen on (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer rpcWsPort = DEFAULT_WEBSOCKET_PORT;
 
@@ -302,7 +302,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1..*",
       converter = RpcApisConverter.class,
       description =
-          "Comma separated APIs to enable on WebSocket channel. default: ${DEFAULT-VALUE}")
+          "Comma separated list of APIs to enable on JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcWsApis = DEFAULT_JSON_RPC_APIS;
 
   private Long rpcWsRefreshDelay;
@@ -312,8 +312,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       paramLabel = "<refresh delay>",
       arity = "1",
       description =
-          "Refresh delay of websocket subscription sync in milliseconds. "
-              + "default: ${DEFAULT-VALUE}",
+          "Refresh delay of WebSocket subscription sync in milliseconds "
+              + "(default: ${DEFAULT-VALUE})",
       defaultValue = "" + DEFAULT_WEBSOCKET_REFRESH_DELAY)
   private Long configureRefreshDelay(final Long refreshDelay) {
     if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
@@ -331,12 +331,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
-          "Set if the websocket JSON-RPC service should require authentication (default: ${DEFAULT-VALUE})")
+          "Require authentication for the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsAuthenticationEnabled = false;
 
   @Option(
       names = {"--metrics-enabled"},
-      description = "Set if the metrics exporter should be started (default: ${DEFAULT-VALUE})")
+      description = "Set to start the metrics exporter (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsEnabled = false;
 
   @Option(
@@ -355,8 +355,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--metrics-push-enabled"},
-      description =
-          "Set if the metrics push gateway integration should be started (default: ${DEFAULT-VALUE})")
+      description = "Enable the metrics push gateway integration (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsPushEnabled = false;
 
   @Option(
@@ -391,7 +390,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--host-whitelist"},
       paramLabel = "<hostname>[,<hostname>...]... or * or all",
       description =
-          "Comma separated list of hostnames to whitelist for RPC access or * or all to accept any host.  default: ${DEFAULT-VALUE}",
+          "Comma separated list of hostnames to whitelist for JSON-RPC access, or * or all to accept any host (default: ${DEFAULT-VALUE})",
       defaultValue = "localhost")
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
@@ -399,63 +398,56 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--logging", "-l"},
       paramLabel = "<LOG VERBOSITY LEVEL>",
       description =
-          "Logging verbosity levels: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO).")
+          "Logging verbosity levels: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)")
   private final Level logLevel = null;
 
   @Option(
       names = {"--miner-enabled"},
-      description = "set if node should perform mining (default: ${DEFAULT-VALUE})")
+      description = "Set if node will perform mining (default: ${DEFAULT-VALUE})")
   private final Boolean isMiningEnabled = false;
 
   @Option(
       names = {"--miner-coinbase"},
       description =
-          "account to which mining rewards are paid. You must specify a valid coinbase if "
-              + "mining is enabled using --miner-enabled option.",
+          "Account to which mining rewards are paid. You must specify a valid coinbase if "
+              + "mining is enabled using --miner-enabled option",
       arity = "1")
   private final Address coinbase = null;
 
   @Option(
       names = {"--min-gas-price"},
       description =
-          "the minimum price (in Wei) offered by a transaction for it to be included in a mined "
-              + "block (default: ${DEFAULT-VALUE}).",
+          "Minimum price (in Wei) offered by a transaction for it to be included in a mined "
+              + "block (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Wei minTransactionGasPrice = DEFAULT_MIN_TRANSACTION_GAS_PRICE;
 
   @Option(
       names = {"--miner-extra-data"},
       description =
-          "a hex string representing the (32) bytes to be included in the extra data "
-              + "field of a mined block. (default: ${DEFAULT-VALUE}).",
+          "A hex string representing the (32) bytes to be included in the extra data "
+              + "field of a mined block (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   @Option(
       names = {"--permissions-nodes-enabled"},
-      description = "Set if node level permissions should be enabled (default: ${DEFAULT-VALUE})")
+      description = "Enable node level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsNodesEnabled = false;
 
   @Option(
       names = {"--permissions-accounts-enabled"},
-      description =
-          "Set if account level permissions should be enabled (default: ${DEFAULT-VALUE})")
+      description = "Enable account level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsAccountsEnabled = false;
 
   @Option(
-      names = {"--permissions-config-file"},
-      description =
-          "Path to permissions config TOML file (default:  a file named \"permissions_config.toml\" in the Pantheon data folder)")
-  private String permissionsConfigFile = null;
-
-  @Option(
       names = {"--privacy-enabled"},
-      description = "Set if private transaction should be enabled (default: ${DEFAULT-VALUE})")
+      description = "Enable private transactions (default: ${DEFAULT-VALUE})")
   private final Boolean privacyEnabled = false;
 
   @Option(
       names = {"--privacy-url"},
-      description = "The URL on which enclave is running ")
+      description = "The URL on which the enclave is running")
   private final URI privacyUrl = PrivacyParameters.DEFAULT_ENCLAVE_URL;
 
   @Option(
@@ -523,7 +515,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       Configurator.setAllLevels("", logLevel);
     }
 
-    // Check that p2p options are able top work or send an error
+    // Check that P2P options are able to work or send an error
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
@@ -536,7 +528,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--banned-node-id",
             "--banned-node-ids"));
 
-    // Check that mining options are able top work or send an error
+    // Check that mining options are able to work or send an error
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
@@ -550,6 +542,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           this.commandLine,
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
+    }
+
+    if (permissionsConfigFile() != null) {
+      if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+        logger.warn(
+            "Permissions config file set {} but no permissions enabled", permissionsConfigFile());
+      }
     }
 
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
@@ -617,8 +616,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private String getPermissionsConfigFile() {
 
-    return permissionsConfigFile != null
-        ? permissionsConfigFile
+    return permissionsConfigFile() != null
+        ? permissionsConfigFile()
         : dataDir().toAbsolutePath()
             + System.getProperty("file.separator")
             + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
@@ -643,7 +642,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isRpcHttpAuthenticationEnabled && rpcHttpAuthenticationCredentialsFile() == null) {
       throw new ParameterException(
           commandLine,
-          "Unable to authenticate RPC HTTP endpoint without a supplied credentials file");
+          "Unable to authenticate JSON-RPC HTTP endpoint without a supplied credentials file");
     }
 
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
@@ -677,7 +676,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isRpcWsAuthenticationEnabled && rpcWsAuthenticationCredentialsFile() == null) {
       throw new ParameterException(
           commandLine,
-          "Unable to authenticate RPC WS endpoint without a supplied credentials file");
+          "Unable to authenticate JSON-RPC WebSocket endpoint without a supplied credentials file");
     }
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
@@ -734,6 +733,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
 
     if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+      if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
+        logger.warn(
+            "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
+      }
       return Optional.empty();
     }
 
@@ -761,7 +764,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
       } else {
         throw new ParameterException(
-            commandLine, "Please specify Enclave public Key file path to Enable Privacy");
+            commandLine, "Please specify Enclave public key file path to enable privacy");
       }
       privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
     }
@@ -933,7 +936,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private Path dataDir() {
     if (isFullInstantiation()) {
-      return standaloneCommands.dataPath;
+      return standaloneCommands.dataPath.toAbsolutePath();
     } else if (isDocker) {
       return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {
@@ -996,6 +999,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (filename != null) {
       RpcAuthFileValidator.validate(commandLine, filename, "WS");
     }
+    return filename;
+  }
+
+  private String permissionsConfigFile() {
+    String filename = null;
+    if (isFullInstantiation()) {
+      filename = standaloneCommands.permissionsConfigFile;
+    } else if (isDocker) {
+      final File file = new File(DOCKER_PERMISSIONS_CONFIG_FILE_LOCATION);
+      if (file.exists()) {
+        filename = file.getAbsolutePath();
+      }
+    }
+
     return filename;
   }
 
