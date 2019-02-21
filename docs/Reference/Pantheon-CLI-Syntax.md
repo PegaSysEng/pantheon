@@ -234,7 +234,7 @@ The default is `127.0.0.1`.
 metrics-port="6174"
 ```
 
-Specifies the port(TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
+Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
 The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 ### metrics-push-enabled 
@@ -308,7 +308,7 @@ Interval in seconds to push metrics when in `push` mode. The default is 15.
 metrics-push-port="6174"
 ```
 
-Port(TCP) of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
+Port (TCP) of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
 The default is `9001`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 ### metrics-push-prometheus-job
@@ -511,7 +511,7 @@ The default is true.
 p2p-host="0.0.0.0"
 ```
 
-Specifies the host on which P2P peer discovery listens.
+Specifies the host on which P2P listens.
 The default is 127.0.0.1.
 
 !!!note
@@ -532,7 +532,7 @@ The default is 127.0.0.1.
 p2p-port="1789"
 ```
 
-Specifies the P2P peer discovery listening port (UDP and TCP).
+Specifies the P2P listening ports (UDP and TCP).
 The default is 30303. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 !!!note

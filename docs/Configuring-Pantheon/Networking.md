@@ -11,7 +11,7 @@ Ports must be exposed appropriately to enable communication. An example port con
                                      
 ![Port Configuration](../images/PortConfiguration.png)
 
-### Peer Discovery  
+### P2P Networking 
 
 To enable peer discovery, the P2P UDP port must be open for inbound connections.
 
