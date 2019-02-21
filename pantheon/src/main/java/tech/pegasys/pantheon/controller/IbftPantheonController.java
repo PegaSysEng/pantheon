@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
+import tech.pegasys.pantheon.consensus.ibft.EthSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
@@ -29,6 +30,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
+import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
@@ -39,6 +41,7 @@ import tech.pegasys.pantheon.consensus.ibft.network.ValidatorPeers;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.FutureMessageBuffer;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
@@ -56,6 +59,7 @@ import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
@@ -168,9 +172,10 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             metricsSystem);
     final SubProtocol ethSubProtocol = EthProtocol.get();
 
+    final EthContext ethContext = ethProtocolManager.ethContext();
+
     final SyncState syncState =
-        new SyncState(
-            protocolContext.getBlockchain(), ethProtocolManager.ethContext().getEthPeers());
+        new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
     final Synchronizer synchronizer =
         new DefaultSynchronizer<>(
             syncConfig,
@@ -183,8 +188,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             metricsSystem);
 
     final TransactionPool transactionPool =
-        TransactionPoolFactory.createTransactionPool(
-            protocolSchedule, protocolContext, ethProtocolManager.ethContext());
+        TransactionPoolFactory.createTransactionPool(protocolSchedule, protocolContext, ethContext);
 
     final IbftEventQueue ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
 
@@ -236,6 +240,14 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
     minedBlockObservers.subscribe(ethProtocolManager);
 
+    final FutureMessageBuffer futureMessageBuffer =
+        new FutureMessageBuffer(
+            ibftConfig.getFutureMessagesMaxDistance(),
+            ibftConfig.getFutureMessagesLimit(),
+            blockchain.getChainHeadBlockNumber());
+    final MessageTracker duplicateMessageTracker =
+        new MessageTracker(ibftConfig.getDuplicateMessageLimit());
+
     final IbftController ibftController =
         new IbftController(
             blockchain,
@@ -250,7 +262,9 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                     messageValidatorFactory),
                 messageValidatorFactory),
             gossiper,
-            ibftConfig.getDuplicateMessageLimit());
+            duplicateMessageTracker,
+            futureMessageBuffer,
+            new EthSynchronizerUpdater(ethContext.getEthPeers()));
     ibftController.start();
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
