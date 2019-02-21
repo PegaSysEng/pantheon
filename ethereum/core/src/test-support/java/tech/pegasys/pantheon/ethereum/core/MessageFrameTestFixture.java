@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -156,7 +155,6 @@ public class MessageFrameTestFixture {
             .messageFrameStack(messageFrameStack)
             .blockchain(blockchain)
             .worldState(worldState.orElseGet(this::createDefaultWorldState))
-            .privateWorldStates(new HashMap<>())
             .initialGas(initialGas)
             .address(address)
             .originator(originator)

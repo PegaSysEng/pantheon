@@ -32,7 +32,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.OptionalLong;
 
 import org.apache.logging.log4j.LogManager;
@@ -200,7 +199,6 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
               .worldState(worldUpdater.updater())
-              .privateWorldStates(new HashMap<>())
               .initialGas(gasAvailable)
               .address(contractAddress)
               .originator(senderAddress)
@@ -228,7 +226,6 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
               .worldState(worldUpdater.updater())
-              .privateWorldStates(new HashMap<>())
               .initialGas(gasAvailable)
               .address(to)
               .originator(senderAddress)

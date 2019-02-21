@@ -168,7 +168,6 @@ public abstract class AbstractCallOperation extends AbstractOperation {
             .messageFrameStack(frame.getMessageFrameStack())
             .blockchain(frame.getBlockchain())
             .worldState(frame.getWorldState().updater())
-            .privateWorldStates(frame.getPrivateWorldStates())
             .initialGas(gasAvailableForChildCall(frame))
             .address(address(frame))
             .originator(frame.getOriginatorAddress())

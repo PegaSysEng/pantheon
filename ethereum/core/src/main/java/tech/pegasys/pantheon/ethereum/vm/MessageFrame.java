@@ -24,9 +24,6 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractMessageProcessor;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateMutableWorldState;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
-import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -34,7 +31,6 @@ import tech.pegasys.pantheon.util.uint.UInt256Value;
 
 import java.util.Deque;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -183,7 +179,6 @@ public class MessageFrame {
 
   // Global data fields.
   private final WorldUpdater worldState;
-  private final HashMap<Integer, WorldUpdater> privateWorldStates;
   private final Blockchain blockchain;
 
   // Metadata fields.
@@ -235,7 +230,6 @@ public class MessageFrame {
       final Blockchain blockchain,
       final Deque<MessageFrame> messageFrameStack,
       final WorldUpdater worldState,
-      final HashMap<Integer, WorldUpdater> privateWorldStates,
       final Gas initialGas,
       final Address recipient,
       final Address originator,
@@ -256,7 +250,6 @@ public class MessageFrame {
     this.blockchain = blockchain;
     this.messageFrameStack = messageFrameStack;
     this.worldState = worldState;
-    this.privateWorldStates = privateWorldStates;
     this.gasRemaining = initialGas;
     this.blockHashLookup = blockHashLookup;
     this.pc = 0;
@@ -653,31 +646,6 @@ public class MessageFrame {
   }
 
   /**
-   * Return the private world states
-   *
-   * @return the private world states
-   */
-  public HashMap<Integer, WorldUpdater> getPrivateWorldStates() {
-    return privateWorldStates;
-  }
-
-  /**
-   * Return the private world state for the corresponding privacyGroupId.
-   *
-   * @param privacyGroupId Identifier for the privacy group
-   * @return the private world state for that privacy group
-   */
-  public WorldUpdater getPrivateWorldState(final Integer privacyGroupId) {
-    return privateWorldStates.getOrDefault(privacyGroupId, createInitialPrivateWorldState());
-  }
-
-  private WorldUpdater createInitialPrivateWorldState() {
-    return new PrivateMutableWorldState(
-            new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage()))
-        .updater();
-  }
-
-  /**
    * Returns the message frame type.
    *
    * @return the message frame type
@@ -848,7 +816,6 @@ public class MessageFrame {
     private Blockchain blockchain;
     private Deque<MessageFrame> messageFrameStack;
     private WorldUpdater worldState;
-    private HashMap<Integer, WorldUpdater> privateWorldStates;
     private Gas initialGas;
     private Address address;
     private Address originator;
@@ -883,11 +850,6 @@ public class MessageFrame {
 
     public Builder worldState(final WorldUpdater worldState) {
       this.worldState = worldState;
-      return this;
-    }
-
-    public Builder privateWorldStates(final HashMap<Integer, WorldUpdater> privateWorldStates) {
-      this.privateWorldStates = privateWorldStates;
       return this;
     }
 
@@ -976,7 +938,6 @@ public class MessageFrame {
       checkState(blockchain != null, "Missing message frame blockchain");
       checkState(messageFrameStack != null, "Missing message frame message frame stack");
       checkState(worldState != null, "Missing message frame world state");
-      checkState(privateWorldStates != null, "Missing message frame private world states");
       checkState(initialGas != null, "Missing message frame initial getGasRemaining");
       checkState(address != null, "Missing message frame recipient");
       checkState(originator != null, "Missing message frame originator");
@@ -1002,7 +963,6 @@ public class MessageFrame {
           blockchain,
           messageFrameStack,
           worldState,
-          privateWorldStates,
           initialGas,
           address,
           originator,

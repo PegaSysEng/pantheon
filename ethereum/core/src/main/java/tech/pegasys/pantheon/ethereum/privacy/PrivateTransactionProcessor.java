@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.core.LogSeries;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
 import tech.pegasys.pantheon.ethereum.core.ProcessableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractMessageProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
@@ -35,7 +36,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -150,19 +150,19 @@ public class PrivateTransactionProcessor {
     LOG.trace("Starting private execution of {}", transaction);
 
     final Address senderAddress = transaction.getSender();
-    final MutableAccount privateStateSender = privateWorldState.getOrCreate(senderAddress);
-    final Account sender = publicWorldState.getOrCreate(senderAddress);
+    final MutableAccount maybePrivateSender = privateWorldState.getMutable(senderAddress);
+    final MutableAccount sender =
+        maybePrivateSender != null
+            ? maybePrivateSender
+            : resolveAccountFromPublicState(publicWorldState, privateWorldState, senderAddress);
 
-    final long previousNonce = privateStateSender.incrementNonce();
+    final long previousNonce = sender.incrementNonce();
     LOG.trace(
         "Incremented private sender {} nonce ({} -> {})",
         senderAddress,
         previousNonce,
         sender.getNonce());
 
-    final WorldUpdater publicWorldUpdater = publicWorldState.updater();
-    final HashMap<Integer, WorldUpdater> privateWorldUpdaters = new HashMap<>();
-    privateWorldUpdaters.put(0, privateWorldState.updater());
     final MessageFrame initialFrame;
     final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
     if (transaction.isContractCreation()) {
@@ -174,8 +174,7 @@ public class PrivateTransactionProcessor {
               .type(MessageFrame.Type.CONTRACT_CREATION)
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
-              .worldState(publicWorldUpdater.updater())
-              .privateWorldStates(privateWorldUpdaters)
+              .worldState(privateWorldState.updater())
               .address(contractAddress)
               .originator(senderAddress)
               .contract(contractAddress)
@@ -202,8 +201,7 @@ public class PrivateTransactionProcessor {
               .type(MessageFrame.Type.MESSAGE_CALL)
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
-              .worldState(publicWorldUpdater.updater())
-              .privateWorldStates(privateWorldUpdaters)
+              .worldState(privateWorldState.updater())
               .address(to)
               .originator(senderAddress)
               .contract(to)
@@ -229,7 +227,6 @@ public class PrivateTransactionProcessor {
     }
 
     if (initialFrame.getState() == MessageFrame.State.COMPLETED_SUCCESS) {
-      publicWorldState.commit();
       privateWorldState.commit();
     }
 
@@ -240,6 +237,14 @@ public class PrivateTransactionProcessor {
       return Result.failed(
           0, ValidationResult.invalid(TransactionInvalidReason.PRIVATE_TRANSACTION_FAILED));
     }
+  }
+
+  private MutableAccount resolveAccountFromPublicState(
+      final WorldUpdater publicWorldState,
+      final WorldUpdater privateWorldState,
+      final Address senderAddress) {
+    final MutableAccount publicSender = publicWorldState.getOrCreate(senderAddress);
+    return privateWorldState.createAccount(senderAddress, publicSender.getNonce(), Wei.ZERO);
   }
 
   private static void clearEmptyAccounts(final WorldUpdater worldState) {

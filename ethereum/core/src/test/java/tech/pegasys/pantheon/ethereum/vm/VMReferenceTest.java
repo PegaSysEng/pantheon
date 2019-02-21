@@ -30,7 +30,6 @@ import tech.pegasys.pantheon.testutil.JsonTestParameters;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -128,7 +127,6 @@ public class VMReferenceTest extends AbstractRetryingTest {
             .messageFrameStack(new ArrayDeque<>())
             .blockchain(blockchain)
             .worldState(worldState.updater())
-            .privateWorldStates(new HashMap<>())
             .initialGas(spec.getExec().getGas())
             .contract(execEnv.getAccountAddress())
             .address(execEnv.getAccountAddress())
