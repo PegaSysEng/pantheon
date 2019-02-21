@@ -1,5 +1,220 @@
 # Changelog
 
+## 1.0 
+
+### Additions and Improvements 
+- IBFT 2.0 
+- Permissioning 
+- JSON-RPC Authentication 
+- Method to reload permissions file [\#834](https://github.com/PegaSysEng/pantheon/pull/834) 
+- Added rebind mitigation for Websockets. [\#905](https://github.com/PegaSysEng/pantheon/pull/905) 
+- Documentation updates include: 
+  - Added note to increase open file limit on Linux  [\#936](https://github.com/PegaSysEng/pantheon/pull/936) 
+  - Added details on port configuration  [\#926](https://github.com/PegaSysEng/pantheon/pull/926)   
+  - Added Resources page linking to Pantheon blog posts and webinars [\#897](https://github.com/PegaSysEng/pantheon/pull/897) ([MadelineMurray](https://github.com/MadelineMurray))
+  - JSON-RPC Authentication  [\#881](https://github.com/PegaSysEng/pantheon/pull/881) ([MadelineMurray](https://github.com/MadelineMurray))
+  - Added tutorial to create permissioned network  [\#850](https://github.com/PegaSysEng/pantheon/pull/850) ([MadelineMurray](https://github.com/MadelineMurray))
+  - - Permissioning overview [\#812](https://github.com/PegaSysEng/pantheon/pull/812) ([MadelineMurray](https://github.com/MadelineMurray)) 
+  - Permissioning API methods [\#783](https://github.com/PegaSysEng/pantheon/pull/783) ([MadelineMurray](https://github.com/MadelineMurray))
+  - - Clique private network [\#771](https://github.com/PegaSysEng/pantheon/pull/771) ([MadelineMurray](https://github.com/MadelineMurray))
+    
+    
+### Technical Improvements 
+- Multiple name options only search for the longest one [\#776](https://github.com/PegaSysEng/pantheon/pull/776) 
+- Removed Orion snapshot dependency [\#933](https://github.com/PegaSysEng/pantheon/pull/933) 
+- Use network ID instead of chain ID in MainnetPantheonController. [\#929](https://github.com/PegaSysEng/pantheon/pull/929) 
+- Propagate new block messages to other clients in a worker thread [\#928](https://github.com/PegaSysEng/pantheon/pull/928) 
+- Parallel downloader should stop on puts if requested. [\#927](https://github.com/PegaSysEng/pantheon/pull/927) 
+- Permission config file location and option under docker [\#925](https://github.com/PegaSysEng/pantheon/pull/925) 
+- Fixed potential stall in world state download [\#922](https://github.com/PegaSysEng/pantheon/pull/922) 
+- Refactoring to introduce deleteOnExit\(\) for temp files [\#920](https://github.com/PegaSysEng/pantheon/pull/920) 
+- Reduce "Received transactions message" log from debug to trace [\#919](https://github.com/PegaSysEng/pantheon/pull/919) 
+- Handle PeerNotConnected exceptions when sending wire keep alives [\#918](https://github.com/PegaSysEng/pantheon/pull/918) 
+- admin_addpeers: error if node not whitelisted [\#917](https://github.com/PegaSysEng/pantheon/pull/917) 
+- Expose the Ibft MiningCoordinator [\#916](https://github.com/PegaSysEng/pantheon/pull/916) 
+- Check perm api against perm cli [\#915](https://github.com/PegaSysEng/pantheon/pull/915) 
+- Update metrics when completing a world state request with existing data [\#914](https://github.com/PegaSysEng/pantheon/pull/914) 
+- Improve RocksDBQueue dequeue performance [\#913](https://github.com/PegaSysEng/pantheon/pull/913) 
+- Error when removing bootnodes from nodes whitelist [\#912](https://github.com/PegaSysEng/pantheon/pull/912) 
+- Incremental Optimization\(s\) on BlockBroadcaster [\#911](https://github.com/PegaSysEng/pantheon/pull/911) 
+- Check permissions CLI dependencies [\#909](https://github.com/PegaSysEng/pantheon/pull/909) 
+- Limit the number of times we retry peer discovery interactions [\#908](https://github.com/PegaSysEng/pantheon/pull/908) 
+- IBFT to use VoteTallyCache [\#907](https://github.com/PegaSysEng/pantheon/pull/907) 
+- Add metric to expose number of inflight world state requests [\#906](https://github.com/PegaSysEng/pantheon/pull/906) 
+- Bootnodes not on whitelist - improve errors [\#904](https://github.com/PegaSysEng/pantheon/pull/904) 
+- Make chain download cancellable [\#901](https://github.com/PegaSysEng/pantheon/pull/901) 
+- Enforce accounts must start with 0x [\#900](https://github.com/PegaSysEng/pantheon/pull/900) 
+- When picking fast sync pivot block, use the peer with the best total difficulty [\#899](https://github.com/PegaSysEng/pantheon/pull/899) 
+- Process world state download data on a worker thread [\#898](https://github.com/PegaSysEng/pantheon/pull/898) 
+- CLI mixin help [\#895](https://github.com/PegaSysEng/pantheon/pull/895) ([macfarla](https://github.com/macfarla))
+- Use absolute datapath instead of relative. [\#894](https://github.com/PegaSysEng/pantheon/pull/894) 
+- Fix task queue so that the updated failure count for requests is stored [\#893](https://github.com/PegaSysEng/pantheon/pull/893) 
+- Fix authentication header [\#891](https://github.com/PegaSysEng/pantheon/pull/891) 
+- Reorganize eth tasks [\#890](https://github.com/PegaSysEng/pantheon/pull/890) 
+- Unit tests of BlockBroadcaster [\#887](https://github.com/PegaSysEng/pantheon/pull/887) 
+- Fix authentication file validation errors [\#886](https://github.com/PegaSysEng/pantheon/pull/886) 
+- Fixing file locations under docker [\#885](https://github.com/PegaSysEng/pantheon/pull/885) 
+- Handle exceptions properly in EthScheduler [\#884](https://github.com/PegaSysEng/pantheon/pull/884)
+- More bootnodes for goerli [\#880](https://github.com/PegaSysEng/pantheon/pull/880)
+- Rename password hash command [\#879](https://github.com/PegaSysEng/pantheon/pull/879) 
+- Add metrics for EthScheduler executors [\#878](https://github.com/PegaSysEng/pantheon/pull/878) 
+- Disconnect peer removed from node whitelist [\#877](https://github.com/PegaSysEng/pantheon/pull/877) 
+- Reduce logging noise from invalid peer discovery packets and handshaking [\#876](https://github.com/PegaSysEng/pantheon/pull/876) 
+- Detect stalled world state downloads [\#875](https://github.com/PegaSysEng/pantheon/pull/875) 
+- Limit size of Ibft future message buffer [\#873](https://github.com/PegaSysEng/pantheon/pull/873) 
+- Ibft2: Replace NewRound with extended Proposal [\#872](https://github.com/PegaSysEng/pantheon/pull/872) 
+- Fixed admin_addPeer to periodically check maintained connections [\#871](https://github.com/PegaSysEng/pantheon/pull/871) 
+- WebSocket method permissions [\#870](https://github.com/PegaSysEng/pantheon/pull/870)
+- Select new pivot block when world state becomes unavailable [\#869](https://github.com/PegaSysEng/pantheon/pull/869) 
+- Introduce FutureUtils to reduce duplicated code around CompletableFuture [\#868](https://github.com/PegaSysEng/pantheon/pull/868) 
+- Implement world state cancel [\#867](https://github.com/PegaSysEng/pantheon/pull/867) 
+- Renaming authentication configuration file CLI command [\#865](https://github.com/PegaSysEng/pantheon/pull/865) 
+- Break out RoundChangeCertificate validation [\#864](https://github.com/PegaSysEng/pantheon/pull/864) 
+- Disconnect peers where the common ancestor is before our fast sync pivot [\#862](https://github.com/PegaSysEng/pantheon/pull/862) 
+- Initial scaffolding re block propagation [\#860](https://github.com/PegaSysEng/pantheon/pull/860) 
+- Fix NullPointerException when determining fast sync pivot [\#859](https://github.com/PegaSysEng/pantheon/pull/859) 
+- Check for invalid token [\#856](https://github.com/PegaSysEng/pantheon/pull/856) 
+- Moving NodeWhitelistController to permissioning package [\#855](https://github.com/PegaSysEng/pantheon/pull/855) 
+- Fix state download race condition by creating a TaskQueue API [\#853](https://github.com/PegaSysEng/pantheon/pull/853) 
+- Changed separator in JSON RPC permissions [\#852](https://github.com/PegaSysEng/pantheon/pull/852) 
+- WebSocket acceptance tests now can use WebSockets [\#851](https://github.com/PegaSysEng/pantheon/pull/851) 
+- IBFT notifies EthPeer when remote node has a better block [\#849](https://github.com/PegaSysEng/pantheon/pull/849) 
+- Support resuming fast-sync downloads [\#848](https://github.com/PegaSysEng/pantheon/pull/848) 
+- Tweak Fast Sync Config [\#847](https://github.com/PegaSysEng/pantheon/pull/847) 
+- RPC authentication configuration validation + tests. [\#846](https://github.com/PegaSysEng/pantheon/pull/846) 
+- Tidy-up FastSyncState persistence [\#845](https://github.com/PegaSysEng/pantheon/pull/845) 
+- Do parallel extract signatures in the parallel block importer. [\#844](https://github.com/PegaSysEng/pantheon/pull/844) 
+- Fix 'the Input Is Too Long' Error on Windows [\#843](https://github.com/PegaSysEng/pantheon/pull/843) (thanks to [glethuillier](https://github.com/glethuillier))
+- Remove unnecessary sleep [\#842](https://github.com/PegaSysEng/pantheon/pull/842) 
+- shutdown improvements [\#841](https://github.com/PegaSysEng/pantheon/pull/841)
+- Speed up shutdown time [\#838](https://github.com/PegaSysEng/pantheon/pull/838) 
+- Add metrics to world state downloader [\#837](https://github.com/PegaSysEng/pantheon/pull/837) 
+- Store pivot block header [\#836](https://github.com/PegaSysEng/pantheon/pull/836) 
+
+
+
+- Support contract code in the genesis file [\#662](https://github.com/PegaSysEng/pantheon/issues/662)
+- NullPointerException When Starting Node [\#854](https://github.com/PegaSysEng/pantheon/issues/854)
+- Windows: "The input line is too long" error [\#839](https://github.com/PegaSysEng/pantheon/issues/839)
+- JSON-RPC API: Inconsistent Errors When Parameters Are Set to Null [\#821](https://github.com/PegaSysEng/pantheon/issues/821)
+- "Good First Issue" Link is Broken in CONTRIBUTING.md [\#797](https://github.com/PegaSysEng/pantheon/issues/797)
+- "Good First Issue" Link is Broken in CONTRIBUTING.md [\#793](https://github.com/PegaSysEng/pantheon/issues/793)
+- Webinar Issue:  "Good First Issue" Link is Broken in CONTRIBUTING.md [\#791](https://github.com/PegaSysEng/pantheon/issues/791)
+- Webinar example: "Good First Issue" Link is Broken in CONTRIBUTING.md [\#789](https://github.com/PegaSysEng/pantheon/issues/789)
+- Improve EthScheduler shutdown code [\#768](https://github.com/PegaSysEng/pantheon/issues/768)
+- Test and update command line scenarios in documentation  [\#561](https://github.com/PegaSysEng/pantheon/issues/561)
+- CLI streamlining and guidelines conformance [\#534](https://github.com/PegaSysEng/pantheon/issues/534)
+- Document CLI changes [\#524](https://github.com/PegaSysEng/pantheon/issues/524)
+- Clique validator issues [\#279](https://github.com/PegaSysEng/pantheon/issues/279)
+- Create unit tests for EthGetTransactionByBlockHashAndIndex [\#190](https://github.com/PegaSysEng/pantheon/issues/190)
+- Create unit tests for EthGetBlockTransactionCountByNumber [\#187](https://github.com/PegaSysEng/pantheon/issues/187)
+- GetBodiesFromPeerTask shouldn't request empty bodies	 [\#181](https://github.com/PegaSysEng/pantheon/issues/181)
+
+**Merged pull requests:**
+
+
+
+
+
+
+
+
+
+
+
+
+- Clique should use beneficiary of zero on epoch blocks [\#833](https://github.com/PegaSysEng/pantheon/pull/833) 
+- Clique should ignore proposals for address 0 [\#831](https://github.com/PegaSysEng/pantheon/pull/831) 
+- Fix intermittency in FullSyncDownloaderTest [\#830](https://github.com/PegaSysEng/pantheon/pull/830) 
+- Added the authentication service to the WebSocket service [\#829](https://github.com/PegaSysEng/pantheon/pull/829)
+- Extract creation and init of ProtocolContext into a re-usable class [\#828](https://github.com/PegaSysEng/pantheon/pull/828) 
+- Prevent duplicate commit seals in ibft header [\#827](https://github.com/PegaSysEng/pantheon/pull/827) 
+- Validate Ibft vanity data length [\#826](https://github.com/PegaSysEng/pantheon/pull/826) 
+- \[NC-2044\] refactor json rpc authentication to be provided as a service [\#825](https://github.com/PegaSysEng/pantheon/pull/825) 
+- Handle unavailable world states [\#824](https://github.com/PegaSysEng/pantheon/pull/824) 
+- password in jwt payload [\#823](https://github.com/PegaSysEng/pantheon/pull/823)
+- fix\(api\): homogenize error messages when required parameters are set … [\#822](https://github.com/PegaSysEng/pantheon/pull/822) ([glethuillier](https://github.com/glethuillier))
+- \[NC-2283\] Set remote peer chain head to parent of block received in NEW\_BLOCK\_MESSAGE [\#819](https://github.com/PegaSysEng/pantheon/pull/819) 
+- Peer disconnects should not result in stack traces. [\#818](https://github.com/PegaSysEng/pantheon/pull/818) 
+- abort previous builds [\#817](https://github.com/PegaSysEng/pantheon/pull/817) 
+- Parallel build stages [\#816](https://github.com/PegaSysEng/pantheon/pull/816) 
+- \[NC-2046\] JWT authentication for JSON-RPC [\#815](https://github.com/PegaSysEng/pantheon/pull/815) 
+- Log errors that occur while finding a common ancestor [\#814](https://github.com/PegaSysEng/pantheon/pull/814) 
+- Shuffled log levels [\#813](https://github.com/PegaSysEng/pantheon/pull/813)
+
+- Prevent duplicate ibft messages being processed by state machine [\#811](https://github.com/PegaSysEng/pantheon/pull/811) 
+- Fix Orion startup ports [\#810](https://github.com/PegaSysEng/pantheon/pull/810) 
+- \[NC-2195\] Commit world state continuously [\#809](https://github.com/PegaSysEng/pantheon/pull/809) 
+- \[NC-2058\] Improve block propagation time [\#808](https://github.com/PegaSysEng/pantheon/pull/808) 
+- \[NC-2044\] jsonrpc authentication cli options & acceptance tests [\#807](https://github.com/PegaSysEng/pantheon/pull/807) 
+- Remove privacy not supported warning [\#806](https://github.com/PegaSysEng/pantheon/pull/806) (thanks to [vinistevam](https://github.com/vinistevam))
+- \[PRIV\] WIP - Wire up Private Transaction Processor [\#805](https://github.com/PegaSysEng/pantheon/pull/805) (thanks to [Puneetha17](https://github.com/Puneetha17))
+
+- Apply a limit to the number of responses in RespondingEthPeer.respondWhile [\#803](https://github.com/PegaSysEng/pantheon/pull/803) 
+- Avoid requesting empty block bodies from the network. [\#802](https://github.com/PegaSysEng/pantheon/pull/802)
+- \[NC-2268\] Handle partial responses to get receipts requests [\#801](https://github.com/PegaSysEng/pantheon/pull/801) 
+- Rename functions in Ibft MessageValidator [\#800](https://github.com/PegaSysEng/pantheon/pull/800) 
+- Upgrade GoogleJavaFormat to 1.7 [\#795](https://github.com/PegaSysEng/pantheon/pull/795) 
+- Minor refactorings of IntegrationTest infrastructure [\#786](https://github.com/PegaSysEng/pantheon/pull/786) 
+- Rework Ibft's MessageValidatorFactory [\#785](https://github.com/PegaSysEng/pantheon/pull/785) 
+- Rework IbftRoundFactory [\#784](https://github.com/PegaSysEng/pantheon/pull/784) 
+
+- Rename artefacts to artifacts within IBFT [\#782](https://github.com/PegaSysEng/pantheon/pull/782) 
+- Rename TerminatedRoundArtefacts to PreparedRoundArtefacts [\#781](https://github.com/PegaSysEng/pantheon/pull/781)
+
+- Rename Ibft MessageFactory methods [\#779](https://github.com/PegaSysEng/pantheon/pull/779) 
+- \[NC-2200\] Update WorldStateDownloader to only filter out known code requests [\#777](https://github.com/PegaSysEng/pantheon/pull/777) 
+- Move ethTaskTimer to abstract root [\#775](https://github.com/PegaSysEng/pantheon/pull/775) 
+- \[NC-2236\] Parallel Block importer [\#774](https://github.com/PegaSysEng/pantheon/pull/774) 
+- \[NC-2180\] Wait for a peer with an estimated chain height before selecting a pivot block [\#772](https://github.com/PegaSysEng/pantheon/pull/772) 
+
+- \[NC-2233\] Randomly perform full validation when fast syncing blocks [\#770](https://github.com/PegaSysEng/pantheon/pull/770) 
+- IBFT 2.1 Message rework, piggybacking blocks on msgs. [\#769](https://github.com/PegaSysEng/pantheon/pull/769) 
+- EthScheduler additions [\#767](https://github.com/PegaSysEng/pantheon/pull/767)
+- \[NC-2247\] Fixing node whitelist isPermitted check [\#766](https://github.com/PegaSysEng/pantheon/pull/766) 
+- Eth/63 labels [\#764](https://github.com/PegaSysEng/pantheon/pull/764) 
+- \[NC-1968\] Permissioning whitelist persistence. [\#763](https://github.com/PegaSysEng/pantheon/pull/763) 
+
+- Created message validators for NewRound and RoundChange [\#760](https://github.com/PegaSysEng/pantheon/pull/760) 
+
+- Add tests for FastSyncChainDownloader as a whole [\#758](https://github.com/PegaSysEng/pantheon/pull/758) 
+- Flatten IBFT Message API [\#757](https://github.com/PegaSysEng/pantheon/pull/757)
+- Added TerminatedRoundArtefacts [\#756](https://github.com/PegaSysEng/pantheon/pull/756) 
+- Fix thread names in EthScheduler to include the thread number [\#755](https://github.com/PegaSysEng/pantheon/pull/755) 
+- Separate round change reception from RoundChangeCertificate [\#754](https://github.com/PegaSysEng/pantheon/pull/754) 
+- \[NC-2044\] jsonrpc authentication login [\#753](https://github.com/PegaSysEng/pantheon/pull/753) 
+- Spilt Ibft MessageValidator into components [\#752](https://github.com/PegaSysEng/pantheon/pull/752) 
+
+- Ensure first checkpoint headers is always in local blockchain for FastSyncCheckpointHeaderManager [\#750](https://github.com/PegaSysEng/pantheon/pull/750) 
+- Support genesis contract code [\#749](https://github.com/PegaSysEng/pantheon/pull/749) (thanks to [kziemianek](https://github.com/kziemianek))
+- \[FIX\] Refactored permissioning components to be Optional. [\#747](https://github.com/PegaSysEng/pantheon/pull/747) 
+- \[NC-2207\] Integrate rocksdb-based queue into WorldStateDownloader [\#746](https://github.com/PegaSysEng/pantheon/pull/746) 
+- \[PRIV\] Generify orion to enclave [\#745](https://github.com/PegaSysEng/pantheon/pull/745) (thanks to [vinistevam](https://github.com/vinistevam))
+- Moved IBFT Message factory to use wrapped message types [\#744](https://github.com/PegaSysEng/pantheon/pull/744) 
+- Handle timeouts when requesting checkpoint headers correctly [\#743](https://github.com/PegaSysEng/pantheon/pull/743)
+- Update RoundChangeManager to use flattened message [\#742](https://github.com/PegaSysEng/pantheon/pull/742) 
+- Handle validation failures when fast importing blocks [\#741](https://github.com/PegaSysEng/pantheon/pull/741) 
+- Updated IbftRound and RoundState APIs to use wrapped messages [\#740](https://github.com/PegaSysEng/pantheon/pull/740)
+- \[NC-2119\] exception handling [\#739](https://github.com/PegaSysEng/pantheon/pull/739)
+- Upgrade dependency versions and build cleanup [\#738](https://github.com/PegaSysEng/pantheon/pull/738)
+- Update IbftBlockHeigntManager to accept new message types. [\#737](https://github.com/PegaSysEng/pantheon/pull/737) 
+- Error response handling for permissions APIs [\#736](https://github.com/PegaSysEng/pantheon/pull/736) 
+- IPV6 bootnodes don't work [\#735](https://github.com/PegaSysEng/pantheon/pull/735) 
+- Updated to use tags of pantheon build rather than another repo [\#734](https://github.com/PegaSysEng/pantheon/pull/734) 
+- Log milestones at startup and other minor logging improvements [\#733](https://github.com/PegaSysEng/pantheon/pull/733) 
+- Create wrapper types for Ibft Signed messages [\#731](https://github.com/PegaSysEng/pantheon/pull/731)
+- Ibft to uniquely ID messages by their hash [\#730](https://github.com/PegaSysEng/pantheon/pull/730) 
+- Rename ibftrevised to ibft2 [\#722](https://github.com/PegaSysEng/pantheon/pull/722)
+- Limit ibft msg queues [\#704](https://github.com/PegaSysEng/pantheon/pull/704) 
+- \[PRIV\] Implement privacy precompiled contract [\#696](https://github.com/PegaSysEng/pantheon/pull/696) (thanks to [Puneetha17](https://github.com/Puneetha17))
+- Integration of RecursivePeerRefreshState and PeerDiscoveryController [\#420](https://github.com/PegaSysEng/pantheon/pull/420) 
+
+
+
+## 0.9.1
+
+Built and compatible with with JDK8. 
+
 ## 0.9
 
 ### Breaking Changes to Command Line
