@@ -42,7 +42,7 @@ public class RocksDbTaskQueue<T> implements TaskQueue<T> {
   private long oldestKey = 0;
   private final Set<RocksDbTask<T>> outstandingTasks = new HashSet<>();
 
-  private final AtomicBoolean closed = new AtomicBoolean(false);
+  private boolean closed = false;
 
   private final Function<T, BytesValue> serializer;
   private final Function<BytesValue, T> deserializer;
@@ -183,17 +183,19 @@ public class RocksDbTaskQueue<T> implements TaskQueue<T> {
 
   @Override
   public synchronized void close() {
-    if (closed.compareAndSet(false, true)) {
-      if (dequeueIterator != null) {
-        dequeueIterator.close();
-      }
-      options.close();
-      db.close();
+    if (closed) {
+      return;
     }
+    closed = true;
+    if (dequeueIterator != null) {
+      dequeueIterator.close();
+    }
+    options.close();
+    db.close();
   }
 
   private void assertNotClosed() {
-    if (closed.get()) {
+    if (closed) {
       throw new IllegalStateException("Attempt to access closed " + getClass().getSimpleName());
     }
   }
