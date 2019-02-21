@@ -5,7 +5,7 @@ evolve and change over time.  In particular the features in later versions are l
 We use the approach of  `#now`, `#next`, `#later` [used by foursquare](https://medium.com/@noah_weiss/now-next-later-roadmaps-without-the-drudgery-1cfe65656645), with a slightly different time horizon.  
 Our now scale is about 3 months, next about 6 months, and then later is beyond.
 
-## Now/v1.1
+## Now (up to v1.1)
 Our key areas for now are:
 * Privacy
 * Smart Contract Based Permissioning
@@ -15,10 +15,14 @@ Our key areas for now are:
 The Enterprise Ethereum `restricted` privacy will be implemented.
 
 ### Smart Contract Based Permissioning
-Building on the Permissioning system  implemented in version 1.0 of Pantheon, we will use a smart contract to share this information across the network, giving a consistent set of permissions, and ensuring that all nodes in the network work consistently.
+Building on the Permissioning mechanism implemented in v1.0, Pantheon will use a smart contract to share 
+permissioning information across the network. This will create a single, decentralized source of truth for node and account 
+ permissions.
 
 ### First Class Client
-There is an ongoing piece of work underway enhancing the core performance of Pantheon, and ensuring that it behaves well as a first class client. The key elements of this are implementation of some performance benchmarks and enhancing our fast sync mechanism.
+There is ongoing work to enhance Pantheon's performance, to ensure it behaves well as a first class client. 
+The current initiatives include the implementation of performance benchmarks, of a fast sync mechanism, and of 
+support for all major testnets.
 
 ## Next
 The key areas for next are:
