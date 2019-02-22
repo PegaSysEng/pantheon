@@ -72,7 +72,7 @@ class PantheonFactoryConfiguration {
     return miningParameters;
   }
 
-  public PrivacyParameters getprivacyParameters() {
+  public PrivacyParameters getPrivacyParameters() {
     return privacyParameters;
   }
 

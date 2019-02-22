@@ -30,7 +30,7 @@ import com.google.common.io.Files;
 public class PrivacyParameters {
   private static final String ENCLAVE_URL = "http://localhost:8888";
   public static final URI DEFAULT_ENCLAVE_URL = URI.create(ENCLAVE_URL);
-  String PRIVATE_DATABASE_PATH = "private";
+  private final String PRIVATE_DATABASE_PATH = "private";
 
   private Integer privacyAddress;
   private boolean enabled;

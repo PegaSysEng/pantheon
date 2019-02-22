@@ -39,7 +39,7 @@ import org.junit.rules.TemporaryFolder;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
+public class DeployPrivateSmartContractAcceptanceTest extends AcceptanceTestBase {
 
   @ClassRule public static final TemporaryFolder folder = new TemporaryFolder();
 
