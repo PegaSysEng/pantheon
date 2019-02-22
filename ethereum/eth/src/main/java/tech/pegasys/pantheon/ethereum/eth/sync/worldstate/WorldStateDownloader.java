@@ -143,9 +143,10 @@ public class WorldStateDownloader {
 
   public CompletableFuture<Void> run(final BlockHeader header) {
     LOG.info(
-        "Begin downloading world state from peers for block {} ({})",
+        "Begin downloading world state from peers for block {} ({}). State root {}",
         header.getNumber(),
-        header.getHash());
+        header.getHash(),
+        header.getStateRoot());
     synchronized (this) {
       if (status == Status.RUNNING) {
         final CompletableFuture<Void> failed = new CompletableFuture<>();
