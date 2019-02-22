@@ -47,6 +47,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -82,6 +83,7 @@ public class WorldStateDownloader {
   private volatile CompletableFuture<Void> future;
   private volatile Status status = Status.IDLE;
   private volatile BytesValue rootNode;
+  private volatile PersistNodeDataTask persistenceTask;
   private final AtomicInteger highestRetryCount = new AtomicInteger(0);
 
   public WorldStateDownloader(
@@ -165,7 +167,8 @@ public class WorldStateDownloader {
       }
     }
     ethContext.getScheduler().scheduleSyncWorkerTask(() -> requestNodeData(header));
-    ethContext.getScheduler().scheduleServiceTask(new PersistNodeDataTask(header));
+    persistenceTask = new PersistNodeDataTask(header);
+    ethContext.getScheduler().scheduleServiceTask(persistenceTask);
     return future;
   }
 
@@ -200,7 +203,8 @@ public class WorldStateDownloader {
     sendAndProcessRequests(peer, toRequest, header)
         .whenComplete(
             (task, error) -> {
-              if (error != null) {
+              if (error != null
+                  && !(ExceptionUtils.rootCause(error) instanceof RejectedExecutionException)) {
                 LOG.error("World state data request failed", error);
               }
               outstandingRequests.remove(task);
@@ -372,6 +376,7 @@ public class WorldStateDownloader {
 
   private synchronized void doCancelDownload() {
     status = Status.CANCELLED;
+    persistenceTask.cancel();
     pendingRequests.clear();
     for (final EthTask<?> outstandingRequest : outstandingRequests) {
       outstandingRequest.cancel();
@@ -410,7 +415,7 @@ public class WorldStateDownloader {
 
     @Override
     protected void executeTask() {
-      while (!isDone() && !future.isDone()) {
+      while (!isDone()) {
         try {
           final Task<NodeDataRequest> task = requestsToPersist.poll(1, TimeUnit.SECONDS);
           if (task != null) {
