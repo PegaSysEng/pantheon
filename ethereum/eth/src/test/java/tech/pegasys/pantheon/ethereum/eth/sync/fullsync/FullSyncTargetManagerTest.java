@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -65,7 +64,6 @@ public class FullSyncTargetManagerTest {
         EthProtocolManagerTestUtil.create(
             localBlockchain,
             localWorldState,
-            DeterministicEthScheduler.TimeoutPolicy.NEVER,
             new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
     final EthContext ethContext = ethProtocolManager.ethContext();
     final SyncState syncState =

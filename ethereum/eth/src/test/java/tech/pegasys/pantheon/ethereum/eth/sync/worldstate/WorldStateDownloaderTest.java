@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler.Time
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
@@ -80,6 +81,8 @@ public class WorldStateDownloaderTest {
 
   private static final Hash EMPTY_TRIE_ROOT = Hash.wrap(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH);
 
+  final BlockDataGenerator dataGen = new BlockDataGenerator(1);
+
   @Test
   public void downloadWorldStateFromPeers_onePeerOneWithManyRequestsOneAtATime() {
     downloadAvailableWorldStateFromPeers(1, 50, 1, 1);
@@ -112,7 +115,6 @@ public class WorldStateDownloaderTest {
 
   @Test
   public void downloadEmptyWorldState() {
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
     final BlockHeader header =
         dataGen
@@ -120,30 +122,29 @@ public class WorldStateDownloaderTest {
             .getHeader();
 
     // Create some peers
-    List<RespondingEthPeer> peers =
+    final List<RespondingEthPeer> peers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(5)
             .collect(Collectors.toList());
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(ethProtocolManager.ethContext(), localStorage, queue);
 
-    CompletableFuture<Void> future = downloader.run(header);
+    final CompletableFuture<Void> future = downloader.run(header);
     assertThat(future).isDone();
 
     // Peers should not have been queried
-    for (RespondingEthPeer peer : peers) {
+    for (final RespondingEthPeer peer : peers) {
       assertThat(peer.hasOutstandingRequests()).isFalse();
     }
   }
 
   @Test
   public void downloadAlreadyAvailableWorldState() {
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
 
     // Setup existing state
@@ -160,29 +161,28 @@ public class WorldStateDownloaderTest {
         dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
 
     // Create some peers
-    List<RespondingEthPeer> peers =
+    final List<RespondingEthPeer> peers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(5)
             .collect(Collectors.toList());
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateDownloader downloader =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateDownloader downloader =
         createDownloader(ethProtocolManager.ethContext(), storage, queue);
 
-    CompletableFuture<Void> future = downloader.run(header);
+    final CompletableFuture<Void> future = downloader.run(header);
     assertThat(future).isDone();
 
     // Peers should not have been queried because we already had the state
-    for (RespondingEthPeer peer : peers) {
+    for (final RespondingEthPeer peer : peers) {
       assertThat(peer.hasOutstandingRequests()).isFalse();
     }
   }
 
   @Test
   public void canRecoverFromTimeouts() {
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
-    TimeoutPolicy timeoutPolicy = TimeoutPolicy.timeoutXTimes(2);
+    final TimeoutPolicy timeoutPolicy = TimeoutPolicy.timeoutXTimes(2);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create(timeoutPolicy);
 
     // Setup "remote" state
@@ -199,31 +199,31 @@ public class WorldStateDownloaderTest {
         dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
 
     // Create some peers
-    List<RespondingEthPeer> peers =
+    final List<RespondingEthPeer> peers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(5)
             .collect(Collectors.toList());
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(ethProtocolManager.ethContext(), localStorage, queue);
 
-    CompletableFuture<Void> result = downloader.run(header);
+    final CompletableFuture<Void> result = downloader.run(header);
 
     // Respond to node data requests
-    Responder responder =
+    final Responder responder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
     while (!result.isDone()) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
 
     // Check that all expected account data was downloaded
-    WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
+    final WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
     final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
@@ -236,7 +236,6 @@ public class WorldStateDownloaderTest {
 
   @Test
   public void doesNotRequestKnownCodeFromNetwork() {
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
 
     // Setup "remote" state
@@ -253,43 +252,43 @@ public class WorldStateDownloaderTest {
         dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
 
     // Create some peers
-    List<RespondingEthPeer> peers =
+    final List<RespondingEthPeer> peers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(5)
             .collect(Collectors.toList());
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
 
     // Seed local storage with some contract values
-    Map<Bytes32, BytesValue> knownCode = new HashMap<>();
+    final Map<Bytes32, BytesValue> knownCode = new HashMap<>();
     accounts.subList(0, 5).forEach(a -> knownCode.put(a.getCodeHash(), a.getCode()));
-    Updater localStorageUpdater = localStorage.updater();
+    final Updater localStorageUpdater = localStorage.updater();
     knownCode.forEach(localStorageUpdater::putCode);
     localStorageUpdater.commit();
 
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(ethProtocolManager.ethContext(), localStorage, queue);
 
-    CompletableFuture<Void> result = downloader.run(header);
+    final CompletableFuture<Void> result = downloader.run(header);
 
     // Respond to node data requests
-    List<MessageData> sentMessages = new ArrayList<>();
-    Responder blockChainResponder =
+    final List<MessageData> sentMessages = new ArrayList<>();
+    final Responder blockChainResponder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
-    Responder responder =
+    final Responder responder =
         RespondingEthPeer.wrapResponderWithCollector(blockChainResponder, sentMessages);
 
     while (!result.isDone()) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
 
     // Check that known code was not requested
-    List<Bytes32> requestedHashes =
+    final List<Bytes32> requestedHashes =
         sentMessages.stream()
             .filter(m -> m.getCode() == EthPV63.GET_NODE_DATA)
             .map(GetNodeDataMessage::readFrom)
@@ -299,7 +298,7 @@ public class WorldStateDownloaderTest {
     assertThat(Collections.disjoint(requestedHashes, knownCode.keySet())).isTrue();
 
     // Check that all expected account data was downloaded
-    WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
+    final WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
     final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
@@ -317,7 +316,6 @@ public class WorldStateDownloaderTest {
 
   @SuppressWarnings("unchecked")
   private void testCancellation(final boolean shouldCancelFuture) {
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
 
     // Setup "remote" state
@@ -333,27 +331,27 @@ public class WorldStateDownloaderTest {
         dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
 
     // Create some peers
-    List<RespondingEthPeer> peers =
+    final List<RespondingEthPeer> peers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(5)
             .collect(Collectors.toList());
 
-    TaskQueue<NodeDataRequest> queue = spy(new InMemoryTaskQueue<>());
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = spy(new InMemoryTaskQueue<>());
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
 
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(ethProtocolManager.ethContext(), localStorage, queue);
 
-    CompletableFuture<Void> result = downloader.run(header);
+    final CompletableFuture<Void> result = downloader.run(header);
 
     // Send a few responses
-    Responder responder =
+    final Responder responder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
 
     for (int i = 0; i < 3; i++) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
@@ -370,7 +368,7 @@ public class WorldStateDownloaderTest {
 
     // Send some more responses after cancelling
     for (int i = 0; i < 3; i++) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
@@ -384,7 +382,6 @@ public class WorldStateDownloaderTest {
 
   @Test
   public void doesRequestKnownAccountTrieNodesFromNetwork() {
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
 
     // Setup "remote" state
@@ -401,23 +398,23 @@ public class WorldStateDownloaderTest {
         dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
 
     // Create some peers
-    List<RespondingEthPeer> peers =
+    final List<RespondingEthPeer> peers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(5)
             .collect(Collectors.toList());
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
 
     // Seed local storage with some trie node values
-    Map<Bytes32, BytesValue> allNodes =
+    final Map<Bytes32, BytesValue> allNodes =
         collectTrieNodesToBeRequested(remoteStorage, remoteWorldState.rootHash(), 5);
     final Set<Bytes32> knownNodes = new HashSet<>();
     final Set<Bytes32> unknownNodes = new HashSet<>();
     assertThat(allNodes.size()).isGreaterThan(0); // Sanity check
-    Updater localStorageUpdater = localStorage.updater();
+    final Updater localStorageUpdater = localStorage.updater();
     final AtomicBoolean storeNode = new AtomicBoolean(true);
     allNodes.forEach(
         (nodeHash, node) -> {
@@ -431,26 +428,26 @@ public class WorldStateDownloaderTest {
         });
     localStorageUpdater.commit();
 
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(ethProtocolManager.ethContext(), localStorage, queue);
 
-    CompletableFuture<Void> result = downloader.run(header);
+    final CompletableFuture<Void> result = downloader.run(header);
 
     // Respond to node data requests
-    List<MessageData> sentMessages = new ArrayList<>();
-    Responder blockChainResponder =
+    final List<MessageData> sentMessages = new ArrayList<>();
+    final Responder blockChainResponder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
-    Responder responder =
+    final Responder responder =
         RespondingEthPeer.wrapResponderWithCollector(blockChainResponder, sentMessages);
 
     while (!result.isDone()) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
 
     // Check that known trie nodes were requested
-    List<Bytes32> requestedHashes =
+    final List<Bytes32> requestedHashes =
         sentMessages.stream()
             .filter(m -> m.getCode() == EthPV63.GET_NODE_DATA)
             .map(GetNodeDataMessage::readFrom)
@@ -461,7 +458,7 @@ public class WorldStateDownloaderTest {
     assertThat(requestedHashes).doesNotContainAnyElementsOf(knownNodes);
 
     // Check that all expected account data was downloaded
-    WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
+    final WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
     final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
@@ -469,7 +466,6 @@ public class WorldStateDownloaderTest {
 
   @Test
   public void doesRequestKnownStorageTrieNodesFromNetwork() {
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
 
     // Setup "remote" state
@@ -486,18 +482,18 @@ public class WorldStateDownloaderTest {
         dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
 
     // Create some peers
-    List<RespondingEthPeer> peers =
+    final List<RespondingEthPeer> peers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(5)
             .collect(Collectors.toList());
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
 
     // Seed local storage with some trie node values
-    List<Bytes32> storageRootHashes =
+    final List<Bytes32> storageRootHashes =
         new StoredMerklePatriciaTrie<>(
                 remoteStorage::getNodeData,
                 remoteWorldState.rootHash(),
@@ -508,18 +504,18 @@ public class WorldStateDownloaderTest {
                 .map(StateTrieAccountValue::readFrom)
                 .map(StateTrieAccountValue::getStorageRoot)
                 .collect(Collectors.toList());
-    Map<Bytes32, BytesValue> allTrieNodes = new HashMap<>();
+    final Map<Bytes32, BytesValue> allTrieNodes = new HashMap<>();
     final Set<Bytes32> knownNodes = new HashSet<>();
     final Set<Bytes32> unknownNodes = new HashSet<>();
-    for (Bytes32 storageRootHash : storageRootHashes) {
+    for (final Bytes32 storageRootHash : storageRootHashes) {
       allTrieNodes.putAll(collectTrieNodesToBeRequested(remoteStorage, storageRootHash, 5));
     }
     assertThat(allTrieNodes.size()).isGreaterThan(0); // Sanity check
-    Updater localStorageUpdater = localStorage.updater();
+    final Updater localStorageUpdater = localStorage.updater();
     boolean storeNode = true;
-    for (Entry<Bytes32, BytesValue> entry : allTrieNodes.entrySet()) {
-      Bytes32 hash = entry.getKey();
-      BytesValue data = entry.getValue();
+    for (final Entry<Bytes32, BytesValue> entry : allTrieNodes.entrySet()) {
+      final Bytes32 hash = entry.getKey();
+      final BytesValue data = entry.getValue();
       if (storeNode) {
         localStorageUpdater.putAccountStorageTrieNode(hash, data);
         knownNodes.add(hash);
@@ -530,22 +526,22 @@ public class WorldStateDownloaderTest {
     }
     localStorageUpdater.commit();
 
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(ethProtocolManager.ethContext(), localStorage, queue);
 
-    CompletableFuture<Void> result = downloader.run(header);
+    final CompletableFuture<Void> result = downloader.run(header);
 
     // Respond to node data requests
-    List<MessageData> sentMessages = new ArrayList<>();
-    Responder blockChainResponder =
+    final List<MessageData> sentMessages = new ArrayList<>();
+    final Responder blockChainResponder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
-    Responder responder =
+    final Responder responder =
         RespondingEthPeer.wrapResponderWithCollector(blockChainResponder, sentMessages);
 
     while (!result.isDone()) {
       // World state should not be available until the entire state is downloaded
       assertThat(localStorage.isWorldStateAvailable(stateRoot)).isFalse();
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
@@ -553,7 +549,7 @@ public class WorldStateDownloaderTest {
     assertThat(localStorage.isWorldStateAvailable(stateRoot)).isTrue();
 
     // Check that known trie nodes were requested
-    List<Bytes32> requestedHashes =
+    final List<Bytes32> requestedHashes =
         sentMessages.stream()
             .filter(m -> m.getCode() == EthPV63.GET_NODE_DATA)
             .map(GetNodeDataMessage::readFrom)
@@ -564,7 +560,7 @@ public class WorldStateDownloaderTest {
     assertThat(requestedHashes).doesNotContainAnyElementsOf(knownNodes);
 
     // Check that all expected account data was downloaded
-    WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
+    final WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
     final WorldState localWorldState = localWorldStateArchive.get(stateRoot).get();
     assertThat(result).isDone();
     assertAccountsMatch(localWorldState, accounts);
@@ -587,7 +583,6 @@ public class WorldStateDownloaderTest {
 
   private void simulateStalledDownload(final int maxRetries) {
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
 
     // Setup "remote" state
     final WorldStateStorage remoteStorage =
@@ -602,26 +597,26 @@ public class WorldStateDownloaderTest {
     final BlockHeader header =
         dataGen.block(BlockOptions.create().setStateRoot(stateRoot).setBlockNumber(10)).getHeader();
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
-    SynchronizerConfiguration syncConfig =
+    final SynchronizerConfiguration syncConfig =
         SynchronizerConfiguration.builder().worldStateRequestMaxRetries(maxRetries).build();
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(syncConfig, ethProtocolManager.ethContext(), localStorage, queue);
 
     // Create a peer that can respond
-    RespondingEthPeer peer =
+    final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber());
 
     // Start downloader
-    CompletableFuture<?> result = downloader.run(header);
+    final CompletableFuture<?> result = downloader.run(header);
     // A second run should return an error without impacting the first result
-    CompletableFuture<?> secondResult = downloader.run(header);
+    final CompletableFuture<?> secondResult = downloader.run(header);
     assertThat(secondResult).isCompletedExceptionally();
     assertThat(result).isNotCompletedExceptionally();
 
-    Responder emptyResponder = RespondingEthPeer.emptyResponder();
+    final Responder emptyResponder = RespondingEthPeer.emptyResponder();
     for (int i = 0; i < maxRetries; i++) {
       peer.respond(emptyResponder);
     }
@@ -646,22 +641,22 @@ public class WorldStateDownloaderTest {
    */
   private Map<Bytes32, BytesValue> collectTrieNodesToBeRequested(
       final WorldStateStorage storage, final Bytes32 rootHash, final int maxNodes) {
-    Map<Bytes32, BytesValue> trieNodes = new HashMap<>();
+    final Map<Bytes32, BytesValue> trieNodes = new HashMap<>();
 
-    TrieNodeDecoder decoder = TrieNodeDecoder.create();
-    BytesValue rootNode = storage.getNodeData(rootHash).get();
+    final TrieNodeDecoder decoder = TrieNodeDecoder.create();
+    final BytesValue rootNode = storage.getNodeData(rootHash).get();
 
     // Walk through hash-referenced nodes
-    List<Node<BytesValue>> hashReferencedNodes = new ArrayList<>();
+    final List<Node<BytesValue>> hashReferencedNodes = new ArrayList<>();
     hashReferencedNodes.add(decoder.decode(rootNode));
     while (!hashReferencedNodes.isEmpty() && trieNodes.size() < maxNodes) {
-      Node<BytesValue> currentNode = hashReferencedNodes.remove(0);
-      List<Node<BytesValue>> children = new ArrayList<>();
+      final Node<BytesValue> currentNode = hashReferencedNodes.remove(0);
+      final List<Node<BytesValue>> children = new ArrayList<>();
       currentNode.getChildren().ifPresent(children::addAll);
       while (!children.isEmpty() && trieNodes.size() < maxNodes) {
-        Node<BytesValue> child = children.remove(0);
+        final Node<BytesValue> child = children.remove(0);
         if (child.isReferencedByHash()) {
-          BytesValue childNode = storage.getNodeData(child.getHash()).get();
+          final BytesValue childNode = storage.getNodeData(child.getHash()).get();
           trieNodes.put(child.getHash(), childNode);
           hashReferencedNodes.add(decoder.decode(childNode));
         } else {
@@ -688,9 +683,9 @@ public class WorldStateDownloaderTest {
       final int hashesPerRequest,
       final int maxOutstandingRequests,
       final NetworkResponder networkResponder) {
-    final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
+    final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create(new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
+
     final int trailingPeerCount = 5;
-    BlockDataGenerator dataGen = new BlockDataGenerator(1);
 
     // Setup "remote" state
     final WorldStateStorage remoteStorage =
@@ -707,33 +702,33 @@ public class WorldStateDownloaderTest {
 
     // Generate more data that should not be downloaded
     final List<Account> otherAccounts = dataGen.createRandomAccounts(remoteWorldState, 5);
-    Hash otherStateRoot = remoteWorldState.rootHash();
-    BlockHeader otherHeader =
+    final Hash otherStateRoot = remoteWorldState.rootHash();
+    final BlockHeader otherHeader =
         dataGen
             .block(BlockOptions.create().setStateRoot(otherStateRoot).setBlockNumber(11))
             .getHeader();
     assertThat(otherStateRoot).isNotEqualTo(stateRoot); // Sanity check
 
-    TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
-    WorldStateStorage localStorage =
+    final TaskQueue<NodeDataRequest> queue = new InMemoryTaskQueue<>();
+    final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
-    WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
-    SynchronizerConfiguration syncConfig =
+    final WorldStateArchive localWorldStateArchive = new WorldStateArchive(localStorage);
+    final SynchronizerConfiguration syncConfig =
         SynchronizerConfiguration.builder()
             .worldStateHashCountPerRequest(hashesPerRequest)
             .worldStateRequestParallelism(maxOutstandingRequests)
             .build();
-    WorldStateDownloader downloader =
+    final WorldStateDownloader downloader =
         createDownloader(syncConfig, ethProtocolManager.ethContext(), localStorage, queue);
 
     // Create some peers that can respond
-    List<RespondingEthPeer> usefulPeers =
+    final List<RespondingEthPeer> usefulPeers =
         Stream.generate(
                 () -> EthProtocolManagerTestUtil.createPeer(ethProtocolManager, header.getNumber()))
             .limit(peerCount)
             .collect(Collectors.toList());
     // And some irrelevant peers
-    List<RespondingEthPeer> trailingPeers =
+    final List<RespondingEthPeer> trailingPeers =
         Stream.generate(
                 () ->
                     EthProtocolManagerTestUtil.createPeer(
@@ -742,17 +737,17 @@ public class WorldStateDownloaderTest {
             .collect(Collectors.toList());
 
     // Start downloader
-    CompletableFuture<?> result = downloader.run(header);
+    final CompletableFuture<?> result = downloader.run(header);
     // A second run should return an error without impacting the first result
-    CompletableFuture<?> secondResult = downloader.run(header);
+    final CompletableFuture<?> secondResult = downloader.run(header);
     assertThat(secondResult).isCompletedExceptionally();
     assertThat(result).isNotCompletedExceptionally();
 
     // Respond to node data requests
     // Send one round of full responses, so that we can get multiple requests queued up
-    Responder fullResponder =
+    final Responder fullResponder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
-    for (RespondingEthPeer peer : usefulPeers) {
+    for (final RespondingEthPeer peer : usefulPeers) {
       peer.respond(fullResponder);
     }
     // Respond to remaining queued requests in custom way
@@ -761,7 +756,7 @@ public class WorldStateDownloaderTest {
     }
 
     // Check that trailing peers were not queried for data
-    for (RespondingEthPeer trailingPeer : trailingPeers) {
+    for (final RespondingEthPeer trailingPeer : trailingPeers) {
       assertThat(trailingPeer.hasOutstandingRequests()).isFalse();
     }
 
@@ -772,7 +767,7 @@ public class WorldStateDownloaderTest {
 
     // We shouldn't have any extra data locally
     assertThat(localStorage.contains(otherHeader.getStateRoot())).isFalse();
-    for (Account otherAccount : otherAccounts) {
+    for (final Account otherAccount : otherAccounts) {
       assertThat(localWorldState.get(otherAccount.getAddress())).isNull();
     }
   }
@@ -781,10 +776,10 @@ public class WorldStateDownloaderTest {
       final List<RespondingEthPeer> peers,
       final WorldStateArchive remoteWorldStateArchive,
       final CompletableFuture<?> downloaderFuture) {
-    Responder responder =
+    final Responder responder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
     while (!downloaderFuture.isDone()) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
       }
     }
@@ -794,16 +789,16 @@ public class WorldStateDownloaderTest {
       final List<RespondingEthPeer> peers,
       final WorldStateArchive remoteWorldStateArchive,
       final CompletableFuture<?> downloaderFuture) {
-    Responder fullResponder =
+    final Responder fullResponder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
-    Responder partialResponder =
+    final Responder partialResponder =
         RespondingEthPeer.partialResponder(
             mock(Blockchain.class), remoteWorldStateArchive, MainnetProtocolSchedule.create(), .5f);
-    Responder emptyResponder = RespondingEthPeer.emptyResponder();
+    final Responder emptyResponder = RespondingEthPeer.emptyResponder();
 
     // Send a few partial responses
     for (int i = 0; i < 5; i++) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(partialResponder);
       }
     }
@@ -813,7 +808,7 @@ public class WorldStateDownloaderTest {
 
     // Send a few empty responses
     for (int i = 0; i < 3; i++) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(emptyResponder);
       }
     }
@@ -822,7 +817,7 @@ public class WorldStateDownloaderTest {
     assertThat(downloaderFuture).isNotDone();
 
     while (!downloaderFuture.isDone()) {
-      for (RespondingEthPeer peer : peers) {
+      for (final RespondingEthPeer peer : peers) {
         peer.respond(fullResponder);
       }
     }
@@ -830,16 +825,16 @@ public class WorldStateDownloaderTest {
 
   private void assertAccountsMatch(
       final WorldState worldState, final List<Account> expectedAccounts) {
-    for (Account expectedAccount : expectedAccounts) {
-      Account actualAccount = worldState.get(expectedAccount.getAddress());
+    for (final Account expectedAccount : expectedAccounts) {
+      final Account actualAccount = worldState.get(expectedAccount.getAddress());
       assertThat(actualAccount).isNotNull();
       // Check each field
       assertThat(actualAccount.getNonce()).isEqualTo(expectedAccount.getNonce());
       assertThat(actualAccount.getCode()).isEqualTo(expectedAccount.getCode());
       assertThat(actualAccount.getBalance()).isEqualTo(expectedAccount.getBalance());
 
-      Map<Bytes32, UInt256> actualStorage = actualAccount.storageEntriesFrom(Bytes32.ZERO, 500);
-      Map<Bytes32, UInt256> expectedStorage = expectedAccount.storageEntriesFrom(Bytes32.ZERO, 500);
+      final Map<Bytes32, UInt256> actualStorage = actualAccount.storageEntriesFrom(Bytes32.ZERO, 500);
+      final Map<Bytes32, UInt256> expectedStorage = expectedAccount.storageEntriesFrom(Bytes32.ZERO, 500);
       assertThat(actualStorage).isEqualTo(expectedStorage);
     }
   }
