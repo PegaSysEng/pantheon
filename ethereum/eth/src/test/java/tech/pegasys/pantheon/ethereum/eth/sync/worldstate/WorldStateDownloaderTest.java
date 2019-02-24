@@ -71,6 +71,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
@@ -78,14 +81,27 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.junit.Ignore;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.junit.After;
 import org.junit.Test;
 
 public class WorldStateDownloaderTest {
 
   private static final Hash EMPTY_TRIE_ROOT = Hash.wrap(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH);
 
-  final BlockDataGenerator dataGen = new BlockDataGenerator(1);
+  private final BlockDataGenerator dataGen = new BlockDataGenerator(1);
+  private final ExecutorService persistenceThread =
+      Executors.newSingleThreadExecutor(
+          new ThreadFactoryBuilder()
+              .setDaemon(true)
+              .setNameFormat(WorldStateDownloaderTest.class.getSimpleName() + "-persistence-%d")
+              .build());
+
+  @After
+  public void tearDown() throws Exception {
+    persistenceThread.shutdownNow();
+    assertThat(persistenceThread.awaitTermination(10, TimeUnit.SECONDS)).isTrue();
+  }
 
   @Test
   public void downloadWorldStateFromPeers_onePeerOneWithManyRequestsOneAtATime() {
@@ -187,10 +203,13 @@ public class WorldStateDownloaderTest {
   }
 
   @Test
-  @Ignore
   public void canRecoverFromTimeouts() {
     final TimeoutPolicy timeoutPolicy = TimeoutPolicy.timeoutXTimes(2);
     final EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create(timeoutPolicy);
+    final MockExecutorService serviceExecutor =
+        ((DeterministicEthScheduler) ethProtocolManager.ethContext().getScheduler())
+            .mockServiceExecutor();
+    serviceExecutor.setAutoRun(false);
 
     // Setup "remote" state
     final WorldStateStorage remoteStorage =
@@ -220,9 +239,12 @@ public class WorldStateDownloaderTest {
 
     final CompletableFuture<Void> result = downloader.run(header);
 
+    persistenceThread.submit(serviceExecutor::runPendingFutures);
+
     // Respond to node data requests
     final Responder responder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
+
     while (!result.isDone()) {
       for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
