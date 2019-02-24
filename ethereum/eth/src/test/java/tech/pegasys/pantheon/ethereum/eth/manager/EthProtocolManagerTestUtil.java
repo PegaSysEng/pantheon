@@ -35,8 +35,7 @@ public class EthProtocolManagerTestUtil {
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final TimeoutPolicy timeoutPolicy) {
-    return create(
-        blockchain, worldStateArchive, new DeterministicEthScheduler(timeoutPolicy));
+    return create(blockchain, worldStateArchive, new DeterministicEthScheduler(timeoutPolicy));
   }
 
   public static EthProtocolManager create(
