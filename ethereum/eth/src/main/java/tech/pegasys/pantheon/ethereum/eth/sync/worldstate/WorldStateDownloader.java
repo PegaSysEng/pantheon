@@ -449,6 +449,12 @@ public class WorldStateDownloader {
           }
         } catch (final InterruptedException ignore) {
           Thread.currentThread().interrupt();
+        } catch (final RuntimeException e) {
+          LOG.error("Unexpected error while persisting world state", e);
+          // Assume we failed to persist any of the requests and ensure we have something
+          // scheduled to kick off another round of requests.
+          batch.forEach(Task::markFailed);
+          ethContext.getScheduler().scheduleSyncWorkerTask(() -> requestNodeData(header));
         }
       }
     }
