@@ -49,7 +49,7 @@ IBFT-Network/
 To enable nodes to discover each other, a network requires one or more bootnodes. 
 For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url). 
 
-In the `Node-1` directory, use the [`public-key`](../Reference/Pantheon-CLI-Syntax.md#public-key) subcommand to write 
+In the `Node-1` directory, use the [`public-key export`](../Reference/Pantheon-CLI-Syntax.md#public-key) subcommand to write 
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
 
 ```bash tab="MacOS"
@@ -76,32 +76,28 @@ The `database` directory contains the blockchain data.
 In IBFT 2.0 networks, the address of at least one initial validator must be included in the genesis file. 
 For this network, we will use Node-1 as the initial validator. This requires obtaining the address for Node-1. 
 
-To obtain the address for Node-1, do one of the following with the private key in the `key` file in the `Node-1-data-path` directory: 
+To obtain the address for Node-1, in the `Node-1` directory, use the [`public-key export-address`](../Reference/Pantheon-CLI-Syntax.md#public-key)
+subcommand to write the node address to the specified file (`nodeAddress1` in this example)
 
-* Import the private key into [MetaMask](https://metamask.io/) and click the **Copy to clipboard** button 
-displayed when hovering over the account name and address. 
-* Use the [ethereumjs-util](https://github.com/ethereumjs/ethereumjs-util) library and [node](https://nodejs.org/en/) 
-to execute the following where `<private key>` is replaced by the private key for Node-1 without the 0x prefix. 
-```js
-var ethUtil = require('ethereumjs-util')
-const privKey = Buffer.from('<private key>', 'hex')
-var address = ethUtil.privateToAddress(privKey).toString('hex')
-console.log("Address=" + address)
+```bash tab="MacOS"
+pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data-path/nodeAddress1
 ```
 
-### 4. RLP Extra Data 
+```bash tab="Windows"
+pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data-path\nodeAddress1
+```
+
+### 4. RLP Encode Extra Data 
 
 The `extraData` property in IBFT 2.0 genesis files is an RLP encoding of `[32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals]`. 
 
 Use the Pantheon subcommand `encode` to generate the `extraData`. 
 
-XYZ Include example here. 
-
-
 ### 5. Create Genesis File 
 
 The genesis file defines the genesis block of the blockchain (that is, the start of the blockchain).
-The [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file) includes the address of Node-1 as the initial signer in the `extraData` field.    
+The [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file) includes the address of Node-1 as the initial validator in the
+data encoded in the `extraData` field.    
 
 All nodes in a network must use the same genesis file. 
 
@@ -147,7 +143,7 @@ Copy the following genesis definition to a file called `ibftGenesis.json` and sa
 }
 ```
 
-In `extraData`, include the [RLP encoded data that includes the initial validator](#4-rlp-extra-data). 
+In `extraData`, include the [RLP encoded data that includes the initial validator](#4-rlp-encode-extra-data). 
 
 !!! example
     
@@ -183,6 +179,7 @@ pantheon --data-path=Node-1-data-path --genesis-file=..\ibftGenesis.json --rpc-h
 
 The command line specifies: 
 
+* Data directory for Node-1 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
 * JSON-RPC API is enabled using the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option
 * ETH,NET, and IBFT APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
 * All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option
@@ -204,10 +201,10 @@ pantheon --data-path=Node-2-data-path --genesis-file=..\ibftGenesis.json --bootn
 
 The command line specifies: 
 
+* Data directory for Node-2 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
 * Different port to Node-1 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
 * Different port to Node-1 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option.
 * Enode URL for Node-1 using the [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option.
-* Data directory for Node-2 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
 * Other options as for [Node-1](#5-start-first-node-as-bootnode).
 
 
@@ -225,9 +222,9 @@ pantheon --data-path=Node-3-data-path --genesis-file=..\ibftGenesis.json --bootn
 
 The command line specifies: 
 
+ * Data directory for Node-3 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
  * Different port to Node-1 and Node-2 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
  * Different port to Node-1 and Node-2 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option.
- * Data directory for Node-3 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
  * Bootnode as for [Node-2](#6-start-node-2).
  * Other options as for [Node-1](#5-start-first-node-as-bootnode). 
 
@@ -267,4 +264,4 @@ Import accounts to MetaMask and send transactions as described in the [Private N
 When finished using the private network, stop all nodes using ++ctrl+c++ in each terminal window. 
 
 !!!tip
-    To restart the IBFT 2.0 network in the future, start from [6. Start First Node as Bootnode](#6-start-first-node-as-bootnode). 
+    To restart the IBFT 2.0 network in the future, start from [7. Start First Node as Bootnode](#7-start-first-node-as-bootnode). 
