@@ -23,10 +23,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.nio.file.Path;
@@ -61,9 +58,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
     this.ethContext = ethContext;
     this.syncState = syncState;
 
-    final LabelledMetric<OperationTimer> ethTasksTimer =
-        metricsSystem.createLabelledTimer(
-            MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
     this.blockPropagationManager =
         new BlockPropagationManager<>(
             syncConfig,
@@ -72,15 +66,15 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             ethContext,
             syncState,
             new PendingBlocks(),
-            ethTasksTimer,
+            metricsSystem,
             new BlockBroadcaster(ethContext));
 
     ChainHeadTracker.trackChainHeadForPeers(
-        ethContext, protocolSchedule, protocolContext.getBlockchain(), syncConfig, ethTasksTimer);
+        ethContext, protocolSchedule, protocolContext.getBlockchain(), syncConfig, metricsSystem);
 
     this.fullSyncDownloader =
         new FullSyncDownloader<>(
-            syncConfig, protocolSchedule, protocolContext, ethContext, syncState, ethTasksTimer);
+            syncConfig, protocolSchedule, protocolContext, ethContext, syncState, metricsSystem);
 
     fastSynchronizer =
         FastSynchronizer.create(
@@ -91,7 +85,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             metricsSystem,
             ethContext,
             worldStateStorage,
-            ethTasksTimer,
             syncState);
   }
 
