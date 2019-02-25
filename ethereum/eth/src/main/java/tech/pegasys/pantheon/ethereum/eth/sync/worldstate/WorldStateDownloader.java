@@ -196,7 +196,13 @@ public class WorldStateDownloader {
           final Optional<EthPeer> maybePeer = ethContext.getEthPeers().idlePeer(header.getNumber());
           if (!maybePeer.isPresent()) {
             // If no peer is available, wait and try again
-            waitForNewPeer().whenComplete((r, t) -> requestNodeData(header, downloadState));
+            downloadState.setWaitingForNewPeer(true);
+            waitForNewPeer()
+                .whenComplete(
+                    (r, t) -> {
+                      downloadState.setWaitingForNewPeer(false);
+                      requestNodeData(header, downloadState);
+                    });
           } else {
             requestDataFromPeer(header, maybePeer.get(), downloadState);
           }

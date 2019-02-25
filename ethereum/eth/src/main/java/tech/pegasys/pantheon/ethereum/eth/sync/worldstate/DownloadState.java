@@ -25,10 +25,10 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,9 +42,9 @@ class DownloadState {
   private final int maxOutstandingRequests;
   private final Set<EthTask<?>> outstandingRequests =
       Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final AtomicBoolean sendingRequests = new AtomicBoolean(false);
   private final CompletableFuture<Void> future;
   private final CompletableFuture<Void> tearDownFuture;
+  private boolean waitingForNewPeer = false;
   private BytesValue rootNodeData;
   private AbstractEthTask<Void> persistenceTask;
 
@@ -58,6 +58,14 @@ class DownloadState {
     this.future = new CompletableFuture<>();
     this.tearDownFuture = new CompletableFuture<>();
     this.future.whenComplete(this::doCancel);
+    this.tearDownFuture.exceptionally(
+        error -> {
+          // Propagate cancellation back to our internal future.
+          if (error instanceof CancellationException) {
+            this.future.cancel(true);
+          }
+          return null;
+        });
   }
 
   private synchronized void doCancel(final Void result, final Throwable error) {
@@ -84,18 +92,14 @@ class DownloadState {
     }
   }
 
-  public void whileAdditionalRequestCanBeSent(final Runnable action) {
+  public synchronized void whileAdditionalRequestCanBeSent(final Runnable action) {
     while (shouldRequestNodeData()) {
-      if (sendingRequests.compareAndSet(false, true)) {
-        try {
-          action.run();
-        } finally {
-          sendingRequests.set(false);
-        }
-      } else {
-        break;
-      }
+      action.run();
     }
+  }
+
+  public synchronized void setWaitingForNewPeer(final boolean waitingForNewPeer) {
+    this.waitingForNewPeer = waitingForNewPeer;
   }
 
   public synchronized void addOutstandingTask(final EthTask<?> task) {
@@ -113,7 +117,8 @@ class DownloadState {
   private synchronized boolean shouldRequestNodeData() {
     return !future.isDone()
         && outstandingRequests.size() < maxOutstandingRequests
-        && !pendingRequests.isEmpty();
+        && !pendingRequests.isEmpty()
+        && !waitingForNewPeer;
   }
 
   public CompletableFuture<Void> getFuture() {
