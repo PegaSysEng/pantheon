@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractEthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
@@ -29,6 +28,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,11 +42,12 @@ class DownloadState {
   private final int maxOutstandingRequests;
   private final Set<EthTask<?>> outstandingRequests =
       Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private final AtomicBoolean sendingRequests = new AtomicBoolean(false);
   private final CompletableFuture<Void> future;
   private final CompletableFuture<Void> tearDownFuture;
   private boolean waitingForNewPeer = false;
   private BytesValue rootNodeData;
-  private AbstractEthTask<Void> persistenceTask;
+  private EthTask<?> persistenceTask;
 
   public DownloadState(
       final TaskQueue<NodeDataRequest> pendingRequests,
@@ -92,9 +93,17 @@ class DownloadState {
     }
   }
 
-  public synchronized void whileAdditionalRequestCanBeSent(final Runnable action) {
+  public void whileAdditionalRequestCanBeSent(final Runnable action) {
     while (shouldRequestNodeData()) {
-      action.run();
+      if (sendingRequests.compareAndSet(false, true)) {
+        try {
+          action.run();
+        } finally {
+          sendingRequests.set(false);
+        }
+      } else {
+        break;
+      }
     }
   }
 
@@ -125,7 +134,7 @@ class DownloadState {
     return tearDownFuture;
   }
 
-  public synchronized void setPersistenceTask(final AbstractEthTask<Void> persistenceTask) {
+  public synchronized void setPersistenceTask(final EthTask<?> persistenceTask) {
     this.persistenceTask = persistenceTask;
   }
 

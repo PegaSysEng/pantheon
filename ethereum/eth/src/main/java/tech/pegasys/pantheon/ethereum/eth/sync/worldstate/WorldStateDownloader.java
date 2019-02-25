@@ -215,7 +215,6 @@ public class WorldStateDownloader {
     final List<Task<NodeDataRequest>> toRequest = getTasksForNextRequest(downloadState);
 
     if (toRequest.isEmpty()) {
-      requestNodeData(header, downloadState);
       return;
     }
 
