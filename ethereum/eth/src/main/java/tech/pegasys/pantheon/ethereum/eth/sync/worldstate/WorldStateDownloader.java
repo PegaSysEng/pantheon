@@ -25,10 +25,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.task.WaitForPeerTask;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.services.queue.TaskQueue;
 import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.ExceptionUtils;
@@ -37,7 +35,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -72,7 +69,7 @@ public class WorldStateDownloader {
   private final int maxNodeRequestRetries;
   private final Set<EthTask<?>> outstandingRequests =
       Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final LabelledMetric<OperationTimer> ethTasksTimer;
+  private final MetricsSystem metricsSystem;
   private final WorldStateStorage worldStateStorage;
   private final AtomicBoolean sendingRequests = new AtomicBoolean(false);
   private volatile CompletableFuture<Void> future;
@@ -87,7 +84,6 @@ public class WorldStateDownloader {
       final int hashCountPerRequest,
       final int maxOutstandingRequests,
       final int maxNodeRequestRetries,
-      final LabelledMetric<OperationTimer> ethTasksTimer,
       final MetricsSystem metricsSystem) {
     this.ethContext = ethContext;
     this.worldStateStorage = worldStateStorage;
@@ -95,7 +91,7 @@ public class WorldStateDownloader {
     this.hashCountPerRequest = hashCountPerRequest;
     this.maxOutstandingRequests = maxOutstandingRequests;
     this.maxNodeRequestRetries = maxNodeRequestRetries;
-    this.ethTasksTimer = ethTasksTimer;
+    this.metricsSystem = metricsSystem;
     metricsSystem.createLongGauge(
         MetricCategory.SYNCHRONIZER,
         "world_state_pending_requests_current",
@@ -237,10 +233,10 @@ public class WorldStateDownloader {
   private CompletableFuture<?> waitForNewPeer() {
     return ethContext
         .getScheduler()
-        .timeout(WaitForPeerTask.create(ethContext, ethTasksTimer), Duration.ofSeconds(5));
+        .timeout(WaitForPeerTask.create(ethContext, metricsSystem), Duration.ofSeconds(5));
   }
 
-  private CompletableFuture<AbstractPeerTask<List<BytesValue>>> sendAndProcessRequests(
+  private CompletableFuture<AbstractPeerTask<Map<Hash, BytesValue>>> sendAndProcessRequests(
       final EthPeer peer,
       final List<Task<NodeDataRequest>> requestTasks,
       final BlockHeader blockHeader) {
@@ -250,13 +246,12 @@ public class WorldStateDownloader {
             .map(NodeDataRequest::getHash)
             .distinct()
             .collect(Collectors.toList());
-    final AbstractPeerTask<List<BytesValue>> ethTask =
-        GetNodeDataFromPeerTask.forHashes(ethContext, hashes, ethTasksTimer).assignPeer(peer);
+    final AbstractPeerTask<Map<Hash, BytesValue>> ethTask =
+        GetNodeDataFromPeerTask.forHashes(ethContext, hashes, metricsSystem).assignPeer(peer);
     outstandingRequests.add(ethTask);
     return ethTask
         .run()
         .thenApply(PeerTaskResult::getResult)
-        .thenApply(this::mapNodeDataByHash)
         .exceptionally(
             error -> {
               final Throwable rootCause = ExceptionUtils.rootCause(error);
@@ -276,10 +271,10 @@ public class WorldStateDownloader {
                         () -> storeData(requestTasks, blockHeader, ethTask, data)));
   }
 
-  private CompletableFuture<AbstractPeerTask<List<BytesValue>>> storeData(
+  private CompletableFuture<AbstractPeerTask<Map<Hash, BytesValue>>> storeData(
       final List<Task<NodeDataRequest>> requestTasks,
       final BlockHeader blockHeader,
-      final AbstractPeerTask<List<BytesValue>> ethTask,
+      final AbstractPeerTask<Map<Hash, BytesValue>> ethTask,
       final Map<Hash, BytesValue> data) {
     final Updater storageUpdater = worldStateStorage.updater();
     for (final Task<NodeDataRequest> task : requestTasks) {
@@ -377,12 +372,5 @@ public class WorldStateDownloader {
 
   private boolean isRootState(final BlockHeader blockHeader, final NodeDataRequest request) {
     return request.getHash().equals(blockHeader.getStateRoot());
-  }
-
-  private Map<Hash, BytesValue> mapNodeDataByHash(final List<BytesValue> data) {
-    // Map data by hash
-    final Map<Hash, BytesValue> dataByHash = new HashMap<>();
-    data.forEach(d -> dataByHash.put(Hash.hash(d), d));
-    return dataByHash;
   }
 }
