@@ -60,7 +60,7 @@ abstract class TrieNodeDataRequest extends NodeDataRequest {
     if (trieNode.isReferencedByHash()) {
       // If child nodes are reference by hash, we need to download them
       final Hash hash = Hash.wrap(trieNode.getHash());
-      if (hash.equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH) || hash.equals(BytesValue.EMPTY)) {
+      if (MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH.equals(hash) || BytesValue.EMPTY.equals(hash)) {
         return Stream.empty();
       }
       final NodeDataRequest req = createChildNodeDataRequest(hash);
