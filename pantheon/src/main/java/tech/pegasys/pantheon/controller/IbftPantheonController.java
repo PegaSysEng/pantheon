@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.controller;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
+import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.IbftConfigOptions;
@@ -215,7 +216,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
 
-    final ScheduledExecutorService timerExecutor = Executors.newSingleThreadScheduledExecutor();
+    final ScheduledExecutorService timerExecutor =
+        newScheduledThreadPool("IbftTimerExecutor", 1, metricsSystem);
 
     final IbftFinalState finalState =
         new IbftFinalState(
@@ -290,7 +292,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
           try {
             timerExecutor.awaitTermination(5, TimeUnit.SECONDS);
           } catch (final InterruptedException e) {
-            LOG.error("Failed to shutdown timerexecutor");
+            LOG.error("Failed to shutdown timer executor");
           }
           try {
             storageProvider.close();
