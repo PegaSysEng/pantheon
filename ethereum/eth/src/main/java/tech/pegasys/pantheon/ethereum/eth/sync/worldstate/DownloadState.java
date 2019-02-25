@@ -17,8 +17,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractEthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
-import tech.pegasys.pantheon.metrics.MetricCategory;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.queue.TaskQueue;
 import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.ExceptionUtils;
@@ -53,26 +51,13 @@ class DownloadState {
   public DownloadState(
       final TaskQueue<NodeDataRequest> pendingRequests,
       final ArrayBlockingQueue<Task<NodeDataRequest>> requestsToPersist,
-      final int maxOutstandingRequests,
-      final MetricsSystem metricsSystem) {
+      final int maxOutstandingRequests) {
     this.pendingRequests = pendingRequests;
     this.requestsToPersist = requestsToPersist;
     this.maxOutstandingRequests = maxOutstandingRequests;
     this.future = new CompletableFuture<>();
     this.tearDownFuture = new CompletableFuture<>();
     this.future.whenComplete(this::doCancel);
-
-    metricsSystem.createIntegerGauge(
-        MetricCategory.SYNCHRONIZER,
-        "world_state_node_persistence_queue_length_current",
-        "Current number of node data requests waiting to be persisted",
-        requestsToPersist::size);
-
-    metricsSystem.createIntegerGauge(
-        MetricCategory.SYNCHRONIZER,
-        "world_state_inflight_requests_current",
-        "Number of requests currently in flight for fast sync world state download",
-        outstandingRequests::size);
   }
 
   private synchronized void doCancel(final Void result, final Throwable error) {
@@ -91,6 +76,7 @@ class DownloadState {
       outstandingRequest.cancel();
     }
     pendingRequests.clear();
+    requestsToPersist.clear();
     if (error != null) {
       tearDownFuture.completeExceptionally(error);
     } else {
@@ -118,6 +104,10 @@ class DownloadState {
 
   public synchronized void removeOutstandingTask(final EthTask<?> task) {
     outstandingRequests.remove(task);
+  }
+
+  public int getOutstandingRequestCount() {
+    return outstandingRequests.size();
   }
 
   private synchronized boolean shouldRequestNodeData() {
@@ -179,6 +169,10 @@ class DownloadState {
         break;
       }
     }
+  }
+
+  public int getPersistenceQueueSize() {
+    return requestsToPersist.size();
   }
 
   public synchronized void markAsStalled(final int maxNodeRequestRetries) {

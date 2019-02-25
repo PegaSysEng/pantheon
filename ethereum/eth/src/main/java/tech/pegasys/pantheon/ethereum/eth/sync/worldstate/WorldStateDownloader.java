@@ -45,6 +45,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -66,7 +69,7 @@ public class WorldStateDownloader {
   private final int maxNodeRequestRetries;
   private final WorldStateStorage worldStateStorage;
 
-  private DownloadState downloadState;
+  private final AtomicReference<DownloadState> downloadState = new AtomicReference<>();
 
   public WorldStateDownloader(
       final EthContext ethContext,
@@ -112,6 +115,25 @@ public class WorldStateDownloader {
         "world_state_node_request_failures_max",
         "Highest number of times a node data request has been retried in this download",
         highestRetryCount::get);
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.SYNCHRONIZER,
+        "world_state_node_persistence_queue_length_current",
+        "Current number of node data requests waiting to be persisted",
+        downloadStateValue(DownloadState::getPersistenceQueueSize));
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.SYNCHRONIZER,
+        "world_state_inflight_requests_current",
+        "Number of requests currently in flight for fast sync world state download",
+        downloadStateValue(DownloadState::getOutstandingRequestCount));
+  }
+
+  private Supplier<Integer> downloadStateValue(final Function<DownloadState, Integer> getter) {
+    return () -> {
+      final DownloadState state = this.downloadState.get();
+      return state != null ? getter.apply(state) : 0;
+    };
   }
 
   public CompletableFuture<Void> run(final BlockHeader header) {
@@ -121,7 +143,8 @@ public class WorldStateDownloader {
         header.getHash(),
         header.getStateRoot());
     synchronized (this) {
-      if (downloadState != null && downloadState.isDownloading()) {
+      final DownloadState oldDownloadState = this.downloadState.get();
+      if (oldDownloadState != null && oldDownloadState.isDownloading()) {
         final CompletableFuture<Void> failed = new CompletableFuture<>();
         failed.completeExceptionally(
             new IllegalStateException(
@@ -136,30 +159,31 @@ public class WorldStateDownloader {
 
       // Room for the requests we expect to do in parallel plus some buffer but not unlimited.
       final int persistenceQueueCapacity = hashCountPerRequest * maxNodeRequestRetries * 2;
-      this.downloadState =
+      final DownloadState newDownloadState =
           new DownloadState(
               taskQueue,
               new ArrayBlockingQueue<>(persistenceQueueCapacity),
-              maxOutstandingRequests,
-              metricsSystem);
+              maxOutstandingRequests);
+      this.downloadState.set(newDownloadState);
       highestRetryCount.set(0);
 
-      downloadState.enqueueRequest(NodeDataRequest.createAccountDataRequest(stateRoot));
+      newDownloadState.enqueueRequest(NodeDataRequest.createAccountDataRequest(stateRoot));
 
       ethContext
           .getScheduler()
-          .scheduleSyncWorkerTask(() -> requestNodeData(header, downloadState));
+          .scheduleSyncWorkerTask(() -> requestNodeData(header, newDownloadState));
 
       // TODO: This is messy.
-      final PersistNodeDataTask persistenceTask = new PersistNodeDataTask(header, downloadState);
-      downloadState.setPersistenceTask(persistenceTask);
+      final PersistNodeDataTask persistenceTask = new PersistNodeDataTask(header, newDownloadState);
+      newDownloadState.setPersistenceTask(persistenceTask);
       ethContext.getScheduler().scheduleServiceTask(persistenceTask);
-      return downloadState.getFuture();
+      return newDownloadState.getFuture();
     }
   }
 
   public void cancel() {
     synchronized (this) {
+      final DownloadState downloadState = this.downloadState.get();
       if (downloadState != null) {
         downloadState.getFuture().cancel(true);
       }
