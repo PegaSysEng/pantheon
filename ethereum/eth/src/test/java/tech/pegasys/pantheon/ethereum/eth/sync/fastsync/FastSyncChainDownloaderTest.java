@@ -80,8 +80,7 @@ public class FastSyncChainDownloaderTest {
         protocolContext,
         ethContext,
         syncState,
-        NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
-        NoOpMetricsSystem.NO_OP_LABELLED_COUNTER,
+        new NoOpMetricsSystem(),
         otherBlockchain.getBlockHeader(pivotBlockNumber).get());
   }
 
