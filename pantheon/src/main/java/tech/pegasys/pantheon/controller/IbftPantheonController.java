@@ -267,7 +267,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             duplicateMessageTracker,
             futureMessageBuffer,
             new EthSynchronizerUpdater(ethContext.getEthPeers()));
-    ibftController.start();
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, eventMultiplexer);
