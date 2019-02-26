@@ -17,25 +17,27 @@ import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent.EventType;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthMessage;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.GetBlockFromPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockHashesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockHashesMessage.NewBlockHash;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetBlockFromPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PersistBlockTask;
+import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayList;
@@ -62,7 +64,8 @@ public class BlockPropagationManager<C> {
   private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
   private final SyncState syncState;
-  private final LabelledMetric<OperationTimer> ethTasksTimer;
+  private final MetricsSystem metricsSystem;
+  private final BlockBroadcaster blockBroadcaster;
 
   private final AtomicBoolean started = new AtomicBoolean(false);
 
@@ -77,13 +80,14 @@ public class BlockPropagationManager<C> {
       final EthContext ethContext,
       final SyncState syncState,
       final PendingBlocks pendingBlocks,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final MetricsSystem metricsSystem,
+      final BlockBroadcaster blockBroadcaster) {
     this.config = config;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
-    this.ethTasksTimer = ethTasksTimer;
-
+    this.metricsSystem = metricsSystem;
+    this.blockBroadcaster = blockBroadcaster;
     this.syncState = syncState;
     this.pendingBlocks = pendingBlocks;
   }
@@ -125,7 +129,7 @@ public class BlockPropagationManager<C> {
               protocolContext,
               readyForImport,
               HeaderValidationMode.FULL,
-              ethTasksTimer);
+              metricsSystem);
       ethContext
           .getScheduler()
           .scheduleSyncWorkerTask(importBlocksTask)
@@ -144,22 +148,12 @@ public class BlockPropagationManager<C> {
     }
   }
 
-  void broadcastBlock(final Block block, final UInt256 difficulty) {
-    ethContext
-        .getEthPeers()
-        .availablePeers()
-        .forEach(ethPeer -> ethPeer.propagateBlock(block, difficulty));
-  }
-
   void handleNewBlockFromNetwork(final EthMessage message) {
     final Blockchain blockchain = protocolContext.getBlockchain();
     final NewBlockMessage newBlockMessage = NewBlockMessage.readFrom(message.getData());
     try {
       final Block block = newBlockMessage.block(protocolSchedule);
       final UInt256 totalDifficulty = newBlockMessage.totalDifficulty(protocolSchedule);
-
-      // TODO: Extract broadcast functionality to independent class.
-      // broadcastBlock(block, totalDifficulty);
 
       message.getPeer().chainState().updateForAnnouncedBlock(block.getHeader(), totalDifficulty);
 
@@ -237,10 +231,20 @@ public class BlockPropagationManager<C> {
   private CompletableFuture<Block> processAnnouncedBlock(
       final EthPeer peer, final NewBlockHash newBlock) {
     final AbstractPeerTask<Block> getBlockTask =
-        GetBlockFromPeerTask.create(protocolSchedule, ethContext, newBlock.hash(), ethTasksTimer)
+        GetBlockFromPeerTask.create(protocolSchedule, ethContext, newBlock.hash(), metricsSystem)
             .assignPeer(peer);
 
     return getBlockTask.run().thenCompose((r) -> importOrSavePendingBlock(r.getResult()));
+  }
+
+  private void broadcastBlock(final Block block, final BlockHeader parent) {
+    final UInt256 totalDifficulty =
+        protocolContext
+            .getBlockchain()
+            .getTotalDifficultyByHash(parent.getHash())
+            .get()
+            .plus(block.getHeader().getDifficulty());
+    blockBroadcaster.propagate(block, totalDifficulty);
   }
 
   @VisibleForTesting
@@ -272,17 +276,54 @@ public class BlockPropagationManager<C> {
       return CompletableFuture.completedFuture(block);
     }
 
-    // Import block
-    final PersistBlockTask<C> importTask =
-        PersistBlockTask.create(
-            protocolSchedule, protocolContext, block, HeaderValidationMode.FULL, ethTasksTimer);
+    final BlockHeader parent =
+        protocolContext
+            .getBlockchain()
+            .getBlockHeader(block.getHeader().getParentHash())
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        "Incapable of retrieving header from non-existent parent of "
+                            + block.getHeader().getNumber()
+                            + "."));
+
+    final ProtocolSpec<C> protocolSpec =
+        protocolSchedule.getByBlockNumber(block.getHeader().getNumber());
+    final BlockHeaderValidator<C> blockHeaderValidator = protocolSpec.getBlockHeaderValidator();
     return ethContext
         .getScheduler()
-        .scheduleSyncWorkerTask(importTask::run)
+        .scheduleSyncWorkerTask(
+            () -> validateAndProcessPendingBlock(blockHeaderValidator, block, parent));
+  }
+
+  private CompletableFuture<Block> validateAndProcessPendingBlock(
+      final BlockHeaderValidator<C> blockHeaderValidator,
+      final Block block,
+      final BlockHeader parent) {
+    if (blockHeaderValidator.validateHeader(
+        block.getHeader(), parent, protocolContext, HeaderValidationMode.FULL)) {
+      ethContext.getScheduler().scheduleSyncWorkerTask(() -> broadcastBlock(block, parent));
+      return runImportTask(block);
+    } else {
+      importingBlocks.remove(block.getHash());
+      LOG.warn(
+          "Failed to import announced block {} ({}).",
+          block.getHeader().getNumber(),
+          block.getHash());
+      return CompletableFuture.completedFuture(block);
+    }
+  }
+
+  private CompletableFuture<Block> runImportTask(final Block block) {
+    final PersistBlockTask<C> importTask =
+        PersistBlockTask.create(
+            protocolSchedule, protocolContext, block, HeaderValidationMode.NONE, metricsSystem);
+    return importTask
+        .run()
         .whenComplete(
-            (r, t) -> {
+            (result, throwable) -> {
               importingBlocks.remove(block.getHash());
-              if (t != null) {
+              if (throwable != null) {
                 LOG.warn(
                     "Failed to import announced block {} ({}).",
                     block.getHeader().getNumber(),

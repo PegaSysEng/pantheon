@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -119,6 +120,7 @@ public class PeerDiscoveryController {
 
   private RetryDelayFunction retryDelayFunction = RetryDelayFunction.linear(1.5, 2000, 60000);
 
+  private final AsyncExecutor workerExecutor;
   private final long tableRefreshIntervalMs;
 
   private final PeerRequirement peerRequirement;
@@ -140,6 +142,7 @@ public class PeerDiscoveryController {
       final Collection<DiscoveryPeer> bootstrapNodes,
       final OutboundMessageHandler outboundMessageHandler,
       final TimerUtil timerUtil,
+      final AsyncExecutor workerExecutor,
       final long tableRefreshIntervalMs,
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
@@ -151,6 +154,7 @@ public class PeerDiscoveryController {
     this.localPeer = localPeer;
     this.bootstrapNodes = bootstrapNodes;
     this.peerTable = peerTable;
+    this.workerExecutor = workerExecutor;
     this.tableRefreshIntervalMs = tableRefreshIntervalMs;
     this.peerRequirement = peerRequirement;
     this.peerBlacklist = peerBlacklist;
@@ -391,31 +395,39 @@ public class PeerDiscoveryController {
         interaction -> {
           final PingPacketData data =
               PingPacketData.create(localPeer.getEndpoint(), peer.getEndpoint());
-          final Packet pingPacket = createPacket(PacketType.PING, data);
+          createPacket(
+              PacketType.PING,
+              data,
+              pingPacket -> {
+                final BytesValue pingHash = pingPacket.getHash();
+                // Update the matching filter to only accept the PONG if it echoes the hash of our
+                // PING.
+                final Predicate<Packet> newFilter =
+                    packet ->
+                        packet
+                            .getPacketData(PongPacketData.class)
+                            .map(pong -> pong.getPingHash().equals(pingHash))
+                            .orElse(false);
+                interaction.updateFilter(newFilter);
 
-          final BytesValue pingHash = pingPacket.getHash();
-          // Update the matching filter to only accept the PONG if it echoes the hash of our PING.
-          final Predicate<Packet> newFilter =
-              packet ->
-                  packet
-                      .getPacketData(PongPacketData.class)
-                      .map(pong -> pong.getPingHash().equals(pingHash))
-                      .orElse(false);
-          interaction.updateFilter(newFilter);
-
-          sendPacket(peer, pingPacket);
+                sendPacket(peer, pingPacket);
+              });
         };
 
     // The filter condition will be updated as soon as the action is performed.
     final PeerInteractionState ping =
-        new PeerInteractionState(action, PacketType.PONG, (packet) -> false, true);
+        new PeerInteractionState(action, peer.getId(), PacketType.PONG, (packet) -> false, true);
     dispatchInteraction(peer, ping);
   }
 
   private void sendPacket(final DiscoveryPeer peer, final PacketType type, final PacketData data) {
-    Packet packet = createPacket(type, data);
-    logSendingPacket(peer, packet);
-    outboundMessageHandler.send(peer, packet);
+    createPacket(
+        type,
+        data,
+        packet -> {
+          logSendingPacket(peer, packet);
+          outboundMessageHandler.send(peer, packet);
+        });
   }
 
   private void sendPacket(final DiscoveryPeer peer, final Packet packet) {
@@ -424,8 +436,17 @@ public class PeerDiscoveryController {
   }
 
   @VisibleForTesting
-  Packet createPacket(final PacketType type, final PacketData data) {
-    return Packet.create(type, data, keypair);
+  void createPacket(final PacketType type, final PacketData data, final Consumer<Packet> handler) {
+    // Creating packets is quite expensive because they have to be cryptographically signed
+    // So ensure the work is done on a worker thread to avoid blocking the vertx event thread.
+    workerExecutor
+        .execute(() -> Packet.create(type, data, keypair))
+        .thenAccept(handler)
+        .exceptionally(
+            error -> {
+              LOG.error("Error while creating packet", error);
+              return null;
+            });
   }
 
   /**
@@ -441,7 +462,7 @@ public class PeerDiscoveryController {
           sendPacket(peer, PacketType.FIND_NEIGHBORS, data);
         };
     final PeerInteractionState interaction =
-        new PeerInteractionState(action, PacketType.NEIGHBORS, packet -> true, true);
+        new PeerInteractionState(action, peer.getId(), PacketType.NEIGHBORS, packet -> true, true);
     dispatchInteraction(peer, interaction);
   }
 
@@ -459,7 +480,7 @@ public class PeerDiscoveryController {
     if (previous != null) {
       previous.cancelTimers();
     }
-    state.execute(0);
+    state.execute(0, 0);
   }
 
   private void respondToPing(
@@ -499,11 +520,15 @@ public class PeerDiscoveryController {
 
   /** Holds the state machine data for a peer interaction. */
   private class PeerInteractionState implements Predicate<Packet> {
+
+    private static final int MAX_RETRIES = 5;
     /**
      * The action that led to the peer being in this state (e.g. sending a PING or NEIGHBORS
      * message), in case it needs to be retried.
      */
     private final Consumer<PeerInteractionState> action;
+
+    private final BytesValue peerId;
     /** The expected type of the message that will transition the peer out of this state. */
     private final PacketType expectedType;
     /** A custom filter to accept transitions out of this state. */
@@ -515,10 +540,12 @@ public class PeerDiscoveryController {
 
     PeerInteractionState(
         final Consumer<PeerInteractionState> action,
+        final BytesValue peerId,
         final PacketType expectedType,
         final Predicate<Packet> filter,
         final boolean retryable) {
       this.action = action;
+      this.peerId = peerId;
       this.expectedType = expectedType;
       this.filter = filter;
       this.retryable = retryable;
@@ -540,11 +567,15 @@ public class PeerDiscoveryController {
      * @param lastTimeout the previous timeout, or 0 if this is the first time the action is being
      *     executed.
      */
-    void execute(final long lastTimeout) {
+    void execute(final long lastTimeout, final int retryCount) {
       action.accept(this);
-      if (retryable) {
+      if (retryable && retryCount < MAX_RETRIES) {
         final long newTimeout = retryDelayFunction.apply(lastTimeout);
-        timerId = OptionalLong.of(timerUtil.setTimer(newTimeout, () -> execute(newTimeout)));
+        timerId =
+            OptionalLong.of(
+                timerUtil.setTimer(newTimeout, () -> execute(newTimeout, retryCount + 1)));
+      } else {
+        inflightInteractions.remove(peerId);
       }
     }
 
@@ -552,5 +583,9 @@ public class PeerDiscoveryController {
     void cancelTimers() {
       timerId.ifPresent(timerUtil::cancelTimer);
     }
+  }
+
+  public interface AsyncExecutor {
+    <T> CompletableFuture<T> execute(Supplier<T> action);
   }
 }

@@ -12,7 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.websocket;
 
+import static com.google.common.collect.Streams.stream;
+
 import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationService;
+import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 
 import java.net.InetSocketAddress;
@@ -20,6 +23,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -29,6 +34,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -94,6 +100,14 @@ public class WebSocketService {
     return websocket -> {
       final SocketAddress socketAddress = websocket.remoteAddress();
       final String connectionId = websocket.textHandlerID();
+      final String token = getAuthToken(websocket);
+      if (token != null) {
+        LOG.trace("Websocket authentication token {}", token);
+      }
+
+      if (!hasWhitelistedHostnameHeader(Optional.ofNullable(websocket.headers().get("Host")))) {
+        websocket.reject(403);
+      }
 
       LOG.debug("Websocket Connected ({})", socketAddressAsString(socketAddress));
 
@@ -104,7 +118,12 @@ public class WebSocketService {
                 buffer.toString(),
                 socketAddressAsString(socketAddress));
 
-            websocketRequestHandler.handle(connectionId, buffer);
+            AuthenticationUtils.getUser(
+                authenticationService,
+                token,
+                user ->
+                    websocketRequestHandler.handle(
+                        authenticationService, connectionId, buffer, user));
           });
 
       websocket.closeHandler(
@@ -128,6 +147,10 @@ public class WebSocketService {
 
   private Handler<HttpServerRequest> httpHandler() {
     final Router router = Router.router(vertx);
+
+    // Verify Host header to avoid rebind attack.
+    router.route().handler(checkWhitelistHostHeader());
+
     if (authenticationService.isPresent()) {
       router.route("/login").handler(BodyHandler.create());
       router
@@ -196,5 +219,53 @@ public class WebSocketService {
 
   private String socketAddressAsString(final SocketAddress socketAddress) {
     return String.format("host=%s, port=%d", socketAddress.host(), socketAddress.port());
+  }
+
+  private String getAuthToken(final ServerWebSocket websocket) {
+    return AuthenticationUtils.getJwtTokenFromAuthorizationHeaderValue(
+        websocket.headers().get("Authorization"));
+  }
+
+  private Handler<RoutingContext> checkWhitelistHostHeader() {
+    return event -> {
+      if (hasWhitelistedHostnameHeader(Optional.ofNullable(event.request().host()))) {
+        event.next();
+      } else {
+        event
+            .response()
+            .setStatusCode(403)
+            .putHeader("Content-Type", "application/json; charset=utf-8")
+            .end("{\"message\":\"Host not authorized.\"}");
+      }
+    };
+  }
+
+  @VisibleForTesting
+  public boolean hasWhitelistedHostnameHeader(final Optional<String> header) {
+    return configuration.getHostsWhitelist().contains("*")
+        || header.map(value -> checkHostInWhitelist(validateHostHeader(value))).orElse(false);
+  }
+
+  private Optional<String> validateHostHeader(final String header) {
+    final Iterable<String> splitHostHeader = Splitter.on(':').split(header);
+    final long hostPieces = stream(splitHostHeader).count();
+    if (hostPieces > 1) {
+      // If the host contains a colon, verify the host is correctly formed - host [ ":" port ]
+      if (hostPieces > 2 || !Iterables.get(splitHostHeader, 1).matches("\\d{1,5}+")) {
+        return Optional.empty();
+      }
+    }
+    return Optional.ofNullable(Iterables.get(splitHostHeader, 0));
+  }
+
+  private boolean checkHostInWhitelist(final Optional<String> hostHeader) {
+    return hostHeader
+        .map(
+            header ->
+                configuration.getHostsWhitelist().stream()
+                    .anyMatch(
+                        whitelistEntry ->
+                            whitelistEntry.toLowerCase().equals(header.toLowerCase())))
+        .orElse(false);
   }
 }

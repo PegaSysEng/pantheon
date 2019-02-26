@@ -31,7 +31,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class FutureHeightTest {
@@ -57,11 +56,6 @@ public class FutureHeightTest {
 
   private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
 
-  @Before
-  public void setup() {
-    context.getController().start();
-  }
-
   @Test
   public void messagesForFutureHeightAreBufferedUntilChainHeightCatchesUp() {
     final Block currentHeightBlock = context.createBlockForProposalFromChainHead(0, 30);
@@ -74,8 +68,17 @@ public class FutureHeightTest {
     peers.getProposer().injectProposal(futureHeightRoundId, futureHeightBlock);
     peers.verifyNoMessagesReceived();
 
+    // verify that we have incremented the estimated height of the proposer.
+    peers
+        .getProposer()
+        .verifyEstimatedChainHeightEquals(futureHeightBlock.getHeader().getNumber() - 1);
+
     // Inject prepares and commits from all peers
     peers.prepareForNonProposing(futureHeightRoundId, futureHeightBlock.getHash());
+    peers.forNonProposing(
+        peer ->
+            peer.verifyEstimatedChainHeightEquals(futureHeightBlock.getHeader().getNumber() - 1));
+
     peers.commitForNonProposing(futureHeightRoundId, futureHeightBlock.getHash());
 
     peers.verifyNoMessagesReceived();

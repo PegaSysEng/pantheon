@@ -19,9 +19,8 @@ import static tech.pegasys.pantheon.ethereum.core.Hash.EMPTY_TRIE_HASH;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +49,7 @@ public class GetReceiptsForHeadersTaskTest
       final Map<BlockHeader, List<TransactionReceipt>> requestedData) {
     final List<BlockHeader> headersToComplete = new ArrayList<>(requestedData.keySet());
     return GetReceiptsForHeadersTask.forHeaders(
-        ethContext, headersToComplete, maxRetries, NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+        ethContext, headersToComplete, maxRetries, metricsSystem);
   }
 
   @Test

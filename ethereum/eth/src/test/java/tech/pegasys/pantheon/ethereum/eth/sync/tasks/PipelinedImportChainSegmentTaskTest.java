@@ -25,10 +25,10 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.AbstractMessageTaskTest;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
 import tech.pegasys.pantheon.ethereum.eth.sync.ValidationPolicy;
@@ -80,7 +80,7 @@ public class PipelinedImportChainSegmentTaskTest
             protocolContext,
             blocks,
             HeaderValidationMode.SKIP_DETACHED,
-            ethTasksTimer)
+            metricsSystem)
         .get();
   }
 
@@ -100,7 +100,7 @@ public class PipelinedImportChainSegmentTaskTest
         modifiedContext,
         ethContext,
         1,
-        ethTasksTimer,
+        metricsSystem,
         createBlockHandler(),
         DETACHED_ONLY_VALIDATION_POLICY,
         previousBlock.getHeader(),
@@ -136,7 +136,7 @@ public class PipelinedImportChainSegmentTaskTest
             modifiedContext,
             ethContext,
             1,
-            ethTasksTimer,
+            metricsSystem,
             createBlockHandler(),
             DETACHED_ONLY_VALIDATION_POLICY,
             firstBlock.getHeader(),
@@ -188,7 +188,7 @@ public class PipelinedImportChainSegmentTaskTest
             modifiedContext,
             ethContext,
             1,
-            ethTasksTimer,
+            metricsSystem,
             createBlockHandler(),
             DETACHED_ONLY_VALIDATION_POLICY,
             fakeFirstBlock.getHeader(),
@@ -244,7 +244,7 @@ public class PipelinedImportChainSegmentTaskTest
             modifiedContext,
             ethContext,
             1,
-            ethTasksTimer,
+            metricsSystem,
             createBlockHandler(),
             DETACHED_ONLY_VALIDATION_POLICY,
             checkpointHeaders);
@@ -307,7 +307,7 @@ public class PipelinedImportChainSegmentTaskTest
             modifiedContext,
             ethContext,
             2,
-            ethTasksTimer,
+            metricsSystem,
             createBlockHandler(),
             DETACHED_ONLY_VALIDATION_POLICY,
             checkpointHeaders);
@@ -374,7 +374,7 @@ public class PipelinedImportChainSegmentTaskTest
             modifiedContext,
             ethContext,
             3,
-            ethTasksTimer,
+            metricsSystem,
             createBlockHandler(),
             DETACHED_ONLY_VALIDATION_POLICY,
             checkpointHeaders);
@@ -432,7 +432,7 @@ public class PipelinedImportChainSegmentTaskTest
   }
 
   private FullSyncBlockHandler<Void> createBlockHandler() {
-    return new FullSyncBlockHandler<>(protocolSchedule, protocolContext, ethContext, ethTasksTimer);
+    return new FullSyncBlockHandler<>(protocolSchedule, protocolContext, ethContext, metricsSystem);
   }
 
   private static class CountingResponder implements Responder {

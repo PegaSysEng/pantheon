@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 import static java.util.Collections.singletonList;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class RetryingGetHeaderFromPeerByNumberTaskTest
   @Override
   protected EthTask<List<BlockHeader>> createTask(final List<BlockHeader> requestedData) {
     return RetryingGetHeaderFromPeerByNumberTask.forSingleNumber(
-        protocolSchedule, ethContext, ethTasksTimer, PIVOT_BLOCK_NUMBER, maxRetries);
+        protocolSchedule, ethContext, metricsSystem, PIVOT_BLOCK_NUMBER, maxRetries);
   }
 
   @Test

@@ -18,17 +18,18 @@ import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.DETACH
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask.PeerTaskResult;
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractRetryingPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractGetHeadersFromPeerTask;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask.PeerTaskResult;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractRetryingPeerTask;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByHashTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,6 +59,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
   private final BlockHeader referenceHeader;
   private final int segmentLength;
   private final long startingBlockNumber;
+  private final MetricsSystem metricsSystem;
 
   private int lastFilledHeaderIndex;
 
@@ -68,13 +70,14 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
       final BlockHeader referenceHeader,
       final int segmentLength,
       final int maxRetries,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethContext, maxRetries, ethTasksTimer, Collection::isEmpty);
+      final MetricsSystem metricsSystem) {
+    super(ethContext, maxRetries, Collection::isEmpty, metricsSystem);
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
     this.referenceHeader = referenceHeader;
     this.segmentLength = segmentLength;
+    this.metricsSystem = metricsSystem;
 
     startingBlockNumber = referenceHeader.getNumber() - segmentLength;
     headers = new BlockHeader[segmentLength];
@@ -88,7 +91,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
       final BlockHeader referenceHeader,
       final int segmentLength,
       final int maxRetries,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final MetricsSystem metricsSystem) {
     return new DownloadHeaderSequenceTask<>(
         protocolSchedule,
         protocolContext,
@@ -96,7 +99,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
         referenceHeader,
         segmentLength,
         maxRetries,
-        ethTasksTimer);
+        metricsSystem);
   }
 
   public static <C> DownloadHeaderSequenceTask<C> endingAtHeader(
@@ -105,7 +108,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
       final EthContext ethContext,
       final BlockHeader referenceHeader,
       final int segmentLength,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
+      final MetricsSystem metricsSystem) {
     return new DownloadHeaderSequenceTask<>(
         protocolSchedule,
         protocolContext,
@@ -113,7 +116,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
         referenceHeader,
         segmentLength,
         DEFAULT_RETRIES,
-        ethTasksTimer);
+        metricsSystem);
   }
 
   @Override
@@ -155,7 +158,7 @@ public class DownloadHeaderSequenceTask<C> extends AbstractRetryingPeerTask<List
                   referenceHash,
                   referenceHeaderForNextRequest.getNumber(),
                   count + 1,
-                  ethTasksTimer);
+                  metricsSystem);
           assignedPeer.ifPresent(headersTask::assignPeer);
           return headersTask.run();
         });

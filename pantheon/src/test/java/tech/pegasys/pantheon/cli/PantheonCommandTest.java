@@ -19,6 +19,7 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.pegasys.pantheon.cli.NetworkName.DEV;
@@ -28,6 +29,7 @@ import static tech.pegasys.pantheon.cli.NetworkName.RINKEBY;
 import static tech.pegasys.pantheon.cli.NetworkName.ROPSTEN;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.ETH;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.NET;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.PERM;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.WEB3;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
@@ -42,12 +44,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -183,10 +185,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void callingWithConfigOptionButNonExistingFileShouldDisplayHelp() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    final File tempConfigFile = temp.newFile("an-invalid-file-name-without-extension");
-    parseCommand("--config-file", tempConfigFile.getPath());
+    final Path tempConfigFilePath = createTempFile("an-invalid-file-name-without-extension", "");
+    parseCommand("--config-file", tempConfigFilePath.toString());
 
-    final String expectedOutputStart = "Unable to read TOML configuration file " + tempConfigFile;
+    final String expectedOutputStart =
+        "Unable to read TOML configuration file " + tempConfigFilePath;
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
     assertThat(commandOutput.toString()).isEmpty();
   }
@@ -208,20 +211,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
-    final File tempConfigFile = temp.newFile("invalid_config.toml");
-    try (final Writer fileWriter = Files.newBufferedWriter(tempConfigFile.toPath(), UTF_8)) {
+    final Path tempConfigFile = createTempFile("invalid_config.toml", ".");
 
-      fileWriter.write("."); // an invalid toml content
-      fileWriter.flush();
+    parseCommand("--config-file", tempConfigFile.toString());
 
-      parseCommand("--config-file", tempConfigFile.getPath());
-
-      final String expectedOutputStart =
-          "Invalid TOML configuration : Unexpected '.', expected a-z, A-Z, 0-9, ', \", a table key, "
-              + "a newline, or end-of-input (line 1, column 1)";
-      assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
-      assertThat(commandOutput.toString()).isEmpty();
-    }
+    final String expectedOutputStart =
+        "Invalid TOML configuration : Unexpected '.', expected a-z, A-Z, 0-9, ', \", a table key, "
+            + "a newline, or end-of-input (line 1, column 1)";
+    assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
+    assertThat(commandOutput.toString()).isEmpty();
   }
 
   @Test
@@ -230,20 +228,14 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     // We write a config file to prevent an invalid file in resource folder to raise errors in
     // code checks (CI + IDE)
-    final File tempConfigFile = temp.newFile("invalid_config.toml");
-    try (final Writer fileWriter = Files.newBufferedWriter(tempConfigFile.toPath(), UTF_8)) {
+    final Path tempConfigFile = createTempFile("invalid_config.toml", "tester===========.......");
+    parseCommand("--config-file", tempConfigFile.toString());
 
-      fileWriter.write("tester===========......."); // an invalid toml content
-      fileWriter.flush();
-
-      parseCommand("--config-file", tempConfigFile.getPath());
-
-      final String expectedOutputStart =
-          "Invalid TOML configuration : Unexpected '=', expected ', \", ''', \"\"\", a number, "
-              + "a boolean, a date/time, an array, or a table (line 1, column 8)";
-      assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
-      assertThat(commandOutput.toString()).isEmpty();
-    }
+    final String expectedOutputStart =
+        "Invalid TOML configuration : Unexpected '=', expected ', \", ''', \"\"\", a number, "
+            + "a boolean, a date/time, an array, or a table (line 1, column 8)";
+    assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
+    assertThat(commandOutput.toString()).isEmpty();
   }
 
   @Test
@@ -255,8 +247,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final String updatedConfig =
         Resources.toString(configFile, UTF_8)
             .replace("~/genesis.json", escapeTomlString(genesisFile.toString()));
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, updatedConfig.getBytes(UTF_8));
+    final Path toml = createTempFile("toml", updatedConfig.getBytes(UTF_8));
 
     Collection<RpcApi> expectedApis = asList(ETH, WEB3);
 
@@ -303,7 +294,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             .setGenesisConfig(encodeJsonGenesis(GENESIS_VALID_JSON))
             .setBootNodes(nodes)
             .build();
-    verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata")));
+    verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata").toAbsolutePath()));
     verify(mockControllerBuilder).ethNetworkConfig(eq(networkConfig));
     verify(mockControllerBuilder).syncWithOttoman(eq(false));
 
@@ -337,11 +328,33 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void permissionsTomlFileWithNoPermissionsEnabledMustError() throws IOException {
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
+    parseCommand("--permissions-config-file", permToml.toString());
+
+    verify(mockRunnerBuilder).build();
+
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void defaultPermissionsTomlFileWithNoPermissionsEnabledMustError() {
+    parseCommand("--p2p-enabled", "false");
+
+    verify(mockRunnerBuilder).build();
+
+    assertThat(commandErrorOutput.toString()).doesNotContain("no permissions enabled");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void permissionsTomlPathMustUseOption() throws IOException {
 
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
-    final Path permToml = Files.createTempFile("toml", "");
-    Files.write(permToml, Resources.toByteArray(configFile));
+    final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
 
     parseCommand(
         "--permissions-accounts-enabled", "--permissions-config-file", permToml.toString());
@@ -368,8 +381,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     // Load a TOML that configures literally everything (except permissioning TOML config)
     final URL configFile = Resources.getResource("everything_config.toml");
-    final Path toml = Files.createTempFile("toml", "");
-    Files.write(toml, Resources.toByteArray(configFile));
+    final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
     // Parse it.
     final CommandLine.Model.CommandSpec spec = parseCommand("--config-file", toml.toString());
@@ -454,6 +466,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void nodekeyOptionMustBeUsed() throws Exception {
     final File file = new File("./specific/key");
+    file.deleteOnExit();
 
     parseCommand("--node-private-key-file", file.getPath());
 
@@ -475,6 +488,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeFalse(isFullInstantiation());
 
     final File file = new File("./specific/key");
+    file.deleteOnExit();
 
     parseCommand("--node-private-key-file", file.getPath());
 
@@ -505,10 +519,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockControllerBuilder).homePath(pathArgumentCaptor.capture());
     verify(mockControllerBuilder).syncWithOttoman(eq(false));
-    verify(mockControllerBuilder).nodePrivateKeyFile(eq(path.resolve("key").toFile()));
+    verify(mockControllerBuilder)
+        .nodePrivateKeyFile(eq(path.resolve("key").toAbsolutePath().toFile()));
     verify(mockControllerBuilder).build();
 
-    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(path);
+    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(path.toAbsolutePath());
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -564,8 +579,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeTrue(isFullInstantiation());
 
     final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
-    final ArgumentCaptor<EthNetworkConfig> networkArg =
-        ArgumentCaptor.forClass(EthNetworkConfig.class);
 
     parseCommand("--genesis-file", genesisFile.toString(), "--network", "rinkeby");
 
@@ -921,13 +934,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void rpcApisPropertyMustBeUsed() {
-    parseCommand("--rpc-http-api", "ETH,NET", "--rpc-http-enabled");
+    parseCommand("--rpc-http-api", "ETH,NET,PERM", "--rpc-http-enabled");
 
     verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
+    verify(mockLogger)
+        .warn("Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
 
     assertThat(jsonRpcConfigArgumentCaptor.getValue().getRpcApis())
-        .containsExactlyInAnyOrder(ETH, NET);
+        .containsExactlyInAnyOrder(ETH, NET, PERM);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1531,6 +1546,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void metricsCategoryPropertyMustBeUsed() {
+    parseCommand("--metrics-enabled", "--metrics-category", MetricCategory.JVM.toString());
+
+    verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(metricsConfigArgumentCaptor.getValue().getMetricCategories())
+        .containsExactly(MetricCategory.JVM);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void metricsPushEnabledPropertyMustBeUsed() {
     parseCommand("--metrics-push-enabled");
 
@@ -1609,10 +1638,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void metricsAndMetricsPushMustNotBeUsedTogether() throws Exception {
     assumeTrue(isFullInstantiation());
-
-    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
-    final ArgumentCaptor<EthNetworkConfig> networkArg =
-        ArgumentCaptor.forClass(EthNetworkConfig.class);
 
     parseCommand("--metrics-enabled", "--metrics-push-enabled");
 
@@ -1851,20 +1876,21 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void privacyOptionsRequiresServiceToBeEnabled() {
+  public void privacyOptionsRequiresServiceToBeEnabled() throws IOException {
 
     final File file = new File("./specific/public_key");
+    file.deleteOnExit();
 
     parseCommand(
         "--privacy-url",
         ENCLAVE_URI,
         "--privacy-public-key-file",
-        file.getPath(),
+        file.toString(),
         "--privacy-precompiled-address",
         String.valueOf(Byte.MAX_VALUE - 1));
 
     verifyOptionsConstraintLoggerCall(
-        "--privacy-url, --privacy-public-key-file and --privacy-precompiled-address",
+        "--privacy-url, --privacy-precompiled-address and --privacy-public-key-file",
         "--privacy-enabled");
 
     assertThat(commandOutput.toString()).isEmpty();
@@ -1889,7 +1915,22 @@ public class PantheonCommandTest extends CommandTestAbstract {
   private Path createFakeGenesisFile(final JsonObject jsonGenesis) throws IOException {
     final Path genesisFile = Files.createTempFile("genesisFile", "");
     Files.write(genesisFile, encodeJsonGenesis(jsonGenesis).getBytes(UTF_8));
+    genesisFile.toFile().deleteOnExit();
     return genesisFile;
+  }
+
+  private Path createTempFile(final String filename, final String contents) throws IOException {
+    final Path file = Files.createTempFile(filename, "");
+    Files.write(file, contents.getBytes(UTF_8));
+    file.toFile().deleteOnExit();
+    return file;
+  }
+
+  private Path createTempFile(final String filename, final byte[] contents) throws IOException {
+    final Path file = Files.createTempFile(filename, "");
+    Files.write(file, contents);
+    file.toFile().deleteOnExit();
+    return file;
   }
 
   private String encodeJsonGenesis(final JsonObject jsonGenesis) {
@@ -1915,7 +1956,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
    */
   private void verifyOptionsConstraintLoggerCall(
       final String dependentOptions, final String mainOption) {
-    verify(mockLogger)
+    verify(mockLogger, atLeast(1))
         .warn(
             stringArgumentCaptor.capture(),
             stringArgumentCaptor.capture(),
@@ -1924,5 +1965,57 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .isEqualTo("{} will have no effect unless {} is defined on the command line.");
     assertThat(stringArgumentCaptor.getAllValues().get(1)).isEqualTo(dependentOptions);
     assertThat(stringArgumentCaptor.getAllValues().get(2)).isEqualTo(mainOption);
+  }
+
+  @Test
+  public void privacyPublicKeyFileOptionDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final Path path = Paths.get(".");
+    parseCommand("--privacy-public-key-file", path.toString());
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --privacy-public-key-file, .");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void rpcHttpAuthCredentialsFileOptionDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final Path path = Paths.get(".");
+    parseCommand("--rpc-http-authentication-credentials-file", path.toString());
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --rpc-http-authentication-credentials-file, .");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void rpcWsAuthCredentialsFileOptionDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final Path path = Paths.get(".");
+    parseCommand("--rpc-ws-authentication-credentials-file", path.toString());
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --rpc-ws-authentication-credentials-file, .");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsConfigFileOptionDisabledUnderDocker() {
+    System.setProperty("pantheon.docker", "true");
+
+    assumeFalse(isFullInstantiation());
+
+    final Path path = Paths.get(".");
+    parseCommand("--permissions-config-file", path.toString());
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Unknown options: --permissions-config-file, .");
+    assertThat(commandOutput.toString()).isEmpty();
   }
 }

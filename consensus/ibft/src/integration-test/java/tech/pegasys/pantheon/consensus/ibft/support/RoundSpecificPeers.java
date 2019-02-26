@@ -19,7 +19,6 @@ import static org.assertj.core.api.Fail.fail;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
@@ -38,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -125,6 +125,10 @@ public class RoundSpecificPeers {
     nonProposingPeers.forEach(peer -> peer.injectCommit(roundId, hash));
   }
 
+  public void forNonProposing(final Consumer<ValidatorPeer> assertion) {
+    nonProposingPeers.forEach(assertion);
+  }
+
   public Collection<SignedData<PreparePayload>> createSignedPreparePayloadOfNonProposing(
       final ConsensusRoundIdentifier preparedRound, final Hash hash) {
     return nonProposingPeers.stream()
@@ -196,9 +200,6 @@ public class RoundSpecificPeers {
         break;
       case IbftV2.COMMIT:
         actualSignedPayload = CommitMessageData.fromMessageData(actual).decode();
-        break;
-      case IbftV2.NEW_ROUND:
-        actualSignedPayload = NewRoundMessageData.fromMessageData(actual).decode();
         break;
       case IbftV2.ROUND_CHANGE:
         actualSignedPayload = RoundChangeMessageData.fromMessageData(actual).decode();

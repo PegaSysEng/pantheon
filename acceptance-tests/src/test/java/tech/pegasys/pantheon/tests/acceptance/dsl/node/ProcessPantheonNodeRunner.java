@@ -71,6 +71,16 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add(node.getMiningParameters().getCoinbase().get().toString());
     }
 
+    if (node.getPrivacyParameters().isEnabled()) {
+      params.add("--privacy-enabled");
+      params.add("--privacy-url");
+      params.add(node.getPrivacyParameters().getUrl());
+      params.add("--privacy-public-key-file");
+      params.add(node.getPrivacyParameters().getPublicKeyFile().getAbsolutePath());
+      params.add("--privacy-precompiled-address");
+      params.add(String.valueOf(node.getPrivacyParameters().getPrivacyAddress()));
+    }
+
     params.add("--bootnodes");
     params.add(String.join(",", node.bootnodes().toString()));
 
@@ -135,7 +145,8 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
   private Path createGenesisFile(final PantheonNode node, final EthNetworkConfig ethNetworkConfig) {
     try {
-      Path genesisFile = Files.createTempFile(node.homeDirectory(), "gensis", "");
+      Path genesisFile = Files.createTempFile(node.homeDirectory(), "genesis", "");
+      genesisFile.toFile().deleteOnExit();
       Files.write(genesisFile, ethNetworkConfig.getGenesisConfig().getBytes(UTF_8));
       return genesisFile;
     } catch (IOException e) {

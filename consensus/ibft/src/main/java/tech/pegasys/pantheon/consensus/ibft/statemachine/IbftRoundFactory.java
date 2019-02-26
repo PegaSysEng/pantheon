@@ -54,7 +54,7 @@ public class IbftRoundFactory {
         new RoundState(
             roundIdentifier,
             finalState.getQuorum(),
-            messageValidatorFactory.createMessageValidator(roundIdentifier));
+            messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
 
     return createNewRoundWithState(parentHeader, roundState);
   }
@@ -73,6 +73,7 @@ public class IbftRoundFactory {
         minedBlockObservers,
         finalState.getNodeKeys(),
         finalState.getMessageFactory(),
-        finalState.getTransmitter());
+        finalState.getTransmitter(),
+        finalState.getRoundTimer());
   }
 }

@@ -26,14 +26,13 @@ import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -56,8 +55,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class DetermineCommonAncestorTaskParameterizedTest {
   private final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
   private static final BlockDataGenerator blockDataGenerator = new BlockDataGenerator();
-  private final LabelledMetric<OperationTimer> ethTasksTimer =
-      NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
+  private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
   private static Block genesisBlock;
   private static MutableBlockchain localBlockchain;
@@ -162,7 +160,7 @@ public class DetermineCommonAncestorTaskParameterizedTest {
             ethContext,
             respondingEthPeer.getEthPeer(),
             headerRequestSize,
-            ethTasksTimer);
+            metricsSystem);
 
     final CompletableFuture<BlockHeader> future = task.run();
     respondingEthPeer.respondWhile(responder, () -> !future.isDone());

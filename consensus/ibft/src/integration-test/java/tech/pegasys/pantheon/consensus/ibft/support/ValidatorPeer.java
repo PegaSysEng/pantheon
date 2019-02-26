@@ -12,23 +12,21 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.support;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.CommitMessageData;
-import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -57,6 +55,7 @@ public class ValidatorPeer {
   private final List<MessageData> receivedMessages = Lists.newArrayList();
 
   private final EventMultiplexer localEventMultiplexer;
+  private long estimatedChainHeight = 0;
 
   public ValidatorPeer(
       final NodeParams nodeParams,
@@ -66,7 +65,7 @@ public class ValidatorPeer {
     this.nodeAddress = nodeParams.getAddress();
     this.messageFactory = messageFactory;
     final BytesValue nodeId = nodeKeys.getPublicKey().getEncodedBytes();
-    this.peerConnection = new StubbedPeerConnection(nodeId);
+    this.peerConnection = StubbedPeerConnection.create(nodeId);
     this.localEventMultiplexer = localEventMultiplexer;
   }
 
@@ -78,8 +77,12 @@ public class ValidatorPeer {
     return nodeKeys;
   }
 
+  public PeerConnection getPeerConnection() {
+    return peerConnection;
+  }
+
   public Proposal injectProposal(final ConsensusRoundIdentifier rId, final Block block) {
-    final Proposal payload = messageFactory.createProposal(rId, block);
+    final Proposal payload = messageFactory.createProposal(rId, block, Optional.empty());
 
     injectMessage(ProposalMessageData.create(payload));
     return payload;
@@ -108,26 +111,15 @@ public class ValidatorPeer {
     return payload;
   }
 
-  public NewRound injectNewRound(
+  public Proposal injectProposalForFutureRound(
       final ConsensusRoundIdentifier rId,
       final RoundChangeCertificate roundChangeCertificate,
-      final Proposal proposal) {
-
-    final NewRound payload =
-        messageFactory.createNewRound(
-            rId, roundChangeCertificate, proposal.getSignedPayload(), proposal.getBlock());
-    injectMessage(NewRoundMessageData.create(payload));
-    return payload;
-  }
-
-  public NewRound injectEmptyNewRound(
-      final ConsensusRoundIdentifier targetRoundId,
-      final List<SignedData<RoundChangePayload>> roundChangePayloads,
       final Block blockToPropose) {
 
-    final Proposal proposal = messageFactory.createProposal(targetRoundId, blockToPropose);
-
-    return injectNewRound(targetRoundId, new RoundChangeCertificate(roundChangePayloads), proposal);
+    final Proposal payload =
+        messageFactory.createProposal(rId, blockToPropose, Optional.of(roundChangeCertificate));
+    injectMessage(ProposalMessageData.create(payload));
+    return payload;
   }
 
   public RoundChange injectRoundChange(
@@ -161,5 +153,13 @@ public class ValidatorPeer {
 
   public KeyPair getNodeKeyPair() {
     return nodeKeys;
+  }
+
+  public void updateEstimatedChainHeight(final long estimatedChainHeight) {
+    this.estimatedChainHeight = estimatedChainHeight;
+  }
+
+  public void verifyEstimatedChainHeightEquals(final long expectedChainHeight) {
+    assertThat(estimatedChainHeight).isEqualTo(expectedChainHeight);
   }
 }

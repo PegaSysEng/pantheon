@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
@@ -29,6 +30,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpRequestFac
 import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.AdminJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EeaJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.IbftJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PermissioningJsonRpcRequestFactory;
@@ -79,6 +81,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   private final String name;
   private final MiningParameters miningParameters;
+  private final PrivacyParameters privacyParameters;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
   private final MetricsConfiguration metricsConfiguration;
@@ -86,6 +89,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
   private final boolean discoveryEnabled;
+  private final boolean isBootnode;
 
   private List<String> bootnodes = new ArrayList<>();
   private JsonRequestFactories jsonRequestFactories;
@@ -97,6 +101,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   public PantheonNode(
       final String name,
       final MiningParameters miningParameters,
+      final PrivacyParameters privacyParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
@@ -105,13 +110,15 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final GenesisConfigProvider genesisConfigProvider,
       final int p2pPort,
       final Boolean p2pEnabled,
-      final boolean discoveryEnabled)
+      final boolean discoveryEnabled,
+      final boolean isBootnode)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.p2pPort = p2pPort;
     this.name = name;
     this.miningParameters = miningParameters;
+    this.privacyParameters = privacyParameters;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
     this.metricsConfiguration = metricsConfiguration;
@@ -120,6 +127,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.devMode = devMode;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
+    this.isBootnode = isBootnode;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -202,7 +210,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         final String url = wsRpcBaseUrl().orElse("ws://" + LOCALHOST + ":" + 8546);
         final Map<String, String> headers = new HashMap<>();
         if (token != null) {
-          headers.put("Bearer", token);
+          headers.put("Authorization", "Bearer " + token);
         }
         final WebSocketClient wsClient = new WebSocketClient(URI.create(url), headers);
 
@@ -220,7 +228,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
                 .map(HttpService::new)
                 .orElse(new HttpService("http://" + LOCALHOST + ":" + 8545));
         if (token != null) {
-          ((HttpService) web3jService).addHeader("Bearer", token);
+          ((HttpService) web3jService).addHeader("Authorization", "Bearer " + token);
         }
       }
 
@@ -231,6 +239,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
               new IbftJsonRpcRequestFactory(web3jService),
               new PermissioningJsonRpcRequestFactory(web3jService),
               new AdminJsonRpcRequestFactory(web3jService),
+              new EeaJsonRpcRequestFactory(web3jService),
               websocketService);
     }
 
@@ -287,6 +296,10 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     }
 
     this.token = token;
+  }
+
+  public KeyPair getKeyPair() {
+    return keyPair;
   }
 
   private void checkIfWebSocketEndpointIsAvailable(final String url) {
@@ -421,12 +434,21 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return miningParameters;
   }
 
+  public PrivacyParameters getPrivacyParameters() {
+    return privacyParameters;
+  }
+
   public boolean isDevMode() {
     return devMode;
   }
 
   public boolean isDiscoveryEnabled() {
     return discoveryEnabled;
+  }
+
+  @Override
+  public boolean isBootnode() {
+    return isBootnode;
   }
 
   Optional<PermissioningConfiguration> getPermissioningConfiguration() {

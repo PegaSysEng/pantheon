@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthAccounts;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthBlockNumber;
@@ -33,7 +34,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.io.ByteArrayInputStream;
@@ -129,7 +129,7 @@ public class JsonRpcHttpServiceLoginTest {
                     supportedCapabilities,
                     Optional.empty(),
                     JSON_RPC_APIS,
-                    mock(PrivateTransactionHandler.class)));
+                    mock(PrivacyParameters.class)));
     service = createJsonRpcHttpService();
     jwtAuth = service.authenticationService.get().getJwtAuthProvider();
     service.start().join();
@@ -391,14 +391,29 @@ public class JsonRpcHttpServiceLoginTest {
             assertThat(r.succeeded()).isTrue();
             final User user = r.result();
             // single eth/blockNumber method permitted
-            assertThat(service.isPermitted(Optional.of(user), ethBlockNumber)).isTrue();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), ethBlockNumber))
+                .isTrue();
             // eth/accounts not permitted
-            assertThat(service.isPermitted(Optional.of(user), ethAccounts)).isFalse();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), ethAccounts))
+                .isFalse();
             // allowed by web3/*
-            assertThat(service.isPermitted(Optional.of(user), web3ClientVersion)).isTrue();
-            assertThat(service.isPermitted(Optional.of(user), web3Sha3)).isTrue();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), web3ClientVersion))
+                .isTrue();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), web3Sha3))
+                .isTrue();
             // no net permissions
-            assertThat(service.isPermitted(Optional.of(user), netVersion)).isFalse();
+            assertThat(
+                    AuthenticationUtils.isPermitted(
+                        service.authenticationService, Optional.of(user), netVersion))
+                .isFalse();
           });
     }
   }
@@ -407,7 +422,10 @@ public class JsonRpcHttpServiceLoginTest {
   public void checkPermissionsWithEmptyUser() {
     JsonRpcMethod ethAccounts = new EthAccounts();
 
-    assertThat(service.isPermitted(Optional.empty(), ethAccounts)).isFalse();
+    assertThat(
+            AuthenticationUtils.isPermitted(
+                service.authenticationService, Optional.empty(), ethAccounts))
+        .isFalse();
   }
 
   @Test
@@ -492,7 +510,7 @@ public class JsonRpcHttpServiceLoginTest {
 
   private Request buildPostRequest(final RequestBody body, final Optional<String> token) {
     final Request.Builder request = new Request.Builder().post(body).url(baseUrl);
-    token.ifPresent(t -> request.addHeader("Bearer", t));
+    token.ifPresent(t -> request.addHeader("Authorization", "Bearer " + t));
     return request.build();
   }
 }

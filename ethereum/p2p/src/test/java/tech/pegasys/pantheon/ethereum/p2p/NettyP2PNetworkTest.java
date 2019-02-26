@@ -46,7 +46,9 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.InetAddress;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -413,9 +415,12 @@ public final class NettyP2PNetworkTest {
     final PeerBlacklist localBlacklist = new PeerBlacklist();
     final PeerBlacklist remoteBlacklist = new PeerBlacklist();
     final PermissioningConfiguration config = PermissioningConfiguration.createDefault();
-    config.setConfigurationFilePath(
-        Files.createTempFile("test", "test").toAbsolutePath().toString());
-    final NodeWhitelistController localWhitelistController = new NodeWhitelistController(config);
+    final Path tempFile = Files.createTempFile("test", "test");
+    tempFile.toFile().deleteOnExit();
+    config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
+
+    final NodeWhitelistController localWhitelistController =
+        new NodeWhitelistController(config, Collections.emptyList());
     // turn on whitelisting by adding a different node NOT remote node
     localWhitelistController.addNodes(Arrays.asList(mockPeer().getEnodeURI()));
 

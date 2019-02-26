@@ -94,6 +94,7 @@ public final class RunnerTest {
     final SynchronizerConfiguration syncConfigAhead =
         SynchronizerConfiguration.builder().syncMode(SyncMode.FULL).build();
     final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
+    final int networkId = 2929;
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
@@ -103,6 +104,7 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             syncConfigAhead,
             new MiningParametersTestBuilder().enabled(false).build(),
+            networkId,
             aheadDbNodeKeys,
             PrivacyParameters.noPrivacy(),
             dataDirAhead,
@@ -118,6 +120,7 @@ public final class RunnerTest {
             MainnetProtocolSchedule.create(),
             syncConfigAhead,
             new MiningParametersTestBuilder().enabled(false).build(),
+            networkId,
             aheadDbNodeKeys,
             PrivacyParameters.noPrivacy(),
             dataDirAhead,
@@ -156,7 +159,7 @@ public final class RunnerTest {
           SynchronizerConfiguration.builder()
               .syncMode(mode)
               .fastSyncPivotDistance(5)
-              .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(5))
+              .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(1))
               .build();
       final Path dataDirBehind = temp.newFolder().toPath();
       final JsonRpcConfiguration behindJsonRpcConfiguration = jsonRpcConfiguration();
@@ -171,6 +174,7 @@ public final class RunnerTest {
               MainnetProtocolSchedule.create(),
               syncConfigBehind,
               new MiningParametersTestBuilder().enabled(false).build(),
+              networkId,
               KeyPair.generate(),
               PrivacyParameters.noPrivacy(),
               dataDirBehind,
@@ -276,6 +280,7 @@ public final class RunnerTest {
     final WebSocketConfiguration configuration = WebSocketConfiguration.createDefault();
     configuration.setPort(0);
     configuration.setEnabled(true);
+    configuration.setHostsWhitelist(Collections.singletonList("*"));
     return configuration;
   }
 

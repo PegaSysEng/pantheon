@@ -106,7 +106,7 @@ data-path="/home/me/me_node"
 The path to the Pantheon data directory. The default is the `/build/distributions/pantheon-<version>` directory in the Pantheon installation directory.
 
 !!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#persisting-data). 
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#data-directory). 
 
 ### discovery-enabled
 
@@ -163,7 +163,8 @@ The path to the genesis file.
 host-whitelist=["medomain.com", "meotherdomain.com"]
 ```
 
-Comma-separated list of hostnames to allow access to the HTTP JSON-RPC API. Default is `localhost`. 
+Comma-separated list of hostnames to allow [access to the JSON-RPC API](../JSON-RPC-API/Using-JSON-RPC-API.md#host-whitelist). 
+Default is `localhost`. 
 
 !!!tip
     To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
@@ -234,8 +235,8 @@ The default is `127.0.0.1`.
 metrics-port="6174"
 ```
 
-Specifies the port on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
-The default is `9545`. 
+Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
+The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 ### metrics-push-enabled 
 
@@ -308,8 +309,8 @@ Interval in seconds to push metrics when in `push` mode. The default is 15.
 metrics-push-port="6174"
 ```
 
-Port of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
-The default is `9001`. 
+Port (TCP) of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
+The default is `9001`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 ### metrics-push-prometheus-job
 
@@ -511,7 +512,7 @@ The default is true.
 p2p-host="0.0.0.0"
 ```
 
-Specifies the host on which P2P peer discovery listens.
+Specifies the host on which P2P listens.
 The default is 127.0.0.1.
 
 !!!note
@@ -532,11 +533,66 @@ The default is 127.0.0.1.
 p2p-port="1789"
 ```
 
-Specifies the port on which P2P peer discovery listens.
-The default is 30303.
+Specifies the P2P listening ports (UDP and TCP).
+The default is 30303. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
+
+### permissions-accounts-enabled
+
+```bash tab="Syntax"
+--permissions-accounts-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-accounts-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-accounts-enabled=true
+```
+
+Set to enable account level permissions.
+
+The default is `false`. 
+    
+### permissions-config-file    
+
+```bash tab="Syntax"
+--permissions-config-file=<FILE>
+```
+
+```bash tab="Example Command Line"
+--permissions-config-file=/home/me/me_configFiles/myPermissionsFile
+```
+
+```bash tab="Example Configuration File"
+permissions-config-file="/home/me/me_configFiles/myPermissionsFile"
+```
+
+Path to the [permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file).
+The default is the `permissions_config.toml` file in the [data directory](#data-path).
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
+
+### permissions-nodes-enabled
+
+```bash tab="Syntax"
+--permissions-nodes-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-nodes-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-nodes-enabled=true
+```
+
+Set to enable node level permissions.
+The default is `false`.
 
 ### privacy-enabled
 
@@ -581,6 +637,9 @@ Path to the public key for the enclave.
 !!!note
     Privacy is under development and will be available in v1.1.
 
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#privacy-public-key-file).
+
 ### privacy-url
 
 ```bash tab="Syntax"
@@ -592,45 +651,106 @@ URL on which enclave is running.
 !!!note
     Privacy is under development and will be available in v1.1.
 
-### permissions-accounts-enabled
+### rpc-http-api
 
 ```bash tab="Syntax"
---permissions-accounts-enabled[=<true|false>]
+--rpc-http-api=<api name>[,<api name>...]...
 ```
 
 ```bash tab="Example Command Line"
---permissions-accounts-enabled
+--rpc-http-api=ETH,NET,WEB3
 ```
 
 ```bash tab="Example Configuration File"
-permissions-accounts-enabled=true
+rpc-http-api=["ETH","NET","WEB3"]
 ```
 
-Set to enable account level permissions.
-The default is `false`.
+Comma-separated APIs to enable on the HTTP JSON-RPC channel.
+When you use this option, the `--rpc-http-enabled` option must also be specified.
+The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `PERM`, `DEBUG`, `MINER`, and `EEA`.
+The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    Permissions is under development and will be available in v1.0. 
+    EEA methods are for privacy features. Privacy features are under development and will be available in v1.1.  
 
-### permissions-nodes-enabled
+!!!tip
+    The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are just two
+    names for the same option.
+    
+### rpc-http-authentication-credentials-file
 
 ```bash tab="Syntax"
---permissions-nodes-enabled[=<true|false>]
+--rpc-http-authentication-credentials-file=<FILE>
 ```
 
 ```bash tab="Example Command Line"
---permissions-nodes-enabled
+--rpc-http-authentication-credentials-file=/home/me/me_node/auth.toml
 ```
 
 ```bash tab="Example Configuration File"
-permissions-nodes-enabled=true
+rpc-http-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
-Set to enable node level permissions.
-The default is `false`.
+[Credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
 
 !!!note
-    Permissions is under development and will be available in v1.0.
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files).
+
+### rpc-http-authentication-enabled
+
+```bash tab="Syntax"
+--rpc-http-authentication-enabled
+```
+
+```bash tab="Example Command Line"
+--rpc-http-authentication-enabled
+```
+
+```bash tab="Example Configuration File"
+rpc-http-authentication-enabled=true
+```
+
+Set to `true` to require [authentication](../JSON-RPC-API/Authentication.md) for the HTTP JSON-RPC service.  
+
+### rpc-http-cors-origins
+
+```bash tab="Syntax"
+--rpc-http-cors-origins=<url>[,<url>...]... or all or *
+```
+
+```bash tab="Example Command Line"
+# You can whitelist one or more domains with a comma-separated list.
+
+--rpc-http-cors-origins="http://medomain.com","https://meotherdomain.com"
+```
+
+```bash tab="Example Configuration File"
+rpc-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
+```
+
+```bash tab="Remix IDE domain example"
+# The following allows Remix to interact with your Pantheon node.
+
+--rpc-http-cors-origins="http://remix.ethereum.org"
+```
+
+Specifies domain URLs for CORS validation.
+Domain URLs must be enclosed in double quotes and comma-separated.
+
+Listed domains can access the node using JSON-RPC.
+If your client interacts with Pantheon using a browser app (such as Remix or a block explorer), 
+you must whitelist the client domains. 
+
+The default value is `"none"`.
+If you don't whitelist any domains, browser apps cannot interact with your Pantheon node.
+
+!!!note
+    To run a local Pantheon node as a backend for MetaMask and use MetaMask anywhere, set `--rpc-http-cors-origins` to `"all"` or `"*"`. 
+    To allow a specific domain to use MetaMask with the Pantheon node, set `--rpc-http-cors-origins` to the client domain. 
+        
+!!!tip
+    For development purposes, you can use `"all"` or `"*"` to accept requests from any domain, 
+    but we don't recommend this for production code.
 
 ### rpc-http-enabled
 
@@ -687,90 +807,11 @@ To allow remote connections, set to `0.0.0.0`
 rpc-http-port="3435"
 ```
 
-Specifies the port on which HTTP JSON-RPC listens.
-The default is 8545.
+Specifies HTTP JSON-RPC listening port (TCP).
+The default is 8545. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration). 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
-
-### rpc-http-api
-
-```bash tab="Syntax"
---rpc-http-api=<api name>[,<api name>...]...
-```
-
-```bash tab="Example Command Line"
---rpc-http-api=ETH,NET,WEB3
-```
-
-```bash tab="Example Configuration File"
-rpc-http-api=["ETH","NET","WEB3"]
-```
-
-Comma-separated APIs to enable on the HTTP JSON-RPC channel.
-When you use this option, the `--rpc-http-enabled` option must also be specified.
-The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, and `MINER`.
-The default is: `ETH`, `NET`, `WEB3`.
-
-!!!note
-    IBFT 2.0 is under development and will be available in v1.0.  
-
-!!!tip
-    The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are just two
-    names for the same option.
-    
-### rpc-http-cors-origins
-
-```bash tab="Syntax"
---rpc-http-cors-origins=<url>[,<url>...]... or all or *
-```
-
-```bash tab="Example Command Line"
-# You can whitelist one or more domains with a comma-separated list.
-
---rpc-http-cors-origins="http://medomain.com","https://meotherdomain.com"
-```
-
-```bash tab="Example Configuration File"
-rpc-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
-```
-
-```bash tab="Remix IDE domain example"
-# The following allows Remix to interact with your Pantheon node.
-
---rpc-http-cors-origins="http://remix.ethereum.org"
-```
-
-Specifies domain URLs for CORS validation.
-Domain URLs must be enclosed in double quotes and comma-separated.
-
-Listed domains can access the node using JSON-RPC.
-If your client interacts with Pantheon using a browser app (such as Remix or a block explorer), 
-you must whitelist the client domains. 
-
-The default value is `"none"`.
-If you don't whitelist any domains, browser apps cannot interact with your Pantheon node.
-
-!!!note
-    To run a local Pantheon node as a backend for MetaMask and use MetaMask anywhere, set `--rpc-http-cors-origins` to `"all"` or `"*"`. 
-    To allow a specific domain to use MetaMask with the Pantheon node, set `--rpc-http-cors-origins` to the client domain. 
-        
-!!!tip
-    For development purposes, you can use `"all"` or `"*"` to accept requests from any domain, 
-    but we don't recommend this for production code.
-
-### rpc-ws-enabled
-
-```bash tab="Syntax"
---rpc-ws-enabled
-```
-
-```bash tab="Example Configuration File"
-rpc-ws-enabled=true
-```
-
-Set to `true` to enable the WebSockets JSON-RPC service.
-The default is `false`.
 
 ### rpc-ws-api
 
@@ -786,31 +827,83 @@ The default is `false`.
 rpc-ws-api=["ETH","NET","WEB3"]
 ```
 
-Comma-separated APIs to enable on Websockets channel.
+Comma-separated APIs to enable on WebSockets channel.
 When you use this option, the `--rpc-ws-enabled` option must also be specified.
-The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, and `MINER`.
+The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `PERM', DEBUG`, `MINER` and `EEA`.
 The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
-    IBFT 2.0 is under development and will be available in v1.0.  
+    EEA methods are for privacy features. Privacy features are under development and will be available in v1.1.  
 
 !!!tip
     The singular `--rpc-ws-api` and plural `--rpc-ws-apis` are available and are just two
     names for the same option.
+
+### rpc-ws-authentication-credentials-file
+
+```bash tab="Syntax"
+--rpc-ws-authentication-credentials-file=<FILE>
+```
+
+```bash tab="Example Command Line"
+--rpc-ws-authentication-credentials-file=/home/me/me_node/auth.toml
+```
+
+```bash tab="Example Configuration File"
+rpc-ws-authentication-credentials-file="/home/me/me_node/auth.toml"
+```
+
+[Credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md).
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files). 
+
+### rpc-ws-authentication-enabled
+
+```bash tab="Syntax"
+--rpc-ws-authentication-enabled
+```
+
+```bash tab="Example Command Line"
+--rpc-ws-authentication-enabled
+```
+
+```bash tab="Example Configuration File"
+rpc-ws-authentication-enabled=true
+```
+
+Set to `true` to require [authentication](../JSON-RPC-API/Authentication.md) for the WebSockets JSON-RPC service.
+
+!!! note 
+    `wscat` does not support headers. [Authentication](../JSON-RPC-API/Authentication.md) requires an authentication token to be passed in the 
+    request header. To use authentication with WebSockets, an app that supports headers is required. 
+
+### rpc-ws-enabled
+
+```bash tab="Syntax"
+--rpc-ws-enabled
+```
+
+```bash tab="Example Configuration File"
+rpc-ws-enabled=true
+```
+
+Set to `true` to enable the WebSockets JSON-RPC service.
+The default is `false`.
     
 ### rpc-ws-host
 
 ```bash tab="Syntax"
---ws-host=<HOST>
+--rpc-ws-host=<HOST>
 ```
 
 ```bash tab="Example Command Line"
 # to listen on all interfaces
---ws-host=0.0.0.0
+--rpc-ws-host=0.0.0.0
 ```
 
 ```bash tab="Example Configuration File"
-ws-host="0.0.0.0"
+rpc-ws-host="0.0.0.0"
 ```
 
 Host for Websocket WS-RPC to listen on.
@@ -824,20 +917,20 @@ To allow remote connections, set to `0.0.0.0`
 ### rpc-ws-port
 
 ```bash tab="Syntax"
---ws-port=<PORT>
+--rpc-ws-port=<PORT>
 ```
 
 ```bash tab="Example Command Line"
 # to listen on port 6174
---ws-port=6174
+--rpc-ws-port=6174
 ```
 
 ```bash tab="Example Configuration File"
-ws-port="6174"
+rpc-ws-port="6174"
 ```
 
-Port for Websocket WS-RPC to listen on.
-The default is 8546.
+Specifies Websockets JSON-RPC listening port (TCP).
+The default is 8546. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -917,14 +1010,36 @@ This command provides node public key related actions.
 #### export
 
 ```bash tab="Syntax"
-$ pantheon public-key export --to=<key-file>
+$ pantheon public-key export [--to=<key-file>]
 ```
 
-```bash tab="Example"
-$ pantheon public-key export --to=/home/me/me_project/not_precious_pub_key
+```bash tab="Example (to standard output)"
+$ pantheon --data-path=<node data path> public-key export
 ```
 
-Exports node public key to the specified file. 
+```bash tab="Example (to file)"
+$ pantheon --data-path=<node data path> public-key export --to=/home/me/me_project/not_precious_pub_key
+```
+
+Outputs the node public key to standard output or writes it to the specified file if 
+`--to=<key-file>` is specified. 
+
+#### export-address
+
+```bash tab="Syntax"
+$ pantheon public-key export-address [--to=<address-file>]
+```
+
+```bash tab="Example (to standard output)"
+$ pantheon --data-path=<node data path> public-key export-address
+```
+
+```bash tab="Example (to file)"
+$ pantheon --data-path=<node data path> public-key export-address --to=/home/me/me_project/me_node_address
+```
+
+Outputs the node public key address to standard output or writes it to the specified file if  
+`--to=<key-file>` is specified. 
 
 ### password
 
@@ -932,7 +1047,8 @@ This command provides password related actions.
 
 #### hash
 
-This command generates the hash of a given password.
+This command generates the hash of a given password. Include the hash in the [credentials file](../JSON-RPC-API/Authentication.md#credentials-file)
+ for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
 
 ```bash tab="Syntax"
 $ pantheon password hash --password=<my-password>
@@ -941,3 +1057,69 @@ $ pantheon password hash --password=<my-password>
 ```bash tab="Example"
 $ pantheon password hash --password=myPassword123
 ```
+
+### rlp
+
+This command provides RLP related actions.
+
+#### encode
+
+This command encodes a typed JSON value from a file or from the standard input into an RLP hexadecimal string.
+
+```bash tab="Syntax"
+$ pantheon rlp encode [--from=<FILE>] [--to=<FILE>] [--type=<type>]
+```
+
+```bash tab="File Example"
+$ pantheon rlp encode --from=ibft_extra_data.json --to=extra_data_for_ibft_genesis.txt --type=IBFT_EXTRA_DATA
+```
+
+```bash tab="Standart Input/Output Example"
+$ cat extra_data.json | pantheon rlp encode > rlp.txt
+```
+
+The `IBFT_EXTRA_DATA` type is the only type supported for RLP encoding.
+This data is included in the [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file).
+
+???+ summary "IBFT 2.0 Extra Data"
+    To generate the RLP encoded `extraData` string, specify a JSON input that is array of validator addresses 
+    in ascending order.
+
+    ??? tip "JSON Schema for IBFT_EXTRA_DATA"
+        The following JSON Schema can be used to validate that your JSON data is well formed. You can use an online validation tool
+        such as https://www.jsonschemavalidator.net/ to validate your JSON content.
+        
+        ```json
+        {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "$id": "http://tech.pegasys.pantheon/cli_rlp_ibft_extra_data.json",
+          "type": "array",
+          "definitions": {},
+          "title": "IBFT extra data",
+          "description":"JSON format used as input to generate an IBFT extra data RLP string",
+          "items": {
+            "$id": "#/address",
+            "type": "string",
+            "title": "Validator address",
+            "description":"The validator node address",
+            "default": "",
+            "examples": [
+              "be068f726a13c8d46c44be6ce9d275600e1735a4",
+              "5ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193"
+            ],
+            "pattern":"^([0-9a-f]{40})$"
+          }
+        }
+        ``` 
+        
+    !!!example "Example IBFT_EXTRA_DATA encoding"
+        ```json tab="JSON Input"
+        [
+          "be068f726a13c8d46c44be6ce9d275600e1735a4",
+          "5ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193"
+        ]
+        ```
+        
+        ``` tab="RLP Output"
+        0xf853a00000000000000000000000000000000000000000000000000000000000000000ea94be068f726a13c8d46c44be6ce9d275600e1735a4945ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193808400000000c0
+        ```

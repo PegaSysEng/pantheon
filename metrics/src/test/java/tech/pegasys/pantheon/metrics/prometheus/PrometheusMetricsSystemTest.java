@@ -17,17 +17,21 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.metrics.MetricCategory.JVM;
+import static tech.pegasys.pantheon.metrics.MetricCategory.NETWORK;
 import static tech.pegasys.pantheon.metrics.MetricCategory.PEERS;
 import static tech.pegasys.pantheon.metrics.MetricCategory.RPC;
 
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.OperationTimer.TimingContext;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.Comparator;
+import java.util.EnumSet;
 
 import org.junit.Test;
 
@@ -49,6 +53,23 @@ public class PrometheusMetricsSystemTest {
         .containsExactly(new Observation(PEERS, "connected", 1d, emptyList()));
 
     counter.inc();
+    assertThat(metricsSystem.getMetrics())
+        .containsExactly(new Observation(PEERS, "connected", 2d, emptyList()));
+  }
+
+  @Test
+  public void shouldHandleDuplicateCounterCreation() {
+    final LabelledMetric<Counter> counter1 =
+        metricsSystem.createLabelledCounter(PEERS, "connected", "Some help string");
+    final LabelledMetric<Counter> counter2 =
+        metricsSystem.createLabelledCounter(PEERS, "connected", "Some help string");
+    assertThat(counter1).isEqualTo(counter2);
+
+    counter1.labels().inc();
+    assertThat(metricsSystem.getMetrics())
+        .containsExactly(new Observation(PEERS, "connected", 1d, emptyList()));
+
+    counter2.labels().inc();
     assertThat(metricsSystem.getMetrics())
         .containsExactly(new Observation(PEERS, "connected", 2d, emptyList()));
   }
@@ -102,11 +123,21 @@ public class PrometheusMetricsSystemTest {
   }
 
   @Test
+  public void shouldHandleDuplicateTimerCreation() {
+    final LabelledMetric<OperationTimer> timer1 =
+        metricsSystem.createLabelledTimer(RPC, "request", "Some help");
+    final LabelledMetric<OperationTimer> timer2 =
+        metricsSystem.createLabelledTimer(RPC, "request", "Some help");
+    assertThat(timer1).isEqualTo(timer2);
+  }
+
+  @Test
   public void shouldCreateObservationsFromTimerWithLabels() {
     final LabelledMetric<OperationTimer> timer =
         metricsSystem.createLabelledTimer(RPC, "request", "Some help", "methodName");
 
-    try (final TimingContext context = timer.labels("method").startTimer()) {}
+    //noinspection EmptyTryBlock
+    try (final TimingContext ignored = timer.labels("method").startTimer()) {}
 
     assertThat(metricsSystem.getMetrics())
         .usingElementComparator(IGNORE_VALUES) // We don't know how long it will actually take.
@@ -127,5 +158,39 @@ public class PrometheusMetricsSystemTest {
 
     assertThat(metricsSystem.getMetrics())
         .containsExactlyInAnyOrder(new Observation(JVM, "myValue", 7d, emptyList()));
+  }
+
+  @Test
+  public void shouldHandleDuplicateGaugeDeclaration() {
+    metricsSystem.createGauge(JVM, "myValue", "Help", () -> 7d);
+    metricsSystem.createGauge(JVM, "myValue", "Help", () -> 7d);
+
+    assertThat(metricsSystem.getMetrics())
+        .containsExactlyInAnyOrder(new Observation(JVM, "myValue", 7d, emptyList()));
+  }
+
+  @Test
+  public void shouldOnlyObserveEnabledMetrics() {
+    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    metricsConfiguration.setMetricCategories(EnumSet.of(MetricCategory.RPC));
+    metricsConfiguration.setEnabled(true);
+    final MetricsSystem localMetricSystem = PrometheusMetricsSystem.init(metricsConfiguration);
+
+    // do a category we are not watching
+    final LabelledMetric<Counter> counterN =
+        localMetricSystem.createLabelledCounter(NETWORK, "ABC", "Not that kind of network", "show");
+    assertThat(counterN).isSameAs(NoOpMetricsSystem.NO_OP_LABELLED_COUNTER);
+
+    counterN.labels("show").inc();
+    assertThat(localMetricSystem.getMetrics()).isEmpty();
+
+    // do a category we are watching
+    final LabelledMetric<Counter> counterR =
+        localMetricSystem.createLabelledCounter(RPC, "name", "Not useful", "method");
+    assertThat(counterR).isNotSameAs(NoOpMetricsSystem.NO_OP_LABELLED_COUNTER);
+
+    counterR.labels("op").inc();
+    assertThat(localMetricSystem.getMetrics())
+        .containsExactly(new Observation(RPC, "name", 1.0, singletonList("op")));
   }
 }

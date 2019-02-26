@@ -21,6 +21,7 @@ import static tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis.IBFT;
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
@@ -56,6 +57,7 @@ public class PantheonNodeFactory {
         new PantheonNode(
             config.getName(),
             config.getMiningParameters(),
+            config.getPrivacyParameters(),
             config.getJsonRpcConfiguration(),
             config.getWebSocketConfiguration(),
             config.getMetricsConfiguration(),
@@ -64,7 +66,8 @@ public class PantheonNodeFactory {
             config.getGenesisConfigProvider(),
             serverSocket.getLocalPort(),
             config.getP2pEnabled(),
-            config.isDiscoveryEnabled());
+            config.isDiscoveryEnabled(),
+            config.isBootnode());
     serverSocket.close();
 
     return node;
@@ -76,6 +79,18 @@ public class PantheonNodeFactory {
             .setName(name)
             .miningEnabled()
             .jsonRpcEnabled()
+            .webSocketEnabled()
+            .build());
+  }
+
+  public PantheonNode createPrivateTransactionEnabledMinerNode(
+      final String name, final PrivacyParameters privacyParameters) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .jsonRpcEnabled()
+            .enablePrivateTransactions(privacyParameters)
             .webSocketEnabled()
             .build());
   }
@@ -101,6 +116,16 @@ public class PantheonNodeFactory {
             .setName(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
+            .build());
+  }
+
+  public PantheonNode createNonBootnodeArchiveNode(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .jsonRpcEnabled()
+            .webSocketEnabled()
+            .setIsBootnode(false)
             .build());
   }
 
@@ -212,6 +237,7 @@ public class PantheonNodeFactory {
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
     File tempFile = createTempPermissioningConfigurationFile();
+    tempFile.deleteOnExit();
     permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
     initPermissioningConfigurationFile(
         WhitelistPersistor.WHITELIST_TYPE.NODES,

@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -29,7 +30,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class FutureRoundTest {
@@ -55,11 +55,6 @@ public class FutureRoundTest {
   private final RoundSpecificPeers futurePeers = context.roundSpecificPeers(futureRoundId);
 
   private final MessageFactory localNodeMessageFactory = context.getLocalNodeMessageFactory();
-
-  @Before
-  public void setup() {
-    context.getController().start();
-  }
 
   @Test
   public void messagesForFutureRoundAreNotActionedUntilRoundIsActive() {
@@ -93,8 +88,10 @@ public class FutureRoundTest {
     // and updates blockchain
     futurePeers
         .getProposer()
-        .injectEmptyNewRound(
-            futureRoundId, futurePeers.createSignedRoundChangePayload(futureRoundId), futureBlock);
+        .injectProposalForFutureRound(
+            futureRoundId,
+            new RoundChangeCertificate(futurePeers.createSignedRoundChangePayload(futureRoundId)),
+            futureBlock);
 
     final Prepare expectedPrepare =
         localNodeMessageFactory.createPrepare(futureRoundId, futureBlock.getHash());
@@ -136,8 +133,10 @@ public class FutureRoundTest {
 
     futurePeers
         .getProposer()
-        .injectEmptyNewRound(
-            futureRoundId, futurePeers.createSignedRoundChangePayload(futureRoundId), futureBlock);
+        .injectProposalForFutureRound(
+            futureRoundId,
+            new RoundChangeCertificate(futurePeers.createSignedRoundChangePayload(futureRoundId)),
+            futureBlock);
 
     final Prepare expectedFuturePrepare =
         localNodeMessageFactory.createPrepare(futureRoundId, futureBlock.getHash());

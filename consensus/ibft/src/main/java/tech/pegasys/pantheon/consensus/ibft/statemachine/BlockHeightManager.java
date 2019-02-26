@@ -15,15 +15,12 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 public interface BlockHeightManager {
-
-  void start();
 
   void handleBlockTimerExpiry(ConsensusRoundIdentifier roundIdentifier);
 
@@ -36,8 +33,6 @@ public interface BlockHeightManager {
   void handleCommitPayload(Commit commit);
 
   void handleRoundChangePayload(RoundChange roundChange);
-
-  void handleNewRoundPayload(NewRound newRound);
 
   long getChainHeight();
 

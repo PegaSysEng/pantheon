@@ -42,13 +42,40 @@ class StandaloneCommand implements DefaultCommandValues {
       names = {"--genesis-file"},
       paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =
-          "The path to genesis file. Setting this option makes --network option ignored and requires --network-id to be set.")
+          "Genesis file. Setting this option makes --network option ignored and requires --network-id to be set.")
   final File genesisFile = null;
 
   @CommandLine.Option(
       names = {"--node-private-key-file"},
       paramLabel = MANDATORY_PATH_FORMAT_HELP,
       description =
-          "the path to the node's private key file (default: a file named \"key\" in the Pantheon data folder)")
+          "The node's private key file (default: a file named \"key\" in the Pantheon data folder)")
   final File nodePrivateKeyFile = null;
+
+  @CommandLine.Option(
+      names = {"--rpc-http-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for JSON-RPC HTTP authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  String rpcHttpAuthenticationCredentialsFile = null;
+
+  @CommandLine.Option(
+      names = {"--rpc-ws-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for JSON-RPC WebSocket authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  String rpcWsAuthenticationCredentialsFile = null;
+
+  @CommandLine.Option(
+      names = {"--privacy-public-key-file"},
+      description = "The enclave's public key file")
+  final File privacyPublicKeyFile = null;
+
+  @CommandLine.Option(
+      names = {"--permissions-config-file"},
+      description =
+          "Permissions config TOML file (default: a file named \"permissions_config.toml\" in the Pantheon data folder)")
+  String permissionsConfigFile = null;
 }

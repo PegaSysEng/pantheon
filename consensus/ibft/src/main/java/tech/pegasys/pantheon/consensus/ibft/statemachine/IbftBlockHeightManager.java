@@ -18,19 +18,17 @@ import static tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightM
 
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.IbftMessage;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
+import tech.pegasys.pantheon.consensus.ibft.validation.FutureRoundProposalMessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.time.Clock;
@@ -59,12 +57,11 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   private final IbftRoundFactory roundFactory;
   private final RoundChangeManager roundChangeManager;
   private final BlockHeader parentHeader;
-  private final RoundTimer roundTimer;
   private final BlockTimer blockTimer;
   private final IbftMessageTransmitter transmitter;
   private final MessageFactory messageFactory;
   private final Map<Integer, RoundState> futureRoundStateBuffer = Maps.newHashMap();
-  private final NewRoundMessageValidator newRoundMessageValidator;
+  private final FutureRoundProposalMessageValidator futureRoundProposalMessageValidator;
   private final Clock clock;
   private final Function<ConsensusRoundIdentifier, RoundState> roundStateCreator;
   private final IbftFinalState finalState;
@@ -82,7 +79,6 @@ public class IbftBlockHeightManager implements BlockHeightManager {
       final MessageValidatorFactory messageValidatorFactory) {
     this.parentHeader = parentHeader;
     this.roundFactory = ibftRoundFactory;
-    this.roundTimer = finalState.getRoundTimer();
     this.blockTimer = finalState.getBlockTimer();
     this.transmitter = finalState.getTransmitter();
     this.messageFactory = finalState.getMessageFactory();
@@ -90,19 +86,18 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     this.roundChangeManager = roundChangeManager;
     this.finalState = finalState;
 
-    newRoundMessageValidator = messageValidatorFactory.createNewRoundValidator(getChainHeight());
+    futureRoundProposalMessageValidator =
+        messageValidatorFactory.createFutureRoundProposalMessageValidator(
+            getChainHeight(), parentHeader);
 
     roundStateCreator =
         (roundIdentifier) ->
             new RoundState(
                 roundIdentifier,
                 finalState.getQuorum(),
-                messageValidatorFactory.createMessageValidator(roundIdentifier));
-  }
+                messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
 
-  @Override
-  public void start() {
-    startNewRound(0);
+    currentRound = roundFactory.createNewRound(parentHeader, 0);
     if (finalState.isLocalNodeProposerForRound(currentRound.getRoundIdentifier())) {
       blockTimer.startTimer(currentRound.getRoundIdentifier(), parentHeader);
     }
@@ -156,8 +151,21 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   @Override
   public void handleProposalPayload(final Proposal proposal) {
     LOG.trace("Received a Proposal Payload.");
-    actionOrBufferMessage(
-        proposal, currentRound::handleProposalMessage, RoundState::setProposedBlock);
+    final MessageAge messageAge =
+        determineAgeOfPayload(proposal.getRoundIdentifier().getRoundNumber());
+
+    if (messageAge == PRIOR_ROUND) {
+      LOG.trace("Received Proposal Payload for a prior round={}", proposal.getRoundIdentifier());
+    } else {
+      if (messageAge == FUTURE_ROUND) {
+        if (!futureRoundProposalMessageValidator.validateProposalMessage(proposal)) {
+          LOG.debug("Received future Proposal which is illegal, no round change triggered.");
+          return;
+        }
+        startNewRound(proposal.getRoundIdentifier().getRoundNumber());
+      }
+      currentRound.handleProposalMessage(proposal);
+    }
   }
 
   @Override
@@ -233,27 +241,6 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     }
     // discard roundChange messages from the current and previous rounds
     roundChangeManager.discardRoundsPriorTo(currentRound.getRoundIdentifier());
-    roundTimer.startTimer(currentRound.getRoundIdentifier());
-  }
-
-  @Override
-  public void handleNewRoundPayload(final NewRound newRound) {
-    // final NewRoundPayload payload = newRound.getSignedPayload().getPayload();
-    final MessageAge messageAge =
-        determineAgeOfPayload(newRound.getRoundIdentifier().getRoundNumber());
-
-    if (messageAge == PRIOR_ROUND) {
-      LOG.trace("Received NewRound Payload for a prior round={}", newRound.getRoundIdentifier());
-      return;
-    }
-    LOG.trace("Received NewRound Payload for {}", newRound.getRoundIdentifier());
-
-    if (newRoundMessageValidator.validateNewRoundMessage(newRound)) {
-      if (messageAge == FUTURE_ROUND) {
-        startNewRound(newRound.getRoundIdentifier().getRoundNumber());
-      }
-      currentRound.handleProposalFromNewRound(newRound);
-    }
   }
 
   @Override

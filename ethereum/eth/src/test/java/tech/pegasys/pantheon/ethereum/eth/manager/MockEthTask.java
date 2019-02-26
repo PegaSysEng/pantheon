@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractEthTask;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.concurrent.CountDownLatch;
@@ -22,7 +23,7 @@ public class MockEthTask extends AbstractEthTask<Object> {
   private CountDownLatch countdown;
 
   MockEthTask(final int count) {
-    super(NoOpMetricsSystem.NO_OP_LABELLED_TIMER);
+    super(new NoOpMetricsSystem());
     countdown = new CountDownLatch(count);
   }
 

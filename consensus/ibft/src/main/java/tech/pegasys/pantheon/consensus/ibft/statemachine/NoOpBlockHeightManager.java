@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
@@ -28,9 +27,6 @@ public class NoOpBlockHeightManager implements BlockHeightManager {
   public NoOpBlockHeightManager(final BlockHeader parentHeader) {
     this.parentHeader = parentHeader;
   }
-
-  @Override
-  public void start() {}
 
   @Override
   public void handleBlockTimerExpiry(final ConsensusRoundIdentifier roundIdentifier) {}
@@ -49,9 +45,6 @@ public class NoOpBlockHeightManager implements BlockHeightManager {
 
   @Override
   public void handleRoundChangePayload(final RoundChange roundChange) {}
-
-  @Override
-  public void handleNewRoundPayload(final NewRound newRound) {}
 
   @Override
   public long getChainHeight() {

@@ -14,12 +14,10 @@ package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPipelinedPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPipelinedTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +30,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ParallelDownloadHeadersTask<C>
-    extends AbstractPipelinedPeerTask<BlockHeader, List<BlockHeader>> {
+    extends AbstractPipelinedTask<BlockHeader, List<BlockHeader>> {
   private static final Logger LOG = LogManager.getLogger();
 
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
+  private final EthContext ethContext;
+  private final MetricsSystem metricsSystem;
 
   ParallelDownloadHeadersTask(
       final BlockingQueue<BlockHeader> inboundQueue,
@@ -44,18 +44,19 @@ public class ParallelDownloadHeadersTask<C>
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(inboundQueue, outboundBacklogSize, ethContext, ethTasksTimer);
+      final MetricsSystem metricsSystem) {
+    super(inboundQueue, outboundBacklogSize, metricsSystem);
 
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
+    this.ethContext = ethContext;
+    this.metricsSystem = metricsSystem;
   }
 
   @Override
   protected Optional<List<BlockHeader>> processStep(
       final BlockHeader nextCheckpointHeader,
-      final Optional<BlockHeader> previousCheckpointHeader,
-      final EthPeer peer) {
+      final Optional<BlockHeader> previousCheckpointHeader) {
     if (!previousCheckpointHeader.isPresent()) {
       return Optional.empty();
     }
@@ -72,8 +73,7 @@ public class ParallelDownloadHeadersTask<C>
             ethContext,
             nextCheckpointHeader,
             segmentLength,
-            ethTasksTimer);
-    downloadTask.assignPeer(peer);
+            metricsSystem);
     final CompletableFuture<List<BlockHeader>> headerFuture = executeSubTask(downloadTask::run);
 
     final List<BlockHeader> headers = Lists.newArrayList(previousCheckpointHeader.get());

@@ -67,7 +67,6 @@ public class SpuriousBehaviourTest {
 
   @Before
   public void setup() {
-    context.getController().start();
 
     expectedPrepare =
         context.getLocalNodeMessageFactory().createPrepare(roundId, proposedBlock.getHash());
@@ -96,7 +95,7 @@ public class SpuriousBehaviourTest {
   }
 
   @Test
-  public void nonValidatorsCannotTriggerReponses() {
+  public void nonValidatorsCannotTriggerResponses() {
     final KeyPair nonValidatorKeys = KeyPair.generate();
     final NodeParams nonValidatorParams =
         new NodeParams(Util.publicKeyToAddress(nonValidatorKeys.getPublicKey()), nonValidatorKeys);

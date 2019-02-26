@@ -14,15 +14,13 @@ package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractEthTask;
-import tech.pegasys.pantheon.ethereum.eth.manager.AbstractPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractEthTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockHandler;
 import tech.pegasys.pantheon.ethereum.eth.sync.ValidationPolicy;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +48,7 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
 
   private final BlockHandler<B> blockHandler;
   private final ValidationPolicy validationPolicy;
+  private final MetricsSystem metricsSystem;
 
   private ParallelImportChainSegmentTask(
       final ProtocolSchedule<C> protocolSchedule,
@@ -57,14 +56,15 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
       final EthContext ethContext,
       final int maxActiveChunks,
       final List<BlockHeader> checkpointHeaders,
-      final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHandler<B> blockHandler,
-      final ValidationPolicy validationPolicy) {
-    super(ethTasksTimer);
+      final ValidationPolicy validationPolicy,
+      final MetricsSystem metricsSystem) {
+    super(metricsSystem);
     this.ethContext = ethContext;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.maxActiveChunks = maxActiveChunks;
+    this.metricsSystem = metricsSystem;
 
     if (checkpointHeaders.size() > 1) {
       this.firstHeaderNumber = checkpointHeaders.get(0).getNumber();
@@ -84,19 +84,19 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,
       final int maxActiveChunks,
-      final LabelledMetric<OperationTimer> ethTasksTimer,
       final BlockHandler<B> blockHandler,
       final ValidationPolicy validationPolicy,
-      final List<BlockHeader> checkpointHeaders) {
+      final List<BlockHeader> checkpointHeaders,
+      final MetricsSystem metricsSystem) {
     return new ParallelImportChainSegmentTask<>(
         protocolSchedule,
         protocolContext,
         ethContext,
         maxActiveChunks,
         checkpointHeaders,
-        ethTasksTimer,
         blockHandler,
-        validationPolicy);
+        validationPolicy,
+        metricsSystem);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
               protocolSchedule,
               protocolContext,
               ethContext,
-              ethTasksTimer);
+              metricsSystem);
       final ParallelValidateHeadersTask<C> validateHeadersTask =
           new ParallelValidateHeadersTask<>(
               validationPolicy,
@@ -120,22 +120,19 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
               maxActiveChunks,
               protocolSchedule,
               protocolContext,
-              ethContext,
-              ethTasksTimer);
+              metricsSystem);
       final ParallelDownloadBodiesTask<B> downloadBodiesTask =
           new ParallelDownloadBodiesTask<>(
-              blockHandler,
-              validateHeadersTask.getOutboundQueue(),
-              maxActiveChunks,
-              ethContext,
-              ethTasksTimer);
+              blockHandler, validateHeadersTask.getOutboundQueue(), maxActiveChunks, metricsSystem);
+      final ParallelExtractTxSignaturesTask<B> extractTxSignaturesTask =
+          new ParallelExtractTxSignaturesTask<>(
+              blockHandler, downloadBodiesTask.getOutboundQueue(), maxActiveChunks, metricsSystem);
       final ParallelValidateAndImportBodiesTask<B> validateAndImportBodiesTask =
           new ParallelValidateAndImportBodiesTask<>(
               blockHandler,
-              downloadBodiesTask.getOutboundQueue(),
+              extractTxSignaturesTask.getOutboundQueue(),
               Integer.MAX_VALUE,
-              ethContext,
-              ethTasksTimer);
+              metricsSystem);
 
       // Start the pipeline.
       final EthScheduler scheduler = ethContext.getScheduler();
@@ -148,15 +145,19 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
       final CompletableFuture<?> downloadBodiesFuture =
           scheduler.scheduleServiceTask(downloadBodiesTask);
       registerSubTask(downloadBodiesFuture);
-      final CompletableFuture<AbstractPeerTask.PeerTaskResult<List<List<B>>>> validateBodiesFuture =
+      final CompletableFuture<?> extractTxSignaturesFuture =
+          scheduler.scheduleServiceTask(extractTxSignaturesTask);
+      registerSubTask(extractTxSignaturesFuture);
+      final CompletableFuture<List<List<B>>> validateBodiesFuture =
           scheduler.scheduleServiceTask(validateAndImportBodiesTask);
       registerSubTask(validateBodiesFuture);
 
       // Hook in pipeline completion signaling.
       downloadHeadersTask.shutdown();
-      downloadHeaderFuture.thenRun(() -> validateHeadersTask.shutdown());
-      validateHeaderFuture.thenRun(() -> downloadBodiesTask.shutdown());
-      downloadBodiesFuture.thenRun(() -> validateAndImportBodiesTask.shutdown());
+      downloadHeaderFuture.thenRun(validateHeadersTask::shutdown);
+      validateHeaderFuture.thenRun(downloadBodiesTask::shutdown);
+      downloadBodiesFuture.thenRun(extractTxSignaturesTask::shutdown);
+      extractTxSignaturesFuture.thenRun(validateAndImportBodiesTask::shutdown);
 
       final BiConsumer<? super Object, ? super Throwable> cancelOnException =
           (s, e) -> {
@@ -164,6 +165,7 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
               downloadHeadersTask.cancel();
               validateHeadersTask.cancel();
               downloadBodiesTask.cancel();
+              extractTxSignaturesTask.cancel();
               validateAndImportBodiesTask.cancel();
               result.get().completeExceptionally(e);
             }
@@ -172,6 +174,7 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
       downloadHeaderFuture.whenComplete(cancelOnException);
       validateHeaderFuture.whenComplete(cancelOnException);
       downloadBodiesFuture.whenComplete(cancelOnException);
+      extractTxSignaturesFuture.whenComplete(cancelOnException);
       validateBodiesFuture.whenComplete(
           (r, e) -> {
             if (e != null) {
@@ -179,7 +182,7 @@ public class ParallelImportChainSegmentTask<C, B> extends AbstractEthTask<List<B
             } else if (r != null) {
               try {
                 final List<B> importedBlocks =
-                    validateBodiesFuture.get().getResult().stream()
+                    validateBodiesFuture.get().stream()
                         .flatMap(Collection::stream)
                         .collect(Collectors.toList());
                 result.get().complete(importedBlocks);

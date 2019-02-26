@@ -17,11 +17,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.MaxRetriesReachedException;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Streams;
 import org.junit.Test;
 
 public class DownloadHeaderSequenceTaskTest extends RetryingMessageTaskTest<List<BlockHeader>> {
@@ -60,7 +59,7 @@ public class DownloadHeaderSequenceTaskTest extends RetryingMessageTaskTest<List
         referenceHeader,
         requestedData.size(),
         maxRetries,
-        ethTasksTimer);
+        metricsSystem);
   }
 
   @Test
@@ -78,7 +77,7 @@ public class DownloadHeaderSequenceTaskTest extends RetryingMessageTaskTest<List
             referenceHeader,
             10,
             maxRetries,
-            ethTasksTimer);
+            metricsSystem);
     final CompletableFuture<List<BlockHeader>> future = task.run();
 
     // Respond with only the reference header
@@ -107,7 +106,7 @@ public class DownloadHeaderSequenceTaskTest extends RetryingMessageTaskTest<List
             referenceHeader,
             10,
             maxRetries,
-            ethTasksTimer);
+            metricsSystem);
     final CompletableFuture<List<BlockHeader>> future = task.run();
 
     // Filter response to include only reference header and previous header
@@ -122,7 +121,7 @@ public class DownloadHeaderSequenceTaskTest extends RetryingMessageTaskTest<List
               BlockHeadersMessage.readFrom(fullResponse.get());
           // Filter for a subset of headers
           final List<BlockHeader> headerSubset =
-              Streams.stream(headersMessage.getHeaders(protocolSchedule))
+              headersMessage.getHeaders(protocolSchedule).stream()
                   .filter(h -> h.getNumber() >= referenceHeader.getNumber() - 1L)
                   .collect(Collectors.toList());
           return Optional.of(BlockHeadersMessage.create(headerSubset));

@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 
 import picocli.CommandLine;
 
-interface DefaultCommandValues {
+public interface DefaultCommandValues {
   String CONFIG_FILE_OPTION_NAME = "--config-file";
 
   String MANDATORY_PATH_FORMAT_HELP = "<PATH>";
@@ -43,6 +43,12 @@ interface DefaultCommandValues {
   long DEFAULT_MIN_REFRESH_DELAY = 1;
   String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
   String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
+  String DOCKER_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE_LOCATION =
+      "/etc/pantheon/rpc_http_auth_config.toml";
+  String DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION =
+      "/etc/pantheon/rpc_ws_auth_config.toml";
+  String DOCKER_PRIVACY_PUBLIC_KEY_FILE = "/etc/pantheon/privacy_public_key";
+  String DOCKER_PERMISSIONS_CONFIG_FILE_LOCATION = "/etc/pantheon/permissions_config.toml";
   String PERMISSIONING_CONFIG_LOCATION = "permissions_config.toml";
   String MANDATORY_HOST_FORMAT_HELP = "<HOST>";
   String MANDATORY_PORT_FORMAT_HELP = "<PORT>";
@@ -83,12 +89,12 @@ interface DefaultCommandValues {
     }
 
     // Try to create it, then verify if the provided path is not already existing and is not a
-    // directory .Otherwise, if it doesn't exist or exists but is already a directory,
+    // directory. Otherwise, if it doesn't exist or exists but is already a directory,
     // Runner will use it to store data.
     try {
       Files.createDirectories(pantheonHome);
     } catch (final FileAlreadyExistsException e) {
-      // Only thrown if it exist but is not a directory
+      // Only thrown if it exists but is not a directory
       throw new CommandLine.ParameterException(
           new CommandLine(command),
           String.format(

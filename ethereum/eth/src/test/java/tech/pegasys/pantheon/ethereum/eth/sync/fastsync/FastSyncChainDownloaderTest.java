@@ -21,7 +21,6 @@ import static tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -68,8 +67,7 @@ public class FastSyncChainDownloaderTest {
         EthProtocolManagerTestUtil.create(
             localBlockchain,
             localBlockchainSetup.getWorldArchive(),
-            DeterministicEthScheduler.TimeoutPolicy.NEVER,
-            new EthScheduler(1, 1, 1));
+            new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
   }
@@ -82,8 +80,7 @@ public class FastSyncChainDownloaderTest {
         protocolContext,
         ethContext,
         syncState,
-        NoOpMetricsSystem.NO_OP_LABELLED_TIMER,
-        NoOpMetricsSystem.NO_OP_LABELLED_COUNTER,
+        new NoOpMetricsSystem(),
         otherBlockchain.getBlockHeader(pivotBlockNumber).get());
   }
 
