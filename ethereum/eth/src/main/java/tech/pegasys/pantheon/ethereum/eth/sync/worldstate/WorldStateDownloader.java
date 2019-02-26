@@ -173,7 +173,6 @@ public class WorldStateDownloader {
           .getScheduler()
           .scheduleSyncWorkerTask(() -> requestNodeData(header, newDownloadState));
 
-      // TODO: This is messy.
       final PersistNodeDataTask persistenceTask = new PersistNodeDataTask(header, newDownloadState);
       newDownloadState.setPersistenceTask(persistenceTask);
       ethContext.getScheduler().scheduleServiceTask(persistenceTask);
