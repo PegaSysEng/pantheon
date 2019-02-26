@@ -74,8 +74,8 @@ The `database` directory contains the blockchain data.
 
 ### 3. Get Node Addresses 
 
-In IBFT 2.0 networks, the address of at least one initial validator must be included in the genesis file. 
-For this network, we will use Node-1 as the initial validator. This requires obtaining the address for Node-1. 
+In IBFT 2.0 networks, the address of at least one initial validator must be included in the genesis file in the
+RPL encoded `extraData` string. For this network, we will use Node-1 as the initial validator. This requires obtaining the address for Node-1. 
 
 To obtain the address for Node-1, in the `Node-1` directory, use the [`public-key export-address`](../Reference/Pantheon-CLI-Syntax.md#public-key)
 subcommand to write the node address to the specified file (`nodeAddress1` in this example)
@@ -105,7 +105,8 @@ pantheon --data-path=Node-3-data-path public-key export-address --to=Node-3-data
 
 ### 4. Create JSON File to RLP Encode
 
-Create a file called `toEncode.json` in the `IBFT-Network` directory that contains the [Node 1 address](#3-get-node-addresses): 
+Create a file called `toEncode.json` in the `IBFT-Network` directory that contains the [Node 1 address](#3-get-node-addresses)
+from the `nodeAddress1` file: 
 
 ```json tab="toEncode.json"
 [
@@ -125,7 +126,7 @@ Create a file called `toEncode.json` in the `IBFT-Network` directory that contai
 The `extraData` property in IBFT 2.0 genesis files is an RLP encoding of `[32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals]`. 
 
 In the `IBFT-Network` directory, use the Pantheon subcommand [`rlp encode`](../Reference/Pantheon-CLI-Syntax.md#rlp) to generate the `extraData` 
-RLP string for inclusion in the genesis file. 
+RLP string to include in the genesis file. 
 
 ```bash tab="MacOS"
 pantheon rlp encode --from=toEncode.json --to=rlpEncodedExtraData
@@ -140,7 +141,7 @@ pantheon rlp encode --from=toEncode.json --to=rlpEncodedExtraData
 
 The genesis file defines the genesis block of the blockchain (that is, the start of the blockchain).
 The [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file) includes the address of Node-1 as the initial validator in the
-data encoded in the `extraData` field.    
+RLP encoded `extraData` string.    
 
 All nodes in a network must use the same genesis file. 
 
@@ -148,21 +149,22 @@ Copy the following genesis definition to a file called `ibftGenesis.json` and sa
 
 ```json
 {
-  "config":{
-    "chainId":1981,
+  "config": {
+    "chainId": 1981,
     "constantinoplefixblock": 0,
     "ibft2": {
       "blockperiodseconds": 2,
       "epochlength": 30000,
       "requesttimeoutseconds": 10
-     }
     }
   },
   "nonce": "0x0",
-  "extraData": "<RLP Encoded Data>",
+  "timestamp": "0x58ee40ba",
+  "extraData": "<RLP Encoded Extra Data>",
+  "gasLimit": "0x47b760",
   "difficulty": "0x1",
   "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
-  "timestamp":"0x5c51a607",
+  "coinbase": "0x0000000000000000000000000000000000000000",
   "alloc": {
       "fe3b557e8fb62b89f4916b721be55ceb828dbd73": {
         "privateKey": "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
@@ -179,14 +181,11 @@ Copy the following genesis definition to a file called `ibftGenesis.json` and sa
         "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
         "balance": "90000000000000000000000"
       }
-   },
-  "number":"0x0",
-  "gasUsed":"0x0",
-  "parentHash":"0x0000000000000000000000000000000000000000000000000000000000000000"
+   }
 }
 ```
 
-In `extraData`, copy the [RLP encoded data that includes the initial validator](#5-rlp-encode-extra-data) from the `rlpEncodedExtraData` file. 
+In `extraData`, copy the [RLP encoded data](#5-rlp-encode-extra-data) from the `rlpEncodedExtraData` file. 
 
 !!! example
     
@@ -210,7 +209,7 @@ The nodes cannot be started with the IBFT 2.0 genesis file while the previously 
 
 ### 8. Start First Node as Bootnode
 
-Start Node-1:
+In the `Node-1` directory, start Node-1:
 
 ```bash tab="MacOS"
 pantheon --data-path=Node-1-data-path --genesis-file=../ibftGenesis.json --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all"      
