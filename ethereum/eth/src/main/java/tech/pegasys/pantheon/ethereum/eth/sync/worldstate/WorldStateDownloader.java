@@ -231,7 +231,8 @@ public class WorldStateDownloader {
             });
   }
 
-  private List<Task<NodeDataRequest>> getTasksForNextRequest(final WorldDownloadState downloadState) {
+  private List<Task<NodeDataRequest>> getTasksForNextRequest(
+      final WorldDownloadState downloadState) {
     final List<Task<NodeDataRequest>> toRequest = new ArrayList<>();
     while (toRequest.size() < hashCountPerRequest) {
       final Task<NodeDataRequest> pendingRequestTask = downloadState.dequeueRequest();
