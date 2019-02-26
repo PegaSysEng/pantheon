@@ -393,7 +393,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       paramLabel = "<hostname>[,<hostname>...]... or * or all",
       description =
           "Comma separated list of hostnames to whitelist for JSON-RPC access, or * or all to accept any host (default: ${DEFAULT-VALUE})",
-      defaultValue = "localhost")
+      defaultValue = "localhost,127.0.0.1")
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
   @Option(
