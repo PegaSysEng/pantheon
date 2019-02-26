@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
@@ -34,14 +35,12 @@ public class EthProtocolManagerTestUtil {
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final TimeoutPolicy timeoutPolicy) {
-    return create(
-        blockchain, worldStateArchive, timeoutPolicy, new DeterministicEthScheduler(timeoutPolicy));
+    return create(blockchain, worldStateArchive, new DeterministicEthScheduler(timeoutPolicy));
   }
 
   public static EthProtocolManager create(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
-      final TimeoutPolicy timeoutPolicy,
       final EthScheduler ethScheduler) {
     final int networkId = 1;
     return new EthProtocolManager(
@@ -58,17 +57,45 @@ public class EthProtocolManagerTestUtil {
     return create(blockchain, worldStateArchive, TimeoutPolicy.NEVER);
   }
 
-  public static EthProtocolManager create() {
-    return create(TimeoutPolicy.NEVER);
-  }
-
-  public static EthProtocolManager create(final TimeoutPolicy timeoutPolicy) {
+  public static EthProtocolManager create(final EthScheduler ethScheduler) {
     final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
     final GenesisConfigFile config = GenesisConfigFile.mainnet();
     final GenesisState genesisState = GenesisState.fromConfig(config, protocolSchedule);
     final Blockchain blockchain = createInMemoryBlockchain(genesisState.getBlock());
     final WorldStateArchive worldStateArchive = createInMemoryWorldStateArchive();
-    return create(blockchain, worldStateArchive, timeoutPolicy);
+    return create(blockchain, worldStateArchive, ethScheduler);
+  }
+
+  public static EthProtocolManager create() {
+    return create(TimeoutPolicy.NEVER);
+  }
+
+  public static EthProtocolManager create(final TimeoutPolicy timeoutPolicy) {
+    return create(new DeterministicEthScheduler(timeoutPolicy));
+  }
+
+  // Utility to prevent scheduler from automatically running submitted tasks
+  public static void disableEthSchedulerAutoRun(final EthProtocolManager ethProtocolManager) {
+    EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
+    checkArgument(
+        scheduler instanceof DeterministicEthScheduler,
+        "EthProtocolManager must be set up with "
+            + DeterministicEthScheduler.class.getSimpleName()
+            + " in order to disable auto run.");
+    ((DeterministicEthScheduler) scheduler).disableAutoRun();
+  }
+
+  // Manually runs any pending tasks submitted to the EthScheduler
+  // Works with {@code disableEthSchedulerAutoRun} - tasks will only be pending if
+  // autoRun has been disabled.
+  public static void runPendingFutures(final EthProtocolManager ethProtocolManager) {
+    EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
+    checkArgument(
+        scheduler instanceof DeterministicEthScheduler,
+        "EthProtocolManager must be set up with "
+            + DeterministicEthScheduler.class.getSimpleName()
+            + " in order to manually run pending futures.");
+    ((DeterministicEthScheduler) scheduler).runPendingFutures();
   }
 
   public static void broadcastMessage(

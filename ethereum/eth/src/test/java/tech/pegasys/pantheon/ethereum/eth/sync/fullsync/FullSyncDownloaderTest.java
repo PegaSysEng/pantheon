@@ -28,7 +28,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
-import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -43,8 +42,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -71,7 +69,7 @@ public class FullSyncDownloaderTest {
   protected MutableBlockchain localBlockchain;
   private BlockchainSetupUtil<Void> otherBlockchainSetup;
   protected Blockchain otherBlockchain;
-  private LabelledMetric<OperationTimer> ethTashsTimer;
+  private MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
   @Before
   public void setupTest() {
@@ -87,17 +85,14 @@ public class FullSyncDownloaderTest {
         EthProtocolManagerTestUtil.create(
             localBlockchain,
             localBlockchainSetup.getWorldArchive(),
-            DeterministicEthScheduler.TimeoutPolicy.NEVER,
             new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
-
-    ethTashsTimer = NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
   }
 
   private FullSyncDownloader<?> downloader(final SynchronizerConfiguration syncConfig) {
     return new FullSyncDownloader<>(
-        syncConfig, protocolSchedule, protocolContext, ethContext, syncState, ethTashsTimer);
+        syncConfig, protocolSchedule, protocolContext, ethContext, syncState, metricsSystem);
   }
 
   private FullSyncDownloader<?> downloader() {
