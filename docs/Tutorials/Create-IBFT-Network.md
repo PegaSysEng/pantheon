@@ -38,36 +38,36 @@ Create directories for your private network, each of the three nodes, and a data
 ```bash
 IBFT-Network/
 ├── Node-1
-│   ├── Node-1-data-path
+│   ├── data
 ├── Node-2
-│   ├── Node-2-data-path
+│   ├── data
 └── Node-3
-    ├── Node-3-data-path
+    ├── data
 ```
 
 ### 2. Get Public Key for Node-1
 
-To enable nodes to discover each other, a network requires one or more bootnodes. 
-For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url). 
+The public key of Node-1 is needed for the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url). The enode URL
+ is used when starting Node-2 and Node-3 to specify Node-1 is the bootnode. 
 
 In the `Node-1` directory, use the [`public-key export`](../Reference/Pantheon-CLI-Syntax.md#public-key) subcommand to write 
-the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
+the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKey`):
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-1-data-path public-key export --to=Node-1-data-path/publicKeyNode1
+pantheon --data-path=data public-key export --to=data/publicKey
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-1-data-path public-key export --to=Node-1-data-path\publicKeyNode1
+pantheon --data-path=path public-key export --to=data\publicKey
 ```
 
 Your node 1 directory now contains: 
 ```bash
 ├── Node-1
-    ├── Node-1-data-path
+    ├── data
         ├── database
         ├── key
-        ├── publicKeyNode1
+        ├── publicKey
 ```
       
 The `database` directory contains the blockchain data. 
@@ -78,35 +78,24 @@ In IBFT 2.0 networks, the address of at least one initial validator must be incl
 RLP encoded `extraData` string. For this network, we will use Node-1 as the initial validator. This requires obtaining the address for Node-1. 
 
 To obtain the address for Node-1, in the `Node-1` directory, use the [`public-key export-address`](../Reference/Pantheon-CLI-Syntax.md#public-key)
-subcommand to write the node address to the specified file (`nodeAddress1` in this example)
+subcommand to write the node address to the specified file (`nodeAddress`)
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data-path/nodeAddress1
+pantheon --data-path=data public-key export-address --to=data/nodeAddress
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data-path\nodeAddress1
+pantheon --data-path=data public-key export-address --to=data\nodeAddress
 ```
 
 To vote in validators once the network is running, the node address for the proposed validator is required. In the `Node-2` 
-and `Node-3` directories, write the node address for each node to the specified files (`nodeAddress2` and `nodeAddress3`). 
-
-```bash tab="MacOS"
-pantheon --data-path=Node-2-data-path public-key export-address --to=Node-2-data-path/nodeAddress2
-
-pantheon --data-path=Node-3-data-path public-key export-address --to=Node-3-data-path/nodeAddress3
-```
-
-```bash tab="Windows"
-pantheon --data-path=Node-2-data-path public-key export-address --to=Node-2-data-path\nodeAddress2
-
-pantheon --data-path=Node-3-data-path public-key export-address --to=Node-3-data-path\nodeAddress3
-```
+and `Node-3` directories, write the node address for each node to the specified file using the `public-key export-address`
+command as for `Node-1`. 
 
 ### 4. Create JSON File to RLP Encode
 
-Create a file called `toEncode.json` in the `IBFT-Network` directory that contains the [Node 1 address](#3-get-node-addresses)
-from the `nodeAddress1` file: 
+Create a file called `toEncode.json` in the `IBFT-Network` directory that contains the [Node 1 address excluding the 0x prefix](#3-get-node-addresses)
+from the `nodeAddress` file in the `Node-1/data` directory: 
 
 ```json tab="toEncode.json"
 [
@@ -123,7 +112,7 @@ from the `nodeAddress1` file:
 
 ### 5. RLP Encode Extra Data 
 
-The `extraData` property in IBFT 2.0 genesis files is an RLP encoding of `[32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals]`. 
+The `extraData` property in IBFT 2.0 genesis files is an RLP encoding of `[32 Bytes Vanity, List<Validators>, No Vote, Round=Int(0), 0 Seals]`. 
 
 In the `IBFT-Network` directory, use the Pantheon subcommand [`rlp encode`](../Reference/Pantheon-CLI-Syntax.md#rlp) to generate the `extraData` 
 RLP string to include in the genesis file. 
@@ -212,11 +201,11 @@ The nodes cannot be started with the IBFT 2.0 genesis file while the previously 
 In the `Node-1` directory, start Node-1:
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-1-data-path --genesis-file=../ibftGenesis.json --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all"      
+pantheon --data-path=data --genesis-file=../ibftGenesis.json --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all"      
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-1-data-path --genesis-file=..\ibftGenesis.json --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all"    
+pantheon --data-path=data --genesis-file=..\ibftGenesis.json --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all"    
 ```
 
 The command line specifies: 
@@ -234,11 +223,11 @@ You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Nod
 Start another terminal, change to the `Node-2` directory and start Node-2 replacing the enode URL with your bootonde:
  
 ```bash tab="MacOS"
-pantheon --data-path=Node-2-data-path --genesis-file=../ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8546     
+pantheon --data-path=data --genesis-file=../ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8546     
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path --genesis-file=..\ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8546     
+pantheon --data-path=data --genesis-file=..\ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8546     
 ```
 
 The command line specifies: 
@@ -255,11 +244,11 @@ The command line specifies:
 Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootnode: 
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-3-data-path --genesis-file=../ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8547    
+pantheon --data-path=data --genesis-file=../ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8547    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-3-data-path --genesis-file=..\ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8547    
+pantheon --data-path=data --genesis-file=..\ibftGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,IBFT --host-whitelist=* --rpc-http-cors-origins="all" --rpc-http-port=8547    
 ```
 
 The command line specifies: 
