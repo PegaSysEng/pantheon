@@ -70,7 +70,7 @@ public class WorldStateDownloaderBenchmark {
   @Setup(Level.Invocation)
   public void setUpUnchangedState() throws Exception {
     final SynchronizerConfiguration syncConfig =
-        new Builder().worldStateHashCountPerRequest(200).build();
+        new SynchronizerConfiguration.Builder().worldStateHashCountPerRequest(200).build();
     final Hash stateRoot = createExistingWorldState();
     blockHeader = new BlockHeaderTestFixture().stateRoot(stateRoot).buildHeader();
 
