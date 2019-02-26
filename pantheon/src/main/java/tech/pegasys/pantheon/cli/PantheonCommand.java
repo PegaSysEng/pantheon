@@ -21,6 +21,7 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_AP
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
+import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
@@ -31,6 +32,7 @@ import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
+import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
@@ -48,6 +50,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -58,6 +61,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
@@ -67,9 +71,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import com.google.common.base.Suppliers;
 import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.DecodeException;
@@ -80,7 +87,6 @@ import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.DefaultExceptionHandler;
 import picocli.CommandLine.ExecutionException;
 import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.Option;
@@ -133,8 +139,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final PantheonControllerBuilder controllerBuilder;
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
-
-  private final MetricsSystem metricsSystem = PrometheusMetricsSystem.init();
 
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
@@ -354,6 +358,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer metricsPort = DEFAULT_METRICS_PORT;
 
   @Option(
+      names = {"--metrics-category", "--metrics-categories"},
+      paramLabel = "<category name>",
+      split = ",",
+      arity = "1..*",
+      description =
+          "Comma separated list of categories to track metrics for (default: ${DEFAULT-VALUE})")
+  private final Set<MetricCategory> metricCategories = DEFAULT_METRIC_CATEGORIES;
+
+  @Option(
       names = {"--metrics-push-enabled"},
       description = "Enable the metrics push gateway integration (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsPushEnabled = false;
@@ -391,7 +404,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       paramLabel = "<hostname>[,<hostname>...]... or * or all",
       description =
           "Comma separated list of hostnames to whitelist for JSON-RPC access, or * or all to accept any host (default: ${DEFAULT-VALUE})",
-      defaultValue = "localhost")
+      defaultValue = "localhost,127.0.0.1")
   private final JsonRPCWhitelistHostsProperty hostsWhitelist = new JsonRPCWhitelistHostsProperty();
 
   @Option(
@@ -443,7 +456,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--privacy-enabled"},
       description = "Enable private transactions (default: ${DEFAULT-VALUE})")
-  private final Boolean privacyEnabled = false;
+  private final Boolean isPrivacyEnabled = false;
 
   @Option(
       names = {"--privacy-url"},
@@ -455,6 +468,41 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "The address to which the privacy pre-compiled contract will be mapped to (default: ${DEFAULT-VALUE})")
   private final Integer privacyPrecompiledAddress = Address.PRIVACY;
+
+  // Inner class so we can get to loggingLevel.
+  public class PantheonExceptionHandler
+      extends CommandLine.AbstractHandler<List<Object>, PantheonExceptionHandler>
+      implements CommandLine.IExceptionHandler2<List<Object>> {
+
+    @Override
+    public List<Object> handleParseException(final ParameterException ex, final String[] args) {
+      if (logLevel != null && Level.DEBUG.isMoreSpecificThan(logLevel)) {
+        ex.printStackTrace(err());
+      } else {
+        err().println(ex.getMessage());
+      }
+      if (!CommandLine.UnmatchedArgumentException.printSuggestions(ex, err())) {
+        ex.getCommandLine().usage(err(), ansi());
+      }
+      return returnResultOrExit(null);
+    }
+
+    @Override
+    public List<Object> handleExecutionException(
+        final ExecutionException ex, final CommandLine.ParseResult parseResult) {
+      return throwOrExit(ex);
+    }
+
+    @Override
+    protected PantheonExceptionHandler self() {
+      return this;
+    }
+  }
+
+  private final Supplier<PantheonExceptionHandler> exceptionHandlerSupplier =
+      Suppliers.memoize(PantheonExceptionHandler::new);
+  private final Supplier<MetricsSystem> metricsSystem =
+      Suppliers.memoize(() -> PrometheusMetricsSystem.init(metricsConfiguration()));
 
   public PantheonCommand(
       final Logger logger,
@@ -473,7 +521,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public void parse(
       final AbstractParseResultHandler<List<Object>> resultHandler,
-      final DefaultExceptionHandler<List<Object>> exceptionHandler,
+      final PantheonExceptionHandler exceptionHandler,
+      final InputStream in,
       final String... args) {
 
     commandLine = new CommandLine(this);
@@ -492,6 +541,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         PublicKeySubCommand.COMMAND_NAME, new PublicKeySubCommand(resultHandler.out()));
     commandLine.addSubcommand(
         PasswordSubCommand.COMMAND_NAME, new PasswordSubCommand(resultHandler.out()));
+    commandLine.addSubcommand(
+        RLPSubCommand.COMMAND_NAME, new RLPSubCommand(resultHandler.out(), in));
 
     commandLine.registerConverter(Address.class, Address::fromHexString);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
@@ -573,7 +624,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           metricsConfiguration(),
           permissioningConfiguration);
     } catch (Exception e) {
-      throw new ParameterException(this.commandLine, e.getMessage());
+      throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
   }
 
@@ -604,7 +655,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(NetworkName.DEV.equals(getNetwork()))
           .nodePrivateKeyFile(nodePrivateKeyFile())
-          .metricsSystem(metricsSystem)
+          .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .build();
     } catch (final InvalidConfigurationException e) {
@@ -721,6 +772,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     metricsConfiguration.setEnabled(isMetricsEnabled);
     metricsConfiguration.setHost(metricsHost);
     metricsConfiguration.setPort(metricsPort);
+    metricsConfiguration.setMetricCategories(metricCategories);
     metricsConfiguration.setPushEnabled(isMetricsPushEnabled);
     metricsConfiguration.setPushHost(metricsPushHost);
     metricsConfiguration.setPushPort(metricsPushPort);
@@ -752,13 +804,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         logger,
         commandLine,
         "--privacy-enabled",
-        !privacyEnabled,
+        !isPrivacyEnabled,
         Arrays.asList(
             "--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
 
     final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
-    if (privacyEnabled) {
-      privacyParameters.setEnabled(privacyEnabled);
+    if (isPrivacyEnabled) {
       privacyParameters.setUrl(privacyUrl.toString());
       if (privacyPublicKeyFile() != null) {
         privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
@@ -767,6 +818,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             commandLine, "Please specify Enclave public key file path to enable privacy");
       }
       privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
+      privacyParameters.enablePrivateDB(dataDir());
     }
     return privacyParameters;
   }
@@ -809,7 +861,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .webSocketConfiguration(webSocketConfiguration)
             .dataDir(dataDir())
             .bannedNodeIds(bannedNodeIds)
-            .metricsSystem(metricsSystem)
+            .metricsSystem(metricsSystem.get())
             .metricsConfiguration(metricsConfiguration)
             .build();
 
@@ -1021,6 +1073,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   public MetricsSystem getMetricsSystem() {
-    return metricsSystem;
+    return metricsSystem.get();
+  }
+
+  public PantheonExceptionHandler exceptionHandler() {
+    return exceptionHandlerSupplier.get();
   }
 }
