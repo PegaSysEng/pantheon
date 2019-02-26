@@ -1021,7 +1021,7 @@ $ pantheon --data-path=<node data path> public-key export
 $ pantheon --data-path=<node data path> public-key export --to=/home/me/me_project/not_precious_pub_key
 ```
 
-Outputs the node public key to standard output or writes it in the specified file if 
+Outputs the node public key to standard output or writes it to the specified file if 
 `--to=<key-file>` is specified. 
 
 #### export-address
@@ -1038,7 +1038,7 @@ $ pantheon --data-path=<node data path> public-key export-address
 $ pantheon --data-path=<node data path> public-key export-address --to=/home/me/me_project/me_node_address
 ```
 
-Outputs the node public key address to standard output or writes it in the specified file if  
+Outputs the node public key address to standard output or writes it to the specified file if  
 `--to=<key-file>` is specified. 
 
 ### password

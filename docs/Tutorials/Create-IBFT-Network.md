@@ -75,7 +75,7 @@ The `database` directory contains the blockchain data.
 ### 3. Get Node Addresses 
 
 In IBFT 2.0 networks, the address of at least one initial validator must be included in the genesis file in the
-RPL encoded `extraData` string. For this network, we will use Node-1 as the initial validator. This requires obtaining the address for Node-1. 
+RLP encoded `extraData` string. For this network, we will use Node-1 as the initial validator. This requires obtaining the address for Node-1. 
 
 To obtain the address for Node-1, in the `Node-1` directory, use the [`public-key export-address`](../Reference/Pantheon-CLI-Syntax.md#public-key)
 subcommand to write the node address to the specified file (`nodeAddress1` in this example)
@@ -88,7 +88,7 @@ pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data
 pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data-path\nodeAddress1
 ```
 
-To vote new validators in once the network is running, the node address is required. In the `Node-2` 
+To vote in validators once the network is running, the node address for the proposed validator is required. In the `Node-2` 
 and `Node-3` directories, write the node address for each node to the specified files (`nodeAddress2` and `nodeAddress3`). 
 
 ```bash tab="MacOS"
@@ -192,7 +192,7 @@ In `extraData`, copy the [RLP encoded data](#5-rlp-encode-extra-data) from the `
     ```json
     {
       ...
-    "extraData":0xf83ea00000000000000000000000000000000000000000000000000000000000000000d5949b9f91039843450927b0043ae71cd803e0db0c30808400000000c0,
+    "extraData":0xf83ea00000000000000000000000000000000000000000000000000000000000000000d5949b9f91039843450927b0043ae71cd803e0db0c30808400000000c0",
       ...
     }
     ```
@@ -291,7 +291,7 @@ The result confirms Node-1 has two peers (Node-2 and Node-3):
 
 Look at the logs displayed to confirm Node-1 is producing blocks and Node-2 and Node-3 are importing blocks. 
 
-Use the [IBFT API to add](../Consensus-Protocols/Clique.md#adding-and-removing-signers) Node-2 or Node-3 as a validator. 
+Use the [IBFT API to add](../Consensus-Protocols/IBFT.md#adding-and-removing-validators) Node-2 or Node-3 as a validator. 
 
 !!! note
     To add Node-2 or Node-3 as a validator you need the [node address as when specifying Node-1](#2-get-address-for-node-1) as the initial validator. 
@@ -306,4 +306,4 @@ Import accounts to MetaMask and send transactions as described in the [Private N
 When finished using the private network, stop all nodes using ++ctrl+c++ in each terminal window. 
 
 !!!tip
-    To restart the IBFT 2.0 network in the future, start from [7. Start First Node as Bootnode](#7-start-first-node-as-bootnode). 
+    To restart the IBFT 2.0 network in the future, start from [8. Start First Node as Bootnode](#8-start-first-node-as-bootnode). 
