@@ -39,7 +39,7 @@ Properties specific to IBFT 2.0 are:
 * `blockperiodseconds` - Minimum block time in seconds. 
 * `epochlength` - Number of blocks after which to reset all votes.
 * `requesttimeoutseconds` - Timeout for each consensus round before a round change. 
-* `extraData` - RLP([32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals])
+* `extraData` - `RLP([32 Bytes Vanity, List<Validators>, No Vote, Round=Int(0), 0 Seals])`
 
 The `extraData` property is RLP encoded. RLP encoding is a space efficient object 
 serialization scheme used in Ethereum. You can use a library such as [EthereumJS RLP](https://github.com/ethereumjs/rlp)
@@ -82,6 +82,12 @@ Optional configuration options that can be specified in the genesis file are:
    
 * `duplicateMesageLimit` - Default is 100. If seeing messages being retransmitted by the same node, increasing the duplicate message limit 
    may reduce the number of retransmissions. A value of 2 to 3 times the number of validators is generally sufficient.  
+   
+*  `futureMessagesLimit` - Default is 1000. The future messages buffer holds IBFT 2.0 messages for a future chain height.
+    For large networks, increasing the future messages limit may be useful. 
+
+*  `futureMessagesMaxDistance` - Default is 10. Specifies the maximum height from the current chain height 
+    for which messages are buffered in the future messages buffer. 
 
 ## Adding and Removing Validators
 

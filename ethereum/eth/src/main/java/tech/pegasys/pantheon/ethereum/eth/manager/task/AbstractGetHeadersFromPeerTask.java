@@ -21,12 +21,10 @@ import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,8 +50,8 @@ public abstract class AbstractGetHeadersFromPeerTask
       final int count,
       final int skip,
       final boolean reverse,
-      final LabelledMetric<OperationTimer> ethTasksTimer) {
-    super(ethContext, EthPV62.GET_BLOCK_HEADERS, ethTasksTimer);
+      final MetricsSystem metricsSystem) {
+    super(ethContext, EthPV62.GET_BLOCK_HEADERS, metricsSystem);
     checkArgument(count > 0);
     this.protocolSchedule = protocolSchedule;
     this.count = count;
@@ -73,13 +71,17 @@ public abstract class AbstractGetHeadersFromPeerTask
     }
 
     final BlockHeadersMessage headersMessage = BlockHeadersMessage.readFrom(message);
-    final Iterator<BlockHeader> headers = headersMessage.getHeaders(protocolSchedule);
-    if (!headers.hasNext()) {
+    final List<BlockHeader> headers = headersMessage.getHeaders(protocolSchedule);
+    if (headers.isEmpty()) {
       // Message contains no data - nothing to do
       return Optional.empty();
     }
+    if (headers.size() > count) {
+      // Too many headers - this isn't our response
+      return Optional.empty();
+    }
 
-    final BlockHeader firstHeader = headers.next();
+    final BlockHeader firstHeader = headers.get(0);
     if (!matchesFirstHeader(firstHeader)) {
       // This isn't our message - nothing to do
       return Optional.empty();
@@ -90,17 +92,14 @@ public abstract class AbstractGetHeadersFromPeerTask
     long prevNumber = firstHeader.getNumber();
 
     final int expectedDelta = reverse ? -(skip + 1) : (skip + 1);
-    while (headers.hasNext()) {
-      final BlockHeader header = headers.next();
+    for (int i = 1; i < headers.size(); i++) {
+      final BlockHeader header = headers.get(i);
       if (header.getNumber() != prevNumber + expectedDelta) {
         // Skip doesn't match, this isn't our data
         return Optional.empty();
       }
       prevNumber = header.getNumber();
       headersList.add(header);
-      if (headersList.size() == count) {
-        break;
-      }
     }
 
     LOG.debug("Received {} of {} headers requested from peer.", headersList.size(), count);

@@ -26,7 +26,10 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
+import tech.pegasys.pantheon.ethereum.eth.peervalidation.DaoForkPeerValidator;
+import tech.pegasys.pantheon.ethereum.eth.peervalidation.PeerValidatorRunner;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -42,6 +45,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Clock;
+import java.util.OptionalLong;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -126,6 +130,16 @@ public class MainnetPantheonController implements PantheonController<Void> {
             syncState,
             dataDirectory,
             metricsSystem);
+
+    OptionalLong daoBlock = genesisConfig.getConfigOptions().getDaoForkBlock();
+    if (daoBlock.isPresent()) {
+      // Setup dao validator
+      EthContext ethContext = ethProtocolManager.ethContext();
+      DaoForkPeerValidator daoForkPeerValidator =
+          new DaoForkPeerValidator(
+              ethContext, protocolSchedule, metricsSystem, daoBlock.getAsLong());
+      PeerValidatorRunner.runValidator(ethContext, daoForkPeerValidator);
+    }
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(

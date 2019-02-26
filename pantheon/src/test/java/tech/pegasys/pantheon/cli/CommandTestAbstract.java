@@ -31,11 +31,11 @@ import tech.pegasys.pantheon.util.BlockImporter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,7 +50,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import picocli.CommandLine;
-import picocli.CommandLine.DefaultExceptionHandler;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.RunLast;
 
@@ -59,10 +58,10 @@ public abstract class CommandTestAbstract {
 
   private final Logger TEST_LOGGER = LogManager.getLogger();
 
-  final ByteArrayOutputStream commandOutput = new ByteArrayOutputStream();
+  protected final ByteArrayOutputStream commandOutput = new ByteArrayOutputStream();
   private final PrintStream outPrintStream = new PrintStream(commandOutput);
 
-  final ByteArrayOutputStream commandErrorOutput = new ByteArrayOutputStream();
+  protected final ByteArrayOutputStream commandErrorOutput = new ByteArrayOutputStream();
   private final PrintStream errPrintStream = new PrintStream(commandErrorOutput);
 
   @Mock RunnerBuilder mockRunnerBuilder;
@@ -141,7 +140,11 @@ public abstract class CommandTestAbstract {
     commandErrorOutput.close();
   }
 
-  CommandLine.Model.CommandSpec parseCommand(final String... args) {
+  protected CommandLine.Model.CommandSpec parseCommand(final String... args) {
+    return parseCommand(System.in, args);
+  }
+
+  protected CommandLine.Model.CommandSpec parseCommand(final InputStream in, final String... args) {
 
     final TestPantheonCommand pantheonCommand =
         new TestPantheonCommand(
@@ -154,7 +157,8 @@ public abstract class CommandTestAbstract {
     // parse using Ansi.OFF to be able to assert on non formatted output results
     pantheonCommand.parse(
         new RunLast().useOut(outPrintStream).useAnsi(Ansi.OFF),
-        new DefaultExceptionHandler<List<Object>>().useErr(errPrintStream).useAnsi(Ansi.OFF),
+        pantheonCommand.exceptionHandler().useErr(errPrintStream).useAnsi(Ansi.OFF),
+        in,
         args);
     return pantheonCommand.spec;
   }
