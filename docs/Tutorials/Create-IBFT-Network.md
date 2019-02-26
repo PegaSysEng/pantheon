@@ -19,14 +19,15 @@ To create a private network using IBFT 2.0 with three nodes and one initial vali
 
 1. [Create Folders](#1-create-folders)
 1. [Get Public Key for Node-1](#2-get-public-key-for-node-1)
-1. [Get Address for Node-1](#3-get-address-for-node-1)
-1. [RLP Encode Extra Data](#4-rlp-encode-extra-data)
-1. [Create Genesis File](#5-create-genesis-file)
-1. [Delete Database Directory](#6-delete-database-directory)
-1. [Start First Node as Bootnode](#7-start-first-node-as-bootnode)
-1. [Start Node-2](#8-start-node-2)
-1. [Start Node-3](#9-start-node-3)
-1. [Confirm Private Network is Working](#10-confirm-private-network-is-working)
+1. [Get Node Addresses](#3-get-node-addresses)
+1. [Create JSON File to RLP Encode](#4-create-json-file-to-rlp-encode)
+1. [RLP Encode Extra Data](#5-rlp-encode-extra-data)
+1. [Create Genesis File](#6-create-genesis-file)
+1. [Delete Database Directory](#7-delete-database-directory)
+1. [Start First Node as Bootnode](#8-start-first-node-as-bootnode)
+1. [Start Node-2](#9-start-node-2)
+1. [Start Node-3](#10-start-node-3)
+1. [Confirm Private Network is Working](#11-confirm-private-network-is-working)
 
 ### 1. Create Folders 
 
@@ -71,7 +72,7 @@ Your node 1 directory now contains:
       
 The `database` directory contains the blockchain data. 
 
-### 3. Get Address for Node-1 
+### 3. Get Node Addresses 
 
 In IBFT 2.0 networks, the address of at least one initial validator must be included in the genesis file. 
 For this network, we will use Node-1 as the initial validator. This requires obtaining the address for Node-1. 
@@ -87,13 +88,55 @@ pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data
 pantheon --data-path=Node-1-data-path public-key export-address --to=Node-1-data-path\nodeAddress1
 ```
 
-### 4. RLP Encode Extra Data 
+To vote new validators in once the network is running, the node address is required. In the `Node-2` 
+and `Node-3` directories, write the node address for each node to the specified files (`nodeAddress2` and `nodeAddress3`). 
+
+```bash tab="MacOS"
+pantheon --data-path=Node-2-data-path public-key export-address --to=Node-2-data-path/nodeAddress2
+
+pantheon --data-path=Node-3-data-path public-key export-address --to=Node-3-data-path/nodeAddress3
+```
+
+```bash tab="Windows"
+pantheon --data-path=Node-2-data-path public-key export-address --to=Node-2-data-path\nodeAddress2
+
+pantheon --data-path=Node-3-data-path public-key export-address --to=Node-3-data-path\nodeAddress3
+```
+
+### 4. Create JSON File to RLP Encode
+
+Create a file called `toEncode.json` in the `IBFT-Network` directory that contains the [Node 1 address](#3-get-node-addresses): 
+
+```json tab="toEncode.json"
+[
+ "<Node 1 Address>"
+]
+```
+
+```json tab="Example"
+[
+ "9b9f91039843450927b0043ae71cd803e0db0c30"
+]
+```
+
+
+### 5. RLP Encode Extra Data 
 
 The `extraData` property in IBFT 2.0 genesis files is an RLP encoding of `[32 Bytes Vanity, List<Validators>, No Votes, Round=Int(0), 0 Seals]`. 
 
-Use the Pantheon subcommand `encode` to generate the `extraData`. 
+In the `IBFT-Network` directory, use the Pantheon subcommand [`rlp encode`](../Reference/Pantheon-CLI-Syntax.md#rlp) to generate the `extraData` 
+RLP string for inclusion in the genesis file. 
 
-### 5. Create Genesis File 
+```bash tab="MacOS"
+pantheon rlp encode --from=toEncode.json --to=rlpEncodedExtraData
+```
+
+```bash tab="Windows"
+pantheon rlp encode --from=toEncode.json --to=rlpEncodedExtraData
+```
+
+
+### 6. Create Genesis File 
 
 The genesis file defines the genesis block of the blockchain (that is, the start of the blockchain).
 The [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file) includes the address of Node-1 as the initial validator in the
@@ -143,14 +186,14 @@ Copy the following genesis definition to a file called `ibftGenesis.json` and sa
 }
 ```
 
-In `extraData`, include the [RLP encoded data that includes the initial validator](#4-rlp-encode-extra-data). 
+In `extraData`, copy the [RLP encoded data that includes the initial validator](#5-rlp-encode-extra-data) from the `rlpEncodedExtraData` file. 
 
 !!! example
     
     ```json
     {
       ...
-    "extraData":"UPDATE",
+    "extraData":0xf83ea00000000000000000000000000000000000000000000000000000000000000000d5949b9f91039843450927b0043ae71cd803e0db0c30808400000000c0,
       ...
     }
     ```
@@ -160,12 +203,12 @@ In `extraData`, include the [RLP encoded data that includes the initial validato
         
     The private keys are displayed which means the accounts are not secure.  
 
-### 6. Delete Database Directory
+### 7. Delete Database Directories
 
-Delete the `database` directory created when [getting the public key for Node-1](#2-get-public-key-for-node-1).
-The node cannot be started with the IBFT 2.0 genesis file while the previously generated data is in the `database` directory. 
+Delete the `database` directories created when [getting the public key for Node-1](#2-get-public-key-for-node-1) and [addresses for Node-2 and Node-3](#3-get-node-addresses).
+The nodes cannot be started with the IBFT 2.0 genesis file while the previously generated data is in the `database` directories. 
 
-### 7. Start First Node as Bootnode
+### 8. Start First Node as Bootnode
 
 Start Node-1:
 
@@ -185,7 +228,7 @@ The command line specifies:
 * All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option
 * All domains can access the node using the HTTP JSON-RPC API using the [`--rpc-http-cors-origins`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-cors-origins) option 
 
-### 8. Start Node-2 
+### 9. Start Node-2 
 
 You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Node-1 to specify Node-1 as a bootnode. 
 
@@ -208,7 +251,7 @@ The command line specifies:
 * Other options as for [Node-1](#5-start-first-node-as-bootnode).
 
 
-### 9. Start Node-3
+### 10. Start Node-3
 
 Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootnode: 
 
@@ -228,7 +271,7 @@ The command line specifies:
  * Bootnode as for [Node-2](#6-start-node-2).
  * Other options as for [Node-1](#5-start-first-node-as-bootnode). 
 
-### 10. Confirm Private Network is Working 
+### 11. Confirm Private Network is Working 
 
 Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
