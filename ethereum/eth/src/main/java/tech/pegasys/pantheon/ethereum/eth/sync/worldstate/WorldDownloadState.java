@@ -43,8 +43,8 @@ class WorldDownloadState {
   private final Set<EthTask<?>> outstandingRequests =
       Collections.newSetFromMap(new ConcurrentHashMap<>());
   private final AtomicBoolean sendingRequests = new AtomicBoolean(false);
-  private final CompletableFuture<Void> future;
-  private final CompletableFuture<Void> tearDownFuture;
+  private final CompletableFuture<Void> internalFuture;
+  private final CompletableFuture<Void> downloadFuture;
   private boolean waitingForNewPeer = false;
   private BytesValue rootNodeData;
   private EthTask<?> persistenceTask;
@@ -56,22 +56,22 @@ class WorldDownloadState {
     this.pendingRequests = pendingRequests;
     this.requestsToPersist = requestsToPersist;
     this.maxOutstandingRequests = maxOutstandingRequests;
-    this.future = new CompletableFuture<>();
-    this.tearDownFuture = new CompletableFuture<>();
-    this.future.whenComplete(this::doCancel);
-    this.tearDownFuture.exceptionally(
+    this.internalFuture = new CompletableFuture<>();
+    this.downloadFuture = new CompletableFuture<>();
+    this.internalFuture.whenComplete(this::cleanup);
+    this.downloadFuture.exceptionally(
         error -> {
           // Propagate cancellation back to our internal future.
           if (error instanceof CancellationException) {
-            this.future.cancel(true);
+            this.internalFuture.cancel(true);
           }
           return null;
         });
   }
 
-  private synchronized void doCancel(final Void result, final Throwable error) {
+  private synchronized void cleanup(final Void result, final Throwable error) {
     // Handle cancellations
-    if (future.isCancelled()) {
+    if (internalFuture.isCancelled()) {
       LOG.info("World state download cancelled");
     } else if (error != null) {
       if (!(ExceptionUtils.rootCause(error) instanceof StalledDownloadException)) {
@@ -87,13 +87,13 @@ class WorldDownloadState {
     pendingRequests.clear();
     requestsToPersist.clear();
     if (error != null) {
-      tearDownFuture.completeExceptionally(error);
+      downloadFuture.completeExceptionally(error);
     } else {
-      tearDownFuture.complete(result);
+      downloadFuture.complete(result);
     }
   }
 
-  public void whileAdditionalRequestCanBeSent(final Runnable action) {
+  public void whileAdditionalRequestsCanBeSent(final Runnable action) {
     while (shouldRequestNodeData()) {
       if (sendingRequests.compareAndSet(false, true)) {
         try {
@@ -124,14 +124,14 @@ class WorldDownloadState {
   }
 
   private synchronized boolean shouldRequestNodeData() {
-    return !future.isDone()
+    return !internalFuture.isDone()
         && outstandingRequests.size() < maxOutstandingRequests
         && !pendingRequests.isEmpty()
         && !waitingForNewPeer;
   }
 
-  public CompletableFuture<Void> getFuture() {
-    return tearDownFuture;
+  public CompletableFuture<Void> getDownloadFuture() {
+    return downloadFuture;
   }
 
   public synchronized void setPersistenceTask(final EthTask<?> persistenceTask) {
@@ -139,25 +139,19 @@ class WorldDownloadState {
   }
 
   public synchronized void enqueueRequest(final NodeDataRequest request) {
-    if (!future.isDone()) {
+    if (!internalFuture.isDone()) {
       pendingRequests.enqueue(request);
     }
   }
 
   public synchronized void enqueueRequests(final Stream<NodeDataRequest> requests) {
-    if (!future.isDone()) {
+    if (!internalFuture.isDone()) {
       requests.forEach(pendingRequests::enqueue);
     }
   }
 
-  public synchronized void markAsFailed(final Task<NodeDataRequest> task) {
-    if (!future.isDone()) {
-      task.markFailed();
-    }
-  }
-
   public synchronized Task<NodeDataRequest> dequeueRequest() {
-    if (future.isDone()) {
+    if (internalFuture.isDone()) {
       return null;
     }
     return pendingRequests.dequeue();
@@ -172,13 +166,13 @@ class WorldDownloadState {
   }
 
   public void addToPersistenceQueue(final Task<NodeDataRequest> task) {
-    while (!future.isDone()) {
+    while (!internalFuture.isDone()) {
       try {
         if (requestsToPersist.offer(task, 1, TimeUnit.SECONDS)) {
           break;
         }
       } catch (final InterruptedException e) {
-        markAsFailed(task);
+        task.markFailed();
         Thread.currentThread().interrupt();
         break;
       }
@@ -195,16 +189,16 @@ class WorldDownloadState {
             + maxNodeRequestRetries
             + " failures)";
     final WorldStateDownloaderException e = new StalledDownloadException(message);
-    future.completeExceptionally(e);
+    internalFuture.completeExceptionally(e);
   }
 
   public synchronized boolean checkCompletion(
       final WorldStateStorage worldStateStorage, final BlockHeader header) {
-    if (!future.isDone() && pendingRequests.allTasksCompleted()) {
+    if (!internalFuture.isDone() && pendingRequests.allTasksCompleted()) {
       final Updater updater = worldStateStorage.updater();
       updater.putAccountStateTrieNode(header.getStateRoot(), rootNodeData);
       updater.commit();
-      future.complete(null);
+      internalFuture.complete(null);
       LOG.info("Finished downloading world state from peers");
       return true;
     } else {
@@ -213,6 +207,6 @@ class WorldDownloadState {
   }
 
   public synchronized boolean isDownloading() {
-    return !future.isDone();
+    return !internalFuture.isDone();
   }
 }

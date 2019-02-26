@@ -25,11 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public abstract class NodeDataRequest {
-  private static final Logger LOG = LogManager.getLogger();
   private final RequestType requestType;
   private final Hash hash;
   private BytesValue data;

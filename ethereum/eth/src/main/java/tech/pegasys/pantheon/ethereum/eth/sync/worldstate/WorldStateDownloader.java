@@ -176,7 +176,7 @@ public class WorldStateDownloader {
       final PersistNodeDataTask persistenceTask = new PersistNodeDataTask(header, newDownloadState);
       newDownloadState.setPersistenceTask(persistenceTask);
       ethContext.getScheduler().scheduleServiceTask(persistenceTask);
-      return newDownloadState.getFuture();
+      return newDownloadState.getDownloadFuture();
     }
   }
 
@@ -184,13 +184,13 @@ public class WorldStateDownloader {
     synchronized (this) {
       final WorldDownloadState downloadState = this.downloadState.get();
       if (downloadState != null) {
-        downloadState.getFuture().cancel(true);
+        downloadState.getDownloadFuture().cancel(true);
       }
     }
   }
 
   private void requestNodeData(final BlockHeader header, final WorldDownloadState downloadState) {
-    downloadState.whileAdditionalRequestCanBeSent(
+    downloadState.whileAdditionalRequestsCanBeSent(
         () -> {
           final Optional<EthPeer> maybePeer = ethContext.getEthPeers().idlePeer(header.getNumber());
           if (!maybePeer.isPresent()) {
@@ -308,7 +308,7 @@ public class WorldStateDownloader {
         retriedRequestsCounter.inc();
         final int requestFailures = request.trackFailure();
         updateHighestRetryCount(requestFailures);
-        downloadState.markAsFailed(task);
+        task.markFailed();
         if (requestFailures > maxNodeRequestRetries) {
           LOG.info("Unavailable node {}", request.getHash());
           downloadState.markAsStalled(maxNodeRequestRetries);
@@ -388,7 +388,7 @@ public class WorldStateDownloader {
           LOG.error("Unexpected error while persisting world state", e);
           // Assume we failed to persist any of the requests and ensure we have something
           // scheduled to kick off another round of requests.
-          batch.forEach(downloadState::markAsFailed);
+          batch.forEach(Task::markFailed);
           ethContext
               .getScheduler()
               .scheduleSyncWorkerTask(() -> requestNodeData(header, downloadState));
