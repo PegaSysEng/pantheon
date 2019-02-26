@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DownloadStateTest {
+public class WorldDownloadStateTest {
 
   private static final BytesValue ROOT_NODE_DATA = BytesValue.of(1, 2, 3, 4);
   private static final Hash ROOT_NODE_HASH = Hash.hash(ROOT_NODE_DATA);
@@ -53,8 +53,8 @@ public class DownloadStateTest {
   private final ArrayBlockingQueue<Task<NodeDataRequest>> requestsToPersist =
       new ArrayBlockingQueue<>(100);
 
-  private final DownloadState downloadState =
-      new DownloadState(pendingRequests, requestsToPersist, MAX_OUTSTANDING_REQUESTS);
+  private final WorldDownloadState downloadState =
+      new WorldDownloadState(pendingRequests, requestsToPersist, MAX_OUTSTANDING_REQUESTS);
 
   private final CompletableFuture<Void> future = downloadState.getFuture();
 

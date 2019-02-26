@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class DownloadState {
+class WorldDownloadState {
   private static final Logger LOG = LogManager.getLogger();
 
   private final TaskQueue<NodeDataRequest> pendingRequests;
@@ -49,7 +49,7 @@ class DownloadState {
   private BytesValue rootNodeData;
   private EthTask<?> persistenceTask;
 
-  public DownloadState(
+  public WorldDownloadState(
       final TaskQueue<NodeDataRequest> pendingRequests,
       final ArrayBlockingQueue<Task<NodeDataRequest>> requestsToPersist,
       final int maxOutstandingRequests) {
