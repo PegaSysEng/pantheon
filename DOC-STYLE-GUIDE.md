@@ -105,16 +105,12 @@ Don't use "PegaSys recommends" or "it is recommended."
 
 Example: this is not recommended for production code -> we don't recommend this for production code
 
-### Examples
-Use Examples subheads in ref when an example exists.
-Use "for example" not "e.g."
-Use "that is" not "i.e."
-
 ### Directory vs Folder 
-Use "directory" as we are writing for developers. 
+Prefer "directory" over "folder" as we are writing for developers. 
 
 ### Title Case For Headings
-Use title case for headings. 
+Use title case for headings.
+
 Note: This is a case where we are not following the Microsoft Writing Style Guide. 
 
 ### Assumed Knowledge For Readers
@@ -126,13 +122,8 @@ We have two distinct audiences that we need to consider when developing differen
 ### Avoid Abbreviations
 
 Try not tu use abbreviations [except for well known ones and some jargon](#abbreviations).
-Don't use
-Use
-e.g.
-for example
-i.e.
-that is
-
+Don't use "e.g." but use "for example".
+Don't use "i.e." but use "that is".
 
 ## Markdown Syntax
 
@@ -167,11 +158,13 @@ and ended by a specific comment.
 each line of Markdown code must be limited to 100 columns long to be readable on any editor.
 Lines have to be wrapped nicely without cutting the line in the middle of a word. Remember that a
 line break will display as a space.
-- No HTML markup must be used inside a Markdown document. We provide a lot of extensions that are
-able to do the same thing without HTML. If you think that one is missing, just discuss about it
-with the team, preferably on [Gitter] and we'll decide together if it's worth adding an extension.
+- No HTML markup must be used inside a Markdown document.
+We provide [a lot of extensions](#installed-markdown-extensions) that are able to do the same thing 
+without HTML. If you think that one is missing, just discuss about it with the team, preferably on 
+[Gitter] and we'll decide together if it's worth adding an extension.
 - Only one first level title must be present on a page.
-- Format tables using 
+- Format tables in a way that they look nice also in the source code.
+You can quickly achieve this result by using a tool like http://markdowntable.com/
 
 ## Documentation Website
 
@@ -180,6 +173,15 @@ with the team, preferably on [Gitter] and we'll decide together if it's worth ad
 The [/docs](/docs) directory in the Pantheon project repository contains all the documentation that 
 will be generated into a static HTML website using [MkDocs] and the [Mkdocs Material] theme 
 then hosted by [readthedocs.org].
+
+The documentation is automatically updated on the [readthedocs.org] site when you merge a pull-request
+in the master branch of Pantheon.
+
+The system also detects tags in the Github repository and takes care of making the latest stable release
+and the different version available.
+
+In case of an issue try to contact the maintainers of the 
+[Pantheon documentation project](https://readthedocs.org/projects/pantheon/).
 
 ### MkDocs Configuration
 
@@ -304,22 +306,22 @@ You have to respect the 4 spaces indentation of the content to be part of the ad
 We usually use the following [types](https://squidfunk.github.io/mkdocs-material/extensions/admonition/#types)
 in our documentation, but any types available can be used if appropriate :
 
-- Note : used to add information about a subject that doesn't directly needs to be taken in account 
+- **Note** : used to add information about a subject that doesn't directly needs to be taken in account 
 to use this specific part.
 Ex: "available since v0.8.3"
-- Abstract : used on the begining of a long article. Also know as "TL;DR" this can help users jump 
+- **Abstract** : used on the begining of a long article. Also know as "TL;DR" this can help users jump 
 into the content knowing that they will find their answer somewhere in the page.
-- Info : used to detail a specific part of the current documentation.
+- **Info** : used to detail a specific part of the current documentation.
 Ex: "The miner coinbase account is one of the accounts defined in the genesis file."
-- Tip : used to provide an information that could help improve the use of the tool, make it faster.
+- **Tip** : used to provide an information that could help improve the use of the tool, make it faster.
 Ex: to prevent restarting the tutorial from scratch we display a tip with the following text:
 "To restart the private network in the future, start from 4. Restart First Node as Bootnode."
-- Warning : used to warn the users about something important.
+- **Warning** : used to warn the users about something important.
 Ex: "This will be deprecated in next version."
-- Danger : used to alert the user about a potential dangerous effect like a risk of destroying 
+- **Danger** : used to alert the user about a potential dangerous effect like a risk of destroying 
 something or lose assets.
 Ex: "Never use the development private keys for production use".
-- Example : used to display an example. We usually use it with a single or tabbed code-block:
+- **Example** : used to display an example. We usually use it with a single or tabbed code-block:
 ````markdown
 !!! example
     This example shows how to use the `net_listening` RPC method.
@@ -362,7 +364,7 @@ these abbreviations by using the [Abbreviation extension](https://python-markdow
 Our style guide requires that abbreviations are placed on the beginning of the Markdown file, just 
 after the meta-data header.
 
-Once done, any words matching the abbreviation will be appear with a dotted underline and when you 
+Once done, any words matching the abbreviation will appear with a dotted underline and when you 
 move focus over them, an interrogation mark will appear with a balloon containing the definition.
 
 Ex:
@@ -391,12 +393,13 @@ $L_{i_1}, \dots,L_{i_t}$ associated to the set $I=\{i_1,\dots,i_t\}$ of signers.
 
 #### Better emphasis
 
-The [Betterem extension](https://facelessuser.github.io/pymdown-extensions/extensions/betterem/) is automatically
-applied to your content so you can make your text bold and italic in a smarter way.
+The [Betterem extension](https://facelessuser.github.io/pymdown-extensions/extensions/betterem/) is 
+automatically applied to your content so you can make your text bold and italic in a smarter way.
 
 #### Keyboard shortcuts
 
-In case you have to explain a keyboard shortcut, use the [Keys syntax](https://facelessuser.github.io/pymdown-extensions/extensions/keys/)
+In case you have to explain a keyboard shortcut, use the 
+[Keys syntax](https://facelessuser.github.io/pymdown-extensions/extensions/keys/)
 
 Ex:
 ```markdown
@@ -445,6 +448,17 @@ Ex:
 ==This is highlighted text==
 ```
 
+#### Striked through text
+
+If you need to indicate something obsolete or a wrong way to do something, you can use the 
+[tilde syntax](https://squidfunk.github.io/mkdocs-material/extensions/pymdown/#tilde) that will
+strike your text through.
+
+Ex:
+```markdown
+~~This is the wrong way to do~~
+```
+
 #### Symbols
 
 If you need to add some symbols to your documentation, take care of using the 
@@ -453,9 +467,14 @@ If you need to add some symbols to your documentation, take care of using the
 Ex:
 `-->` will draw a nice right arrow.
 
-#### Code Samples And Examples Style Guides
+#### Task lists
 
-#### Format The Code
+If you need to display a list looking like a checklist, use the 
+[Task list syntax](https://squidfunk.github.io/mkdocs-material/extensions/pymdown/#tasklist)
+
+#### Code Samples And Examples With [SuperFences]
+
+##### Format The Code
 
 For writing code such as samples or examples inside the documentation, we will refer to developer 
 style guides depending on the language we use:
@@ -465,15 +484,16 @@ style guides depending on the language we use:
 - TOML : we follow version 0.5.0 language definition.
 - JavaScript : see [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html).
 
-#### Include The Code In The Documentation
+##### Include The Code In The Documentation
 
-We use code-blocks to present code samples and examples in the documentation.
+We use code-blocks provided by the [SuperFences] extension to present code samples and examples in the
+documentation.
 
 A basic code-block uses triple back ticks and the language name to enable syntax highlighting.
 
 For instance a basic JSON result will be written as the following :
 
-````
+````markdown
 ```json
 {
   "jsonrpc": "2.0",
@@ -483,7 +503,31 @@ For instance a basic JSON result will be written as the following :
 ```
 ````
 
+But [SuperFences] enables to do more things. One interesting feature is the tabbed code-block.
+
+We use it for instance to group the usage syntax and a usage example under the same block with tabs:
+
+````markdown
+```bash tab="Syntax"
+$ pantheon rlp encode [--from=<FILE>] [--to=<FILE>] [--type=<type>]
+```
+
+```bash tab="File Example"
+$ pantheon rlp encode --from=ibft_extra_data.json --to=extra_data_for_ibft_genesis.txt --type=IBFT_EXTRA_DATA
+```
+
+```bash tab="Standart Input/Output Example"
+$ cat extra_data.json | pantheon rlp encode > rlp.txt
+```
+````
+
+[SuperFences] also enables the addition of line numbers if you need to explain your code, it's easier
+to be able to refer to a number without having to count the lines manually.
+
+
+
 [MkDocs]: https://www.mkdocs.org/
 [readthedocs.org]: https://readthedocs.org/
 [Mkdocs Material]: https://squidfunk.github.io/mkdocs-material/
 [Gitter]: https://gitter.im/PegaSysEng/pantheon
+[SuperFences]: https://squidfunk.github.io/mkdocs-material/extensions/pymdown/#superfences
