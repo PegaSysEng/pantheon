@@ -1010,14 +1010,36 @@ This command provides node public key related actions.
 #### export
 
 ```bash tab="Syntax"
-$ pantheon public-key export --to=<key-file>
+$ pantheon public-key export [--to=<key-file>]
 ```
 
-```bash tab="Example"
-$ pantheon public-key export --to=/home/me/me_project/not_precious_pub_key
+```bash tab="Example (to standard output)"
+$ pantheon --data-path=<node data path> public-key export
 ```
 
-Exports node public key to the specified file. 
+```bash tab="Example (to file)"
+$ pantheon --data-path=<node data path> public-key export --to=/home/me/me_project/not_precious_pub_key
+```
+
+Outputs the node public key to standard output or writes it to the specified file if 
+`--to=<key-file>` is specified. 
+
+#### export-address
+
+```bash tab="Syntax"
+$ pantheon public-key export-address [--to=<address-file>]
+```
+
+```bash tab="Example (to standard output)"
+$ pantheon --data-path=<node data path> public-key export-address
+```
+
+```bash tab="Example (to file)"
+$ pantheon --data-path=<node data path> public-key export-address --to=/home/me/me_project/me_node_address
+```
+
+Outputs the node public key address to standard output or writes it to the specified file if  
+`--to=<key-file>` is specified. 
 
 ### password
 
