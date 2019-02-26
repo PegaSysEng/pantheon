@@ -54,7 +54,7 @@ try {
                 docker.image(build_image).inside("--link ${d.id}:docker") {
                     try {
                         stage(stage_name + 'Prepare') {
-                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava compileJmh assemble'
+                            sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
                         }
                         stage(stage_name + 'Unit tests') {
                             sh './gradlew --no-daemon --parallel build'
@@ -112,6 +112,9 @@ try {
                         }
                         stage(stage_name + 'Check javadoc') {
                             sh './gradlew --no-daemon --parallel javadoc'
+                        }
+                        stage(stage_name + 'Compile Benchmarks') {
+                            sh './gradlew --no-daemon --parallel compileJmh'
                         }
                     } finally {
                         archiveArtifacts '**/build/reports/**'
