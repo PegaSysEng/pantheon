@@ -134,7 +134,7 @@ public abstract class CommandTestAbstract {
     TEST_LOGGER.info("Standard error {}", commandErrorOutput.toString());
   }
 
-  protected CommandLine.Model.CommandSpec parseCommand(final InputStream in, final String... args) {
+  CommandLine.Model.CommandSpec parseCommand(final String... args) {
     // turn off ansi usage globally in picocli
     System.setProperty("picocli.ansi", "false");
 
