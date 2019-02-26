@@ -28,7 +28,7 @@ public class EthGetTransactionReceiptTransaction
 
   private final String input;
 
-  EthGetTransactionReceiptTransaction(final String input) {
+  public EthGetTransactionReceiptTransaction(final String input) {
     this.input = input;
   }
 
