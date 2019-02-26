@@ -6,20 +6,25 @@
 - [IBFT 2.0](https://docs.pantheon.pegasys.tech/en/latest/Consensus-Protocols/IBFT/) 
 - [Permissioning](https://docs.pantheon.pegasys.tech/en/latest/Permissions/Permissioning/) 
 - [JSON-RPC Authentication](https://docs.pantheon.pegasys.tech/en/latest/JSON-RPC-API/Authentication/) 
+- Added `rlp encode` subcommand [\#965](https://github.com/PegaSysEng/pantheon/pull/965)
 - Method to reload permissions file [\#834](https://github.com/PegaSysEng/pantheon/pull/834) 
 - Added rebind mitigation for Websockets. [\#905](https://github.com/PegaSysEng/pantheon/pull/905) 
 - Support genesis contract code [\#749](https://github.com/PegaSysEng/pantheon/pull/749) (thanks to [kziemianek](https://github.com/kziemianek)). Fixes issue [\#662](https://github.com/PegaSysEng/pantheon/issues/662). 
 - Documentation updates include: 
-  - Added details on [port configuration](https://docs.pantheon.pegasys.tech/en/latest/Configuring-Pantheon/Networking/#port-configuration)  [\#926](https://github.com/PegaSysEng/pantheon/pull/926)   
-  - Added [Resources page](https://docs.pantheon.pegasys.tech/en/latest/Resources/Resources/) linking to Pantheon blog posts and webinars [\#897](https://github.com/PegaSysEng/pantheon/pull/897) 
-  - Added [JSON-RPC Authentication](https://docs.pantheon.pegasys.tech/en/latest/JSON-RPC-API/Authentication/)  [\#881](https://github.com/PegaSysEng/pantheon/pull/881) 
-  - Added [tutorial to create permissioned network](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Permissioned-Network/)  [\#850](https://github.com/PegaSysEng/pantheon/pull/850) 
-  - Added [Permissioning](https://docs.pantheon.pegasys.tech/en/latest/Permissions/Permissioning/) content [\#812](https://github.com/PegaSysEng/pantheon/pull/812) 
-  - Added [Permissioning API methods](https://docs.pantheon.pegasys.tech/en/latest/Reference/JSON-RPC-API-Methods/#permissioning-methods) [\#783](https://github.com/PegaSysEng/pantheon/pull/783) 
-  - Added [tutorial to create Clique private network](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Private-Clique-Network/) [\#771](https://github.com/PegaSysEng/pantheon/pull/771) 
+  - Added details on [port configuration](https://docs.pantheon.pegasys.tech/en/latest/Configuring-Pantheon/Networking/#port-configuration)    
+  - Added [Resources page](https://docs.pantheon.pegasys.tech/en/latest/Resources/Resources/) linking to Pantheon blog posts and webinars 
+  - Added [JSON-RPC Authentication](https://docs.pantheon.pegasys.tech/en/latest/JSON-RPC-API/Authentication/)  
+  - Added [tutorial to create permissioned network](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Permissioned-Network/) 
+  - Added [Permissioning](https://docs.pantheon.pegasys.tech/en/latest/Permissions/Permissioning/) content 
+  - Added [Permissioning API methods](https://docs.pantheon.pegasys.tech/en/latest/Reference/JSON-RPC-API-Methods/#permissioning-methods) 
+  - Added [tutorial to create Clique private network](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Private-Clique-Network/)
+  - Added [tutorial to create IBFT 2.0 private network](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-IBFT-Network/)
         
 ### Technical Improvements 
-- Multiple name options only search for the longest one [\#776](https://github.com/PegaSysEng/pantheon/pull/776) 
+- RPC tests can use 127.0.0.1 loopback rather than localhost [\#979](https://github.com/PegaSysEng/pantheon/pull/979)
+- Only import block if it isn't already on the block chain [\#977](https://github.com/PegaSysEng/pantheon/pull/977)
+- Disable picocli ansi when testing [\#975](https://github.com/PegaSysEng/pantheon/pull/975)
+- Create peer discovery packets on a worker thread [\#961](https://github.com/PegaSysEng/pantheon/pull/961)
 - Removed Orion snapshot dependency [\#933](https://github.com/PegaSysEng/pantheon/pull/933) 
 - Use network ID instead of chain ID in MainnetPantheonController. [\#929](https://github.com/PegaSysEng/pantheon/pull/929) 
 - Propagate new block messages to other clients in a worker thread [\#928](https://github.com/PegaSysEng/pantheon/pull/928) 
@@ -126,6 +131,7 @@
 - Rename TerminatedRoundArtefacts to PreparedRoundArtefacts [\#781](https://github.com/PegaSysEng/pantheon/pull/781)
 - Rename Ibft MessageFactory methods [\#779](https://github.com/PegaSysEng/pantheon/pull/779) 
 - Update WorldStateDownloader to only filter out known code requests [\#777](https://github.com/PegaSysEng/pantheon/pull/777) 
+- Multiple name options only search for the longest one [\#776](https://github.com/PegaSysEng/pantheon/pull/776)
 - Move ethTaskTimer to abstract root [\#775](https://github.com/PegaSysEng/pantheon/pull/775) 
 - Parallel Block importer [\#774](https://github.com/PegaSysEng/pantheon/pull/774) 
 - Wait for a peer with an estimated chain height before selecting a pivot block [\#772](https://github.com/PegaSysEng/pantheon/pull/772) 
