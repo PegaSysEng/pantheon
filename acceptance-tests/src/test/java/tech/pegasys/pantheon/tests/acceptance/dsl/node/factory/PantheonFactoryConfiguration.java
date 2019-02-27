@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node.factory;
 
-import java.util.List;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
@@ -21,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
+import java.util.List;
 import java.util.Optional;
 
 class PantheonFactoryConfiguration {

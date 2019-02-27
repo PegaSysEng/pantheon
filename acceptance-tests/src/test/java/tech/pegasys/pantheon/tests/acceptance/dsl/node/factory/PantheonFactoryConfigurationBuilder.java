@@ -14,8 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node.factory;
 
 import static java.util.Collections.singletonList;
 
-import java.util.ArrayList;
-import java.util.List;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
@@ -28,7 +26,9 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class PantheonFactoryConfigurationBuilder {

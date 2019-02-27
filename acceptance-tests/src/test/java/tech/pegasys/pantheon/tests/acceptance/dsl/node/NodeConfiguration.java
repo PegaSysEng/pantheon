@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import java.net.URI;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 

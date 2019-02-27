@@ -46,7 +46,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.google.common.io.Resources;
 
@@ -239,16 +238,13 @@ public class PantheonNodeFactory {
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
 
-    final List<String> whitelistAsStrings = nodesWhitelist.parallelStream()
-        .map(URI::toString)
-        .collect(toList());
+    final List<String> whitelistAsStrings =
+        nodesWhitelist.parallelStream().map(URI::toString).collect(toList());
     final File tempFile = createTempPermissioningConfigurationFile();
     tempFile.deleteOnExit();
     permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
     initPermissioningConfigurationFile(
-        WhitelistPersistor.WHITELIST_TYPE.NODES,
-        whitelistAsStrings,
-        tempFile.toPath());
+        WhitelistPersistor.WHITELIST_TYPE.NODES, whitelistAsStrings, tempFile.toPath());
 
     return create(
         new PantheonFactoryConfigurationBuilder()
@@ -260,24 +256,21 @@ public class PantheonNodeFactory {
   }
 
   public PantheonNode createNodeWithBootnodeAndNodesWhitelist(
-      final String name, final List<URI> bootnodes, final List<URI> nodesWhitelist) throws IOException {
+      final String name, final List<URI> bootnodes, final List<URI> nodesWhitelist)
+      throws IOException {
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
 
-    final List<String> bootnodesAsStrings = bootnodes.parallelStream()
-        .map(URI::toString)
-        .collect(toList());
-    final List<String> whitelistAsStrings = nodesWhitelist.parallelStream()
-        .map(URI::toString)
-        .collect(toList());
+    final List<String> bootnodesAsStrings =
+        bootnodes.parallelStream().map(URI::toString).collect(toList());
+    final List<String> whitelistAsStrings =
+        nodesWhitelist.parallelStream().map(URI::toString).collect(toList());
     final File tempFile = createTempPermissioningConfigurationFile();
     tempFile.deleteOnExit();
     permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
     initPermissioningConfigurationFile(
-        WhitelistPersistor.WHITELIST_TYPE.NODES,
-        whitelistAsStrings,
-        tempFile.toPath());
+        WhitelistPersistor.WHITELIST_TYPE.NODES, whitelistAsStrings, tempFile.toPath());
 
     return create(
         new PantheonFactoryConfigurationBuilder()
