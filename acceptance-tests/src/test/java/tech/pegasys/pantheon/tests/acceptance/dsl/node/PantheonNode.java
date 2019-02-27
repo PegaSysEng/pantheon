@@ -90,8 +90,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   private final boolean devMode;
   private final boolean discoveryEnabled;
   private final boolean isBootnode;
+  private final List<String> bootnodes;
 
-  private List<String> bootnodes = new ArrayList<>();
   private JsonRequestFactories jsonRequestFactories;
   private HttpRequestFactory httpRequestFactory;
   private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
@@ -111,7 +111,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final int p2pPort,
       final Boolean p2pEnabled,
       final boolean discoveryEnabled,
-      final boolean isBootnode)
+      final boolean isBootnode,
+      final List<String> bootnodes)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
@@ -128,6 +129,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
     this.isBootnode = isBootnode;
+    this.bootnodes = bootnodes;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -429,7 +431,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return p2pPort;
   }
 
-  List<URI> bootnodes() {
+  public List<URI> bootnodes() {
     return bootnodes.stream()
         .filter(node -> !node.equals(this.enodeUrl()))
         .map(URI::create)
@@ -442,7 +444,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public void bootnodes(final List<String> bootnodes) {
-    this.bootnodes = bootnodes;
+    this.bootnodes.clear();
+    this.bootnodes.addAll(bootnodes);
   }
 
   MiningParameters getMiningParameters() {

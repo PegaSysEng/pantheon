@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
+import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
@@ -67,7 +68,8 @@ public class PantheonNodeFactory {
             serverSocket.getLocalPort(),
             config.getP2pEnabled(),
             config.isDiscoveryEnabled(),
-            config.isBootnode());
+            config.isBootnode(),
+            config.getBootnodes());
     serverSocket.close();
 
     return node;
@@ -217,7 +219,7 @@ public class PantheonNodeFactory {
       final List<String> accountsWhitelist,
       final String tempFilePath)
       throws IOException {
-    PermissioningConfiguration permissioningConfiguration =
+    final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
     permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
@@ -233,15 +235,19 @@ public class PantheonNodeFactory {
 
   public PantheonNode createNodeWithNodesWhitelist(
       final String name, final List<URI> nodesWhitelist) throws IOException {
-    PermissioningConfiguration permissioningConfiguration =
+    final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-    File tempFile = createTempPermissioningConfigurationFile();
+
+    final List<String> whitelistAsStrings = nodesWhitelist.parallelStream()
+        .map(URI::toString)
+        .collect(toList());
+    final File tempFile = createTempPermissioningConfigurationFile();
     tempFile.deleteOnExit();
     permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
     initPermissioningConfigurationFile(
         WhitelistPersistor.WHITELIST_TYPE.NODES,
-        nodesWhitelist.parallelStream().map(URI::toString).collect(Collectors.toList()),
+        whitelistAsStrings,
         tempFile.toPath());
 
     return create(
@@ -249,6 +255,36 @@ public class PantheonNodeFactory {
             .setName(name)
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
             .setPermissioningConfiguration(permissioningConfiguration)
+            .setBootnodes(whitelistAsStrings)
+            .build());
+  }
+
+  public PantheonNode createNodeWithBootnodeAndNodesWhitelist(
+      final String name, final List<URI> bootnodes, final List<URI> nodesWhitelist) throws IOException {
+    final PermissioningConfiguration permissioningConfiguration =
+        PermissioningConfiguration.createDefault();
+    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
+
+    final List<String> bootnodesAsStrings = bootnodes.parallelStream()
+        .map(URI::toString)
+        .collect(toList());
+    final List<String> whitelistAsStrings = nodesWhitelist.parallelStream()
+        .map(URI::toString)
+        .collect(toList());
+    final File tempFile = createTempPermissioningConfigurationFile();
+    tempFile.deleteOnExit();
+    permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
+    initPermissioningConfigurationFile(
+        WhitelistPersistor.WHITELIST_TYPE.NODES,
+        whitelistAsStrings,
+        tempFile.toPath());
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
+            .setPermissioningConfiguration(permissioningConfiguration)
+            .setBootnodes(bootnodesAsStrings)
             .build());
   }
 
@@ -267,6 +303,12 @@ public class PantheonNodeFactory {
     permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
     permissioningConfiguration.setConfigurationFilePath(
         createTempPermissioningConfigurationFile().getPath());
+
+    File tempFile = createTempPermissioningConfigurationFile();
+    tempFile.deleteOnExit();
+    permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
+    initPermissioningConfigurationFile(
+        WHITELIST_TYPE.ACCOUNTS, accountsWhitelist, tempFile.toPath());
 
     return create(
         new PantheonFactoryConfigurationBuilder()

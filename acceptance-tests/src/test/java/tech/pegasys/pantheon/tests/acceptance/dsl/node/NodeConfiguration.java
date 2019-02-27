@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import java.net.URI;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public interface NodeConfiguration {
   String enodeUrl();
 
   void bootnodes(List<String> bootnodes);
+
+  List<URI> bootnodes();
 
   void useWebSocketsForJsonRpc();
 

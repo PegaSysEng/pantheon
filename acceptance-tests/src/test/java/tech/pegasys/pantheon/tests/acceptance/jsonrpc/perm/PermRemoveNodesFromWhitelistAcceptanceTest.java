@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.jsonrpc.perm;
 
+import java.util.Collections;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
@@ -37,7 +38,8 @@ public class PermRemoveNodesFromWhitelistAcceptanceTest extends AcceptanceTestBa
 
   @Before
   public void setUp() throws Exception {
-    node = pantheon.createNodeWithNodesWhitelist("node1", nodesWhitelist);
+    node = pantheon
+        .createNodeWithBootnodeAndNodesWhitelist("node1", Collections.emptyList(), nodesWhitelist);
     cluster.start(node);
   }
 

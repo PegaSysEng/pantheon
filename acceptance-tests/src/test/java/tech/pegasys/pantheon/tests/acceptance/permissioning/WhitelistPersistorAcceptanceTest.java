@@ -46,6 +46,7 @@ public class WhitelistPersistorAcceptanceTest extends AcceptanceTestBase {
     senderA = accounts.getPrimaryBenefactor();
     senderB = accounts.getSecondaryBenefactor();
     tempFile = Files.createTempFile("test", "test");
+    Files.write(tempFile, ("accounts-whitelist=[\"" + senderA.getAddress() + "\"]\nnodes-whitelist=[]").getBytes());
     node =
         pantheon.createNodeWithWhitelistsEnabled(
             "node",

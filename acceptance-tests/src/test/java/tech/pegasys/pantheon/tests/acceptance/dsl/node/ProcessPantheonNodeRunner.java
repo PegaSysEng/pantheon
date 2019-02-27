@@ -147,6 +147,10 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
               if (permissioningConfiguration.isAccountWhitelistEnabled()) {
                 params.add("--permissions-accounts-enabled");
               }
+              if (permissioningConfiguration.getConfigurationFilePath() != null) {
+                params.add("--permissions-config-file");
+                params.add(permissioningConfiguration.getConfigurationFilePath());
+              }
             });
 
     LOG.info("Creating pantheon process with params {}", params);
