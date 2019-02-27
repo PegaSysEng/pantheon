@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.pubsub;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
@@ -44,8 +45,9 @@ public class Subscription {
   }
 
   public void verifyEventReceived(final Hash expectedTransaction, final int expectedOccurrences) {
+    waitFor(() -> assertThat(connection.getSubscriptionEvents()).isNotEmpty());
+
     final List<SubscriptionEvent> events = connection.getSubscriptionEvents();
-    assertThat(events).isNotNull();
     int occurrences = 0;
 
     for (final SubscriptionEvent event : events) {
