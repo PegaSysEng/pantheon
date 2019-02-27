@@ -2,48 +2,43 @@
 
 ## Purpose of this Document
 
-This document contains guidelines to help the Pantheon documentation contributor make the user 
-experience as nice as possible by providing a coherent documentation with comprehensive examples and
-well organised content.
+This document contains guidelines to ensure the Pantheon documentation is consistent and well organised.
 
-This is a living document and it should evolve to better suit Pantheon users and contributors needs.
+This is a living document and will evolve to better suit Pantheon users and contributors needs.
 
-> **Note:** Although not every pattern shown in this style guide is currently followed in Pantheon 
-documention, it is our intention to revise and write new parts with these guidelines in mind.
+> **Note:** Although not everything in this style guide is currently followed in the Pantheon 
+documention, these guidelines are intended to be applied when writing new content and revising 
+existing content.
 
 **The primary audience for this document is:**
 
 *   Members of the Pantheon team
-*   Developers and technical writers contributing to the Pantheon project
+*   Developers and technical writers contributing to the Pantheon documentation
 
 ## Mission Statement
 
-The Pantheon documentation should create a consistent and easy to understand experience for end users.
+The Pantheon documentation contributes to a consistent and easy to understand experience for end users.
 We're focused on creating a great experience for both new and expert users of Ethereum clients.
 
 ## General Guidelines
 
-There are four guiding principles for the Pantheon documentation to help us create a good 
-experience for both new and expert users: 
-1. be consistent,
-1. keep it simple but technically correct,
-1. be proactive and suggest good practices,
-1. be informative and exhaustive.
-
-This section outlines what each of these principles mean and the following sections explain how 
-these principles should be applied in specific scenarios.     
+The guiding principles for the Pantheon documentation are: 
+1. Be consistent
+1. Keep it simple but technically correct
+1. Be proactive and suggest good practices
+1. Be informative and exhaustive.
 
 ### 1. Be Consistent
 
 Consistency is important to help our end users build a mental model of how Pantheon works.
 By being consistent with our word choices, visual formatting, and style of communication it helps 
-users know what to expect as they refer or search Pantheon documentation.  
+users know what to expect as they refer to or search Pantheon documentation.  
 
 ### 2. Keep It Simple But Technically Correct
 
-Avoid technical jargon and always assume our end users may not have all the knowledge about Ethereum.
+Avoid technical jargon and always assume our end users may not be Ethereum experts.
 
-It doesn't mean explaining all Ethereum technology in our documentation, but it does mean explaining 
+This doesn't mean explaining all Ethereum technology in our documentation, but it does mean explaining 
 things in a simple way and when complexity inevitably rises, directing our users to some resources 
 that will help them.
 
