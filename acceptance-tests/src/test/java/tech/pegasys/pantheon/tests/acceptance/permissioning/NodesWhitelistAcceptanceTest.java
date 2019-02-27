@@ -70,7 +70,6 @@ public class NodesWhitelistAcceptanceTest extends AcceptanceTestBase {
     permissionedNode.verify(
         perm.removeNodesFromWhitelist(Lists.newArrayList(((PantheonNode) allowedNode).enodeUrl())));
 
-    // node should not be connected to any peers
     permissionedNode.verify(net.awaitPeerCount(1));
   }
 
