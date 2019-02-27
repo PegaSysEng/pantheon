@@ -154,7 +154,7 @@ public class PrivateTransactionProcessor {
     final MutableAccount sender =
         maybePrivateSender != null
             ? maybePrivateSender
-            : resolveAccountFromPublicState(publicWorldState, privateWorldState, senderAddress);
+            : privateWorldState.createAccount(senderAddress, 0, Wei.ZERO);
 
     final long previousNonce = sender.incrementNonce();
     LOG.trace(
@@ -237,14 +237,6 @@ public class PrivateTransactionProcessor {
       return Result.failed(
           0, ValidationResult.invalid(TransactionInvalidReason.PRIVATE_TRANSACTION_FAILED));
     }
-  }
-
-  private MutableAccount resolveAccountFromPublicState(
-      final WorldUpdater publicWorldState,
-      final WorldUpdater privateWorldState,
-      final Address senderAddress) {
-    final MutableAccount publicSender = publicWorldState.getOrCreate(senderAddress);
-    return privateWorldState.createAccount(senderAddress, publicSender.getNonce(), Wei.ZERO);
   }
 
   private static void clearEmptyAccounts(final WorldUpdater worldState) {
