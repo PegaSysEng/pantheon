@@ -15,6 +15,7 @@ package tech.pegasys.pantheon;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
+import org.junit.Ignore;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -77,11 +78,13 @@ public final class RunnerTest {
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   @Test
+  @Ignore
   public void fullSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FULL);
   }
 
   @Test
+  @Ignore
   public void fastSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FAST);
   }
