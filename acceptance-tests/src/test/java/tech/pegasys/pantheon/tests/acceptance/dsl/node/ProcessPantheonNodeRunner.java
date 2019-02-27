@@ -198,7 +198,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   @Override
   public boolean isActive(final String nodeName) {
     final Process process = pantheonProcesses.get(nodeName);
-    return process.isAlive();
+    return process != null && process.isAlive();
   }
 
   private void killPantheonProcess(final String name, final Process process) {
