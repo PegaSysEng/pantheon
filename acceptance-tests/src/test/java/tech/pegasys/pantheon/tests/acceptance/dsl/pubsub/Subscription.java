@@ -45,21 +45,22 @@ public class Subscription {
   }
 
   public void verifyEventReceived(final Hash expectedTransaction, final int expectedOccurrences) {
-    waitFor(() -> {
-      assertThat(connection.getSubscriptionEvents()).isNotEmpty();
-      final List<SubscriptionEvent> events = connection.getSubscriptionEvents();
+    waitFor(
+        () -> {
+          assertThat(connection.getSubscriptionEvents()).isNotEmpty();
+          final List<SubscriptionEvent> events = connection.getSubscriptionEvents();
 
-      int occurrences = 0;
-      for (final SubscriptionEvent event : events) {
-        if (matches(expectedTransaction, event)) {
-          occurrences++;
-        }
-      }
+          int occurrences = 0;
+          for (final SubscriptionEvent event : events) {
+            if (matches(expectedTransaction, event)) {
+              occurrences++;
+            }
+          }
 
-      assertThat(occurrences)
-          .as("Expecting: %s occurrences, but found: %s", expectedOccurrences, occurrences)
-          .isEqualTo(expectedOccurrences);
-    });
+          assertThat(occurrences)
+              .as("Expecting: %s occurrences, but found: %s", expectedOccurrences, occurrences)
+              .isEqualTo(expectedOccurrences);
+        });
   }
 
   private boolean matches(final Hash expectedTransaction, final SubscriptionEvent event) {
