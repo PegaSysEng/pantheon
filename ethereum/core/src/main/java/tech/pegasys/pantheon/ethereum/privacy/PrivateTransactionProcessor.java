@@ -166,8 +166,8 @@ public class PrivateTransactionProcessor {
     final MessageFrame initialFrame;
     final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
     if (transaction.isContractCreation()) {
-      final Address contractAddress =
-          Address.contractAddress(senderAddress, sender.getNonce() - 1L);
+      final Address privateContractAddress =
+          Address.privateContractAddress(senderAddress, sender.getNonce() - 1L, 0);
 
       initialFrame =
           MessageFrame.builder()
@@ -175,9 +175,9 @@ public class PrivateTransactionProcessor {
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
               .worldState(privateWorldState.updater())
-              .address(contractAddress)
+              .address(privateContractAddress)
               .originator(senderAddress)
-              .contract(contractAddress)
+              .contract(privateContractAddress)
               .initialGas(Gas.MAX_VALUE)
               .gasPrice(transaction.getGasPrice())
               .inputData(BytesValue.EMPTY)

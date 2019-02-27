@@ -129,6 +129,30 @@ public class Address extends DelegatingBytesValue {
                 })));
   }
 
+  /**
+   * Address of the created private contract.
+   *
+   * <p>This implement equation (86) in Section 7 of the Yellow Paper (rev. a91c29c).
+   *
+   * @param senderAddress the address of the transaction sender.
+   * @param nonce the nonce of this transaction.
+   * @param privacyGroup hash of participants list ordered from Enclave response.
+   * @return The generated address of the created private contract.
+   */
+  public static Address privateContractAddress(
+      final Address senderAddress, final long nonce, final int privacyGroup) {
+    return Address.extract(
+        Hash.hash(
+            RLP.encode(
+                out -> {
+                  out.startList();
+                  out.writeBytesValue(senderAddress);
+                  out.writeLongScalar(nonce);
+                  out.writeIntScalar(privacyGroup);
+                  out.endList();
+                })));
+  }
+
   @Override
   public Address copy() {
     final BytesValue copiedStorage = wrapped.copy();
