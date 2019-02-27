@@ -44,7 +44,6 @@ import java.net.ConnectException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -431,6 +430,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return p2pPort;
   }
 
+  @Override
   public List<URI> bootnodes() {
     return bootnodes.stream()
         .filter(node -> !node.equals(this.enodeUrl()))
