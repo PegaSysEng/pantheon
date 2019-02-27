@@ -15,7 +15,6 @@ package tech.pegasys.pantheon;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
-import org.junit.Ignore;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -68,6 +67,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
