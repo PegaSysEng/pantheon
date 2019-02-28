@@ -303,8 +303,7 @@ public class RunnerBuilder {
               privacyParameters);
 
       final SubscriptionManager subscriptionManager =
-          createSubscriptionManager(
-              vertx, transactionPool, webSocketConfiguration.getRefreshDelay());
+          createSubscriptionManager(vertx, transactionPool);
 
       createLogsSubscriptionService(
           context.getBlockchain(), context.getWorldStateArchive(), subscriptionManager);
@@ -385,8 +384,8 @@ public class RunnerBuilder {
   }
 
   private SubscriptionManager createSubscriptionManager(
-      final Vertx vertx, final TransactionPool transactionPool, final long refreshDelay) {
-    final SubscriptionManager subscriptionManager = new SubscriptionManager(refreshDelay);
+      final Vertx vertx, final TransactionPool transactionPool) {
+    final SubscriptionManager subscriptionManager = new SubscriptionManager();
     final PendingTransactionSubscriptionService pendingTransactions =
         new PendingTransactionSubscriptionService(subscriptionManager);
     transactionPool.addTransactionListener(pendingTransactions);
