@@ -35,7 +35,6 @@ public class WebSocketConfiguration {
   private int port;
   private String host;
   private Collection<RpcApi> rpcApis;
-  private long refreshDelay;
   private boolean authenticationEnabled = false;
   private String authenticationCredentialsFile;
   private Collection<String> hostsWhitelist = Collections.singletonList("localhost");
@@ -46,7 +45,6 @@ public class WebSocketConfiguration {
     config.setHost(DEFAULT_WEBSOCKET_HOST);
     config.setPort(DEFAULT_WEBSOCKET_PORT);
     config.setRpcApis(DEFAULT_WEBSOCKET_APIS);
-    config.setRefreshDelay(DEFAULT_WEBSOCKET_REFRESH_DELAY);
     return config;
   }
 
@@ -119,14 +117,6 @@ public class WebSocketConfiguration {
   @Override
   public int hashCode() {
     return Objects.hashCode(enabled, port, host, rpcApis);
-  }
-
-  public void setRefreshDelay(final long refreshDelay) {
-    this.refreshDelay = refreshDelay;
-  }
-
-  public long getRefreshDelay() {
-    return refreshDelay;
   }
 
   public boolean isAuthenticationEnabled() {
