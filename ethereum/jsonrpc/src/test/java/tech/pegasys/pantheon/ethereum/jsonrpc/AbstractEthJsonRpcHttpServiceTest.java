@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
+import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
@@ -60,7 +61,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
@@ -175,7 +175,7 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
             .methods(
                 CLIENT_VERSION,
                 NETWORK_ID,
-                JsonNodeFactory.instance.objectNode(),
+                new StubGenesisConfigOptions(),
                 peerDiscoveryMock,
                 blockchainQueries,
                 synchronizerMock,

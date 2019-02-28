@@ -63,7 +63,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
@@ -116,7 +115,7 @@ public class JsonRpcHttpServiceTest {
                 .methods(
                     CLIENT_VERSION,
                     CHAIN_ID,
-                    JsonNodeFactory.instance.objectNode(),
+                    new StubGenesisConfigOptions(),
                     peerDiscoveryMock,
                     blockchainQueries,
                     synchronizer,

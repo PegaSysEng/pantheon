@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -33,8 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,8 @@ public class AdminNodeInfoTest {
       new PeerInfo(5, "0x0", Collections.emptyList(), 30303, BytesValue.EMPTY);
   private final InetSocketAddress discoverySocketAddress = new InetSocketAddress("1.2.3.4", 7890);
   private final ChainHead testChainHead = new ChainHead(Hash.EMPTY, UInt256.ONE);
-  private final ObjectNode testConfig = JsonNodeFactory.instance.objectNode();
+  private final GenesisConfigOptions genesisConfigOptions =
+      new StubGenesisConfigOptions().chainId(2019);
 
   @Before
   public void setup() {
@@ -64,10 +65,10 @@ public class AdminNodeInfoTest {
     when(blockchainQueries.getBlockchain()).thenReturn(blockchain);
     when(blockchainQueries.getBlockHashByNumber(anyLong())).thenReturn(Optional.of(Hash.EMPTY));
     when(blockchain.getChainHead()).thenReturn(testChainHead);
-    testConfig.put("test", "foo");
 
     method =
-        new AdminNodeInfo("testnet/1.0/this/that", 2018, testConfig, p2pNetwork, blockchainQueries);
+        new AdminNodeInfo(
+            "testnet/1.0/this/that", 2018, genesisConfigOptions, p2pNetwork, blockchainQueries);
   }
 
   @Test
@@ -87,7 +88,7 @@ public class AdminNodeInfoTest {
             "eth",
             ImmutableMap.of(
                 "config",
-                testConfig,
+                genesisConfigOptions.asMap(),
                 "difficulty",
                 1L,
                 "genesis",

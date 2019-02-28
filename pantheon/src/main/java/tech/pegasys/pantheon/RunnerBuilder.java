@@ -62,7 +62,6 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -71,8 +70,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.vertx.core.Vertx;
 
@@ -364,19 +361,12 @@ public class RunnerBuilder {
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountWhitelistController,
       final PrivacyParameters privacyParameters) {
-    JsonNode genesisConfigConfig;
-    try {
-      genesisConfigConfig =
-          new ObjectMapper().readTree(ethNetworkConfig.getGenesisConfig()).get("config");
-    } catch (final IOException ioe) {
-      genesisConfigConfig = null;
-    }
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
                 PantheonInfo.version(),
                 ethNetworkConfig.getNetworkId(),
-                genesisConfigConfig,
+                pantheonController.getGenesisConfigOptions(),
                 network,
                 context.getBlockchain(),
                 context.getWorldStateArchive(),

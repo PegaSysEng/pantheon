@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import okhttp3.MediaType;
@@ -88,7 +87,7 @@ public class JsonRpcHttpServiceHostWhitelistTest {
                 .methods(
                     CLIENT_VERSION,
                     CHAIN_ID,
-                    JsonNodeFactory.instance.objectNode(),
+                    new StubGenesisConfigOptions(),
                     peerDiscoveryMock,
                     blockchainQueries,
                     synchronizer,

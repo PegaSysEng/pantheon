@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
+import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -42,8 +43,6 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 /** Provides a facade to construct the JSON-RPC component. */
 public class JsonRpcTestMethodsFactory {
@@ -91,7 +90,7 @@ public class JsonRpcTestMethodsFactory {
         .methods(
             CLIENT_VERSION,
             NETWORK_ID,
-            JsonNodeFactory.instance.objectNode(),
+            new StubGenesisConfigOptions(),
             peerDiscovery,
             blockchainQueries,
             synchronizer,

@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
+import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
@@ -37,7 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -172,7 +172,7 @@ public class JsonRpcHttpServiceRpcApisTest {
                 .methods(
                     CLIENT_VERSION,
                     NETWORK_ID,
-                    JsonNodeFactory.instance.objectNode(),
+                    new StubGenesisConfigOptions(),
                     mock(P2PNetwork.class),
                     blockchainQueries,
                     mock(Synchronizer.class),

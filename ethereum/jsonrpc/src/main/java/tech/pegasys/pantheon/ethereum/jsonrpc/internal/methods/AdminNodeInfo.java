@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
@@ -28,29 +29,30 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class AdminNodeInfo implements JsonRpcMethod {
+
   private static final Logger LOG = LogManager.getLogger();
+
   private final String clientVersion;
   private final int networkId;
-  private final JsonNode genesisConfigConfig;
+  private final GenesisConfigOptions genesisConfigOptions;
   private final P2PNetwork peerNetwork;
   private final BlockchainQueries blockchainQueries;
 
   public AdminNodeInfo(
       final String clientVersion,
       final int networkId,
-      final JsonNode genesisConfigConfig,
+      final GenesisConfigOptions genesisConfigOptions,
       final P2PNetwork peerNetwork,
       final BlockchainQueries blockchainQueries) {
     this.peerNetwork = peerNetwork;
     this.clientVersion = clientVersion;
-    this.genesisConfigConfig = genesisConfigConfig;
+    this.genesisConfigOptions = genesisConfigOptions;
     this.blockchainQueries = blockchainQueries;
     this.networkId = networkId;
   }
@@ -92,7 +94,7 @@ public class AdminNodeInfo implements JsonRpcMethod {
               "eth",
               ImmutableMap.of(
                   "config",
-                  genesisConfigConfig,
+                  genesisConfigOptions.asMap(),
                   "difficulty",
                   chainHead.getTotalDifficulty().toLong(),
                   "genesis",

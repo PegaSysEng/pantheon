@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -100,8 +101,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 public class JsonRpcMethodsFactory {
 
   private final BlockResultFactory blockResult = new BlockResultFactory();
@@ -110,7 +109,7 @@ public class JsonRpcMethodsFactory {
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
       final int networkId,
-      final JsonNode genesisConfigConfig,
+      final GenesisConfigOptions genesisConfigOptions,
       final P2PNetwork peerNetworkingService,
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
@@ -129,7 +128,7 @@ public class JsonRpcMethodsFactory {
     return methods(
         clientVersion,
         networkId,
-        genesisConfigConfig,
+        genesisConfigOptions,
         peerNetworkingService,
         blockchainQueries,
         synchronizer,
@@ -147,7 +146,7 @@ public class JsonRpcMethodsFactory {
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
       final int networkId,
-      final JsonNode genesisConfigConfig,
+      final GenesisConfigOptions genesisConfigOptions,
       final P2PNetwork p2pNetwork,
       final BlockchainQueries blockchainQueries,
       final Synchronizer synchronizer,
@@ -265,7 +264,7 @@ public class JsonRpcMethodsFactory {
           enabledMethods,
           new AdminAddPeer(p2pNetwork, parameter),
           new AdminNodeInfo(
-              clientVersion, networkId, genesisConfigConfig, p2pNetwork, blockchainQueries),
+              clientVersion, networkId, genesisConfigOptions, p2pNetwork, blockchainQueries),
           new AdminPeers(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.EEA)) {
