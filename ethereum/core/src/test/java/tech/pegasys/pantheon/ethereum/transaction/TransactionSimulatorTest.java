@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
+package tech.pegasys.pantheon.ethereum.transaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,9 +28,6 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.CallParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransientTransactionProcessingResult;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransientTransactionProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
@@ -49,7 +46,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class TransientTransactionProcessorTest {
+public class TransactionSimulatorTest {
 
   private static final SECP256K1.Signature FAKE_SIGNATURE =
       SECP256K1.Signature.create(SECP256K1.HALF_CURVE_ORDER, SECP256K1.HALF_CURVE_ORDER, (byte) 0);
@@ -57,7 +54,7 @@ public class TransientTransactionProcessorTest {
   private static final Address DEFAULT_FROM =
       Address.fromHexString("0x0000000000000000000000000000000000000000");
 
-  private TransientTransactionProcessor transientTransactionProcessor;
+  private TransactionSimulator transactionSimulator;
 
   @Mock private Blockchain blockchain;
   @Mock private WorldStateArchive worldStateArchive;
@@ -68,16 +65,16 @@ public class TransientTransactionProcessorTest {
 
   @Before
   public void setUp() {
-    this.transientTransactionProcessor =
-        new TransientTransactionProcessor(blockchain, worldStateArchive, protocolSchedule);
+    this.transactionSimulator =
+        new TransactionSimulator(blockchain, worldStateArchive, protocolSchedule);
   }
 
   @Test
   public void shouldReturnEmptyWhenBlockDoesNotExist() {
     when(blockchain.getBlockHeader(eq(1L))).thenReturn(Optional.empty());
 
-    final Optional<TransientTransactionProcessingResult> result =
-        transientTransactionProcessor.process(callParameter(), 1L);
+    final Optional<TransactionSimulatorResult> result =
+        transactionSimulator.process(callParameter(), 1L);
 
     assertThat(result.isPresent()).isFalse();
   }
@@ -103,8 +100,8 @@ public class TransientTransactionProcessorTest {
     mockProcessorStatusForTransaction(
         1L, expectedTransaction, Status.SUCCESSFUL, callParameter.getPayload());
 
-    final Optional<TransientTransactionProcessingResult> result =
-        transientTransactionProcessor.process(callParameter, 1L);
+    final Optional<TransactionSimulatorResult> result =
+        transactionSimulator.process(callParameter, 1L);
 
     assertThat(result.get().isSuccessful()).isTrue();
     verifyTransactionWasProcessed(expectedTransaction);
@@ -130,7 +127,7 @@ public class TransientTransactionProcessorTest {
             .build();
     mockProcessorStatusForTransaction(1L, expectedTransaction, Status.SUCCESSFUL, BytesValue.of());
 
-    transientTransactionProcessor.process(callParameter, 1L);
+    transactionSimulator.process(callParameter, 1L);
 
     verifyTransactionWasProcessed(expectedTransaction);
   }
@@ -155,7 +152,7 @@ public class TransientTransactionProcessorTest {
             .build();
     mockProcessorStatusForTransaction(1L, expectedTransaction, Status.SUCCESSFUL, BytesValue.of());
 
-    transientTransactionProcessor.process(callParameter, 1L);
+    transactionSimulator.process(callParameter, 1L);
 
     verifyTransactionWasProcessed(expectedTransaction);
   }
@@ -180,8 +177,8 @@ public class TransientTransactionProcessorTest {
             .build();
     mockProcessorStatusForTransaction(1L, expectedTransaction, Status.FAILED, null);
 
-    final Optional<TransientTransactionProcessingResult> result =
-        transientTransactionProcessor.process(callParameter, 1L);
+    final Optional<TransactionSimulatorResult> result =
+        transactionSimulator.process(callParameter, 1L);
 
     assertThat(result.get().isSuccessful()).isFalse();
     verifyTransactionWasProcessed(expectedTransaction);
@@ -238,6 +235,12 @@ public class TransientTransactionProcessorTest {
   }
 
   private CallParameter callParameter() {
-    return new CallParameter("0x0", "0x0", "0x0", "0x0", "0x0", "");
+    return new CallParameter(
+        Address.fromHexString("0x0"),
+        Address.fromHexString("0x0"),
+        0,
+        Wei.of(0),
+        Wei.of(0),
+        BytesValue.EMPTY);
   }
 }
