@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminAddPeer;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminNodeInfo;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminPeers;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugMetrics;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugStorageRangeAt;
@@ -99,6 +100,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class JsonRpcMethodsFactory {
 
   private final BlockResultFactory blockResult = new BlockResultFactory();
@@ -106,6 +109,8 @@ public class JsonRpcMethodsFactory {
 
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
+      final int networkId,
+      final JsonNode genesisConfigConfig,
       final P2PNetwork peerNetworkingService,
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
@@ -123,6 +128,8 @@ public class JsonRpcMethodsFactory {
         new BlockchainQueries(blockchain, worldStateArchive);
     return methods(
         clientVersion,
+        networkId,
+        genesisConfigConfig,
         peerNetworkingService,
         blockchainQueries,
         synchronizer,
@@ -139,6 +146,8 @@ public class JsonRpcMethodsFactory {
 
   public Map<String, JsonRpcMethod> methods(
       final String clientVersion,
+      final int networkId,
+      final JsonNode genesisConfigConfig,
       final P2PNetwork p2pNetwork,
       final BlockchainQueries blockchainQueries,
       final Synchronizer synchronizer,
@@ -252,8 +261,12 @@ public class JsonRpcMethodsFactory {
               accountsWhitelistController, p2pNetwork.getNodeWhitelistController()));
     }
     if (rpcApis.contains(RpcApis.ADMIN)) {
-      addMethods(enabledMethods, new AdminPeers(p2pNetwork));
-      addMethods(enabledMethods, new AdminAddPeer(p2pNetwork, parameter));
+      addMethods(
+          enabledMethods,
+          new AdminAddPeer(p2pNetwork, parameter),
+          new AdminNodeInfo(
+              clientVersion, networkId, genesisConfigConfig, p2pNetwork, blockchainQueries),
+          new AdminPeers(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.EEA)) {
       addMethods(

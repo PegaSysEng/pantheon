@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -65,6 +66,7 @@ public class JsonRpcHttpServiceRpcApisTest {
   private static String baseUrl;
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
   private static final String CLIENT_VERSION = "TestClientVersion/0.1.0";
+  private static final int NETWORK_ID = 123;
   private JsonRpcConfiguration configuration;
 
   @Mock protected static BlockchainQueries blockchainQueries;
@@ -169,6 +171,8 @@ public class JsonRpcHttpServiceRpcApisTest {
             new JsonRpcMethodsFactory()
                 .methods(
                     CLIENT_VERSION,
+                    NETWORK_ID,
+                    JsonNodeFactory.instance.objectNode(),
                     mock(P2PNetwork.class),
                     blockchainQueries,
                     mock(Synchronizer.class),

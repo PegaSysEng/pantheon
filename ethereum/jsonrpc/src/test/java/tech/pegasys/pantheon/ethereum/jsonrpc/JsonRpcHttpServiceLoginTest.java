@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.Json;
@@ -116,6 +117,8 @@ public class JsonRpcHttpServiceLoginTest {
             new JsonRpcMethodsFactory()
                 .methods(
                     CLIENT_VERSION,
+                    CHAIN_ID,
+                    JsonNodeFactory.instance.objectNode(),
                     peerDiscoveryMock,
                     blockchainQueries,
                     synchronizer,

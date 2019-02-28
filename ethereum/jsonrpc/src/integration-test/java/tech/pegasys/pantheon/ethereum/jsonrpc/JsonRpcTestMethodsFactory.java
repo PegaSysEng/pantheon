@@ -43,10 +43,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 /** Provides a facade to construct the JSON-RPC component. */
 public class JsonRpcTestMethodsFactory {
 
   private static final String CLIENT_VERSION = "TestClientVersion/0.1.0";
+  private static final int NETWORK_ID = 123;
 
   private final BlockchainImporter importer;
 
@@ -87,6 +90,8 @@ public class JsonRpcTestMethodsFactory {
     return new JsonRpcMethodsFactory()
         .methods(
             CLIENT_VERSION,
+            NETWORK_ID,
+            JsonNodeFactory.instance.objectNode(),
             peerDiscovery,
             blockchainQueries,
             synchronizer,

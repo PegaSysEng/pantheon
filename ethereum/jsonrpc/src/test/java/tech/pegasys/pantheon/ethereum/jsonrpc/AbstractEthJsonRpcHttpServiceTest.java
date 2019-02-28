@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
@@ -93,6 +94,8 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
   protected final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
   protected final String CLIENT_VERSION = "TestClientVersion/0.1.0";
+
+  protected final int NETWORK_ID = 123;
 
   protected static final Collection<RpcApi> JSON_RPC_APIS =
       Arrays.asList(RpcApis.ETH, RpcApis.NET, RpcApis.WEB3);
@@ -171,6 +174,8 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
         new JsonRpcMethodsFactory()
             .methods(
                 CLIENT_VERSION,
+                NETWORK_ID,
+                JsonNodeFactory.instance.objectNode(),
                 peerDiscoveryMock,
                 blockchainQueries,
                 synchronizerMock,

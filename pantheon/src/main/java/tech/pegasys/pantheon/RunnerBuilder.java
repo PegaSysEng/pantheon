@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -61,6 +62,7 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -69,6 +71,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.vertx.core.Vertx;
 
@@ -78,7 +82,7 @@ public class RunnerBuilder {
   private PantheonController<?> pantheonController;
   private boolean p2pEnabled = true;
   private boolean discovery;
-  private Collection<?> bootstrapPeers;
+  private EthNetworkConfig ethNetworkConfig;
   private String discoveryHost;
   private int listenPort;
   private int maxPeers;
@@ -110,8 +114,8 @@ public class RunnerBuilder {
     return this;
   }
 
-  public RunnerBuilder bootstrapPeers(final Collection<?> bootstrapPeers) {
-    this.bootstrapPeers = bootstrapPeers;
+  public RunnerBuilder ethNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
+    this.ethNetworkConfig = ethNetworkConfig;
     return this;
   }
 
@@ -173,10 +177,10 @@ public class RunnerBuilder {
     final DiscoveryConfiguration discoveryConfiguration;
     if (discovery) {
       final Collection<?> bootstrap;
-      if (bootstrapPeers == null) {
+      if (ethNetworkConfig.getBootNodes() == null) {
         bootstrap = DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
       } else {
-        bootstrap = bootstrapPeers;
+        bootstrap = ethNetworkConfig.getBootNodes();
       }
       discoveryConfiguration =
           DiscoveryConfiguration.create()
@@ -251,7 +255,7 @@ public class RunnerBuilder {
             .filter(PermissioningConfiguration::isAccountWhitelistEnabled)
             .map(
                 configuration -> {
-                  AccountWhitelistController whitelistController =
+                  final AccountWhitelistController whitelistController =
                       new AccountWhitelistController(configuration);
                   transactionPool.setAccountWhitelist(whitelistController);
                   return whitelistController;
@@ -360,10 +364,19 @@ public class RunnerBuilder {
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountWhitelistController,
       final PrivacyParameters privacyParameters) {
+    JsonNode genesisConfigConfig;
+    try {
+      genesisConfigConfig =
+          new ObjectMapper().readTree(ethNetworkConfig.getGenesisConfig()).get("config");
+    } catch (final IOException ioe) {
+      genesisConfigConfig = null;
+    }
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
                 PantheonInfo.version(),
+                ethNetworkConfig.getNetworkId(),
+                genesisConfigConfig,
                 network,
                 context.getBlockchain(),
                 context.getWorldStateArchive(),
