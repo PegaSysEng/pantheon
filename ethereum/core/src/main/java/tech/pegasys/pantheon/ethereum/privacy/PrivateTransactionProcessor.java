@@ -167,7 +167,7 @@ public class PrivateTransactionProcessor {
     final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
     if (transaction.isContractCreation()) {
       final Address privateContractAddress =
-          Address.privateContractAddress(senderAddress, sender.getNonce() - 1L, 0);
+          Address.privateContractAddress(senderAddress, sender.getNonce() - 1L, BytesValue.EMPTY);
 
       initialFrame =
           MessageFrame.builder()
