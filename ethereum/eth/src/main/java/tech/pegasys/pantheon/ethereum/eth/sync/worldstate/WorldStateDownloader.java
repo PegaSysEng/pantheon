@@ -156,7 +156,7 @@ public class WorldStateDownloader {
       }
 
       // Room for the requests we expect to do in parallel plus some buffer but not unlimited.
-      final int persistenceQueueCapacity = hashCountPerRequest * maxNodeRequestsWithoutProgress * 2;
+      final int persistenceQueueCapacity = hashCountPerRequest * maxOutstandingRequests * 2;
       final WorldDownloadState newDownloadState =
           new WorldDownloadState(
               taskQueue,
