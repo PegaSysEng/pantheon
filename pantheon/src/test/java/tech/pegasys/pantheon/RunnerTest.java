@@ -37,6 +37,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
+import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
@@ -181,11 +183,17 @@ public final class RunnerTest {
               PrivacyParameters.noPrivacy(),
               dataDirBehind,
               noOpMetricsSystem);
+      final Peer advertisedPeer = runnerAhead.getAdvertisedPeer();
       final EthNetworkConfig behindEthNetworkConfiguration =
           new EthNetworkConfig(
               EthNetworkConfig.jsonConfig(DEV),
               DEV_NETWORK_ID,
-              Collections.singletonList(runnerAhead.getAdvertisedPeer()));
+              Collections.singletonList(
+                  new DefaultPeer(
+                      advertisedPeer.getId(),
+                      advertisedPeer.getEndpoint().getHost(),
+                      advertisedPeer.getEndpoint().getUdpPort(),
+                      runnerAhead.getP2pTcpPort())));
       final Runner runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
