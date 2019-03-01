@@ -39,13 +39,7 @@ public class CliqueConfigOptions {
   }
 
   Map<String, Object> asMap() {
-    final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-    if (cliqueConfigRoot.containsKey("epochlength")) {
-      builder.put("epochLength", getEpochLength());
-    }
-    if (cliqueConfigRoot.containsKey("blockperiodseconds")) {
-      builder.put("blockPeriodSeconds", getBlockPeriodSeconds());
-    }
-    return builder.build();
+    return ImmutableMap.of(
+        "epochLength", getEpochLength(), "blockPeriodSeconds", getBlockPeriodSeconds());
   }
 }
