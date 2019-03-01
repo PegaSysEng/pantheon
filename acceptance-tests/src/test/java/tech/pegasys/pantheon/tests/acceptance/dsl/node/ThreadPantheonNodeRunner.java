@@ -84,8 +84,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         runnerBuilder
             .vertx(Vertx.vertx())
             .pantheonController(pantheonController)
+            .ethNetworkConfig(ethNetworkConfig)
             .discovery(node.isDiscoveryEnabled())
-            .bootstrapPeers(node.bootnodes())
             .discoveryHost(node.hostName())
             .discoveryPort(0)
             .maxPeers(25)
