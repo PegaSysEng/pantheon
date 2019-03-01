@@ -164,7 +164,7 @@ host-whitelist=["medomain.com", "meotherdomain.com"]
 ```
 
 Comma-separated list of hostnames to allow [access to the JSON-RPC API](../JSON-RPC-API/Using-JSON-RPC-API.md#host-whitelist). 
-Default is `localhost`. 
+By default, access from `localhost` and `127.0.0.1` is accepted. 
 
 !!!tip
     To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
@@ -934,20 +934,6 @@ The default is 8546. Ports must be [exposed appropriately](../Configuring-Panthe
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
-
-### rpc-ws-refresh-delay
-
-```bash tab="Syntax"
---rpc-ws-refresh-delay=<refresh delay>
-```
-
-```bash tab="Example"
---rpc-ws-refresh-delay="10000"
-```
-
-Refresh delay for Websocket synchronizing subscription in milliseconds. 
-The default is 5000. 
-
 
 ### help
 
