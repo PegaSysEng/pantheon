@@ -25,11 +25,11 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,17 +51,19 @@ public class AdminNodeInfoTest {
 
   private AdminNodeInfo method;
 
-  private final PeerInfo localPeer =
-      new PeerInfo(5, "0x0", Collections.emptyList(), 30303, BytesValue.EMPTY);
-  private final InetSocketAddress discoverySocketAddress = new InetSocketAddress("1.2.3.4", 7890);
+  private final BytesValue nodeId =
+      BytesValue.fromHexString(
+          "0x0f1b319e32017c3fcb221841f0f978701b4e9513fe6a567a2db43d43381a9c7e3dfe7cae13cbc2f56943400bacaf9082576ab087cd51983b17d729ae796f6807");
+  private final PeerInfo localPeer = new PeerInfo(5, "0x0", Collections.emptyList(), 30303, nodeId);
   private final ChainHead testChainHead = new ChainHead(Hash.EMPTY, UInt256.ONE);
   private final GenesisConfigOptions genesisConfigOptions =
       new StubGenesisConfigOptions().chainId(2019);
+  private final DefaultPeer defaultPeer = new DefaultPeer(nodeId, "1.2.3.4", 7890, 30303);
 
   @Before
   public void setup() {
     when(p2pNetwork.getLocalPeerInfo()).thenReturn(localPeer);
-    when(p2pNetwork.getDiscoverySocketAddress()).thenReturn(discoverySocketAddress);
+    when(p2pNetwork.getAdvertisedPeer()).thenReturn(defaultPeer);
     when(blockchainQueries.getBlockchain()).thenReturn(blockchain);
     when(blockchainQueries.getBlockHashByNumber(anyLong())).thenReturn(Optional.of(Hash.EMPTY));
     when(blockchain.getChainHead()).thenReturn(testChainHead);
@@ -77,11 +79,16 @@ public class AdminNodeInfoTest {
 
     final JsonRpcSuccessResponse actual = (JsonRpcSuccessResponse) method.response(request);
     final Map<String, Object> expected = new HashMap<>();
-    expected.put("enode", "enode://@1.2.3.4:30303");
-    expected.put("id", "");
+    expected.put(
+        "enode",
+        "enode://0f1b319e32017c3fcb221841f0f978701b4e9513fe6a567a2db43d43381a9c7e3dfe7cae13cbc2f56943400bacaf9082576ab087cd51983b17d729ae796f6807@1.2.3.4:30303?discport=7890");
+    expected.put(
+        "id",
+        "0f1b319e32017c3fcb221841f0f978701b4e9513fe6a567a2db43d43381a9c7e3dfe7cae13cbc2f56943400bacaf9082576ab087cd51983b17d729ae796f6807");
+    expected.put("ip", "1.2.3.4");
     expected.put("listenAddr", "1.2.3.4:30303");
     expected.put("name", "testnet/1.0/this/that");
-    expected.put("ports", ImmutableMap.of("discovery", 30303, "listener", 30303));
+    expected.put("ports", ImmutableMap.of("discovery", 7890, "listener", 30303));
     expected.put(
         "protocols",
         ImmutableMap.of(
