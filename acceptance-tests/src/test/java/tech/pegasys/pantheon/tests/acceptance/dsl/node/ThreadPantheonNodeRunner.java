@@ -87,7 +87,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .discovery(node.isDiscoveryEnabled())
             .bootstrapPeers(node.bootnodes())
             .discoveryHost(node.hostName())
-            .discoveryPort(node.p2pPort())
+            .discoveryPort(0)
             .maxPeers(25)
             .jsonRpcConfiguration(node.jsonRpcConfiguration())
             .webSocketConfiguration(node.webSocketConfiguration())
@@ -95,7 +95,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .bannedNodeIds(Collections.emptySet())
             .metricsSystem(noOpMetricsSystem)
             .metricsConfiguration(node.metricsConfiguration())
-            .p2pEnabled(node.p2pEnabled())
+            .p2pEnabled(node.isP2pEnabled())
             .build();
 
     nodeExecutor.submit(runner::execute);

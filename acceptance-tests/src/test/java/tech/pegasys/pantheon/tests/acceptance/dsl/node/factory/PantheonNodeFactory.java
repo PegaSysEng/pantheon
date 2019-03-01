@@ -35,7 +35,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -52,26 +51,20 @@ import com.google.common.io.Resources;
 public class PantheonNodeFactory {
 
   private PantheonNode create(final PantheonFactoryConfiguration config) throws IOException {
-    ServerSocket serverSocket = new ServerSocket(0);
-    final PantheonNode node =
-        new PantheonNode(
-            config.getName(),
-            config.getMiningParameters(),
-            config.getPrivacyParameters(),
-            config.getJsonRpcConfiguration(),
-            config.getWebSocketConfiguration(),
-            config.getMetricsConfiguration(),
-            config.getPermissioningConfiguration(),
-            config.isDevMode(),
-            config.getGenesisConfigProvider(),
-            serverSocket.getLocalPort(),
-            config.getP2pEnabled(),
-            config.isDiscoveryEnabled(),
-            config.isBootnode(),
-            config.getBootnodes());
-    serverSocket.close();
-
-    return node;
+    return new PantheonNode(
+        config.getName(),
+        config.getMiningParameters(),
+        config.getPrivacyParameters(),
+        config.getJsonRpcConfiguration(),
+        config.getWebSocketConfiguration(),
+        config.getMetricsConfiguration(),
+        config.getPermissioningConfiguration(),
+        config.isDevMode(),
+        config.getGenesisConfigProvider(),
+        config.getP2pEnabled(),
+        config.isDiscoveryEnabled(),
+        config.isBootnode(),
+        config.getBootnodes());
   }
 
   public PantheonNode createMinerNode(final String name) throws IOException {

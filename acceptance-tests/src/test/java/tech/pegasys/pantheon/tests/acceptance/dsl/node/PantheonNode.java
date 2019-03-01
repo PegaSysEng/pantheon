@@ -74,7 +74,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   private final Path homeDirectory;
   private final KeyPair keyPair;
-  private final int p2pPort;
   private final Properties portsProperties = new Properties();
   private final Boolean p2pEnabled;
 
@@ -107,7 +106,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       final Optional<PermissioningConfiguration> permissioningConfiguration,
       final boolean devMode,
       final GenesisConfigProvider genesisConfigProvider,
-      final int p2pPort,
       final Boolean p2pEnabled,
       final boolean discoveryEnabled,
       final boolean isBootnode,
@@ -115,7 +113,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
-    this.p2pPort = p2pPort;
     this.name = name;
     this.miningParameters = miningParameters;
     this.privacyParameters = privacyParameters;
@@ -152,7 +149,26 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         + "@"
         + LOCALHOST
         + ":"
-        + p2pPort;
+        + getP2pPort()
+        + "?discport="
+        + getDiscoveryPort();
+  }
+
+  private String getP2pPort() {
+    final String port = portsProperties.getProperty("p2p");
+    if (port == null) {
+      throw new IllegalStateException("Requested p2p port before ports properties was written");
+    }
+    return port;
+  }
+
+  private String getDiscoveryPort() {
+    final String port = portsProperties.getProperty("discovery");
+    if (port == null) {
+      throw new IllegalStateException(
+          "Requested discovery port before ports properties was written");
+    }
+    return port;
   }
 
   private Optional<String> jsonRpcBaseUrl() {
@@ -218,7 +234,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
         web3jService = new WebSocketService(wsClient, false);
         try {
           ((WebSocketService) web3jService).connect();
-        } catch (ConnectException e) {
+        } catch (final ConnectException e) {
           throw new RuntimeException(e);
         }
 
@@ -299,10 +315,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     this.token = token;
   }
 
-  public KeyPair getKeyPair() {
-    return keyPair;
-  }
-
   private void checkIfWebSocketEndpointIsAvailable(final String url) {
     final WebSocketClient webSocketClient = new WebSocketClient(URI.create(url));
     // Web3j implementation always invoke the listener (even when one hasn't been set). We are using
@@ -359,6 +371,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     try (final FileInputStream fis =
         new FileInputStream(new File(homeDirectory.toFile(), "pantheon.ports"))) {
       portsProperties.load(fis);
+      LOG.info("Ports: " + portsProperties);
     } catch (final IOException e) {
       throw new RuntimeException("Error reading Pantheon ports file", e);
     }
@@ -418,27 +431,17 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return metricsConfiguration;
   }
 
-  int p2pPort() {
-    return p2pPort;
-  }
-
   String p2pListenHost() {
     return LOCALHOST;
   }
 
-  int p2pListenPort() {
-    return p2pPort;
+  @Override
+  public List<URI> bootnodes() {
+    return bootnodes.stream().map(URI::create).collect(Collectors.toList());
   }
 
   @Override
-  public List<URI> bootnodes() {
-    return bootnodes.stream()
-        .filter(node -> !node.equals(this.enodeUrl()))
-        .map(URI::create)
-        .collect(Collectors.toList());
-  }
-
-  Boolean p2pEnabled() {
+  public Boolean isP2pEnabled() {
     return p2pEnabled;
   }
 
@@ -460,6 +463,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
     return devMode;
   }
 
+  @Override
   public boolean isDiscoveryEnabled() {
     return discoveryEnabled;
   }
@@ -477,7 +481,6 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("name", name)
-        .add("p2pPort", p2pPort)
         .add("homeDirectory", homeDirectory)
         .add("keyPair", keyPair)
         .add("p2pEnabled", p2pEnabled)

@@ -37,7 +37,7 @@ class PantheonFactoryConfiguration {
   private final Boolean p2pEnabled;
   private final boolean discoveryEnabled;
   private final boolean isBootnode;
-  private List<String> bootnodes;
+  private final List<String> bootnodes;
 
   PantheonFactoryConfiguration(
       final String name,
