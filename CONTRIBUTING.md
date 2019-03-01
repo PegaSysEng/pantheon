@@ -155,12 +155,19 @@ To contribute and propose your changes, the workflow is as follows:
 1. [**Fork the repository**](https://github.com/PegaSysEng/pantheon/fork).
 1. **Clone your fork** on your computer.
 1. **Create a topic branch** _, name it in a way you can know what it's about.
-Starting the name by the issue number is a good practice and a reminder to fix only one issue in a PR._
+Starting the name by the issue number is a good practice and a reminder to fix only one issue in a 
+Pull-Request (PR)._
 1. **Make your changes** adhering to the coding and documentation conventions herein set forth.
 _In general a commit serves a single purpose and diffs should be easily comprehensible.
 For this reason do not mix any formatting fixes or code moves with actual code changes._
 1. **Commit your changes** using a clear commit message.
-1. **Push your changes** to your remote fork.
+1. **Test your changes** locally before pushing to ensure that what you are proposing is not breaking
+another part of the software.
+    * For the code changes, running the `./gradlew clean check test` command locally will help you
+being confident that your changes will pass CI tests once pushed as a Pull Request.
+    * For the doc changes, you should try running the doc with [MkDocs] in a preview mode to check the
+  rendering as explained in [MkDocs And Markdown Guide](MKDOCS-MARKDOWN-GUIDE.md#preview-the-documentation). 
+1. **Push your changes** to your remote fork (usually labeled as `origin`).
 1. **Create a pull-request** (PR) on the original Pantheon Github repository to merge your branch with the master branch.
 1. **Add the labels** to identify the type of your PR. _For instance, if your PR only changes documentation, add the
 "documentation" label. If it fixes a bug, add the "bug" label._
@@ -235,7 +242,10 @@ If you have to make changes to the documentation, we propose a set of
 [documentation guidelines and examples](DOC-STYLE-GUIDE.md) to help you.
 
 These rules are not automatically enforced yet, but it's highly recommended to follow them
-to make the documentation coherent and the user experience as pleasant as possible. 
+to make the documentation coherent and the user experience as pleasant as possible.
+
+Also have a look at our [MKDocs Markdown guide](MKDOCS-MARKDOWN-GUIDE.md) to be sure to use the right
+syntax and take advantage of all the powerful extensions that are available for writing our documentation.
 
 ## Git Commit Messages & Pull Request Messages
 * Use the present tense ("Add feature" not "Added feature")
@@ -308,3 +318,4 @@ to make the documentation coherent and the user experience as pleasant as possib
 [Debugging documentation]: https://docs.pantheon.pegasys.tech/en/stable/Using-Pantheon/Debugging/
 [CLA.md]: /CLA.md
 [Code Reviews]: /docs/community/code-reviews.md
+[MkDocs]: https://www.mkdocs.org/
