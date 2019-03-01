@@ -113,11 +113,11 @@ public class PeerDiscoveryAgentTest {
   @Test
   public void shouldEvictPeerOnDisconnect() {
     final MockPeerDiscoveryAgent peerDiscoveryAgent1 = helper.startDiscoveryAgent();
-    peerDiscoveryAgent1.start().join();
+    peerDiscoveryAgent1.start(2244).join();
     final DiscoveryPeer peer = peerDiscoveryAgent1.getAdvertisedPeer();
 
     final MockPeerDiscoveryAgent peerDiscoveryAgent2 = helper.startDiscoveryAgent(peer);
-    peerDiscoveryAgent2.start().join();
+    peerDiscoveryAgent2.start(45632).join();
 
     assertThat(peerDiscoveryAgent2.getPeers().size()).isEqualTo(1);
 
