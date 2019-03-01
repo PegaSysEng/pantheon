@@ -144,7 +144,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   @Override
   public String enodeUrl() {
-    final String discport = isDiscoveryEnabled() ? "?disport=" + getDiscoveryPort() : "";
+    final String discport = isDiscoveryEnabled() ? "?discport=" + getDiscoveryPort() : "";
     return "enode://"
         + keyPair.getPublicKey().toString().substring(2)
         + "@"

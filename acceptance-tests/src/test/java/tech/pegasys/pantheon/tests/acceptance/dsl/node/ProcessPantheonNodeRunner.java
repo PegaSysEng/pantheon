@@ -59,9 +59,6 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     final List<String> params = new ArrayList<>();
     params.add("build/install/pantheon/bin/pantheon");
 
-    params.add("--logging");
-    params.add("TRACE");
-
     params.add("--data-path");
     params.add(dataDir.toAbsolutePath().toString());
 
