@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
@@ -60,8 +61,19 @@ public class TransactionSimulator {
   }
 
   public Optional<TransactionSimulatorResult> process(
+      final CallParameter callParams, final Hash blockHeaderHash) {
+    final BlockHeader header = blockchain.getBlockHeader(blockHeaderHash).orElse(null);
+    return process(callParams, header);
+  }
+
+  public Optional<TransactionSimulatorResult> process(
       final CallParameter callParams, final long blockNumber) {
     final BlockHeader header = blockchain.getBlockHeader(blockNumber).orElse(null);
+    return process(callParams, header);
+  }
+
+  private Optional<TransactionSimulatorResult> process(
+      final CallParameter callParams, final BlockHeader header) {
     if (header == null) {
       return Optional.empty();
     }
