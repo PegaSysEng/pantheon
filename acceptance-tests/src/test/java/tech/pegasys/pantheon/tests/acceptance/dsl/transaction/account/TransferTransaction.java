@@ -44,55 +44,18 @@ public class TransferTransaction implements Transaction<Hash> {
   private final BigInteger gasPrice;
   private final BigInteger nonce;
 
-  // TODO delete some of me!
-
   public TransferTransaction(
       final Account sender,
       final Account recipient,
       final Amount transferAmount,
-      final Amount executionCost) {
-    this.sender = sender;
-    this.recipient = recipient;
-    this.transferAmount = transferAmount.getValue();
-    this.transferUnit = transferAmount.getUnit();
-    this.gasPrice = convertGasPriceToWei(executionCost);
-    this.nonce = null;
-  }
-
-  public TransferTransaction(
-      final Account sender, final Account recipient, final Amount transferAmount) {
-    this.sender = sender;
-    this.recipient = recipient;
-    this.transferAmount = transferAmount.getValue();
-    this.transferUnit = transferAmount.getUnit();
-    this.gasPrice = MINIMUM_GAS_PRICE;
-    this.nonce = null;
-  }
-
-  public TransferTransaction(
-      final Account sender, final Account recipient, final String transferAmount, final Unit unit) {
-    this.sender = sender;
-    this.recipient = recipient;
-    this.transferAmount = transferAmount;
-    this.transferUnit = unit;
-    this.nonce = null;
-
-    this.gasPrice = MINIMUM_GAS_PRICE;
-  }
-
-  public TransferTransaction(
-      final Account sender,
-      final Account recipient,
-      final String transferAmount,
-      final Unit unit,
+      final Amount gasPrice,
       final BigInteger nonce) {
     this.sender = sender;
     this.recipient = recipient;
-    this.transferAmount = transferAmount;
-    this.transferUnit = unit;
+    this.transferAmount = transferAmount.getValue();
+    this.transferUnit = transferAmount.getUnit();
+    this.gasPrice = gasPrice == null ? MINIMUM_GAS_PRICE : convertGasPriceToWei(gasPrice);
     this.nonce = nonce;
-
-    this.gasPrice = MINIMUM_GAS_PRICE;
   }
 
   @Override
