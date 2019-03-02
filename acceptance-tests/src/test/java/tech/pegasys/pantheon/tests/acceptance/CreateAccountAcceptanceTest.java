@@ -12,13 +12,10 @@
  */
 package tech.pegasys.pantheon.tests.acceptance;
 
-import static org.web3j.utils.Convert.Unit.ETHER;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Amount;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransaction;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,40 +38,5 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
     minerNode.execute(transactions.createTransfer(account, balance));
 
     cluster.verify(account.balanceEquals(balance));
-  }
-
-  @Test
-  public void transitiveTransfer() {
-
-    // Create accounts: one & two
-    final Account accountOne = accounts.createAccount("account-one");
-    final Account accountTwo = accounts.createAccount("account-two");
-
-    // Create transfer of 20 ETH from fund pool to account one
-    final Amount accountOneStartingBalance = Amount.ether(20);
-
-    // Execute the transfer order
-    minerNode.execute(transactions.createTransfer(accountOne, accountOneStartingBalance));
-
-    // Verify account one balance == 20 ETH
-    cluster.verify(accountOne.balanceEquals(accountOneStartingBalance));
-
-    // Create transfer of 15 ETH from one to two (using default gas price)
-    final Amount transferAmount = Amount.ether(15);
-    final TransferTransaction transitiveTransfer =
-        transactions.createTransfer(accountOne, accountTwo, transferAmount);
-
-    // Execute the transfer order
-    minerNode.execute(transitiveTransfer);
-
-    // Verify account one balance == 20 ETH - 15 ETH - execution cost
-    final Amount balanceAfter =
-        accountOneStartingBalance
-            .subtract(transitiveTransfer.executionCost())
-            .subtract(transferAmount);
-    cluster.verify(accountOne.balanceEquals(balanceAfter));
-
-    // Verify account two balance == 15 ETH
-    cluster.verify(accountTwo.balanceEquals("15", ETHER));
   }
 }
