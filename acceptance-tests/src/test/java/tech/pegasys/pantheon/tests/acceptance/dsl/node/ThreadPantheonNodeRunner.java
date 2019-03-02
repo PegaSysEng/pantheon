@@ -77,15 +77,15 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       throw new RuntimeException("Error building PantheonController", e);
     }
 
-    RunnerBuilder runnerBuilder = new RunnerBuilder();
+    final RunnerBuilder runnerBuilder = new RunnerBuilder();
     node.getPermissioningConfiguration().ifPresent(runnerBuilder::permissioningConfiguration);
 
     final Runner runner =
         runnerBuilder
             .vertx(Vertx.vertx())
             .pantheonController(pantheonController)
+            .ethNetworkConfig(ethNetworkConfig)
             .discovery(node.isDiscoveryEnabled())
-            .bootstrapPeers(node.bootnodes())
             .discoveryHost(node.hostName())
             .discoveryPort(node.p2pPort())
             .maxPeers(25)

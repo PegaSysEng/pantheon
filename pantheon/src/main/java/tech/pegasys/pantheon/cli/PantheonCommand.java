@@ -19,7 +19,6 @@ import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
-import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_REFRESH_DELAY;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
 import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
@@ -216,6 +215,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + " (default: MAINNET)")
   private final NetworkName network = null;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--p2p-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -243,6 +243,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Set to start the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--rpc-http-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -285,6 +286,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Set to start the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--rpc-ws-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -312,27 +314,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Long rpcWsRefreshDelay;
 
   @Option(
-      names = {"--rpc-ws-refresh-delay"},
-      paramLabel = "<refresh delay>",
-      arity = "1",
-      description =
-          "Refresh delay of WebSocket subscription sync in milliseconds "
-              + "(default: ${DEFAULT-VALUE})",
-      defaultValue = "" + DEFAULT_WEBSOCKET_REFRESH_DELAY)
-  private Long configureRefreshDelay(final Long refreshDelay) {
-    if (refreshDelay < DEFAULT_MIN_REFRESH_DELAY || refreshDelay > DEFAULT_MAX_REFRESH_DELAY) {
-      throw new ParameterException(
-          this.commandLine,
-          String.format(
-              "Refresh delay must be a positive integer between %s and %s",
-              String.valueOf(DEFAULT_MIN_REFRESH_DELAY),
-              String.valueOf(DEFAULT_MAX_REFRESH_DELAY)));
-    }
-    this.rpcWsRefreshDelay = refreshDelay;
-    return refreshDelay;
-  }
-
-  @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
           "Require authentication for the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
@@ -343,6 +324,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Set to start the metrics exporter (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--metrics-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -371,6 +353,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Enable the metrics push gateway integration (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsPushEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--metrics-push-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -393,6 +376,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1")
   private final Integer metricsPushInterval = 15;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--metrics-push-prometheus-job"},
       description = "Job name to use when in push mode (default: ${DEFAULT-VALUE})",
@@ -615,7 +599,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           buildController(),
           p2pEnabled,
           peerDiscoveryEnabled,
-          ethNetworkConfig.getBootNodes(),
+          ethNetworkConfig,
           maxPeers,
           p2pHost,
           p2pPort,
@@ -623,7 +607,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           webSocketConfiguration,
           metricsConfiguration(),
           permissioningConfiguration);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
   }
@@ -674,7 +658,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
-  private JsonRpcConfiguration jsonRpcConfiguration() throws Exception {
+  private JsonRpcConfiguration jsonRpcConfiguration() {
 
     CommandLineUtils.checkOptionDependencies(
         logger,
@@ -718,7 +702,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         Arrays.asList(
             "--rpc-ws-api",
             "--rpc-ws-apis",
-            "--rpc-ws-refresh-delay",
             "--rpc-ws-host",
             "--rpc-ws-port",
             "--rpc-ws-authentication-enabled",
@@ -735,7 +718,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     webSocketConfiguration.setHost(rpcWsHost);
     webSocketConfiguration.setPort(rpcWsPort);
     webSocketConfiguration.setRpcApis(rpcWsApis);
-    webSocketConfiguration.setRefreshDelay(rpcWsRefreshDelay);
     webSocketConfiguration.setAuthenticationEnabled(isRpcWsAuthenticationEnabled);
     webSocketConfiguration.setAuthenticationCredentialsFile(rpcWsAuthenticationCredentialsFile());
     webSocketConfiguration.setHostsWhitelist(hostsWhitelist);
@@ -834,7 +816,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final PantheonController<?> controller,
       final boolean p2pEnabled,
       final boolean peerDiscoveryEnabled,
-      final Collection<?> bootstrapNodes,
+      final EthNetworkConfig ethNetworkConfig,
       final int maxPeers,
       final String discoveryHost,
       final int discoveryPort,
@@ -853,7 +835,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .pantheonController(controller)
             .p2pEnabled(p2pEnabled)
             .discovery(peerDiscoveryEnabled)
-            .bootstrapPeers(bootstrapNodes)
+            .ethNetworkConfig(ethNetworkConfig)
             .discoveryHost(discoveryHost)
             .discoveryPort(discoveryPort)
             .maxPeers(maxPeers)
@@ -1020,7 +1002,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private String rpcHttpAuthenticationCredentialsFile() throws Exception {
+  private String rpcHttpAuthenticationCredentialsFile() {
     String filename = null;
     if (isFullInstantiation()) {
       filename = standaloneCommands.rpcHttpAuthenticationCredentialsFile;

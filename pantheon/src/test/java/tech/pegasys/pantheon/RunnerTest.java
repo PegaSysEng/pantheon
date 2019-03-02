@@ -13,8 +13,11 @@
 package tech.pegasys.pantheon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.cli.EthNetworkConfig.DEV_NETWORK_ID;
+import static tech.pegasys.pantheon.cli.NetworkName.DEV;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -67,7 +70,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -78,13 +80,11 @@ public final class RunnerTest {
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   @Test
-  @Ignore
   public void fullSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FULL);
   }
 
   @Test
-  @Ignore
   public void fastSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FAST);
   }
@@ -147,7 +147,7 @@ public final class RunnerTest {
     final Runner runnerAhead =
         runnerBuilder
             .pantheonController(controllerAhead)
-            .bootstrapPeers(Collections.emptyList())
+            .ethNetworkConfig(EthNetworkConfig.getNetworkConfig(DEV))
             .jsonRpcConfiguration(aheadJsonRpcConfiguration)
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .metricsConfiguration(aheadMetricsConfiguration)
@@ -157,6 +157,16 @@ public final class RunnerTest {
     try {
 
       executorService.submit(runnerAhead::execute);
+
+      // Wait for network to initialize to get the P2P UDP port
+      Awaitility.await()
+          .atMost(20, TimeUnit.SECONDS)
+          .ignoreExceptions()
+          .untilAsserted(() -> assertThat(runnerAhead.getP2pUdpPort()).isNotNull());
+      Awaitility.await()
+          .atMost(20, TimeUnit.SECONDS)
+          .ignoreExceptions()
+          .untilAsserted(() -> assertThat(runnerAhead.getP2pTcpPort()).isNotNull());
 
       final SynchronizerConfiguration syncConfigBehind =
           SynchronizerConfiguration.builder()
@@ -182,16 +192,20 @@ public final class RunnerTest {
               PrivacyParameters.noPrivacy(),
               dataDirBehind,
               noOpMetricsSystem);
+      final EthNetworkConfig behindEthNetworkConfiguration =
+          new EthNetworkConfig(
+              EthNetworkConfig.jsonConfig(DEV),
+              DEV_NETWORK_ID,
+              Collections.singletonList(
+                  new DefaultPeer(
+                      aheadDbNodeKeys.getPublicKey().getEncodedBytes(),
+                      listenHost,
+                      runnerAhead.getP2pUdpPort(),
+                      runnerAhead.getP2pTcpPort())));
       final Runner runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
-              .bootstrapPeers(
-                  Collections.singletonList(
-                      new DefaultPeer(
-                          aheadDbNodeKeys.getPublicKey().getEncodedBytes(),
-                          listenHost,
-                          runnerAhead.getP2pUdpPort(),
-                          runnerAhead.getP2pTcpPort())))
+              .ethNetworkConfig(behindEthNetworkConfiguration)
               .jsonRpcConfiguration(behindJsonRpcConfiguration)
               .webSocketConfiguration(behindWebSocketConfiguration)
               .metricsConfiguration(behindMetricsConfiguration)
