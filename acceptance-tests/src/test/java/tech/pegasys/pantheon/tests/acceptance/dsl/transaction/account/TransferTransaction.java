@@ -16,6 +16,7 @@ import static org.web3j.utils.Numeric.toHexString;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Amount;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
@@ -30,35 +31,68 @@ import org.web3j.utils.Convert.Unit;
 
 public class TransferTransaction implements Transaction<Hash> {
 
+  /** Price for each for each GAS units in this transaction (wei). */
   private static final BigInteger MINIMUM_GAS_PRICE = BigInteger.valueOf(1000);
-  private static final BigInteger TRANSFER_GAS_COST = BigInteger.valueOf(21000);
+
+  /** Number of GAS units that the transaction will cost. */
+  private static final BigInteger INTRINSIC_GAS = BigInteger.valueOf(21000);
 
   private final Account sender;
   private final Account recipient;
-  private final String amount;
-  private final Unit unit;
-  private final Optional<BigInteger> nonce;
+  private final String transferAmount;
+  private final Unit transferUnit;
+  private final BigInteger gasPrice;
+  private final BigInteger nonce;
+
+  // TODO delete some of me!
 
   public TransferTransaction(
-      final Account sender, final Account recipient, final String amount, final Unit unit) {
-    this(sender, recipient, amount, unit, null);
+      final Account sender,
+      final Account recipient,
+      final Amount transferAmount,
+      final Amount executionCost) {
+    this.sender = sender;
+    this.recipient = recipient;
+    this.transferAmount = transferAmount.getValue();
+    this.transferUnit = transferAmount.getUnit();
+    this.gasPrice = convertGasPriceToWei(executionCost);
+    this.nonce = null;
+  }
+
+  public TransferTransaction(
+      final Account sender, final Account recipient, final Amount transferAmount) {
+    this.sender = sender;
+    this.recipient = recipient;
+    this.transferAmount = transferAmount.getValue();
+    this.transferUnit = transferAmount.getUnit();
+    this.gasPrice = MINIMUM_GAS_PRICE;
+    this.nonce = null;
+  }
+
+  public TransferTransaction(
+      final Account sender, final Account recipient, final String transferAmount, final Unit unit) {
+    this.sender = sender;
+    this.recipient = recipient;
+    this.transferAmount = transferAmount;
+    this.transferUnit = unit;
+    this.nonce = null;
+
+    this.gasPrice = MINIMUM_GAS_PRICE;
   }
 
   public TransferTransaction(
       final Account sender,
       final Account recipient,
-      final String amount,
+      final String transferAmount,
       final Unit unit,
       final BigInteger nonce) {
     this.sender = sender;
     this.recipient = recipient;
-    this.amount = amount;
-    this.unit = unit;
-    if (nonce != null) {
-      this.nonce = Optional.of(nonce);
-    } else {
-      this.nonce = Optional.empty();
-    }
+    this.transferAmount = transferAmount;
+    this.transferUnit = unit;
+    this.nonce = nonce;
+
+    this.gasPrice = MINIMUM_GAS_PRICE;
   }
 
   @Override
@@ -72,15 +106,39 @@ public class TransferTransaction implements Transaction<Hash> {
     }
   }
 
+  public Amount executionCost() {
+    return new Amount(INTRINSIC_GAS.multiply(gasPrice), Unit.WEI);
+  }
+
   public String signedTransactionData() {
+    final Optional<BigInteger> nonce = getNonce();
+
     final RawTransaction transaction =
         RawTransaction.createEtherTransaction(
             nonce.orElse(nonce.orElseGet(sender::getNextNonce)),
-            MINIMUM_GAS_PRICE,
-            TRANSFER_GAS_COST,
+            gasPrice,
+            INTRINSIC_GAS,
             recipient.getAddress(),
-            Convert.toWei(amount, unit).toBigIntegerExact());
+            Convert.toWei(transferAmount, transferUnit).toBigIntegerExact());
 
     return toHexString(TransactionEncoder.signMessage(transaction, sender.web3jCredentials()));
+  }
+
+  private Optional<BigInteger> getNonce() {
+    return nonce == null ? Optional.empty() : Optional.of(nonce);
+  }
+
+  private BigInteger convertGasPriceToWei(final Amount unconverted) {
+    final BigInteger price =
+        Convert.toWei(unconverted.getValue(), unconverted.getUnit()).toBigInteger();
+
+    if (MINIMUM_GAS_PRICE.compareTo(price) == 1) {
+      throw new IllegalArgumentException(
+          String.format(
+              "Gas price: %s WEI, is below the accepted minimum: %s WEI",
+              price, MINIMUM_GAS_PRICE));
+    }
+
+    return price;
   }
 }

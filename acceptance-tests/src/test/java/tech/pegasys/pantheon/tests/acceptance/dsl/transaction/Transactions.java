@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
+import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Amount;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransactionSet;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaGetTransactionReceiptTransaction;
@@ -47,9 +48,26 @@ public class Transactions {
     return createTransfer(accounts.getPrimaryBenefactor(), recipient, amount);
   }
 
+  public TransferTransaction createTransfer(final Account recipient, final Amount amount) {
+    return createTransfer(accounts.getPrimaryBenefactor(), recipient, amount);
+  }
+
   public TransferTransaction createTransfer(
       final Account sender, final Account recipient, final int amount) {
     return new TransferTransaction(sender, recipient, String.valueOf(amount), Unit.ETHER);
+  }
+
+  public TransferTransaction createTransfer(
+      final Account sender,
+      final Account recipient,
+      final Amount amount,
+      final Amount transferCost) {
+    return new TransferTransaction(sender, recipient, amount, transferCost);
+  }
+
+  public TransferTransaction createTransfer(
+      final Account sender, final Account recipient, final Amount amount) {
+    return new TransferTransaction(sender, recipient, amount);
   }
 
   public TransferTransaction createTransfer(

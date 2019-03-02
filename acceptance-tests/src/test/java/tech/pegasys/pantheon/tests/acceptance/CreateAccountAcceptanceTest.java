@@ -16,7 +16,9 @@ import static org.web3j.utils.Convert.Unit.ETHER;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
+import tech.pegasys.pantheon.tests.acceptance.dsl.blockchain.Amount;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransaction;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,14 +29,49 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    minerNode = pantheon.createMinerNode("node1");
-    cluster.start(minerNode, pantheon.createArchiveNode("node2"));
+    minerNode = pantheon.createMinerNode("minerNode");
+    cluster.start(minerNode, pantheon.createArchiveNode("archiveNode"));
   }
 
   @Test
   public void shouldCreateAnAccount() {
-    final Account account = accounts.createAccount("a-new-account");
+    final Account account = accounts.createAccount("account-one");
     minerNode.execute(transactions.createTransfer(account, 20));
     cluster.verify(account.balanceEquals("20", ETHER));
+  }
+
+  @Test
+  public void transitiveTransfer() {
+
+    // Create accounts: one & two
+    final Account accountOne = accounts.createAccount("account-one");
+    final Account accountTwo = accounts.createAccount("account-two");
+
+    // Create transfer of 20 ETH from fund pool to account one
+    final Amount accountOneStartingBalance = new Amount(20, ETHER);
+
+    // Execute the transfer order
+    minerNode.execute(transactions.createTransfer(accountOne, accountOneStartingBalance));
+
+    // Verify account one balance == 20 ETH
+    cluster.verify(accountOne.balanceEquals(accountOneStartingBalance));
+
+    // Create transfer of 15 ETH from one to two (using default gas price)
+    final Amount transferAmount = new Amount(15, ETHER);
+    final TransferTransaction transitiveTransfer =
+        transactions.createTransfer(accountOne, accountTwo, transferAmount);
+
+    // Execute the transfer order
+    minerNode.execute(transitiveTransfer);
+
+    // Verify account one balance == 20 ETH - 15 ETH - execution cost
+    final Amount balanceAfter =
+        accountOneStartingBalance
+            .subtract(transitiveTransfer.executionCost())
+            .subtract(transferAmount);
+    cluster.verify(accountOne.balanceEquals(balanceAfter));
+
+    // Verify account two balance == 15 ETH
+    cluster.verify(accountTwo.balanceEquals("15", ETHER));
   }
 }
