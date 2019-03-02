@@ -36,8 +36,11 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldCreateAnAccount() {
     final Account account = accounts.createAccount("account-one");
-    minerNode.execute(transactions.createTransfer(account, 20));
-    cluster.verify(account.balanceEquals("20", ETHER));
+    final Amount balance = Amount.ether(20);
+
+    minerNode.execute(transactions.createTransfer(account, balance));
+
+    cluster.verify(account.balanceEquals(balance));
   }
 
   @Test
@@ -48,7 +51,7 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
     final Account accountTwo = accounts.createAccount("account-two");
 
     // Create transfer of 20 ETH from fund pool to account one
-    final Amount accountOneStartingBalance = new Amount(20, ETHER);
+    final Amount accountOneStartingBalance = Amount.ether(20);
 
     // Execute the transfer order
     minerNode.execute(transactions.createTransfer(accountOne, accountOneStartingBalance));
@@ -57,7 +60,7 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
     cluster.verify(accountOne.balanceEquals(accountOneStartingBalance));
 
     // Create transfer of 15 ETH from one to two (using default gas price)
-    final Amount transferAmount = new Amount(15, ETHER);
+    final Amount transferAmount = Amount.ether(15);
     final TransferTransaction transitiveTransfer =
         transactions.createTransfer(accountOne, accountTwo, transferAmount);
 

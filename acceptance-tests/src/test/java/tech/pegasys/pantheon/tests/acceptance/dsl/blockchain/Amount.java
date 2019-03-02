@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.blockchain;
 
+import static org.web3j.utils.Convert.Unit.ETHER;
+import static org.web3j.utils.Convert.Unit.WEI;
+
 import java.math.BigInteger;
 
 import org.web3j.utils.Convert;
@@ -22,12 +25,12 @@ public class Amount {
   private String value;
   private Unit unit;
 
-  public Amount(final int value, final Unit unit) {
+  private Amount(final long value, final Unit unit) {
     this.value = String.valueOf(value);
     this.unit = unit;
   }
 
-  public Amount(final BigInteger value, final Unit unit) {
+  private Amount(final BigInteger value, final Unit unit) {
     this.value = value.toString();
     this.unit = unit;
   }
@@ -57,5 +60,13 @@ public class Amount {
             .toBigInteger();
 
     return new Amount(result, denominator);
+  }
+
+  public static Amount ether(final long value) {
+    return new Amount(value, ETHER);
+  }
+
+  public static Amount wei(final BigInteger value) {
+    return new Amount(value, WEI);
   }
 }

@@ -107,7 +107,7 @@ public class TransferTransaction implements Transaction<Hash> {
   }
 
   public Amount executionCost() {
-    return new Amount(INTRINSIC_GAS.multiply(gasPrice), Unit.WEI);
+    return Amount.wei(INTRINSIC_GAS.multiply(gasPrice));
   }
 
   public String signedTransactionData() {
