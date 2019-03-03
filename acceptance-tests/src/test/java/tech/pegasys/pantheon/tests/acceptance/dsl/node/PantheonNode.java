@@ -368,7 +368,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     try (final FileInputStream fis =
         new FileInputStream(new File(homeDirectory.toFile(), "pantheon.ports"))) {
       portsProperties.load(fis);
-      LOG.info("Ports: " + portsProperties);
+      LOG.info("Ports for node {}: {}", name, portsProperties);
     } catch (final IOException e) {
       throw new RuntimeException("Error reading Pantheon ports file", e);
     }
