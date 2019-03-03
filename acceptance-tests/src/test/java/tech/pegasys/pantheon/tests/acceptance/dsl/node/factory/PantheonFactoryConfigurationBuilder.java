@@ -45,7 +45,6 @@ public class PantheonFactoryConfigurationBuilder {
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
   private Boolean p2pEnabled = true;
   private boolean discoveryEnabled = true;
-  private boolean isBootnode = true;
   private List<String> bootnodes = new ArrayList<>();
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
@@ -161,11 +160,6 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setIsBootnode(final boolean isBootnode) {
-    this.isBootnode = isBootnode;
-    return this;
-  }
-
   public PantheonFactoryConfigurationBuilder setBootnodes(final List<String> bootnodes) {
     this.bootnodes.addAll(bootnodes);
     return this;
@@ -184,7 +178,6 @@ public class PantheonFactoryConfigurationBuilder {
         genesisConfigProvider,
         p2pEnabled,
         discoveryEnabled,
-        isBootnode,
         bootnodes);
   }
 }

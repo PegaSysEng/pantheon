@@ -65,7 +65,6 @@ public class PantheonNodeFactory {
         config.getGenesisConfigProvider(),
         config.getP2pEnabled(),
         config.isDiscoveryEnabled(),
-        config.isBootnode(),
         config.getBootnodes());
   }
 
@@ -97,16 +96,6 @@ public class PantheonNodeFactory {
             .setName(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
-            .build());
-  }
-
-  public PantheonNode createNonBootnodeArchiveNode(final String name) throws IOException {
-    return create(
-        new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .jsonRpcEnabled()
-            .webSocketEnabled()
-            .setIsBootnode(false)
             .build());
   }
 

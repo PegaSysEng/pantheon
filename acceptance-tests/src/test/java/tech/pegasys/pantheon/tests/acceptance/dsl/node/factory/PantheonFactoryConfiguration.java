@@ -36,7 +36,6 @@ class PantheonFactoryConfiguration {
   private final GenesisConfigProvider genesisConfigProvider;
   private final Boolean p2pEnabled;
   private final boolean discoveryEnabled;
-  private final boolean isBootnode;
   private final List<String> bootnodes;
 
   PantheonFactoryConfiguration(
@@ -51,7 +50,6 @@ class PantheonFactoryConfiguration {
       final GenesisConfigProvider genesisConfigProvider,
       final Boolean p2pEnabled,
       final boolean discoveryEnabled,
-      final boolean isBootnode,
       final List<String> bootnodes) {
     this.name = name;
     this.miningParameters = miningParameters;
@@ -64,7 +62,6 @@ class PantheonFactoryConfiguration {
     this.genesisConfigProvider = genesisConfigProvider;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
-    this.isBootnode = isBootnode;
     this.bootnodes = bootnodes;
   }
 
@@ -110,10 +107,6 @@ class PantheonFactoryConfiguration {
 
   public Boolean getP2pEnabled() {
     return p2pEnabled;
-  }
-
-  public boolean isBootnode() {
-    return isBootnode;
   }
 
   public List<String> getBootnodes() {
