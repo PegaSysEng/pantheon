@@ -30,4 +30,6 @@ public interface RunnableNode extends Node {
   String getName();
 
   Address getAddress();
+
+  String enodeUrl();
 }

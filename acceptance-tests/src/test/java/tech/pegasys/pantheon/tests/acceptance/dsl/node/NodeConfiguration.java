@@ -20,8 +20,6 @@ import java.util.Optional;
 
 public interface NodeConfiguration {
 
-  String enodeUrl();
-
   void bootnodes(List<String> bootnodes);
 
   List<URI> bootnodes();

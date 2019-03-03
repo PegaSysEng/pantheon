@@ -16,12 +16,10 @@ import static java.util.Arrays.asList;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
 
-import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,8 +62,7 @@ public class NodesWhitelistAcceptanceTest extends AcceptanceTestBase {
     permissionedNode.verify(net.awaitPeerCount(2));
 
     // remove allowed node from the whitelist
-    permissionedNode.verify(
-        perm.removeNodesFromWhitelist(Lists.newArrayList(((PantheonNode) allowedNode).enodeUrl())));
+    permissionedNode.verify(perm.removeNodesFromWhitelist(allowedNode));
 
     permissionedNode.verify(net.awaitPeerCount(1));
   }

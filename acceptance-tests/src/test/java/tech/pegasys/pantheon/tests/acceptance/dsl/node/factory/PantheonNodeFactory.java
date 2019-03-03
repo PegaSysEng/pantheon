@@ -31,7 +31,6 @@ import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.NodeConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
@@ -246,8 +245,7 @@ public class PantheonNodeFactory {
   private List<URI> convertToEnodes(final List<Node> nodes) {
     return nodes.stream()
         .map(node -> (RunnableNode) node)
-        .map(RunnableNode::getConfiguration)
-        .map(NodeConfiguration::enodeUrl)
+        .map(RunnableNode::enodeUrl)
         .map(URI::create)
         .collect(toList());
   }
@@ -262,13 +260,13 @@ public class PantheonNodeFactory {
 
   public PantheonNode createNodeWithAccountsWhitelist(
       final String name, final List<String> accountsWhitelist) throws IOException {
-    PermissioningConfiguration permissioningConfiguration =
+    final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setAccountWhitelist(accountsWhitelist);
     permissioningConfiguration.setConfigurationFilePath(
         createTempPermissioningConfigurationFile().getPath());
 
-    File tempFile = createTempPermissioningConfigurationFile();
+    final File tempFile = createTempPermissioningConfigurationFile();
     tempFile.deleteOnExit();
     permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
     initPermissioningConfigurationFile(
@@ -284,7 +282,7 @@ public class PantheonNodeFactory {
   }
 
   private File createTempPermissioningConfigurationFile() throws IOException {
-    File tempFile = File.createTempFile("temp", "temp");
+    final File tempFile = File.createTempFile("temp", "temp");
     tempFile.deleteOnExit();
     return tempFile;
   }
@@ -379,9 +377,9 @@ public class PantheonNodeFactory {
 
   private String genesisTemplateConfig(final String template) {
     try {
-      URI uri = Resources.getResource(template).toURI();
+      final URI uri = Resources.getResource(template).toURI();
       return Resources.toString(uri.toURL(), Charset.defaultCharset());
-    } catch (URISyntaxException | IOException e) {
+    } catch (final URISyntaxException | IOException e) {
       throw new IllegalStateException("Unable to get test genesis config " + template);
     }
   }
