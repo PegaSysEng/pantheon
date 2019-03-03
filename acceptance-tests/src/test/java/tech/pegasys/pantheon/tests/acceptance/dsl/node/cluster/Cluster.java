@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeRunner;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ public class Cluster implements AutoCloseable {
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
   private final Net net;
   private final ClusterConfiguration clusterConfiguration;
+  private List<String> bootNodes = emptyList();
 
   public Cluster(final Net net) {
     this(new ClusterConfigurationBuilder().build(), net);
@@ -90,25 +92,12 @@ public class Cluster implements AutoCloseable {
           node.getConfiguration().ethNetworkConfig(ethNetworkConfig);
           node.start(pantheonNodeRunner);
         });
-    final List<String> bootNodes =
+    bootNodes =
         bootnode.map(node -> singletonList(node.getConfiguration().enodeUrl())).orElse(emptyList());
 
     nodes.stream()
         .filter(node -> bootnode.map(boot -> boot != node).orElse(true))
-        .forEach(
-            node -> {
-              if (node.getConfiguration().bootnodes().isEmpty()) {
-                node.getConfiguration().bootnodes(bootNodes);
-              }
-              final Optional<EthNetworkConfig> ethNetworkConfig =
-                  node.getConfiguration()
-                      .genesisConfigProvider()
-                      .createGenesisConfig(nodes)
-                      .map(config -> new EthNetworkConfig(config, NETWORK_ID, bootNodes));
-              node.getConfiguration().ethNetworkConfig(ethNetworkConfig);
-              LOG.info("Starting node {}", node.getName());
-              node.start(pantheonNodeRunner);
-            });
+        .forEach(node -> addNode(nodes, node));
 
     if (clusterConfiguration.isAwaitPeerDiscovery()) {
       for (final RunnableNode node : nodes) {
@@ -116,6 +105,26 @@ public class Cluster implements AutoCloseable {
         node.awaitPeerDiscovery(net.awaitPeerCount(nodes.size() - 1));
       }
     }
+  }
+
+  public void addNode(final Node node) {
+    addNode(new ArrayList<>(this.nodes.values()), (RunnableNode) node);
+    if (clusterConfiguration.isAwaitPeerDiscovery()) {
+      ((RunnableNode) node).awaitPeerDiscovery(net.awaitPeerCount(nodes.size() - 1));
+    }
+  }
+
+  private void addNode(final List<? extends RunnableNode> nodes, final RunnableNode node) {
+    if (node.getConfiguration().bootnodes().isEmpty()) {
+      node.getConfiguration().bootnodes(bootNodes);
+    }
+    final Optional<String> genesisConfig =
+        node.getConfiguration().genesisConfigProvider().createGenesisConfig(nodes);
+    final Optional<EthNetworkConfig> ethNetworkConfig =
+        genesisConfig.map(config -> new EthNetworkConfig(config, NETWORK_ID, bootNodes));
+    node.getConfiguration().ethNetworkConfig(ethNetworkConfig);
+    LOG.info("Starting node {}", node.getName());
+    node.start(pantheonNodeRunner);
   }
 
   public void stop() {

@@ -67,7 +67,7 @@ import org.web3j.protocol.websocket.WebSocketListener;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
 
-public class PantheonNode implements Node, NodeConfiguration, RunnableNode, AutoCloseable {
+public class PantheonNode implements NodeConfiguration, RunnableNode, AutoCloseable {
 
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();

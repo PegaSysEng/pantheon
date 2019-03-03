@@ -30,6 +30,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.NodeConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 
@@ -244,6 +246,21 @@ public class PantheonNodeFactory {
             .setPermissioningConfiguration(permissioningConfiguration)
             .setBootnodes(bootnodesAsStrings)
             .build());
+  }
+
+  public PantheonNode createNodeWithBootnodeAndNodesWhitelist(
+      final String name, final Node bootnode, final List<Node> nodesWhitelist) throws IOException {
+    return createNodeWithBootnodeAndNodesWhitelist(
+        name, convertToEnodes(singletonList(bootnode)), convertToEnodes(nodesWhitelist));
+  }
+
+  private List<URI> convertToEnodes(final List<Node> nodes) {
+    return nodes.stream()
+        .map(node -> (RunnableNode) node)
+        .map(RunnableNode::getConfiguration)
+        .map(NodeConfiguration::enodeUrl)
+        .map(URI::create)
+        .collect(toList());
   }
 
   private void initPermissioningConfigurationFile(

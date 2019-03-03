@@ -12,16 +12,14 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.permissioning;
 
+import static java.util.Arrays.asList;
+
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
-
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -45,13 +43,12 @@ public class NodesWhitelistAcceptanceTest extends AcceptanceTestBase {
     forbiddenNode = pantheon.createNonBootnodeArchiveNode("forbidden-node");
     allowedNode = pantheon.createNonBootnodeArchiveNode("allowed-node");
 
-    final List<URI> bootnodes = Arrays.asList(getEnodeURI(bootnode));
-    final List<URI> nodeWhitelist = Arrays.asList(getEnodeURI(bootnode), getEnodeURI(allowedNode));
+    permissionedCluster.start(bootnode, allowedNode, forbiddenNode);
 
     permissionedNode =
         pantheon.createNodeWithBootnodeAndNodesWhitelist(
-            "permissioned-node", bootnodes, nodeWhitelist);
-    permissionedCluster.start(bootnode, allowedNode, forbiddenNode, permissionedNode);
+            "permissioned-node", bootnode, asList(bootnode, allowedNode));
+    permissionedCluster.addNode(permissionedNode);
   }
 
   @Test
@@ -71,10 +68,6 @@ public class NodesWhitelistAcceptanceTest extends AcceptanceTestBase {
         perm.removeNodesFromWhitelist(Lists.newArrayList(((PantheonNode) allowedNode).enodeUrl())));
 
     permissionedNode.verify(net.awaitPeerCount(1));
-  }
-
-  private URI getEnodeURI(final Node node) {
-    return URI.create(((PantheonNode) node).getConfiguration().enodeUrl());
   }
 
   @Override
