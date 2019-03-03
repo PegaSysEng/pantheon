@@ -42,7 +42,7 @@ public interface NodeConfiguration {
 
   void ethNetworkConfig(Optional<EthNetworkConfig> ethNetworkConfig);
 
-  Boolean isP2pEnabled();
+  boolean isP2pEnabled();
 
   boolean isDiscoveryEnabled();
 }

@@ -438,7 +438,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public Boolean isP2pEnabled() {
+  public boolean isP2pEnabled() {
     return p2pEnabled;
   }
 
