@@ -59,9 +59,11 @@ public class AdminAddPeerWithP2PDisabledAcceptanceTest extends AcceptanceTestBas
   }
 
   @Test
-  public void adminAddPeerHasNoEffectWhenP2PDisabledOnInputNode() {
-    final String nodeAEnode = nodeA.enodeUrl();
-    nodeB.verify(admin.addPeer(nodeAEnode));
+  public void adminAddPeerHasNoEffectWhenOtherNodeNotAvailable() {
+    // If you have an ethereum node listening on port 1, this test may fail. Don't do that.
+    nodeB.verify(
+        admin.addPeer(
+            "enode://d2567893371ea5a6fa6371d483891ed0d129e79a8fc74d6df95a00a6545444cd4a6960bbffe0b4e2edcf35135271de57ee559c0909236bbc2074346ef2b5b47c@127.0.0.1:1"));
     nodeB.verify(net.awaitPeerCount(0));
   }
 }
