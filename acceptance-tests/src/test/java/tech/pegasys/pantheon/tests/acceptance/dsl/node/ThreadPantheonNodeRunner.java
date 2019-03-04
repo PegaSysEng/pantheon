@@ -17,7 +17,6 @@ import static tech.pegasys.pantheon.cli.NetworkName.DEV;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
-import tech.pegasys.pantheon.cli.EthNetworkConfig.Builder;
 import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -52,8 +51,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
-    final Builder networkConfigBuilder =
-        new Builder(EthNetworkConfig.getNetworkConfig(DEV))
+    final EthNetworkConfig.Builder networkConfigBuilder =
+        new EthNetworkConfig.Builder(EthNetworkConfig.getNetworkConfig(DEV))
             .setBootNodes(node.getConfiguration().bootnodes());
     node.getConfiguration().getGenesisConfig().ifPresent(networkConfigBuilder::setGenesisConfig);
     final EthNetworkConfig ethNetworkConfig = networkConfigBuilder.build();
