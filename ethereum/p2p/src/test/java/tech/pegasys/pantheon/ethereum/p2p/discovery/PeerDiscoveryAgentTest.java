@@ -31,11 +31,14 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
 
 public class PeerDiscoveryAgentTest {
+
+  private static final int BROADCAST_TCP_PORT = 30303;
   private final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
 
   @Test
@@ -64,6 +67,7 @@ public class PeerDiscoveryAgentTest {
     final List<DiscoveryPeer> otherPeers =
         otherAgents.stream()
             .map(MockPeerDiscoveryAgent::getAdvertisedPeer)
+            .map(Optional::get)
             .collect(Collectors.toList());
 
     // Start another peer pointing to those 20 agents.
@@ -82,7 +86,7 @@ public class PeerDiscoveryAgentTest {
     packet =
         Packet.create(
             PacketType.FIND_NEIGHBORS,
-            FindNeighborsPacketData.create(otherAgents.get(0).getAdvertisedPeer().getId()),
+            FindNeighborsPacketData.create(otherAgents.get(0).getAdvertisedPeer().get().getId()),
             testAgent.getKeyPair());
     helper.sendMessageBetweenAgents(testAgent, agent, packet);
 
@@ -106,18 +110,18 @@ public class PeerDiscoveryAgentTest {
     otherPeers.removeAll(neighbors.getNodes());
     assertThat(otherPeers.size()).isBetween(4, 5);
     if (otherPeers.size() == 5) {
-      assertThat(neighbors.getNodes()).contains(testAgent.getAdvertisedPeer());
+      assertThat(neighbors.getNodes()).contains(testAgent.getAdvertisedPeer().get());
     }
   }
 
   @Test
   public void shouldEvictPeerOnDisconnect() {
     final MockPeerDiscoveryAgent peerDiscoveryAgent1 = helper.startDiscoveryAgent();
-    peerDiscoveryAgent1.start().join();
-    final DiscoveryPeer peer = peerDiscoveryAgent1.getAdvertisedPeer();
+    peerDiscoveryAgent1.start(BROADCAST_TCP_PORT).join();
+    final DiscoveryPeer peer = peerDiscoveryAgent1.getAdvertisedPeer().get();
 
     final MockPeerDiscoveryAgent peerDiscoveryAgent2 = helper.startDiscoveryAgent(peer);
-    peerDiscoveryAgent2.start().join();
+    peerDiscoveryAgent2.start(BROADCAST_TCP_PORT).join();
 
     assertThat(peerDiscoveryAgent2.getPeers().size()).isEqualTo(1);
 
