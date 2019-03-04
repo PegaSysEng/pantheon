@@ -23,17 +23,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 public class PeerDiscoveryObserversTest {
-  private static final Logger LOG = LogManager.getLogger();
-  private static final int BROADCAST_TCP_PORT = 26422;
+  private static final int BROADCAST_TCP_PORT = 30303;
   private final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
 
   @Test
@@ -87,6 +85,7 @@ public class PeerDiscoveryObserversTest {
     final List<DiscoveryPeer> peers1 =
         others1.stream()
             .map(MockPeerDiscoveryAgent::getAdvertisedPeer)
+            .map(Optional::get)
             .collect(Collectors.toList());
 
     // Create two discovery agents pointing to the above as bootstrap peers.
@@ -94,6 +93,7 @@ public class PeerDiscoveryObserversTest {
     final List<DiscoveryPeer> peers2 =
         others2.stream()
             .map(MockPeerDiscoveryAgent::getAdvertisedPeer)
+            .map(Optional::get)
             .collect(Collectors.toList());
 
     // A list of all peers.
@@ -106,7 +106,7 @@ public class PeerDiscoveryObserversTest {
     // A queue for storing peer bonded events.
     final List<PeerBondedEvent> events = new ArrayList<>(10);
     agent.observePeerBondedEvents(events::add);
-    agent.start();
+    agent.start(BROADCAST_TCP_PORT).join();
 
     final HashSet<BytesValue> seenPeers = new HashSet<>();
     List<DiscoveryPeer> discoveredPeers =
@@ -132,7 +132,7 @@ public class PeerDiscoveryObserversTest {
     // Create 3 discovery agents with no bootstrap peers.
     final List<MockPeerDiscoveryAgent> others =
         helper.startDiscoveryAgents(3, Collections.emptyList());
-    final DiscoveryPeer peer = others.get(0).getAdvertisedPeer();
+    final DiscoveryPeer peer = others.get(0).getAdvertisedPeer().get();
 
     // Create a discovery agent (which we'll assert on), using the above two peers as bootstrap
     // peers.
@@ -146,7 +146,7 @@ public class PeerDiscoveryObserversTest {
     queues.forEach(q -> agent.observePeerBondedEvents(q::add));
 
     // Start the agent and wait until each queue receives one event.
-    agent.start();
+    agent.start(BROADCAST_TCP_PORT).join();
     for (List<PeerBondedEvent> eventQueue : queues) {
       assertThat(eventQueue.size()).isEqualTo(1);
     }
