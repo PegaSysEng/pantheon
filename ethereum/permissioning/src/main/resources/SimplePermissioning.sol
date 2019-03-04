@@ -10,9 +10,9 @@ contract SimplePermissioning {
     }
     mapping(bytes => EnodeIpv6) private whitelistIpv6; // should there be a size for the whitelist?
 
-    function connectionAllowedIpv6(bytes32 sourceEnodeHigh, bytes32 sourceEnodeLow, bytes16 sourceEnodeIpv4, uint16 sourceEnodePort) public view returns (bool){
+    function connectionAllowedIpv6(bytes32 sourceEnodeHigh, bytes32 sourceEnodeLow, bytes16 sourceEnodeIpv6, uint16 sourceEnodePort) public view returns (bool){
         require (sourceEnodePort > 0 && sourceEnodePort < 99999, "port out of range");
-        bytes memory key = computeKey(sourceEnodeHigh, sourceEnodeLow, sourceEnodeIpv4, sourceEnodePort);
+        bytes memory key = computeKey(sourceEnodeHigh, sourceEnodeLow, sourceEnodeIpv6, sourceEnodePort);
         EnodeIpv6 storage whitelistSource = whitelistIpv6[key];
         if (whitelistSource.enodeHigh == sourceEnodeHigh) {
             return true;
