@@ -101,11 +101,11 @@ public class PantheonNodeFactory {
   public Node createArchiveNodeThatMustNotBeTheBootnode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-        .setName(name)
-        .jsonRpcEnabled()
-        .webSocketEnabled()
-        .bootnodeEligible(false)
-        .build());
+            .setName(name)
+            .jsonRpcEnabled()
+            .webSocketEnabled()
+            .bootnodeEligible(false)
+            .build());
   }
 
   public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)

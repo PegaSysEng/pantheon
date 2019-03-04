@@ -43,7 +43,7 @@ public class PantheonFactoryConfigurationBuilder {
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
   private Boolean p2pEnabled = true;
   private boolean discoveryEnabled = true;
-  private boolean bootnodeEligible;
+  private boolean bootnodeEligible = true;
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
     this.name = name;
