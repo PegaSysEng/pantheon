@@ -41,4 +41,6 @@ public interface NodeConfiguration {
   boolean isP2pEnabled();
 
   boolean isDiscoveryEnabled();
+
+  boolean isBootnodeEligible();
 }

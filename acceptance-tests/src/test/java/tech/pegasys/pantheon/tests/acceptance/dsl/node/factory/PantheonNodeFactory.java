@@ -62,8 +62,9 @@ public class PantheonNodeFactory {
         config.getPermissioningConfiguration(),
         config.isDevMode(),
         config.getGenesisConfigProvider(),
-        config.getP2pEnabled(),
-        config.isDiscoveryEnabled());
+        config.isP2pEnabled(),
+        config.isDiscoveryEnabled(),
+        config.isBootnodeEligible());
   }
 
   public PantheonNode createMinerNode(final String name) throws IOException {
@@ -95,6 +96,16 @@ public class PantheonNodeFactory {
             .jsonRpcEnabled()
             .webSocketEnabled()
             .build());
+  }
+
+  public Node createArchiveNodeThatMustNotBeTheBootnode(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+        .setName(name)
+        .jsonRpcEnabled()
+        .webSocketEnabled()
+        .bootnodeEligible(false)
+        .build());
   }
 
   public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)

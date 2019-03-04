@@ -91,6 +91,7 @@ public class Cluster implements AutoCloseable {
       final List<? extends RunnableNode> nodes) {
     final Optional<? extends RunnableNode> bootnode =
         nodes.stream()
+            .filter(node -> node.getConfiguration().isBootnodeEligible())
             .filter(node -> node.getConfiguration().isP2pEnabled())
             .filter(node -> node.getConfiguration().isDiscoveryEnabled())
             .findFirst();

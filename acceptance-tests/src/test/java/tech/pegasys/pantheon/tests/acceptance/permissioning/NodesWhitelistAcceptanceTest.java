@@ -36,7 +36,7 @@ public class NodesWhitelistAcceptanceTest extends AcceptanceTestBase {
 
     permissionedCluster = new Cluster(clusterConfiguration, net);
     bootnode = pantheon.createArchiveNode("bootnode");
-    forbiddenNode = pantheon.createArchiveNode("forbidden-node");
+    forbiddenNode = pantheon.createArchiveNodeThatMustNotBeTheBootnode("forbidden-node");
     allowedNode = pantheon.createArchiveNode("allowed-node");
 
     permissionedCluster.start(bootnode, allowedNode, forbiddenNode);

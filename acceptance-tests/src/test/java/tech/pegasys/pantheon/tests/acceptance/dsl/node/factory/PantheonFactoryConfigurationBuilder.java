@@ -43,6 +43,7 @@ public class PantheonFactoryConfigurationBuilder {
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
   private Boolean p2pEnabled = true;
   private boolean discoveryEnabled = true;
+  private boolean bootnodeEligible;
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
     this.name = name;
@@ -117,6 +118,11 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder bootnodeEligible(final boolean bootnodeEligible) {
+    this.bootnodeEligible = bootnodeEligible;
+    return this;
+  }
+
   public PantheonFactoryConfigurationBuilder webSocketAuthenticationEnabled()
       throws URISyntaxException {
     final String authTomlPath =
@@ -169,6 +175,7 @@ public class PantheonFactoryConfigurationBuilder {
         devMode,
         genesisConfigProvider,
         p2pEnabled,
-        discoveryEnabled);
+        discoveryEnabled,
+        bootnodeEligible);
   }
 }

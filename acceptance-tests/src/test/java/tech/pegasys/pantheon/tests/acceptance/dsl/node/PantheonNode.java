@@ -88,6 +88,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final boolean devMode;
   private final boolean discoveryEnabled;
   private final List<URI> bootnodes = new ArrayList<>();
+  private final boolean bootnodeEligible;
 
   private Optional<String> genesisConfig = Optional.empty();
   private JsonRequestFactories jsonRequestFactories;
@@ -105,9 +106,11 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final Optional<PermissioningConfiguration> permissioningConfiguration,
       final boolean devMode,
       final GenesisConfigProvider genesisConfigProvider,
-      final Boolean p2pEnabled,
-      final boolean discoveryEnabled)
+      final boolean p2pEnabled,
+      final boolean discoveryEnabled,
+      final boolean bootnodeEligible)
       throws IOException {
+    this.bootnodeEligible = bootnodeEligible;
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
     this.name = name;
@@ -439,6 +442,11 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   @Override
   public boolean isP2pEnabled() {
     return p2pEnabled;
+  }
+
+  @Override
+  public boolean isBootnodeEligible() {
+    return bootnodeEligible;
   }
 
   @Override
