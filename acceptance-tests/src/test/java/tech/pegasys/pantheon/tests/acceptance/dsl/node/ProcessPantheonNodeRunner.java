@@ -14,12 +14,14 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.ProcessBuilder.Redirect;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +30,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -38,8 +42,10 @@ import org.awaitility.Awaitility;
 public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
   private final Logger LOG = LogManager.getLogger();
+  private final Logger PROCESS_LOG = LogManager.getLogger("tech.pegasys.pantheon.SubProcessLog");
 
   private final Map<String, Process> pantheonProcesses = new HashMap<>();
+  private final ExecutorService outputProcessorExecutor = Executors.newCachedThreadPool();
 
   ProcessPantheonNodeRunner() {
     Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
@@ -51,6 +57,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
     final List<String> params = new ArrayList<>();
     params.add("build/install/pantheon/bin/pantheon");
+
     params.add("--data-path");
     params.add(dataDir.toAbsolutePath().toString());
 
@@ -66,7 +73,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     params.add(node.p2pListenHost());
 
     params.add("--p2p-port");
-    params.add(Integer.toString(node.p2pListenPort()));
+    params.add("0");
 
     if (node.getMiningParameters().isMiningEnabled()) {
       params.add("--miner-enabled");
@@ -124,16 +131,15 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       }
     }
 
-    if (node.ethNetworkConfig().isPresent()) {
-      final EthNetworkConfig ethNetworkConfig = node.ethNetworkConfig().get();
-      final Path genesisFile = createGenesisFile(node, ethNetworkConfig);
-      params.add("--genesis-file");
-      params.add(genesisFile.toString());
-      params.add("--network-id");
-      params.add(Integer.toString(ethNetworkConfig.getNetworkId()));
-    }
+    node.getGenesisConfig()
+        .ifPresent(
+            genesis -> {
+              final Path genesisFile = createGenesisFile(node, genesis);
+              params.add("--genesis-file");
+              params.add(genesisFile.toAbsolutePath().toString());
+            });
 
-    if (!node.p2pEnabled()) {
+    if (!node.isP2pEnabled()) {
       params.add("--p2p-enabled");
       params.add("false");
     }
@@ -157,10 +163,12 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     final ProcessBuilder processBuilder =
         new ProcessBuilder(params)
             .directory(new File(System.getProperty("user.dir")).getParentFile())
-            .inheritIO();
+            .redirectErrorStream(true)
+            .redirectInput(Redirect.INHERIT);
 
     try {
       final Process process = processBuilder.start();
+      outputProcessorExecutor.submit(() -> printOutput(node, process));
       pantheonProcesses.put(node.getName(), process);
     } catch (final IOException e) {
       LOG.error("Error starting PantheonNode process", e);
@@ -169,11 +177,24 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     waitForPortsFile(dataDir);
   }
 
-  private Path createGenesisFile(final PantheonNode node, final EthNetworkConfig ethNetworkConfig) {
+  private void printOutput(final PantheonNode node, final Process process) {
+    try (final BufferedReader in =
+        new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8))) {
+      String line = in.readLine();
+      while (line != null) {
+        PROCESS_LOG.info("{}: {}", node.getName(), line);
+        line = in.readLine();
+      }
+    } catch (final IOException e) {
+      LOG.error("Failed to read output from process", e);
+    }
+  }
+
+  private Path createGenesisFile(final PantheonNode node, final String genesisConfig) {
     try {
       final Path genesisFile = Files.createTempFile(node.homeDirectory(), "genesis", "");
       genesisFile.toFile().deleteOnExit();
-      Files.write(genesisFile, ethNetworkConfig.getGenesisConfig().getBytes(UTF_8));
+      Files.write(genesisFile, genesisConfig.getBytes(UTF_8));
       return genesisFile;
     } catch (final IOException e) {
       throw new IllegalStateException(e);
@@ -197,6 +218,15 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   public synchronized void shutdown() {
     final HashMap<String, Process> localMap = new HashMap<>(pantheonProcesses);
     localMap.forEach(this::killPantheonProcess);
+    outputProcessorExecutor.shutdown();
+    try {
+      if (!outputProcessorExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+        LOG.error("Output processor executor did not shutdown cleanly.");
+      }
+    } catch (final InterruptedException e) {
+      LOG.error("Interrupted while already shutting down", e);
+      Thread.currentThread().interrupt();
+    }
   }
 
   @Override
