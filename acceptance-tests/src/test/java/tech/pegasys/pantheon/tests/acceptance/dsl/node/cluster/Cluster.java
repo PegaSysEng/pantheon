@@ -17,7 +17,6 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Net;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
@@ -38,7 +37,6 @@ import org.apache.logging.log4j.Logger;
 
 public class Cluster implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();
-  public static final int NETWORK_ID = 10;
 
   private final Map<String, RunnableNode> nodes = new HashMap<>();
   private final PantheonNodeRunner pantheonNodeRunner = PantheonNodeRunner.instance();
@@ -97,12 +95,7 @@ public class Cluster implements AutoCloseable {
             .filter(node -> node.getConfiguration().isDiscoveryEnabled())
             .findFirst();
 
-    bootnode.ifPresent(
-        node -> {
-          LOG.info("Starting node {}", node.getName());
-          updateNetworkConfig(node, emptyList());
-          node.start(pantheonNodeRunner);
-        });
+    bootnode.ifPresent(this::startNode);
     bootnodes = bootnode.map(node -> singletonList(node.enodeUrl())).orElse(emptyList());
     return bootnode;
   }
@@ -123,18 +116,12 @@ public class Cluster implements AutoCloseable {
     if (node.getConfiguration().bootnodes().isEmpty()) {
       node.getConfiguration().bootnodes(bootnodes);
     }
-    updateNetworkConfig(node, bootnodes);
+    node.getConfiguration()
+        .genesisConfigProvider()
+        .createGenesisConfig(originalNodes)
+        .ifPresent(node.getConfiguration()::setGenesisConfig);
     LOG.info("Starting node {}", node.getName());
     node.start(pantheonNodeRunner);
-  }
-
-  private void updateNetworkConfig(final RunnableNode node, final List<URI> bootnodes) {
-    final Optional<EthNetworkConfig> ethNetworkConfig =
-        node.getConfiguration()
-            .genesisConfigProvider()
-            .createGenesisConfig(originalNodes)
-            .map(config -> new EthNetworkConfig(config, NETWORK_ID, bootnodes));
-    node.getConfiguration().ethNetworkConfig(ethNetworkConfig);
   }
 
   public void stop() {

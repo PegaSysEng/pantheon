@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 import static java.util.Collections.unmodifiableList;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -90,9 +89,9 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final boolean discoveryEnabled;
   private final List<URI> bootnodes = new ArrayList<>();
 
+  private Optional<String> genesisConfig = Optional.empty();
   private JsonRequestFactories jsonRequestFactories;
   private HttpRequestFactory httpRequestFactory;
-  private Optional<EthNetworkConfig> ethNetworkConfig = Optional.empty();
   private boolean useWsForJsonRpc = false;
   private String token = null;
 
@@ -504,13 +503,13 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public Optional<EthNetworkConfig> ethNetworkConfig() {
-    return ethNetworkConfig;
+  public Optional<String> getGenesisConfig() {
+    return genesisConfig;
   }
 
   @Override
-  public void ethNetworkConfig(final Optional<EthNetworkConfig> ethNetworkConfig) {
-    this.ethNetworkConfig = ethNetworkConfig;
+  public void setGenesisConfig(final String config) {
+    this.genesisConfig = Optional.of(config);
   }
 
   @Override

@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 
@@ -132,14 +131,13 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       }
     }
 
-    if (node.ethNetworkConfig().isPresent()) {
-      final EthNetworkConfig ethNetworkConfig = node.ethNetworkConfig().get();
-      final Path genesisFile = createGenesisFile(node, ethNetworkConfig);
-      params.add("--genesis-file");
-      params.add(genesisFile.toString());
-      params.add("--network-id");
-      params.add(Integer.toString(ethNetworkConfig.getNetworkId()));
-    }
+    node.getGenesisConfig()
+        .ifPresent(
+            genesis -> {
+              final Path genesisFile = createGenesisFile(node, genesis);
+              params.add("--genesis-file");
+              params.add(genesisFile.toAbsolutePath().toString());
+            });
 
     if (!node.isP2pEnabled()) {
       params.add("--p2p-enabled");
@@ -192,11 +190,11 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     }
   }
 
-  private Path createGenesisFile(final PantheonNode node, final EthNetworkConfig ethNetworkConfig) {
+  private Path createGenesisFile(final PantheonNode node, final String genesisConfig) {
     try {
       final Path genesisFile = Files.createTempFile(node.homeDirectory(), "genesis", "");
       genesisFile.toFile().deleteOnExit();
-      Files.write(genesisFile, ethNetworkConfig.getGenesisConfig().getBytes(UTF_8));
+      Files.write(genesisFile, genesisConfig.getBytes(UTF_8));
       return genesisFile;
     } catch (final IOException e) {
       throw new IllegalStateException(e);
