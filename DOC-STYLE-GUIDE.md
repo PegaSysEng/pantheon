@@ -32,16 +32,16 @@ The guiding principles for the Pantheon documentation are:
 
 Consistency is important to help our end users build a mental model of how Pantheon works.
 By being consistent with our word choices, visual formatting, and style of communication it helps 
-users know what to expect as they refer to or search Pantheon documentation.  
+users know what to expect when they refer to or search Pantheon documentation.  
 
 ### 2. Keep It Simple But Technically Correct
 
 Avoid technical jargon and always assume our end users may not be Ethereum experts.
 
-This doesn't mean explaining all Ethereum technology in our documentation. Explain Pantheon functionality  
+This doesn't mean explaining all Ethereum concepts in our documentation. Explain Pantheon functionality  
 and when an understanding of complex Ethereum concepts is required refer users to relevant resources.
 
-Example: To explain how the EVM works, link to ethdocs.org documentation such as 
+For example, to explain how the EVM works, link to ethdocs.org documentation such as 
 http://ethdocs.org/en/latest/introduction/what-is-ethereum.html#ethereum-virtual-machine
 
 Simple explanations must still be technically correct.
@@ -55,12 +55,12 @@ Put yourself in the user's shoes and consider what questions you would have when
 Do not assume required steps are implied. Err on the side of including them if you are unsure. 
 
 Documenting good practices is also important.
-Example: Instruct users to secure private keys and protect RPC endpoints a production environments. 
+For example, instruct users to secure private keys and protect RPC endpoints a production environments. 
 
 ### 4. Be Informative But Concise 
 
 We seek a balance between providing enough relevant information to help our users develop a solid 
-mental model of how Pantheon works without forcing them to read too much text.
+mental model of how Pantheon works without forcing them to read too much text or redundant detail.
 
 To provide additional detail, use sub-sections.
 
@@ -105,6 +105,6 @@ We have two distinct audiences to consider when developing content:
 
 ### Avoid Abbreviations
 
-Try not to use abbreviations [except for well known ones and some jargon](#abbreviations).
+Try not to use abbreviations [except for well known ones and some jargon](MKDOCS-MARKDOWN-GUIDE.md#abbreviations).
 Don't use "e.g." but use "for example".
 Don't use "i.e." but use "that is".

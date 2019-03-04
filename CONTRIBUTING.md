@@ -148,34 +148,34 @@ and a test or two.
 The codebase and documentation are maintained using the same "*contributor workflow*" where everyone 
 without exception contributes changes proposals using "*pull-requests*".
 
-This facilitates social contribution, easy testing and peer review.
+This facilitates social contribution, easy testing, and peer review.
 
-To contribute and propose your changes, the workflow is as follows:
+To contribute changes, use the following workflow:
 
 1. [**Fork the repository**](https://github.com/PegaSysEng/pantheon/fork).
-1. **Clone your fork** on your computer.
-1. **Create a topic branch** _, name it in a way you can know what it's about.
-Starting the name by the issue number is a good practice and a reminder to fix only one issue in a 
+1. **Clone your fork** to your computer.
+1. **Create a topic branch** and name it appropriately.
+Starting the branch name with the issue number is a good practice and a reminder to fix only one issue in a 
 Pull-Request (PR)._
-1. **Make your changes** adhering to the coding and documentation conventions herein set forth.
+1. **Make your changes** adhering to the coding and documentation conventions described below.
 _In general a commit serves a single purpose and diffs should be easily comprehensible.
 For this reason do not mix any formatting fixes or code moves with actual code changes._
 1. **Commit your changes** using a clear commit message.
 1. **Test your changes** locally before pushing to ensure that what you are proposing is not breaking
 another part of the software.
-    * For the code changes, running the `./gradlew clean check test` command locally will help you
-being confident that your changes will pass CI tests once pushed as a Pull Request.
-    * For the doc changes, you should try running the doc with [MkDocs] in a preview mode to check the
-  rendering as explained in [MkDocs And Markdown Guide](MKDOCS-MARKDOWN-GUIDE.md#preview-the-documentation). 
+    * For code changes, running the `./gradlew clean check test` command locally will help you
+to be confident that your changes will pass CI tests once pushed as a Pull Request.
+    * For doc changes, displaying the doc with [MkDocs] in a preview mode enables you to check the
+  rendering as explained in the [MkDocs And Markdown Guide](MKDOCS-MARKDOWN-GUIDE.md#preview-the-documentation). 
 1. **Push your changes** to your remote fork (usually labeled as `origin`).
-1. **Create a pull-request** (PR) on the original Pantheon Github repository to merge your branch with the master branch.
-1. **Add the labels** to identify the type of your PR. _For instance, if your PR only changes documentation, add the
+1. **Create a pull-request** (PR) on the Pantheon repository.
+1. **Add labels** to identify the type of your PR. _For example, if your PR only changes documentation, add the
 "documentation" label. If it fixes a bug, add the "bug" label._
-1. **Make your changes reviewed**.
-_To do so, you have to select the reviewers you would like to review your PR,
-if you don't know who to choose, simply select the ones that are proposed by GitHub._
-1. **You may have some changes to do** on your contribution given the reviewers feedback.
-_Make these changes and commit them to your branch and push the changes to your remote fork._
+1. **Ensure your changes are reviewed**.
+_Select the reviewers you would like to review your PR.
+If you don't know who to choose, simply select the reviewers proposed by GitHub or leave blank._
+1. **Make any required changes** on your contribution from the reviewers feedback.
+_Make the changes, commit to your branch, and push to your remote fork._
 1. **When your PR is validated**, all tests passed and your branch has no conflicts with the target branch,
 you can **"squash and merge"** your PR and you're done. You contributed to Pantheon ! Thanks !
 
@@ -238,14 +238,13 @@ We have a set of [coding conventions](CODING-CONVENTIONS.md) to which we try to 
 These are not strictly enforced during the build, but should be adhered to and called out in code reviews.
 
 ## Documentation Style Guide
-If you have to make changes to the documentation, we propose a set of 
-[documentation guidelines and examples](DOC-STYLE-GUIDE.md) to help you.
+For documentation, we have [documentation guidelines and examples](DOC-STYLE-GUIDE.md). 
+These rules are not automatically enforced but are recommended to make the documentation consistent
+ and enhance the user experience.
 
-These rules are not automatically enforced yet, but it's highly recommended to follow them
-to make the documentation coherent and the user experience as pleasant as possible.
-
-Also have a look at our [MKDocs Markdown guide](MKDOCS-MARKDOWN-GUIDE.md) to be sure to use the right
-syntax and take advantage of all the powerful extensions that are available for writing our documentation.
+Also have a look at our [MKDocs Markdown guide](MKDOCS-MARKDOWN-GUIDE.md) if you're not famililar with 
+MarkDown syntax. We also have a number of extensions that are available in the Pantheon documentation described
+in this guide.
 
 ## Git Commit Messages & Pull Request Messages
 * Use the present tense ("Add feature" not "Added feature")
