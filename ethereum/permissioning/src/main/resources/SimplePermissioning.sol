@@ -9,6 +9,7 @@ contract SimplePermissioning {
         uint16 enodePort;
     }
     mapping(uint16 => Enode) public whitelist; // should there be a size for the whitelist?
+    mapping(bytes => Enode) private whitelistByHash;
     
     uint data;
 
@@ -36,6 +37,10 @@ contract SimplePermissioning {
         //Enode memory newEnode = Enode(enodeHigh, enodeLow, enodeIpv4, enodePort);
         Enode memory zeros = Enode(bytes32(0), bytes32(0), bytes16(0), 0);
         whitelist[enodePort] = zeros;
+    }
+    function computeKey(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv4, uint16 enodePort) public pure returns (bytes memory) {
+        return abi.encodePacked(enodeHigh, enodeLow, enodeIpv4, enodePort);
+        //return abi.encode(enodeHigh, enodeLow, enodeIpv4, enodePort);
     }
     function test32(bytes32 x) pure public returns (bool) {
         return true;
