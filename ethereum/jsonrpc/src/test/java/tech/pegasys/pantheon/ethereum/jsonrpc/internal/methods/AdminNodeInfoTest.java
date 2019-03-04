@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
@@ -63,7 +64,7 @@ public class AdminNodeInfoTest {
   @Before
   public void setup() {
     when(p2pNetwork.getLocalPeerInfo()).thenReturn(localPeer);
-    when(p2pNetwork.getAdvertisedPeer()).thenReturn(defaultPeer);
+    doReturn(Optional.of(this.defaultPeer)).when(p2pNetwork).getAdvertisedPeer();
     when(blockchainQueries.getBlockchain()).thenReturn(blockchain);
     when(blockchainQueries.getBlockHashByNumber(anyLong())).thenReturn(Optional.of(Hash.EMPTY));
     when(blockchain.getChainHead()).thenReturn(testChainHead);

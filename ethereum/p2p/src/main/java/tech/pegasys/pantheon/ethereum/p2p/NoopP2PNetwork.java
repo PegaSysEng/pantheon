@@ -62,8 +62,8 @@ public class NoopP2PNetwork implements P2PNetwork {
   public void awaitStop() {}
 
   @Override
-  public Peer getAdvertisedPeer() {
-    throw new P2pDisabledException("P2P networking disabled.  Advertised peer info unavailable.");
+  public Optional<Peer> getAdvertisedPeer() {
+    return Optional.empty();
   }
 
   @Override

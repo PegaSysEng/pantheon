@@ -228,8 +228,8 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
         .orElse(Collections.emptyList());
   }
 
-  public DiscoveryPeer getAdvertisedPeer() {
-    return advertisedPeer;
+  public Optional<DiscoveryPeer> getAdvertisedPeer() {
+    return Optional.ofNullable(advertisedPeer);
   }
 
   public BytesValue getId() {

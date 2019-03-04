@@ -184,7 +184,7 @@ public final class RunnerTest {
               PrivacyParameters.noPrivacy(),
               dataDirBehind,
               noOpMetricsSystem);
-      final Peer advertisedPeer = runnerAhead.getAdvertisedPeer();
+      final Peer advertisedPeer = runnerAhead.getAdvertisedPeer().get();
       final EthNetworkConfig behindEthNetworkConfiguration =
           new EthNetworkConfig(
               EthNetworkConfig.jsonConfig(DEV),

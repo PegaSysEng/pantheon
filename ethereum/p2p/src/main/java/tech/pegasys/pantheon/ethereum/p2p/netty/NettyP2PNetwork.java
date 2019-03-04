@@ -542,7 +542,7 @@ public class NettyP2PNetwork implements P2PNetwork {
   }
 
   @Override
-  public Peer getAdvertisedPeer() {
+  public Optional<? extends Peer> getAdvertisedPeer() {
     return peerDiscoveryAgent.getAdvertisedPeer();
   }
 
