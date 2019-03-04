@@ -49,6 +49,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
@@ -189,11 +190,13 @@ public final class RunnerTest {
               EthNetworkConfig.jsonConfig(DEV),
               DEV_NETWORK_ID,
               Collections.singletonList(
-                  new DefaultPeer(
-                      advertisedPeer.getId(),
-                      advertisedPeer.getEndpoint().getHost(),
-                      advertisedPeer.getEndpoint().getUdpPort(),
-                      runnerAhead.getP2pTcpPort())));
+                  URI.create(
+                      new DefaultPeer(
+                              advertisedPeer.getId(),
+                              advertisedPeer.getEndpoint().getHost(),
+                              advertisedPeer.getEndpoint().getUdpPort(),
+                              runnerAhead.getP2pTcpPort())
+                          .getEnodeURI())));
       final Runner runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
