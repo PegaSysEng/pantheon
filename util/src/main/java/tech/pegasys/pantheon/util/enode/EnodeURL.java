@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.util.enode;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.net.InetAddresses;
+import java.net.InetAddress;
 import tech.pegasys.pantheon.util.NetworkUtility;
 
 import java.net.URI;
@@ -38,7 +40,7 @@ public class EnodeURL {
       "enode://(?<nodeId>\\w+)@(?<ip>" + IP_REPLACE_MARKER + "):(?<listening>\\d+)";
 
   private final String nodeId;
-  private final String ip;
+  private final InetAddress ip;
   private final Integer listeningPort;
   private final OptionalInt discoveryPort;
 
@@ -48,16 +50,13 @@ public class EnodeURL {
       final Integer listeningPort,
       final OptionalInt discoveryPort) {
     this.nodeId = nodeId;
-    this.ip = ip;
+    this.ip = InetAddresses.forString(ip);
     this.listeningPort = listeningPort;
     this.discoveryPort = discoveryPort;
   }
 
   public EnodeURL(final String nodeId, final String ip, final Integer listeningPort) {
-    this.nodeId = nodeId;
-    this.ip = ip;
-    this.listeningPort = listeningPort;
-    this.discoveryPort = OptionalInt.empty();
+    this(nodeId, ip, listeningPort, OptionalInt.empty());
   }
 
   public EnodeURL(final String value) {
@@ -96,7 +95,7 @@ public class EnodeURL {
         "Invalid enode URL syntax. Enode URL should have the following format 'enode://<node_id>@<ip>:<listening_port>[?discport=<discovery_port>]'.");
 
     this.nodeId = getAndValidateNodeId(matcher);
-    this.ip = matcher.group("ip");
+    this.ip = getAndValidateIp(matcher);
     this.listeningPort = getAndValidatePort(matcher, "listening");
 
     if (containsDiscoveryPort(value)) {
@@ -131,6 +130,20 @@ public class EnodeURL {
     return nodeId;
   }
 
+  private static InetAddress getAndValidateIp(final Matcher matcher) {
+    final String ipString = matcher.group("ip");
+
+    try {
+      return InetAddresses.forString(ipString);
+    } catch (IllegalArgumentException e) {
+      if (e.getMessage().contains("is not an IP string literal.")) {
+        throw new IllegalArgumentException("Invalid enode URL IP format.");
+      } else {
+        throw e;
+      }
+    }
+  }
+
   private static Integer getAndValidatePort(final Matcher matcher, final String portName) {
     int port = Integer.valueOf(matcher.group(portName));
     checkArgument(
@@ -148,7 +161,7 @@ public class EnodeURL {
   }
 
   public String getIp() {
-    return ip;
+    return ip.getHostAddress();
   }
 
   public Integer getListeningPort() {
