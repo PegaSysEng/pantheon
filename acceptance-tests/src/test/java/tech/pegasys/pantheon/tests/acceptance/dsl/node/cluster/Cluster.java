@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -25,12 +26,12 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeRunner;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +64,7 @@ public class Cluster implements AutoCloseable {
                   assertThat(n instanceof RunnableNode).isTrue();
                   return (RunnableNode) n;
                 })
-            .collect(Collectors.toList()));
+            .collect(toList()));
   }
 
   public void start(final List<? extends RunnableNode> nodes) {
@@ -122,12 +123,12 @@ public class Cluster implements AutoCloseable {
     if (node.getConfiguration().bootnodes().isEmpty()) {
       node.getConfiguration().bootnodes(bootnodes);
     }
-    updateNetworkConfig(node, bootnodes);
+    updateNetworkConfig(node, bootnodes.stream().map(URI::create).collect(toList()));
     LOG.info("Starting node {}", node.getName());
     node.start(pantheonNodeRunner);
   }
 
-  private void updateNetworkConfig(final RunnableNode node, final List<String> bootnodes) {
+  private void updateNetworkConfig(final RunnableNode node, final List<URI> bootnodes) {
     final Optional<EthNetworkConfig> ethNetworkConfig =
         node.getConfiguration()
             .genesisConfigProvider()
