@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-pragma solidity ^0.4.17;
+pragma solidity ^0.5.0;
 
 contract Adoption {
     address[16] public adopters;
@@ -31,19 +31,19 @@ function getOwner(uint petId) public view returns (address) {
 // is this pet adopted?
 function isAdopted(uint petId) public view returns (bool) {
   require(petId >= 0 && petId <= 15);
-  return adopters[petId] != 0;
+  return adopters[petId] != address(0);
 }
 // Adopting a pet
 function unadopt(uint petId) public returns (uint) {
   require(petId >= 0 && petId <= 15);
 
-  adopters[petId] = 0;
+  adopters[petId] = address(0);
 
   return petId;
 }
 
 // Retrieving the adopters
-function getAdopters() public view returns (address[16]) {
+function getAdopters() public view returns (address[16] memory) {
   return adopters;
 }
 }

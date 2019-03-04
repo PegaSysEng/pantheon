@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-pragma solidity ^0.4.17;
+pragma solidity ^0.5.0;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -30,7 +30,7 @@ function testUserCanAdoptPet() public {
 // Testing retrieval of a single pet's owner
 function testGetAdopterAddressByPetId() public {
   // Expected owner is this contract
-  address expected = this;
+  address expected = address(this);
 
   address adopter = adoption.adopters(8);
 
@@ -40,7 +40,7 @@ function testGetAdopterAddressByPetId() public {
 // Testing retrieval of all pet owners
 function testGetAdopterAddressByPetIdInArray() public {
   // Expected owner is this contract
-  address expected = this;
+  address expected = address(this);
 
   // Store adopters in memory rather than contract's storage
   address[16] memory adopters = adoption.getAdopters();
@@ -59,6 +59,6 @@ function testUserCanUnadoptPet() public {
 
   // Store adopters in memory rather than contract's storage
   address[16] memory adopters = adoption.getAdopters();
-  Assert.equal(adopters[8], 0, "owner should be reset after unadopt");
+  Assert.equal(adopters[8], address(0), "owner should be reset after unadopt");
 }
 }
