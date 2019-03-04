@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -70,14 +69,17 @@ public class AdminNodeInfo implements JsonRpcMethod {
 
       final PeerInfo peerInfo = peerNetwork.getLocalPeerInfo();
       final BytesValue nodeId = peerInfo.getNodeId();
-      final Peer advertisedPeer = peerNetwork.getAdvertisedPeer();
-      if (advertisedPeer != null) {
-        response.put("enode", advertisedPeer.getEnodeURI());
-        ports.put("discovery", advertisedPeer.getEndpoint().getUdpPort());
-        response.put("ip", advertisedPeer.getEndpoint().getHost());
-        response.put(
-            "listenAddr", advertisedPeer.getEndpoint().getHost() + ":" + peerInfo.getPort());
-      }
+      peerNetwork
+          .getAdvertisedPeer()
+          .ifPresent(
+              advertisedPeer -> {
+                response.put("enode", advertisedPeer.getEnodeURI());
+                ports.put("discovery", advertisedPeer.getEndpoint().getUdpPort());
+                response.put("ip", advertisedPeer.getEndpoint().getHost());
+                response.put(
+                    "listenAddr",
+                    advertisedPeer.getEndpoint().getHost() + ":" + peerInfo.getPort());
+              });
       response.put("id", nodeId.toString().substring(2));
       response.put("name", clientVersion);
 

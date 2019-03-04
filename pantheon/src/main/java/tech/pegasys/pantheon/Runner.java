@@ -115,11 +115,14 @@ public class Runner implements AutoCloseable {
     final Properties properties = new Properties();
 
     if (networkRunner.getNetwork().isP2pEnabled()) {
-      final Peer advertisedPeer = networkRunner.getNetwork().getAdvertisedPeer();
-      if (advertisedPeer != null) {
-        final Endpoint endpoint = advertisedPeer.getEndpoint();
-        properties.setProperty("discovery", String.valueOf(endpoint.getUdpPort()));
-      }
+      networkRunner
+          .getNetwork()
+          .getAdvertisedPeer()
+          .ifPresent(
+              advertisedPeer -> {
+                final Endpoint endpoint = advertisedPeer.getEndpoint();
+                properties.setProperty("discovery", String.valueOf(endpoint.getUdpPort()));
+              });
       final int tcpPort = networkRunner.getNetwork().getLocalPeerInfo().getPort();
       properties.setProperty("p2p", String.valueOf(tcpPort));
     }
@@ -162,7 +165,7 @@ public class Runner implements AutoCloseable {
     }
   }
 
-  public Peer getAdvertisedPeer() {
+  public Optional<? extends Peer> getAdvertisedPeer() {
     return networkRunner.getNetwork().getAdvertisedPeer();
   }
 }

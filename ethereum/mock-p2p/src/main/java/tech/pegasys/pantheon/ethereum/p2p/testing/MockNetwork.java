@@ -177,8 +177,8 @@ public final class MockNetwork {
     public void awaitStop() {}
 
     @Override
-    public Peer getAdvertisedPeer() {
-      return new DefaultPeer(self.getId(), "127.0.0.1", 0, 0);
+    public Optional<Peer> getAdvertisedPeer() {
+      return Optional.of(new DefaultPeer(self.getId(), "127.0.0.1", 0, 0));
     }
 
     @Override

@@ -60,12 +60,12 @@ public class NetworkingServiceLifecycleTest {
             new NoOpMetricsSystem(),
             Optional.empty())) {
       service.start();
-      final int udpPort = service.getAdvertisedPeer().getEndpoint().getUdpPort();
-      final OptionalInt tcpPort = service.getAdvertisedPeer().getEndpoint().getTcpPort();
+      final int udpPort = service.getAdvertisedPeer().get().getEndpoint().getUdpPort();
+      final OptionalInt tcpPort = service.getAdvertisedPeer().get().getEndpoint().getTcpPort();
 
       assertEquals(
           config.getDiscovery().getAdvertisedHost(),
-          service.getAdvertisedPeer().getEndpoint().getHost());
+          service.getAdvertisedPeer().get().getEndpoint().getHost());
       assertThat(udpPort).isNotZero();
       assertThat(tcpPort).isPresent();
       assertThat(tcpPort.getAsInt()).isNotZero();
@@ -213,7 +213,9 @@ public class NetworkingServiceLifecycleTest {
             Optional.empty())) {
       service1.start();
       final NetworkingConfiguration config = configWithRandomPorts();
-      config.getDiscovery().setBindPort(service1.getAdvertisedPeer().getEndpoint().getUdpPort());
+      config
+          .getDiscovery()
+          .setBindPort(service1.getAdvertisedPeer().get().getEndpoint().getUdpPort());
       try (final NettyP2PNetwork service2 =
           new NettyP2PNetwork(
               vertx,

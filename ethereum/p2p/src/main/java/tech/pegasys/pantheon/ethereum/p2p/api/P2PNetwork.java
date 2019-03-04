@@ -88,7 +88,7 @@ public interface P2PNetwork extends Closeable {
   /** Blocks until the P2P network layer has stopped. */
   void awaitStop();
 
-  Peer getAdvertisedPeer();
+  Optional<? extends Peer> getAdvertisedPeer();
 
   /**
    * Returns {@link PeerInfo} object for this node
