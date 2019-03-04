@@ -63,8 +63,7 @@ public class PantheonNodeFactory {
         config.isDevMode(),
         config.getGenesisConfigProvider(),
         config.getP2pEnabled(),
-        config.isDiscoveryEnabled(),
-        config.getBootnodes());
+        config.isDiscoveryEnabled());
   }
 
   public PantheonNode createMinerNode(final String name) throws IOException {
@@ -188,6 +187,11 @@ public class PantheonNodeFactory {
   }
 
   public PantheonNode createNodeWithNodesWhitelist(
+      final String name, final Node... whitelistedNodes) throws IOException {
+    return createNodeWithNodesWhitelist(name, convertToEnodes(asList(whitelistedNodes)));
+  }
+
+  public PantheonNode createNodeWithNodesWhitelist(
       final String name, final List<URI> nodesWhitelist) throws IOException {
     final PermissioningConfiguration permissioningConfiguration =
         PermissioningConfiguration.createDefault();
@@ -206,47 +210,13 @@ public class PantheonNodeFactory {
             .setName(name)
             .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
             .setPermissioningConfiguration(permissioningConfiguration)
-            .setBootnodes(whitelistAsStrings)
             .build());
-  }
-
-  public PantheonNode createNodeWithBootnodeAndNodesWhitelist(
-      final String name, final List<URI> bootnodes, final List<URI> nodesWhitelist)
-      throws IOException {
-    final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setNodeWhitelist(nodesWhitelist);
-
-    final List<String> bootnodesAsStrings =
-        bootnodes.parallelStream().map(URI::toString).collect(toList());
-    final List<String> whitelistAsStrings =
-        nodesWhitelist.parallelStream().map(URI::toString).collect(toList());
-    final File tempFile = createTempPermissioningConfigurationFile();
-    tempFile.deleteOnExit();
-    permissioningConfiguration.setConfigurationFilePath(tempFile.getPath());
-    initPermissioningConfigurationFile(
-        WhitelistPersistor.WHITELIST_TYPE.NODES, whitelistAsStrings, tempFile.toPath());
-
-    return create(
-        new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setJsonRpcConfiguration(jsonRpcConfigWithPermissioning())
-            .setPermissioningConfiguration(permissioningConfiguration)
-            .setBootnodes(bootnodesAsStrings)
-            .build());
-  }
-
-  public PantheonNode createNodeWithBootnodeAndNodesWhitelist(
-      final String name, final Node bootnode, final List<Node> nodesWhitelist) throws IOException {
-    return createNodeWithBootnodeAndNodesWhitelist(
-        name, convertToEnodes(singletonList(bootnode)), convertToEnodes(nodesWhitelist));
   }
 
   private List<URI> convertToEnodes(final List<Node> nodes) {
     return nodes.stream()
         .map(node -> (RunnableNode) node)
         .map(RunnableNode::enodeUrl)
-        .map(URI::create)
         .collect(toList());
   }
 

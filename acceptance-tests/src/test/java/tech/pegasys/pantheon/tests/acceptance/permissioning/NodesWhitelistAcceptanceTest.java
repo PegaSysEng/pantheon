@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.permissioning;
 
-import static java.util.Arrays.asList;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
@@ -44,8 +42,7 @@ public class NodesWhitelistAcceptanceTest extends AcceptanceTestBase {
     permissionedCluster.start(bootnode, allowedNode, forbiddenNode);
 
     permissionedNode =
-        pantheon.createNodeWithBootnodeAndNodesWhitelist(
-            "permissioned-node", bootnode, asList(bootnode, allowedNode));
+        pantheon.createNodeWithNodesWhitelist("permissioned-node", bootnode, allowedNode);
     permissionedCluster.addNode(permissionedNode);
   }
 

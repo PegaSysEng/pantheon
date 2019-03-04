@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
+import static java.util.Collections.unmodifiableList;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -44,13 +45,13 @@ import java.net.ConnectException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.io.MoreFiles;
@@ -87,7 +88,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean devMode;
   private final boolean discoveryEnabled;
-  private final List<String> bootnodes;
+  private final List<URI> bootnodes = new ArrayList<>();
 
   private JsonRequestFactories jsonRequestFactories;
   private HttpRequestFactory httpRequestFactory;
@@ -106,8 +107,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final boolean devMode,
       final GenesisConfigProvider genesisConfigProvider,
       final Boolean p2pEnabled,
-      final boolean discoveryEnabled,
-      final List<String> bootnodes)
+      final boolean discoveryEnabled)
       throws IOException {
     this.homeDirectory = Files.createTempDirectory("acctest");
     this.keyPair = KeyPairUtil.loadKeyPair(homeDirectory);
@@ -122,7 +122,6 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     this.devMode = devMode;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
-    this.bootnodes = bootnodes;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -140,15 +139,16 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public String enodeUrl() {
+  public URI enodeUrl() {
     final String discport = isDiscoveryEnabled() ? "?discport=" + getDiscoveryPort() : "";
-    return "enode://"
-        + keyPair.getPublicKey().toString().substring(2)
-        + "@"
-        + LOCALHOST
-        + ":"
-        + getP2pPort()
-        + discport;
+    return URI.create(
+        "enode://"
+            + keyPair.getPublicKey().toString().substring(2)
+            + "@"
+            + LOCALHOST
+            + ":"
+            + getP2pPort()
+            + discport);
   }
 
   private String getP2pPort() {
@@ -434,7 +434,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   @Override
   public List<URI> bootnodes() {
-    return bootnodes.stream().map(URI::create).collect(Collectors.toList());
+    return unmodifiableList(bootnodes);
   }
 
   @Override
@@ -443,7 +443,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public void bootnodes(final List<String> bootnodes) {
+  public void bootnodes(final List<URI> bootnodes) {
     this.bootnodes.clear();
     this.bootnodes.addAll(bootnodes);
   }

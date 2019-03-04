@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -38,9 +37,7 @@ public class PermRemoveNodesFromWhitelistAcceptanceTest extends AcceptanceTestBa
 
   @Before
   public void setUp() throws Exception {
-    node =
-        pantheon.createNodeWithBootnodeAndNodesWhitelist(
-            "node1", Collections.emptyList(), nodesWhitelist);
+    node = pantheon.createNodeWithNodesWhitelist("node1", nodesWhitelist);
     cluster.start(node);
   }
 

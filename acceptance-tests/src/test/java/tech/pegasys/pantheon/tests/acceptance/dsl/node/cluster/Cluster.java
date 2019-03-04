@@ -45,7 +45,7 @@ public class Cluster implements AutoCloseable {
   private final Net net;
   private final ClusterConfiguration clusterConfiguration;
   private List<? extends RunnableNode> originalNodes = emptyList();
-  private List<String> bootnodes = emptyList();
+  private List<URI> bootnodes = emptyList();
 
   public Cluster(final Net net) {
     this(new ClusterConfigurationBuilder().build(), net);
@@ -123,7 +123,7 @@ public class Cluster implements AutoCloseable {
     if (node.getConfiguration().bootnodes().isEmpty()) {
       node.getConfiguration().bootnodes(bootnodes);
     }
-    updateNetworkConfig(node, bootnodes.stream().map(URI::create).collect(toList()));
+    updateNetworkConfig(node, bootnodes);
     LOG.info("Starting node {}", node.getName());
     node.start(pantheonNodeRunner);
   }
