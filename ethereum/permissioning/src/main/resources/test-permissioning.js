@@ -31,7 +31,7 @@ contract('Permissioning Ipv6', () => {
       assert.equal(permitted, true, 'expected node added to be permitted');
  
       // await another
-      await proxy.addEnodeIpv6(b32, b322, b16, port2);
+      await proxy.addEnodeIpv6(b32, b322, b162, port2);
       permitted = await proxy.enodeAllowedIpv6(b32, b322, b162, port2);
       assert.equal(permitted, true, 'expected node 2 added to be permitted');
  
