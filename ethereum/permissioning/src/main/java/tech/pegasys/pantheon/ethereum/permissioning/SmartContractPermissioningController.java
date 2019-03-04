@@ -14,11 +14,15 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
+import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
+import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
-public class SmartContractPermissioningController implements NodePermissioningProvider {
+import java.util.Optional;
 
+public class SmartContractPermissioningController implements NodePermissioningProvider {
   private final Address contractAddress;
   private final TransactionSimulator transactionSimulator;
 
@@ -28,8 +32,21 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     this.transactionSimulator = transactionSimulator;
   }
 
+  public boolean isPermitted(final String sourceEnodeURL, final String destinationEnodeUrl) {
+    return isPermitted(new EnodeURL(sourceEnodeURL), new EnodeURL(destinationEnodeUrl));
+  }
+
   @Override
-  public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    return true;
+  private boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
+    final BytesValue payload = createPayload(sourceEnode, destinationEnode);
+    final CallParameter callParams =
+        new CallParameter(null, contractAddress, -1, null, null, payload);
+    final Optional<TransactionSimulatorResult> result =
+        transactionSimulator.processAtHead(callParams);
+    return result.map(r -> false).orElse(false);
+  }
+
+  private BytesValue createPayload(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
+    return null;
   }
 }
