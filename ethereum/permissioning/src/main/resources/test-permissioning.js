@@ -6,6 +6,7 @@ var b16 = "0x9bd359fdc3a2ed5df436c3d8914b1532";
 var b32 = "0x9bd359fdc3a2ed5df436c3d8914b1532740128929892092b7fcb320c1b62f375";
 var port1 = 30303;
 var port2 = 30304;
+var badPort = "9999999";
 
 contract('Permissioning 1', () => {
   describe('Function: permissioning 1', () => {
@@ -17,7 +18,7 @@ contract('Permissioning 1', () => {
     });
 
     it('Should NOT permit any node when none have been added', async () => {
-      let permitted = await proxy.connectionAllowedIpv4(b32, b32, b16, port1);
+      let permitted = await proxy.connectionAllowedIpv6(b32, b32, b16, port1);
       assert.equal(permitted, false, 'expected node NOT permitted');
     });
 
@@ -31,23 +32,23 @@ contract('Permissioning 1', () => {
     });
 
     it('Should add a node to the whitelist and then permit that node', async () => {
-      await proxy.addEnodeIpv4(b32, b32, b16, port1);
-      let permitted = await proxy.connectionAllowedIpv4(b32, b32, b16, port1);
+      await proxy.addEnodeIpv6(b32, b32, b16, port1);
+      let permitted = await proxy.connectionAllowedIpv6(b32, b32, b16, port1);
       assert.equal(permitted, true, 'expected node added to be permitted');
  
       // await another
-      await proxy.addEnodeIpv4(b32, b32, b16, port2);
-      permitted = await proxy.connectionAllowedIpv4(b32, b32, b16, port2);
+      await proxy.addEnodeIpv6(b32, b32, b16, port2);
+      permitted = await proxy.connectionAllowedIpv6(b32, b32, b16, port2);
       assert.equal(permitted, true, 'expected node 2 added to be permitted');
  
       // first one still permitted
-      permitted = await proxy.connectionAllowedIpv4(b32, b32, b16, port1);
+      permitted = await proxy.connectionAllowedIpv6(b32, b32, b16, port1);
       assert.equal(permitted, true, 'expected node 1 added to be permitted');
     });
 
     it('Should remove a node from the whitelist and then NOT permit that node', async () => {
-      await proxy.removeEnodeIpv4(b32, b32, b16, port1);
-      let permitted = await proxy.connectionAllowedIpv4(b32, b32, b16, port1);
+      await proxy.removeEnodeIpv6(b32, b32, b16, port1);
+      let permitted = await proxy.connectionAllowedIpv6(b32, b32, b16, port1);
       assert.equal(permitted, false, 'expected removed node NOT permitted');
     });
 
@@ -60,7 +61,7 @@ contract('Permissioning 1', () => {
           return;
         }
 
-      assert(false, 'did not catch expected error ');
+      assert(false, 'did not catch expected error from port out of range');
     });
 
   });

@@ -2,45 +2,35 @@ pragma solidity >=0.4.0 <0.6.0;
 
 
 contract SimplePermissioning {
-    struct Enode {
+    struct EnodeIpv6 {
         bytes32 enodeHigh;
         bytes32 enodeLow;
-        bytes16 enodeHost; // Ipv4 OR Ipv6
+        bytes16 enodeHost; // Ipv6
         uint16 enodePort;
     }
-    mapping(uint16 => Enode) public whitelist; // should there be a size for the whitelist?
-    mapping(bytes => Enode) private whitelistByHash;
-    
-    uint data;
+    mapping(bytes => EnodeIpv6) private whitelistIpv6; // should there be a size for the whitelist?
 
-    function set(uint value) public {
-        data = value;
-    }
-
-    function get() public view returns (uint) {
-        return data;
-    }
-
-    function connectionAllowedIpv4(bytes32 sourceEnodeHigh, bytes32 sourceEnodeLow, bytes16 sourceEnodeIpv4, uint16 sourceEnodePort) view public returns (bool){
-        require (sourceEnodePort < 99999);
-        Enode memory source = Enode(sourceEnodeHigh, sourceEnodeLow, sourceEnodeIpv4, sourceEnodePort);
-        Enode storage whitelistSource = whitelist[sourceEnodePort];
-        if (whitelistSource.enodeHigh == source.enodeHigh) {
+    function connectionAllowedIpv6(bytes32 sourceEnodeHigh, bytes32 sourceEnodeLow, bytes16 sourceEnodeIpv4, uint16 sourceEnodePort) public view returns (bool){
+        require (sourceEnodePort > 0 && sourceEnodePort < 99999, "port out of range");
+        bytes memory key = computeKey(sourceEnodeHigh, sourceEnodeLow, sourceEnodeIpv4, sourceEnodePort);
+        EnodeIpv6 storage whitelistSource = whitelistIpv6[key];
+        if (whitelistSource.enodeHigh == sourceEnodeHigh) {
             return true;
         }
     }
-    function addEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv4, uint16 enodePort) public {
-        Enode memory newEnode = Enode(enodeHigh, enodeLow, enodeIpv4, enodePort);
-        whitelist[enodePort] = newEnode;
+    function addEnodeIpv6(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv6, uint16 enodePort) public {
+        EnodeIpv6 memory newEnode = EnodeIpv6(enodeHigh, enodeLow, enodeIpv6, enodePort);
+        bytes memory key = computeKey(enodeHigh, enodeLow, enodeIpv6, enodePort);
+        whitelistIpv6[key] = newEnode;
     }
-    function removeEnodeIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv4, uint16 enodePort) public {
-        //Enode memory newEnode = Enode(enodeHigh, enodeLow, enodeIpv4, enodePort);
-        Enode memory zeros = Enode(bytes32(0), bytes32(0), bytes16(0), 0);
-        whitelist[enodePort] = zeros;
+    function removeEnodeIpv6(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv4, uint16 enodePort) public {
+        bytes memory key = computeKey(enodeHigh, enodeLow, enodeIpv4, enodePort);
+        EnodeIpv6 memory zeros = EnodeIpv6(bytes32(0), bytes32(0), bytes16(0), 0);
+        whitelistIpv6[key] = zeros;
     }
-    function computeKey(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv4, uint16 enodePort) public pure returns (bytes memory) {
-        return abi.encodePacked(enodeHigh, enodeLow, enodeIpv4, enodePort);
-        //return abi.encode(enodeHigh, enodeLow, enodeIpv4, enodePort);
+    function computeKey(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv6, uint16 enodePort) public pure returns (bytes memory) {
+        //return abi.encodePacked(enodeHigh, enodeLow, enodeIpv4, enodePort);
+        return abi.encode(enodeHigh, enodeLow, enodeIpv6, enodePort);
     }
     function test32(bytes32 x) pure public returns (bool) {
         return true;
