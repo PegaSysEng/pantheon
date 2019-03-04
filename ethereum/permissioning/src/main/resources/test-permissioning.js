@@ -1,7 +1,9 @@
 const TestPermissioning = artifacts.require('SimplePermissioning.sol');
 var proxy;
 var b16 = "0x9bd359fdc3a2ed5df436c3d8914b1532";
+var b162 = "0x596c3d8914b1532fdc3a2ed5df439bd3";
 var b32 = "0x9bd359fdc3a2ed5df436c3d8914b1532740128929892092b7fcb320c1b62f375";
+var b322 = "0x892092b7fcb320c1b62f3759bd359fdc3a2ed5df436c3d8914b1532740128929";
 var port1 = 30303;
 var port2 = 30304;
 
@@ -29,8 +31,8 @@ contract('Permissioning Ipv6', () => {
       assert.equal(permitted, true, 'expected node added to be permitted');
  
       // await another
-      await proxy.addEnodeIpv6(b32, b32, b16, port2);
-      permitted = await proxy.enodeAllowedIpv6(b32, b32, b16, port2);
+      await proxy.addEnodeIpv6(b32, b322, b16, port2);
+      permitted = await proxy.enodeAllowedIpv6(b32, b322, b162, port2);
       assert.equal(permitted, true, 'expected node 2 added to be permitted');
  
       // first one still permitted
@@ -39,7 +41,7 @@ contract('Permissioning Ipv6', () => {
     });
 
     it('Should allow a connection between 2 added nodes', async () => {
-      let permitted = await proxy.connectionAllowedIpv6(b32, b32, b16, port1, b32, b32, b16, port2);
+      let permitted = await proxy.connectionAllowedIpv6(b32, b32, b16, port1, b32, b322, b162, port2);
       assert.equal(permitted, true, 'expected 2 added nodes to work as source <> destination');
     });
 
