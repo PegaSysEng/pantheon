@@ -14,8 +14,8 @@ contract SimplePermissioning {
         bytes4 enodeHost; // Ipv4
         uint16 enodePort;
     }
-    mapping(bytes => EnodeIpv6) private whitelistIpv6; // should there be a size for the whitelist?
-    mapping(bytes => EnodeIpv4) private whitelistIpv4; // should there be a size for the whitelist?
+    mapping(bytes => EnodeIpv6) private whitelistIpv6; // should there be a size for the whitelists?
+    mapping(bytes => EnodeIpv4) private whitelistIpv4; 
 
     function connectionAllowedIpv6(
         bytes32 sourceEnodeHigh, bytes32 sourceEnodeLow, bytes16 sourceEnodeIpv6, uint16 sourceEnodePort, 
@@ -33,20 +33,17 @@ contract SimplePermissioning {
     }
     function enodeAllowedIpv6(bytes32 sourceEnodeHigh, bytes32 sourceEnodeLow, bytes16 sourceEnodeIpv6, uint16 sourceEnodePort) 
     public view returns (bool){
-        require (sourceEnodePort > 0 && sourceEnodePort < 99999, "port out of range");
         bytes memory key = computeKeyIpv6(sourceEnodeHigh, sourceEnodeLow, sourceEnodeIpv6, sourceEnodePort);
         EnodeIpv6 storage whitelistSource = whitelistIpv6[key];
-        if (whitelistSource.enodeHigh == sourceEnodeHigh) {
-            // TODO check other attributes?
+        if (whitelistSource.enodeHost > 0) {
             return true;
         }
     }
     function enodeAllowedIpv4(bytes32 sourceEnodeHigh, bytes32 sourceEnodeLow, bytes4 sourceEnodeIpv4, uint16 sourceEnodePort) 
     public view returns (bool){
-        require (sourceEnodePort > 0 && sourceEnodePort < 99999, "port out of range");
         bytes memory key = computeKeyIpv4(sourceEnodeHigh, sourceEnodeLow, sourceEnodeIpv4, sourceEnodePort);
         EnodeIpv4 storage whitelistSource = whitelistIpv4[key];
-        if (whitelistSource.enodeHigh == sourceEnodeHigh) {
+        if (whitelistSource.enodeHost > 0) {
             return true;
         }
     }
