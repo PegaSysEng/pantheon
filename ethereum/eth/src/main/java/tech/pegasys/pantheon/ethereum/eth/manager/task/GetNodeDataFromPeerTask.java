@@ -46,7 +46,8 @@ public class GetNodeDataFromPeerTask extends AbstractPeerRequestTask<Map<Hash, B
   private GetNodeDataFromPeerTask(
       final EthContext ethContext,
       final Collection<Hash> hashes,
-      final long pivotBlockNumber, final MetricsSystem metricsSystem) {
+      final long pivotBlockNumber,
+      final MetricsSystem metricsSystem) {
     super(ethContext, EthPV63.GET_NODE_DATA, metricsSystem);
     this.hashes = new HashSet<>(hashes);
     this.pivotBlockNumber = pivotBlockNumber;
