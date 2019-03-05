@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNode
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,8 @@ public class NodePermissioningController {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider;
-  private Optional<Runnable> peerDiscoveryCallback = Optional.empty();
+  private final AtomicReference<Optional<Runnable>> peerDiscoveryCallback =
+      new AtomicReference<>(Optional.empty());
 
   public NodePermissioningController(
       final SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider) {
@@ -46,32 +48,37 @@ public class NodePermissioningController {
         .orElse(true);
   }
 
-  public void startPeerDiscoveryCallback(final Runnable callback) {
+  public void startPeerDiscoveryCallback(final Runnable peerDiscoveryCallback) {
     syncStatusNodePermissioningProvider.ifPresent(
-        (provider) -> {
-          if (provider.hasReachedSync()) {
-            callback.run();
-          } else {
-            this.peerDiscoveryCallback = Optional.of(callback);
-          }
-        });
+        (provider) ->
+            this.peerDiscoveryCallback.getAndUpdate(
+                (callback) -> {
+                  if (provider.hasReachedSync()) {
+                    peerDiscoveryCallback.run();
+                    return callback;
+                  } else if (callback.isPresent()) {
+                    return callback;
+                  } else {
+                    return Optional.of(peerDiscoveryCallback);
+                  }
+                }));
   }
 
   private void onReachingSync() {
-    if (peerDiscoveryCallback.isPresent()) {
-      synchronized (this) {
-        peerDiscoveryCallback.ifPresent(
-            (c) -> {
-              LOG.trace("Executing onReachingSync callback");
-              c.run();
-            });
-        peerDiscoveryCallback = Optional.empty();
-      }
-    }
+    peerDiscoveryCallback.getAndUpdate(
+        (callback) -> {
+          callback.ifPresent(this::runPeerDiscoveryCalllback);
+          return Optional.empty();
+        });
+  }
+
+  private void runPeerDiscoveryCalllback(Runnable callback) {
+    LOG.trace("Executing onReachingSync callback");
+    callback.run();
   }
 
   @VisibleForTesting
   Optional<Runnable> getPeerDiscoveryCallback() {
-    return peerDiscoveryCallback;
+    return peerDiscoveryCallback.get();
   }
 }
