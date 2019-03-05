@@ -29,8 +29,8 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResu
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult.EvictOutcome;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -136,7 +136,8 @@ public class PeerDiscoveryController {
 
   private RecursivePeerRefreshState recursivePeerRefreshState;
 
-  private final NodePermissioningController nodePermissioningController = new NodePermissioningController();
+  private final NodePermissioningController nodePermissioningController =
+      new NodePermissioningController();
 
   public PeerDiscoveryController(
       final KeyPair keypair,
@@ -594,6 +595,4 @@ public class PeerDiscoveryController {
   public interface AsyncExecutor {
     <T> CompletableFuture<T> execute(Supplier<T> action);
   }
-
-
 }

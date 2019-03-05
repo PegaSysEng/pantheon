@@ -1,14 +1,27 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.permissioning.node.provider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
 
 public class SyncStatusNodePermissioningProvider implements NodePermissioningProvider {
 
@@ -16,8 +29,8 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
   private boolean hasReachedSync = false;
   private Optional<Runnable> hasReachedSyncCallback = Optional.empty();
 
-  public SyncStatusNodePermissioningProvider(final Synchronizer synchronizer,
-      final Collection<EnodeURL> bootnodes) {
+  public SyncStatusNodePermissioningProvider(
+      final Synchronizer synchronizer, final Collection<EnodeURL> bootnodes) {
     checkNotNull(synchronizer);
     synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
     this.bootnodes.addAll(bootnodes);
@@ -52,7 +65,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
    * @param sourceEnode the enode source of the packet or connection
    * @param destinationEnode the enode target of the packet or connection
    * @return true, if the communication from sourceEnode to destinationEnode is permitted, false
-   * otherwise
+   *     otherwise
    */
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
