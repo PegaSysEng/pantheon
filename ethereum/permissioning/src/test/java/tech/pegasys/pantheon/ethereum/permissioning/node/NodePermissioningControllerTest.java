@@ -83,8 +83,6 @@ public class NodePermissioningControllerTest {
 
     controller.startPeerDiscoveryCallback(peerDiscoveryCallback);
 
-    hasReachedSyncCallback.run();
-
     verifyZeroInteractions(peerDiscoveryCallback);
     assertThat(controller.getPeerDiscoveryCallback()).isNotEmpty();
   }
