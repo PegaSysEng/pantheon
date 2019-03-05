@@ -3,6 +3,8 @@
 *.tmp
 *~.nib
 *.iml
+*.ipr
+*.iws
 *.launch
 *.swp
 *.log
