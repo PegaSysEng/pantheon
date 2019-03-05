@@ -25,7 +25,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
 
   private void handleSyncStatusUpdate(SyncStatus syncStatus) {
     if (syncStatus != null && !hasReachedSync) {
-      long blocksBehind = syncStatus.getCurrentBlock() - syncStatus.getHighestBlock();
+      long blocksBehind = syncStatus.getHighestBlock() - syncStatus.getCurrentBlock();
       if (blocksBehind <= 0) {
         synchronized (this) {
           hasReachedSync = true;
