@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ValidationTestUtils;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.function.Function;
 
 import com.google.common.collect.Lists;
@@ -62,7 +63,7 @@ public class EthHashBlockCreatorTest {
         new EthHashBlockCreator(
             BLOCK_1_COINBASE,
             parent -> BLOCK_1_EXTRA_DATA,
-            new PendingTransactions(1),
+            new PendingTransactions(1, Clock.systemUTC()),
             executionContextTestFixture.getProtocolContext(),
             executionContextTestFixture.getProtocolSchedule(),
             gasLimit -> gasLimit,

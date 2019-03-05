@@ -46,6 +46,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.time.Clock;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -109,7 +110,7 @@ public class CliqueBlockCreatorTest {
         new CliqueBlockCreator(
             coinbase,
             parent -> extraData.encode(),
-            new PendingTransactions(5),
+            new PendingTransactions(5, Clock.systemUTC()),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,
@@ -136,7 +137,7 @@ public class CliqueBlockCreatorTest {
         new CliqueBlockCreator(
             coinbase,
             parent -> extraData.encode(),
-            new PendingTransactions(5),
+            new PendingTransactions(5, Clock.systemUTC()),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,
@@ -162,7 +163,7 @@ public class CliqueBlockCreatorTest {
         new CliqueBlockCreator(
             coinbase,
             parent -> extraData.encode(),
-            new PendingTransactions(5),
+            new PendingTransactions(5, Clock.systemUTC()),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,
@@ -191,7 +192,7 @@ public class CliqueBlockCreatorTest {
         new CliqueBlockCreator(
             coinbase,
             parent -> extraData.encode(),
-            new PendingTransactions(5),
+            new PendingTransactions(5, Clock.systemUTC()),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,

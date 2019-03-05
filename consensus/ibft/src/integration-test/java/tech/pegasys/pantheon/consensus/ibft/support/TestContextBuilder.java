@@ -281,7 +281,7 @@ public class TestContextBuilder {
     final IbftBlockCreatorFactory blockCreatorFactory =
         new IbftBlockCreatorFactory(
             (gasLimit) -> gasLimit,
-            new PendingTransactions(1), // changed from IbftPantheonController
+            new PendingTransactions(1, clock), // changed from IbftPantheonController
             protocolContext,
             protocolSchedule,
             miningParams,

@@ -40,6 +40,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -96,7 +97,7 @@ public class IbftBlockCreatorTest {
                         null,
                         initialValidatorList)
                     .encode(),
-            new PendingTransactions(1),
+            new PendingTransactions(1, Clock.systemUTC()),
             protContext,
             protocolSchedule,
             parentGasLimit -> parentGasLimit,

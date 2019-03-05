@@ -51,6 +51,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -131,7 +132,8 @@ public class TestNode implements Closeable {
 
     final EthContext ethContext = ethProtocolManager.ethContext();
     transactionPool =
-        TransactionPoolFactory.createTransactionPool(protocolSchedule, protocolContext, ethContext);
+        TransactionPoolFactory.createTransactionPool(
+            protocolSchedule, protocolContext, ethContext, Clock.systemUTC());
     networkRunner.start();
 
     selfPeer = new DefaultPeer(id(), endpoint());

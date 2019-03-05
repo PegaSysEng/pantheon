@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions.TransactionSelectionResult;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
@@ -32,7 +33,8 @@ public class PendingTransactionsTest {
   private static final int MAX_TRANSACTIONS = 5;
   private static final KeyPair KEYS1 = KeyPair.generate();
   private static final KeyPair KEYS2 = KeyPair.generate();
-  private final PendingTransactions transactions = new PendingTransactions(MAX_TRANSACTIONS);
+  private final PendingTransactions transactions =
+      new PendingTransactions(MAX_TRANSACTIONS, Clock.systemUTC());
   private final Transaction transaction1 = createTransaction(2);
   private final Transaction transaction2 = createTransaction(1);
 

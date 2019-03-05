@@ -147,7 +147,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
-            protocolSchedule, protocolContext, ethProtocolManager.ethContext());
+            protocolSchedule, protocolContext, ethProtocolManager.ethContext(), Clock.systemUTC());
 
     final ExecutorService minerThreadPool = Executors.newCachedThreadPool();
     final EthHashMinerExecutor executor =

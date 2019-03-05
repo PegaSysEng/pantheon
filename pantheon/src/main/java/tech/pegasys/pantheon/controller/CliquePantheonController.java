@@ -165,7 +165,7 @@ public class CliquePantheonController implements PantheonController<CliqueContex
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
-            protocolSchedule, protocolContext, ethProtocolManager.ethContext());
+            protocolSchedule, protocolContext, ethProtocolManager.ethContext(), Clock.systemUTC());
 
     final ExecutorService minerThreadPool = Executors.newCachedThreadPool();
     final CliqueMinerExecutor miningExecutor =

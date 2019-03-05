@@ -36,7 +36,7 @@ public class EthHashMinerExecutorTest {
             null,
             Executors.newCachedThreadPool(),
             null,
-            new PendingTransactions(1),
+            new PendingTransactions(1, Clock.systemUTC()),
             miningParameters,
             new DefaultBlockScheduler(1, 10, Clock.systemUTC()));
 
@@ -54,7 +54,7 @@ public class EthHashMinerExecutorTest {
             null,
             Executors.newCachedThreadPool(),
             null,
-            new PendingTransactions(1),
+            new PendingTransactions(1, Clock.systemUTC()),
             miningParameters,
             new DefaultBlockScheduler(1, 10, Clock.systemUTC()));
 
