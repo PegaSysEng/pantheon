@@ -1,5 +1,6 @@
 pragma solidity >=0.4.0 <0.6.0;
-
+// THIS CONTRACT IS FOR TESTING PURPOSES ONLY
+// DO NOT USE THIS CONTRACT IN PRODUCTION APPLICATIONS
 
 contract SimplePermissioning {
     struct EnodeIpv6 {
@@ -68,11 +69,9 @@ contract SimplePermissioning {
         whitelistIpv4[key] = zeros;
     }
     function computeKeyIpv6(bytes32 enodeHigh, bytes32 enodeLow, bytes16 enodeIpv6, uint16 enodePort) public pure returns (bytes memory) {
-        //return abi.encodePacked(enodeHigh, enodeLow, enodeIpv4, enodePort);
         return abi.encode(enodeHigh, enodeLow, enodeIpv6, enodePort);
     }
     function computeKeyIpv4(bytes32 enodeHigh, bytes32 enodeLow, bytes4 enodeIpv4, uint16 enodePort) public pure returns (bytes memory) {
-        //return abi.encodePacked(enodeHigh, enodeLow, enodeIpv4, enodePort);
         return abi.encode(enodeHigh, enodeLow, enodeIpv4, enodePort);
     }
 }
