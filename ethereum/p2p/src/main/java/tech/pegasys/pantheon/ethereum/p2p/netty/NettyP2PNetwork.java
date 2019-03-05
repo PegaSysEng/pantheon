@@ -35,7 +35,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -157,7 +157,7 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   private final LabelledMetric<Counter> outboundMessagesCounter;
 
-  private final Optional<NodeWhitelistController> nodeWhitelistController;
+  private final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController;
 
   /**
    * Creates a peer networking service for production purposes.
@@ -183,7 +183,7 @@ public class NettyP2PNetwork implements P2PNetwork {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
-      final Optional<NodeWhitelistController> nodeWhitelistController) {
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController) {
 
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
@@ -562,7 +562,7 @@ public class NettyP2PNetwork implements P2PNetwork {
   }
 
   @Override
-  public Optional<NodeWhitelistController> getNodeWhitelistController() {
+  public Optional<NodeLocalConfigPermissioningController> getNodeWhitelistController() {
     return nodeWhitelistController;
   }
 

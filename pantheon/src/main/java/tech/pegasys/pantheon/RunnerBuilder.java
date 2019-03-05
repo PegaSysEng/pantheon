@@ -53,7 +53,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -219,10 +219,11 @@ public class RunnerBuilder {
         discoveryConfiguration.getBootstrapPeers().stream()
             .map(p -> new EnodeURL(p.getEnodeURI()))
             .collect(Collectors.toList());
-    final Optional<NodeWhitelistController> nodeWhitelistController =
+    final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController =
         permissioningConfiguration
             .filter(PermissioningConfiguration::isNodeWhitelistEnabled)
-            .map(config -> new NodeWhitelistController(config, bootnodesAsEnodeURLs));
+            .map(
+                config -> new NodeLocalConfigPermissioningController(config, bootnodesAsEnodeURLs));
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
 

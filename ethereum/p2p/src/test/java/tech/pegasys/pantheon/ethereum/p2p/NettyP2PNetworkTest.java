@@ -39,7 +39,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -419,8 +419,8 @@ public final class NettyP2PNetworkTest {
     tempFile.toFile().deleteOnExit();
     config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
 
-    final NodeWhitelistController localWhitelistController =
-        new NodeWhitelistController(config, Collections.emptyList());
+    final NodeLocalConfigPermissioningController localWhitelistController =
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
     // turn on whitelisting by adding a different node NOT remote node
     localWhitelistController.addNodes(Arrays.asList(mockPeer().getEnodeURI()));
 

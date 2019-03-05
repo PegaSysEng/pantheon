@@ -27,7 +27,7 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.BondingAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.FindNeighbourDispatcher;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -487,8 +487,9 @@ public class RecursivePeerRefreshStateTest {
         PermissioningConfiguration.createDefault();
     permissioningConfiguration.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
 
-    final NodeWhitelistController peerWhitelist =
-        new NodeWhitelistController(permissioningConfiguration, Collections.emptyList());
+    final NodeLocalConfigPermissioningController peerWhitelist =
+        new NodeLocalConfigPermissioningController(
+            permissioningConfiguration, Collections.emptyList());
     peerWhitelist.addNodes(Arrays.asList(peerA.getEnodeURI()));
 
     recursivePeerRefreshState =

@@ -40,7 +40,7 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResu
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -991,19 +991,19 @@ public class PeerDiscoveryControllerTest {
 
     final PeerBlacklist blacklist = new PeerBlacklist();
     final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final NodeWhitelistController nodeWhitelistController =
-        new NodeWhitelistController(config, Collections.emptyList());
+    final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
 
     // Whitelist peers
-    nodeWhitelistController.addNodes(Arrays.asList(discoPeer.getEnodeURI()));
-    nodeWhitelistController.addNodes(Arrays.asList(otherPeer2.getEnodeURI()));
+    nodeLocalConfigPermissioningController.addNodes(Arrays.asList(discoPeer.getEnodeURI()));
+    nodeLocalConfigPermissioningController.addNodes(Arrays.asList(otherPeer2.getEnodeURI()));
 
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     controller =
         getControllerBuilder()
             .peers(discoPeer)
             .blacklist(blacklist)
-            .whitelist(nodeWhitelistController)
+            .whitelist(nodeLocalConfigPermissioningController)
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -1055,14 +1055,14 @@ public class PeerDiscoveryControllerTest {
     // don't add disco peer to whitelist
     PermissioningConfiguration config = permissioningConfigurationWithTempFile();
     config.setNodeWhitelist(new ArrayList<>());
-    NodeWhitelistController nodeWhitelistController =
-        new NodeWhitelistController(config, Collections.emptyList());
+    NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
 
     controller =
         getControllerBuilder()
             .peers(discoPeer)
             .blacklist(blacklist)
-            .whitelist(nodeWhitelistController)
+            .whitelist(nodeLocalConfigPermissioningController)
             .build();
 
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
@@ -1081,14 +1081,17 @@ public class PeerDiscoveryControllerTest {
     final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
     final URI peerURI = URI.create(peer.getEnodeURI());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeWhitelistController nodeWhitelistController =
-        new NodeWhitelistController(config, Collections.emptyList());
+    final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
 
     controller =
-        getControllerBuilder().whitelist(nodeWhitelistController).peerTable(peerTableSpy).build();
+        getControllerBuilder()
+            .whitelist(nodeLocalConfigPermissioningController)
+            .peerTable(peerTableSpy)
+            .build();
 
     controller.start();
-    nodeWhitelistController.removeNodes(Lists.newArrayList(peerURI.toString()));
+    nodeLocalConfigPermissioningController.removeNodes(Lists.newArrayList(peerURI.toString()));
 
     verify(peerTableSpy).tryEvict(eq(DiscoveryPeer.fromURI(peerURI)));
   }
@@ -1105,8 +1108,8 @@ public class PeerDiscoveryControllerTest {
     final PermissioningConfiguration config = permissioningConfigurationWithTempFile();
     final URI peerURI = URI.create(peer.getEnodeURI());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeWhitelistController nodeWhitelistController =
-        new NodeWhitelistController(config, Collections.emptyList());
+    final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
 
     final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
     final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
@@ -1116,13 +1119,13 @@ public class PeerDiscoveryControllerTest {
 
     controller =
         getControllerBuilder()
-            .whitelist(nodeWhitelistController)
+            .whitelist(nodeLocalConfigPermissioningController)
             .peerTable(peerTableSpy)
             .peerDroppedObservers(peerDroppedSubscribers)
             .build();
 
     controller.start();
-    nodeWhitelistController.removeNodes(Lists.newArrayList(peerURI.toString()));
+    nodeLocalConfigPermissioningController.removeNodes(Lists.newArrayList(peerURI.toString()));
 
     ArgumentCaptor<PeerDroppedEvent> captor = ArgumentCaptor.forClass(PeerDroppedEvent.class);
     verify(peerDroppedEventConsumer).accept(captor.capture());
@@ -1220,7 +1223,7 @@ public class PeerDiscoveryControllerTest {
   static class ControllerBuilder {
     private Collection<DiscoveryPeer> discoPeers = Collections.emptyList();
     private PeerBlacklist blacklist = new PeerBlacklist();
-    private Optional<NodeWhitelistController> whitelist = Optional.empty();
+    private Optional<NodeLocalConfigPermissioningController> whitelist = Optional.empty();
     private MockTimerUtil timerUtil = new MockTimerUtil();
     private KeyPair keypair;
     private DiscoveryPeer localPeer;
@@ -1249,7 +1252,7 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder whitelist(final NodeWhitelistController whitelist) {
+    ControllerBuilder whitelist(final NodeLocalConfigPermissioningController whitelist) {
       this.whitelist = Optional.of(whitelist);
       return this;
     }

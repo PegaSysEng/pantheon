@@ -31,7 +31,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NodeWhitelistController {
+public class NodeLocalConfigPermissioningController {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -42,7 +42,7 @@ public class NodeWhitelistController {
   private final Subscribers<Consumer<NodeWhitelistUpdatedEvent>> nodeWhitelistUpdatedObservers =
       new Subscribers<>();
 
-  public NodeWhitelistController(
+  public NodeLocalConfigPermissioningController(
       final PermissioningConfiguration permissioningConfiguration, final List<EnodeURL> bootnodes) {
     this(
         permissioningConfiguration,
@@ -50,7 +50,7 @@ public class NodeWhitelistController {
         new WhitelistPersistor(permissioningConfiguration.getConfigurationFilePath()));
   }
 
-  public NodeWhitelistController(
+  public NodeLocalConfigPermissioningController(
       final PermissioningConfiguration configuration,
       final List<EnodeURL> bootnodes,
       final WhitelistPersistor whitelistPersistor) {

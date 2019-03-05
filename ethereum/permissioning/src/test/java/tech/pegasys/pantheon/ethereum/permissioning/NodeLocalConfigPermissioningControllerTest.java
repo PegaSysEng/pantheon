@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController.NodesWhitelistResult;
+import static tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController.NodesWhitelistResult;
 
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -48,11 +48,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class NodeWhitelistControllerTest {
+public class NodeLocalConfigPermissioningControllerTest {
 
   @Mock private WhitelistPersistor whitelistPersistor;
   private final List<EnodeURL> bootnodesList = new ArrayList<>();
-  private NodeWhitelistController controller;
+  private NodeLocalConfigPermissioningController controller;
 
   private final String enode1 =
       "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:4567";
@@ -63,7 +63,7 @@ public class NodeWhitelistControllerTest {
   public void setUp() {
     bootnodesList.clear();
     controller =
-        new NodeWhitelistController(
+        new NodeLocalConfigPermissioningController(
             PermissioningConfiguration.createDefault(), bootnodesList, whitelistPersistor);
   }
 
@@ -245,7 +245,7 @@ public class NodeWhitelistControllerTest {
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist())
         .thenReturn(Arrays.asList(URI.create(expectedEnodeURL)));
-    controller = new NodeWhitelistController(permissioningConfig, bootnodesList);
+    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
 
     controller.reload();
 
@@ -262,7 +262,7 @@ public class NodeWhitelistControllerTest {
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist())
         .thenReturn(Arrays.asList(URI.create(expectedEnodeURI)));
-    controller = new NodeWhitelistController(permissioningConfig, bootnodesList);
+    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
 
     final Throwable thrown = catchThrowable(() -> controller.reload());
 
@@ -357,7 +357,7 @@ public class NodeWhitelistControllerTest {
         .thenReturn(permissionsFile.toAbsolutePath().toString());
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(enode1)));
-    controller = new NodeWhitelistController(permissioningConfig, bootnodesList);
+    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
     controller.subscribeToListUpdatedEvent(consumer);
 
     controller.reload();
@@ -377,7 +377,7 @@ public class NodeWhitelistControllerTest {
         .thenReturn(permissionsFile.toAbsolutePath().toString());
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(enode1)));
-    controller = new NodeWhitelistController(permissioningConfig, bootnodesList);
+    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
     controller.subscribeToListUpdatedEvent(consumer);
 
     controller.reload();
