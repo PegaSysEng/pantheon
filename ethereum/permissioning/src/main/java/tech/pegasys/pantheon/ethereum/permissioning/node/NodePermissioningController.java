@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,17 +46,32 @@ public class NodePermissioningController {
         .orElse(true);
   }
 
-  public boolean delayPeerDiscovery() {
-    return syncStatusNodePermissioningProvider
-        .map((provider) -> !provider.hasReachedSync())
-        .orElse(false);
-  }
-
-  public void peerDiscoveryCallback(final Runnable runnable) {
-    this.peerDiscoveryCallback = Optional.of(runnable);
+  public void startPeerDiscoveryCallback(final Runnable callback) {
+    syncStatusNodePermissioningProvider.ifPresent(
+        (provider) -> {
+          if (provider.hasReachedSync()) {
+            callback.run();
+          } else {
+            this.peerDiscoveryCallback = Optional.of(callback);
+          }
+        });
   }
 
   private void onReachingSync() {
-    peerDiscoveryCallback.ifPresent(Runnable::run);
+    if (peerDiscoveryCallback.isPresent()) {
+      synchronized (this) {
+        peerDiscoveryCallback.ifPresent(
+            (c) -> {
+              LOG.trace("Executing onReachingSync callback");
+              c.run();
+            });
+        peerDiscoveryCallback = Optional.empty();
+      }
+    }
+  }
+
+  @VisibleForTesting
+  Optional<Runnable> getPeerDiscoveryCallback() {
+    return peerDiscoveryCallback;
   }
 }

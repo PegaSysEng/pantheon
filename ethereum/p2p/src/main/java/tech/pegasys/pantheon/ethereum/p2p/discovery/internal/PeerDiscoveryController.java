@@ -136,8 +136,8 @@ public class PeerDiscoveryController {
 
   private RecursivePeerRefreshState recursivePeerRefreshState;
 
-  private final NodePermissioningController nodePermissioningController =
-      new NodePermissioningController();
+  private final Optional<NodePermissioningController> nodePermissioningController =
+      Optional.empty();
 
   public PeerDiscoveryController(
       final KeyPair keypair,
@@ -193,9 +193,12 @@ public class PeerDiscoveryController {
         bootstrapNodes.stream()
             .filter(this::whitelistIfPresentIsNodePermitted)
             .collect(Collectors.toList());
-    if (nodePermissioningController.delayPeerDiscovery()) {
-      nodePermissioningController.peerDiscoveryCallback(
-          () -> recursivePeerRefreshState.start(initialDiscoveryPeers, localPeer.getId()));
+
+    if (nodePermissioningController.isPresent()) {
+      nodePermissioningController
+          .get()
+          .startPeerDiscoveryCallback(
+              () -> recursivePeerRefreshState.start(initialDiscoveryPeers, localPeer.getId()));
     } else {
       recursivePeerRefreshState.start(initialDiscoveryPeers, localPeer.getId());
     }
