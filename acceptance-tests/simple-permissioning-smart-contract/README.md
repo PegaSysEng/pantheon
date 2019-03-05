@@ -7,7 +7,7 @@ npm install -g truffle
 ```
 npm install truffle-hdwallet-provider
 ```
-## To run the pet shop example:
+## To run the tests:
 ```
 cd acceptance-tests/simple-permissioning-smart-contract
 ```
