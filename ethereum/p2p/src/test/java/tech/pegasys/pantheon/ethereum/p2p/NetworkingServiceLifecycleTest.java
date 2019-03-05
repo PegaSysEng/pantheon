@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static tech.pegasys.pantheon.ethereum.p2p.NetworkingTestHelper.configWithRandomPorts;
+import static tech.pegasys.pantheon.ethereum.p2p.NetworkingTestHelper.getLoopbackBindHost;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -60,10 +61,9 @@ public class NetworkingServiceLifecycleTest {
             Optional.empty())) {
       service.run();
       final int port = service.getDiscoverySocketAddress().getPort();
-
-      assertEquals(
-          (NetworkUtility.isIPv6Available() ? "/0:0:0:0:0:0:0:0:" : "/0.0.0.0:") + port,
-          service.getDiscoverySocketAddress().toString());
+      final String host = getLoopbackBindHost();
+      final String address = (NetworkUtility.isIPv6Available() ? "/" : "") + host + ":" + port;
+      assertEquals(address, service.getDiscoverySocketAddress().toString());
       assertThat(service.getDiscoveryPeers()).hasSize(0);
     }
   }
@@ -223,10 +223,13 @@ public class NetworkingServiceLifecycleTest {
           service2.run();
         } catch (final Exception e) {
           assertThat(e.getCause()).hasCauseExactlyInstanceOf(PeerDiscoveryServiceException.class);
+          final String host = getLoopbackBindHost();
           assertThat(e.getCause())
               .hasMessageStartingWith(
                   "tech.pegasys.pantheon.ethereum.p2p.discovery."
-                      + "PeerDiscoveryServiceException: Failed to bind Ethereum UDP discovery listener to 0.0.0.0:");
+                      + "PeerDiscoveryServiceException: Failed to bind Ethereum UDP discovery listener to "
+                      + host
+                      + ":");
           assertThat(e).hasMessageContaining("Address already in use");
         } finally {
           service1.stop();
