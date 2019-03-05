@@ -25,14 +25,17 @@ import java.util.Optional;
 
 public class SyncStatusNodePermissioningProvider implements NodePermissioningProvider {
 
+  private final Synchronizer synchronizer;
   private final Collection<EnodeURL> bootnodes = new HashSet<>();
+  private final long syncStatusObserverId;
   private boolean hasReachedSync = false;
   private Optional<Runnable> hasReachedSyncCallback = Optional.empty();
 
   public SyncStatusNodePermissioningProvider(
       final Synchronizer synchronizer, final Collection<EnodeURL> bootnodes) {
     checkNotNull(synchronizer);
-    synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
+    this.synchronizer = synchronizer;
+    this.syncStatusObserverId = this.synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
     this.bootnodes.addAll(bootnodes);
   }
 
@@ -43,6 +46,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
         synchronized (this) {
           hasReachedSync = true;
           hasReachedSyncCallback.ifPresent(Runnable::run);
+          synchronizer.removeObserver(syncStatusObserverId);
         }
       }
     }

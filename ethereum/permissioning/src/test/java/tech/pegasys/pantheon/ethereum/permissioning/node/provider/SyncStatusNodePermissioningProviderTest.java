@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.permissioning.node.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -51,12 +52,13 @@ public class SyncStatusNodePermissioningProviderTest {
   private Collection<EnodeURL> bootnodes = new ArrayList<>();
   private SyncStatusNodePermissioningProvider provider;
   private SyncStatusListener syncStatusListener;
+  private long syncStatusObserverId = 1L;
 
   @Before
   public void before() {
     final ArgumentCaptor<SyncStatusListener> captor =
         ArgumentCaptor.forClass(SyncStatusListener.class);
-    when(synchronizer.observeSyncStatus(captor.capture())).thenReturn(1L);
+    when(synchronizer.observeSyncStatus(captor.capture())).thenReturn(syncStatusObserverId);
     bootnodes.add(bootnode);
 
     this.provider = new SyncStatusNodePermissioningProvider(synchronizer, bootnodes);
@@ -109,6 +111,8 @@ public class SyncStatusNodePermissioningProviderTest {
     syncStatusListener.onSyncStatus(new SyncStatus(0, 1, 1));
 
     verify(callbackFunction).run();
+    // after executing callback, it should unsubscribe from the SyncStatus updates
+    verify(synchronizer).removeObserver(eq(syncStatusObserverId));
   }
 
   @Test
