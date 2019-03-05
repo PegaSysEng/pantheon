@@ -64,6 +64,7 @@ import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -303,7 +304,7 @@ public class TestContextBuilder {
                 ibftEventQueue,
                 BLOCK_TIMER_SEC * 1000,
                 Executors.newScheduledThreadPool(1),
-                Clock.systemUTC()),
+                TestClock.fixed()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
             clock);

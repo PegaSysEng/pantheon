@@ -38,8 +38,8 @@ public class TransactionInfoResult implements TransactionResult {
   }
 
   @JsonGetter(value = "addedToPoolAt")
-  public long getAddedToPoolAt() {
-    return addedToPoolAt.toEpochMilli();
+  public String getAddedToPoolAt() {
+    return addedToPoolAt.toString();
   }
 
   @JsonGetter(value = "isReceivedFromLocalSource")

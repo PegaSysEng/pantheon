@@ -42,9 +42,9 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
+import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.time.Clock;
 import java.util.List;
 
 import org.junit.Before;
@@ -68,7 +68,7 @@ public class TransactionPoolTest {
   private final TransactionValidator transactionValidator = mock(TransactionValidator.class);
   private MutableBlockchain blockchain;
   private final PendingTransactions transactions =
-      new PendingTransactions(MAX_TRANSACTIONS, Clock.systemUTC());
+      new PendingTransactions(MAX_TRANSACTIONS, TestClock.fixed());
   private final Transaction transaction1 = createTransaction(1);
   private final Transaction transaction2 = createTransaction(2);
   private TransactionPool transactionPool;

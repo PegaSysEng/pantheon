@@ -73,6 +73,6 @@ public class TxPoolPendingTransactionsTest {
         result.getResults().stream().findFirst().get();
     assertEquals(TRANSACTION_HASH, actualTransactionInfo.getHash());
     assertEquals(true, actualTransactionInfo.isReceivedFromLocalSource());
-    assertEquals(addedAt.toEpochMilli(), actualTransactionInfo.getAddedToPoolAt());
+    assertEquals(addedAt.toString(), actualTransactionInfo.getAddedToPoolAt());
   }
 }
