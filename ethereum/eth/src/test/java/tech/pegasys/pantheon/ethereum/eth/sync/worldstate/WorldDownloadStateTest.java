@@ -32,9 +32,9 @@ import tech.pegasys.pantheon.services.queue.InMemoryTaskQueue;
 import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +44,7 @@ public class WorldDownloadStateTest {
   private static final BytesValue ROOT_NODE_DATA = BytesValue.of(1, 2, 3, 4);
   private static final Hash ROOT_NODE_HASH = Hash.hash(ROOT_NODE_DATA);
   private static final int MAX_OUTSTANDING_REQUESTS = 3;
+  private static final int MAX_REQUESTS_WITHOUT_PROGRESS = 10;
 
   private final WorldStateStorage worldStateStorage =
       new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
@@ -55,7 +56,11 @@ public class WorldDownloadStateTest {
       new ArrayBlockingQueue<>(100);
 
   private final WorldDownloadState downloadState =
-      new WorldDownloadState(pendingRequests, requestsToPersist, MAX_OUTSTANDING_REQUESTS);
+      new WorldDownloadState(
+          pendingRequests,
+          requestsToPersist,
+          MAX_OUTSTANDING_REQUESTS,
+          MAX_REQUESTS_WITHOUT_PROGRESS);
 
   private final CompletableFuture<Void> future = downloadState.getDownloadFuture();
 
@@ -181,10 +186,26 @@ public class WorldDownloadStateTest {
   @Test
   public void shouldStopSendingAdditionalRequestsWhenDownloadIsMarkedAsStalled() {
     pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    final Runnable sendRequest = mockWithAction(() -> downloadState.markAsStalled(1));
+    final Runnable sendRequest = mockWithAction(() -> downloadState.requestComplete(false));
 
     downloadState.whileAdditionalRequestsCanBeSent(sendRequest);
-    verify(sendRequest, times(1)).run();
+    verify(sendRequest, times(MAX_REQUESTS_WITHOUT_PROGRESS)).run();
+  }
+
+  @Test
+  public void shouldResetRequestsSinceProgressCountWhenProgressIsMade() {
+    downloadState.requestComplete(false);
+    downloadState.requestComplete(false);
+
+    downloadState.requestComplete(true);
+
+    for (int i = 0; i < MAX_REQUESTS_WITHOUT_PROGRESS - 1; i++) {
+      downloadState.requestComplete(false);
+      assertThat(downloadState.getDownloadFuture()).isNotDone();
+    }
+
+    downloadState.requestComplete(false);
+    assertThat(downloadState.getDownloadFuture()).isCompletedExceptionally();
   }
 
   @Test
@@ -205,7 +226,7 @@ public class WorldDownloadStateTest {
   public void shouldNotEnqueueRequestsAfterDownloadIsStalled() {
     downloadState.checkCompletion(worldStateStorage, header);
 
-    downloadState.enqueueRequests(Stream.of(createAccountDataRequest(Hash.EMPTY_TRIE_HASH)));
+    downloadState.enqueueRequests(Arrays.asList(createAccountDataRequest(Hash.EMPTY_TRIE_HASH)));
     downloadState.enqueueRequest(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
 
     assertThat(pendingRequests.isEmpty()).isTrue();

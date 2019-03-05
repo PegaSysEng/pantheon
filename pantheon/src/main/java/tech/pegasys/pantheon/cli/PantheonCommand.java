@@ -220,6 +220,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + " (default: MAINNET)")
   private final NetworkName network = null;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--p2p-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -247,6 +248,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Set to start the JSON-RPC HTTP service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcHttpEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--rpc-http-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -289,6 +291,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Set to start the JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Boolean isRpcWsEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--rpc-ws-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -326,6 +329,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Set to start the metrics exporter (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--metrics-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -354,6 +358,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Enable the metrics push gateway integration (default: ${DEFAULT-VALUE})")
   private final Boolean isMetricsPushEnabled = false;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--metrics-push-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
@@ -376,6 +381,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1")
   private final Integer metricsPushInterval = 15;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--metrics-push-prometheus-job"},
       description = "Job name to use when in push mode (default: ${DEFAULT-VALUE})",
@@ -599,7 +605,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           buildController(),
           p2pEnabled,
           peerDiscoveryEnabled,
-          ethNetworkConfig.getBootNodes(),
+          ethNetworkConfig,
           maxPeers,
           p2pHost,
           p2pPort,
@@ -607,7 +613,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           webSocketConfiguration,
           metricsConfiguration(),
           permissioningConfiguration);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
   }
@@ -658,7 +664,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
-  private JsonRpcConfiguration jsonRpcConfiguration() throws Exception {
+  private JsonRpcConfiguration jsonRpcConfiguration() {
 
     CommandLineUtils.checkOptionDependencies(
         logger,
@@ -816,7 +822,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final PantheonController<?> controller,
       final boolean p2pEnabled,
       final boolean peerDiscoveryEnabled,
-      final Collection<?> bootstrapNodes,
+      final EthNetworkConfig ethNetworkConfig,
       final int maxPeers,
       final String discoveryHost,
       final int discoveryPort,
@@ -835,7 +841,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .pantheonController(controller)
             .p2pEnabled(p2pEnabled)
             .discovery(peerDiscoveryEnabled)
-            .bootstrapPeers(bootstrapNodes)
+            .ethNetworkConfig(ethNetworkConfig)
             .discoveryHost(discoveryHost)
             .discoveryPort(discoveryPort)
             .maxPeers(maxPeers)
@@ -1002,7 +1008,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private String rpcHttpAuthenticationCredentialsFile() throws Exception {
+  private String rpcHttpAuthenticationCredentialsFile() {
     String filename = null;
     if (isFullInstantiation()) {
       filename = standaloneCommands.rpcHttpAuthenticationCredentialsFile;

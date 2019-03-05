@@ -13,8 +13,11 @@
 package tech.pegasys.pantheon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.cli.EthNetworkConfig.DEV_NETWORK_ID;
+import static tech.pegasys.pantheon.cli.NetworkName.DEV;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -34,7 +37,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
@@ -45,6 +48,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
@@ -144,7 +148,7 @@ public final class RunnerTest {
     final Runner runnerAhead =
         runnerBuilder
             .pantheonController(controllerAhead)
-            .bootstrapPeers(Collections.emptyList())
+            .ethNetworkConfig(EthNetworkConfig.getNetworkConfig(DEV))
             .jsonRpcConfiguration(aheadJsonRpcConfiguration)
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .metricsConfiguration(aheadMetricsConfiguration)
@@ -154,16 +158,6 @@ public final class RunnerTest {
     try {
 
       executorService.submit(runnerAhead::execute);
-
-      // Wait for network to initialize to get the P2P UDP port
-      Awaitility.await()
-          .atMost(20, TimeUnit.SECONDS)
-          .ignoreExceptions()
-          .untilAsserted(() -> assertThat(runnerAhead.getP2pUdpPort()).isNotNull());
-      Awaitility.await()
-          .atMost(20, TimeUnit.SECONDS)
-          .ignoreExceptions()
-          .untilAsserted(() -> assertThat(runnerAhead.getP2pTcpPort()).isNotNull());
 
       final SynchronizerConfiguration syncConfigBehind =
           SynchronizerConfiguration.builder()
@@ -189,16 +183,16 @@ public final class RunnerTest {
               PrivacyParameters.noPrivacy(),
               dataDirBehind,
               noOpMetricsSystem);
+      final Peer advertisedPeer = runnerAhead.getAdvertisedPeer().get();
+      final EthNetworkConfig behindEthNetworkConfiguration =
+          new EthNetworkConfig(
+              EthNetworkConfig.jsonConfig(DEV),
+              DEV_NETWORK_ID,
+              Collections.singletonList(URI.create(advertisedPeer.getEnodeURI())));
       final Runner runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
-              .bootstrapPeers(
-                  Collections.singletonList(
-                      new DefaultPeer(
-                          aheadDbNodeKeys.getPublicKey().getEncodedBytes(),
-                          listenHost,
-                          runnerAhead.getP2pUdpPort(),
-                          runnerAhead.getP2pTcpPort())))
+              .ethNetworkConfig(behindEthNetworkConfiguration)
               .jsonRpcConfiguration(behindJsonRpcConfiguration)
               .webSocketConfiguration(behindWebSocketConfiguration)
               .metricsConfiguration(behindMetricsConfiguration)
