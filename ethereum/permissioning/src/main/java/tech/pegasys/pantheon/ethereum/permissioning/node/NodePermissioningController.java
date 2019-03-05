@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.node;
 
+import tech.pegasys.pantheon.ethereum.permissioning.node.provider.LocalConfigNodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
@@ -25,24 +26,32 @@ public class NodePermissioningController {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider;
+  private final Optional<LocalConfigNodePermissioningProvider> localConfigNodePermissioningProvider;
   private Optional<Runnable> peerDiscoveryCallback = Optional.empty();
 
   public NodePermissioningController(
-      final SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider) {
+      final SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider,
+      final LocalConfigNodePermissioningProvider localConfigNodePermissioningProvider) {
+    this.localConfigNodePermissioningProvider = Optional.of(localConfigNodePermissioningProvider);
     this.syncStatusNodePermissioningProvider = Optional.of(syncStatusNodePermissioningProvider);
     this.syncStatusNodePermissioningProvider.get().setHasReachedSyncCallback(this::onReachingSync);
   }
 
   public NodePermissioningController() {
+    this.localConfigNodePermissioningProvider = Optional.empty();
     this.syncStatusNodePermissioningProvider = Optional.empty();
   }
 
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     LOG.trace("Checking node permission: {} -> {}", sourceEnode, destinationEnode);
 
-    return syncStatusNodePermissioningProvider
-        .map((provider) -> provider.isPermitted(sourceEnode, destinationEnode))
-        .orElse(true);
+    if (syncStatusNodePermissioningProvider.isPresent() && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
+      return false;
+    } else {
+      return localConfigNodePermissioningProvider
+          .map((provider) -> provider.isPermitted(sourceEnode, destinationEnode))
+          .orElse(true);
+    }
   }
 
   public boolean delayPeerDiscovery() {

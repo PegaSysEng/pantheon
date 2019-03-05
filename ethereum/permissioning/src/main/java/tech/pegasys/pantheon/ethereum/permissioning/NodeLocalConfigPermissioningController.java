@@ -192,7 +192,7 @@ public class NodeLocalConfigPermissioningController {
     return isPermitted(new EnodeURL(enodeURL));
   }
 
-  private boolean isPermitted(final EnodeURL node) {
+  public boolean isPermitted(final EnodeURL node) {
     return nodesWhitelist.stream()
         .anyMatch(
             p -> {
