@@ -57,10 +57,10 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
   }
 
   /**
-   * Before reaching a sync'd state, the node will only be allowed to talk to its bootnodes. After
-   * reaching a sync'd state, it is expected that other providers will check the permissions (most
-   * likely the smart contract based provider). That's why we always return true after reaching a
-   * sync'd state.
+   * Before reaching a sync'd state, the node will only be allowed to talk to its bootnodes
+   * (outgoing connections). After reaching a sync'd state, it is expected that other providers will
+   * check the permissions (most likely the smart contract based provider). That's why we always
+   * return true after reaching a sync'd state.
    *
    * @param sourceEnode the enode source of the packet or connection
    * @param destinationEnode the enode target of the packet or connection
