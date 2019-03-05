@@ -1,5 +1,5 @@
-var Adoption = artifacts.require("Adoption");
+var SimplePermissioning = artifacts.require("SimplePermissioning");
 
 module.exports = function(deployer) {
-  deployer.deploy(Adoption);
+  deployer.deploy(SimplePermissioning);
 };
