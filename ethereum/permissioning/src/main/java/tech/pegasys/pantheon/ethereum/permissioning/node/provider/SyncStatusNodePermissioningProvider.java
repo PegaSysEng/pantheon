@@ -36,7 +36,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
     this.bootnodes.addAll(bootnodes);
   }
 
-  private void handleSyncStatusUpdate(SyncStatus syncStatus) {
+  private void handleSyncStatusUpdate(final SyncStatus syncStatus) {
     if (syncStatus != null && !hasReachedSync) {
       long blocksBehind = syncStatus.getHighestBlock() - syncStatus.getCurrentBlock();
       if (blocksBehind <= 0) {
