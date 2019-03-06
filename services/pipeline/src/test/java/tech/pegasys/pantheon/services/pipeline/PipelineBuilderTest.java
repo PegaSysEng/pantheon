@@ -13,17 +13,19 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static com.google.common.primitives.Ints.asList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.junit.AfterClass;
@@ -45,7 +47,7 @@ public class PipelineBuilderTest {
   @AfterClass
   public static void afterClass() throws Exception {
     executorService.shutdownNow();
-    if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+    if (!executorService.awaitTermination(10, SECONDS)) {
       fail("Executor service did not shut down cleanly");
     }
   }
@@ -55,7 +57,7 @@ public class PipelineBuilderTest {
     final List<Integer> output = new ArrayList<>();
     final Pipeline pipeline = PipelineBuilder.createPipelineFrom(tasks).andFinishWith(output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
-    result.get(10, TimeUnit.SECONDS);
+    result.get(10, SECONDS);
     assertThat(output).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
   }
 
@@ -68,9 +70,37 @@ public class PipelineBuilderTest {
             .andFinishWith(output::add);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
-    result.get(10, TimeUnit.SECONDS);
+    result.get(10, SECONDS);
     assertThat(output)
         .containsExactly(
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
+  }
+
+  @Test
+  public void shouldCombineIntoBatches() throws Exception {
+    final Pipe<Integer> input = new Pipe<>(20);
+    tasks.forEachRemaining(input::put);
+    final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(input).inBatches(6).andFinishWith(output::offer);
+
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    assertThat(output.poll(10, SECONDS)).containsExactly(1, 2, 3, 4, 5, 6);
+    assertThat(output.poll(10, SECONDS)).containsExactly(7, 8, 9, 10, 11, 12);
+    assertThat(output.poll(10, SECONDS)).containsExactly(13, 14, 15);
+
+    assertThat(output).isEmpty();
+    assertThat(result).isNotDone();
+
+    // Should not wait to fill the batch.
+    input.put(16);
+    assertThat(output.poll(10, SECONDS)).containsExactly(16);
+    input.put(17);
+    assertThat(output.poll(10, SECONDS)).containsExactly(17);
+
+    input.close();
+    result.get(10, SECONDS);
+    assertThat(output).isEmpty();
   }
 }

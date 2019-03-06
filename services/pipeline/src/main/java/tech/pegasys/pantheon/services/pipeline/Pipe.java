@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +60,18 @@ class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
       }
     }
     return null;
+  }
+
+  @Override
+  public List<T> getBatch(final int maximumBatchSize) {
+    final T nextItem = get();
+    if (nextItem == null) {
+      return Collections.emptyList();
+    }
+    final List<T> batch = new ArrayList<>();
+    batch.add(nextItem);
+    queue.drainTo(batch, maximumBatchSize - 1);
+    return batch;
   }
 
   @Override

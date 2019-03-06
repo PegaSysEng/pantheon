@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -36,15 +38,30 @@ public class PipelineBuilder<T> {
     return new PipelineBuilder<>(singleton(sourceStage), pipe);
   }
 
+  public static <T> PipelineBuilder<T> createPipelineFrom(final InputPipe<T> pipe) {
+    return new PipelineBuilder<>(emptyList(), pipe);
+  }
+
   public <O> PipelineBuilder<O> thenProcessWith(final Function<T, O> processor) {
-    final ArrayList<Runnable> newStages = new ArrayList<>(stages);
     final Pipe<O> outputPipe = new Pipe<>(10);
     final ProcessStage<T, O> processStage = new ProcessStage<>(pipeEnd, outputPipe, processor);
-    newStages.add(processStage);
-    return new PipelineBuilder<>(newStages, outputPipe);
+    return addStage(processStage, outputPipe);
+  }
+
+  public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
+    final Pipe<List<T>> outputPipe = new Pipe<>(10);
+    final BatchingStage<T> batchingStage =
+        new BatchingStage<>(pipeEnd, outputPipe, maximumBatchSize);
+    return addStage(batchingStage, outputPipe);
   }
 
   public Pipeline andFinishWith(final Consumer<T> completer) {
     return new Pipeline(stages, new CompleterStage<>(pipeEnd, completer));
+  }
+
+  private <O> PipelineBuilder<O> addStage(final Runnable stage, final Pipe<O> outputPipe) {
+    final ArrayList<Runnable> newStages = new ArrayList<>(stages);
+    newStages.add(stage);
+    return new PipelineBuilder<>(newStages, outputPipe);
   }
 }
