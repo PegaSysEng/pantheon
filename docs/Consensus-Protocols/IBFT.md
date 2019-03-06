@@ -61,7 +61,7 @@ to generate the `extraData` RLP string to include in the genesis file.
 
 !!! example                                        
     ```bash
-    pantheon rlp encode --from=toEncode.json --to=rlpEncodedExtraData
+    pantheon rlp encode --from=toEncode.json
     ```    
 
 Where the `toEncode.json` file contains a list of the initial validators in ascending order. 
@@ -73,26 +73,27 @@ Where the `toEncode.json` file contains a list of the initial validators in asce
     ]
     ``` 
 
-Copy the RLP encoded data from the `rlpEncodedExtraData` file to the `extraData` in the genesis file. 
+Copy the RLP encoded data to the `extraData` in the genesis file. 
 
 ### Block Time 
 
-When a block is received, the block time and timeout timers are started. When `blockperiodseconds` is reached, 
-a new block is proposed. Generally, the proposed block is added before reaching `requesttimeoutseconds`. A new 
-round is then started, and the block time and timeout timers are reset. When `blockperiodseconds` is reached, the next 
-new block is proposed. 
+When a new chain head is received, the block time (`blockperiodseconds`) and round timeout (`requesttimeoutseconds`) 
+timers are started. When `blockperiodseconds` is reached, a new block is proposed. 
 
 If `requesttimeoutseconds` is reached before the proposed block is added, a round change occurs, and the block time and 
-timeout timers are reset. The timeout period for the new round is 2 X `requesttimeoutseconds`. The timeout period continues 
-to double each time a round fails to add a block. 
+timeout timers are reset. The timeout period for the new round is two times `requesttimeoutseconds`. The 
+timeout period continues to double each time a round fails to add a block. 
+
+Generally, the proposed block is added before reaching `requesttimeoutseconds`. A new round is then started, 
+and the block time and round timeout timers are reset. When `blockperiodseconds` is reached, the next new block is proposed. 
 
 The time from proposing a block to the block being added is small (around 1s) even in networks
 with geographically dispersed validators. Setting `blockperiodseconds` to your desired block time and `requesttimeoutseconds`
-to 2 X `blockperiodseconds` generally results in blocks being added every `blockperiodseconds`. 
+to two times `blockperiodseconds` generally results in blocks being added every `blockperiodseconds`. 
 
 !!! example 
     An internal PegaSys IBFT 2.0 testnet has 4 geographically dispersed validators in Sweden, 
-    Sydney, and North Viringia (2). With a `blockperiodseconds`of 5 and a `requesttimeoutseconds` of 10
+    Sydney, and North Viringia (2 validators). With a `blockperiodseconds`of 5 and a `requesttimeoutseconds` of 10,
     the testnet consistently creates block with a 5 second blocktime. 
 
 ### Optional Configuration Options 
