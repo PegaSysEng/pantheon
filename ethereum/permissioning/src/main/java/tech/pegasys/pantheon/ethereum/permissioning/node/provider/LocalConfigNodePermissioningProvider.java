@@ -12,13 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.node.provider;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -27,7 +20,8 @@ public class LocalConfigNodePermissioningProvider implements NodePermissioningPr
 
   private NodeLocalConfigPermissioningController localConfigPermissioningController;
 
-  public LocalConfigNodePermissioningProvider(NodeLocalConfigPermissioningController localConfigPermissioningController) {
+  public LocalConfigNodePermissioningProvider(
+      NodeLocalConfigPermissioningController localConfigPermissioningController) {
     this.localConfigPermissioningController = localConfigPermissioningController;
   }
 
@@ -41,7 +35,7 @@ public class LocalConfigNodePermissioningProvider implements NodePermissioningPr
    */
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    return localConfigPermissioningController.isPermitted(sourceEnode) &&
-        localConfigPermissioningController.isPermitted(destinationEnode);
+    return localConfigPermissioningController.isPermitted(sourceEnode)
+        && localConfigPermissioningController.isPermitted(destinationEnode);
   }
 }

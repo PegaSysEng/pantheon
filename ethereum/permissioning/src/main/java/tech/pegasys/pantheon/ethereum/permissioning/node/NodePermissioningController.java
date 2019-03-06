@@ -37,6 +37,7 @@ public class NodePermissioningController {
     this.syncStatusNodePermissioningProvider.get().setHasReachedSyncCallback(this::onReachingSync);
   }
 
+  // TODO is this constructor needed?
   public NodePermissioningController() {
     this.localConfigNodePermissioningProvider = Optional.empty();
     this.syncStatusNodePermissioningProvider = Optional.empty();
@@ -45,7 +46,8 @@ public class NodePermissioningController {
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     LOG.trace("Checking node permission: {} -> {}", sourceEnode, destinationEnode);
 
-    if (syncStatusNodePermissioningProvider.isPresent() && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
+    if (syncStatusNodePermissioningProvider.isPresent()
+        && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
       return false;
     } else {
       return localConfigNodePermissioningProvider
@@ -54,17 +56,12 @@ public class NodePermissioningController {
     }
   }
 
-  public boolean delayPeerDiscovery() {
-    return syncStatusNodePermissioningProvider
-        .map((provider) -> !provider.hasReachedSync())
-        .orElse(false);
-  }
-
-  public void peerDiscoveryCallback(final Runnable runnable) {
-    this.peerDiscoveryCallback = Optional.of(runnable);
-  }
-
   private void onReachingSync() {
     peerDiscoveryCallback.ifPresent(Runnable::run);
+  }
+
+  public void startPeerDiscoveryCallback(final Runnable peerDiscoveryCallback) {
+    syncStatusNodePermissioningProvider.ifPresent(
+        (p) -> p.setHasReachedSyncCallback(peerDiscoveryCallback));
   }
 }
