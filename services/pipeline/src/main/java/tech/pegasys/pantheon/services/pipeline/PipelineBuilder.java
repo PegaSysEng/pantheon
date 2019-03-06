@@ -26,30 +26,35 @@ public class PipelineBuilder<T> {
 
   private final Collection<Runnable> stages;
   private final InputPipe<T> pipeEnd;
+  private final int bufferSize;
 
-  public PipelineBuilder(final Collection<Runnable> stages, final InputPipe<T> pipeEnd) {
+  public PipelineBuilder(
+      final Collection<Runnable> stages, final InputPipe<T> pipeEnd, final int bufferSize) {
     this.stages = stages;
     this.pipeEnd = pipeEnd;
+    this.bufferSize = bufferSize;
   }
 
-  public static <T> PipelineBuilder<T> createPipelineFrom(final Iterator<T> taskStream) {
-    final Pipe<T> pipe = new Pipe<>(10);
+  public static <T> PipelineBuilder<T> createPipelineFrom(
+      final Iterator<T> taskStream, final int bufferSize) {
+    final Pipe<T> pipe = new Pipe<>(bufferSize);
     final SourceStage<T> sourceStage = new SourceStage<>(taskStream, pipe);
-    return new PipelineBuilder<>(singleton(sourceStage), pipe);
+    return new PipelineBuilder<>(singleton(sourceStage), pipe, bufferSize);
   }
 
-  public static <T> PipelineBuilder<T> createPipelineFrom(final InputPipe<T> pipe) {
-    return new PipelineBuilder<>(emptyList(), pipe);
+  public static <T> PipelineBuilder<T> createPipelineFrom(
+      final InputPipe<T> pipe, final int bufferSize) {
+    return new PipelineBuilder<>(emptyList(), pipe, bufferSize);
   }
 
   public <O> PipelineBuilder<O> thenProcessWith(final Function<T, O> processor) {
-    final Pipe<O> outputPipe = new Pipe<>(10);
+    final Pipe<O> outputPipe = new Pipe<>(bufferSize);
     final ProcessStage<T, O> processStage = new ProcessStage<>(pipeEnd, outputPipe, processor);
     return addStage(processStage, outputPipe);
   }
 
   public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
-    final Pipe<List<T>> outputPipe = new Pipe<>(10);
+    final Pipe<List<T>> outputPipe = new Pipe<>(bufferSize / maximumBatchSize + 1);
     final BatchingStage<T> batchingStage =
         new BatchingStage<>(pipeEnd, outputPipe, maximumBatchSize);
     return addStage(batchingStage, outputPipe);
@@ -62,6 +67,6 @@ public class PipelineBuilder<T> {
   private <O> PipelineBuilder<O> addStage(final Runnable stage, final Pipe<O> outputPipe) {
     final ArrayList<Runnable> newStages = new ArrayList<>(stages);
     newStages.add(stage);
-    return new PipelineBuilder<>(newStages, outputPipe);
+    return new PipelineBuilder<>(newStages, outputPipe, bufferSize);
   }
 }

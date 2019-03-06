@@ -55,7 +55,8 @@ public class PipelineBuilderTest {
   @Test
   public void shouldPipeTasksFromSupplierToCompleter() throws Exception {
     final List<Integer> output = new ArrayList<>();
-    final Pipeline pipeline = PipelineBuilder.createPipelineFrom(tasks).andFinishWith(output::add);
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(tasks, 10).andFinishWith(output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
     result.get(10, SECONDS);
     assertThat(output).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -65,7 +66,7 @@ public class PipelineBuilderTest {
   public void shouldPassInputThroughIntermediateStage() throws Exception {
     final List<String> output = new ArrayList<>();
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks)
+        PipelineBuilder.createPipelineFrom(tasks, 10)
             .thenProcessWith(Object::toString)
             .andFinishWith(output::add);
 
@@ -82,7 +83,7 @@ public class PipelineBuilderTest {
     tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(input).inBatches(6).andFinishWith(output::offer);
+        PipelineBuilder.createPipelineFrom(input, 20).inBatches(6).andFinishWith(output::offer);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
