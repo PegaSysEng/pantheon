@@ -72,11 +72,6 @@ class PublicKeySubCommand implements Runnable {
     spec.commandLine().usage(out);
   }
 
-  @FunctionalInterface
-  public interface KeyLoader {
-    SECP256K1.KeyPair load(final File keyFile) throws IOException;
-  }
-
   private Optional<KeyPair> getKeyPair() {
     try {
       return Optional.of(keyLoader.load(parentCommand.nodePrivateKeyFile()));
@@ -188,5 +183,10 @@ class PublicKeySubCommand implements Runnable {
         parentCommand.out.println(address.toString());
       }
     }
+  }
+
+  @FunctionalInterface
+  public interface KeyLoader {
+    SECP256K1.KeyPair load(final File keyFile) throws IOException;
   }
 }
