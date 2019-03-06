@@ -131,12 +131,6 @@ public class EthSendRawTransactionTest {
   }
 
   @Test
-  public void transactionWithNonceAboveAccountNonceIsRejected() {
-    verifyErrorForInvalidTransaction(
-        TransactionInvalidReason.INCORRECT_NONCE, JsonRpcError.INCORRECT_NONCE);
-  }
-
-  @Test
   public void transactionWithInvalidSignatureIsRejected() {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.INVALID_SIGNATURE, JsonRpcError.INVALID_TRANSACTION_SIGNATURE);

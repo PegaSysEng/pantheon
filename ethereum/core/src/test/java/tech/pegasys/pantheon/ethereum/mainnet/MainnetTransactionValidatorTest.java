@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INTRINSIC_GAS_EXCEEDS_GAS_LIMIT;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED;
@@ -30,8 +29,6 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-
-import java.util.OptionalLong;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,7 +77,7 @@ public class MainnetTransactionValidatorTest {
   public void shouldRejectTransactionWhenSenderAccountDoesNotExist() {
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(gasCalculator, false, 1);
-    assertThat(validator.validateForSender(basicTransaction, null, OptionalLong.empty()))
+    assertThat(validator.validateForSender(basicTransaction, null))
         .isEqualTo(ValidationResult.invalid(UPFRONT_COST_EXCEEDS_BALANCE));
   }
 
@@ -90,57 +87,28 @@ public class MainnetTransactionValidatorTest {
         new MainnetTransactionValidator(gasCalculator, false, 1);
 
     final Account account = accountWithNonce(basicTransaction.getNonce() + 1);
-    assertThat(validator.validateForSender(basicTransaction, account, OptionalLong.empty()))
+    assertThat(validator.validateForSender(basicTransaction, account))
         .isEqualTo(ValidationResult.invalid(NONCE_TOO_LOW));
   }
 
   @Test
-  public void shouldRejectTransactionWhenTransactionNonceAboveAccountNonce() {
+  public void shouldAcceptTransactionWhenTransactionNonceEqualsAccountNonce() {
+    final MainnetTransactionValidator validator =
+        new MainnetTransactionValidator(gasCalculator, false, 1);
+
+    final Account account = accountWithNonce(basicTransaction.getNonce());
+    assertThat(validator.validateForSender(basicTransaction, account))
+        .isEqualTo(ValidationResult.valid());
+  }
+
+  @Test
+  public void shouldAcceptTransactionWhenTransactionNonceAboveAccountNonce() {
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(gasCalculator, false, 1);
 
     final Account account = accountWithNonce(basicTransaction.getNonce() - 1);
-    assertThat(validator.validateForSender(basicTransaction, account, OptionalLong.empty()))
-        .isEqualTo(ValidationResult.invalid(INCORRECT_NONCE));
-  }
-
-  @Test
-  public void shouldAcceptTransactionWhenNonceBetweenAccountNonceAndMaximumAllowedNonce() {
-    final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, 1);
-
-    final Transaction transaction =
-        new TransactionTestFixture().nonce(10).createTransaction(senderKeys);
-    final Account account = accountWithNonce(5);
-
-    assertThat(validator.validateForSender(transaction, account, OptionalLong.of(15)))
+    assertThat(validator.validateForSender(basicTransaction, account))
         .isEqualTo(ValidationResult.valid());
-  }
-
-  @Test
-  public void shouldAcceptTransactionWhenNonceEqualsMaximumAllowedNonce() {
-    final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, 1);
-
-    final Transaction transaction =
-        new TransactionTestFixture().nonce(10).createTransaction(senderKeys);
-    final Account account = accountWithNonce(5);
-
-    assertThat(validator.validateForSender(transaction, account, OptionalLong.of(10)))
-        .isEqualTo(ValidationResult.valid());
-  }
-
-  @Test
-  public void shouldRejectTransactionWhenNonceExceedsMaximumAllowedNonce() {
-    final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, 1);
-
-    final Transaction transaction =
-        new TransactionTestFixture().nonce(11).createTransaction(senderKeys);
-    final Account account = accountWithNonce(5);
-
-    assertThat(validator.validateForSender(transaction, account, OptionalLong.of(10)))
-        .isEqualTo(ValidationResult.invalid(INCORRECT_NONCE));
   }
 
   @Test
@@ -153,9 +121,7 @@ public class MainnetTransactionValidatorTest {
     final Address arbitrarySender = Address.fromHexString("1");
     builder.gasPrice(Wei.ZERO).nonce(0).sender(arbitrarySender).value(Wei.ZERO);
 
-    assertThat(
-            validator.validateForSender(
-                builder.createTransaction(senderKeyPair), null, OptionalLong.of(10)))
+    assertThat(validator.validateForSender(builder.createTransaction(senderKeyPair), null))
         .isEqualTo(ValidationResult.valid());
   }
 

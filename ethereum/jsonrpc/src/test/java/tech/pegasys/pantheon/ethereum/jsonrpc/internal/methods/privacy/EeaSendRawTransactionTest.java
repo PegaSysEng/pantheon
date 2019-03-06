@@ -173,12 +173,6 @@ public class EeaSendRawTransactionTest {
   }
 
   @Test
-  public void transactionWithNonceAboveAccountNonceIsRejected() throws IOException {
-    verifyErrorForInvalidTransaction(
-        TransactionInvalidReason.INCORRECT_NONCE, JsonRpcError.INCORRECT_NONCE);
-  }
-
-  @Test
   public void transactionWithInvalidSignatureIsRejected() throws IOException {
     verifyErrorForInvalidTransaction(
         TransactionInvalidReason.INVALID_SIGNATURE, JsonRpcError.INVALID_TRANSACTION_SIGNATURE);

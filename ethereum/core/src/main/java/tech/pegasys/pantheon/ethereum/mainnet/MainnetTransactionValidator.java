@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
-import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INTRINSIC_GAS_EXCEEDS_GAS_LIMIT;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
@@ -28,7 +27,6 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 
 import java.util.OptionalInt;
-import java.util.OptionalLong;
 
 /**
  * Validates a transaction based on Frontier protocol runtime requirements.
@@ -86,45 +84,33 @@ public class MainnetTransactionValidator implements TransactionValidator {
 
   @Override
   public ValidationResult<TransactionInvalidReason> validateForSender(
-      final Transaction transaction, final Account sender, final OptionalLong maximumNonce) {
+      final Transaction transaction, final Account sender) {
 
-    Wei balance = Account.DEFAULT_BALANCE;
-    long nonce = Account.DEFAULT_NONCE;
+    Wei senderBalance = Account.DEFAULT_BALANCE;
+    long senderNonce = Account.DEFAULT_NONCE;
 
     if (sender != null) {
-      balance = sender.getBalance();
-      nonce = sender.getNonce();
+      senderBalance = sender.getBalance();
+      senderNonce = sender.getNonce();
     }
 
-    if (transaction.getUpfrontCost().compareTo(balance) > 0) {
+    if (transaction.getUpfrontCost().compareTo(senderBalance) > 0) {
       return ValidationResult.invalid(
           UPFRONT_COST_EXCEEDS_BALANCE,
           String.format(
               "transaction up-front cost %s exceeds transaction sender account balance %s",
-              transaction.getUpfrontCost(), balance));
+              transaction.getUpfrontCost(), senderBalance));
     }
 
-    if (transaction.getNonce() < nonce) {
+    if (transaction.getNonce() < senderNonce) {
       return ValidationResult.invalid(
           NONCE_TOO_LOW,
           String.format(
-              "transaction nonce %s below sender account nonce %s", transaction.getNonce(), nonce));
-    }
-
-    if (violatesMaximumNonce(transaction, maximumNonce) && nonce != transaction.getNonce()) {
-      return ValidationResult.invalid(
-          INCORRECT_NONCE,
-          String.format(
-              "transaction nonce %s does not match sender account nonce %s.",
-              transaction.getNonce(), nonce));
+              "transaction nonce %s below sender account nonce %s",
+              transaction.getNonce(), senderNonce));
     }
 
     return ValidationResult.valid();
-  }
-
-  private boolean violatesMaximumNonce(
-      final Transaction transaction, final OptionalLong maximumNonce) {
-    return !maximumNonce.isPresent() || transaction.getNonce() > maximumNonce.getAsLong();
   }
 
   public ValidationResult<TransactionInvalidReason> validateTransactionSignature(
