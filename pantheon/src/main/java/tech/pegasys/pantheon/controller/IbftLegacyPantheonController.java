@@ -35,6 +35,7 @@ import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
+import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
@@ -202,7 +203,9 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
 
   @Override
   public SubProtocolConfiguration subProtocolConfiguration() {
-    return new SubProtocolConfiguration().withSubProtocol(ethSubProtocol, ethProtocolManager);
+    return new SubProtocolConfiguration()
+        .withSubProtocol(Istanbul64Protocol.get(), ethProtocolManager)
+        .withSubProtocol(EthProtocol.get(), ethProtocolManager);
   }
 
   @Override
