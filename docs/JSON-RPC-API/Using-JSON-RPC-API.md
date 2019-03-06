@@ -3,18 +3,6 @@ description: How to use Pantheon JSON-RPC API
 
 # Using the JSON-RPC API
 
-## Postman
-
-Use the button to import our collection of examples to [Postman](https://www.getpostman.com/). 
-
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/cffe1bc034b3ab139fa7)
-
-## Endpoint Host and Port
-
-The placeholder
-`<JSON-RPC-http-endpoint:port>` and `<JSON-RPC-ws-endpoint:port>` represents an endpoint (IP address and port) 
-of the JSON-RPC service of a Pantheon node for HTTP and WebSocket requests.
-
 To enable JSON-RPC over HTTP or WebSockets, use the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) 
 and [`--rpc-ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled) options.
 
@@ -25,13 +13,25 @@ Set the host to `0.0.0.0` to allow remote connections.
 
 !!! caution 
     Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
-    production environment, ensure you are using a firewall to avoid exposing your node to the internet.  
+    production environment, ensure you use a firewall to avoid exposing your node to the internet.  
 
 Use the [--rpc-http-port](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) and [--rpc-ws-port](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-port)
 options to specify the port on which the JSON-RPC listens. The default ports are: 
 
 * 8545 for HTTP
 * 8546 for WebSockets
+
+## Postman
+
+Use the button to import our collection of examples to [Postman](https://www.getpostman.com/). 
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/cffe1bc034b3ab139fa7)
+
+## Geth Console 
+
+To use the geth console with Pantheon: 
+
+1. Start Pantheon with the [`--rpc-http-enabled`]
 
 ## Host Whitelist 
 
@@ -75,7 +75,7 @@ First connect to the WebSockets server using `wscat` (you only need to connect o
 $ wscat -c ws://<JSON-RPC-ws-endpoint:port>
 ```
 
-After the connection is established, the terminal will display a '>' prompt.
+After the connection is established, the terminal displays a '>' prompt.
 Send individual requests as a JSON data package at each prompt:
 
 ```bash
