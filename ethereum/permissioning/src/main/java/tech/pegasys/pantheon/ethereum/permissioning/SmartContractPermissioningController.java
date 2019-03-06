@@ -51,7 +51,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
   }
 
   @Override
-  private boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
+  public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     final BytesValue payload = createPayload(sourceEnode, destinationEnode);
     final CallParameter callParams =
         new CallParameter(null, contractAddress, -1, null, null, payload);
