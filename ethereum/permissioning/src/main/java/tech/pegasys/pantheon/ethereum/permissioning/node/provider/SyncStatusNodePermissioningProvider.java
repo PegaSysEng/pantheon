@@ -22,12 +22,15 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.OptionalLong;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class SyncStatusNodePermissioningProvider implements NodePermissioningProvider {
 
   private final Synchronizer synchronizer;
   private final Collection<EnodeURL> bootnodes = new HashSet<>();
-  private final long syncStatusObserverId;
+  private OptionalLong syncStatusObserverId;
   private boolean hasReachedSync = false;
   private Optional<Runnable> hasReachedSyncCallback = Optional.empty();
 
@@ -35,29 +38,41 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
       final Synchronizer synchronizer, final Collection<EnodeURL> bootnodes) {
     checkNotNull(synchronizer);
     this.synchronizer = synchronizer;
-    this.syncStatusObserverId = this.synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
+    long id = this.synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
+    this.syncStatusObserverId = OptionalLong.of(id);
     this.bootnodes.addAll(bootnodes);
   }
 
   private void handleSyncStatusUpdate(final SyncStatus syncStatus) {
-    if (syncStatus != null && !hasReachedSync) {
+    if (syncStatus != null) {
       long blocksBehind = syncStatus.getHighestBlock() - syncStatus.getCurrentBlock();
       if (blocksBehind <= 0) {
         synchronized (this) {
-          hasReachedSync = true;
-          hasReachedSyncCallback.ifPresent(Runnable::run);
-          synchronizer.removeObserver(syncStatusObserverId);
+          if (!hasReachedSync) {
+            runCallback();
+            syncStatusObserverId.ifPresent(
+                id -> {
+                  synchronizer.removeObserver(id);
+                  syncStatusObserverId = OptionalLong.empty();
+                });
+            hasReachedSync = true;
+          }
         }
       }
     }
   }
 
-  public boolean hasReachedSync() {
-    return hasReachedSync;
+  public synchronized void setHasReachedSyncCallback(final Runnable runnable) {
+    if (hasReachedSync) {
+      runCallback();
+    } else {
+      this.hasReachedSyncCallback = Optional.of(runnable);
+    }
   }
 
-  public void setHasReachedSyncCallback(final Runnable runnable) {
-    this.hasReachedSyncCallback = Optional.of(runnable);
+  private synchronized void runCallback() {
+    hasReachedSyncCallback.ifPresent(Runnable::run);
+    hasReachedSyncCallback = Optional.empty();
   }
 
   /**
@@ -78,5 +93,10 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
     } else {
       return bootnodes.contains(destinationEnode);
     }
+  }
+
+  @VisibleForTesting
+  boolean hasReachedSync() {
+    return hasReachedSync;
   }
 }

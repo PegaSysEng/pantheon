@@ -12,13 +12,9 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.node;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -26,7 +22,6 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -43,17 +38,10 @@ public class NodePermissioningControllerTest {
   @Mock private SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider;
 
   private NodePermissioningController controller;
-  private Runnable hasReachedSyncCallback;
 
   @Before
   public void before() {
-    ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
-    doNothing()
-        .when(syncStatusNodePermissioningProvider)
-        .setHasReachedSyncCallback(captor.capture());
-
     this.controller = new NodePermissioningController(syncStatusNodePermissioningProvider);
-    this.hasReachedSyncCallback = captor.getValue();
   }
 
   @Test
@@ -64,36 +52,9 @@ public class NodePermissioningControllerTest {
   }
 
   @Test
-  public void ifSyncHasBeenReachedPeerDiscoveryShouldRun() {
-    final Runnable peerDiscoveryCallback = mock(Runnable.class);
-    when(syncStatusNodePermissioningProvider.hasReachedSync()).thenReturn(true);
+  public void peerDiscoveryCallbackShouldBeDelegatedToSyncStatusNodePermissioningProvider() {
+    controller.startPeerDiscoveryCallback(() -> {});
 
-    controller.startPeerDiscoveryCallback(peerDiscoveryCallback);
-
-    verify(peerDiscoveryCallback).run();
-  }
-
-  @Test
-  public void ifSyncHasNotBeenReachedShouldSetPeerDiscoveryCallback() {
-    final Runnable peerDiscoveryCallback = mock(Runnable.class);
-    when(syncStatusNodePermissioningProvider.hasReachedSync()).thenReturn(false);
-
-    controller.startPeerDiscoveryCallback(peerDiscoveryCallback);
-
-    verifyZeroInteractions(peerDiscoveryCallback);
-    assertThat(controller.getPeerDiscoveryCallback()).isNotEmpty();
-  }
-
-  @Test
-  public void shouldExecutePeerDiscoveryCallbackWhenHasReachedSyncCallbackIsTriggered() {
-    final Runnable peerDiscoveryCallback = mock(Runnable.class);
-    when(syncStatusNodePermissioningProvider.hasReachedSync()).thenReturn(false);
-
-    controller.startPeerDiscoveryCallback(peerDiscoveryCallback);
-    hasReachedSyncCallback.run();
-
-    verify(peerDiscoveryCallback).run();
-    // should set the callback to empty after executing it once
-    assertThat(controller.getPeerDiscoveryCallback()).isEmpty();
+    verify(syncStatusNodePermissioningProvider).setHasReachedSyncCallback(any(Runnable.class));
   }
 }
