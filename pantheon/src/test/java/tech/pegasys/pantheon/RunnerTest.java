@@ -160,7 +160,13 @@ public final class RunnerTest {
             .build();
     try {
 
-      executorService.submit(runnerAhead::execute);
+      runnerAhead.start();
+
+      // Wait for network to initialize
+      Awaitility.await()
+          .atMost(20, TimeUnit.SECONDS)
+          .ignoreExceptions()
+          .untilAsserted(() -> assertThat(runnerAhead.getAdvertisedPeer()).isNotEmpty());
 
       final SynchronizerConfiguration syncConfigBehind =
           SynchronizerConfiguration.builder()
@@ -204,7 +210,7 @@ public final class RunnerTest {
               .metricsSystem(noOpMetricsSystem)
               .build();
 
-      executorService.submit(runnerBehind::execute);
+      runnerBehind.start();
       final Call.Factory client = new OkHttpClient();
       Awaitility.await()
           .ignoreExceptions()
