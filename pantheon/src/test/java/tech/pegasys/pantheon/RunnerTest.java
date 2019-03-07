@@ -162,12 +162,6 @@ public final class RunnerTest {
 
       runnerAhead.start();
 
-      // Wait for network to initialize
-      Awaitility.await()
-          .atMost(20, TimeUnit.SECONDS)
-          .ignoreExceptions()
-          .untilAsserted(() -> assertThat(runnerAhead.getAdvertisedPeer()).isNotEmpty());
-
       final SynchronizerConfiguration syncConfigBehind =
           SynchronizerConfiguration.builder()
               .syncMode(mode)
