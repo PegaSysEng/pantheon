@@ -152,20 +152,31 @@ class WorldDownloadState {
   public synchronized void enqueueRequest(final NodeDataRequest request) {
     if (!internalFuture.isDone()) {
       pendingRequests.enqueue(request);
+      notifyAll();
     }
   }
 
   public synchronized void enqueueRequests(final Collection<NodeDataRequest> requests) {
     if (!internalFuture.isDone()) {
-      requests.forEach(pendingRequests::enqueue);
+      pendingRequests.enqueue(requests);
+      notifyAll();
     }
   }
 
-  public synchronized Task<NodeDataRequest> dequeueRequest() {
-    if (internalFuture.isDone()) {
-      return null;
+  public synchronized Task<NodeDataRequest> dequeueRequestBlocking() {
+    while (!internalFuture.isDone()) {
+      final Task<NodeDataRequest> task = pendingRequests.dequeue();
+      if (task != null) {
+        return task;
+      }
+      try {
+        wait(TimeUnit.SECONDS.toMillis(1));
+      } catch (final InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return null;
+      }
     }
-    return pendingRequests.dequeue();
+    return null;
   }
 
   public synchronized void setRootNodeData(final BytesValue rootNodeData) {
