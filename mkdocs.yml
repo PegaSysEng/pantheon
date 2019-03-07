@@ -11,7 +11,7 @@
 
 # Project information
 site_name: Pantheon
-site_url: https://docs.pantheon.pegasys.tech/
+site_url: https://docs.pantheon.pegasys.tech/en/stable/
 site_description: Pantheon Java Ethereum client documentation.
 site_author: Pantheon community
 copyright: Pantheon and its documentation are licensed under Apache 2.0 license /
@@ -29,7 +29,7 @@ extra:
 
 # Repository
 repo_name: PegaSysEng/pantheon
-repo_url: https://github.com/PegaSysEng/pantheon/en/stable/
+repo_url: https://github.com/PegaSysEng/pantheon
 edit_uri: ""
 
 theme:
