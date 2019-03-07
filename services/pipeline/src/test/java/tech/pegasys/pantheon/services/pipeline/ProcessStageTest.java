@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Locale;
+
 import org.junit.Test;
 
 public class ProcessStageTest {
@@ -22,7 +24,7 @@ public class ProcessStageTest {
   private final Pipe<String> output = new Pipe<>(10);
 
   private final ProcessStage<String, String> stage =
-      new ProcessStage<>(input, output, String::toLowerCase);
+      new ProcessStage<>(input, output, value -> value.toLowerCase(Locale.UK));
 
   @Test
   public void shouldCloseOutputPipeWhenInputIsClosed() {

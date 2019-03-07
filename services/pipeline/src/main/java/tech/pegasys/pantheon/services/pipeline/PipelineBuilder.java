@@ -19,8 +19,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class PipelineBuilder<T> {
 
@@ -47,10 +49,28 @@ public class PipelineBuilder<T> {
     return new PipelineBuilder<>(emptyList(), pipe, bufferSize);
   }
 
-  public <O> PipelineBuilder<O> thenProcessWith(final Function<T, O> processor) {
+  public <O> PipelineBuilder<O> thenProcess(final Function<T, O> processor) {
     final Pipe<O> outputPipe = new Pipe<>(bufferSize);
     final ProcessStage<T, O> processStage = new ProcessStage<>(pipeEnd, outputPipe, processor);
     return addStage(processStage, outputPipe);
+  }
+
+  public <O> PipelineBuilder<O> thenProcessInParallel(final Function<T, O> processor, final int numberOfThreads) {
+    final Pipe<O> outputPipe = new Pipe<>(bufferSize);
+    final ArrayList<Runnable> newStages = new ArrayList<>(stages);
+    for (int i = 0; i < numberOfThreads; i++) {
+      final ProcessStage<T, O> processStage = new ProcessStage<>(pipeEnd, outputPipe, processor);
+      newStages.add(processStage);
+    }
+    return new PipelineBuilder<>(newStages, outputPipe, bufferSize);
+  }
+
+  public <O> PipelineBuilder<O> thenProcessAsync(
+      final Function<T, CompletableFuture<O>> processor, final int maxConcurrency) {
+    final Pipe<O> outputPipe = new Pipe<>(bufferSize);
+    final AsyncProcessStage<T, O> stage =
+        new AsyncProcessStage<>(pipeEnd, outputPipe, processor, maxConcurrency);
+    return addStage(stage, outputPipe);
   }
 
   public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
@@ -58,6 +78,12 @@ public class PipelineBuilder<T> {
     final BatchingStage<T> batchingStage =
         new BatchingStage<>(pipeEnd, outputPipe, maximumBatchSize);
     return addStage(batchingStage, outputPipe);
+  }
+
+  public <O> PipelineBuilder<O> theFlatMap(final Function<T, Stream<O>> mapper, final int newBufferSize) {
+    final Pipe<O> outputPipe = new Pipe<>(newBufferSize);
+    final FlatMapStage<T, O> stage = new FlatMapStage<>(pipeEnd, outputPipe, mapper);
+    return addStage(stage, outputPipe);
   }
 
   public Pipeline andFinishWith(final Consumer<T> completer) {

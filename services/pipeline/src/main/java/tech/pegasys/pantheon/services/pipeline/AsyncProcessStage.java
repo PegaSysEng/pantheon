@@ -1,0 +1,95 @@
+package tech.pegasys.pantheon.services.pipeline;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class AsyncProcessStage<I, O> implements Runnable {
+  private static final Logger LOG = LogManager.getLogger();
+  private final InputPipe<I> inputPipe;
+  private final OutputPipe<O> outputPipe;
+  private final Function<I, CompletableFuture<O>> processor;
+  private final Collection<CompletableFuture<O>> inProgress;
+  private final int maxConcurrency;
+
+  public AsyncProcessStage(
+      final InputPipe<I> inputPipe,
+      final OutputPipe<O> outputPipe,
+      final Function<I, CompletableFuture<O>> processor,
+      final int maxConcurrency) {
+    this.inputPipe = inputPipe;
+    this.outputPipe = outputPipe;
+    this.processor = processor;
+    this.maxConcurrency = maxConcurrency;
+    this.inProgress = new ArrayList<>(maxConcurrency);
+  }
+
+  @Override
+  public void run() {
+    final Thread stageThread = Thread.currentThread();
+    while (inputPipe.hasMore()) {
+      if (inProgress.size() < maxConcurrency) {
+        final I value = inputPipe.get();
+        if (value != null) {
+          final CompletableFuture<O> future = processor.apply(value);
+          // When the future completes, interrupt so if we're waiting for new input we wake up and
+          // schedule the output.
+          future.whenComplete((result, error) -> stageThread.interrupt());
+          inProgress.add(future);
+        }
+
+        outputCompletedTasks(0);
+      } else {
+        outputNextCompletedTask();
+      }
+    }
+
+    while (!inProgress.isEmpty()) {
+      outputNextCompletedTask();
+    }
+
+    outputPipe.close();
+  }
+
+  private void outputNextCompletedTask() {
+    try {
+      waitForAnyFutureToComplete();
+      outputCompletedTasks(1);
+    } catch (final InterruptedException e) {
+      LOG.trace("Interrupted while waiting for processing to complete", e);
+    } catch (final ExecutionException e) {
+      LOG.error("Processing failed and we don't handle exceptions properly yet", e);
+    } catch (final TimeoutException e) {
+      // Ignore and go back around the loop.
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private void waitForAnyFutureToComplete()
+      throws InterruptedException, ExecutionException, TimeoutException {
+    CompletableFuture.anyOf(inProgress.toArray(new CompletableFuture[0]))
+        .get(1, TimeUnit.SECONDS);
+  }
+
+  private void outputCompletedTasks(final int minTasksToOutput) {
+    int outputTasks = 0;
+    for (final Iterator<CompletableFuture<O>> i = inProgress.iterator();
+        i.hasNext() && (outputTasks < minTasksToOutput || outputPipe.hasRemainingCapacity()); ) {
+      final CompletableFuture<O> process = i.next();
+      final O result = process.getNow(null);
+      if (result != null) {
+        outputPipe.put(result);
+        i.remove();
+        outputTasks++;
+      }
+    }
+  }
+}

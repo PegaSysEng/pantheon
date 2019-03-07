@@ -43,23 +43,33 @@ class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
   }
 
   @Override
+  public boolean hasRemainingCapacity() {
+    return queue.remainingCapacity() > 0;
+  }
+
+  @Override
   public boolean hasMore() {
     return !closed.get() || !queue.isEmpty();
   }
 
   @Override
   public T get() {
-    while (isOpen() || !queue.isEmpty()) {
-      try {
+    try {
+      while (isOpen() || !queue.isEmpty()) {
         final T value = queue.poll(1, TimeUnit.SECONDS);
         if (value != null) {
           return value;
         }
-      } catch (final InterruptedException e) {
-        LOG.trace("Interrupted while waiting for next item", e);
       }
+    } catch (final InterruptedException e) {
+      LOG.trace("Interrupted while waiting for next item", e);
     }
     return null;
+  }
+
+  @Override
+  public T poll() {
+    return queue.poll();
   }
 
   @Override

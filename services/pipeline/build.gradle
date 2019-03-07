@@ -36,5 +36,6 @@ dependencies {
 
   testImplementation 'junit:junit'
   testImplementation 'org.assertj:assertj-core'
+  testImplementation 'org.awaitility:awaitility'
   testImplementation 'org.mockito:mockito-core'
 }

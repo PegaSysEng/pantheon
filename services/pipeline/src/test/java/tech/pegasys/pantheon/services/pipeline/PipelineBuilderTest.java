@@ -13,21 +13,25 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static com.google.common.primitives.Ints.asList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.awaitility.Awaitility;
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -67,7 +71,7 @@ public class PipelineBuilderTest {
     final List<String> output = new ArrayList<>();
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
-            .thenProcessWith(Object::toString)
+            .thenProcess(Object::toString)
             .andFinishWith(output::add);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
@@ -103,5 +107,61 @@ public class PipelineBuilderTest {
     input.close();
     result.get(10, SECONDS);
     assertThat(output).isEmpty();
+  }
+
+  @Test
+  public void shouldProcessAsync() throws Exception {
+    final List<String> output = new ArrayList<>();
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(tasks, 10)
+            .thenProcessAsync(value -> completedFuture(Integer.toString(value)), 3)
+            .andFinishWith(output::add);
+    final CompletableFuture<?> result = pipeline.start(executorService);
+    result.get(10, SECONDS);
+    assertThat(output)
+        .containsExactlyInAnyOrder(
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15");
+  }
+
+  @Test
+  public void shouldLimitInFlightProcessesWhenProcessingAsync() throws Exception {
+    final List<String> output = new ArrayList<>();
+    final List<CompletableFuture<String>> futures = new CopyOnWriteArrayList<>();
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(asList(1, 2, 3, 4, 5, 6, 7).iterator(), 10)
+            .thenProcessAsync(
+                value -> {
+                  final CompletableFuture<String> future = new CompletableFuture<>();
+                  futures.add(future);
+                  return future;
+                },
+                3)
+            .andFinishWith(output::add);
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    waitForSize(futures, 3);
+
+    assertThat(result).isNotDone();
+
+    // Completing one task should cause another to be started.
+    futures.get(1).complete("2");
+    waitForSize(futures, 4);
+
+    futures.get(0).complete("1");
+    futures.get(2).complete("3");
+    futures.get(3).complete("4");
+
+    waitForSize(futures, 7);
+    futures.get(4).complete("5");
+    futures.get(5).complete("6");
+    futures.get(6).complete("7");
+
+    result.get(10, SECONDS);
+    assertThat(output).containsExactly("2", "1", "3", "4", "5", "6", "7");
+  }
+
+  private void waitForSize(final Collection<?> collection, final int targetSize) {
+    Awaitility.waitAtMost(10, SECONDS)
+        .untilAsserted(() -> assertThat(collection).hasSize(targetSize));
   }
 }

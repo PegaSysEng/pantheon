@@ -18,4 +18,6 @@ public interface OutputPipe<T> {
   void put(T value);
 
   void close();
+
+  boolean hasRemainingCapacity();
 }

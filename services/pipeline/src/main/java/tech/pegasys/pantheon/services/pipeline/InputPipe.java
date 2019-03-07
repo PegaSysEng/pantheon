@@ -19,5 +19,7 @@ public interface InputPipe<T> {
 
   T get();
 
+  T poll();
+
   List<T> getBatch(int maximumBatchSize);
 }

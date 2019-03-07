@@ -26,7 +26,10 @@ class SourceStage<T> implements Runnable {
   @Override
   public void run() {
     while (output.isOpen() && source.hasNext()) {
-      output.put(source.next());
+      final T value = source.next();
+      if (value != null) {
+        output.put(value);
+      }
     }
     output.close();
   }

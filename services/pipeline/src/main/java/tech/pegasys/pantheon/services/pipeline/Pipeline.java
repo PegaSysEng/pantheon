@@ -27,8 +27,8 @@ public class Pipeline {
   }
 
   public CompletableFuture<?> start(final ExecutorService executorService) {
-    stages.forEach(executorService::submit);
-    executorService.submit(completerStage);
+    stages.forEach(executorService::execute);
+    executorService.execute(completerStage);
     return completerStage.getFuture();
   }
 }
