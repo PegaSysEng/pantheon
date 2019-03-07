@@ -1,28 +1,18 @@
-<!--
-  Copyright (c) 2016-2019 Martin Donath <martin.donath@squidfunk.com>
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to
-  deal in the Software without restriction, including without limitation the
-  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-  sell copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-  IN THE SOFTWARE.
--->
-
-{% extends "rtd_base.html" %}
+{% extends "main.html" %}
 
 <!-- Content block -->
 {% block content %}
-  <h1>404 - Not found</h1>
+
+<p style="text-align: center;font-size: 3em"><i class="md-icon">account_balance</i></p>
+<h1 id="404-page-not-found" style="text-align: center">404</h1>
+<p style="text-align: center"><strong>Deity not found in the Pantheon</strong></p>
+<p style="text-align: center">
+  Try the <a href="/">homepage</a>, or use the search field on the top of this page.
+</p>
+<p style="text-align: center">
+  If you think we made a mistake and deleted a page that should be here, then please tell us on
+  <a href="{{config.extra.support.gitter}}">{{config.site_name}} Gitter channel</a> or create an issue in
+  <a href="{{ config.repo_url + '/issues' | url }}">Pantheon Github repository</a>.
+</p>
+
 {% endblock %}
