@@ -111,26 +111,15 @@ public class MainnetTransactionValidator implements TransactionValidator {
               transaction.getNonce(), senderNonce));
     }
 
-    if (allowFutureNonce) {
-      if (senderNonce > transaction.getNonce()) {
-        return invalidNonceResult(transaction, senderNonce);
-      }
-    } else {
-      if (senderNonce != transaction.getNonce()) {
-        return invalidNonceResult(transaction, senderNonce);
-      }
+    if (!allowFutureNonce && senderNonce != transaction.getNonce()) {
+      return ValidationResult.invalid(
+          INCORRECT_NONCE,
+          String.format(
+              "transaction nonce %s does not match sender account nonce %s.",
+              transaction.getNonce(), senderNonce));
     }
 
     return ValidationResult.valid();
-  }
-
-  private ValidationResult<TransactionInvalidReason> invalidNonceResult(
-      final Transaction transaction, final long senderNonce) {
-    return ValidationResult.invalid(
-        INCORRECT_NONCE,
-        String.format(
-            "transaction nonce %s does not match sender account nonce %s.",
-            transaction.getNonce(), senderNonce));
   }
 
   public ValidationResult<TransactionInvalidReason> validateTransactionSignature(
