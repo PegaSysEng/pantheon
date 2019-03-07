@@ -20,6 +20,8 @@ import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.Ad
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
@@ -34,6 +36,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningContro
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Collection;
 import java.util.List;
@@ -136,8 +139,9 @@ public class PeerDiscoveryController {
 
   private RecursivePeerRefreshState recursivePeerRefreshState;
 
-  private final Optional<NodePermissioningController> nodePermissioningController =
-      Optional.empty();
+  private final Optional<NodePermissioningController> nodePermissioningController;
+  private final Optional<Blockchain> blockchain;
+  private OptionalLong blockAddedObserverId = OptionalLong.empty();
 
   public PeerDiscoveryController(
       final KeyPair keypair,
@@ -153,19 +157,55 @@ public class PeerDiscoveryController {
       final Optional<NodeWhitelistController> nodeWhitelistController,
       final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers,
       final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers) {
-    this.timerUtil = timerUtil;
+    this(
+        keypair,
+        localPeer,
+        peerTable,
+        bootstrapNodes,
+        outboundMessageHandler,
+        timerUtil,
+        workerExecutor,
+        tableRefreshIntervalMs,
+        peerRequirement,
+        peerBlacklist,
+        nodeWhitelistController,
+        peerBondedObservers,
+        peerDroppedObservers,
+        null,
+        null);
+  }
+
+  public PeerDiscoveryController(
+      final KeyPair keypair,
+      final DiscoveryPeer localPeer,
+      final PeerTable peerTable,
+      final Collection<DiscoveryPeer> bootstrapNodes,
+      final OutboundMessageHandler outboundMessageHandler,
+      final TimerUtil timerUtil,
+      final AsyncExecutor workerExecutor,
+      final long tableRefreshIntervalMs,
+      final PeerRequirement peerRequirement,
+      final PeerBlacklist peerBlacklist,
+      final Optional<NodeWhitelistController> nodeWhitelistController,
+      final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers,
+      final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers,
+      final NodePermissioningController nodePermissioningController,
+      final Blockchain blockchain) {
     this.keypair = keypair;
     this.localPeer = localPeer;
-    this.bootstrapNodes = bootstrapNodes;
     this.peerTable = peerTable;
+    this.bootstrapNodes = bootstrapNodes;
+    this.outboundMessageHandler = outboundMessageHandler;
+    this.timerUtil = timerUtil;
     this.workerExecutor = workerExecutor;
     this.tableRefreshIntervalMs = tableRefreshIntervalMs;
     this.peerRequirement = peerRequirement;
     this.peerBlacklist = peerBlacklist;
     this.nodeWhitelistController = nodeWhitelistController;
-    this.outboundMessageHandler = outboundMessageHandler;
     this.peerBondedObservers = peerBondedObservers;
     this.peerDroppedObservers = peerDroppedObservers;
+    this.nodePermissioningController = Optional.ofNullable(nodePermissioningController);
+    this.blockchain = Optional.ofNullable(blockchain);
   }
 
   public void start() {
@@ -195,6 +235,16 @@ public class PeerDiscoveryController {
             .collect(Collectors.toList());
 
     if (nodePermissioningController.isPresent()) {
+      if (blockchain.isPresent()) {
+        if (!blockAddedObserverId.isPresent()) {
+          blockAddedObserverId =
+              OptionalLong.of(blockchain.get().observeBlockAdded(this::handleBlockAddedEvent));
+        }
+      } else {
+        throw new IllegalStateException(
+            "PeerDiscoveryController permissioning needs to listen to BlockAddedEvents. Blockchain can't be null.");
+      }
+
       nodePermissioningController
           .get()
           .startPeerDiscoveryCallback(
@@ -222,12 +272,37 @@ public class PeerDiscoveryController {
     tableRefreshTimerId = OptionalLong.empty();
     inflightInteractions.values().forEach(PeerInteractionState::cancelTimers);
     inflightInteractions.clear();
+    blockchain.ifPresent(b -> blockAddedObserverId.ifPresent(b::removeObserver));
     return CompletableFuture.completedFuture(null);
   }
 
   private boolean whitelistIfPresentIsNodePermitted(final DiscoveryPeer sender) {
     return nodeWhitelistController
         .map(nodeWhitelistController -> nodeWhitelistController.isPermitted(sender.getEnodeURI()))
+        .orElse(true);
+  }
+
+  private synchronized void handleBlockAddedEvent(
+      final BlockAddedEvent event, final Blockchain blockchain) {
+    final Collection<DiscoveryPeer> activePeers = peerTable.getAllPeers();
+
+    LOG.trace(
+        "Handling block added event - will check if {} active peers are still permitted (blockHash = {})",
+        activePeers.size(),
+        event.getBlock().getHash());
+
+    activePeers.stream().filter(p -> !isPeerPermitted(p)).forEach(this::dropFromPeerTable);
+  }
+
+  private boolean isPeerPermitted(final Peer peer) {
+    final EnodeURL localPeerEnodeURL = new EnodeURL(localPeer.getEnodeURI());
+    final EnodeURL remotePeerEnodeURL = new EnodeURL(peer.getEnodeURI());
+
+    return nodePermissioningController
+        .map(
+            c ->
+                c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL)
+                    || c.isPermitted(remotePeerEnodeURL, localPeerEnodeURL))
         .orElse(true);
   }
 
