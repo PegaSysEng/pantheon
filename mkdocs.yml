@@ -22,6 +22,7 @@ extra:
   support:
     gitter: https://gitter.im/PegaSysEng/pantheon
     email: support@pegasys.tech
+    pegasys_website: https://pegasys.tech/
   google:
     analytics_id: 'UA-117921923-2'
     site_verification: 'za1cLzyS6LXDGO-pMzvfQdYTZ0Zc67uZtY0asA4YXZ0'
