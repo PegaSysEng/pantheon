@@ -46,9 +46,11 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
@@ -56,6 +58,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -158,6 +161,7 @@ public final class RunnerTest {
     try {
 
       executorService.submit(runnerAhead::execute);
+      waitForPortsFile(dbAhead);
 
       final SynchronizerConfiguration syncConfigBehind =
           SynchronizerConfiguration.builder()
@@ -316,5 +320,20 @@ public final class RunnerTest {
         throw new IllegalStateException("Unable to import block " + block.getHeader().getNumber());
       }
     }
+  }
+
+  private void waitForPortsFile(final Path dataDir) {
+    final File file = new File(dataDir.toFile(), "pantheon.ports");
+    Awaitility.waitAtMost(30, TimeUnit.SECONDS)
+        .until(
+            () -> {
+              if (file.exists()) {
+                try (final Stream<String> s = Files.lines(file.toPath())) {
+                  return s.count() > 0;
+                }
+              } else {
+                return false;
+              }
+            });
   }
 }
