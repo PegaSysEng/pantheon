@@ -56,14 +56,15 @@ public class PipelineBuilder<T> {
 
   public <O> PipelineBuilder<O> thenProcessInParallel(
       final Function<T, O> processor, final int numberOfThreads) {
-    final Pipe<O> outputPipe = new Pipe<>(bufferSize);
+    final Pipe<O> newPipeEnd = new Pipe<>(bufferSize);
+    final OutputPipe<O> outputPipe = new SharedOutputPipe<>(newPipeEnd, numberOfThreads);
     final ArrayList<Runnable> newStages = new ArrayList<>(stages);
     for (int i = 0; i < numberOfThreads; i++) {
       final Runnable processStage =
           new InputOutputStage<>(pipeEnd, outputPipe, new ProcessStage<>(processor));
       newStages.add(processStage);
     }
-    return new PipelineBuilder<>(newStages, outputPipe, bufferSize);
+    return new PipelineBuilder<>(newStages, newPipeEnd, bufferSize);
   }
 
   public <O> PipelineBuilder<O> thenProcessAsync(

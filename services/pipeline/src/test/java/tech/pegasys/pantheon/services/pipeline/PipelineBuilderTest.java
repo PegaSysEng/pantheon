@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static com.google.common.primitives.Ints.asList;
+import static java.util.Collections.synchronizedList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +27,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -175,6 +177,40 @@ public class PipelineBuilderTest {
         .containsExactly(
             1, 2, 2, 4, 3, 6, 4, 8, 5, 10, 6, 12, 7, 14, 8, 16, 9, 18, 10, 20, 11, 22, 12, 24, 13,
             26, 14, 28, 15, 30);
+  }
+
+  @Test
+  public void shouldProcessInParallel() throws Exception {
+    final List<String> output = synchronizedList(new ArrayList<>());
+    final CountDownLatch latch = new CountDownLatch(1);
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(tasks, 10)
+            .thenProcessInParallel(
+                value -> {
+                  if (value == 2) {
+                    try {
+                      latch.await();
+                    } catch (InterruptedException e) {
+                      throw new RuntimeException(e);
+                    }
+                  }
+                  return value.toString();
+                },
+                2)
+            .andFinishWith(output::add);
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    // One thread will block but the other should process the remaining entries.
+    waitForSize(output, 14);
+    assertThat(result).isNotDone();
+
+    latch.countDown();
+
+    result.get(10, SECONDS);
+
+    assertThat(output)
+        .containsExactly(
+            "1", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "2");
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {
