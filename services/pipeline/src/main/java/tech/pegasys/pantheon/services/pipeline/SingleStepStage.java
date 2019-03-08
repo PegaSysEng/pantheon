@@ -14,4 +14,6 @@ package tech.pegasys.pantheon.services.pipeline;
 
 public interface SingleStepStage<I, O> {
   void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe);
+
+  default void finalize(final OutputPipe<O> outputPipe) {}
 }

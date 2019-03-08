@@ -32,6 +32,7 @@ public class InputOutputStage<I, O> implements Runnable {
     while (inputPipe.hasMore()) {
       singleStepStage.processNextInput(inputPipe, outputPipe);
     }
+    singleStepStage.finalize(outputPipe);
     outputPipe.close();
   }
 }
