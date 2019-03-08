@@ -25,6 +25,16 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Supports building a new pipeline. Pipelines are comprised of a source, various processing stages
+ * and a consumer, each of which run in their own thread.
+ *
+ * <p>The pipeline completes when all items from the source have passed through each stage and are
+ * received by the consumer. The pipeline will halt immediately if an exception is thrown from any
+ * processing stage.
+ *
+ * @param <T> the output type of the last stage in the pipeline.
+ */
 public class PipelineBuilder<T> {
 
   private final PipelineSource<?> pipelineSource;
@@ -47,24 +57,60 @@ public class PipelineBuilder<T> {
     this.bufferSize = bufferSize;
   }
 
+  /**
+   * Create a new pipeline that processes inputs from <i>source</i>. The pipeline completes when
+   * <i>source</i> returns <code>false</code> from {@link Iterator#hasNext()} and the last item has
+   * been reached the end of the pipeline.
+   *
+   * @param source the source to pull items from for processing.
+   * @param bufferSize the number of items to be buffered between each stage in the pipeline.
+   * @param <T> the type of items input into the pipeline.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
   public static <T> PipelineBuilder<T> createPipelineFrom(
-      final Iterator<T> taskStream, final int bufferSize) {
+      final Iterator<T> source, final int bufferSize) {
     final Pipe<T> pipe = new Pipe<>(bufferSize);
-    final StreamSourceStage<T> sourceStage = new StreamSourceStage<>(taskStream, pipe);
+    final StreamSourceStage<T> sourceStage = new StreamSourceStage<>(source, pipe);
     return new PipelineBuilder<>(
         sourceStage, singleton(sourceStage), singleton(pipe), pipe, bufferSize);
   }
 
+  /**
+   * Create a new pipeline that processes inputs added to <i>pipe</i>. The pipeline completes when
+   * <i>pipe</i> is closed and the last item has been reached the end of the pipeline.
+   *
+   * @param pipe the pipe feeding the pipeline.
+   * @param <T> the type of items input into the pipeline.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
   public static <T> PipelineBuilder<T> createPipelineFrom(final Pipe<T> pipe) {
     return new PipelineBuilder<>(
         new ExternalPipelineSource<>(pipe), emptyList(), singleton(pipe), pipe, pipe.getCapacity());
   }
 
+  /**
+   * Adds a 1-to-1 processing stage to the pipeline. A single thread processes each item in the
+   * pipeline with <i>processor</i> outputting its return value to the next stage.
+   *
+   * @param processor the processing to apply to each item.
+   * @param <O> the output type for this processing step.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
   public <O> PipelineBuilder<O> thenProcess(final Function<T, O> processor) {
     final SingleStepStage<T, O> singleStepStage = new ProcessStage<>(processor);
     return addStage(singleStepStage);
   }
 
+  /**
+   * Adds a 1-to-1 processing stage to the pipeline. Multiple threads processes items in the
+   * pipeline concurrently with <i>processor</i> outputting its return value to the next stage.
+   *
+   * <p>Note: The order of items is not preserved.
+   *
+   * @param processor the processing to apply to each item.
+   * @param <O> the output type for this processing step.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
   public <O> PipelineBuilder<O> thenProcessInParallel(
       final Function<T, O> processor, final int numberOfThreads) {
     final Pipe<O> newPipeEnd = new Pipe<>(bufferSize);
@@ -79,20 +125,66 @@ public class PipelineBuilder<T> {
         pipelineSource, newStages, concat(pipes, newPipeEnd), newPipeEnd, bufferSize);
   }
 
+  /**
+   * Adds a 1-to-1, asynchronous processing stage to the pipeline. A single thread reads items from
+   * the input and calls <i>processor</i> to begin processing. While a single thread is used to
+   * begin processing, up to <i>maxConcurrency</i> items may be in progress concurrently. When the
+   * returned {@link CompletableFuture} completes successfully the result is passed to the next
+   * stage.
+   *
+   * <p>If the returned {@link CompletableFuture} completes exceptionally the pipeline will abort.
+   *
+   * <p>Note: The order of items is not preserved.
+   *
+   * @param processor the processing to apply to each item.
+   * @param <O> the output type for this processing step.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
   public <O> PipelineBuilder<O> thenProcessAsync(
       final Function<T, CompletableFuture<O>> processor, final int maxConcurrency) {
     return addStage(new AsyncProcessStage<>(processor, maxConcurrency));
   }
 
+  /**
+   * Batches items into groups of at most <i>maximumBatchSize</i>. Batches are created eagerly to
+   * minimize delay so may not be full.
+   *
+   * <p>Order of items is preserved.
+   *
+   * <p>The output buffer size is reduced to <code>bufferSize / maximumBatchSize + 1</code>.
+   *
+   * @param maximumBatchSize the maximum number of items to include in a batch.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
   public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
     return addStage(new BatchingStage<>(maximumBatchSize), bufferSize / maximumBatchSize + 1);
   }
 
+  /**
+   * Adds a 1-to-many processing stage to the pipeline. For each item in the stream, <i>mapper</i>
+   * is called and each item of the {@link Stream} it returns is output as an individual item. The
+   * returned Stream may be empty to remove an item.
+   *
+   * <p>This can be used to reverse the effect of {@link #inBatches(int)} with:
+   *
+   * <pre>thenFlatMap(List::stream, newBufferSize)</pre>
+   *
+   * @param mapper the function to process each item with.
+   * @param newBufferSize the output buffer size to use from this stage onwards.
+   * @param <O> the type of items to be output from this stage.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
   public <O> PipelineBuilder<O> thenFlatMap(
       final Function<T, Stream<O>> mapper, final int newBufferSize) {
     return addStage(new FlatMapStage<>(mapper), newBufferSize);
   }
 
+  /**
+   * End the pipeline with a {@link Consumer} that is the last stage of the pipeline.
+   *
+   * @param completer the {@link Consumer} that accepts the final output of the pipeline.
+   * @return the constructed pipeline ready to execute.
+   */
   public Pipeline andFinishWith(final Consumer<T> completer) {
     return new Pipeline(pipelineSource, stages, pipes, new CompleterStage<>(pipeEnd, completer));
   }

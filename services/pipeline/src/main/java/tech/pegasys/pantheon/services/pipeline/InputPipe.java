@@ -14,6 +14,11 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.List;
 
+/**
+ * The end of the pipe that stages read input from.
+ *
+ * @param <T> the type of input.
+ */
 interface InputPipe<T> {
   boolean hasMore();
 

@@ -12,6 +12,11 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
+/**
+ * The end of the pipe that stages write their output to.
+ *
+ * @param <T> the type of output.
+ */
 interface OutputPipe<T> {
   boolean isOpen();
 

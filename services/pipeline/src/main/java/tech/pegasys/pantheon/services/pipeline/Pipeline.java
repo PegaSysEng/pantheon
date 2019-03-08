@@ -47,6 +47,14 @@ public class Pipeline {
     this.completerStage = completerStage;
   }
 
+  /**
+   * Starts execution of the pipeline. Each stage in the pipeline requires a dedicated thread from
+   * the supplied executor service.
+   *
+   * @param executorService the {@link ExecutorService} to execute each stage in.
+   * @return a future that will be completed when the pipeline completes. If the pipeline fails or
+   *     is aborted the returned future will be completed exceptionally.
+   */
   public CompletableFuture<?> start(final ExecutorService executorService) {
     if (!started.compareAndSet(false, true)) {
       return overallFuture;
@@ -70,6 +78,14 @@ public class Pipeline {
     return overallFuture;
   }
 
+  /**
+   * Abort execution of this pipeline. The future returned by {@link #start(ExecutorService)} will
+   * be completed with a {@link CancellationException}.
+   *
+   * <p>A best effort is made to halt all processing by the pipeline immediately by interrupting
+   * each execution thread and pipes connecting each stage will no longer accept or provide further
+   * items.
+   */
   public void abort() {
     final CancellationException exception = new CancellationException("Pipeline aborted");
     abort(exception);
