@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.awaitility.Awaitility;
@@ -158,6 +159,22 @@ public class PipelineBuilderTest {
 
     result.get(10, SECONDS);
     assertThat(output).containsExactly("2", "1", "3", "4", "5", "6", "7");
+  }
+
+  @Test
+  public void shouldFlatMapItems() throws Exception {
+    final List<Integer> output = new ArrayList<>();
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(tasks, 10)
+            .thenFlatMap(input -> Stream.of(input, input * 2), 20)
+            .andFinishWith(output::add);
+
+    pipeline.start(executorService).get(10, SECONDS);
+
+    assertThat(output)
+        .containsExactly(
+            1, 2, 2, 4, 3, 6, 4, 8, 5, 10, 6, 12, 7, 14, 8, 16, 9, 18, 10, 20, 11, 22, 12, 24, 13,
+            26, 14, 28, 15, 30);
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {
