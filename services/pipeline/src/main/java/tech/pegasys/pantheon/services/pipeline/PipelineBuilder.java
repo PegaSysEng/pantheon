@@ -108,6 +108,7 @@ public class PipelineBuilder<T> {
    * <p>Note: The order of items is not preserved.
    *
    * @param processor the processing to apply to each item.
+   * @param numberOfThreads the number of threads to use for processing.
    * @param <O> the output type for this processing step.
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
@@ -137,6 +138,7 @@ public class PipelineBuilder<T> {
    * <p>Note: The order of items is not preserved.
    *
    * @param processor the processing to apply to each item.
+   * @param maxConcurrency the maximum number of items being processed concurrently.
    * @param <O> the output type for this processing step.
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
