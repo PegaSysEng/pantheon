@@ -2483,3 +2483,38 @@ None
         "result": "Success"
     }
     ```
+    
+## Miscellaneous Methods 
+
+### rpc_modules
+
+Lists [enabled JSON-RPC APIs](../JSON-RPC-API/Using-JSON-RPC-API.md#api-methods-enabled-by-default) and the version of each.  
+
+**Parameters** 
+
+None
+
+**Returns** 
+
+Enabled JSON-RPC APIs.
+
+!!! example
+    ```bash tab="curl HTTP request"
+    $ curl -X POST --data '{"jsonrpc":"2.0","method":"rpc_modules","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"rpc_modules","params":[],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "web3": "1.0",
+            "eth": "1.0",
+            "net": "1.0"
+        }
+    }
+    ``` 

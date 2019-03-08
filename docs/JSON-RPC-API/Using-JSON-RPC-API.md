@@ -31,8 +31,22 @@ Use the button to import our collection of examples to [Postman](https://www.get
 
 To use the geth console with Pantheon: 
 
-1. Start Pantheon with the [`--rpc-http-enabled`]
+1. Start Pantheon with the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option. 
 
+1. Specify which APIs to enable using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option. 
+
+1. Start the geth console: 
+   ```bash
+    geth attach http://localhost:8545
+   ``` 
+   
+Use the geth console to call [JSON-RPC API methods](../Reference/JSON-RPC-API-Methods.md) that geth and Pantheon share. 
+
+!!! example 
+    ```bash
+    eth.syncing
+    ```
+    
 ## Host Whitelist 
 
 To prevent DNS rebinding, incoming HTTP requests and WebSockets connections are only accepted from hostnames 
