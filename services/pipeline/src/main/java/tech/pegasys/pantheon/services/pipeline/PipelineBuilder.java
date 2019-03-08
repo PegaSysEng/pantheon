@@ -50,10 +50,8 @@ public class PipelineBuilder<T> {
   }
 
   public <O> PipelineBuilder<O> thenProcess(final Function<T, O> processor) {
-    final Pipe<O> outputPipe = new Pipe<>(bufferSize);
-    final Runnable processStage =
-        new InputOutputStage<>(pipeEnd, outputPipe, new ProcessStage<>(processor));
-    return addStage(processStage, outputPipe);
+    final SingleStepStage<T, O> singleStepStage = new ProcessStage<>(processor);
+    return addStage(singleStepStage);
   }
 
   public <O> PipelineBuilder<O> thenProcessInParallel(
@@ -70,33 +68,35 @@ public class PipelineBuilder<T> {
 
   public <O> PipelineBuilder<O> thenProcessAsync(
       final Function<T, CompletableFuture<O>> processor, final int maxConcurrency) {
-    final Pipe<O> outputPipe = new Pipe<>(bufferSize);
-    final Runnable stage =
-        new InputOutputStage<>(
-            pipeEnd, outputPipe, new AsyncProcessStage<>(processor, maxConcurrency));
-    return addStage(stage, outputPipe);
+    return addStage(new AsyncProcessStage<>(processor, maxConcurrency));
   }
 
   public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
-    final Pipe<List<T>> outputPipe = new Pipe<>(bufferSize / maximumBatchSize + 1);
-    final Runnable stage =
-        new InputOutputStage<>(pipeEnd, outputPipe, new BatchingStage<>(maximumBatchSize));
-    return addStage(stage, outputPipe);
+    return addStage(new BatchingStage<>(maximumBatchSize), bufferSize / maximumBatchSize + 1);
   }
 
   public <O> PipelineBuilder<O> thenFlatMap(
       final Function<T, Stream<O>> mapper, final int newBufferSize) {
-    final Pipe<O> outputPipe = new Pipe<>(newBufferSize);
-    final Runnable stage = new InputOutputStage<>(pipeEnd, outputPipe, new FlatMapStage<>(mapper));
-    return addStage(stage, outputPipe);
+    return addStage(new FlatMapStage<>(mapper), newBufferSize);
   }
 
   public Pipeline andFinishWith(final Consumer<T> completer) {
     return new Pipeline(stages, new CompleterStage<>(pipeEnd, completer));
   }
 
+  private <O> PipelineBuilder<O> addStage(final SingleStepStage<T, O> singleStepStage) {
+    return addStage(singleStepStage, bufferSize);
+  }
+
+  private <O> PipelineBuilder<O> addStage(
+      final SingleStepStage<T, O> singleStepStage, final int newBufferSize) {
+    final Pipe<O> outputPipe = new Pipe<>(newBufferSize);
+    final Runnable processStage = new InputOutputStage<>(pipeEnd, outputPipe, singleStepStage);
+    return addStage(processStage, outputPipe);
+  }
+
   private <O> PipelineBuilder<O> addStage(final Runnable stage, final Pipe<O> outputPipe) {
-    final ArrayList<Runnable> newStages = new ArrayList<>(stages);
+    final List<Runnable> newStages = new ArrayList<>(stages);
     newStages.add(stage);
     return new PipelineBuilder<>(newStages, outputPipe, bufferSize);
   }
