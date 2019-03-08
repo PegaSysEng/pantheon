@@ -21,7 +21,7 @@ public class LocalConfigNodePermissioningProvider implements NodePermissioningPr
   private NodeLocalConfigPermissioningController localConfigPermissioningController;
 
   public LocalConfigNodePermissioningProvider(
-      NodeLocalConfigPermissioningController localConfigPermissioningController) {
+      final NodeLocalConfigPermissioningController localConfigPermissioningController) {
     this.localConfigPermissioningController = localConfigPermissioningController;
   }
 

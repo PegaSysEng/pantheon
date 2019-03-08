@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.node;
 
-import tech.pegasys.pantheon.ethereum.permissioning.node.provider.LocalConfigNodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
@@ -26,21 +25,13 @@ public class NodePermissioningController {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider;
-  private final Optional<LocalConfigNodePermissioningProvider> localConfigNodePermissioningProvider;
-  private Optional<Runnable> peerDiscoveryCallback = Optional.empty();
+  NodePermissioningProvider[] providers;
 
   public NodePermissioningController(
       final SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider,
-      final LocalConfigNodePermissioningProvider localConfigNodePermissioningProvider) {
-    this.localConfigNodePermissioningProvider = Optional.of(localConfigNodePermissioningProvider);
+      final NodePermissioningProvider[] providers) {
+    this.providers = providers;
     this.syncStatusNodePermissioningProvider = Optional.of(syncStatusNodePermissioningProvider);
-    this.syncStatusNodePermissioningProvider.get().setHasReachedSyncCallback(this::onReachingSync);
-  }
-
-  // TODO is this constructor needed?
-  public NodePermissioningController() {
-    this.localConfigNodePermissioningProvider = Optional.empty();
-    this.syncStatusNodePermissioningProvider = Optional.empty();
   }
 
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
@@ -50,14 +41,12 @@ public class NodePermissioningController {
         && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
       return false;
     } else {
-      return localConfigNodePermissioningProvider
-          .map((provider) -> provider.isPermitted(sourceEnode, destinationEnode))
-          .orElse(true);
+      for (int i = 0; i < providers.length; i++)
+        if (!providers[i].isPermitted(sourceEnode, destinationEnode)) {
+          return false;
+        }
     }
-  }
-
-  private void onReachingSync() {
-    peerDiscoveryCallback.ifPresent(Runnable::run);
+    return true;
   }
 
   public void startPeerDiscoveryCallback(final Runnable peerDiscoveryCallback) {
