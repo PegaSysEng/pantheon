@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class BatchingStageTest {
 
   private final Pipe<Integer> inputPipe = new Pipe<>(10);
   private final Pipe<List<Integer>> outputPipe = new Pipe<>(10);
-  private final BatchingStage<Integer> stage = new BatchingStage<>(inputPipe, outputPipe, 3);
+  private final BatchingStage<Integer> stage = new BatchingStage<>(3);
 
   @Test
   public void shouldCreateBatches() {
@@ -32,17 +34,26 @@ public class BatchingStageTest {
     }
     inputPipe.close();
 
-    stage.run();
+    stage.processNextInput(inputPipe, outputPipe);
 
-    assertThat(outputPipe.hasMore()).isTrue();
-    assertThat(outputPipe.get()).isEqualTo(asList(1, 2, 3));
+    assertThat(outputPipe.poll()).isEqualTo(asList(1, 2, 3));
+    assertThat(outputPipe.poll()).isNull();
 
-    assertThat(outputPipe.hasMore()).isTrue();
-    assertThat(outputPipe.get()).isEqualTo(asList(4, 5, 6));
+    stage.processNextInput(inputPipe, outputPipe);
+    assertThat(outputPipe.poll()).isEqualTo(asList(4, 5, 6));
+    assertThat(outputPipe.poll()).isNull();
 
-    assertThat(outputPipe.hasMore()).isTrue();
-    assertThat(outputPipe.get()).isEqualTo(asList(7, 8));
+    stage.processNextInput(inputPipe, outputPipe);
+    assertThat(outputPipe.poll()).isEqualTo(asList(7, 8));
+    assertThat(outputPipe.poll()).isNull();
+  }
 
-    assertThat(outputPipe.hasMore()).isFalse();
+  @Test
+  public void shouldNotOutputItemWhenInputIsClosed() {
+    @SuppressWarnings("unchecked")
+    final OutputPipe<List<Integer>> outputPipe = mock(OutputPipe.class);
+    inputPipe.close();
+    stage.processNextInput(inputPipe, outputPipe);
+    verifyZeroInteractions(outputPipe);
   }
 }

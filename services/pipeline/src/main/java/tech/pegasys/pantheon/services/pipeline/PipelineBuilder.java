@@ -51,15 +51,18 @@ public class PipelineBuilder<T> {
 
   public <O> PipelineBuilder<O> thenProcess(final Function<T, O> processor) {
     final Pipe<O> outputPipe = new Pipe<>(bufferSize);
-    final ProcessStage<T, O> processStage = new ProcessStage<>(pipeEnd, outputPipe, processor);
+    final Runnable processStage =
+        new InputOutputStage<>(pipeEnd, outputPipe, new ProcessStage<>(processor));
     return addStage(processStage, outputPipe);
   }
 
-  public <O> PipelineBuilder<O> thenProcessInParallel(final Function<T, O> processor, final int numberOfThreads) {
+  public <O> PipelineBuilder<O> thenProcessInParallel(
+      final Function<T, O> processor, final int numberOfThreads) {
     final Pipe<O> outputPipe = new Pipe<>(bufferSize);
     final ArrayList<Runnable> newStages = new ArrayList<>(stages);
     for (int i = 0; i < numberOfThreads; i++) {
-      final ProcessStage<T, O> processStage = new ProcessStage<>(pipeEnd, outputPipe, processor);
+      final Runnable processStage =
+          new InputOutputStage<>(pipeEnd, outputPipe, new ProcessStage<>(processor));
       newStages.add(processStage);
     }
     return new PipelineBuilder<>(newStages, outputPipe, bufferSize);
@@ -75,14 +78,15 @@ public class PipelineBuilder<T> {
 
   public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
     final Pipe<List<T>> outputPipe = new Pipe<>(bufferSize / maximumBatchSize + 1);
-    final BatchingStage<T> batchingStage =
-        new BatchingStage<>(pipeEnd, outputPipe, maximumBatchSize);
-    return addStage(batchingStage, outputPipe);
+    final Runnable stage =
+        new InputOutputStage<>(pipeEnd, outputPipe, new BatchingStage<>(maximumBatchSize));
+    return addStage(stage, outputPipe);
   }
 
-  public <O> PipelineBuilder<O> theFlatMap(final Function<T, Stream<O>> mapper, final int newBufferSize) {
+  public <O> PipelineBuilder<O> thenFlatMap(
+      final Function<T, Stream<O>> mapper, final int newBufferSize) {
     final Pipe<O> outputPipe = new Pipe<>(newBufferSize);
-    final FlatMapStage<T, O> stage = new FlatMapStage<>(pipeEnd, outputPipe, mapper);
+    final Runnable stage = new InputOutputStage<>(pipeEnd, outputPipe, new FlatMapStage<>(mapper));
     return addStage(stage, outputPipe);
   }
 

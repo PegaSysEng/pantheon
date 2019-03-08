@@ -14,29 +14,20 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.List;
 
-public class BatchingStage<T> implements Runnable {
+public class BatchingStage<T> implements SingleStepStage<T, List<T>> {
 
-  private final InputPipe<T> inputPipe;
-  private final OutputPipe<List<T>> outputPipe;
   private final int maximumBatchSize;
 
-  public BatchingStage(
-      final InputPipe<T> inputPipe,
-      final OutputPipe<List<T>> outputPipe,
-      final int maximumBatchSize) {
-    this.inputPipe = inputPipe;
-    this.outputPipe = outputPipe;
+  public BatchingStage(final int maximumBatchSize) {
     this.maximumBatchSize = maximumBatchSize;
   }
 
   @Override
-  public void run() {
-    while (inputPipe.hasMore()) {
-      final List<T> batch = inputPipe.getBatch(maximumBatchSize);
-      if (!batch.isEmpty()) {
-        outputPipe.put(batch);
-      }
+  public void processNextInput(final InputPipe<T> inputPipe, final OutputPipe<List<T>> outputPipe) {
+
+    final List<T> batch = inputPipe.getBatch(maximumBatchSize);
+    if (!batch.isEmpty()) {
+      outputPipe.put(batch);
     }
-    outputPipe.close();
   }
 }

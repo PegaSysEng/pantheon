@@ -13,8 +13,12 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
-import java.util.Locale;
+import java.util.function.Function;
 
 import org.junit.Test;
 
@@ -23,36 +27,27 @@ public class ProcessStageTest {
   private final Pipe<String> input = new Pipe<>(10);
   private final Pipe<String> output = new Pipe<>(10);
 
-  private final ProcessStage<String, String> stage =
-      new ProcessStage<>(input, output, value -> value.toLowerCase(Locale.UK));
+  @SuppressWarnings("unchecked")
+  private final Function<String, String> processor = mock(Function.class);
 
-  @Test
-  public void shouldCloseOutputPipeWhenInputIsClosed() {
-    input.put("A");
-    input.put("B");
-    input.put("C");
-    input.close();
-
-    stage.run();
-
-    assertThat(output.isOpen()).isFalse();
-  }
+  private final ProcessStage<String, String> stage = new ProcessStage<>(processor);
 
   @Test
   public void shouldApplyFunctionToItems() {
+    when(processor.apply("A")).thenReturn("a");
     input.put("A");
-    input.put("B");
-    input.put("C");
-    input.close();
 
-    stage.run();
+    stage.processNextInput(input, output);
 
     assertThat(output.hasMore()).isTrue();
     assertThat(output.get()).isEqualTo("a");
-    assertThat(output.hasMore()).isTrue();
-    assertThat(output.get()).isEqualTo("b");
-    assertThat(output.hasMore()).isTrue();
-    assertThat(output.get()).isEqualTo("c");
-    assertThat(output.hasMore()).isFalse();
+    verify(processor).apply("A");
+  }
+
+  @Test
+  public void shouldSkipProcessingWhenInputIsClosed() {
+    input.close();
+    stage.processNextInput(input, output);
+    verifyZeroInteractions(processor);
   }
 }
