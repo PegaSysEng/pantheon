@@ -256,6 +256,11 @@ public class WorldStateDownloader {
             .distinct()
             .collect(Collectors.toList());
     return sendRequest(blockHeader, hashes)
+        .thenApply(
+            data -> {
+              downloadState.requestComplete(!data.isEmpty());
+              return data;
+            })
         .exceptionally(
             error -> {
               final Throwable rootCause = ExceptionUtils.rootCause(error);
@@ -269,16 +274,13 @@ public class WorldStateDownloader {
             })
         .thenApply(
             data -> {
-              boolean madeProgress = false;
               for (final Task<NodeDataRequest> task : requestTasks) {
                 final NodeDataRequest request = task.getData();
                 final BytesValue matchingData = data.get(request.getHash());
                 if (matchingData != null) {
-                  madeProgress = true;
                   request.setData(matchingData);
                 }
               }
-              downloadState.requestComplete(madeProgress);
               return requestTasks;
             });
   }
