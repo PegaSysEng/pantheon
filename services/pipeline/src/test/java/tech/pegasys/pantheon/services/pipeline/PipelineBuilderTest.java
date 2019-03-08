@@ -17,6 +17,7 @@ import static java.util.Collections.synchronizedList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.waitAtMost;
 
@@ -26,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -244,10 +246,33 @@ public class PipelineBuilderTest {
 
     pipeline.abort();
 
-    result.get(10, SECONDS);
+    assertThatThrownBy(() -> result.get(10, SECONDS)).isInstanceOf(CancellationException.class);
     assertThat(output).containsExactly(1, 2, 3, 4, 5);
 
     waitAtMost(10, SECONDS).untilAsserted(() -> assertThat(processorInterrupted).isTrue());
+  }
+
+  @Test
+  public void shouldAbortPipelineWhenProcessorThrowsException() {
+    final RuntimeException expectedError = new RuntimeException("Oops");
+    final List<Integer> output = new ArrayList<>();
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(tasks, 10)
+            .thenProcess(
+                value -> {
+                  if (value == 4) {
+                    throw expectedError;
+                  }
+                  return value;
+                })
+            .andFinishWith(output::add);
+
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    assertThatThrownBy(() -> result.get(10, SECONDS))
+        .extracting(Throwable::getCause)
+        .isSameAs(expectedError);
+    assertThat(output).containsExactly(1, 2, 3);
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {

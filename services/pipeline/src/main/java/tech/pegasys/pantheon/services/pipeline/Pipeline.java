@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -32,6 +33,7 @@ public class Pipeline {
   private final Collection<Pipe<?>> pipes;
   private final CompleterStage<?> completerStage;
   private final AtomicBoolean started = new AtomicBoolean(false);
+  private final CompletableFuture<?> overallFuture = new CompletableFuture<>();
   private volatile List<Future<?>> futures;
 
   public Pipeline(
@@ -47,13 +49,25 @@ public class Pipeline {
 
   public CompletableFuture<?> start(final ExecutorService executorService) {
     if (!started.compareAndSet(false, true)) {
-      throw new IllegalStateException("Already started");
+      return overallFuture;
     }
     futures =
         Stream.concat(stages.stream(), Stream.of(completerStage))
             .map(task -> runWithErrorLogging(executorService, task))
             .collect(toList());
-    return completerStage.getFuture();
+    completerStage
+        .getFuture()
+        .whenComplete(
+            (result, error) -> {
+              synchronized (this) {
+                if (error != null) {
+                  overallFuture.completeExceptionally(error);
+                } else {
+                  overallFuture.complete(null);
+                }
+              }
+            });
+    return overallFuture;
   }
 
   private Future<?> runWithErrorLogging(
@@ -63,14 +77,23 @@ public class Pipeline {
           try {
             task.run();
           } catch (final Throwable t) {
-            LOG.error("Unhandled exception in pipeline", t);
+            LOG.debug("Unhandled exception in pipeline. Aborting.", t);
+            abort(t);
           }
         });
   }
 
   public void abort() {
-    pipelineSource.abort();
-    pipes.forEach(Pipe::abort);
-    futures.forEach(future -> future.cancel(true));
+    final CancellationException exception = new CancellationException("Pipeline aborted");
+    abort(exception);
+  }
+
+  private void abort(final Throwable error) {
+    synchronized (this) {
+      pipelineSource.abort();
+      pipes.forEach(Pipe::abort);
+      futures.forEach(future -> future.cancel(true));
+      overallFuture.completeExceptionally(error);
+    }
   }
 }
