@@ -41,8 +41,10 @@ import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class PipelineBuilderTest {
 
   private static final ThreadFactory THREAD_FACTORY =
