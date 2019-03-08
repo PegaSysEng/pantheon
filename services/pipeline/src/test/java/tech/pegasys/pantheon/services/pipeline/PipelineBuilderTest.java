@@ -36,6 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -52,8 +53,7 @@ public class PipelineBuilderTest {
   private final Iterator<Integer> tasks =
       asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15).iterator();
 
-  private final ExecutorService executorService =
-      Executors.newCachedThreadPool(THREAD_FACTORY);
+  private final ExecutorService executorService = Executors.newCachedThreadPool(THREAD_FACTORY);
 
   @After
   public void afterClass() throws Exception {
@@ -258,12 +258,10 @@ public class PipelineBuilderTest {
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
             .thenProcess(
-                value -> {
-                  if (value == 4) {
-                    throw expectedError;
-                  }
-                  return value;
-                })
+                (Function<Integer, Integer>)
+                    value -> {
+                      throw expectedError;
+                    })
             .andFinishWith(new ArrayList<Integer>()::add);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
