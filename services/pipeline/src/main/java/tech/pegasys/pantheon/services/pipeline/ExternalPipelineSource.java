@@ -12,25 +12,21 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import java.util.Iterator;
+class ExternalPipelineSource<T> implements PipelineSource<T> {
 
-class SourceStage<T> implements Runnable {
-  private final Iterator<T> source;
-  private final OutputPipe<T> output;
+  private final Pipe<T> pipe;
 
-  SourceStage(final Iterator<T> source, final OutputPipe<T> output) {
-    this.source = source;
-    this.output = output;
+  public ExternalPipelineSource(final Pipe<T> pipe) {
+    this.pipe = pipe;
   }
 
   @Override
-  public void run() {
-    while (output.isOpen() && source.hasNext()) {
-      final T value = source.next();
-      if (value != null) {
-        output.put(value);
-      }
-    }
-    output.close();
+  public InputPipe<T> getPipe() {
+    return pipe;
+  }
+
+  @Override
+  public void abort() {
+    pipe.abort();
   }
 }

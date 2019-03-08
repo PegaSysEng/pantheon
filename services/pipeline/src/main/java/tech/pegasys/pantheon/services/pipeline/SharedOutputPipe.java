@@ -41,6 +41,11 @@ public class SharedOutputPipe<T> implements OutputPipe<T> {
   }
 
   @Override
+  public void abort() {
+    delegate.abort();
+  }
+
+  @Override
   public boolean hasRemainingCapacity() {
     return delegate.hasRemainingCapacity();
   }

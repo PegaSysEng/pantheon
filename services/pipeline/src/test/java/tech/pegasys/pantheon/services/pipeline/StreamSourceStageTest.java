@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.Iterators;
 import org.junit.Test;
 
-public class SourceStageTest {
+public class StreamSourceStageTest {
 
   private final Pipe<String> output = new Pipe<>(10);
 
-  private final SourceStage<String> stage =
-      new SourceStage<>(Iterators.forArray("a", "b", "c", "d"), output);
+  private final StreamSourceStage<String> stage =
+      new StreamSourceStage<>(Iterators.forArray("a", "b", "c", "d"), output);
 
   @Test
   public void shouldOutputEntriesThenClosePipe() {

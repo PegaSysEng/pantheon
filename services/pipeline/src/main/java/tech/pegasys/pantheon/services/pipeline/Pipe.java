@@ -26,20 +26,22 @@ import org.apache.logging.log4j.Logger;
 class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
   private static final Logger LOG = LogManager.getLogger();
   private final BlockingQueue<T> queue;
+  private final int capacity;
   private final AtomicBoolean closed = new AtomicBoolean();
+  private final AtomicBoolean aborted = new AtomicBoolean();
 
   public Pipe(final int capacity) {
     queue = new ArrayBlockingQueue<>(capacity);
+    this.capacity = capacity;
   }
 
   @Override
   public boolean isOpen() {
-    return !closed.get();
+    return !closed.get() && !aborted.get();
   }
 
-  @Override
-  public void close() {
-    closed.set(true);
+  public int getCapacity() {
+    return capacity;
   }
 
   @Override
@@ -48,14 +50,27 @@ class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
   }
 
   @Override
+  public void close() {
+    closed.set(true);
+  }
+
+  @Override
+  public void abort() {
+    aborted.set(true);
+  }
+
+  @Override
   public boolean hasMore() {
+    if (aborted.get()) {
+      return false;
+    }
     return !closed.get() || !queue.isEmpty();
   }
 
   @Override
   public T get() {
     try {
-      while (isOpen() || !queue.isEmpty()) {
+      while (hasMore()) {
         final T value = queue.poll(1, TimeUnit.SECONDS);
         if (value != null) {
           return value;

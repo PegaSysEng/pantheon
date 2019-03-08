@@ -12,23 +12,65 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Pipeline {
-
+  private static final Logger LOG = LogManager.getLogger();
+  private final PipelineSource<?> pipelineSource;
   private final Collection<Runnable> stages;
+  private final Collection<Pipe<?>> pipes;
   private final CompleterStage<?> completerStage;
+  private final AtomicBoolean started = new AtomicBoolean(false);
+  private volatile List<Future<?>> futures;
 
-  public Pipeline(final Collection<Runnable> stages, final CompleterStage<?> completerStage) {
+  public Pipeline(
+      final PipelineSource<?> pipelineSource,
+      final Collection<Runnable> stages,
+      final Collection<Pipe<?>> pipes,
+      final CompleterStage<?> completerStage) {
+    this.pipelineSource = pipelineSource;
     this.stages = stages;
+    this.pipes = pipes;
     this.completerStage = completerStage;
   }
 
   public CompletableFuture<?> start(final ExecutorService executorService) {
-    stages.forEach(executorService::execute);
-    executorService.execute(completerStage);
+    if (!started.compareAndSet(false, true)) {
+      throw new IllegalStateException("Already started");
+    }
+    futures =
+        Stream.concat(stages.stream(), Stream.of(completerStage))
+            .map(task -> runWithErrorLogging(executorService, task))
+            .collect(toList());
     return completerStage.getFuture();
+  }
+
+  private Future<?> runWithErrorLogging(
+      final ExecutorService executorService, final Runnable task) {
+    return executorService.submit(
+        () -> {
+          try {
+            task.run();
+          } catch (final Throwable t) {
+            LOG.error("Unhandled exception in pipeline", t);
+          }
+        });
+  }
+
+  public void abort() {
+    pipelineSource.abort();
+    pipes.forEach(Pipe::abort);
+    futures.forEach(future -> future.cancel(true));
   }
 }

@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
@@ -26,13 +27,22 @@ import java.util.stream.Stream;
 
 public class PipelineBuilder<T> {
 
+  private final PipelineSource<?> pipelineSource;
   private final Collection<Runnable> stages;
+  private final Collection<Pipe<?>> pipes;
   private final InputPipe<T> pipeEnd;
   private final int bufferSize;
 
   public PipelineBuilder(
-      final Collection<Runnable> stages, final InputPipe<T> pipeEnd, final int bufferSize) {
+      final PipelineSource<?> pipelineSource,
+      final Collection<Runnable> stages,
+      final Collection<Pipe<?>> pipes,
+      final InputPipe<T> pipeEnd,
+      final int bufferSize) {
+    checkArgument(!pipes.isEmpty(), "Must have at least one pipe in a pipeline");
+    this.pipelineSource = pipelineSource;
     this.stages = stages;
+    this.pipes = pipes;
     this.pipeEnd = pipeEnd;
     this.bufferSize = bufferSize;
   }
@@ -40,13 +50,14 @@ public class PipelineBuilder<T> {
   public static <T> PipelineBuilder<T> createPipelineFrom(
       final Iterator<T> taskStream, final int bufferSize) {
     final Pipe<T> pipe = new Pipe<>(bufferSize);
-    final SourceStage<T> sourceStage = new SourceStage<>(taskStream, pipe);
-    return new PipelineBuilder<>(singleton(sourceStage), pipe, bufferSize);
+    final StreamSourceStage<T> sourceStage = new StreamSourceStage<>(taskStream, pipe);
+    return new PipelineBuilder<>(
+        sourceStage, singleton(sourceStage), singleton(pipe), pipe, bufferSize);
   }
 
-  public static <T> PipelineBuilder<T> createPipelineFrom(
-      final InputPipe<T> pipe, final int bufferSize) {
-    return new PipelineBuilder<>(emptyList(), pipe, bufferSize);
+  public static <T> PipelineBuilder<T> createPipelineFrom(final Pipe<T> pipe) {
+    return new PipelineBuilder<>(
+        new ExternalPipelineSource<>(pipe), emptyList(), singleton(pipe), pipe, pipe.getCapacity());
   }
 
   public <O> PipelineBuilder<O> thenProcess(final Function<T, O> processor) {
@@ -64,7 +75,8 @@ public class PipelineBuilder<T> {
           new InputOutputStage<>(pipeEnd, outputPipe, new ProcessStage<>(processor));
       newStages.add(processStage);
     }
-    return new PipelineBuilder<>(newStages, newPipeEnd, bufferSize);
+    return new PipelineBuilder<>(
+        pipelineSource, newStages, concat(pipes, newPipeEnd), newPipeEnd, bufferSize);
   }
 
   public <O> PipelineBuilder<O> thenProcessAsync(
@@ -82,7 +94,7 @@ public class PipelineBuilder<T> {
   }
 
   public Pipeline andFinishWith(final Consumer<T> completer) {
-    return new Pipeline(stages, new CompleterStage<>(pipeEnd, completer));
+    return new Pipeline(pipelineSource, stages, pipes, new CompleterStage<>(pipeEnd, completer));
   }
 
   private <O> PipelineBuilder<O> addStage(final SingleStepStage<T, O> singleStepStage) {
@@ -97,8 +109,14 @@ public class PipelineBuilder<T> {
   }
 
   private <O> PipelineBuilder<O> addStage(final Runnable stage, final Pipe<O> outputPipe) {
-    final List<Runnable> newStages = new ArrayList<>(stages);
-    newStages.add(stage);
-    return new PipelineBuilder<>(newStages, outputPipe, bufferSize);
+    final List<Runnable> newStages = concat(stages, stage);
+    return new PipelineBuilder<>(
+        pipelineSource, newStages, concat(pipes, outputPipe), outputPipe, bufferSize);
+  }
+
+  private <X> List<X> concat(final Collection<X> existing, final X newItem) {
+    final List<X> newList = new ArrayList<>(existing);
+    newList.add(newItem);
+    return newList;
   }
 }

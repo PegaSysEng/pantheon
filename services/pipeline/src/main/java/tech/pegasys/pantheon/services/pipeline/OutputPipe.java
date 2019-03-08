@@ -17,7 +17,9 @@ public interface OutputPipe<T> {
 
   void put(T value);
 
+  boolean hasRemainingCapacity();
+
   void close();
 
-  boolean hasRemainingCapacity();
+  void abort();
 }

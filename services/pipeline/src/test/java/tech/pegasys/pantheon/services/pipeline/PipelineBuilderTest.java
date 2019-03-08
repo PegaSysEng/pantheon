@@ -18,6 +18,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.awaitility.Awaitility.waitAtMost;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,10 +32,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.awaitility.Awaitility;
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -90,7 +92,7 @@ public class PipelineBuilderTest {
     tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(input, 20).inBatches(6).andFinishWith(output::offer);
+        PipelineBuilder.createPipelineFrom(input).inBatches(6).andFinishWith(output::offer);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
@@ -213,8 +215,42 @@ public class PipelineBuilderTest {
             "1", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "2");
   }
 
+  @Test
+  public void shouldAbortPipeline() throws Exception {
+    final int allowProcessingUpTo = 5;
+    final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
+    final List<Integer> output = synchronizedList(new ArrayList<>());
+    final CountDownLatch startedProcessingValueSix = new CountDownLatch(1);
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(tasks, 10)
+            .thenProcess(
+                value -> {
+                  if (value > allowProcessingUpTo) {
+                    try {
+                      startedProcessingValueSix.countDown();
+                      Thread.sleep(TimeUnit.MINUTES.toNanos(2));
+                    } catch (final InterruptedException e) {
+                      processorInterrupted.set(true);
+                    }
+                  }
+                  return value;
+                })
+            .andFinishWith(output::add);
+
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    startedProcessingValueSix.await(10, SECONDS);
+    waitForSize(output, allowProcessingUpTo);
+
+    pipeline.abort();
+
+    result.get(10, SECONDS);
+    assertThat(output).containsExactly(1, 2, 3, 4, 5);
+
+    waitAtMost(10, SECONDS).untilAsserted(() -> assertThat(processorInterrupted).isTrue());
+  }
+
   private void waitForSize(final Collection<?> collection, final int targetSize) {
-    Awaitility.waitAtMost(10, SECONDS)
-        .untilAsserted(() -> assertThat(collection).hasSize(targetSize));
+    waitAtMost(10, SECONDS).untilAsserted(() -> assertThat(collection).hasSize(targetSize));
   }
 }
