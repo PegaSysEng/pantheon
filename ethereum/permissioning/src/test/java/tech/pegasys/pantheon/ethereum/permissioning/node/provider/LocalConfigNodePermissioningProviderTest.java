@@ -1,15 +1,28 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.permissioning.node.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalConfigNodePermissioningProviderTest {
@@ -20,8 +33,7 @@ public class LocalConfigNodePermissioningProviderTest {
       new EnodeURL(
           "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.3:5678");
 
-  @Mock
-  private NodeLocalConfigPermissioningController controller;
+  @Mock private NodeLocalConfigPermissioningController controller;
   private LocalConfigNodePermissioningProvider provider;
 
   @Test

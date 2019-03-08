@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.node;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -39,6 +40,7 @@ public class NodePermissioningControllerTest {
 
   @Mock private SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider;
   @Mock private LocalConfigNodePermissioningProvider localConfigNodePermissioningProvider;
+  @Mock private NodePermissioningProvider otherPermissioningProvider;
 
   private NodePermissioningController controller;
 
@@ -66,13 +68,53 @@ public class NodePermissioningControllerTest {
   @Test
   public void whenInSyncWeShouldDelegateToLocalConfigNodePermissioningProvider() {
     NodePermissioningProvider[] providers = {localConfigNodePermissioningProvider};
-    this.controller = new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
+    this.controller =
+        new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
 
     when(syncStatusNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
 
     controller.isPermitted(enode1, enode2);
 
     verify(localConfigNodePermissioningProvider).isPermitted(eq(enode1), eq(enode2));
+  }
 
+  @Test
+  public void
+      whenInSyncWeShouldDelegateToAnyOtherNodePermissioningProviderAndIsPermittedIfAllPermitted() {
+    NodePermissioningProvider[] providers = {
+      localConfigNodePermissioningProvider, otherPermissioningProvider
+    };
+    this.controller =
+        new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
+
+    when(syncStatusNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
+    when(localConfigNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
+    when(otherPermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
+
+    assertThat(controller.isPermitted(enode1, enode2)).isTrue();
+
+    verify(syncStatusNodePermissioningProvider).isPermitted(eq(enode1), eq(enode2));
+    verify(localConfigNodePermissioningProvider).isPermitted(eq(enode1), eq(enode2));
+    verify(otherPermissioningProvider).isPermitted(eq(enode1), eq(enode2));
+  }
+
+  @Test
+  public void
+      whenInSyncWeShouldDelegateToAnyOtherNodePermissioningProviderAndIsNotPermittedIfAnyNotPermitted() {
+    NodePermissioningProvider[] providers = {
+      localConfigNodePermissioningProvider, otherPermissioningProvider
+    };
+    this.controller =
+        new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
+
+    when(syncStatusNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
+    when(localConfigNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
+    when(otherPermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(false);
+
+    assertThat(controller.isPermitted(enode1, enode2)).isFalse();
+
+    verify(syncStatusNodePermissioningProvider).isPermitted(eq(enode1), eq(enode2));
+    verify(localConfigNodePermissioningProvider).isPermitted(eq(enode1), eq(enode2));
+    verify(otherPermissioningProvider).isPermitted(eq(enode1), eq(enode2));
   }
 }
