@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Test;
 
 public class PipelineBuilderTest {
@@ -52,11 +52,11 @@ public class PipelineBuilderTest {
   private final Iterator<Integer> tasks =
       asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15).iterator();
 
-  private static final ExecutorService executorService =
+  private final ExecutorService executorService =
       Executors.newCachedThreadPool(THREAD_FACTORY);
 
-  @AfterClass
-  public static void afterClass() throws Exception {
+  @After
+  public void afterClass() throws Exception {
     executorService.shutdownNow();
     if (!executorService.awaitTermination(10, SECONDS)) {
       fail("Executor service did not shut down cleanly");
