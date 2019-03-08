@@ -19,6 +19,7 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -41,10 +42,10 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
+import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.List;
-import java.util.OptionalLong;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -66,7 +67,8 @@ public class TransactionPoolTest {
 
   private final TransactionValidator transactionValidator = mock(TransactionValidator.class);
   private MutableBlockchain blockchain;
-  private final PendingTransactions transactions = new PendingTransactions(MAX_TRANSACTIONS);
+  private final PendingTransactions transactions =
+      new PendingTransactions(MAX_TRANSACTIONS, TestClock.fixed());
   private final Transaction transaction1 = createTransaction(1);
   private final Transaction transaction2 = createTransaction(2);
   private TransactionPool transactionPool;
@@ -211,7 +213,7 @@ public class TransactionPoolTest {
   public void shouldNotAddRemoteTransactionsThatAreInvalidAccordingToStateDependentChecks() {
     givenTransactionIsValid(transaction2);
     when(transactionValidator.validate(transaction1)).thenReturn(valid());
-    when(transactionValidator.validateForSender(transaction1, null, OptionalLong.empty()))
+    when(transactionValidator.validateForSender(transaction1, null, true))
         .thenReturn(ValidationResult.invalid(NONCE_TOO_LOW));
 
     transactionPool.addRemoteTransactions(asList(transaction1, transaction2));
@@ -230,13 +232,13 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(OptionalLong.empty())))
+            eq(transaction1), nullable(Account.class), eq(true)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(OptionalLong.of(2))))
+            eq(transaction2), nullable(Account.class), eq(true)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction3), nullable(Account.class), eq(OptionalLong.of(3))))
+            eq(transaction3), nullable(Account.class), eq(true)))
         .thenReturn(valid());
 
     assertThat(transactionPool.addLocalTransaction(transaction1)).isEqualTo(valid());
@@ -258,13 +260,13 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(OptionalLong.empty())))
+            eq(transaction1), nullable(Account.class), eq(true)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(OptionalLong.of(2))))
+            eq(transaction2), nullable(Account.class), eq(true)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction3), nullable(Account.class), eq(OptionalLong.of(3))))
+            eq(transaction3), nullable(Account.class), eq(true)))
         .thenReturn(valid());
 
     transactionPool.addRemoteTransactions(asList(transaction3, transaction1, transaction2));
@@ -284,10 +286,10 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(OptionalLong.empty())))
+            eq(transaction1), nullable(Account.class), eq(true)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(OptionalLong.of(2))))
+            eq(transaction2), nullable(Account.class), eq(true)))
         .thenReturn(valid());
 
     transactionPool.addRemoteTransactions(singletonList(transaction1));
@@ -308,10 +310,10 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(OptionalLong.empty())))
+            eq(transaction1), nullable(Account.class), eq(true)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(OptionalLong.of(2))))
+            eq(transaction2), nullable(Account.class), eq(true)))
         .thenReturn(valid());
 
     transactionPool.addLocalTransaction(transaction1);
@@ -443,7 +445,7 @@ public class TransactionPoolTest {
   private void givenTransactionIsValid(final Transaction transaction) {
     when(transactionValidator.validate(transaction)).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction), nullable(Account.class), any(OptionalLong.class)))
+            eq(transaction), nullable(Account.class), anyBoolean()))
         .thenReturn(valid());
   }
 }

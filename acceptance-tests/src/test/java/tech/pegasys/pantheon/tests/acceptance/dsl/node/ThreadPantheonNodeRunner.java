@@ -64,7 +64,6 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .synchronizerConfiguration(new SynchronizerConfiguration.Builder().build())
               .homePath(node.homeDirectory())
               .ethNetworkConfig(ethNetworkConfig)
-              .syncWithOttoman(false)
               .miningParameters(node.getMiningParameters())
               .privacyParameters(node.getPrivacyParameters())
               .devMode(node.isDevMode())
@@ -96,9 +95,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .p2pEnabled(node.isP2pEnabled())
             .build();
 
-    nodeExecutor.submit(runner::execute);
-
-    waitForPortsFile(node.homeDirectory().toAbsolutePath());
+    runner.start();
 
     pantheonRunners.put(node.getName(), runner);
   }
