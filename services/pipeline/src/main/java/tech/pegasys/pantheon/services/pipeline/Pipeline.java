@@ -53,7 +53,7 @@ public class Pipeline {
     }
     futures =
         Stream.concat(stages.stream(), Stream.of(completerStage))
-            .map(task -> runWithErrorLogging(executorService, task))
+            .map(task -> runWithErrorHandling(executorService, task))
             .collect(toList());
     completerStage
         .getFuture()
@@ -70,7 +70,12 @@ public class Pipeline {
     return overallFuture;
   }
 
-  private Future<?> runWithErrorLogging(
+  public void abort() {
+    final CancellationException exception = new CancellationException("Pipeline aborted");
+    abort(exception);
+  }
+
+  private Future<?> runWithErrorHandling(
       final ExecutorService executorService, final Runnable task) {
     return executorService.submit(
         () -> {
@@ -81,11 +86,6 @@ public class Pipeline {
             abort(t);
           }
         });
-  }
-
-  public void abort() {
-    final CancellationException exception = new CancellationException("Pipeline aborted");
-    abort(exception);
   }
 
   private void abort(final Throwable error) {

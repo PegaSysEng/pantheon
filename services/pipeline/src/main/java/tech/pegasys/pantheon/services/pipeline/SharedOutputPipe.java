@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SharedOutputPipe<T> implements OutputPipe<T> {
+class SharedOutputPipe<T> implements OutputPipe<T> {
   private final OutputPipe<T> delegate;
   private final AtomicInteger remainingClosesRequired;
 

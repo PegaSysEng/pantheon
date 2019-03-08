@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.List;
 
-public class BatchingStage<T> implements SingleStepStage<T, List<T>> {
+class BatchingStage<T> implements SingleStepStage<T, List<T>> {
 
   private final int maximumBatchSize;
 

@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.List;
 
-public interface InputPipe<T> {
+interface InputPipe<T> {
   boolean hasMore();
 
   T get();

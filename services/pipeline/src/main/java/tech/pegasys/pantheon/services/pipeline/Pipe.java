@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
+public class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
   private static final Logger LOG = LogManager.getLogger();
   private final BlockingQueue<T> queue;
   private final int capacity;

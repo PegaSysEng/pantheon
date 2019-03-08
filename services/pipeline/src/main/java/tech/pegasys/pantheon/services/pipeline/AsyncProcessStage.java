@@ -24,7 +24,7 @@ import java.util.function.Function;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AsyncProcessStage<I, O> implements SingleStepStage<I, O> {
+class AsyncProcessStage<I, O> implements SingleStepStage<I, O> {
   private static final Logger LOG = LogManager.getLogger();
   private final Function<I, CompletableFuture<O>> processor;
   private final Collection<CompletableFuture<O>> inProgress;

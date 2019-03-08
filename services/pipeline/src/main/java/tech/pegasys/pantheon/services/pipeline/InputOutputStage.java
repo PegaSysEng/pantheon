@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-public class InputOutputStage<I, O> implements Runnable {
+class InputOutputStage<I, O> implements Runnable {
 
   private final InputPipe<I> inputPipe;
   private final OutputPipe<O> outputPipe;

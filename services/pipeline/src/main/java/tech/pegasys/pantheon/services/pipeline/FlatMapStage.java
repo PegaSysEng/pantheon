@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.services.pipeline;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class FlatMapStage<I, O> implements SingleStepStage<I, O> {
+class FlatMapStage<I, O> implements SingleStepStage<I, O> {
 
   private final Function<I, Stream<O>> mapper;
 

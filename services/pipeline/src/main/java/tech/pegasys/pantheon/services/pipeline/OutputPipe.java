@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-public interface OutputPipe<T> {
+interface OutputPipe<T> {
   boolean isOpen();
 
   void put(T value);
