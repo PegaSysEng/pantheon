@@ -255,7 +255,6 @@ public class PipelineBuilderTest {
   @Test
   public void shouldAbortPipelineWhenProcessorThrowsException() {
     final RuntimeException expectedError = new RuntimeException("Oops");
-    final List<Integer> output = new ArrayList<>();
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
             .thenProcess(
@@ -265,14 +264,13 @@ public class PipelineBuilderTest {
                   }
                   return value;
                 })
-            .andFinishWith(output::add);
+            .andFinishWith(new ArrayList<Integer>()::add);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
     assertThatThrownBy(() -> result.get(10, SECONDS))
         .extracting(Throwable::getCause)
         .isSameAs(expectedError);
-    assertThat(output).containsExactly(1, 2, 3);
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {
