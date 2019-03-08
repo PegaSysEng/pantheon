@@ -24,57 +24,49 @@ import java.util.function.Function;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AsyncProcessStage<I, O> implements Runnable {
+public class AsyncProcessStage<I, O> implements SingleStepStage<I, O> {
   private static final Logger LOG = LogManager.getLogger();
-  private final InputPipe<I> inputPipe;
-  private final OutputPipe<O> outputPipe;
   private final Function<I, CompletableFuture<O>> processor;
   private final Collection<CompletableFuture<O>> inProgress;
   private final int maxConcurrency;
 
   public AsyncProcessStage(
-      final InputPipe<I> inputPipe,
-      final OutputPipe<O> outputPipe,
-      final Function<I, CompletableFuture<O>> processor,
-      final int maxConcurrency) {
-    this.inputPipe = inputPipe;
-    this.outputPipe = outputPipe;
+      final Function<I, CompletableFuture<O>> processor, final int maxConcurrency) {
     this.processor = processor;
     this.maxConcurrency = maxConcurrency;
     this.inProgress = new ArrayList<>(maxConcurrency);
   }
 
   @Override
-  public void run() {
-    final Thread stageThread = Thread.currentThread();
-    while (inputPipe.hasMore()) {
-      if (inProgress.size() < maxConcurrency) {
-        final I value = inputPipe.get();
-        if (value != null) {
-          final CompletableFuture<O> future = processor.apply(value);
-          // When the future completes, interrupt so if we're waiting for new input we wake up and
-          // schedule the output.
-          future.whenComplete((result, error) -> stageThread.interrupt());
-          inProgress.add(future);
-        }
-
-        outputCompletedTasks(0);
-      } else {
-        outputNextCompletedTask();
+  public void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
+    if (inProgress.size() < maxConcurrency) {
+      final I value = inputPipe.get();
+      if (value != null) {
+        final CompletableFuture<O> future = processor.apply(value);
+        // When the future completes, interrupt so if we're waiting for new input we wake up and
+        // schedule the output.
+        final Thread stageThread = Thread.currentThread();
+        future.whenComplete((result, error) -> stageThread.interrupt());
+        inProgress.add(future);
       }
-    }
 
-    while (!inProgress.isEmpty()) {
-      outputNextCompletedTask();
+      outputCompletedTasks(0, outputPipe);
+    } else {
+      outputNextCompletedTask(outputPipe);
     }
-
-    outputPipe.close();
   }
 
-  private void outputNextCompletedTask() {
+  @Override
+  public void finalize(final OutputPipe<O> outputPipe) {
+    while (!inProgress.isEmpty()) {
+      outputNextCompletedTask(outputPipe);
+    }
+  }
+
+  private void outputNextCompletedTask(final OutputPipe<O> outputPipe) {
     try {
       waitForAnyFutureToComplete();
-      outputCompletedTasks(1);
+      outputCompletedTasks(1, outputPipe);
     } catch (final InterruptedException e) {
       LOG.trace("Interrupted while waiting for processing to complete", e);
     } catch (final ExecutionException e) {
@@ -90,7 +82,7 @@ public class AsyncProcessStage<I, O> implements Runnable {
     CompletableFuture.anyOf(inProgress.toArray(new CompletableFuture[0])).get(1, TimeUnit.SECONDS);
   }
 
-  private void outputCompletedTasks(final int minTasksToOutput) {
+  private void outputCompletedTasks(final int minTasksToOutput, final OutputPipe<O> outputPipe) {
     int outputTasks = 0;
     for (final Iterator<CompletableFuture<O>> i = inProgress.iterator();
         i.hasNext() && (outputTasks < minTasksToOutput || outputPipe.hasRemainingCapacity()); ) {

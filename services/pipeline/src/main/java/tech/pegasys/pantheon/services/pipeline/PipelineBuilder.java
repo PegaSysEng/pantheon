@@ -71,8 +71,9 @@ public class PipelineBuilder<T> {
   public <O> PipelineBuilder<O> thenProcessAsync(
       final Function<T, CompletableFuture<O>> processor, final int maxConcurrency) {
     final Pipe<O> outputPipe = new Pipe<>(bufferSize);
-    final AsyncProcessStage<T, O> stage =
-        new AsyncProcessStage<>(pipeEnd, outputPipe, processor, maxConcurrency);
+    final Runnable stage =
+        new InputOutputStage<>(
+            pipeEnd, outputPipe, new AsyncProcessStage<>(processor, maxConcurrency));
     return addStage(stage, outputPipe);
   }
 
