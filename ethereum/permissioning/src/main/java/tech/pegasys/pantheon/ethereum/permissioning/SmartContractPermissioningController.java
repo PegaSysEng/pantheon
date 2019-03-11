@@ -12,9 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
@@ -25,19 +22,26 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.util.Optional;
 
 public class SmartContractPermissioningController implements NodePermissioningProvider {
   private final Address contractAddress;
   private final TransactionSimulator transactionSimulator;
 
-  private static final String IPV4_FUNCTION_SIGNATURE = "connectionAllowedIpv4(bytes32,bytes32,bytes4,uint16,bytes32,bytes32,bytes4,uint16)";
-  private static final BytesValue IPV4_FUNCTION_SIGNATURE_HASH = hashSignature(IPV4_FUNCTION_SIGNATURE);
-  private static final String IPV6_FUNCTION_SIGNATURE = "connectionAllowedIpv6(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)";
-  private static final BytesValue IPV6_FUNCTION_SIGNATURE_HASH = hashSignature(IPV6_FUNCTION_SIGNATURE);
+  private static final String IPV4_FUNCTION_SIGNATURE =
+      "connectionAllowedIpv4(bytes32,bytes32,bytes4,uint16,bytes32,bytes32,bytes4,uint16)";
+  private static final BytesValue IPV4_FUNCTION_SIGNATURE_HASH =
+      hashSignature(IPV4_FUNCTION_SIGNATURE);
+  private static final String IPV6_FUNCTION_SIGNATURE =
+      "connectionAllowedIpv6(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)";
+  private static final BytesValue IPV6_FUNCTION_SIGNATURE_HASH =
+      hashSignature(IPV6_FUNCTION_SIGNATURE);
 
   private static BytesValue hashSignature(final String signature) {
-    return Hash.keccak256(BytesValue.of(signature.getBytes())).slice(0,8);
+    return Hash.keccak256(BytesValue.of(signature.getBytes())).slice(0, 4);
   }
 
   public SmartContractPermissioningController(
@@ -59,7 +63,9 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     final Optional<TransactionSimulatorResult> result =
         transactionSimulator.processAtHead(callParams);
 
-    return result.map(r -> checkTransactionResult(r.getOutput())).orElse(false);
+    return result
+        .map(r -> checkTransactionResult(r.getOutput()))
+        .orElseThrow(() -> new IllegalStateException("the hell")); // .orElse(false);
   }
 
   private Boolean checkTransactionResult(BytesValue result) {
@@ -70,7 +76,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     trueValue[31] = (byte) (0xFF & 1L);
     if (result.isZero()) {
       return false;
-    } else if (result == BytesValue.wrap(trueValue)) {
+    } else if (result.compareTo(BytesValue.wrap(trueValue)) == 0) {
       return true;
     } else {
       throw new IllegalStateException("Unexpected result form");
@@ -79,41 +85,45 @@ public class SmartContractPermissioningController implements NodePermissioningPr
 
   private BytesValue createPayload(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     final BytesValue signature;
-    if (sourceEnode.getInetAddress() instanceof Inet4Address && destinationEnode.getInetAddress() instanceof Inet4Address) {
+    if (sourceEnode.getInetAddress() instanceof Inet4Address
+        && destinationEnode.getInetAddress() instanceof Inet4Address) {
       signature = IPV4_FUNCTION_SIGNATURE_HASH;
-    } else if (sourceEnode.getInetAddress() instanceof Inet6Address && destinationEnode.getInetAddress() instanceof Inet6Address) {
+    } else if (sourceEnode.getInetAddress() instanceof Inet6Address
+        && destinationEnode.getInetAddress() instanceof Inet6Address) {
       signature = IPV6_FUNCTION_SIGNATURE_HASH;
     } else {
-      throw new IllegalArgumentException("No payload possible for checking an ipv4 to ipv6 connection");
+      throw new IllegalArgumentException(
+          "No payload possible for checking an ipv4 to ipv6 connection");
     }
     return BytesValues.concatenate(
-        signature,
-        encodeEnodeUrl(sourceEnode),
-        encodeEnodeUrl(destinationEnode)
-    );
+        signature, encodeEnodeUrl(sourceEnode), encodeEnodeUrl(destinationEnode));
   }
 
   private BytesValue encodeEnodeUrl(final EnodeURL enode) {
+    final BytesValue id =
+        encodeEnodeId(enode.getNodeId());
+    final BytesValue ip =
+        encodeIp(enode.getInetAddress());
+    final BytesValue port =
+        encodePort(enode.getListeningPort());
     return BytesValues.concatenate(
-        encodeEnodeId(enode.getNodeId()),
-        encodeIp(enode.getInetAddress()),
-        encodePort(enode.getListeningPort())
-    );
+        id, ip, port);
   }
 
   private BytesValue encodeIp(final InetAddress addr) {
     final byte[] address = addr.getAddress();
     final byte[] res = new byte[32];
-    System.arraycopy(address, 0, res,0, address.length);
+    System.arraycopy(address, 0, res, 0, address.length);
     return BytesValue.wrap(res);
   }
 
   private BytesValue encodePort(final Integer port) {
     final byte[] res = new byte[32];
-    res[31] = (byte)((port) & 0xFF);
-    res[30] = (byte)((port >> 8) & 0xFF);
+    res[31] = (byte) ((port) & 0xFF);
+    res[30] = (byte) ((port >> 8) & 0xFF);
     return BytesValue.wrap(res);
   }
+
   private BytesValue encodeEnodeId(String id) {
     return BytesValue.fromHexString(id);
   }
