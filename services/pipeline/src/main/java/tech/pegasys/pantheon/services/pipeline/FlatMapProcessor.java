@@ -12,27 +12,22 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-class InputOutputStage<I, O> implements Runnable {
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-  private final InputPipe<I> inputPipe;
-  private final OutputPipe<O> outputPipe;
-  private final SingleStepStage<I, O> singleStepStage;
+class FlatMapProcessor<I, O> implements Processor<I, O> {
 
-  public InputOutputStage(
-      final InputPipe<I> inputPipe,
-      final OutputPipe<O> outputPipe,
-      final SingleStepStage<I, O> singleStepStage) {
-    this.inputPipe = inputPipe;
-    this.outputPipe = outputPipe;
-    this.singleStepStage = singleStepStage;
+  private final Function<I, Stream<O>> mapper;
+
+  public FlatMapProcessor(final Function<I, Stream<O>> mapper) {
+    this.mapper = mapper;
   }
 
   @Override
-  public void run() {
-    while (inputPipe.hasMore()) {
-      singleStepStage.processNextInput(inputPipe, outputPipe);
+  public void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
+    final I value = inputPipe.get();
+    if (value != null) {
+      mapper.apply(value).forEach(outputPipe::put);
     }
-    singleStepStage.finalize(outputPipe);
-    outputPipe.close();
   }
 }

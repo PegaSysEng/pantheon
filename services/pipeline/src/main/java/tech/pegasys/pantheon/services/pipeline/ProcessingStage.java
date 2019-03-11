@@ -12,21 +12,27 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-class ExternalProducingStage<T> implements ProducingStage<T> {
+class ProcessingStage<I, O> implements Runnable {
 
-  private final Pipe<T> pipe;
+  private final InputPipe<I> inputPipe;
+  private final OutputPipe<O> outputPipe;
+  private final Processor<I, O> processor;
 
-  public ExternalProducingStage(final Pipe<T> pipe) {
-    this.pipe = pipe;
+  public ProcessingStage(
+      final InputPipe<I> inputPipe,
+      final OutputPipe<O> outputPipe,
+      final Processor<I, O> processor) {
+    this.inputPipe = inputPipe;
+    this.outputPipe = outputPipe;
+    this.processor = processor;
   }
 
   @Override
-  public InputPipe<T> getPipe() {
-    return pipe;
-  }
-
-  @Override
-  public void abort() {
-    pipe.abort();
+  public void run() {
+    while (inputPipe.hasMore()) {
+      processor.processNextInput(inputPipe, outputPipe);
+    }
+    processor.finalize(outputPipe);
+    outputPipe.close();
   }
 }

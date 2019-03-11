@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-interface ProducingStage<T> {
-  InputPipe<T> getPipe();
+interface Processor<I, O> {
+  void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe);
 
-  void abort();
+  default void finalize(final OutputPipe<O> outputPipe) {}
 }

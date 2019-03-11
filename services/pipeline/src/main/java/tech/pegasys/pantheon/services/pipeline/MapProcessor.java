@@ -13,21 +13,20 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.function.Function;
-import java.util.stream.Stream;
 
-class FlatMapStage<I, O> implements SingleStepStage<I, O> {
+class MapProcessor<I, O> implements Processor<I, O> {
 
-  private final Function<I, Stream<O>> mapper;
+  private final Function<I, O> processor;
 
-  public FlatMapStage(final Function<I, Stream<O>> mapper) {
-    this.mapper = mapper;
+  public MapProcessor(final Function<I, O> processor) {
+    this.processor = processor;
   }
 
   @Override
   public void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
     final I value = inputPipe.get();
     if (value != null) {
-      mapper.apply(value).forEach(outputPipe::put);
+      outputPipe.put(processor.apply(value));
     }
   }
 }

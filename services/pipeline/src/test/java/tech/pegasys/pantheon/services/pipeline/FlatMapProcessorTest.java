@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 
-public class FlatMapStageTest {
+public class FlatMapProcessorTest {
 
   private final Pipe<String> input = new Pipe<>(10);
   private final Pipe<String> output = new Pipe<>(10);
@@ -31,7 +31,7 @@ public class FlatMapStageTest {
   @SuppressWarnings("unchecked")
   private final Function<String, Stream<String>> mapper = mock(Function.class);
 
-  private final FlatMapStage<String, String> stage = new FlatMapStage<>(mapper);
+  private final FlatMapProcessor<String, String> stage = new FlatMapProcessor<>(mapper);
 
   @Test
   public void shouldOutputItemsFromReturnedStreamIndividually() {

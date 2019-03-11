@@ -37,20 +37,20 @@ import java.util.stream.Stream;
  */
 public class PipelineBuilder<T> {
 
-  private final ProducingStage<?> producingStage;
+  private final Pipe<?> inputPipe;
   private final Collection<Runnable> stages;
   private final Collection<Pipe<?>> pipes;
   private final InputPipe<T> pipeEnd;
   private final int bufferSize;
 
   public PipelineBuilder(
-      final ProducingStage<?> producingStage,
+      final Pipe<?> inputPipe,
       final Collection<Runnable> stages,
       final Collection<Pipe<?>> pipes,
       final InputPipe<T> pipeEnd,
       final int bufferSize) {
     checkArgument(!pipes.isEmpty(), "Must have at least one pipe in a pipeline");
-    this.producingStage = producingStage;
+    this.inputPipe = inputPipe;
     this.stages = stages;
     this.pipes = pipes;
     this.pipeEnd = pipeEnd;
@@ -70,9 +70,8 @@ public class PipelineBuilder<T> {
   public static <T> PipelineBuilder<T> createPipelineFrom(
       final Iterator<T> source, final int bufferSize) {
     final Pipe<T> pipe = new Pipe<>(bufferSize);
-    final StreamSourceStage<T> sourceStage = new StreamSourceStage<>(source, pipe);
-    return new PipelineBuilder<>(
-        sourceStage, singleton(sourceStage), singleton(pipe), pipe, bufferSize);
+    final IteratorSourceStage<T> sourceStage = new IteratorSourceStage<>(source, pipe);
+    return new PipelineBuilder<>(pipe, singleton(sourceStage), singleton(pipe), pipe, bufferSize);
   }
 
   /**
@@ -84,8 +83,7 @@ public class PipelineBuilder<T> {
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
   public static <T> PipelineBuilder<T> createPipelineFrom(final Pipe<T> pipe) {
-    return new PipelineBuilder<>(
-        new ExternalProducingStage<>(pipe), emptyList(), singleton(pipe), pipe, pipe.getCapacity());
+    return new PipelineBuilder<>(pipe, emptyList(), singleton(pipe), pipe, pipe.getCapacity());
   }
 
   /**
@@ -97,7 +95,7 @@ public class PipelineBuilder<T> {
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
   public <O> PipelineBuilder<O> thenProcess(final Function<T, O> processor) {
-    final SingleStepStage<T, O> singleStepStage = new ProcessStage<>(processor);
+    final Processor<T, O> singleStepStage = new MapProcessor<>(processor);
     return addStage(singleStepStage);
   }
 
@@ -119,11 +117,11 @@ public class PipelineBuilder<T> {
     final ArrayList<Runnable> newStages = new ArrayList<>(stages);
     for (int i = 0; i < numberOfThreads; i++) {
       final Runnable processStage =
-          new InputOutputStage<>(pipeEnd, outputPipe, new ProcessStage<>(processor));
+          new ProcessingStage<>(pipeEnd, outputPipe, new MapProcessor<>(processor));
       newStages.add(processStage);
     }
     return new PipelineBuilder<>(
-        producingStage, newStages, concat(pipes, newPipeEnd), newPipeEnd, bufferSize);
+        inputPipe, newStages, concat(pipes, newPipeEnd), newPipeEnd, bufferSize);
   }
 
   /**
@@ -144,7 +142,7 @@ public class PipelineBuilder<T> {
    */
   public <O> PipelineBuilder<O> thenProcessAsync(
       final Function<T, CompletableFuture<O>> processor, final int maxConcurrency) {
-    return addStage(new AsyncProcessStage<>(processor, maxConcurrency));
+    return addStage(new AsyncOperationProcessor<>(processor, maxConcurrency));
   }
 
   /**
@@ -159,7 +157,7 @@ public class PipelineBuilder<T> {
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
   public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
-    return addStage(new BatchingStage<>(maximumBatchSize), bufferSize / maximumBatchSize + 1);
+    return addStage(new BatchingProcessor<>(maximumBatchSize), bufferSize / maximumBatchSize + 1);
   }
 
   /**
@@ -178,7 +176,7 @@ public class PipelineBuilder<T> {
    */
   public <O> PipelineBuilder<O> thenFlatMap(
       final Function<T, Stream<O>> mapper, final int newBufferSize) {
-    return addStage(new FlatMapStage<>(mapper), newBufferSize);
+    return addStage(new FlatMapProcessor<>(mapper), newBufferSize);
   }
 
   /**
@@ -188,24 +186,24 @@ public class PipelineBuilder<T> {
    * @return the constructed pipeline ready to execute.
    */
   public Pipeline andFinishWith(final Consumer<T> completer) {
-    return new Pipeline(producingStage, stages, pipes, new CompleterStage<>(pipeEnd, completer));
+    return new Pipeline(inputPipe, stages, pipes, new CompleterStage<>(pipeEnd, completer));
   }
 
-  private <O> PipelineBuilder<O> addStage(final SingleStepStage<T, O> singleStepStage) {
-    return addStage(singleStepStage, bufferSize);
+  private <O> PipelineBuilder<O> addStage(final Processor<T, O> processor) {
+    return addStage(processor, bufferSize);
   }
 
   private <O> PipelineBuilder<O> addStage(
-      final SingleStepStage<T, O> singleStepStage, final int newBufferSize) {
+      final Processor<T, O> processor, final int newBufferSize) {
     final Pipe<O> outputPipe = new Pipe<>(newBufferSize);
-    final Runnable processStage = new InputOutputStage<>(pipeEnd, outputPipe, singleStepStage);
+    final Runnable processStage = new ProcessingStage<>(pipeEnd, outputPipe, processor);
     return addStage(processStage, outputPipe);
   }
 
   private <O> PipelineBuilder<O> addStage(final Runnable stage, final Pipe<O> outputPipe) {
     final List<Runnable> newStages = concat(stages, stage);
     return new PipelineBuilder<>(
-        producingStage, newStages, concat(pipes, outputPipe), outputPipe, bufferSize);
+        inputPipe, newStages, concat(pipes, outputPipe), outputPipe, bufferSize);
   }
 
   private <X> List<X> concat(final Collection<X> existing, final X newItem) {

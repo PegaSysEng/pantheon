@@ -12,8 +12,25 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-interface SingleStepStage<I, O> {
-  void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe);
+import java.util.Iterator;
 
-  default void finalize(final OutputPipe<O> outputPipe) {}
+class IteratorSourceStage<T> implements Runnable {
+  private final Iterator<T> source;
+  private final Pipe<T> pipe;
+
+  IteratorSourceStage(final Iterator<T> source, final Pipe<T> pipe) {
+    this.source = source;
+    this.pipe = pipe;
+  }
+
+  @Override
+  public void run() {
+    while (pipe.isOpen() && source.hasNext()) {
+      final T value = source.next();
+      if (value != null) {
+        pipe.put(value);
+      }
+    }
+    pipe.close();
+  }
 }

@@ -12,21 +12,21 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import java.util.function.Function;
+import java.util.List;
 
-class ProcessStage<I, O> implements SingleStepStage<I, O> {
+class BatchingProcessor<T> implements Processor<T, List<T>> {
 
-  private final Function<I, O> processor;
+  private final int maximumBatchSize;
 
-  public ProcessStage(final Function<I, O> processor) {
-    this.processor = processor;
+  public BatchingProcessor(final int maximumBatchSize) {
+    this.maximumBatchSize = maximumBatchSize;
   }
 
   @Override
-  public void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
-    final I value = inputPipe.get();
-    if (value != null) {
-      outputPipe.put(processor.apply(value));
+  public void processNextInput(final InputPipe<T> inputPipe, final OutputPipe<List<T>> outputPipe) {
+    final List<T> batch = inputPipe.getBatch(maximumBatchSize);
+    if (!batch.isEmpty()) {
+      outputPipe.put(batch);
     }
   }
 }

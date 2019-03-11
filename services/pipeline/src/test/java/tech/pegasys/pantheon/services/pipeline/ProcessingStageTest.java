@@ -27,16 +27,16 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InputOutputStageTest {
+public class ProcessingStageTest {
 
   private final Pipe<String> inputPipe = new Pipe<>(10);
   private final Pipe<String> outputPipe = new Pipe<>(10);
-  @Mock private SingleStepStage<String, String> singleStep;
-  private InputOutputStage<String, String> stage;
+  @Mock private Processor<String, String> singleStep;
+  private ProcessingStage<String, String> stage;
 
   @Before
   public void setUp() {
-    stage = new InputOutputStage<>(inputPipe, outputPipe, singleStep);
+    stage = new ProcessingStage<>(inputPipe, outputPipe, singleStep);
     doAnswer(
             invocation -> {
               outputPipe.put(inputPipe.get().toLowerCase(Locale.UK));

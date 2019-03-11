@@ -24,13 +24,13 @@ import java.util.function.Function;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class AsyncProcessStage<I, O> implements SingleStepStage<I, O> {
+class AsyncOperationProcessor<I, O> implements Processor<I, O> {
   private static final Logger LOG = LogManager.getLogger();
   private final Function<I, CompletableFuture<O>> processor;
   private final Collection<CompletableFuture<O>> inProgress;
   private final int maxConcurrency;
 
-  public AsyncProcessStage(
+  public AsyncOperationProcessor(
       final Function<I, CompletableFuture<O>> processor, final int maxConcurrency) {
     this.processor = processor;
     this.maxConcurrency = maxConcurrency;

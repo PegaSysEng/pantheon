@@ -21,11 +21,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class BatchingStageTest {
+public class BatchingProcessorTest {
 
   private final Pipe<Integer> inputPipe = new Pipe<>(10);
   private final Pipe<List<Integer>> outputPipe = new Pipe<>(10);
-  private final BatchingStage<Integer> stage = new BatchingStage<>(3);
+  private final BatchingProcessor<Integer> stage = new BatchingProcessor<>(3);
 
   @Test
   public void shouldCreateBatches() {

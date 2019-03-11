@@ -13,41 +13,29 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
-import java.util.function.Function;
-
+import com.google.common.collect.Iterators;
 import org.junit.Test;
 
-public class ProcessStageTest {
+public class IteratorSourceStageTest {
 
-  private final Pipe<String> input = new Pipe<>(10);
   private final Pipe<String> output = new Pipe<>(10);
 
-  @SuppressWarnings("unchecked")
-  private final Function<String, String> processor = mock(Function.class);
-
-  private final ProcessStage<String, String> stage = new ProcessStage<>(processor);
+  private final IteratorSourceStage<String> stage =
+      new IteratorSourceStage<>(Iterators.forArray("a", "b", "c", "d"), output);
 
   @Test
-  public void shouldApplyFunctionToItems() {
-    when(processor.apply("A")).thenReturn("a");
-    input.put("A");
-
-    stage.processNextInput(input, output);
-
+  public void shouldOutputEntriesThenClosePipe() {
+    stage.run();
+    assertThat(output.isOpen()).isFalse();
     assertThat(output.hasMore()).isTrue();
     assertThat(output.get()).isEqualTo("a");
-    verify(processor).apply("A");
-  }
-
-  @Test
-  public void shouldSkipProcessingWhenInputIsClosed() {
-    input.close();
-    stage.processNextInput(input, output);
-    verifyZeroInteractions(processor);
+    assertThat(output.hasMore()).isTrue();
+    assertThat(output.get()).isEqualTo("b");
+    assertThat(output.hasMore()).isTrue();
+    assertThat(output.get()).isEqualTo("c");
+    assertThat(output.hasMore()).isTrue();
+    assertThat(output.get()).isEqualTo("d");
+    assertThat(output.hasMore()).isFalse();
   }
 }
