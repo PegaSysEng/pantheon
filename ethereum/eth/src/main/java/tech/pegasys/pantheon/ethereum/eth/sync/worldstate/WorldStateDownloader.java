@@ -212,14 +212,18 @@ public class WorldStateDownloader {
                   });
       fetchDataPipelineFuture.exceptionally(
           error -> {
-            LOG.error("Pipeline failed", error);
+            if (!(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+              LOG.error("Pipeline failed", error);
+            }
             completionPipeline.abort();
             return null;
           });
 
       completionPipelineFuture.exceptionally(
           error -> {
-            LOG.error("Pipeline failed", error);
+            if (!(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+              LOG.error("Pipeline failed", error);
+            }
             fetchDataPipeline.abort();
             return null;
           });
