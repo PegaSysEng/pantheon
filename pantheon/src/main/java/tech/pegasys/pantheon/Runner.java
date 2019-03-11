@@ -25,9 +25,6 @@ import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
@@ -38,8 +35,6 @@ public class Runner implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Vertx vertx;
-
-  private final ExecutorService exec = Executors.newCachedThreadPool();
 
   private final NetworkRunner networkRunner;
   private final Optional<JsonRpcHttpService> jsonRpc;
@@ -98,20 +93,15 @@ public class Runner implements AutoCloseable {
     networkRunner.stop();
     networkRunner.awaitStop();
 
-    exec.shutdown();
     try {
       jsonRpc.ifPresent(service -> service.stop().join());
       websocketRpc.ifPresent(service -> service.stop().join());
       metrics.ifPresent(service -> service.stop().join());
     } finally {
       try {
-        exec.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        vertx.close();
       } finally {
-        try {
-          vertx.close();
-        } finally {
-          pantheonController.close();
-        }
+        pantheonController.close();
       }
     }
   }
