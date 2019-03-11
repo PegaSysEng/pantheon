@@ -41,7 +41,6 @@ import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class PipelineBuilderTest {
@@ -254,7 +253,6 @@ public class PipelineBuilderTest {
   }
 
   @Test
-  @Ignore
   public void shouldAbortPipelineWhenProcessorThrowsException() {
     final RuntimeException expectedError = new RuntimeException("Oops");
     final Pipeline pipeline =
