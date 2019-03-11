@@ -30,7 +30,7 @@ extra:
 
 # Repository
 repo_name: PegaSysEng/pantheon
-repo_url: https://github.com/PegaSysEng/pantheon
+repo_url: https://github.com/PegaSysEng/pantheon/
 
 theme:
     name: material
