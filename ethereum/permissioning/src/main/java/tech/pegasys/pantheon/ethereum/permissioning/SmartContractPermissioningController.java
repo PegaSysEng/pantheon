@@ -89,7 +89,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
 
     return result
         .map(r -> checkTransactionResult(r.getOutput()))
-        .orElseThrow(() -> new IllegalStateException("the hell")); // .orElse(false);
+        .orElse(false);
   }
 
   // Checks the returned bytes from the permissioning contract call to see if it's a value we
