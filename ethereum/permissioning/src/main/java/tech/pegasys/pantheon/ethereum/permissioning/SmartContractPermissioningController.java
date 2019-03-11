@@ -27,6 +27,11 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.Optional;
 
+/**
+ * Controller that can read from a smart contract that exposes the permissioning calls
+ * connectionAllowedIpv4(bytes32,bytes32,bytes4,uint16,bytes32,bytes32,bytes4,uint16)
+ * connectionAllowedIpv6(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)
+ */
 public class SmartContractPermissioningController implements NodePermissioningProvider {
   private final Address contractAddress;
   private final TransactionSimulator transactionSimulator;
