@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-public interface PipelineSource<T> {
+interface ProducingStage<T> {
   InputPipe<T> getPipe();
 
   void abort();

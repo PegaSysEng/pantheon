@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.Iterator;
 
-class StreamSourceStage<T> implements PipelineSource<T>, Runnable {
+class StreamSourceStage<T> implements ProducingStage<T>, Runnable {
   private final Iterator<T> source;
   private final Pipe<T> pipe;
 

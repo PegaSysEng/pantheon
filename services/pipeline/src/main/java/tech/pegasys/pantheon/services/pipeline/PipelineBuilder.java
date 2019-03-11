@@ -37,20 +37,20 @@ import java.util.stream.Stream;
  */
 public class PipelineBuilder<T> {
 
-  private final PipelineSource<?> pipelineSource;
+  private final ProducingStage<?> producingStage;
   private final Collection<Runnable> stages;
   private final Collection<Pipe<?>> pipes;
   private final InputPipe<T> pipeEnd;
   private final int bufferSize;
 
   public PipelineBuilder(
-      final PipelineSource<?> pipelineSource,
+      final ProducingStage<?> producingStage,
       final Collection<Runnable> stages,
       final Collection<Pipe<?>> pipes,
       final InputPipe<T> pipeEnd,
       final int bufferSize) {
     checkArgument(!pipes.isEmpty(), "Must have at least one pipe in a pipeline");
-    this.pipelineSource = pipelineSource;
+    this.producingStage = producingStage;
     this.stages = stages;
     this.pipes = pipes;
     this.pipeEnd = pipeEnd;
@@ -85,7 +85,7 @@ public class PipelineBuilder<T> {
    */
   public static <T> PipelineBuilder<T> createPipelineFrom(final Pipe<T> pipe) {
     return new PipelineBuilder<>(
-        new ExternalPipelineSource<>(pipe), emptyList(), singleton(pipe), pipe, pipe.getCapacity());
+        new ExternalProducingStage<>(pipe), emptyList(), singleton(pipe), pipe, pipe.getCapacity());
   }
 
   /**
@@ -123,7 +123,7 @@ public class PipelineBuilder<T> {
       newStages.add(processStage);
     }
     return new PipelineBuilder<>(
-        pipelineSource, newStages, concat(pipes, newPipeEnd), newPipeEnd, bufferSize);
+        producingStage, newStages, concat(pipes, newPipeEnd), newPipeEnd, bufferSize);
   }
 
   /**
@@ -188,7 +188,7 @@ public class PipelineBuilder<T> {
    * @return the constructed pipeline ready to execute.
    */
   public Pipeline andFinishWith(final Consumer<T> completer) {
-    return new Pipeline(pipelineSource, stages, pipes, new CompleterStage<>(pipeEnd, completer));
+    return new Pipeline(producingStage, stages, pipes, new CompleterStage<>(pipeEnd, completer));
   }
 
   private <O> PipelineBuilder<O> addStage(final SingleStepStage<T, O> singleStepStage) {
@@ -205,7 +205,7 @@ public class PipelineBuilder<T> {
   private <O> PipelineBuilder<O> addStage(final Runnable stage, final Pipe<O> outputPipe) {
     final List<Runnable> newStages = concat(stages, stage);
     return new PipelineBuilder<>(
-        pipelineSource, newStages, concat(pipes, outputPipe), outputPipe, bufferSize);
+        producingStage, newStages, concat(pipes, outputPipe), outputPipe, bufferSize);
   }
 
   private <X> List<X> concat(final Collection<X> existing, final X newItem) {

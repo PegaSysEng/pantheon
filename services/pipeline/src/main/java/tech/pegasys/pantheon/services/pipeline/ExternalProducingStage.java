@@ -12,11 +12,11 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-class ExternalPipelineSource<T> implements PipelineSource<T> {
+class ExternalProducingStage<T> implements ProducingStage<T> {
 
   private final Pipe<T> pipe;
 
-  public ExternalPipelineSource(final Pipe<T> pipe) {
+  public ExternalProducingStage(final Pipe<T> pipe) {
     this.pipe = pipe;
   }
 

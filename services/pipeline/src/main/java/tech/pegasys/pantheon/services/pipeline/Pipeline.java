@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Pipeline {
   private static final Logger LOG = LogManager.getLogger();
-  private final PipelineSource<?> pipelineSource;
+  private final ProducingStage<?> producingStage;
   private final Collection<Runnable> stages;
   private final Collection<Pipe<?>> pipes;
   private final CompleterStage<?> completerStage;
@@ -37,11 +37,11 @@ public class Pipeline {
   private volatile List<Future<?>> futures;
 
   public Pipeline(
-      final PipelineSource<?> pipelineSource,
+      final ProducingStage<?> producingStage,
       final Collection<Runnable> stages,
       final Collection<Pipe<?>> pipes,
       final CompleterStage<?> completerStage) {
-    this.pipelineSource = pipelineSource;
+    this.producingStage = producingStage;
     this.stages = stages;
     this.pipes = pipes;
     this.completerStage = completerStage;
@@ -106,7 +106,7 @@ public class Pipeline {
 
   private void abort(final Throwable error) {
     synchronized (overallFuture) {
-      pipelineSource.abort();
+      producingStage.abort();
       pipes.forEach(Pipe::abort);
       futures.forEach(future -> future.cancel(true));
       overallFuture.completeExceptionally(error);
