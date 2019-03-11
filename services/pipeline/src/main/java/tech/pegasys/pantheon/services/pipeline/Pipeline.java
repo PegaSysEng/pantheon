@@ -37,10 +37,11 @@ public class Pipeline {
   /**
    * Flags that the pipeline is being completed so that when we abort we can close the streams
    * without the completion stage then marking the future successful before we finish the abort
-   * process and mark it as exceptionally completed. We can't just use synchronized because it
-   * winds up being the same thread coming in via a callback so already has the lock.
+   * process and mark it as exceptionally completed. We can't just use synchronized because it winds
+   * up being the same thread coming in via a callback so already has the lock.
    */
   private final AtomicBoolean completing = new AtomicBoolean(false);
+
   private final CompletableFuture<?> overallFuture = new CompletableFuture<>();
   private volatile List<Future<?>> futures;
 
