@@ -18,7 +18,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.permissioning.node.provider.LocalConfigNodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 

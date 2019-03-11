@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -31,7 +32,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NodeLocalConfigPermissioningController {
+public class NodeLocalConfigPermissioningController implements NodePermissioningProvider {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -291,5 +292,10 @@ public class NodeLocalConfigPermissioningController {
     public Optional<String> message() {
       return message;
     }
+  }
+
+  @Override
+  public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
+    return isPermitted(sourceEnode) && isPermitted(destinationEnode);
   }
 }
