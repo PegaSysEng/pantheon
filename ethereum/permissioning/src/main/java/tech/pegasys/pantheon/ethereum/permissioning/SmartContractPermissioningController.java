@@ -31,29 +31,53 @@ public class SmartContractPermissioningController implements NodePermissioningPr
   private final Address contractAddress;
   private final TransactionSimulator transactionSimulator;
 
+  // full function signature for ipv4 call
   private static final String IPV4_FUNCTION_SIGNATURE =
       "connectionAllowedIpv4(bytes32,bytes32,bytes4,uint16,bytes32,bytes32,bytes4,uint16)";
+  // hashed function signature for ipv4 call
   private static final BytesValue IPV4_FUNCTION_SIGNATURE_HASH =
       hashSignature(IPV4_FUNCTION_SIGNATURE);
+  // full function signature for ipv6 call
   private static final String IPV6_FUNCTION_SIGNATURE =
       "connectionAllowedIpv6(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)";
+  // hashed function signature for ipv6 call
   private static final BytesValue IPV6_FUNCTION_SIGNATURE_HASH =
       hashSignature(IPV6_FUNCTION_SIGNATURE);
 
+  // The first 4 bytes of the hash of the full textual signature of the function is used in
+  // contract calls to determine the function being called
   private static BytesValue hashSignature(final String signature) {
     return Hash.keccak256(BytesValue.of(signature.getBytes())).slice(0, 4);
   }
 
+  // True from a contract is 1 filled to 32 bytes
+  private static final BytesValue TRUE_RESPONSE;
+
+  static {
+    final byte[] trueValue = new byte[32];
+    trueValue[31] = (byte) (0xFF & 1L);
+    TRUE_RESPONSE = BytesValue.wrap(trueValue);
+  }
+
+  /**
+   * Creates a permissioning controller attached to a blockchain
+   *
+   * @param contractAddress The address at which the permissioning smart contract resides
+   * @param transactionSimulator A transaction simulator with attached blockchain and world state
+   */
   public SmartContractPermissioningController(
       final Address contractAddress, final TransactionSimulator transactionSimulator) {
     this.contractAddress = contractAddress;
     this.transactionSimulator = transactionSimulator;
   }
 
-  public boolean isPermitted(final String sourceEnodeURL, final String destinationEnodeUrl) {
-    return isPermitted(new EnodeURL(sourceEnodeURL), new EnodeURL(destinationEnodeUrl));
-  }
-
+  /**
+   * Check whether a given connection from the source to destination enode should be permitted
+   *
+   * @param sourceEnode The enode url of the node initiating the connection
+   * @param destinationEnode The enode url of the node receiving the connection
+   * @return boolean of whether or not to permit the connection to occur
+   */
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     final BytesValue payload = createPayload(sourceEnode, destinationEnode);
@@ -68,23 +92,30 @@ public class SmartContractPermissioningController implements NodePermissioningPr
         .orElseThrow(() -> new IllegalStateException("the hell")); // .orElse(false);
   }
 
+  // Checks the returned bytes from the permissioning contract call to see if it's a value we
+  // understand
   private Boolean checkTransactionResult(BytesValue result) {
+    // booleans are padded to 32 bytes
     if (result.size() != 32) {
       throw new IllegalArgumentException("Unexpected result size");
     }
-    byte[] trueValue = new byte[32];
-    trueValue[31] = (byte) (0xFF & 1L);
+
+    // 0 is false
     if (result.isZero()) {
       return false;
-    } else if (result.compareTo(BytesValue.wrap(trueValue)) == 0) {
+      // 1 filled to 32 bytes is true
+    } else if (result.compareTo(TRUE_RESPONSE) == 0) {
       return true;
+      // Anything else is wrong
     } else {
       throw new IllegalStateException("Unexpected result form");
     }
   }
 
+  // Assemble the bytevalue payload to call the contract
   private BytesValue createPayload(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     final BytesValue signature;
+    // Grab the right function signature based on the enodes provided
     if (sourceEnode.getInetAddress() instanceof Inet4Address
         && destinationEnode.getInetAddress() instanceof Inet4Address) {
       signature = IPV4_FUNCTION_SIGNATURE_HASH;
@@ -92,6 +123,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
         && destinationEnode.getInetAddress() instanceof Inet6Address) {
       signature = IPV6_FUNCTION_SIGNATURE_HASH;
     } else {
+      // If we got mixed mode enodes then it's wrong
       throw new IllegalArgumentException(
           "No payload possible for checking an ipv4 to ipv6 connection");
     }
@@ -100,23 +132,23 @@ public class SmartContractPermissioningController implements NodePermissioningPr
   }
 
   private BytesValue encodeEnodeUrl(final EnodeURL enode) {
-    final BytesValue id =
-        encodeEnodeId(enode.getNodeId());
-    final BytesValue ip =
-        encodeIp(enode.getInetAddress());
-    final BytesValue port =
-        encodePort(enode.getListeningPort());
     return BytesValues.concatenate(
-        id, ip, port);
+        encodeEnodeId(enode.getNodeId()),
+        encodeIp(enode.getInetAddress()),
+        encodePort(enode.getListeningPort()));
   }
 
+  // As a function parameter an ip needs to be the appropriate number of bytes, big endian, and
+  // filled to 32 bytes
   private BytesValue encodeIp(final InetAddress addr) {
+    // InetAddress deals with giving us the right number of bytes
     final byte[] address = addr.getAddress();
     final byte[] res = new byte[32];
     System.arraycopy(address, 0, res, 0, address.length);
     return BytesValue.wrap(res);
   }
 
+  // The port, a uint16, needs to be 2 bytes, little endian, and filled to 32 bytes
   private BytesValue encodePort(final Integer port) {
     final byte[] res = new byte[32];
     res[31] = (byte) ((port) & 0xFF);
@@ -124,6 +156,8 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     return BytesValue.wrap(res);
   }
 
+  // The enode high and low need to be 32 bytes each. They then get concatenated as they are
+  // adjacent parameters
   private BytesValue encodeEnodeId(String id) {
     return BytesValue.fromHexString(id);
   }
