@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
@@ -52,7 +54,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
   // The first 4 bytes of the hash of the full textual signature of the function is used in
   // contract calls to determine the function being called
   private static BytesValue hashSignature(final String signature) {
-    return Hash.keccak256(BytesValue.of(signature.getBytes())).slice(0, 4);
+    return Hash.keccak256(BytesValue.of(signature.getBytes(UTF_8))).slice(0, 4);
   }
 
   // True from a contract is 1 filled to 32 bytes
