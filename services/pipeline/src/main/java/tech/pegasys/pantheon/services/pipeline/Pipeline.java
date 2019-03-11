@@ -67,7 +67,7 @@ public class Pipeline {
         .getFuture()
         .whenComplete(
             (result, error) -> {
-              synchronized (this) {
+              synchronized (overallFuture) {
                 if (error != null) {
                   overallFuture.completeExceptionally(error);
                 } else {
@@ -105,7 +105,7 @@ public class Pipeline {
   }
 
   private void abort(final Throwable error) {
-    synchronized (this) {
+    synchronized (overallFuture) {
       pipelineSource.abort();
       pipes.forEach(Pipe::abort);
       futures.forEach(future -> future.cancel(true));
