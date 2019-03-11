@@ -12,10 +12,14 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
+import tech.pegasys.pantheon.services.pipeline.Pipeline;
 import tech.pegasys.pantheon.services.queue.TaskQueue;
 import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.ExceptionUtils;
@@ -23,6 +27,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
@@ -51,7 +56,7 @@ class WorldDownloadState {
   private volatile int requestsSinceLastProgress = 0;
   private boolean waitingForNewPeer = false;
   private BytesValue rootNodeData;
-  private EthTask<?> persistenceTask;
+  private List<Pipeline> pipelines = emptyList();
 
   public WorldDownloadState(
       final TaskQueue<NodeDataRequest> pendingRequests,
@@ -85,9 +90,6 @@ class WorldDownloadState {
         LOG.info("World state download failed. ", error);
       }
     }
-    if (persistenceTask != null) {
-      persistenceTask.cancel();
-    }
     for (final EthTask<?> outstandingRequest : outstandingRequests) {
       outstandingRequest.cancel();
     }
@@ -98,6 +100,7 @@ class WorldDownloadState {
     } else {
       downloadFuture.complete(result);
     }
+    pipelines.forEach(Pipeline::abort);
   }
 
   public boolean downloadWasResumed() {
@@ -130,10 +133,6 @@ class WorldDownloadState {
     outstandingRequests.remove(task);
   }
 
-  public int getOutstandingRequestCount() {
-    return outstandingRequests.size();
-  }
-
   private synchronized boolean shouldRequestNodeData() {
     return !internalFuture.isDone()
         && outstandingRequests.size() < maxOutstandingRequests
@@ -145,10 +144,6 @@ class WorldDownloadState {
     return downloadFuture;
   }
 
-  public synchronized void setPersistenceTask(final EthTask<?> persistenceTask) {
-    this.persistenceTask = persistenceTask;
-  }
-
   public synchronized void enqueueRequest(final NodeDataRequest request) {
     if (!internalFuture.isDone()) {
       pendingRequests.enqueue(request);
@@ -158,7 +153,7 @@ class WorldDownloadState {
 
   public synchronized void enqueueRequests(final Collection<NodeDataRequest> requests) {
     if (!internalFuture.isDone()) {
-      pendingRequests.enqueue(requests);
+      requests.forEach(pendingRequests::enqueue);
       notifyAll();
     }
   }
@@ -181,28 +176,6 @@ class WorldDownloadState {
 
   public synchronized void setRootNodeData(final BytesValue rootNodeData) {
     this.rootNodeData = rootNodeData;
-  }
-
-  public ArrayBlockingQueue<Task<NodeDataRequest>> getRequestsToPersist() {
-    return requestsToPersist;
-  }
-
-  public void addToPersistenceQueue(final Task<NodeDataRequest> task) {
-    while (!internalFuture.isDone()) {
-      try {
-        if (requestsToPersist.offer(task, 1, TimeUnit.SECONDS)) {
-          break;
-        }
-      } catch (final InterruptedException e) {
-        task.markFailed();
-        Thread.currentThread().interrupt();
-        break;
-      }
-    }
-  }
-
-  public int getPersistenceQueueSize() {
-    return requestsToPersist.size();
   }
 
   public synchronized void requestComplete(final boolean madeProgress) {
@@ -250,5 +223,9 @@ class WorldDownloadState {
 
   public synchronized boolean isDownloading() {
     return !internalFuture.isDone();
+  }
+
+  public void registerPipelines(final Pipeline... pipelines) {
+    this.pipelines = asList(pipelines);
   }
 }

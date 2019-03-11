@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -65,7 +65,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -421,7 +420,6 @@ public class WorldStateDownloaderTest {
 
     verify(queue, times(1)).clear();
     verify(queue, never()).dequeue();
-    verify(queue, never()).enqueue(any(Collection.class));
     verify(queue, never()).enqueue(any(NodeDataRequest.class));
     // Target world state should not be available
     assertThat(localStorage.isWorldStateAvailable(header.getStateRoot())).isFalse();
@@ -738,11 +736,10 @@ public class WorldStateDownloaderTest {
     assertThat(requestedHashes).containsAll(queuedHashes);
 
     // Check that already enqueued requests were not enqueued more than once
-//    for (Bytes32 bytes32 : queuedHashes) {
-//      final Hash hash = Hash.wrap(bytes32);
-//      verify(queue, times(1)).enqueue(argThat((r) -> r.getHash().equals(hash)));
-//    }
-    fail("Need to update this test");
+    for (Bytes32 bytes32 : queuedHashes) {
+      final Hash hash = Hash.wrap(bytes32);
+      verify(queue, times(1)).enqueue(argThat((r) -> r.getHash().equals(hash)));
+    }
 
     // Check that all expected account data was downloaded
     assertThat(result).isDone();
@@ -1000,7 +997,7 @@ public class WorldStateDownloaderTest {
   }
 
   private void giveOtherThreadsAGo() {
-    LockSupport.parkNanos(2000);
+    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(2));
   }
 
   @FunctionalInterface

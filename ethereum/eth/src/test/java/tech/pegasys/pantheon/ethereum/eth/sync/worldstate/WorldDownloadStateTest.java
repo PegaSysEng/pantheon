@@ -106,12 +106,10 @@ public class WorldDownloadStateTest {
   @Test
   @SuppressWarnings("unchecked")
   public void shouldCancelOutstandingTasksWhenFutureIsCancelled() {
-    final EthTask<?> persistenceTask = mock(EthTask.class);
     final EthTask<?> outstandingTask1 = mock(EthTask.class);
     final EthTask<?> outstandingTask2 = mock(EthTask.class);
     final Task<NodeDataRequest> toPersist1 = mock(Task.class);
     final Task<NodeDataRequest> toPersist2 = mock(Task.class);
-    downloadState.setPersistenceTask(persistenceTask);
     downloadState.addOutstandingTask(outstandingTask1);
     downloadState.addOutstandingTask(outstandingTask2);
 
@@ -122,7 +120,6 @@ public class WorldDownloadStateTest {
 
     future.cancel(true);
 
-    verify(persistenceTask).cancel();
     verify(outstandingTask1).cancel();
     verify(outstandingTask2).cancel();
 
