@@ -92,14 +92,12 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     final Optional<TransactionSimulatorResult> result =
         transactionSimulator.processAtHead(callParams);
 
-    return result
-        .map(r -> checkTransactionResult(r.getOutput()))
-        .orElse(false);
+    return result.map(r -> checkTransactionResult(r.getOutput())).orElse(false);
   }
 
   // Checks the returned bytes from the permissioning contract call to see if it's a value we
   // understand
-  private Boolean checkTransactionResult(BytesValue result) {
+  private Boolean checkTransactionResult(final BytesValue result) {
     // booleans are padded to 32 bytes
     if (result.size() != 32) {
       throw new IllegalArgumentException("Unexpected result size");
@@ -163,7 +161,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
 
   // The enode high and low need to be 32 bytes each. They then get concatenated as they are
   // adjacent parameters
-  private BytesValue encodeEnodeId(String id) {
+  private BytesValue encodeEnodeId(final String id) {
     return BytesValue.fromHexString(id);
   }
 }
