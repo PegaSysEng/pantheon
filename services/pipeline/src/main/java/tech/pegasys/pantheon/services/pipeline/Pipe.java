@@ -23,6 +23,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Forms the connection between two pipeline stages. A pipe is essentially a blocking queue with the
+ * added ability to signal when no further input is available because the pipe has been closed or
+ * the pipeline aborted.
+ *
+ * <p>In most cases a Pipe is used through one of two narrower interfaces it supports {@link
+ * InputPipe} and {@link OutputPipe}. These are designed to expose only the operations relevant to
+ * objects either reading from or publishing to the pipe respectively.
+ *
+ * @param <T> the type of item that flows through the pipe.
+ */
 public class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
   private static final Logger LOG = LogManager.getLogger();
   private final BlockingQueue<T> queue;
@@ -40,6 +51,11 @@ public class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
     return !closed.get() && !aborted.get();
   }
 
+  /**
+   * Get the number of items that can be queued inside this pipe.
+   *
+   * @return the pipe's capacity.
+   */
   public int getCapacity() {
     return capacity;
   }

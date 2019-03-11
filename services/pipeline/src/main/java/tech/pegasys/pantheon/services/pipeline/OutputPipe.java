@@ -17,14 +17,37 @@ package tech.pegasys.pantheon.services.pipeline;
  *
  * @param <T> the type of output.
  */
-interface OutputPipe<T> {
+public interface OutputPipe<T> {
+
+  /**
+   * Determine if this pipe is still open and accepting output.
+   *
+   * @return true if and only if the pipe is open.
+   */
   boolean isOpen();
 
+  /**
+   * Adds a new item to the pipe. This method will block until capacity is available in the pipe.
+   * The item will be discarded if the pipe is closed befoer capacity becomes available.
+   *
+   * @param value the value to add to the pipe.
+   */
   void put(T value);
 
+  /**
+   * Determine if this pipe has capacity to accept another item.
+   *
+   * @return true if the pipe has capacity to accept one more item.
+   */
   boolean hasRemainingCapacity();
 
+  /**
+   * Close this output pipe indicating that no further data will be published to it. When reading
+   * from the other end of this pipe {@link InputPipe#hasMore()} will continue to return true until
+   * all the already queued data has been drained.
+   */
   void close();
 
+  /** Abort this pipe. The pipe is closed and any queued data is discarded. */
   void abort();
 }
