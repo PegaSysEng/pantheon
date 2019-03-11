@@ -31,6 +31,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -267,6 +268,8 @@ public class PipelineBuilderTest {
     final CompletableFuture<?> result = pipeline.start(executorService);
 
     assertThatThrownBy(() -> result.get(10, SECONDS))
+        .isInstanceOf(ExecutionException.class)
+        .hasRootCauseExactlyInstanceOf(RuntimeException.class)
         .extracting(Throwable::getCause)
         .isSameAs(expectedError);
   }

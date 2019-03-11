@@ -33,6 +33,14 @@ public class Pipeline {
   private final Collection<Pipe<?>> pipes;
   private final CompleterStage<?> completerStage;
   private final AtomicBoolean started = new AtomicBoolean(false);
+
+  /**
+   * Flags that the pipeline is being completed so that when we abort we can close the streams
+   * without the completion stage then marking the future successful before we finish the abort
+   * process and mark it as exceptionally completed. We can't just use synchronized because it
+   * winds up being the same thread coming in via a callback so already has the lock.
+   */
+  private final AtomicBoolean completing = new AtomicBoolean(false);
   private final CompletableFuture<?> overallFuture = new CompletableFuture<>();
   private volatile List<Future<?>> futures;
 
@@ -55,7 +63,7 @@ public class Pipeline {
    * @return a future that will be completed when the pipeline completes. If the pipeline fails or
    *     is aborted the returned future will be completed exceptionally.
    */
-  public CompletableFuture<?> start(final ExecutorService executorService) {
+  public synchronized CompletableFuture<?> start(final ExecutorService executorService) {
     if (!started.compareAndSet(false, true)) {
       return overallFuture;
     }
@@ -67,7 +75,7 @@ public class Pipeline {
         .getFuture()
         .whenComplete(
             (result, error) -> {
-              synchronized (overallFuture) {
+              if (completing.compareAndSet(false, true)) {
                 if (error != null) {
                   overallFuture.completeExceptionally(error);
                 } else {
@@ -99,13 +107,20 @@ public class Pipeline {
             task.run();
           } catch (final Throwable t) {
             LOG.debug("Unhandled exception in pipeline. Aborting.", t);
-            abort(t);
+            try {
+              abort(t);
+            } catch (final Throwable t2) {
+              // Seems excessive but exceptions that propagate out of this method won't be logged
+              // because the executor just completes the future exceptionally and we never
+              // need to call get on it which would normally expose the error.
+              LOG.error("Failed to abort pipeline after error", t2);
+            }
           }
         });
   }
 
-  private void abort(final Throwable error) {
-    synchronized (overallFuture) {
+  private synchronized void abort(final Throwable error) {
+    if (completing.compareAndSet(false, true)) {
       producingStage.abort();
       pipes.forEach(Pipe::abort);
       futures.forEach(future -> future.cancel(true));
