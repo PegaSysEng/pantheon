@@ -219,7 +219,6 @@ public class PipelineBuilderTest {
   }
 
   @Test
-  @Ignore
   public void shouldAbortPipeline() throws Exception {
     final int allowProcessingUpTo = 5;
     final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
