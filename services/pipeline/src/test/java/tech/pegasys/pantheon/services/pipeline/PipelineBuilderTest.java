@@ -132,7 +132,6 @@ public class PipelineBuilderTest {
   }
 
   @Test
-  @Ignore
   public void shouldLimitInFlightProcessesWhenProcessingAsync() throws Exception {
     final List<String> output = new ArrayList<>();
     final List<CompletableFuture<String>> futures = new CopyOnWriteArrayList<>();
@@ -170,7 +169,6 @@ public class PipelineBuilderTest {
   }
 
   @Test
-  @Ignore
   public void shouldFlatMapItems() throws Exception {
     final List<Integer> output = new ArrayList<>();
     final Pipeline pipeline =
@@ -187,7 +185,6 @@ public class PipelineBuilderTest {
   }
 
   @Test
-  @Ignore
   public void shouldProcessInParallel() throws Exception {
     final List<String> output = synchronizedList(new ArrayList<>());
     final CountDownLatch latch = new CountDownLatch(1);
