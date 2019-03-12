@@ -18,17 +18,17 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.PendingTransactionsResult;
 
-public class TxPoolPendingTransactions implements JsonRpcMethod {
+public class TxPoolTransactions implements JsonRpcMethod {
 
   private final PendingTransactions pendingTransactions;
 
-  public TxPoolPendingTransactions(final PendingTransactions pendingTransactions) {
+  public TxPoolTransactions(final PendingTransactions pendingTransactions) {
     this.pendingTransactions = pendingTransactions;
   }
 
   @Override
   public String getName() {
-    return "pantheon_txpool_pendingTransactions";
+    return "pantheon_txpool_transactions";
   }
 
   @Override

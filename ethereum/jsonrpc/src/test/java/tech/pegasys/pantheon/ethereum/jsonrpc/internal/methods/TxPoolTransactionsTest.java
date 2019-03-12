@@ -35,30 +35,30 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TxPoolPendingTransactionsTest {
+public class TxPoolTransactionsTest {
 
   @Mock private PendingTransactions pendingTransactions;
-  private TxPoolPendingTransactions method;
+  private TxPoolTransactions method;
   private final String JSON_RPC_VERSION = "2.0";
-  private final String TXPOOL_PENDING_TRANSACTIONS_METHOD = "pantheon_txpool_pendingTransactions";
+  private final String TXPOOL_TRANSACTIONS_METHOD = "pantheon_txpool_transactions";
   private static final String TRANSACTION_HASH =
       "0xbac263fb39f2a51053fb5e1e52aeb4e980fba9e151aa7e4f12eca95a697aeac9";
 
   @Before
   public void setUp() {
-    method = new TxPoolPendingTransactions(pendingTransactions);
+    method = new TxPoolTransactions(pendingTransactions);
   }
 
   @Test
   public void returnsCorrectMethodName() {
-    assertThat(method.getName()).isEqualTo(TXPOOL_PENDING_TRANSACTIONS_METHOD);
+    assertThat(method.getName()).isEqualTo(TXPOOL_TRANSACTIONS_METHOD);
   }
 
   @Test
   public void shouldReturnPendingTransactions() {
     Instant addedAt = Instant.ofEpochMilli(10_000_000);
     final JsonRpcRequest request =
-        new JsonRpcRequest(JSON_RPC_VERSION, TXPOOL_PENDING_TRANSACTIONS_METHOD, new Object[] {});
+        new JsonRpcRequest(JSON_RPC_VERSION, TXPOOL_TRANSACTIONS_METHOD, new Object[] {});
 
     TransactionInfo transactionInfo = mock(TransactionInfo.class);
     when(transactionInfo.getHash()).thenReturn(Hash.fromHexString(TRANSACTION_HASH));
