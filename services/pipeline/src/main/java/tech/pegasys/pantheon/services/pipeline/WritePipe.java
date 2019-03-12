@@ -13,11 +13,11 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 /**
- * The end of the pipe that stages write their output to.
+ * The interface used to add items to a pipe.
  *
  * @param <T> the type of output.
  */
-public interface OutputPipe<T> {
+public interface WritePipe<T> {
 
   /**
    * Determine if this pipe is still open and accepting output.
@@ -42,8 +42,8 @@ public interface OutputPipe<T> {
   boolean hasRemainingCapacity();
 
   /**
-   * Close this output pipe indicating that no further data will be published to it. When reading
-   * from the other end of this pipe {@link InputPipe#hasMore()} will continue to return true until
+   * Close this write pipe indicating that no further data will be published to it. When reading
+   * from the other end of this pipe {@link ReadPipe#hasMore()} will continue to return true until
    * all the already queued data has been drained.
    */
   void close();

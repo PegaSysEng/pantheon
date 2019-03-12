@@ -31,12 +31,12 @@ import org.apache.logging.log4j.Logger;
  * the pipeline aborted.
  *
  * <p>In most cases a Pipe is used through one of two narrower interfaces it supports {@link
- * InputPipe} and {@link OutputPipe}. These are designed to expose only the operations relevant to
+ * ReadPipe} and {@link WritePipe}. These are designed to expose only the operations relevant to
  * objects either reading from or publishing to the pipe respectively.
  *
  * @param <T> the type of item that flows through the pipe.
  */
-public class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
+public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
   private static final Logger LOG = LogManager.getLogger();
   private final BlockingQueue<T> queue;
   private final int capacity;

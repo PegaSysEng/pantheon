@@ -14,14 +14,12 @@ package tech.pegasys.pantheon.services.pipeline;
 
 class ProcessingStage<I, O> implements Runnable {
 
-  private final InputPipe<I> inputPipe;
-  private final OutputPipe<O> outputPipe;
+  private final ReadPipe<I> inputPipe;
+  private final WritePipe<O> outputPipe;
   private final Processor<I, O> processor;
 
   public ProcessingStage(
-      final InputPipe<I> inputPipe,
-      final OutputPipe<O> outputPipe,
-      final Processor<I, O> processor) {
+      final ReadPipe<I> inputPipe, final WritePipe<O> outputPipe, final Processor<I, O> processor) {
     this.inputPipe = inputPipe;
     this.outputPipe = outputPipe;
     this.processor = processor;

@@ -43,7 +43,7 @@ public class PipelineBuilder<T> {
   private final Pipe<?> inputPipe;
   private final Collection<Runnable> stages;
   private final Collection<Pipe<?>> pipes;
-  private final InputPipe<T> pipeEnd;
+  private final ReadPipe<T> pipeEnd;
   private final int bufferSize;
   private final LabelledMetric<Counter> outputCounter;
 
@@ -51,7 +51,7 @@ public class PipelineBuilder<T> {
       final Pipe<?> inputPipe,
       final Collection<Runnable> stages,
       final Collection<Pipe<?>> pipes,
-      final InputPipe<T> pipeEnd,
+      final ReadPipe<T> pipeEnd,
       final int bufferSize,
       final LabelledMetric<Counter> outputCounter) {
     this.outputCounter = outputCounter;
@@ -133,7 +133,7 @@ public class PipelineBuilder<T> {
   public <O> PipelineBuilder<O> thenProcessInParallel(
       final String stageName, final Function<T, O> processor, final int numberOfThreads) {
     final Pipe<O> newPipeEnd = new Pipe<>(bufferSize, outputCounter.labels(stageName));
-    final OutputPipe<O> outputPipe = new SharedOutputPipe<>(newPipeEnd, numberOfThreads);
+    final WritePipe<O> outputPipe = new SharedWritePipe<>(newPipeEnd, numberOfThreads);
     final ArrayList<Runnable> newStages = new ArrayList<>(stages);
     for (int i = 0; i < numberOfThreads; i++) {
       final Runnable processStage =

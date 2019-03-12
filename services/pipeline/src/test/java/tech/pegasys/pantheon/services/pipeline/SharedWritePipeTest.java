@@ -18,14 +18,14 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.junit.Test;
 
-public class SharedOutputPipeTest {
+public class SharedWritePipeTest {
 
   private static final int CLOSES_REQUIRED = 3;
 
   @SuppressWarnings("unchecked")
-  private final OutputPipe<String> delegate = mock(OutputPipe.class);
+  private final WritePipe<String> delegate = mock(WritePipe.class);
 
-  private final SharedOutputPipe<String> pipe = new SharedOutputPipe<>(delegate, CLOSES_REQUIRED);
+  private final SharedWritePipe<String> pipe = new SharedWritePipe<>(delegate, CLOSES_REQUIRED);
 
   @Test
   public void shouldOnlyCloseDelegatePipeWhenCloseCalledSpecifiedNumberOfTimes() {

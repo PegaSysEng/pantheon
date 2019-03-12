@@ -18,13 +18,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 class CompleterStage<T> implements Runnable {
-  private final InputPipe<T> input;
+  private final ReadPipe<T> input;
   private final Consumer<T> completer;
   private final Counter outputCounter;
   private final CompletableFuture<?> future = new CompletableFuture<>();
 
   CompleterStage(
-      final InputPipe<T> input, final Consumer<T> completer, final Counter outputCounter) {
+      final ReadPipe<T> input, final Consumer<T> completer, final Counter outputCounter) {
     this.input = input;
     this.completer = completer;
     this.outputCounter = outputCounter;

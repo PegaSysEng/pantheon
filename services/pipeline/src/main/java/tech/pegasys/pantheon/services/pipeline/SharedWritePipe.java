@@ -15,24 +15,24 @@ package tech.pegasys.pantheon.services.pipeline;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A wrapper around an {@link OutputPipe} which allows multiple stages to share the same output
- * pipe. Most operations simply pass through to the underlying pipe but the underlying pipe is only
- * closed when all stages have signalled this pipe should close.
+ * A wrapper around an {@link WritePipe} which allows multiple stages to share the same write pipe.
+ * Most operations simply pass through to the underlying pipe but the underlying pipe is only closed
+ * when all stages have signalled this pipe should close.
  *
  * @param <T> the type of item in the pipe.
  */
-class SharedOutputPipe<T> implements OutputPipe<T> {
-  private final OutputPipe<T> delegate;
+class SharedWritePipe<T> implements WritePipe<T> {
+  private final WritePipe<T> delegate;
   private final AtomicInteger remainingClosesRequired;
 
   /**
-   * Creates a new SharedOutputPipe.
+   * Creates a new SharedWritePipe.
    *
    * @param delegate the pipe to wrap.
    * @param closesRequired the number of stages this output pipe will be shared with. The underlying
    *     pipe will only be closed when {@link #close()} is called this many times.
    */
-  public SharedOutputPipe(final OutputPipe<T> delegate, final int closesRequired) {
+  public SharedWritePipe(final WritePipe<T> delegate, final int closesRequired) {
     this.delegate = delegate;
     this.remainingClosesRequired = new AtomicInteger(closesRequired);
   }

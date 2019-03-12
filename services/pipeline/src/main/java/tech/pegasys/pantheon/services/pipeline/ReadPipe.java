@@ -15,32 +15,32 @@ package tech.pegasys.pantheon.services.pipeline;
 import java.util.List;
 
 /**
- * The end of the pipe that stages read input from.
+ * The interface used to read items from a pipe.
  *
  * @param <T> the type of input.
  */
-public interface InputPipe<T> {
+public interface ReadPipe<T> {
 
   /**
    * Determines if this pipe has more items to be read. The pipe is considered to have no more items
-   * when it has either been aborted with {@link OutputPipe#abort()} or if all queued items have
-   * been read and the pipe has been closed with {@link OutputPipe#close()}.
+   * when it has either been aborted with {@link WritePipe#abort()} or if all queued items have been
+   * read and the pipe has been closed with {@link WritePipe#close()}.
    *
    * @return true if there are more items to process, otherwise false.
    */
   boolean hasMore();
 
   /**
-   * Get the next item from this pipe. This method will block until the next item is available but
-   * may still return <code>null</code> if the pipe is closed or the thread interrupted while
-   * waiting.
+   * Get and remove the next item from this pipe. This method will block until the next item is
+   * available but may still return <code>null</code> if the pipe is closed or the thread
+   * interrupted while waiting.
    *
    * @return the next item or <code>null</code> if the pipe is closed or the thread interrupted.
    */
   T get();
 
   /**
-   * Get the next item from this pipe without blocking if it is available.
+   * Get and remove the next item from this pipe without blocking if it is available.
    *
    * @return the next item or <code>null</code> if the pipe is empty.
    */

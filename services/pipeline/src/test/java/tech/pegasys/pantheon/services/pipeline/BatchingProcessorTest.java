@@ -52,7 +52,7 @@ public class BatchingProcessorTest {
   @Test
   public void shouldNotOutputItemWhenInputIsClosed() {
     @SuppressWarnings("unchecked")
-    final OutputPipe<List<Integer>> outputPipe = mock(OutputPipe.class);
+    final WritePipe<List<Integer>> outputPipe = mock(WritePipe.class);
     inputPipe.close();
     stage.processNextInput(inputPipe, outputPipe);
     verifyZeroInteractions(outputPipe);
