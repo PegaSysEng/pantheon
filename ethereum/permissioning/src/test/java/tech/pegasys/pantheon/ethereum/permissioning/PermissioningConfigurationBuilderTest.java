@@ -174,8 +174,7 @@ public class PermissioningConfigurationBuilderTest {
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
     PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfiguration(
-            toml.toString(), true, true);
+        PermissioningConfigurationBuilder.permissioningConfiguration(toml.toString(), true, true);
 
     assertThat(permissioningConfiguration.getConfigurationFilePath()).isEqualTo(toml.toString());
   }
