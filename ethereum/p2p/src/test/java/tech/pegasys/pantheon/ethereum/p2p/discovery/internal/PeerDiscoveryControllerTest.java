@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -32,11 +31,6 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
-import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
@@ -48,12 +42,10 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
@@ -94,10 +86,6 @@ public class PeerDiscoveryControllerTest {
   private KeyPair localKeyPair;
   private final AtomicInteger counter = new AtomicInteger(1);
   private final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
-  private NodePermissioningController nodePermissioningController;
-  private Blockchain blockchain;
-  private ArgumentCaptor<BlockAddedObserver> observerCaptor =
-      ArgumentCaptor.forClass(BlockAddedObserver.class);
 
   @Before
   public void initializeMocks() {
@@ -105,9 +93,6 @@ public class PeerDiscoveryControllerTest {
     localKeyPair = keyPairs.get(0);
     localPeer = helper.createDiscoveryPeer(localKeyPair);
     peerTable = new PeerTable(localPeer.getId());
-    nodePermissioningController = mock(NodePermissioningController.class);
-    blockchain = mock(Blockchain.class);
-    when(blockchain.observeBlockAdded(observerCaptor.capture())).thenReturn(1L);
   }
 
   @After
@@ -180,11 +165,11 @@ public class PeerDiscoveryControllerTest {
   private void mockPacketCreation(
       final PacketType type, final Optional<DiscoveryPeer> peer, final Packet mockPacket) {
     doAnswer(
-            invocation -> {
-              final Consumer<Packet> handler = invocation.getArgument(2);
-              handler.accept(mockPacket);
-              return null;
-            })
+        invocation -> {
+          final Consumer<Packet> handler = invocation.getArgument(2);
+          handler.accept(mockPacket);
+          return null;
+        })
         .when(controller)
         .createPacket(eq(type), peer.isPresent() ? matchPingDataForPeer(peer.get()) : any(), any());
   }
@@ -303,8 +288,8 @@ public class PeerDiscoveryControllerTest {
     controller.start();
 
     assertThat(
-            controller.getPeers().stream()
-                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+        controller.getPeers().stream()
+            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
     // Simulate PONG messages from all peers
@@ -329,11 +314,11 @@ public class PeerDiscoveryControllerTest {
     }
 
     assertThat(
-            controller.getPeers().stream()
-                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+        controller.getPeers().stream()
+            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(0);
     assertThat(
-            controller.getPeers().stream().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDED))
+        controller.getPeers().stream().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDED))
         .hasSize(3);
   }
 
@@ -359,8 +344,8 @@ public class PeerDiscoveryControllerTest {
     controller.start();
 
     assertThat(
-            controller.getPeers().stream()
-                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+        controller.getPeers().stream()
+            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
     // Send a PONG packet from peer 1, with an incorrect hash.
@@ -374,8 +359,8 @@ public class PeerDiscoveryControllerTest {
         .send(eq(peers.get(1)), matchPacketOfType(PacketType.FIND_NEIGHBORS));
 
     assertThat(
-            controller.getPeers().stream()
-                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+        controller.getPeers().stream()
+            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
   }
 
@@ -1156,114 +1141,13 @@ public class PeerDiscoveryControllerTest {
 
     doReturn(EvictResult.absent()).when(peerTableSpy).tryEvict(any());
 
-    controller =
-        getControllerBuilder()
-            .peerTable(peerTableSpy)
-            .peerDroppedObservers(peerDroppedSubscribers)
-            .build();
+    controller = getControllerBuilder().peerDroppedObservers(peerDroppedSubscribers).build();
 
     controller.start();
     boolean dropped = controller.dropFromPeerTable(peer);
 
     assertThat(dropped).isFalse();
     verifyZeroInteractions(peerDroppedEventConsumer);
-  }
-
-  @Test
-  public void whenStartingControllerWithNodePermissioningShouldSubscribeToBlockAddedEvents() {
-    controller =
-        getControllerBuilder()
-            .nodePermissioningController(nodePermissioningController)
-            .blockchain(blockchain)
-            .build();
-
-    controller.start();
-
-    verify(blockchain).observeBlockAdded(any());
-  }
-
-  @Test
-  public void
-      whenStartingControllerWithNodePermissioningWithoutBlockchainShouldThrowIllegalState() {
-    controller =
-        getControllerBuilder().nodePermissioningController(nodePermissioningController).build();
-
-    final Throwable throwable = catchThrowable(() -> controller.start());
-    assertThat(throwable)
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage(
-            "PeerDiscoveryController permissioning needs to listen to BlockAddedEvents. Blockchain can't be null.");
-  }
-
-  @Test
-  public void whenStoppingControllerWithNodePermissioningShouldUnsubscribeBlockAddedEvents() {
-    controller =
-        getControllerBuilder()
-            .nodePermissioningController(nodePermissioningController)
-            .blockchain(blockchain)
-            .build();
-
-    controller.start();
-    controller.stop();
-
-    verify(blockchain).removeObserver(eq(1L));
-  }
-
-  @Test
-  public void onBlockAddedShouldCheckPermissionsForAllPeers() {
-    final BlockAddedEvent blockAddedEvent = blockAddedEvent();
-    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 5);
-
-    controller =
-        getControllerBuilder()
-            .peers(peers)
-            .nodePermissioningController(nodePermissioningController)
-            .blockchain(blockchain)
-            .build();
-    controller.start();
-
-    final BlockAddedObserver blockAddedObserver = observerCaptor.getValue();
-    blockAddedObserver.onBlockAdded(blockAddedEvent, blockchain);
-
-    // we check is permitted 2x per peer (each communication direction)
-    verify(nodePermissioningController, times(peers.size() * 2)).isPermitted(any(), any());
-  }
-
-  @Test
-  public void onBlockAddedAndPeerNotPermittedShouldDropFromPeerTable() {
-    final BlockAddedEvent blockAddedEvent = blockAddedEvent();
-    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 2);
-    final PeerTable peerTableSpy = spy(peerTable);
-    final DiscoveryPeer notPermittedPeer = peers.get(0);
-    final EnodeURL notPermittedPeerEnodeURL = new EnodeURL(notPermittedPeer.getEnodeURI());
-
-    controller =
-        getControllerBuilder()
-            .peers(peers)
-            .peerTable(peerTableSpy)
-            .nodePermissioningController(nodePermissioningController)
-            .blockchain(blockchain)
-            .build();
-    controller.start();
-
-    final BlockAddedObserver blockAddedObserver = observerCaptor.getValue();
-    blockAddedObserver.onBlockAdded(blockAddedEvent, blockchain);
-
-    when(nodePermissioningController.isPermitted(eq(notPermittedPeerEnodeURL), any()))
-        .thenReturn(false);
-
-    // we check is permitted 2x per peer (each communication direction)
-    verify(nodePermissioningController, times(peers.size() * 2)).isPermitted(any(), any());
-    // only the non permitted peer should be evicted
-    verify(peerTableSpy).tryEvict(eq(notPermittedPeer));
-  }
-
-  private BlockAddedEvent blockAddedEvent() {
-    final Block block = mock(Block.class);
-    when(block.getHash()).thenReturn(Hash.ZERO);
-    final BlockAddedEvent blockAddedEvent = mock(BlockAddedEvent.class);
-    when(blockAddedEvent.getBlock()).thenReturn(block);
-    return blockAddedEvent;
   }
 
   private static Packet mockPingPacket(final Peer from, final Peer to) {
@@ -1345,8 +1229,6 @@ public class PeerDiscoveryControllerTest {
     private static final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
     private Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers = new Subscribers<>();
     private Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers = new Subscribers<>();
-    private NodePermissioningController nodePermissioningController;
-    private Blockchain blockchain;
 
     public static ControllerBuilder create() {
       return new ControllerBuilder();
@@ -1408,16 +1290,6 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder nodePermissioningController(final NodePermissioningController controller) {
-      this.nodePermissioningController = controller;
-      return this;
-    }
-
-    ControllerBuilder blockchain(final Blockchain blockchain) {
-      this.blockchain = blockchain;
-      return this;
-    }
-
     PeerDiscoveryController build() {
       checkNotNull(keypair);
       if (localPeer == null) {
@@ -1426,7 +1298,6 @@ public class PeerDiscoveryControllerTest {
       if (peerTable == null) {
         peerTable = new PeerTable(localPeer.getId());
       }
-
       return spy(
           new PeerDiscoveryController(
               keypair,

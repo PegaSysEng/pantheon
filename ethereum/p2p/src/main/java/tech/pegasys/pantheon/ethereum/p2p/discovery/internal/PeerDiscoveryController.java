@@ -193,7 +193,6 @@ public class PeerDiscoveryController {
         bootstrapNodes.stream()
             .filter(this::whitelistIfPresentIsNodePermitted)
             .collect(Collectors.toList());
-    recursivePeerRefreshState.start(initialDiscoveryPeers, localPeer.getId());
 
     if (nodePermissioningController.isPresent()) {
       nodePermissioningController
