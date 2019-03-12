@@ -23,10 +23,12 @@ class BatchingProcessor<T> implements Processor<T, List<T>> {
   }
 
   @Override
-  public void processNextInput(final InputPipe<T> inputPipe, final OutputPipe<List<T>> outputPipe) {
+  public int processNextInput(final InputPipe<T> inputPipe, final OutputPipe<List<T>> outputPipe) {
     final List<T> batch = inputPipe.getBatch(maximumBatchSize);
     if (!batch.isEmpty()) {
       outputPipe.put(batch);
+      return 1;
     }
+    return 0;
   }
 }

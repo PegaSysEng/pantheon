@@ -13,7 +13,9 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 interface Processor<I, O> {
-  void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe);
+  int processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe);
 
-  default void finalize(final OutputPipe<O> outputPipe) {}
+  default int finalize(final OutputPipe<O> outputPipe) {
+    return 0;
+  }
 }

@@ -49,6 +49,18 @@ public class BatchingProcessorTest {
   }
 
   @Test
+  public void shouldCountABatchAsOneNotAsThenNumberOfItemsInTheBatch() {
+    for (int i = 1; i <= 8; i++) {
+      inputPipe.put(i);
+    }
+    inputPipe.close();
+
+    assertThat(stage.processNextInput(inputPipe, outputPipe)).isEqualTo(1);
+    assertThat(stage.processNextInput(inputPipe, outputPipe)).isEqualTo(1);
+    assertThat(stage.processNextInput(inputPipe, outputPipe)).isEqualTo(1);
+  }
+
+  @Test
   public void shouldNotOutputItemWhenInputIsClosed() {
     @SuppressWarnings("unchecked")
     final OutputPipe<List<Integer>> outputPipe = mock(OutputPipe.class);

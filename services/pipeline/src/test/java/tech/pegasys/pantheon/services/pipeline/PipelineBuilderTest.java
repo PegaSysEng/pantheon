@@ -21,14 +21,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.waitAtMost;
 
+import tech.pegasys.pantheon.metrics.Counter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -37,6 +41,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -68,7 +73,7 @@ public class PipelineBuilderTest {
   public void shouldPipeTasksFromSupplierToCompleter() throws Exception {
     final List<Integer> output = new ArrayList<>();
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10).andFinishWith(output::add);
+        PipelineBuilder.createPipelineFrom(tasks, 10).andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
     result.get(10, SECONDS);
     assertThat(output).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -79,8 +84,8 @@ public class PipelineBuilderTest {
     final List<String> output = new ArrayList<>();
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
-            .thenProcess(Object::toString)
-            .andFinishWith(output::add);
+            .thenProcess("toString", Object::toString)
+            .andFinishWith("end", output::add);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
     result.get(10, SECONDS);
@@ -95,7 +100,9 @@ public class PipelineBuilderTest {
     tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(input).inBatches(6).andFinishWith(output::offer);
+        PipelineBuilder.createPipelineFrom(input)
+            .inBatches("batch", 6)
+            .andFinishWith("end", output::offer);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
@@ -122,8 +129,8 @@ public class PipelineBuilderTest {
     final List<String> output = new ArrayList<>();
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
-            .thenProcessAsync(value -> completedFuture(Integer.toString(value)), 3)
-            .andFinishWith(output::add);
+            .thenProcessAsync("toString", value -> completedFuture(Integer.toString(value)), 3)
+            .andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
     result.get(10, SECONDS);
     assertThat(output)
@@ -138,13 +145,14 @@ public class PipelineBuilderTest {
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(asList(1, 2, 3, 4, 5, 6, 7).iterator(), 10)
             .thenProcessAsync(
+                "createFuture",
                 value -> {
                   final CompletableFuture<String> future = new CompletableFuture<>();
                   futures.add(future);
                   return future;
                 },
                 3)
-            .andFinishWith(output::add);
+            .andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
 
     waitForSize(futures, 3);
@@ -173,8 +181,8 @@ public class PipelineBuilderTest {
     final List<Integer> output = new ArrayList<>();
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
-            .thenFlatMap(input -> Stream.of(input, input * 2), 20)
-            .andFinishWith(output::add);
+            .thenFlatMap("flatMap", input -> Stream.of(input, input * 2), 20)
+            .andFinishWith("end", output::add);
 
     pipeline.start(executorService).get(10, SECONDS);
 
@@ -191,6 +199,7 @@ public class PipelineBuilderTest {
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
             .thenProcessInParallel(
+                "stageName",
                 value -> {
                   if (value == 2) {
                     try {
@@ -202,7 +211,7 @@ public class PipelineBuilderTest {
                   return value.toString();
                 },
                 2)
-            .andFinishWith(output::add);
+            .andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
 
     // One thread will block but the other should process the remaining entries.
@@ -227,6 +236,7 @@ public class PipelineBuilderTest {
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
             .thenProcess(
+                "stageName",
                 value -> {
                   if (value > allowProcessingUpTo) {
                     try {
@@ -238,7 +248,7 @@ public class PipelineBuilderTest {
                   }
                   return value;
                 })
-            .andFinishWith(output::add);
+            .andFinishWith("end", output::add);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
@@ -259,11 +269,12 @@ public class PipelineBuilderTest {
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(tasks, 10)
             .thenProcess(
+                "stageName",
                 (Function<Integer, Integer>)
                     value -> {
                       throw expectedError;
                     })
-            .andFinishWith(new ArrayList<Integer>()::add);
+            .andFinishWith("end", new ArrayList<Integer>()::add);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
@@ -274,7 +285,48 @@ public class PipelineBuilderTest {
         .isSameAs(expectedError);
   }
 
+  @Test
+  public void shouldTrackTaskCountMetric() throws Exception {
+    final Map<String, SimpleCounter> counters = new ConcurrentHashMap<>();
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom(tasks, 10)
+            .trackOutputCount(
+                labels -> counters.computeIfAbsent(labels[0], label -> new SimpleCounter()))
+            .thenProcess("map", Function.identity())
+            .thenProcessInParallel("parallel", Function.identity(), 3)
+            .thenProcessAsync("async", CompletableFuture::completedFuture, 3)
+            .inBatches("batch", 4)
+            .thenFlatMap("flatMap", List::stream, 10)
+            .andFinishWith("finish", new ArrayList<>()::add);
+
+    pipeline.start(executorService).get(10, SECONDS);
+
+    assertThat(counters).containsOnlyKeys("map", "parallel", "async", "batch", "flatMap", "finish");
+    assertThat(counters.get("map").count).hasValue(15);
+    assertThat(counters.get("parallel").count).hasValue(15);
+    assertThat(counters.get("async").count).hasValue(15);
+    assertThat(counters.get("flatMap").count).hasValue(15);
+    assertThat(counters.get("finish").count).hasValue(15);
+    // We don't know how many batches will be produced because it's timing dependent but it must
+    // be at least 4 to fit all the items and shouldn't be more than the items we put in.
+    assertThat(counters.get("batch").count).hasValueBetween(4, 15);
+  }
+
   private void waitForSize(final Collection<?> collection, final int targetSize) {
     waitAtMost(10, SECONDS).untilAsserted(() -> assertThat(collection).hasSize(targetSize));
+  }
+
+  private static class SimpleCounter implements Counter {
+    private final AtomicLong count = new AtomicLong(0);
+
+    @Override
+    public void inc() {
+      count.incrementAndGet();
+    }
+
+    @Override
+    public void inc(final long amount) {
+      count.addAndGet(amount);
+    }
   }
 }

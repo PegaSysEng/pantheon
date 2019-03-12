@@ -13,6 +13,11 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import tech.pegasys.pantheon.metrics.Counter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +28,9 @@ public class CompleterStageTest {
 
   private final Pipe<String> pipe = new Pipe<>(10);
   private final List<String> output = new ArrayList<>();
-  private final CompleterStage<String> stage = new CompleterStage<>(pipe, output::add);
+  private final Counter outputCounter = mock(Counter.class);
+  private final CompleterStage<String> stage =
+      new CompleterStage<>(pipe, output::add, outputCounter);
 
   @Test
   public void shouldAddItemsToOutputUntilPipeHasNoMore() {
@@ -35,5 +42,6 @@ public class CompleterStageTest {
     stage.run();
 
     assertThat(output).containsExactly("a", "b", "c");
+    verify(outputCounter, times(3)).inc();
   }
 }
