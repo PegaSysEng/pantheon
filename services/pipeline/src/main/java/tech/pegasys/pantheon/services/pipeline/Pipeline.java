@@ -47,7 +47,7 @@ public class Pipeline {
   private final CompletableFuture<Void> overallFuture = new CompletableFuture<>();
   private volatile List<Future<?>> futures;
 
-  public Pipeline(
+  Pipeline(
       final Pipe<?> inputPipe,
       final Collection<Runnable> stages,
       final Collection<Pipe<?>> pipes,
