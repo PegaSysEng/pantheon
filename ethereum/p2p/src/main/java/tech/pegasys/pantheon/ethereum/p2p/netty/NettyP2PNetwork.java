@@ -563,15 +563,14 @@ public class NettyP2PNetwork implements P2PNetwork {
     LOG.trace(
         "Checking if connection with peer {} is permitted", peerConnection.getPeer().getNodeId());
 
-    final EnodeURL localPeerEnodeURL = peerInfoToEnodeURL(ourPeerInfo,
-        (InetSocketAddress) peerConnection.getLocalAddress());
-    final EnodeURL remotePeerEnodeURL = peerInfoToEnodeURL(peerConnection.getPeer(),
-        (InetSocketAddress) peerConnection.getRemoteAddress());
+    final EnodeURL localPeerEnodeURL =
+        peerInfoToEnodeURL(ourPeerInfo, (InetSocketAddress) peerConnection.getLocalAddress());
+    final EnodeURL remotePeerEnodeURL =
+        peerInfoToEnodeURL(
+            peerConnection.getPeer(), (InetSocketAddress) peerConnection.getRemoteAddress());
 
     return nodePermissioningController
-        .map(
-            c ->
-                c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL))
+        .map(c -> c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL))
         .orElse(true);
   }
 
