@@ -692,8 +692,7 @@ public final class NettyP2PNetworkTest {
     final BlockAddedObserver blockAddedObserver = observerCaptor.getValue();
     blockAddedObserver.onBlockAdded(blockAddedEvent, blockchain);
 
-    // we check is permitted 2x per peer (each communication direction)
-    verify(nodePermissioningController, times(4)).isPermitted(any(), any());
+    verify(nodePermissioningController, times(2)).isPermitted(any(), any());
   }
 
   @Test
@@ -720,13 +719,7 @@ public final class NettyP2PNetworkTest {
         .when(nodePermissioningController.isPermitted(any(), enodeEq(notPermittedEnodeURL)))
         .thenReturn(false);
     lenient()
-        .when(nodePermissioningController.isPermitted(enodeEq(notPermittedEnodeURL), any()))
-        .thenReturn(false);
-    lenient()
         .when(nodePermissioningController.isPermitted(any(), enodeEq(permittedEnodeURL)))
-        .thenReturn(true);
-    lenient()
-        .when(nodePermissioningController.isPermitted(enodeEq(permittedEnodeURL), any()))
         .thenReturn(true);
 
     final BlockAddedObserver blockAddedObserver = observerCaptor.getValue();
