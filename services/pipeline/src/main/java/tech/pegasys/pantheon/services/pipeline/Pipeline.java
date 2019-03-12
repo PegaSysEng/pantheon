@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import static java.util.stream.Collectors.toList;
 
+import tech.pegasys.pantheon.util.ExceptionUtils;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -42,7 +44,7 @@ public class Pipeline {
    */
   private final AtomicBoolean completing = new AtomicBoolean(false);
 
-  private final CompletableFuture<?> overallFuture = new CompletableFuture<>();
+  private final CompletableFuture<Void> overallFuture = new CompletableFuture<>();
   private volatile List<Future<?>> futures;
 
   public Pipeline(
@@ -64,7 +66,7 @@ public class Pipeline {
    * @return a future that will be completed when the pipeline completes. If the pipeline fails or
    *     is aborted the returned future will be completed exceptionally.
    */
-  public synchronized CompletableFuture<?> start(final ExecutorService executorService) {
+  public synchronized CompletableFuture<Void> start(final ExecutorService executorService) {
     if (!started.compareAndSet(false, true)) {
       return overallFuture;
     }
@@ -84,6 +86,13 @@ public class Pipeline {
                 }
               }
             });
+    overallFuture.exceptionally(
+        error -> {
+          if (ExceptionUtils.rootCause(error) instanceof CancellationException) {
+            abort();
+          }
+          return null;
+        });
     return overallFuture;
   }
 

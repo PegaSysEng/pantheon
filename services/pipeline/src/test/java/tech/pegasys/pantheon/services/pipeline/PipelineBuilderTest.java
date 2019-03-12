@@ -269,6 +269,42 @@ public class PipelineBuilderTest {
   }
 
   @Test
+  public void shouldAbortPipelineWhenFutureIsCancelled() throws Exception {
+    final int allowProcessingUpTo = 5;
+    final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
+    final List<Integer> output = synchronizedList(new ArrayList<>());
+    final CountDownLatch startedProcessingValueSix = new CountDownLatch(1);
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
+            .thenProcess(
+                "stageName",
+                value -> {
+                  if (value > allowProcessingUpTo) {
+                    try {
+                      startedProcessingValueSix.countDown();
+                      Thread.sleep(TimeUnit.MINUTES.toNanos(2));
+                    } catch (final InterruptedException e) {
+                      processorInterrupted.set(true);
+                    }
+                  }
+                  return value;
+                })
+            .andFinishWith("end", output::add);
+
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    startedProcessingValueSix.await(10, SECONDS);
+    waitForSize(output, allowProcessingUpTo);
+
+    result.cancel(false);
+
+    assertThatThrownBy(() -> result.get(10, SECONDS)).isInstanceOf(CancellationException.class);
+    assertThat(output).containsExactly(1, 2, 3, 4, 5);
+
+    waitAtMost(10, SECONDS).untilAsserted(() -> assertThat(processorInterrupted).isTrue());
+  }
+
+  @Test
   public void shouldAbortPipelineWhenProcessorThrowsException() {
     final RuntimeException expectedError = new RuntimeException("Oops");
     final Pipeline pipeline =
