@@ -23,12 +23,10 @@ class MapProcessor<I, O> implements Processor<I, O> {
   }
 
   @Override
-  public int processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
+  public void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
     final I value = inputPipe.get();
     if (value != null) {
       outputPipe.put(processor.apply(value));
-      return 1;
     }
-    return 0;
   }
 }

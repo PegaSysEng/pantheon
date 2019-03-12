@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
+import tech.pegasys.pantheon.metrics.Counter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,12 +40,14 @@ public class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
   private static final Logger LOG = LogManager.getLogger();
   private final BlockingQueue<T> queue;
   private final int capacity;
+  private final Counter itemCounter;
   private final AtomicBoolean closed = new AtomicBoolean();
   private final AtomicBoolean aborted = new AtomicBoolean();
 
-  public Pipe(final int capacity) {
+  public Pipe(final int capacity, final Counter itemCounter) {
     queue = new ArrayBlockingQueue<>(capacity);
     this.capacity = capacity;
+    this.itemCounter = itemCounter;
   }
 
   @Override
@@ -120,6 +124,7 @@ public class Pipe<T> implements InputPipe<T>, OutputPipe<T> {
     while (isOpen()) {
       try {
         if (queue.offer(value, 1, TimeUnit.SECONDS)) {
+          itemCounter.inc();
           return;
         }
       } catch (final InterruptedException e) {

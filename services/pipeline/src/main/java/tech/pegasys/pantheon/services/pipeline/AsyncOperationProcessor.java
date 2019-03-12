@@ -38,7 +38,7 @@ class AsyncOperationProcessor<I, O> implements Processor<I, O> {
   }
 
   @Override
-  public int processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
+  public void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
     if (inProgress.size() < maxConcurrency) {
       final I value = inputPipe.get();
       if (value != null) {
@@ -50,25 +50,23 @@ class AsyncOperationProcessor<I, O> implements Processor<I, O> {
         inProgress.add(future);
       }
 
-      return outputCompletedTasks(0, outputPipe);
+      outputCompletedTasks(0, outputPipe);
     } else {
-      return outputNextCompletedTask(outputPipe);
+      outputNextCompletedTask(outputPipe);
     }
   }
 
   @Override
-  public int finalize(final OutputPipe<O> outputPipe) {
-    int outputCount = 0;
+  public void finalize(final OutputPipe<O> outputPipe) {
     while (!inProgress.isEmpty()) {
-      outputCount += outputNextCompletedTask(outputPipe);
+      outputNextCompletedTask(outputPipe);
     }
-    return outputCount;
   }
 
-  private int outputNextCompletedTask(final OutputPipe<O> outputPipe) {
+  private void outputNextCompletedTask(final OutputPipe<O> outputPipe) {
     try {
       waitForAnyFutureToComplete();
-      return outputCompletedTasks(1, outputPipe);
+      outputCompletedTasks(1, outputPipe);
     } catch (final InterruptedException e) {
       LOG.trace("Interrupted while waiting for processing to complete", e);
     } catch (final ExecutionException e) {
@@ -76,7 +74,6 @@ class AsyncOperationProcessor<I, O> implements Processor<I, O> {
     } catch (final TimeoutException e) {
       // Ignore and go back around the loop.
     }
-    return 0;
   }
 
   @SuppressWarnings("rawtypes")
@@ -85,7 +82,7 @@ class AsyncOperationProcessor<I, O> implements Processor<I, O> {
     CompletableFuture.anyOf(inProgress.toArray(new CompletableFuture[0])).get(1, TimeUnit.SECONDS);
   }
 
-  private int outputCompletedTasks(final int minTasksToOutput, final OutputPipe<O> outputPipe) {
+  private void outputCompletedTasks(final int minTasksToOutput, final OutputPipe<O> outputPipe) {
     int outputTasks = 0;
     for (final Iterator<CompletableFuture<O>> i = inProgress.iterator();
         i.hasNext() && (outputTasks < minTasksToOutput || outputPipe.hasRemainingCapacity()); ) {
@@ -97,6 +94,5 @@ class AsyncOperationProcessor<I, O> implements Processor<I, O> {
         outputTasks++;
       }
     }
-    return outputTasks;
   }
 }

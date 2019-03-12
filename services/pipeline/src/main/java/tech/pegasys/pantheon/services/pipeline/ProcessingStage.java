@@ -12,34 +12,27 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import tech.pegasys.pantheon.metrics.Counter;
-
 class ProcessingStage<I, O> implements Runnable {
 
   private final InputPipe<I> inputPipe;
   private final OutputPipe<O> outputPipe;
   private final Processor<I, O> processor;
-  private final Counter outputCounter;
 
   public ProcessingStage(
       final InputPipe<I> inputPipe,
       final OutputPipe<O> outputPipe,
-      final Processor<I, O> processor,
-      final Counter outputCounter) {
+      final Processor<I, O> processor) {
     this.inputPipe = inputPipe;
     this.outputPipe = outputPipe;
     this.processor = processor;
-    this.outputCounter = outputCounter;
   }
 
   @Override
   public void run() {
     while (inputPipe.hasMore()) {
-      final int outputCount = processor.processNextInput(inputPipe, outputPipe);
-      outputCounter.inc(outputCount);
+      processor.processNextInput(inputPipe, outputPipe);
     }
-    final int outputCount = processor.finalize(outputPipe);
-    outputCounter.inc(outputCount);
+    processor.finalize(outputPipe);
     outputPipe.close();
   }
 }

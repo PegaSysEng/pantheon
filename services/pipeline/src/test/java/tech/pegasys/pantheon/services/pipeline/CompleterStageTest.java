@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 
 import tech.pegasys.pantheon.metrics.Counter;
 
@@ -26,7 +27,7 @@ import org.junit.Test;
 
 public class CompleterStageTest {
 
-  private final Pipe<String> pipe = new Pipe<>(10);
+  private final Pipe<String> pipe = new Pipe<>(10, NO_OP_COUNTER);
   private final List<String> output = new ArrayList<>();
   private final Counter outputCounter = mock(Counter.class);
   private final CompleterStage<String> stage =

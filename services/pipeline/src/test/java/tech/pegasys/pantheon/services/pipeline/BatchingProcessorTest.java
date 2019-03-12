@@ -16,6 +16,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 
 import java.util.List;
 
@@ -23,8 +24,8 @@ import org.junit.Test;
 
 public class BatchingProcessorTest {
 
-  private final Pipe<Integer> inputPipe = new Pipe<>(10);
-  private final Pipe<List<Integer>> outputPipe = new Pipe<>(10);
+  private final Pipe<Integer> inputPipe = new Pipe<>(10, NO_OP_COUNTER);
+  private final Pipe<List<Integer>> outputPipe = new Pipe<>(10, NO_OP_COUNTER);
   private final BatchingProcessor<Integer> stage = new BatchingProcessor<>(3);
 
   @Test
@@ -46,18 +47,6 @@ public class BatchingProcessorTest {
     stage.processNextInput(inputPipe, outputPipe);
     assertThat(outputPipe.poll()).isEqualTo(asList(7, 8));
     assertThat(outputPipe.poll()).isNull();
-  }
-
-  @Test
-  public void shouldCountABatchAsOneNotAsThenNumberOfItemsInTheBatch() {
-    for (int i = 1; i <= 8; i++) {
-      inputPipe.put(i);
-    }
-    inputPipe.close();
-
-    assertThat(stage.processNextInput(inputPipe, outputPipe)).isEqualTo(1);
-    assertThat(stage.processNextInput(inputPipe, outputPipe)).isEqualTo(1);
-    assertThat(stage.processNextInput(inputPipe, outputPipe)).isEqualTo(1);
   }
 
   @Test

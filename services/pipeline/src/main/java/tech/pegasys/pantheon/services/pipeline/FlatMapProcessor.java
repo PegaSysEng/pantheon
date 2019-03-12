@@ -25,16 +25,13 @@ class FlatMapProcessor<I, O> implements Processor<I, O> {
   }
 
   @Override
-  public int processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
-    int outputCount = 0;
+  public void processNextInput(final InputPipe<I> inputPipe, final OutputPipe<O> outputPipe) {
     final I value = inputPipe.get();
     if (value != null) {
       final Iterator<O> outputs = mapper.apply(value).iterator();
       while (outputs.hasNext()) {
         outputPipe.put(outputs.next());
-        outputCount++;
       }
     }
-    return outputCount;
   }
 }

@@ -13,13 +13,14 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 
 import com.google.common.collect.Iterators;
 import org.junit.Test;
 
 public class IteratorSourceStageTest {
 
-  private final Pipe<String> output = new Pipe<>(10);
+  private final Pipe<String> output = new Pipe<>(10, NO_OP_COUNTER);
 
   private final IteratorSourceStage<String> stage =
       new IteratorSourceStage<>(Iterators.forArray("a", "b", "c", "d"), output);

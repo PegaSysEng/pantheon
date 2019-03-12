@@ -20,8 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.waitAtMost;
+import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
+import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_COUNTER;
 
 import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,7 +76,8 @@ public class PipelineBuilderTest {
   public void shouldPipeTasksFromSupplierToCompleter() throws Exception {
     final List<Integer> output = new ArrayList<>();
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10).andFinishWith("end", output::add);
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
+            .andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
     result.get(10, SECONDS);
     assertThat(output).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -83,7 +87,7 @@ public class PipelineBuilderTest {
   public void shouldPassInputThroughIntermediateStage() throws Exception {
     final List<String> output = new ArrayList<>();
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10)
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess("toString", Object::toString)
             .andFinishWith("end", output::add);
 
@@ -96,11 +100,11 @@ public class PipelineBuilderTest {
 
   @Test
   public void shouldCombineIntoBatches() throws Exception {
-    final Pipe<Integer> input = new Pipe<>(20);
+    final Pipe<Integer> input = new Pipe<>(20, NO_OP_COUNTER);
     tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(input)
+        PipelineBuilder.createPipelineFrom(input, NO_OP_LABELLED_COUNTER)
             .inBatches("batch", 6)
             .andFinishWith("end", output::offer);
 
@@ -128,7 +132,7 @@ public class PipelineBuilderTest {
   public void shouldProcessAsync() throws Exception {
     final List<String> output = new ArrayList<>();
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10)
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcessAsync("toString", value -> completedFuture(Integer.toString(value)), 3)
             .andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
@@ -143,7 +147,8 @@ public class PipelineBuilderTest {
     final List<String> output = new ArrayList<>();
     final List<CompletableFuture<String>> futures = new CopyOnWriteArrayList<>();
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(asList(1, 2, 3, 4, 5, 6, 7).iterator(), 10)
+        PipelineBuilder.createPipelineFrom(
+                "input", asList(1, 2, 3, 4, 5, 6, 7).iterator(), 10, NO_OP_LABELLED_COUNTER)
             .thenProcessAsync(
                 "createFuture",
                 value -> {
@@ -180,7 +185,7 @@ public class PipelineBuilderTest {
   public void shouldFlatMapItems() throws Exception {
     final List<Integer> output = new ArrayList<>();
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10)
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenFlatMap("flatMap", input -> Stream.of(input, input * 2), 20)
             .andFinishWith("end", output::add);
 
@@ -197,7 +202,7 @@ public class PipelineBuilderTest {
     final List<String> output = synchronizedList(new ArrayList<>());
     final CountDownLatch latch = new CountDownLatch(1);
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10)
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcessInParallel(
                 "stageName",
                 value -> {
@@ -234,7 +239,7 @@ public class PipelineBuilderTest {
     final List<Integer> output = synchronizedList(new ArrayList<>());
     final CountDownLatch startedProcessingValueSix = new CountDownLatch(1);
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10)
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
                 value -> {
@@ -267,7 +272,7 @@ public class PipelineBuilderTest {
   public void shouldAbortPipelineWhenProcessorThrowsException() {
     final RuntimeException expectedError = new RuntimeException("Oops");
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10)
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
                 (Function<Integer, Integer>)
@@ -288,10 +293,10 @@ public class PipelineBuilderTest {
   @Test
   public void shouldTrackTaskCountMetric() throws Exception {
     final Map<String, SimpleCounter> counters = new ConcurrentHashMap<>();
+    final LabelledMetric<Counter> labelledCounter =
+        labels -> counters.computeIfAbsent(labels[0], label -> new SimpleCounter());
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(tasks, 10)
-            .trackOutputCount(
-                labels -> counters.computeIfAbsent(labels[0], label -> new SimpleCounter()))
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, labelledCounter)
             .thenProcess("map", Function.identity())
             .thenProcessInParallel("parallel", Function.identity(), 3)
             .thenProcessAsync("async", CompletableFuture::completedFuture, 3)
@@ -301,7 +306,9 @@ public class PipelineBuilderTest {
 
     pipeline.start(executorService).get(10, SECONDS);
 
-    assertThat(counters).containsOnlyKeys("map", "parallel", "async", "batch", "flatMap", "finish");
+    assertThat(counters)
+        .containsOnlyKeys("input", "map", "parallel", "async", "batch", "flatMap", "finish");
+    assertThat(counters.get("input").count).hasValue(15);
     assertThat(counters.get("map").count).hasValue(15);
     assertThat(counters.get("parallel").count).hasValue(15);
     assertThat(counters.get("async").count).hasValue(15);

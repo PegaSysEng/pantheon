@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 
 import java.util.function.Function;
 
@@ -24,8 +25,8 @@ import org.junit.Test;
 
 public class MapProcessorTest {
 
-  private final Pipe<String> input = new Pipe<>(10);
-  private final Pipe<String> output = new Pipe<>(10);
+  private final Pipe<String> input = new Pipe<>(10, NO_OP_COUNTER);
+  private final Pipe<String> output = new Pipe<>(10, NO_OP_COUNTER);
 
   @SuppressWarnings("unchecked")
   private final Function<String, String> processor = mock(Function.class);

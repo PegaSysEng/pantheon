@@ -13,11 +13,17 @@
 package tech.pegasys.pantheon.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import tech.pegasys.pantheon.metrics.Counter;
 
 import org.junit.Test;
 
 public class PipeTest {
-  private final Pipe<String> pipe = new Pipe<>(5);
+  private final Counter itemCounter = mock(Counter.class);
+  private final Pipe<String> pipe = new Pipe<>(5, itemCounter);
 
   @Test
   public void shouldNotHaveMoreWhenEmptyAndClosed() {
@@ -65,5 +71,13 @@ public class PipeTest {
   public void shouldNotBeOpenAfterAbort() {
     pipe.abort();
     assertThat(pipe.isOpen()).isFalse();
+  }
+
+  @Test
+  public void shouldIncrementCounterWhenItemAddedToPipe() {
+    pipe.put("A");
+    verify(itemCounter).inc();
+    pipe.put("B");
+    verify(itemCounter, times(2)).inc();
   }
 }

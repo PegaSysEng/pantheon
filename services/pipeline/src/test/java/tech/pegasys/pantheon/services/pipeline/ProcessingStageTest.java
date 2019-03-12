@@ -14,12 +14,10 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-
-import tech.pegasys.pantheon.metrics.Counter;
+import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 
 import java.util.Locale;
 
@@ -32,15 +30,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessingStageTest {
 
-  private final Pipe<String> inputPipe = new Pipe<>(10);
-  private final Pipe<String> outputPipe = new Pipe<>(10);
+  private final Pipe<String> inputPipe = new Pipe<>(10, NO_OP_COUNTER);
+  private final Pipe<String> outputPipe = new Pipe<>(10, NO_OP_COUNTER);
   @Mock private Processor<String, String> singleStep;
-  private final Counter outputCounter = mock(Counter.class);
   private ProcessingStage<String, String> stage;
 
   @Before
   public void setUp() {
-    stage = new ProcessingStage<>(inputPipe, outputPipe, singleStep, outputCounter);
+    stage = new ProcessingStage<>(inputPipe, outputPipe, singleStep);
     doAnswer(
             invocation -> {
               outputPipe.put(inputPipe.get().toLowerCase(Locale.UK));
@@ -65,7 +62,6 @@ public class ProcessingStageTest {
     assertThat(outputPipe.poll()).isNull();
 
     verify(singleStep, times(3)).processNextInput(inputPipe, outputPipe);
-    verify(outputCounter, times(3)).inc(1);
   }
 
   @Test
