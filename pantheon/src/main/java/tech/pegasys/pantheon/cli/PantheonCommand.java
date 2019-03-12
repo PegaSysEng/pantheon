@@ -27,6 +27,7 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.crea
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
+import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
@@ -138,6 +139,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final PantheonControllerBuilder controllerBuilder;
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
+
+  protected KeyLoader getKeyLoader() {
+    return KeyPairUtil::loadKeyPair;
+  }
 
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
@@ -522,7 +527,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.addSubcommand(
         BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
     commandLine.addSubcommand(
-        PublicKeySubCommand.COMMAND_NAME, new PublicKeySubCommand(resultHandler.out()));
+        PublicKeySubCommand.COMMAND_NAME,
+        new PublicKeySubCommand(resultHandler.out(), getKeyLoader()));
     commandLine.addSubcommand(
         PasswordSubCommand.COMMAND_NAME, new PasswordSubCommand(resultHandler.out()));
     commandLine.addSubcommand(
@@ -634,7 +640,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .synchronizerConfiguration(buildSyncConfig())
           .homePath(dataDir())
           .ethNetworkConfig(updateNetworkConfig(getNetwork()))
-          .syncWithOttoman(false) // ottoman feature is still there but it's now removed from CLI
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(NetworkName.DEV.equals(getNetwork()))
@@ -848,7 +853,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .build();
 
     addShutdownHook(runner);
-    runner.execute();
+    runner.start();
+    runner.awaitStop();
   }
 
   private void addShutdownHook(final Runner runner) {
@@ -978,7 +984,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private File nodePrivateKeyFile() {
+  File nodePrivateKeyFile() {
     File nodePrivateKeyFile = null;
     if (isFullInstantiation()) {
       nodePrivateKeyFile = standaloneCommands.nodePrivateKeyFile;

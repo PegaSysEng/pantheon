@@ -28,13 +28,13 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Clock;
 
 public class PantheonControllerBuilder {
 
   private SynchronizerConfiguration synchronizerConfiguration;
   private Path homePath;
   private EthNetworkConfig ethNetworkConfig;
-  private boolean syncWithOttoman;
   private MiningParameters miningParameters;
   private boolean devMode;
   private File nodePrivateKeyFile;
@@ -54,11 +54,6 @@ public class PantheonControllerBuilder {
 
   public PantheonControllerBuilder ethNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
     this.ethNetworkConfig = ethNetworkConfig;
-    return this;
-  }
-
-  public PantheonControllerBuilder syncWithOttoman(final boolean syncWithOttoman) {
-    this.syncWithOttoman = syncWithOttoman;
     return this;
   }
 
@@ -102,17 +97,17 @@ public class PantheonControllerBuilder {
       final String genesisConfig = ethNetworkConfig.getGenesisConfig();
       genesisConfigFile = GenesisConfigFile.fromConfig(genesisConfig);
     }
-
+    Clock clock = Clock.systemUTC();
     return PantheonController.fromConfig(
         genesisConfigFile,
         synchronizerConfiguration,
         storageProvider,
-        syncWithOttoman,
         ethNetworkConfig.getNetworkId(),
         miningParameters,
         nodeKeys,
         metricsSystem,
         privacyParameters,
-        homePath);
+        homePath,
+        clock);
   }
 }

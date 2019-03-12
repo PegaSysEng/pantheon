@@ -3,6 +3,18 @@ description: How to use Pantheon JSON-RPC API
 
 # Using the JSON-RPC API
 
+## Postman
+
+Use the button to import our collection of examples to [Postman](https://www.getpostman.com/). 
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/c765d7d22b055c42a510)
+
+## Endpoint Host and Port
+
+The placeholder
+`<JSON-RPC-http-endpoint:port>` and `<JSON-RPC-ws-endpoint:port>` represents an endpoint (IP address and port) 
+of the JSON-RPC service of a Pantheon node for HTTP and WebSocket requests.
+
 To enable JSON-RPC over HTTP or WebSockets, use the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) 
 and [`--rpc-ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled) options.
 
@@ -20,12 +32,6 @@ options to specify the port on which the JSON-RPC listens. The default ports are
 
 * 8545 for HTTP
 * 8546 for WebSockets
-
-## Postman
-
-Use the button to import our collection of examples to [Postman](https://www.getpostman.com/). 
-
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/cffe1bc034b3ab139fa7)
 
 ## Geth Console 
 
