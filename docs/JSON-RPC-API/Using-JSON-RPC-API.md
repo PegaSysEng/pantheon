@@ -29,6 +29,9 @@ Use the button to import our collection of examples to [Postman](https://www.get
 
 ## Geth Console 
 
+The geth console is a REPL (Read, Evaluate, & Print Loop) Javascript console. Use JSON-RPC APIs supported by geth and 
+Pantheon directly in the console.  
+
 To use the geth console with Pantheon: 
 
 1. Start Pantheon with the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option. 
