@@ -66,7 +66,7 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
 
   @Override
   public boolean hasRemainingCapacity() {
-    return queue.remainingCapacity() > 0;
+    return queue.remainingCapacity() > 0 && isOpen();
   }
 
   @Override
