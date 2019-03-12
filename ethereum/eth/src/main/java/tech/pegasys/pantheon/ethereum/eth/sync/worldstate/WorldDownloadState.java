@@ -12,14 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
-import tech.pegasys.pantheon.services.pipeline.Pipeline;
 import tech.pegasys.pantheon.services.queue.TaskQueue;
 import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.ExceptionUtils;
@@ -27,9 +23,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +38,6 @@ class WorldDownloadState {
 
   private final boolean downloadWasResumed;
   private final TaskQueue<NodeDataRequest> pendingRequests;
-  private final ArrayBlockingQueue<Task<NodeDataRequest>> requestsToPersist;
   private final int maxOutstandingRequests;
   private final int maxRequestsWithoutProgress;
   private final Set<EthTask<?>> outstandingRequests =
@@ -56,16 +49,14 @@ class WorldDownloadState {
   private volatile int requestsSinceLastProgress = 0;
   private boolean waitingForNewPeer = false;
   private BytesValue rootNodeData;
-  private List<Pipeline> pipelines = emptyList();
+  private WorldStateDownloadProcess worldStateDownloadProcess;
 
   public WorldDownloadState(
       final TaskQueue<NodeDataRequest> pendingRequests,
-      final ArrayBlockingQueue<Task<NodeDataRequest>> requestsToPersist,
       final int maxOutstandingRequests,
       final int maxRequestsWithoutProgress) {
     this.downloadWasResumed = !pendingRequests.isEmpty();
     this.pendingRequests = pendingRequests;
-    this.requestsToPersist = requestsToPersist;
     this.maxOutstandingRequests = maxOutstandingRequests;
     this.maxRequestsWithoutProgress = maxRequestsWithoutProgress;
     this.internalFuture = new CompletableFuture<>();
@@ -94,13 +85,15 @@ class WorldDownloadState {
       outstandingRequest.cancel();
     }
     pendingRequests.clear();
-    requestsToPersist.clear();
+
     if (error != null) {
+      if (worldStateDownloadProcess != null) {
+        worldStateDownloadProcess.abort();
+      }
       downloadFuture.completeExceptionally(error);
     } else {
       downloadFuture.complete(result);
     }
-    pipelines.forEach(Pipeline::abort);
   }
 
   public boolean downloadWasResumed() {
@@ -225,7 +218,8 @@ class WorldDownloadState {
     return !internalFuture.isDone();
   }
 
-  public void registerPipelines(final Pipeline... pipelines) {
-    this.pipelines = asList(pipelines);
+  public synchronized void setWorldStateDownloadProcess(
+      final WorldStateDownloadProcess worldStateDownloadProcess) {
+    this.worldStateDownloadProcess = worldStateDownloadProcess;
   }
 }

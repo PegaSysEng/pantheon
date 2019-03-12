@@ -1,0 +1,240 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static tech.pegasys.pantheon.services.pipeline.PipelineBuilder.createPipelineFrom;
+
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.services.pipeline.Pipe;
+import tech.pegasys.pantheon.services.pipeline.Pipeline;
+import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
+import tech.pegasys.pantheon.util.ExceptionUtils;
+
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * Establishes the pipelines required for downloading world state. This involves:
+ *
+ * <pre>
+ *                                ---------------------------
+ *                                | Load from Pending Queue |
+ *                                ---------------------------
+ *                                             |
+ *                                             |
+ *                                ---------------------------
+ *                                |  Is Available Locally?  |
+ *                                ---------------------------
+ *                             Yes             |             No
+ *                    ---------------------------------------------------
+ *                    |                                                 |
+ *                    |                                                 |
+ *                    |                                         ------------------
+ *                    |                                         | Create Batches |
+ *                    |                                         ------------------
+ *                    |                                                 |
+ *                    |                                                 |
+ *                    |                                       ------------------------
+ *                    |                                       |  Request From Peers  |
+ *                    |                                       ------------------------
+ *                    |                                                 |
+ *                    |                                                 |
+ *                    |                                         ------------------
+ *                    |                                         |  Persist Data  |
+ *                    |                                         ------------------
+ *                    |                                                 |
+ *                    |                                                 |
+ *                    ---------------------------------------------------
+ *                                            |
+ *                                            |
+ *                                   --------------------
+ *                                   | Enqueue Children |
+ *                                   --------------------
+ *                                            |
+ *                                            |
+ *                                   --------------------
+ *                                   |   Mark Complete  |
+ *                                   --------------------
+ * </pre>
+ */
+public class WorldStateDownloadProcess {
+  private static final Logger LOG = LogManager.getLogger();
+  private final Pipeline fetchDataPipeline;
+  private final Pipeline completionPipeline;
+
+  private WorldStateDownloadProcess(
+      final Pipeline fetchDataPipeline, final Pipeline completionPipeline) {
+    this.fetchDataPipeline = fetchDataPipeline;
+    this.completionPipeline = completionPipeline;
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public CompletableFuture<Void> start(final EthScheduler ethScheduler) {
+    final CompletableFuture<Void> fetchDataFuture = ethScheduler.startPipeline(fetchDataPipeline);
+    final CompletableFuture<Void> completionFuture = ethScheduler.startPipeline(completionPipeline);
+
+    fetchDataFuture.exceptionally(
+        error -> {
+          if (!(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+            LOG.error("Pipeline failed", error);
+          }
+          completionPipeline.abort();
+          return null;
+        });
+
+    completionFuture.exceptionally(
+        error -> {
+          if (!(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+            LOG.error("Pipeline failed", error);
+          }
+          fetchDataPipeline.abort();
+          return null;
+        });
+    return completionFuture;
+  }
+
+  public void abort() {
+    fetchDataPipeline.abort();
+    completionPipeline.abort();
+  }
+
+  public static class Builder {
+
+    private int hashCountPerRequest;
+    private int maxOutstandingRequests;
+    private LoadLocalDataStep loadLocalDataStep;
+    private WorldDownloadState downloadState;
+    private MetricsSystem metricsSystem;
+    private RequestDataStep requestDataStep;
+    private BlockHeader pivotBlockHeader;
+    private PersistDataStep persistDataStep;
+    private EnqueueChildrenStep enqueueChildrenStep;
+    private CompleteTaskStep completeTaskStep;
+
+    public Builder hashCountPerRequest(final int hashCountPerRequest) {
+      this.hashCountPerRequest = hashCountPerRequest;
+      return this;
+    }
+
+    public Builder maxOutstandingRequests(final int maxOutstandingRequests) {
+      this.maxOutstandingRequests = maxOutstandingRequests;
+      return this;
+    }
+
+    public Builder loadLocalDataStep(final LoadLocalDataStep loadLocalDataStep) {
+      this.loadLocalDataStep = loadLocalDataStep;
+      return this;
+    }
+
+    public Builder requestDataStep(final RequestDataStep requestDataStep) {
+      this.requestDataStep = requestDataStep;
+      return this;
+    }
+
+    public Builder persistDataStep(final PersistDataStep persistDataStep) {
+      this.persistDataStep = persistDataStep;
+      return this;
+    }
+
+    public Builder enqueueChildrenStep(final EnqueueChildrenStep enqueueChildrenStep) {
+      this.enqueueChildrenStep = enqueueChildrenStep;
+      return this;
+    }
+
+    public Builder completeTaskStep(final CompleteTaskStep completeTaskStep) {
+      this.completeTaskStep = completeTaskStep;
+      return this;
+    }
+
+    public Builder downloadState(final WorldDownloadState downloadState) {
+      this.downloadState = downloadState;
+      return this;
+    }
+
+    public Builder pivotBlockHeader(final BlockHeader pivotBlockHeader) {
+      this.pivotBlockHeader = pivotBlockHeader;
+      return this;
+    }
+
+    public Builder metricsSystem(final MetricsSystem metricsSystem) {
+      this.metricsSystem = metricsSystem;
+      return this;
+    }
+
+    public WorldStateDownloadProcess build() {
+      checkNotNull(loadLocalDataStep);
+      checkNotNull(requestDataStep);
+      checkNotNull(persistDataStep);
+      checkNotNull(enqueueChildrenStep);
+      checkNotNull(completeTaskStep);
+      checkNotNull(downloadState);
+      checkNotNull(pivotBlockHeader);
+      checkNotNull(metricsSystem);
+
+      // Room for the requests we expect to do in parallel plus some buffer but not unlimited.
+      final int bufferCapacity = hashCountPerRequest * 2;
+      final LabelledMetric<Counter> outputCounter =
+          metricsSystem.createLabelledCounter(
+              MetricCategory.SYNCHRONIZER,
+              "world_state_pipeline_processed_total",
+              "Number of entries processed by each world state download pipeline stage",
+              "step");
+
+      final Pipe<Task<NodeDataRequest>> requestsToComplete =
+          new Pipe<>(bufferCapacity, outputCounter.labels("dataAvailable"));
+      final Pipeline fetchDataPipeline =
+          createPipelineFrom(
+                  "dequeued", new TaskQueueIterator(downloadState), bufferCapacity, outputCounter)
+              .thenFlatMap(
+                  "loadLocalData",
+                  task -> loadLocalDataStep.loadLocalData(task, requestsToComplete),
+                  bufferCapacity)
+              .inBatches("batch", hashCountPerRequest)
+              .thenProcessAsync(
+                  "downloadData",
+                  requestTasks ->
+                      requestDataStep.requestData(requestTasks, pivotBlockHeader, downloadState),
+                  maxOutstandingRequests)
+              .thenProcess(
+                  "persistData",
+                  tasks -> persistDataStep.persist(tasks, pivotBlockHeader, downloadState))
+              .andFinishWith("dataDownloaded", tasks -> tasks.forEach(requestsToComplete::put));
+
+      final Pipeline completionPipeline =
+          createPipelineFrom(requestsToComplete, outputCounter)
+              .thenProcess(
+                  "enqueueChildren",
+                  task ->
+                      enqueueChildrenStep.enqueueChildren(task, pivotBlockHeader, downloadState))
+              .andFinishWith(
+                  "completeTask",
+                  task ->
+                      completeTaskStep.markAsCompleteOrFailed(
+                          pivotBlockHeader, downloadState, task));
+
+      return new WorldStateDownloadProcess(fetchDataPipeline, completionPipeline);
+    }
+  }
+}

@@ -29,11 +29,9 @@ import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldState
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.queue.InMemoryTaskQueue;
-import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Arrays;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.Before;
@@ -52,15 +50,12 @@ public class WorldDownloadStateTest {
   private final BlockHeader header =
       new BlockHeaderTestFixture().stateRoot(ROOT_NODE_HASH).buildHeader();
   private final InMemoryTaskQueue<NodeDataRequest> pendingRequests = new InMemoryTaskQueue<>();
-  private final ArrayBlockingQueue<Task<NodeDataRequest>> requestsToPersist =
-      new ArrayBlockingQueue<>(100);
+  private final WorldStateDownloadProcess worldStateDownloadProcess =
+      mock(WorldStateDownloadProcess.class);
 
   private final WorldDownloadState downloadState =
       new WorldDownloadState(
-          pendingRequests,
-          requestsToPersist,
-          MAX_OUTSTANDING_REQUESTS,
-          MAX_REQUESTS_WITHOUT_PROGRESS);
+          pendingRequests, MAX_OUTSTANDING_REQUESTS, MAX_REQUESTS_WITHOUT_PROGRESS);
 
   private final CompletableFuture<Void> future = downloadState.getDownloadFuture();
 
@@ -104,19 +99,15 @@ public class WorldDownloadStateTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void shouldCancelOutstandingTasksWhenFutureIsCancelled() {
     final EthTask<?> outstandingTask1 = mock(EthTask.class);
     final EthTask<?> outstandingTask2 = mock(EthTask.class);
-    final Task<NodeDataRequest> toPersist1 = mock(Task.class);
-    final Task<NodeDataRequest> toPersist2 = mock(Task.class);
     downloadState.addOutstandingTask(outstandingTask1);
     downloadState.addOutstandingTask(outstandingTask2);
 
     pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
     pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY));
-    requestsToPersist.add(toPersist1);
-    requestsToPersist.add(toPersist2);
+    downloadState.setWorldStateDownloadProcess(worldStateDownloadProcess);
 
     future.cancel(true);
 
@@ -124,7 +115,7 @@ public class WorldDownloadStateTest {
     verify(outstandingTask2).cancel();
 
     assertThat(pendingRequests.isEmpty()).isTrue();
-    assertThat(requestsToPersist).isEmpty();
+    verify(worldStateDownloadProcess).abort();
     assertThat(downloadState.isDownloading()).isFalse();
   }
 

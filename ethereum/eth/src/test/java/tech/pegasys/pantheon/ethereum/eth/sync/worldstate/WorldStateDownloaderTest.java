@@ -695,10 +695,10 @@ public class WorldStateDownloaderTest {
       queue.enqueue(new AccountTrieNodeDataRequest(Hash.wrap(bytes32)));
     }
     // Sanity check
-//    for (Bytes32 bytes32 : queuedHashes) {
-//      final Hash hash = Hash.wrap(bytes32);
-//      verify(queue, times(1)).enqueue(argThat((r) -> r.getHash().equals(hash)));
-//    }
+    //    for (Bytes32 bytes32 : queuedHashes) {
+    //      final Hash hash = Hash.wrap(bytes32);
+    //      verify(queue, times(1)).enqueue(argThat((r) -> r.getHash().equals(hash)));
+    //    }
 
     final WorldStateStorage localStorage =
         new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
