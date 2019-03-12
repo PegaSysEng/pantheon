@@ -25,7 +25,7 @@ public class NodePermissioningController {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider;
-  NodePermissioningProvider[] providers;
+  private NodePermissioningProvider[] providers;
 
   public NodePermissioningController(
       final SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider,

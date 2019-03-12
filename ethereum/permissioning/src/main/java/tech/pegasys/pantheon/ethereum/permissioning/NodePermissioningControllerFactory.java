@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
@@ -26,26 +25,24 @@ import java.util.Collection;
 public class NodePermissioningControllerFactory {
 
   public NodePermissioningController create(
-      final PermissioningConfiguration config,
+      final PermissioningConfiguration localConfigPermissioningConfiguration,
       final Synchronizer synchronizer,
       final Collection<EnodeURL> bootnodes,
-      final Address contractAddress,
+      final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration,
       final TransactionSimulator transactionSimulator) {
     final SyncStatusNodePermissioningProvider syncStatusProvider =
         new SyncStatusNodePermissioningProvider(synchronizer, bootnodes);
     NodePermissioningProvider[] providers = {};
-    int i = 0;
-    if (config.isNodeWhitelistEnabled()) {
+    if (localConfigPermissioningConfiguration.isNodeWhitelistEnabled()) {
       NodeLocalConfigPermissioningController localProvider =
-          new NodeLocalConfigPermissioningController(config, new ArrayList<>(bootnodes));
-      providers[i] = localProvider;
-      i++;
+          new NodeLocalConfigPermissioningController(localConfigPermissioningConfiguration, new ArrayList<>(bootnodes));
+      providers[providers.length] = localProvider;
     }
-    // TODO if smart contract permissioning enabled
-    if (true) {
+
+    if (smartContractPermissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
       SmartContractPermissioningController smartContractProvider =
-          new SmartContractPermissioningController(contractAddress, transactionSimulator);
-      providers[i] = smartContractProvider;
+          new SmartContractPermissioningController(smartContractPermissioningConfiguration.getSmartContractAddress(), transactionSimulator);
+      providers[providers.length] = smartContractProvider;
     }
     return new NodePermissioningController(syncStatusProvider, providers);
   }

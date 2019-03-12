@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.URI;
@@ -25,6 +26,13 @@ public class PermissioningConfigurationBuilder {
 
   public static final String ACCOUNTS_WHITELIST = "accounts-whitelist";
   public static final String NODES_WHITELIST = "nodes-whitelist";
+
+  public static SmartContractPermissioningConfiguration smartContractPermissioningConfiguration(final Address address, final boolean smartContractPermissionedNodeEnabled) {
+    SmartContractPermissioningConfiguration config = new SmartContractPermissioningConfiguration();
+    config.setSmartContractAddress(address);
+    config.setSmartContractNodeWhitelistEnabled(smartContractPermissionedNodeEnabled);
+    return config;
+  }
 
   // will be used to reload the config from a file while node is running
   public static PermissioningConfiguration permissioningConfiguration(
