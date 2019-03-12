@@ -600,4 +600,3 @@ public class PeerDiscoveryController {
     <T> CompletableFuture<T> execute(Supplier<T> action);
   }
 }
-

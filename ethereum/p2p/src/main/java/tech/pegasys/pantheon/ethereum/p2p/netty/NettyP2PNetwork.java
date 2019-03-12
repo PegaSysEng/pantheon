@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.p2p.netty;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import java.net.InetAddress;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -45,6 +44,7 @@ import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
@@ -77,8 +77,6 @@ import io.netty.util.concurrent.SingleThreadEventExecutor;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 /**
  * The peer network service (defunct PeerNetworkingService) is the entrypoint to the peer-to-peer
@@ -178,8 +176,17 @@ public class NettyP2PNetwork implements P2PNetwork {
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
       final Optional<NodeWhitelistController> nodeWhitelistController) {
-    this(vertx, keyPair, config, supportedCapabilities, peerRequirement, peerBlacklist,
-        metricsSystem, nodeWhitelistController, null, null);
+    this(
+        vertx,
+        keyPair,
+        config,
+        supportedCapabilities,
+        peerRequirement,
+        peerBlacklist,
+        metricsSystem,
+        nodeWhitelistController,
+        null,
+        null);
   }
 
   /**
@@ -539,18 +546,21 @@ public class NettyP2PNetwork implements P2PNetwork {
     };
   }
 
-  private synchronized void handleBlockAddedEvent(final BlockAddedEvent event,
-      final Blockchain blockchain) {
-    connections.getPeerConnections().forEach(peerConnection -> {
-      if (!isPeerConnectionAllowed(peerConnection)) {
-        peerConnection.disconnect(DisconnectReason.REQUESTED);
-      }
-    });
+  private synchronized void handleBlockAddedEvent(
+      final BlockAddedEvent event, final Blockchain blockchain) {
+    connections
+        .getPeerConnections()
+        .forEach(
+            peerConnection -> {
+              if (!isPeerConnectionAllowed(peerConnection)) {
+                peerConnection.disconnect(DisconnectReason.REQUESTED);
+              }
+            });
   }
 
-  private boolean isPeerConnectionAllowed(PeerConnection peerConnection) {
-    LOG.trace("Checking if connection with peer {} is permitted",
-        peerConnection.getPeer().getNodeId());
+  private boolean isPeerConnectionAllowed(final PeerConnection peerConnection) {
+    LOG.trace(
+        "Checking if connection with peer {} is permitted", peerConnection.getPeer().getNodeId());
 
     final String localNodeId = ourPeerInfo.getNodeId().toString().substring(2);
     final InetSocketAddress localAddress = (InetSocketAddress) peerConnection.getLocalAddress();

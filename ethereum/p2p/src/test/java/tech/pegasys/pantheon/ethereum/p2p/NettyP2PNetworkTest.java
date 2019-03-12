@@ -28,17 +28,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.net.InetSocketAddress;
-import org.junit.Before;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
@@ -59,8 +52,10 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -73,20 +68,21 @@ import java.util.concurrent.TimeUnit;
 
 import io.vertx.core.Vertx;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 /** Tests for {@link NettyP2PNetwork}. */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public final class NettyP2PNetworkTest {
 
-  @Mock
-  private NodePermissioningController nodePermissioningController;
+  @Mock private NodePermissioningController nodePermissioningController;
 
-  @Mock
-  private Blockchain blockchain;
+  @Mock private Blockchain blockchain;
 
   private ArgumentCaptor<BlockAddedObserver> observerCaptor =
       ArgumentCaptor.forClass(BlockAddedObserver.class);
@@ -657,8 +653,7 @@ public final class NettyP2PNetworkTest {
   }
 
   @Test
-  public void
-  whenStartingNetworkWithNodePermissioningWithoutBlockchainShouldThrowIllegalState() {
+  public void whenStartingNetworkWithNodePermissioningWithoutBlockchainShouldThrowIllegalState() {
     blockchain = null;
     final NettyP2PNetwork nettyP2PNetwork = mockNettyP2PNetwork();
 
@@ -711,7 +706,8 @@ public final class NettyP2PNetworkTest {
     final Peer notPermittedPeer = mockPeer("127.0.0.3", 30303);
 
     final PeerConnection permittedPeerConnection = mockPeerConnection(localPeer, permittedPeer);
-    final PeerConnection notPermittedPeerConnection = mockPeerConnection(localPeer, notPermittedPeer);
+    final PeerConnection notPermittedPeerConnection =
+        mockPeerConnection(localPeer, notPermittedPeer);
 
     final EnodeURL permittedEnodeURL = new EnodeURL(permittedPeer.getEnodeURI());
     final EnodeURL notPermittedEnodeURL = new EnodeURL(notPermittedPeer.getEnodeURI());
@@ -720,14 +716,18 @@ public final class NettyP2PNetworkTest {
     nettyP2PNetwork.connect(permittedPeer).complete(permittedPeerConnection);
     nettyP2PNetwork.connect(notPermittedPeer).complete(notPermittedPeerConnection);
 
-    lenient().when(nodePermissioningController
-        .isPermitted(any(), enodeEq(notPermittedEnodeURL))).thenReturn(false);
-    lenient().when(nodePermissioningController
-        .isPermitted(enodeEq(notPermittedEnodeURL), any())).thenReturn(false);
-    lenient().when(nodePermissioningController
-        .isPermitted(any(), enodeEq(permittedEnodeURL))).thenReturn(true);
-    lenient().when(nodePermissioningController
-        .isPermitted(enodeEq(permittedEnodeURL), any())).thenReturn(true);
+    lenient()
+        .when(nodePermissioningController.isPermitted(any(), enodeEq(notPermittedEnodeURL)))
+        .thenReturn(false);
+    lenient()
+        .when(nodePermissioningController.isPermitted(enodeEq(notPermittedEnodeURL), any()))
+        .thenReturn(false);
+    lenient()
+        .when(nodePermissioningController.isPermitted(any(), enodeEq(permittedEnodeURL)))
+        .thenReturn(true);
+    lenient()
+        .when(nodePermissioningController.isPermitted(enodeEq(permittedEnodeURL), any()))
+        .thenReturn(true);
 
     final BlockAddedObserver blockAddedObserver = observerCaptor.getValue();
     blockAddedObserver.onBlockAdded(blockAddedEvent, blockchain);
@@ -752,7 +752,7 @@ public final class NettyP2PNetworkTest {
     return mockPeerConnection(BytesValue.fromHexString("0x00"));
   }
 
-  private PeerConnection mockPeerConnection(Peer localPeer, Peer remotePeer) {
+  private PeerConnection mockPeerConnection(final Peer localPeer, final Peer remotePeer) {
     final PeerInfo peerInfo = mock(PeerInfo.class);
     doReturn(remotePeer.getId()).when(peerInfo).getNodeId();
 
@@ -760,13 +760,13 @@ public final class NettyP2PNetworkTest {
     when(peerConnection.getPeer()).thenReturn(peerInfo);
 
     Endpoint localEndpoint = localPeer.getEndpoint();
-    InetSocketAddress localSocketAddress = new InetSocketAddress(localEndpoint.getHost(),
-        localEndpoint.getTcpPort().getAsInt());
+    InetSocketAddress localSocketAddress =
+        new InetSocketAddress(localEndpoint.getHost(), localEndpoint.getTcpPort().getAsInt());
     when(peerConnection.getLocalAddress()).thenReturn(localSocketAddress);
 
     Endpoint remoteEndpoint = remotePeer.getEndpoint();
-    InetSocketAddress remoteSocketAddress = new InetSocketAddress(remoteEndpoint.getHost(),
-        remoteEndpoint.getTcpPort().getAsInt());
+    InetSocketAddress remoteSocketAddress =
+        new InetSocketAddress(remoteEndpoint.getHost(), remoteEndpoint.getTcpPort().getAsInt());
     when(peerConnection.getRemoteAddress()).thenReturn(remoteSocketAddress);
 
     return peerConnection;
@@ -790,20 +790,22 @@ public final class NettyP2PNetworkTest {
         () -> false,
         new PeerBlacklist(),
         new NoOpMetricsSystem(),
-        Optional.empty(), nodePermissioningController, blockchain);
+        Optional.empty(),
+        nodePermissioningController,
+        blockchain);
   }
 
   private Peer mockPeer() {
-    return mockPeer(SECP256K1.KeyPair.generate().getPublicKey().getEncodedBytes(), "127.0.0.1",
-        30303);
+    return mockPeer(
+        SECP256K1.KeyPair.generate().getPublicKey().getEncodedBytes(), "127.0.0.1", 30303);
   }
 
-  private Peer mockPeer(String host, int port) {
+  private Peer mockPeer(final String host, final int port) {
     final BytesValue id = SECP256K1.KeyPair.generate().getPublicKey().getEncodedBytes();
     return mockPeer(id, host, port);
   }
 
-  private Peer mockPeer(BytesValue id, String host, int port) {
+  private Peer mockPeer(final BytesValue id, final String host, final int port) {
     final Peer peer = mock(Peer.class);
     final Endpoint endpoint = new Endpoint(host, port, OptionalInt.of(port));
     final String enodeURL =
@@ -821,7 +823,7 @@ public final class NettyP2PNetworkTest {
     return peer;
   }
 
-  public class EnodeURLMatcher implements ArgumentMatcher<EnodeURL> {
+  public static class EnodeURLMatcher implements ArgumentMatcher<EnodeURL> {
 
     private final EnodeURL enodeURL;
 
