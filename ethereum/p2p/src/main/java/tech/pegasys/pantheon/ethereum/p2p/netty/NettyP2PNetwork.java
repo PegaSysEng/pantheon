@@ -204,6 +204,7 @@ public class NettyP2PNetwork implements P2PNetwork {
    * @param peerRequirement Queried to determine if enough peers are currently connected.
    * @param metricsSystem The metrics system to capture metrics with.
    * @param nodeWhitelistController Controls the whitelist of nodes to which this node will connect.
+   * @param blockchain The blockchain to subscribe to BlockAddedEvents
    */
   public NettyP2PNetwork(
       final Vertx vertx,
@@ -562,24 +563,23 @@ public class NettyP2PNetwork implements P2PNetwork {
     LOG.trace(
         "Checking if connection with peer {} is permitted", peerConnection.getPeer().getNodeId());
 
-    final String localNodeId = ourPeerInfo.getNodeId().toString().substring(2);
-    final InetSocketAddress localAddress = (InetSocketAddress) peerConnection.getLocalAddress();
-    final String localHostAddress = localAddress.getHostString();
-    final int localPort = localAddress.getPort();
-    final EnodeURL localPeerEnodeURL = new EnodeURL(localNodeId, localHostAddress, localPort);
-
-    final String remoteNodeId = peerConnection.getPeer().getNodeId().toString().substring(2);
-    final InetSocketAddress remoteAddress = (InetSocketAddress) peerConnection.getRemoteAddress();
-    final String remoteHostAddress = remoteAddress.getHostString();
-    final int remotePort = remoteAddress.getPort();
-    final EnodeURL remotePeerEnodeURL = new EnodeURL(remoteNodeId, remoteHostAddress, remotePort);
+    final EnodeURL localPeerEnodeURL = peerInfoToEnodeURL(ourPeerInfo,
+        (InetSocketAddress) peerConnection.getLocalAddress());
+    final EnodeURL remotePeerEnodeURL = peerInfoToEnodeURL(peerConnection.getPeer(),
+        (InetSocketAddress) peerConnection.getRemoteAddress());
 
     return nodePermissioningController
         .map(
             c ->
-                c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL)
-                    || c.isPermitted(remotePeerEnodeURL, localPeerEnodeURL))
+                c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL))
         .orElse(true);
+  }
+
+  private EnodeURL peerInfoToEnodeURL(final PeerInfo ourPeerInfo, final InetSocketAddress address) {
+    final String localNodeId = ourPeerInfo.getNodeId().toString().substring(2);
+    final String localHostAddress = address.getHostString();
+    final int localPort = address.getPort();
+    return new EnodeURL(localNodeId, localHostAddress, localPort);
   }
 
   private boolean isConnecting(final Peer peer) {
