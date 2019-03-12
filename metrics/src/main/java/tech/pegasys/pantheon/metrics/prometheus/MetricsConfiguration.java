@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.metrics.prometheus;
 
+import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
+
 import tech.pegasys.pantheon.metrics.MetricCategory;
 
 import java.util.Arrays;
@@ -46,7 +48,7 @@ public class MetricsConfiguration {
     metricsConfiguration.setEnabled(false);
     metricsConfiguration.setPort(DEFAULT_METRICS_PORT);
     metricsConfiguration.setHost(DEFAULT_METRICS_HOST);
-    metricsConfiguration.setMetricCategories(EnumSet.allOf(MetricCategory.class));
+    metricsConfiguration.setMetricCategories(DEFAULT_METRIC_CATEGORIES);
     metricsConfiguration.setPushEnabled(false);
     metricsConfiguration.setPushPort(DEFAULT_METRICS_PUSH_PORT);
     metricsConfiguration.setPushHost(DEFAULT_METRICS_PUSH_HOST);
