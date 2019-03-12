@@ -204,7 +204,8 @@ public class NettyP2PNetwork implements P2PNetwork {
    * @param peerRequirement Queried to determine if enough peers are currently connected.
    * @param metricsSystem The metrics system to capture metrics with.
    * @param nodeWhitelistController Controls the whitelist of nodes to which this node will connect.
-   * @param blockchain The blockchain to subscribe to BlockAddedEvents
+   * @param nodePermissioningController Controls node permissioning.
+   * @param blockchain The blockchain to subscribe to BlockAddedEvents.
    */
   public NettyP2PNetwork(
       final Vertx vertx,
