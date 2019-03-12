@@ -112,7 +112,7 @@ public class WorldStateDownloader {
           stateRoot);
 
       final WorldDownloadState newDownloadState =
-          new WorldDownloadState(taskQueue, maxOutstandingRequests, maxNodeRequestsWithoutProgress);
+          new WorldDownloadState(taskQueue, maxNodeRequestsWithoutProgress);
       this.downloadState.set(newDownloadState);
 
       if (!newDownloadState.downloadWasResumed()) {
@@ -127,7 +127,6 @@ public class WorldStateDownloader {
               .loadLocalDataStep(new LoadLocalDataStep(worldStateStorage, metricsSystem))
               .requestDataStep(new RequestDataStep(ethContext, metricsSystem))
               .persistDataStep(new PersistDataStep(worldStateStorage))
-              .enqueueChildrenStep(new EnqueueChildrenStep())
               .completeTaskStep(new CompleteTaskStep(worldStateStorage, metricsSystem))
               .downloadState(newDownloadState)
               .pivotBlockHeader(header)

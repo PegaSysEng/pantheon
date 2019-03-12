@@ -27,8 +27,6 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,26 +36,20 @@ class WorldDownloadState {
 
   private final boolean downloadWasResumed;
   private final TaskQueue<NodeDataRequest> pendingRequests;
-  private final int maxOutstandingRequests;
   private final int maxRequestsWithoutProgress;
   private final Set<EthTask<?>> outstandingRequests =
       Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private final AtomicBoolean sendingRequests = new AtomicBoolean(false);
   private final CompletableFuture<Void> internalFuture;
   private final CompletableFuture<Void> downloadFuture;
   // Volatile so monitoring can access it without having to synchronize.
   private volatile int requestsSinceLastProgress = 0;
-  private boolean waitingForNewPeer = false;
   private BytesValue rootNodeData;
   private WorldStateDownloadProcess worldStateDownloadProcess;
 
   public WorldDownloadState(
-      final TaskQueue<NodeDataRequest> pendingRequests,
-      final int maxOutstandingRequests,
-      final int maxRequestsWithoutProgress) {
+      final TaskQueue<NodeDataRequest> pendingRequests, final int maxRequestsWithoutProgress) {
     this.downloadWasResumed = !pendingRequests.isEmpty();
     this.pendingRequests = pendingRequests;
-    this.maxOutstandingRequests = maxOutstandingRequests;
     this.maxRequestsWithoutProgress = maxRequestsWithoutProgress;
     this.internalFuture = new CompletableFuture<>();
     this.downloadFuture = new CompletableFuture<>();
@@ -100,41 +92,16 @@ class WorldDownloadState {
     return downloadWasResumed;
   }
 
-  public void whileAdditionalRequestsCanBeSent(final Runnable action) {
-    while (shouldRequestNodeData()) {
-      if (sendingRequests.compareAndSet(false, true)) {
-        try {
-          action.run();
-        } finally {
-          sendingRequests.set(false);
-        }
-      } else {
-        break;
-      }
-    }
-  }
-
-  public synchronized void setWaitingForNewPeer(final boolean waitingForNewPeer) {
-    this.waitingForNewPeer = waitingForNewPeer;
-  }
-
-  public synchronized void addOutstandingTask(final EthTask<?> task) {
+  public void addOutstandingTask(final EthTask<?> task) {
     outstandingRequests.add(task);
   }
 
-  public synchronized void removeOutstandingTask(final EthTask<?> task) {
+  public void removeOutstandingTask(final EthTask<?> task) {
     outstandingRequests.remove(task);
   }
 
   public int getOutstandingTaskCount() {
     return outstandingRequests.size();
-  }
-
-  private synchronized boolean shouldRequestNodeData() {
-    return !internalFuture.isDone()
-        && outstandingRequests.size() < maxOutstandingRequests
-        && !pendingRequests.isEmpty()
-        && !waitingForNewPeer;
   }
 
   public CompletableFuture<Void> getDownloadFuture() {
@@ -162,7 +129,7 @@ class WorldDownloadState {
         return task;
       }
       try {
-        wait(TimeUnit.SECONDS.toMillis(1));
+        wait();
       } catch (final InterruptedException e) {
         Thread.currentThread().interrupt();
         return null;

@@ -68,11 +68,7 @@ import org.apache.logging.log4j.Logger;
  *                                            |
  *                                   --------------------
  *                                   | Enqueue Children |
- *                                   --------------------
- *                                            |
- *                                            |
- *                                   --------------------
- *                                   |   Mark Complete  |
+ *                                   | & Mark Complete  |
  *                                   --------------------
  * </pre>
  */
@@ -130,7 +126,6 @@ public class WorldStateDownloadProcess {
     private RequestDataStep requestDataStep;
     private BlockHeader pivotBlockHeader;
     private PersistDataStep persistDataStep;
-    private EnqueueChildrenStep enqueueChildrenStep;
     private CompleteTaskStep completeTaskStep;
 
     public Builder hashCountPerRequest(final int hashCountPerRequest) {
@@ -158,11 +153,6 @@ public class WorldStateDownloadProcess {
       return this;
     }
 
-    public Builder enqueueChildrenStep(final EnqueueChildrenStep enqueueChildrenStep) {
-      this.enqueueChildrenStep = enqueueChildrenStep;
-      return this;
-    }
-
     public Builder completeTaskStep(final CompleteTaskStep completeTaskStep) {
       this.completeTaskStep = completeTaskStep;
       return this;
@@ -187,7 +177,6 @@ public class WorldStateDownloadProcess {
       checkNotNull(loadLocalDataStep);
       checkNotNull(requestDataStep);
       checkNotNull(persistDataStep);
-      checkNotNull(enqueueChildrenStep);
       checkNotNull(completeTaskStep);
       checkNotNull(downloadState);
       checkNotNull(pivotBlockHeader);
@@ -228,10 +217,6 @@ public class WorldStateDownloadProcess {
 
       final Pipeline completionPipeline =
           createPipelineFrom(requestsToComplete, outputCounter)
-              .thenProcess(
-                  "requestEnqueueChildren",
-                  task ->
-                      enqueueChildrenStep.enqueueChildren(task, pivotBlockHeader, downloadState))
               .andFinishWith(
                   "requestCompleteTask",
                   task ->
