@@ -203,33 +203,37 @@ public class WorldStateDownloadProcess {
               "step");
 
       final Pipe<Task<NodeDataRequest>> requestsToComplete =
-          new Pipe<>(bufferCapacity, outputCounter.labels("dataAvailable"));
+          new Pipe<>(bufferCapacity, outputCounter.labels("requestDataAvailable"));
       final Pipeline fetchDataPipeline =
           createPipelineFrom(
-                  "dequeued", new TaskQueueIterator(downloadState), bufferCapacity, outputCounter)
+                  "requestDequeued",
+                  new TaskQueueIterator(downloadState),
+                  bufferCapacity,
+                  outputCounter)
               .thenFlatMap(
-                  "loadLocalData",
+                  "requestLoadLocalData",
                   task -> loadLocalDataStep.loadLocalData(task, requestsToComplete),
                   bufferCapacity)
-              .inBatches("batch", hashCountPerRequest)
+              .inBatches("batchCreate", hashCountPerRequest)
               .thenProcessAsync(
-                  "downloadData",
+                  "batchDownloadData",
                   requestTasks ->
                       requestDataStep.requestData(requestTasks, pivotBlockHeader, downloadState),
                   maxOutstandingRequests)
               .thenProcess(
-                  "persistData",
+                  "batchPersistData",
                   tasks -> persistDataStep.persist(tasks, pivotBlockHeader, downloadState))
-              .andFinishWith("dataDownloaded", tasks -> tasks.forEach(requestsToComplete::put));
+              .andFinishWith(
+                  "batchDataDownloaded", tasks -> tasks.forEach(requestsToComplete::put));
 
       final Pipeline completionPipeline =
           createPipelineFrom(requestsToComplete, outputCounter)
               .thenProcess(
-                  "enqueueChildren",
+                  "requestEnqueueChildren",
                   task ->
                       enqueueChildrenStep.enqueueChildren(task, pivotBlockHeader, downloadState))
               .andFinishWith(
-                  "completeTask",
+                  "requestCompleteTask",
                   task ->
                       completeTaskStep.markAsCompleteOrFailed(
                           pivotBlockHeader, downloadState, task));
