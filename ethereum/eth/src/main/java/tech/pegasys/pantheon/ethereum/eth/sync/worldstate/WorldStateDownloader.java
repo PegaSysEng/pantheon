@@ -70,6 +70,12 @@ public class WorldStateDownloader {
         "world_state_node_requests_since_last_progress_current",
         "Number of world state requests made since the last time new data was returned",
         downloadStateValue(WorldDownloadState::getRequestsSinceLastProgress));
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.SYNCHRONIZER,
+        "world_state_inflight_requests_current",
+        "Number of in progress requests for world state data",
+        downloadStateValue(WorldDownloadState::getOutstandingTaskCount));
   }
 
   private Supplier<Integer> downloadStateValue(final Function<WorldDownloadState, Integer> getter) {

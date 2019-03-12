@@ -126,6 +126,10 @@ class WorldDownloadState {
     outstandingRequests.remove(task);
   }
 
+  public int getOutstandingTaskCount() {
+    return outstandingRequests.size();
+  }
+
   private synchronized boolean shouldRequestNodeData() {
     return !internalFuture.isDone()
         && outstandingRequests.size() < maxOutstandingRequests

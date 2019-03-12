@@ -78,6 +78,7 @@ public class RequestDataStep {
     return task.run()
         .handle(
             (result, error) -> {
+              downloadState.removeOutstandingTask(task);
               if (error != null) {
                 final Throwable rootCause = ExceptionUtils.rootCause(error);
                 if (!(rootCause instanceof TimeoutException
