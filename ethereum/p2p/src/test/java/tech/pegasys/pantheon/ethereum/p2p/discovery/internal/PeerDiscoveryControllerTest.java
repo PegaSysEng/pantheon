@@ -1441,9 +1441,7 @@ public class PeerDiscoveryControllerTest {
               blacklist,
               whitelist,
               peerBondedObservers,
-              peerDroppedObservers,
-              nodePermissioningController,
-              blockchain));
+              peerDroppedObservers));
     }
   }
 }

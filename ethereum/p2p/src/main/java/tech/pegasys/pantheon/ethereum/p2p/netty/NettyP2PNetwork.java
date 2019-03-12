@@ -14,7 +14,10 @@ package tech.pegasys.pantheon.ethereum.p2p.netty;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import java.net.InetAddress;
 import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.p2p.PeerNotWhitelistedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.DisconnectCallback;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
@@ -36,6 +39,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -73,6 +77,8 @@ import io.netty.util.concurrent.SingleThreadEventExecutor;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 /**
  * The peer network service (defunct PeerNetworkingService) is the entrypoint to the peer-to-peer
@@ -159,6 +165,23 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   private final Optional<NodeWhitelistController> nodeWhitelistController;
 
+  private final Optional<NodePermissioningController> nodePermissioningController;
+  private final Optional<Blockchain> blockchain;
+  private OptionalLong blockAddedObserverId = OptionalLong.empty();
+
+  public NettyP2PNetwork(
+      final Vertx vertx,
+      final SECP256K1.KeyPair keyPair,
+      final NetworkingConfiguration config,
+      final List<Capability> supportedCapabilities,
+      final PeerRequirement peerRequirement,
+      final PeerBlacklist peerBlacklist,
+      final MetricsSystem metricsSystem,
+      final Optional<NodeWhitelistController> nodeWhitelistController) {
+    this(vertx, keyPair, config, supportedCapabilities, peerRequirement, peerBlacklist,
+        metricsSystem, nodeWhitelistController, null, null);
+  }
+
   /**
    * Creates a peer networking service for production purposes.
    *
@@ -183,7 +206,9 @@ public class NettyP2PNetwork implements P2PNetwork {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
-      final Optional<NodeWhitelistController> nodeWhitelistController) {
+      final Optional<NodeWhitelistController> nodeWhitelistController,
+      final NodePermissioningController nodePermissioningController,
+      final Blockchain blockchain) {
 
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
@@ -266,6 +291,9 @@ public class NettyP2PNetwork implements P2PNetwork {
     } catch (final InterruptedException e) {
       throw new RuntimeException("Interrupted before startup completed", e);
     }
+
+    this.nodePermissioningController = Optional.ofNullable(nodePermissioningController);
+    this.blockchain = Optional.ofNullable(blockchain);
   }
 
   private Supplier<Integer> pendingTaskCounter(final EventLoopGroup eventLoopGroup) {
@@ -473,6 +501,20 @@ public class NettyP2PNetwork implements P2PNetwork {
         OptionalLong.of(peerDiscoveryAgent.observePeerBondedEvents(handlePeerBondedEvent()));
     peerDroppedObserverId =
         OptionalLong.of(peerDiscoveryAgent.observePeerDroppedEvents(handlePeerDroppedEvents()));
+
+    if (nodePermissioningController.isPresent()) {
+      if (blockchain.isPresent()) {
+        synchronized (this) {
+          if (!blockAddedObserverId.isPresent()) {
+            blockAddedObserverId =
+                OptionalLong.of(blockchain.get().observeBlockAdded(this::handleBlockAddedEvent));
+          }
+        }
+      } else {
+        throw new IllegalStateException(
+            "NettyP2PNetwork permissioning needs to listen to BlockAddedEvents. Blockchain can't be null.");
+      }
+    }
   }
 
   private Consumer<PeerBondedEvent> handlePeerBondedEvent() {
@@ -497,6 +539,39 @@ public class NettyP2PNetwork implements P2PNetwork {
     };
   }
 
+  private synchronized void handleBlockAddedEvent(final BlockAddedEvent event,
+      final Blockchain blockchain) {
+    connections.getPeerConnections().forEach(peerConnection -> {
+      if (!isPeerConnectionAllowed(peerConnection)) {
+        peerConnection.disconnect(DisconnectReason.REQUESTED);
+      }
+    });
+  }
+
+  private boolean isPeerConnectionAllowed(PeerConnection peerConnection) {
+    LOG.trace("Checking if connection with peer {} is permitted",
+        peerConnection.getPeer().getNodeId());
+
+    final String localNodeId = ourPeerInfo.getNodeId().toString().substring(2);
+    final InetSocketAddress localAddress = (InetSocketAddress) peerConnection.getLocalAddress();
+    final String localHostAddress = localAddress.getHostString();
+    final int localPort = localAddress.getPort();
+    final EnodeURL localPeerEnodeURL = new EnodeURL(localNodeId, localHostAddress, localPort);
+
+    final String remoteNodeId = peerConnection.getPeer().getNodeId().toString().substring(2);
+    final InetSocketAddress remoteAddress = (InetSocketAddress) peerConnection.getRemoteAddress();
+    final String remoteHostAddress = remoteAddress.getHostString();
+    final int remotePort = remoteAddress.getPort();
+    final EnodeURL remotePeerEnodeURL = new EnodeURL(remoteNodeId, remoteHostAddress, remotePort);
+
+    return nodePermissioningController
+        .map(
+            c ->
+                c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL)
+                    || c.isPermitted(remotePeerEnodeURL, localPeerEnodeURL))
+        .orElse(true);
+  }
+
   private boolean isConnecting(final Peer peer) {
     return pendingConnections.containsKey(peer);
   }
@@ -513,6 +588,8 @@ public class NettyP2PNetwork implements P2PNetwork {
     peerBondedObserverId = OptionalLong.empty();
     peerDroppedObserverId.ifPresent(peerDiscoveryAgent::removePeerDroppedObserver);
     peerDroppedObserverId = OptionalLong.empty();
+    blockchain.ifPresent(b -> blockAddedObserverId.ifPresent(b::removeObserver));
+    blockAddedObserverId = OptionalLong.empty();
     peerDiscoveryAgent.stop().join();
     workers.shutdownGracefully();
     boss.shutdownGracefully();
