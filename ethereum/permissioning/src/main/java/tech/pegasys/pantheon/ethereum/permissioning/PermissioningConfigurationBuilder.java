@@ -27,16 +27,6 @@ public class PermissioningConfigurationBuilder {
   public static final String NODES_WHITELIST = "nodes-whitelist";
 
   // will be used to reload the config from a file while node is running
-  public static PermissioningConfiguration permissioningConfigurationFromToml(
-      final String configFilePath,
-      final boolean permissionedNodeEnabled,
-      final boolean permissionedAccountEnabled)
-      throws Exception {
-
-    return permissioningConfiguration(
-        configFilePath, permissionedNodeEnabled, permissionedAccountEnabled);
-  }
-
   public static PermissioningConfiguration permissioningConfiguration(
       final String configFilePath,
       final boolean permissionedNodeEnabled,

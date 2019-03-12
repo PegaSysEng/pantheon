@@ -220,7 +220,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
     try {
       final PermissioningConfiguration updatedConfig =
-          PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+          PermissioningConfigurationBuilder.permissioningConfiguration(
               configuration.getConfigurationFilePath(),
               configuration.isNodeWhitelistEnabled(),
               configuration.isAccountWhitelistEnabled());

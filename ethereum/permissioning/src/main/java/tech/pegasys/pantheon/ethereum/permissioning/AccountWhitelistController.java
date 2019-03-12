@@ -167,7 +167,7 @@ public class AccountWhitelistController {
 
     try {
       final PermissioningConfiguration updatedConfig =
-          PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+          PermissioningConfigurationBuilder.permissioningConfiguration(
               configuration.getConfigurationFilePath(),
               configuration.isNodeWhitelistEnabled(),
               configuration.isAccountWhitelistEnabled());

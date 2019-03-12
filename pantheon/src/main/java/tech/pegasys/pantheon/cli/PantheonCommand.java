@@ -780,7 +780,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+        PermissioningConfigurationBuilder.permissioningConfiguration(
             getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
     return Optional.of(permissioningConfiguration);
   }

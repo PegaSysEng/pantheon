@@ -174,7 +174,7 @@ public class PermissioningConfigurationBuilderTest {
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
     PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+        PermissioningConfigurationBuilder.permissioningConfiguration(
             toml.toString(), true, true);
 
     assertThat(permissioningConfiguration.getConfigurationFilePath()).isEqualTo(toml.toString());
@@ -195,7 +195,7 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile =
         Resources.getResource(PERMISSIONING_CONFIG_NODE_WHITELIST_ONLY_MULTILINE);
     final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+        PermissioningConfigurationBuilder.permissioningConfiguration(
             configFile.getPath(), true, false);
 
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
