@@ -165,11 +165,11 @@ public class PeerDiscoveryControllerTest {
   private void mockPacketCreation(
       final PacketType type, final Optional<DiscoveryPeer> peer, final Packet mockPacket) {
     doAnswer(
-        invocation -> {
-          final Consumer<Packet> handler = invocation.getArgument(2);
-          handler.accept(mockPacket);
-          return null;
-        })
+            invocation -> {
+              final Consumer<Packet> handler = invocation.getArgument(2);
+              handler.accept(mockPacket);
+              return null;
+            })
         .when(controller)
         .createPacket(eq(type), peer.isPresent() ? matchPingDataForPeer(peer.get()) : any(), any());
   }
@@ -288,8 +288,8 @@ public class PeerDiscoveryControllerTest {
     controller.start();
 
     assertThat(
-        controller.getPeers().stream()
-            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+            controller.getPeers().stream()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
     // Simulate PONG messages from all peers
@@ -314,11 +314,11 @@ public class PeerDiscoveryControllerTest {
     }
 
     assertThat(
-        controller.getPeers().stream()
-            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+            controller.getPeers().stream()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(0);
     assertThat(
-        controller.getPeers().stream().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDED))
+            controller.getPeers().stream().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDED))
         .hasSize(3);
   }
 
@@ -344,8 +344,8 @@ public class PeerDiscoveryControllerTest {
     controller.start();
 
     assertThat(
-        controller.getPeers().stream()
-            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+            controller.getPeers().stream()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
     // Send a PONG packet from peer 1, with an incorrect hash.
@@ -359,8 +359,8 @@ public class PeerDiscoveryControllerTest {
         .send(eq(peers.get(1)), matchPacketOfType(PacketType.FIND_NEIGHBORS));
 
     assertThat(
-        controller.getPeers().stream()
-            .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+            controller.getPeers().stream()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
   }
 
