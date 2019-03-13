@@ -19,8 +19,9 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.queue.TaskQueue;
-import tech.pegasys.pantheon.util.FutureUtils;
+import tech.pegasys.pantheon.util.ExceptionUtils;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -137,8 +138,13 @@ public class WorldStateDownloader {
 
       final CompletableFuture<Void> downloadProcessFuture =
           downloadProcess.start(ethContext.getScheduler());
-
-      FutureUtils.propagateResult(downloadProcessFuture, newDownloadState.getDownloadFuture());
+      downloadProcessFuture.whenComplete(
+          (result, error) -> {
+            if (error != null
+                && !(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+              newDownloadState.getDownloadFuture().completeExceptionally(error);
+            }
+          });
       return newDownloadState.getDownloadFuture();
     }
   }
