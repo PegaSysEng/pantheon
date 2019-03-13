@@ -178,6 +178,9 @@ class WorldDownloadState {
       updater.putAccountStateTrieNode(header.getStateRoot(), rootNodeData);
       updater.commit();
       internalFuture.complete(null);
+      // THere are no more inputs to process so make sure we wake up any threads waiting to dequeue
+      // so they can give up waiting.
+      notifyAll();
       LOG.info("Finished downloading world state from peers");
       return true;
     } else {
