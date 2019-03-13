@@ -29,28 +29,31 @@ transaction, the sending party, or the list of participating addresses.
  recipient, is only available to the subset of network actors who are
  parties to that transaction.
 - **Private Transaction Manager**: A subsystem of an Enterprise Ethereum
- system for implementing privacy and permissioning. e.g. [Orion](https://github.com/PegaSysEng/orion) .
+  system for implementing privacy and permissioning known as Enclave.
+  e.g. [Orion](https://github.com/PegaSysEng/orion) .
 - **Actor**:   The public key of someone involved in the private transaction (as per the privateFor member).
 - **Privacy group**:   The actors that are involved in a set of transactions.
 
 
 ### Privacy Overview
 
-1. DApp sends a private transaction through [eea_sendrawtransaction](),
+1. DApp sends a private transaction through [eea_sendrawtransaction](../Reference/JSON-RPC-API-Methods.md#eea_sendRawTransaction),
   uses the `privateFor` attribute to specify the list of actors,
   `privateFrom` with the sender public key, and `restriction` to handle
   with *restricted* and *unrestricted* transaction.
  
 2. The JSON RPC detects the private transaction and hands it off to a
-  Private Transaction Handler.
+   Private Transaction Handler.
 
-3. The Private Transaction Handler sends the transaction to Enclave.
+3. The Private Transaction Handler connect to the Enclave (Private
+   Transaction Manager) instance and sends the transaction through this
+   instance.
 
 4. Enclave will authenticated-encrypt and distribute the private
-  transaction through the nodes, including the Participants, and an id
-  for the privacy group that it has generated. Each Enclave node will
-  store the transaction, along with the associated privacy group and
-  actor list.
+   transaction through the nodes, including the actors, and an id for
+   the privacy group that it has generated. Each Enclave node will store
+   the transaction, along with the associated privacy group and actor
+   list.
 
 5. Enclave sends the Private Transaction Hash back to the Private
   Transaction Handler (as a response to the synchronous HTTP call),
