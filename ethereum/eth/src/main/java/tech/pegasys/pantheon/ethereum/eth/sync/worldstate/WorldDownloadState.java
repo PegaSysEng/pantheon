@@ -193,4 +193,8 @@ class WorldDownloadState {
       final WorldStateDownloadProcess worldStateDownloadProcess) {
     this.worldStateDownloadProcess = worldStateDownloadProcess;
   }
+
+  public synchronized void notifyTaskAvailable() {
+    notifyAll();
+  }
 }

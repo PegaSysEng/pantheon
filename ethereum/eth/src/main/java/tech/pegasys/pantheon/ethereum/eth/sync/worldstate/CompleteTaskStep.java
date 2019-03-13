@@ -57,6 +57,7 @@ public class CompleteTaskStep {
     } else {
       retriedRequestsCounter.inc();
       task.markFailed();
+      downloadState.notifyTaskAvailable();
     }
   }
 
