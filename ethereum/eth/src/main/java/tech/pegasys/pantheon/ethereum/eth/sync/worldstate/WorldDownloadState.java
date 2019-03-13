@@ -16,8 +16,8 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
-import tech.pegasys.pantheon.services.queue.TaskQueue;
-import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
+import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
+import tech.pegasys.pantheon.services.tasks.Task;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -35,7 +35,7 @@ class WorldDownloadState {
   private static final Logger LOG = LogManager.getLogger();
 
   private final boolean downloadWasResumed;
-  private final TaskQueue<NodeDataRequest> pendingRequests;
+  private final CachingTaskCollection<NodeDataRequest> pendingRequests;
   private final int maxRequestsWithoutProgress;
   private final Set<EthTask<?>> outstandingRequests =
       Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -47,7 +47,8 @@ class WorldDownloadState {
   private WorldStateDownloadProcess worldStateDownloadProcess;
 
   public WorldDownloadState(
-      final TaskQueue<NodeDataRequest> pendingRequests, final int maxRequestsWithoutProgress) {
+      final CachingTaskCollection<NodeDataRequest> pendingRequests,
+      final int maxRequestsWithoutProgress) {
     this.downloadWasResumed = !pendingRequests.isEmpty();
     this.pendingRequests = pendingRequests;
     this.maxRequestsWithoutProgress = maxRequestsWithoutProgress;
@@ -110,21 +111,21 @@ class WorldDownloadState {
 
   public synchronized void enqueueRequest(final NodeDataRequest request) {
     if (!internalFuture.isDone()) {
-      pendingRequests.enqueue(request);
+      pendingRequests.add(request);
       notifyAll();
     }
   }
 
   public synchronized void enqueueRequests(final Collection<NodeDataRequest> requests) {
     if (!internalFuture.isDone()) {
-      requests.forEach(pendingRequests::enqueue);
+      requests.forEach(pendingRequests::add);
       notifyAll();
     }
   }
 
   public synchronized Task<NodeDataRequest> dequeueRequestBlocking() {
     while (!internalFuture.isDone()) {
-      final Task<NodeDataRequest> task = pendingRequests.dequeue();
+      final Task<NodeDataRequest> task = pendingRequests.remove();
       if (task != null) {
         return task;
       }

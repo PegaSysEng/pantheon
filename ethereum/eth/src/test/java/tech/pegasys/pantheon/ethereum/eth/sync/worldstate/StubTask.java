@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
-import tech.pegasys.pantheon.services.queue.TaskQueue;
+import tech.pegasys.pantheon.services.tasks.Task;
 
-public class StubTask implements TaskQueue.Task<NodeDataRequest> {
+public class StubTask implements Task<NodeDataRequest> {
 
   private final NodeDataRequest data;
   private boolean completed = false;

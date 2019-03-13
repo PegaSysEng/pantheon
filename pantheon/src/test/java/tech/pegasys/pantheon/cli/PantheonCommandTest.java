@@ -37,6 +37,7 @@ import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
@@ -444,6 +445,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).build();
 
     verify(mockControllerBuilder).devMode(eq(false));
+    verify(mockControllerBuilder)
+        .maxPendingTransactions(eq(PendingTransactions.MAX_PENDING_TRANSACTIONS));
     verify(mockControllerBuilder).build();
 
     // TODO: Re-enable as per NC-1057/NC-1681
@@ -1839,6 +1842,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).privacyParameters(enclaveArg.capture());
     verify(mockControllerBuilder).build();
 
+    assertThat(enclaveArg.getValue().isEnabled()).isEqualTo(true);
     assertThat(enclaveArg.getValue().getUrl()).isEqualTo(ENCLAVE_URI);
     assertThat(enclaveArg.getValue().getPublicKey()).isEqualTo(ENCLAVE_PUBLIC_KEY);
 

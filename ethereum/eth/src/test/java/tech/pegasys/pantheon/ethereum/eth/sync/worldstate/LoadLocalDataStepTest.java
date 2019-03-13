@@ -22,8 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipe;
-import tech.pegasys.pantheon.services.queue.TaskQueue;
-import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
+import tech.pegasys.pantheon.services.tasks.Task;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Optional;
@@ -39,10 +38,9 @@ public class LoadLocalDataStepTest {
   private final WorldStateStorage.Updater updater = mock(WorldStateStorage.Updater.class);
 
   private final CodeNodeDataRequest request = NodeDataRequest.createCodeRequest(HASH);
-  private final TaskQueue.Task<NodeDataRequest> task = new StubTask(request);
+  private final Task<NodeDataRequest> task = new StubTask(request);
 
-  private final Pipe<TaskQueue.Task<NodeDataRequest>> completedTasks =
-      new Pipe<>(10, NO_OP_COUNTER);
+  private final Pipe<Task<NodeDataRequest>> completedTasks = new Pipe<>(10, NO_OP_COUNTER);
   private final LoadLocalDataStep loadLocalDataStep =
       new LoadLocalDataStep(worldStateStorage, new NoOpMetricsSystem());
 

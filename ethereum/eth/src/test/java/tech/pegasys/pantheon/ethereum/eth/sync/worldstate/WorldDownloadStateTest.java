@@ -25,7 +25,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
-import tech.pegasys.pantheon.services.queue.InMemoryTaskQueue;
+import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
+import tech.pegasys.pantheon.services.tasks.InMemoryTaskQueue;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +45,8 @@ public class WorldDownloadStateTest {
 
   private final BlockHeader header =
       new BlockHeaderTestFixture().stateRoot(ROOT_NODE_HASH).buildHeader();
-  private final InMemoryTaskQueue<NodeDataRequest> pendingRequests = new InMemoryTaskQueue<>();
+  private final CachingTaskCollection<NodeDataRequest> pendingRequests =
+      new CachingTaskCollection<>(new InMemoryTaskQueue<>());
   private final WorldStateDownloadProcess worldStateDownloadProcess =
       mock(WorldStateDownloadProcess.class);
 
@@ -83,7 +85,7 @@ public class WorldDownloadStateTest {
 
   @Test
   public void shouldNotCompleteWhenThereArePendingTasks() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
+    pendingRequests.add(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
 
     downloadState.checkCompletion(worldStateStorage, header);
 
@@ -99,8 +101,8 @@ public class WorldDownloadStateTest {
     downloadState.addOutstandingTask(outstandingTask1);
     downloadState.addOutstandingTask(outstandingTask2);
 
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY));
+    pendingRequests.add(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
+    pendingRequests.add(createAccountDataRequest(Hash.EMPTY));
     downloadState.setWorldStateDownloadProcess(worldStateDownloadProcess);
 
     future.cancel(true);
@@ -130,7 +132,7 @@ public class WorldDownloadStateTest {
   }
 
   @Test
-  public void shouldNotEnqueueRequestsAfterDownloadIsStalled() {
+  public void shouldNotAddRequestsAfterDownloadIsStalled() {
     downloadState.checkCompletion(worldStateStorage, header);
 
     downloadState.enqueueRequests(singletonList(createAccountDataRequest(Hash.EMPTY_TRIE_HASH)));
