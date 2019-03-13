@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodePermissioningControllerFactory;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
@@ -25,6 +26,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,25 +41,25 @@ public class NodePermissioningControllerFactoryTest {
   @Mock private TransactionSimulator transactionSimulator;
 
   Collection<EnodeURL> bootnodes = Collections.emptyList();
-  PermissioningConfiguration localPermissioningConfig;
+  LocalPermissioningConfiguration localPermissioningConfig;
   SmartContractPermissioningConfiguration smartContractPermissioningConfiguration;
+  PermissioningConfiguration config;
 
   @Before
   public void setUp() {
-    localPermissioningConfig = PermissioningConfiguration.createDefault();
+    localPermissioningConfig = LocalPermissioningConfiguration.createDefault();
     smartContractPermissioningConfiguration = new SmartContractPermissioningConfiguration();
+    config =
+        new PermissioningConfiguration(
+            Optional.of(localPermissioningConfig),
+            Optional.of(smartContractPermissioningConfiguration));
   }
 
   @Test
   public void testCreateWithNeitherPermissioningEnabled() {
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
-        factory.create(
-            localPermissioningConfig,
-            synchronizer,
-            bootnodes,
-            smartContractPermissioningConfiguration,
-            transactionSimulator);
+        factory.create(config, synchronizer, bootnodes, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(0);
@@ -71,12 +73,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
-        factory.create(
-            localPermissioningConfig,
-            synchronizer,
-            bootnodes,
-            smartContractPermissioningConfiguration,
-            transactionSimulator);
+        factory.create(config, synchronizer, bootnodes, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(1);
@@ -92,12 +89,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
-        factory.create(
-            localPermissioningConfig,
-            synchronizer,
-            bootnodes,
-            smartContractPermissioningConfiguration,
-            transactionSimulator);
+        factory.create(config, synchronizer, bootnodes, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(1);

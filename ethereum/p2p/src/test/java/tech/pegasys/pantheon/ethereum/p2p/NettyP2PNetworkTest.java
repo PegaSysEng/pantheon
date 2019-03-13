@@ -47,8 +47,8 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -441,7 +441,7 @@ public final class NettyP2PNetworkTest {
     final BytesValue localId = localKp.getPublicKey().getEncodedBytes();
     final PeerBlacklist localBlacklist = new PeerBlacklist();
     final PeerBlacklist remoteBlacklist = new PeerBlacklist();
-    final PermissioningConfiguration config = PermissioningConfiguration.createDefault();
+    final LocalPermissioningConfiguration config = LocalPermissioningConfiguration.createDefault();
     final Path tempFile = Files.createTempFile("test", "test");
     tempFile.toFile().deleteOnExit();
     config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());

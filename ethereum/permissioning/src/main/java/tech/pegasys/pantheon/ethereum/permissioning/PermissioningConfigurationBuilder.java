@@ -36,7 +36,7 @@ public class PermissioningConfigurationBuilder {
   }
 
   // will be used to reload the config from a file while node is running
-  public static PermissioningConfiguration permissioningConfiguration(
+  public static LocalPermissioningConfiguration permissioningConfiguration(
       final String configFilePath,
       final boolean permissionedNodeEnabled,
       final boolean permissionedAccountEnabled)
@@ -54,8 +54,8 @@ public class PermissioningConfigurationBuilder {
     TomlArray accountWhitelistTomlArray = permToml.getArray(ACCOUNTS_WHITELIST);
     TomlArray nodeWhitelistTomlArray = permToml.getArray(NODES_WHITELIST);
 
-    final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
+    final LocalPermissioningConfiguration permissioningConfiguration =
+        LocalPermissioningConfiguration.createDefault();
     permissioningConfiguration.setConfigurationFilePath(configFilePath);
     if (permissionedAccountEnabled) {
       if (accountWhitelistTomlArray != null) {

@@ -53,8 +53,8 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -90,7 +90,7 @@ public class RunnerBuilder {
   private Collection<String> bannedNodeIds;
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
-  private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
+  private Optional<LocalPermissioningConfiguration> permissioningConfiguration = Optional.empty();
 
   public RunnerBuilder vertx(final Vertx vertx) {
     this.vertx = vertx;
@@ -143,7 +143,7 @@ public class RunnerBuilder {
   }
 
   public RunnerBuilder permissioningConfiguration(
-      final PermissioningConfiguration permissioningConfiguration) {
+      final LocalPermissioningConfiguration permissioningConfiguration) {
     this.permissioningConfiguration = Optional.of(permissioningConfiguration);
     return this;
   }
@@ -221,7 +221,7 @@ public class RunnerBuilder {
             .collect(Collectors.toList());
     final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController =
         permissioningConfiguration
-            .filter(PermissioningConfiguration::isNodeWhitelistEnabled)
+            .filter(LocalPermissioningConfiguration::isNodeWhitelistEnabled)
             .map(
                 config -> new NodeLocalConfigPermissioningController(config, bootnodesAsEnodeURLs));
 
@@ -251,7 +251,7 @@ public class RunnerBuilder {
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
     final Optional<AccountWhitelistController> accountWhitelistController =
         permissioningConfiguration
-            .filter(PermissioningConfiguration::isAccountWhitelistEnabled)
+            .filter(LocalPermissioningConfiguration::isAccountWhitelistEnabled)
             .map(
                 configuration -> {
                   final AccountWhitelistController whitelistController =

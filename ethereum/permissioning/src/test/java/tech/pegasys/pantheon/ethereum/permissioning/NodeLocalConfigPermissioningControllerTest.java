@@ -64,7 +64,7 @@ public class NodeLocalConfigPermissioningControllerTest {
     bootnodesList.clear();
     controller =
         new NodeLocalConfigPermissioningController(
-            PermissioningConfiguration.createDefault(), bootnodesList, whitelistPersistor);
+            LocalPermissioningConfiguration.createDefault(), bootnodesList, whitelistPersistor);
   }
 
   @Test
@@ -238,7 +238,8 @@ public class NodeLocalConfigPermissioningControllerTest {
     final String expectedEnodeURL =
         "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.9:4567";
     final Path permissionsFile = createPermissionsFileWithNode(expectedEnodeURL);
-    final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
+    final LocalPermissioningConfiguration permissioningConfig =
+        mock(LocalPermissioningConfiguration.class);
 
     when(permissioningConfig.getConfigurationFilePath())
         .thenReturn(permissionsFile.toAbsolutePath().toString());
@@ -256,7 +257,8 @@ public class NodeLocalConfigPermissioningControllerTest {
   public void reloadNodeWhitelistWithErrorReadingConfigFileShouldKeepOldWhitelist() {
     final String expectedEnodeURI =
         "enode://aaaa80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.9:4567";
-    final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
+    final LocalPermissioningConfiguration permissioningConfig =
+        mock(LocalPermissioningConfiguration.class);
 
     when(permissioningConfig.getConfigurationFilePath()).thenReturn("foo");
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
@@ -347,7 +349,8 @@ public class NodeLocalConfigPermissioningControllerTest {
   @SuppressWarnings("unchecked")
   public void whenReloadingWhitelistShouldNotifyWhitelistModifiedSubscribers() throws Exception {
     final Path permissionsFile = createPermissionsFileWithNode(enode2);
-    final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
+    final LocalPermissioningConfiguration permissioningConfig =
+        mock(LocalPermissioningConfiguration.class);
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
     final NodeWhitelistUpdatedEvent expectedEvent =
         new NodeWhitelistUpdatedEvent(
@@ -370,7 +373,8 @@ public class NodeLocalConfigPermissioningControllerTest {
   public void whenReloadingWhitelistAndNothingChangesShouldNotNotifyWhitelistModifiedSubscribers()
       throws Exception {
     final Path permissionsFile = createPermissionsFileWithNode(enode1);
-    final PermissioningConfiguration permissioningConfig = mock(PermissioningConfiguration.class);
+    final LocalPermissioningConfiguration permissioningConfig =
+        mock(LocalPermissioningConfiguration.class);
     final Consumer<NodeWhitelistUpdatedEvent> consumer = mock(Consumer.class);
 
     when(permissioningConfig.getConfigurationFilePath())

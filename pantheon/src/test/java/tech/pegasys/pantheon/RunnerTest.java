@@ -38,7 +38,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -133,7 +133,8 @@ public final class RunnerTest {
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
-    final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
+    final LocalPermissioningConfiguration aheadPermissioningConfiguration =
+        permissioningConfiguration();
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
@@ -300,8 +301,8 @@ public final class RunnerTest {
     return configuration;
   }
 
-  private PermissioningConfiguration permissioningConfiguration() {
-    return PermissioningConfiguration.createDefault();
+  private LocalPermissioningConfiguration permissioningConfiguration() {
+    return LocalPermissioningConfiguration.createDefault();
   }
 
   private static void setupState(

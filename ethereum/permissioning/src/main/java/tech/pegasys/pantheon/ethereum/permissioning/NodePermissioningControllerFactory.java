@@ -26,27 +26,34 @@ import java.util.List;
 public class NodePermissioningControllerFactory {
 
   public NodePermissioningController create(
-      final PermissioningConfiguration localConfigPermissioningConfiguration,
+      final PermissioningConfiguration permissioningConfiguration,
       final Synchronizer synchronizer,
       final Collection<EnodeURL> bootnodes,
-      final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration,
       final TransactionSimulator transactionSimulator) {
     final SyncStatusNodePermissioningProvider syncStatusProvider =
         new SyncStatusNodePermissioningProvider(synchronizer, bootnodes);
     List<NodePermissioningProvider> providers = new ArrayList<>();
-    if (localConfigPermissioningConfiguration.isNodeWhitelistEnabled()) {
-      NodeLocalConfigPermissioningController localProvider =
-          new NodeLocalConfigPermissioningController(
-              localConfigPermissioningConfiguration, new ArrayList<>(bootnodes));
-      providers.add(localProvider);
+    if (permissioningConfiguration.getLocalConfig().isPresent()) {
+      LocalPermissioningConfiguration localPermissioningConfiguration =
+          permissioningConfiguration.getLocalConfig().get();
+      if (permissioningConfiguration.getLocalConfig().get().isNodeWhitelistEnabled()) {
+        NodeLocalConfigPermissioningController localProvider =
+            new NodeLocalConfigPermissioningController(
+                localPermissioningConfiguration, new ArrayList<>(bootnodes));
+        providers.add(localProvider);
+      }
     }
 
-    if (smartContractPermissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
-      SmartContractPermissioningController smartContractProvider =
-          new SmartContractPermissioningController(
-              smartContractPermissioningConfiguration.getSmartContractAddress(),
-              transactionSimulator);
-      providers.add(smartContractProvider);
+    if (permissioningConfiguration.getSmartContractConfig().isPresent()) {
+      SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+          permissioningConfiguration.getSmartContractConfig().get();
+      if (smartContractPermissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
+        SmartContractPermissioningController smartContractProvider =
+            new SmartContractPermissioningController(
+                smartContractPermissioningConfiguration.getSmartContractAddress(),
+                transactionSimulator);
+        providers.add(smartContractProvider);
+      }
     }
     return new NodePermissioningController(syncStatusProvider, providers);
   }

@@ -36,7 +36,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private PermissioningConfiguration configuration;
+  private LocalPermissioningConfiguration configuration;
   private final List<EnodeURL> bootnodes;
   private final List<EnodeURL> nodesWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
@@ -44,7 +44,8 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
       new Subscribers<>();
 
   public NodeLocalConfigPermissioningController(
-      final PermissioningConfiguration permissioningConfiguration, final List<EnodeURL> bootnodes) {
+      final LocalPermissioningConfiguration permissioningConfiguration,
+      final List<EnodeURL> bootnodes) {
     this(
         permissioningConfiguration,
         bootnodes,
@@ -52,7 +53,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
   }
 
   public NodeLocalConfigPermissioningController(
-      final PermissioningConfiguration configuration,
+      final LocalPermissioningConfiguration configuration,
       final List<EnodeURL> bootnodes,
       final WhitelistPersistor whitelistPersistor) {
     this.configuration = configuration;
@@ -61,7 +62,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
     readNodesFromConfig(configuration);
   }
 
-  private void readNodesFromConfig(final PermissioningConfiguration configuration) {
+  private void readNodesFromConfig(final LocalPermissioningConfiguration configuration) {
     if (configuration.isNodeWhitelistEnabled() && configuration.getNodeWhitelist() != null) {
       for (URI uri : configuration.getNodeWhitelist()) {
         nodesWhitelist.add(new EnodeURL(uri.toString()));
@@ -219,7 +220,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
     nodesWhitelist.clear();
 
     try {
-      final PermissioningConfiguration updatedConfig =
+      final LocalPermissioningConfiguration updatedConfig =
           PermissioningConfigurationBuilder.permissioningConfiguration(
               configuration.getConfigurationFilePath(),
               configuration.isNodeWhitelistEnabled(),
