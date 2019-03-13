@@ -3,6 +3,13 @@ description: Pantheon JSON-RPC API methods reference
 
 # JSON-RPC API Methods
 
+## Endpoint Host and Port
+
+All JSON-RPC HTTP examples use the default host and port endpoint `http://127.0.0.1:8545`. 
+
+If using the [--rpc-http-host](../Reference/Pantheon-CLI-Syntax.md#rpc-http-host) or [--rpc-http-port](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port)
+options, update the endpoint.  
+
 ## Admin Methods
 
 !!! note
@@ -37,7 +44,7 @@ The enode is `enode://<id>@<host:port>` where:
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -79,7 +86,7 @@ Properties of the node object are:
 
 !!! example
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"admin_nodeInfo","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"admin_nodeInfo","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -150,7 +157,7 @@ match the hex value for `port`. The remote address depends on which node initiat
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -200,7 +207,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -229,7 +236,7 @@ Returns a [SHA3](https://en.wikipedia.org/wiki/SHA-3) hash of the specified data
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"web3_sha3","params":["0x68656c6c6f20776f726c00"],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"web3_sha3","params":["0x68656c6c6f20776f726c00"],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -265,7 +272,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data ''{"jsonrpc":"2.0","method":"net_version","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data ''{"jsonrpc":"2.0","method":"net_version","params":[],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -302,7 +309,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"net_listening","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"net_listening","params":[],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -331,7 +338,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -372,7 +379,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":51}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":51}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -405,7 +412,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":51}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":51}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -442,7 +449,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_coinbase","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_coinbase","params":[],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -471,7 +478,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -500,7 +507,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_hashrate","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_hashrate","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -529,7 +536,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_gasPrice","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_gasPrice","params":[],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -561,7 +568,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -591,7 +598,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":51}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":51}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -622,7 +629,7 @@ Returns the account balance of the specified address.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0xdd37f65db31c107f773e82a4f85c693058fef7a9", "latest"],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0xdd37f65db31c107f773e82a4f85c693058fef7a9", "latest"],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -657,7 +664,7 @@ Returns the value of a storage position at a specified address.
     Calculating the correct position depends on the storage you want to retrieve.
 
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method": "eth_getStorageAt","params": ["0x‭3B3F3E‬","0x0","latest"],"id": 53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method": "eth_getStorageAt","params": ["0x‭3B3F3E‬","0x0","latest"],"id": 53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -688,7 +695,7 @@ Returns the number of transactions sent from a specified address.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionCount","params":["0xc94770007dda54cF92009BFF0dE90c06F603a09f","latest"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionCount","params":["0xc94770007dda54cF92009BFF0dE90c06F603a09f","latest"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -717,7 +724,7 @@ Returns the number of transactions in the block matching the given block hash.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -746,7 +753,7 @@ Returns the number of transactions in a block matching the specified block numbe
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByNumber","params":["0xe8"],"id":51}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockTransactionCountByNumber","params":["0xe8"],"id":51}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -775,7 +782,7 @@ Returns the number of uncles in a block from a block matching the given block ha
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockHash","params":["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -804,7 +811,7 @@ Returns the number of uncles in a block matching the specified block number.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockNumber","params":["0xe8"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockNumber","params":["0xe8"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -835,7 +842,7 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getCode","params":["0xa50a51c09a5c451c52bb714527e1974b686d8e77", "latest"],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getCode","params":["0xa50a51c09a5c451c52bb714527e1974b686d8e77", "latest"],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -876,7 +883,7 @@ To avoid exposing your private key, create signed transactions offline and send 
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -909,7 +916,7 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x69498dd54bd25aa0c886cf1f8b8ae0856d55ff13","value":"0x1"}, "latest"],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x69498dd54bd25aa0c886cf1f8b8ae0856d55ff13","value":"0x1"}, "latest"],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -949,7 +956,7 @@ The following example returns an estimate of 21000 wei (0x5208) for the transact
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73","to":"0x44Aa93095D6749A706051658B970b941c72c1D53","value":"0x1"}],"id":53}' <JSON-RPC-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_estimateGas","params":[{"from":"0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73","to":"0x44Aa93095D6749A706051658B970b941c72c1D53","value":"0x1"}],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -972,8 +979,8 @@ for example, **Remix > Compile tab > details > WEB3DEPLOY**.) The result is 1133
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST \
-        http://localhost:8545 \
+     curl -X POST \
+        http://127.0.0.1:8545 \
         -H 'Content-Type: application/json' \
         -d '{
           "jsonrpc": "2.0",
@@ -1012,7 +1019,7 @@ Returns information about the block by hash.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockByHash","params":["0x16b69965a5949262642cfb5e86368ddbbe57ab9f17d999174a65fd0e66580d8f", false],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockByHash","params":["0x16b69965a5949262642cfb5e86368ddbbe57ab9f17d999174a65fd0e66580d8f", false],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1063,7 +1070,7 @@ Returns information about a block by block number.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["0x64", true],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["0x64", true],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1112,7 +1119,7 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByHash","params":["0xa52be92809541220ee0aaaede6047d9a6c5d0cd96a517c854d944ee70a0ebb44"],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByHash","params":["0xa52be92809541220ee0aaaede6047d9a6c5d0cd96a517c854d944ee70a0ebb44"],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1158,7 +1165,7 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByBlockHashAndIndex","params":["0xbf137c3a7a1ebdfac21252765e5d7f40d115c2757e4a4abee929be88c624fdb7", "0x2"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByBlockHashAndIndex","params":["0xbf137c3a7a1ebdfac21252765e5d7f40d115c2757e4a4abee929be88c624fdb7", "0x2"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1209,7 +1216,7 @@ Object - [Transaction object](JSON-RPC-API-Objects.md#transaction-object), or `n
     This request returns the third transaction in the 82990 block on the Ropsten testnet. You can also view this [block](https://ropsten.etherscan.io/txs?block=82990) and [transaction](https://ropsten.etherscan.io/tx/0xfc766a71c406950d4a4955a340a092626c35083c64c7be907060368a5e6811d6) on Etherscan.
 
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByBlockNumberAndIndex","params":["82990", "0x2"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByBlockNumberAndIndex","params":["82990", "0x2"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1253,7 +1260,7 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionReceipt","params":["0x504ce587a65bdbdb6414a0c6c16d86a04dd79bfcc4f2950eec9634b30ce5370f"],"id":53}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionReceipt","params":["0x504ce587a65bdbdb6414a0c6c16d86a04dd79bfcc4f2950eec9634b30ce5370f"],"id":53}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1298,7 +1305,7 @@ Creates a [log filter](../Using-Pantheon/Events-and-Logs.md). To poll for logs a
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newFilter","params":[{"fromBlock":"earliest", "toBlock":"latest", "topics":[]}],"id":1}' <JSON-RPC-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newFilter","params":[{"fromBlock":"earliest", "toBlock":"latest", "topics":[]}],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1327,7 +1334,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newBlockFilter","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newBlockFilter","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1356,7 +1363,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newPendingTransactionFilter","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_newPendingTransactionFilter","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1389,7 +1396,7 @@ Filters time out when not requested by [eth_getFilterChanges](#eth_getfilterchan
     The following request deletes the block filter with an ID of 0x4:
 
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_uninstallFilter","params":["0x70355a0b574b437eaa19fe95adfedc0a"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_uninstallFilter","params":["0x70355a0b574b437eaa19fe95adfedc0a"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1422,7 +1429,7 @@ Polls the specified filter and returns an array of changes that have occurred si
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getFilterChanges","params":["0xf8bf5598d9e04fbe84523d42640b9b0e"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getFilterChanges","params":["0xf8bf5598d9e04fbe84523d42640b9b0e"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1511,7 +1518,7 @@ Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) for the specifi
 !!! example
 
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getFilterLogs","params":["0x5ace5de3985749b6a1b2b0d3f3e1fb69"],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getFilterLogs","params":["0x5ace5de3985749b6a1b2b0d3f3e1fb69"],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1562,7 +1569,7 @@ Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) matching a spec
     The following request returns all logs for the contract at address `0x2e1f232a9439c3d459fceca0beef13acc8259dd8`. 
 
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getLogs","params":[{"fromBlock":"earliest", "toBlock":"latest", "address": "0x2e1f232a9439c3d459fceca0beef13acc8259dd8", "topics":[]}], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getLogs","params":[{"fromBlock":"earliest", "toBlock":"latest", "address": "0x2e1f232a9439c3d459fceca0beef13acc8259dd8", "topics":[]}], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1615,7 +1622,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getWork","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getWork","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1655,7 +1662,7 @@ Discards a proposal to [add or remove a signer with the specified address](../Co
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_discard","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1684,7 +1691,7 @@ Lists [signers for the specified block](../Consensus-Protocols/Clique.md#adding-
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSigners","params":["latest"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1713,7 +1720,7 @@ Lists signers for the specified block.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSignersAtHash","params":["0x98b2ddb5106b03649d2d337d42154702796438b3c74fd25a5782940e84237a48"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_getSignersAtHash","params":["0x98b2ddb5106b03649d2d337d42154702796438b3c74fd25a5782940e84237a48"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1744,7 +1751,7 @@ Proposes [adding or removing a signer with the specified address](../Consensus-P
    
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_propose","params":["0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73", true], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1775,7 +1782,7 @@ If the boolean value is `true`, the proposal is to add a signer. If `false`, the
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"clique_proposals","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"clique_proposals","params":[], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1823,7 +1830,7 @@ Returns the contract storage for the specified range.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_storageRangeAt","params":["0x2b76b3a2fc44c0e21ea183d06c846353279a7acf12abcc6fb9d5e8fb14ae2f8c",0,"0x0e0d2c8f7794e82164f11798276a188147fbd415","0x0000000000000000000000000000000000000000000000000000000000000000",1], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"debug_storageRangeAt","params":["0x2b76b3a2fc44c0e21ea183d06c846353279a7acf12abcc6fb9d5e8fb14ae2f8c",0,"0x0e0d2c8f7794e82164f11798276a188147fbd415","0x0000000000000000000000000000000000000000000000000000000000000000",1], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1868,7 +1875,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_metrics","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"debug_metrics","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -1995,7 +2002,7 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceTransaction","params":["0x2cc6c94c21685b7e0f8ddabf277a5ccf98db157c62619cde8baea696a74ed18e",{"disableStorage":true}],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceTransaction","params":["0x2cc6c94c21685b7e0f8ddabf277a5ccf98db157c62619cde8baea696a74ed18e",{"disableStorage":true}],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2044,7 +2051,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_start","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"miner_start","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2073,7 +2080,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_stop","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"miner_stop","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2108,7 +2115,7 @@ Discards a proposal to [add or remove a validator](../Consensus-Protocols/IBFT.m
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xef1bfb6a12794615c9b0b5a21e6741f01e570185"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_discardValidatorVote","params":["0xef1bfb6a12794615c9b0b5a21e6741f01e570185"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2139,7 +2146,7 @@ If the boolean value is `true`, the vote is to add a validator. If `false`, the 
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getPendingVotes","params":[], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2171,7 +2178,7 @@ Lists the validators defined in the specified block.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0xbae7d3feafd743343b9a4c578cab5e5d65eb735f6855fb845c00cab356331256"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockHash","params":["0xbae7d3feafd743343b9a4c578cab5e5d65eb735f6855fb845c00cab356331256"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2204,7 +2211,7 @@ Lists the validators defined in the specified block.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_getValidatorsByBlockNumber","params":["latest"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2239,7 +2246,7 @@ Proposes [adding or removing a validator](../Consensus-Protocols/IBFT.md#adding-
    
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["42d4287eac8078828cf5f3486cfe601a275a49a5",true], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"ibft_proposeValidatorVote","params":["42d4287eac8078828cf5f3486cfe601a275a49a5",true], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2278,7 +2285,7 @@ including invalid account addresses.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_addAccountsToWhitelist","params":[["0xb9b81ee349c3807e46bc71aa2632203c5b462032", "0xb9b81ee349c3807e46bc71aa2632203c5b462034"]], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"perm_addAccountsToWhitelist","params":[["0xb9b81ee349c3807e46bc71aa2632203c5b462032", "0xb9b81ee349c3807e46bc71aa2632203c5b462034"]], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2307,7 +2314,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_getAccountsWhitelist","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"perm_getAccountsWhitelist","params":[], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2343,7 +2350,7 @@ including invalid account addresses.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_removeAccountsFromWhitelist","params":[["0xb9b81ee349c3807e46bc71aa2632203c5b462032", "0xb9b81ee349c3807e46bc71aa2632203c5b462034"]], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"perm_removeAccountsFromWhitelist","params":[["0xb9b81ee349c3807e46bc71aa2632203c5b462032", "0xb9b81ee349c3807e46bc71aa2632203c5b462034"]], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2375,7 +2382,7 @@ including invalid enode URLs.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_addNodesToWhitelist","params":[["enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304"]], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"perm_addNodesToWhitelist","params":[["enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304"]], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2404,7 +2411,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_getNodesWhitelist","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"perm_getNodesWhitelist","params":[], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2440,7 +2447,7 @@ including invalid enode URLs.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_removeNodesFromWhitelist","params":[["enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304"]], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"perm_removeNodesFromWhitelist","params":[["enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304"]], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2469,7 +2476,7 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"perm_reloadPermissionsFromFile","params":[], "id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"perm_reloadPermissionsFromFile","params":[], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
@@ -2500,7 +2507,7 @@ Enabled JSON-RPC APIs.
 
 !!! example
     ```bash tab="curl HTTP request"
-    $ curl -X POST --data '{"jsonrpc":"2.0","method":"rpc_modules","params":[],"id":1}' <JSON-RPC-http-endpoint:port>
+    curl -X POST --data '{"jsonrpc":"2.0","method":"rpc_modules","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
