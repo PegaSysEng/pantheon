@@ -94,7 +94,7 @@ public class WorldStateDownloaderTest {
 
   private final BlockDataGenerator dataGen = new BlockDataGenerator(1);
   private final ExecutorService persistenceThread =
-      Executors.newSingleThreadExecutor(
+      Executors.newCachedThreadPool(
           new ThreadFactoryBuilder()
               .setDaemon(true)
               .setNameFormat(WorldStateDownloaderTest.class.getSimpleName() + "-persistence-%d")
@@ -242,7 +242,7 @@ public class WorldStateDownloaderTest {
 
     final CompletableFuture<Void> result = downloader.run(header);
 
-    persistenceThread.submit(serviceExecutor::runPendingFutures);
+    serviceExecutor.runPendingFuturesInSeparateThreads(persistenceThread);
 
     // Respond to node data requests
     final Responder responder =
@@ -879,10 +879,7 @@ public class WorldStateDownloaderTest {
       peer.respond(fullResponder);
     }
     // Respond to remaining queued requests in custom way
-    while (!result.isDone()) {
-      networkResponder.respond(usefulPeers, remoteWorldStateArchive, result);
-      giveOtherThreadsAGo();
-    }
+    networkResponder.respond(usefulPeers, remoteWorldStateArchive, result);
 
     // Check that trailing peers were not queried for data
     for (final RespondingEthPeer trailingPeer : trailingPeers) {
@@ -997,7 +994,7 @@ public class WorldStateDownloaderTest {
   }
 
   private void giveOtherThreadsAGo() {
-    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(2));
+    LockSupport.parkNanos(10);
   }
 
   @FunctionalInterface
