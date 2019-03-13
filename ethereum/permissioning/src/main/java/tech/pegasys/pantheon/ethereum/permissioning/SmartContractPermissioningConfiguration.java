@@ -22,7 +22,8 @@ public class SmartContractPermissioningConfiguration {
     return smartContractNodeWhitelistEnabled;
   }
 
-  public void setSmartContractNodeWhitelistEnabled(boolean smartContractNodeWhitelistEnabled) {
+  public void setSmartContractNodeWhitelistEnabled(
+      final boolean smartContractNodeWhitelistEnabled) {
     this.smartContractNodeWhitelistEnabled = smartContractNodeWhitelistEnabled;
   }
 
@@ -30,7 +31,7 @@ public class SmartContractPermissioningConfiguration {
     return smartContractAddress;
   }
 
-  public void setSmartContractAddress(Address smartContractAddress) {
+  public void setSmartContractAddress(final Address smartContractAddress) {
     this.smartContractAddress = smartContractAddress;
   }
 }
