@@ -49,14 +49,12 @@ public class CompleteTaskStep {
       enqueueChildren(task, header, downloadState);
       completedRequestsCounter.inc();
       task.markCompleted();
-      if (downloadState.shouldRequestRootNode()) {
-        downloadState.enqueueRequest(
-            NodeDataRequest.createAccountDataRequest(header.getStateRoot()));
-      }
       downloadState.checkCompletion(worldStateStorage, header);
     } else {
       retriedRequestsCounter.inc();
       task.markFailed();
+      // Marking the task as failed will add it back to the queue so make sure any threads
+      // waiting to read from the queue are notified.
       downloadState.notifyTaskAvailable();
     }
   }
@@ -67,9 +65,7 @@ public class CompleteTaskStep {
       final WorldDownloadState downloadState) {
     final NodeDataRequest request = task.getData();
     // Only queue rootnode children if we started from scratch
-    if (request.getData() != null
-        && (!downloadState.downloadWasResumed() || !isRootState(blockHeader, request))) {
-
+    if (!downloadState.downloadWasResumed() || !isRootState(blockHeader, request)) {
       downloadState.enqueueRequests(request.getChildRequests());
     }
   }
