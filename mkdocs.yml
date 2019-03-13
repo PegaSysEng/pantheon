@@ -61,6 +61,7 @@ nav:
         - Comparing PoA Consensus Protocols: Consensus-Protocols/Comparing-PoA.md
         - Clique: Consensus-Protocols/Clique.md
         - IBFT 2.0: Consensus-Protocols/IBFT.md
+        - Quorum IBFT 1.0: Consensus-Protocols/QuorumIBFT.md
     - JSON-RPC API:
         - Overview: JSON-RPC-API/JSON-RPC-API.md
         - Using the JSON-RPC API: JSON-RPC-API/Using-JSON-RPC-API.md
@@ -97,7 +98,7 @@ markdown_extensions:
     - toc:
         permalink: 
         toc_depth: 3
-    - pymdownx.highlight:
+    - codehilite
     - markdown_include.include:
         base_path: docs
     - admonition
