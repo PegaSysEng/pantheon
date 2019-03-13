@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipe;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
+import tech.pegasys.pantheon.services.pipeline.WritePipe;
 import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
@@ -76,11 +77,15 @@ public class WorldStateDownloadProcess {
   private static final Logger LOG = LogManager.getLogger();
   private final Pipeline fetchDataPipeline;
   private final Pipeline completionPipeline;
+  private final WritePipe<Task<NodeDataRequest>> requestsToComplete;
 
   private WorldStateDownloadProcess(
-      final Pipeline fetchDataPipeline, final Pipeline completionPipeline) {
+      final Pipeline fetchDataPipeline,
+      final Pipeline completionPipeline,
+      final WritePipe<Task<NodeDataRequest>> requestsToComplete) {
     this.fetchDataPipeline = fetchDataPipeline;
     this.completionPipeline = completionPipeline;
+    this.requestsToComplete = requestsToComplete;
   }
 
   public static Builder builder() {
@@ -91,13 +96,17 @@ public class WorldStateDownloadProcess {
     final CompletableFuture<Void> fetchDataFuture = ethScheduler.startPipeline(fetchDataPipeline);
     final CompletableFuture<Void> completionFuture = ethScheduler.startPipeline(completionPipeline);
 
-    fetchDataFuture.exceptionally(
-        error -> {
-          if (!(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
-            LOG.error("Pipeline failed", error);
+    fetchDataFuture.whenComplete(
+        (result, error) -> {
+          if (error != null) {
+            if (!(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+              LOG.error("Pipeline failed", error);
+            }
+            completionPipeline.abort();
+          } else {
+            // No more data to fetch, so propagate the pipe closure onto the completion pipe.
+            requestsToComplete.close();
           }
-          completionPipeline.abort();
-          return null;
         });
 
     completionFuture.exceptionally(
@@ -223,7 +232,8 @@ public class WorldStateDownloadProcess {
                       completeTaskStep.markAsCompleteOrFailed(
                           pivotBlockHeader, downloadState, task));
 
-      return new WorldStateDownloadProcess(fetchDataPipeline, completionPipeline);
+      return new WorldStateDownloadProcess(
+          fetchDataPipeline, completionPipeline, requestsToComplete);
     }
   }
 }
