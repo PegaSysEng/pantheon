@@ -65,12 +65,12 @@ import org.apache.logging.log4j.Logger;
  *                    |                                                 |
  *                    |                                                 |
  *                    ---------------------------------------------------
- *                                            |
- *                                            |
- *                                   --------------------
- *                                   | Enqueue Children |
- *                                   | & Mark Complete  |
- *                                   --------------------
+ *                                             |
+ *                                             |
+ *                                   ----------------------
+ *                                   |  Enqueue Children  |
+ *                                   | and Mark Complete  |
+ *                                   ----------------------
  * </pre>
  */
 public class WorldStateDownloadProcess {
