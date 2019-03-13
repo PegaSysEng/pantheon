@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class NodePermissioningControllerFactory {
 
@@ -32,17 +33,20 @@ public class NodePermissioningControllerFactory {
       final TransactionSimulator transactionSimulator) {
     final SyncStatusNodePermissioningProvider syncStatusProvider =
         new SyncStatusNodePermissioningProvider(synchronizer, bootnodes);
-    NodePermissioningProvider[] providers = {};
+    List<NodePermissioningProvider> providers = new ArrayList<>();
     if (localConfigPermissioningConfiguration.isNodeWhitelistEnabled()) {
       NodeLocalConfigPermissioningController localProvider =
-          new NodeLocalConfigPermissioningController(localConfigPermissioningConfiguration, new ArrayList<>(bootnodes));
-      providers[providers.length] = localProvider;
+          new NodeLocalConfigPermissioningController(
+              localConfigPermissioningConfiguration, new ArrayList<>(bootnodes));
+      providers.add(localProvider);
     }
 
     if (smartContractPermissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
       SmartContractPermissioningController smartContractProvider =
-          new SmartContractPermissioningController(smartContractPermissioningConfiguration.getSmartContractAddress(), transactionSimulator);
-      providers[providers.length] = smartContractProvider;
+          new SmartContractPermissioningController(
+              smartContractPermissioningConfiguration.getSmartContractAddress(),
+              transactionSimulator);
+      providers.add(smartContractProvider);
     }
     return new NodePermissioningController(syncStatusProvider, providers);
   }

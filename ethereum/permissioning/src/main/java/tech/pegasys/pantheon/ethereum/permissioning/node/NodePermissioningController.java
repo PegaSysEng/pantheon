@@ -15,8 +15,10 @@ package tech.pegasys.pantheon.ethereum.permissioning.node;
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,11 +27,11 @@ public class NodePermissioningController {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider;
-  private NodePermissioningProvider[] providers;
+  private List<NodePermissioningProvider> providers;
 
   public NodePermissioningController(
       final SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider,
-      final NodePermissioningProvider[] providers) {
+      final List<NodePermissioningProvider> providers) {
     this.providers = providers;
     this.syncStatusNodePermissioningProvider = Optional.of(syncStatusNodePermissioningProvider);
   }
@@ -41,10 +43,11 @@ public class NodePermissioningController {
         && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
       return false;
     } else {
-      for (int i = 0; i < providers.length; i++)
-        if (!providers[i].isPermitted(sourceEnode, destinationEnode)) {
+      for (NodePermissioningProvider provider : providers) {
+        if (!provider.isPermitted(sourceEnode, destinationEnode)) {
           return false;
         }
+      }
     }
     return true;
   }
@@ -52,5 +55,10 @@ public class NodePermissioningController {
   public void startPeerDiscoveryCallback(final Runnable peerDiscoveryCallback) {
     syncStatusNodePermissioningProvider.ifPresent(
         (p) -> p.setHasReachedSyncCallback(peerDiscoveryCallback));
+  }
+
+  @VisibleForTesting
+  List<NodePermissioningProvider> getProviders() {
+    return providers;
   }
 }

@@ -22,6 +22,9 @@ import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioning
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +49,7 @@ public class NodePermissioningControllerTest {
 
   @Before
   public void before() {
-    NodePermissioningProvider[] emptyProviders = {};
+    List<NodePermissioningProvider> emptyProviders = new ArrayList<>();
     this.controller =
         new NodePermissioningController(syncStatusNodePermissioningProvider, emptyProviders);
   }
@@ -67,7 +70,8 @@ public class NodePermissioningControllerTest {
 
   @Test
   public void whenInSyncWeShouldDelegateToLocalConfigNodePermissioningProvider() {
-    NodePermissioningProvider[] providers = {localConfigNodePermissioningProvider};
+    List<NodePermissioningProvider> providers = new ArrayList<>();
+    providers.add(localConfigNodePermissioningProvider);
     this.controller =
         new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
 
@@ -81,9 +85,7 @@ public class NodePermissioningControllerTest {
   @Test
   public void
       whenInSyncWeShouldDelegateToAnyOtherNodePermissioningProviderAndIsPermittedIfAllPermitted() {
-    NodePermissioningProvider[] providers = {
-      localConfigNodePermissioningProvider, otherPermissioningProvider
-    };
+    List<NodePermissioningProvider> providers = getNodePermissioningProviders();
     this.controller =
         new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
 
@@ -98,12 +100,18 @@ public class NodePermissioningControllerTest {
     verify(otherPermissioningProvider).isPermitted(eq(enode1), eq(enode2));
   }
 
+  private List<NodePermissioningProvider> getNodePermissioningProviders() {
+    List<NodePermissioningProvider> providers = new ArrayList<>();
+    providers.add(localConfigNodePermissioningProvider);
+    providers.add(otherPermissioningProvider);
+    return providers;
+  }
+
   @Test
   public void
       whenInSyncWeShouldDelegateToAnyOtherNodePermissioningProviderAndIsNotPermittedIfAnyNotPermitted() {
-    NodePermissioningProvider[] providers = {
-      localConfigNodePermissioningProvider, otherPermissioningProvider
-    };
+    List<NodePermissioningProvider> providers = getNodePermissioningProviders();
+
     this.controller =
         new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
 
