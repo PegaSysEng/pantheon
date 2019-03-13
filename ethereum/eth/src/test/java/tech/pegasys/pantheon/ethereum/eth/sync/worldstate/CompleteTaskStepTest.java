@@ -52,10 +52,10 @@ public class CompleteTaskStepTest {
   public void shouldEnqueueChildrenAndMarkCompleteWhenTaskHasData() {
     // Use an arbitrary but actually valid trie node to get children from.
     final Hash hash =
-        Hash.fromHexString("0xbb1f7ff2c72bfc5aeab245db5951352717cb9b236965a556a56de4ccdac8f85c");
+        Hash.fromHexString("0x601a7b0d0267209790cf4c4d9e0cab11b26c537e2ade006412f48b070010e847");
     final BytesValue data =
         BytesValue.fromHexString(
-            "0xf843a02067b0e3c82238f4f2d1a50a8b3a44f96311d77b148c30dc0ef863e1a060dcb6a1a0e8bf75989ccc3c3918b8ff26d0a494e090e4bf7dff75e064ddf06e4271bafeb4");
+            "0xf85180808080a05ac6993e3fbca0bfbd30173396dd5c2412657fae0bad92e401d17b2aa9a3698f80808080a012f96a0812be538c302416dc6e8df19ce18f1cc7b06a3c7a16831d766c87a9b580808080808080");
     final StubTask task = new StubTask(NodeDataRequest.createAccountDataRequest(hash));
     task.getData().setData(data);
 
