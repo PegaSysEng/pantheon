@@ -208,9 +208,10 @@ public class WorldStateDownloadProcess {
                   new TaskQueueIterator(downloadState),
                   bufferCapacity,
                   outputCounter)
-              .thenFlatMap(
+              .thenFlatMapInParallel(
                   "requestLoadLocalData",
                   task -> loadLocalDataStep.loadLocalData(task, requestsToComplete),
+                  3,
                   bufferCapacity)
               .inBatches("batchCreate", hashCountPerRequest)
               .thenProcessAsync(
