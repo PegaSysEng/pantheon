@@ -82,7 +82,7 @@ public class NodeLocalConfigPermissioningControllerTest {
   }
 
   @Test
-  public void whenAddNodesInputIsSelfShouldReturnAddingSelfError() {
+  public void whenAddNodesInputContainsSelfShouldReturnAddingSelfError() {
     controller.addNodes(Arrays.asList(enode1));
 
     NodesWhitelistResult expected =
@@ -225,6 +225,15 @@ public class NodeLocalConfigPermissioningControllerTest {
     controller.addNodes(Arrays.asList(peerWithDifferentTcpPortSet));
 
     assertThat(controller.isPermitted(peerWithTcpPortSet)).isFalse();
+  }
+
+  @Test
+  public void whenCheckingIfNodeIsPermittedOrderDoesNotMatter() {
+    controller.addNodes(Arrays.asList(enode1));
+    assertThat(controller.isPermitted(new EnodeURL(enode1), new EnodeURL(selfEnode))).isTrue();
+    assertThat(controller.isPermitted(new EnodeURL(selfEnode), new EnodeURL(enode1))).isTrue();
+    
+    assertThat(controller.isPermitted(new EnodeURL(selfEnode), new EnodeURL(selfEnode))).isFalse();
   }
 
   @Test

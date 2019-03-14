@@ -314,6 +314,6 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    return isPermitted(sourceEnode) && isPermitted(destinationEnode);
+    return isPermitted(sourceEnode) || isPermitted(destinationEnode);
   }
 }
