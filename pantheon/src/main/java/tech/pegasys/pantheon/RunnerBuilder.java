@@ -241,7 +241,7 @@ public class RunnerBuilder {
                             synchronizer::hasSufficientPeers,
                             peerBlacklist,
                             metricsSystem,
-                            nodeWhitelistController)
+                            nodeWhitelistController, Optional.empty())
                     : caps -> new NoopP2PNetwork())
             .metricsSystem(metricsSystem)
             .build();

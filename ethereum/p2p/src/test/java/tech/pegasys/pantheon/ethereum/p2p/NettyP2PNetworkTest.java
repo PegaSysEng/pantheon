@@ -116,6 +116,7 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty());
         final P2PNetwork connector =
             new NettyP2PNetwork(
@@ -129,6 +130,7 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty())) {
 
       final int listenPort = listener.getLocalPeerInfo().getPort();
@@ -170,6 +172,7 @@ public final class NettyP2PNetworkTest {
                 () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty());
         final P2PNetwork connector =
             new NettyP2PNetwork(
@@ -183,6 +186,7 @@ public final class NettyP2PNetworkTest {
                 () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty())) {
       final int listenPort = listener.getLocalPeerInfo().getPort();
       listener.start();
@@ -239,6 +243,7 @@ public final class NettyP2PNetworkTest {
                 () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty());
         final P2PNetwork connector1 =
             new NettyP2PNetwork(
@@ -252,6 +257,7 @@ public final class NettyP2PNetworkTest {
                 () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty());
         final P2PNetwork connector2 =
             new NettyP2PNetwork(
@@ -265,6 +271,7 @@ public final class NettyP2PNetworkTest {
                 () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty())) {
 
       final int listenPort = listener.getLocalPeerInfo().getPort();
@@ -320,6 +327,7 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty());
         final P2PNetwork connector =
             new NettyP2PNetwork(
@@ -333,6 +341,7 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty())) {
       final int listenPort = listener.getLocalPeerInfo().getPort();
       listener.start();
@@ -375,6 +384,7 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 localBlacklist,
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty());
         final P2PNetwork remoteNetwork =
             new NettyP2PNetwork(
@@ -388,6 +398,7 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 remoteBlacklist,
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty())) {
       final int localListenPort = localNetwork.getLocalPeerInfo().getPort();
       final int remoteListenPort = remoteNetwork.getLocalPeerInfo().getPort();
@@ -465,7 +476,8 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 localBlacklist,
                 new NoOpMetricsSystem(),
-                Optional.of(localWhitelistController));
+                Optional.of(localWhitelistController),
+                Optional.empty());
         final P2PNetwork remoteNetwork =
             new NettyP2PNetwork(
                 vertx,
@@ -478,6 +490,7 @@ public final class NettyP2PNetworkTest {
                 () -> false,
                 remoteBlacklist,
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty())) {
       final int localListenPort = localNetwork.getLocalPeerInfo().getPort();
       final Peer localPeer =
@@ -784,7 +797,7 @@ public final class NettyP2PNetworkTest {
         new PeerBlacklist(),
         new NoOpMetricsSystem(),
         Optional.empty(),
-        nodePermissioningController,
+        Optional.of(nodePermissioningController),
         blockchain);
   }
 

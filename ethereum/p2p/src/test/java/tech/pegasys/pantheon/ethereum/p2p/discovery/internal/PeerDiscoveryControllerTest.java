@@ -20,7 +20,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -30,9 +29,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import sun.rmi.runtime.RuntimeUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.p2p.NodePermissioningControllerBuilder;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
@@ -49,7 +48,6 @@ import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
@@ -1014,7 +1012,8 @@ public class PeerDiscoveryControllerTest {
 
     // Setup ping to be sent to discoveryPeer
     List<SECP256K1.KeyPair> keyPairs = PeerDiscoveryTestHelper.generateKeyPairs(1);
-    PingPacketData pingPacketData = PingPacketData.create(localEndpoint, discoveryPeer.getEndpoint());
+    PingPacketData pingPacketData =
+        PingPacketData.create(localEndpoint, discoveryPeer.getEndpoint());
     final Packet discoPeerPing = Packet.create(PacketType.PING, pingPacketData, keyPairs.get(0));
     mockPacketCreation(PacketType.PING, discoveryPeer, discoPeerPing);
 
@@ -1054,9 +1053,7 @@ public class PeerDiscoveryControllerTest {
     final DiscoveryPeer discoPeer = peers.get(0);
 
     final NodePermissioningController nodePermissioningController =
-        new NodePermissioningControllerBuilder(localPeer)
-            .withForbiddenPeers(discoPeer)
-            .build();
+        new NodePermissioningControllerBuilder(localPeer).withForbiddenPeers(discoPeer).build();
 
     controller =
         getControllerBuilder()
@@ -1214,47 +1211,6 @@ public class PeerDiscoveryControllerTest {
     tempFile.toFile().deleteOnExit();
     config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
     return config;
-  }
-
-  static class NodePermissioningControllerBuilder {
-    private final EnodeURL localNode;
-    private final Collection<EnodeURL> permittedNodes = new ArrayList<>();
-    private final Collection<EnodeURL> notPermittedNodes = new ArrayList<>();
-
-    public NodePermissioningControllerBuilder(Peer localPeer) {
-      this.localNode = new EnodeURL(localPeer.getEnodeURI());
-    }
-
-    NodePermissioningControllerBuilder withPermittedPeers(Peer ... peers) {
-      this.permittedNodes.addAll(
-          Arrays.stream(peers).map(p -> new EnodeURL(p.getEnodeURI()))
-              .collect(Collectors.toList()));
-      return this;
-    }
-
-    NodePermissioningControllerBuilder withForbiddenPeers(Peer ... peers) {
-      this.notPermittedNodes.addAll(
-          Arrays.stream(peers).map(p -> new EnodeURL(p.getEnodeURI()))
-              .collect(Collectors.toList()));
-      return this;
-    }
-
-    NodePermissioningController build() {
-      final NodePermissioningController nodePermissioningController =
-          spy(new NodePermissioningController());
-
-      permittedNodes.forEach(node -> {
-        when(nodePermissioningController.isPermitted(eq(localNode), eq(node))).thenReturn(true);
-        when(nodePermissioningController.isPermitted(eq(node), eq(localNode))).thenReturn(true);
-      });
-
-      notPermittedNodes.forEach(node -> {
-        when(nodePermissioningController.isPermitted(eq(localNode), eq(node))).thenReturn(false);
-        when(nodePermissioningController.isPermitted(eq(node), eq(localNode))).thenReturn(false);
-      });
-
-      return nodePermissioningController;
-    }
   }
 
   static class ControllerBuilder {

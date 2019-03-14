@@ -175,7 +175,8 @@ public class NettyP2PNetwork implements P2PNetwork {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
-      final Optional<NodeWhitelistController> nodeWhitelistController) {
+      final Optional<NodeWhitelistController> nodeWhitelistController,
+      final Optional<NodePermissioningController> nodePermissioningController) {
     this(
         vertx,
         keyPair,
@@ -185,7 +186,7 @@ public class NettyP2PNetwork implements P2PNetwork {
         peerBlacklist,
         metricsSystem,
         nodeWhitelistController,
-        null,
+        nodePermissioningController,
         null);
   }
 
@@ -216,7 +217,7 @@ public class NettyP2PNetwork implements P2PNetwork {
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
       final Optional<NodeWhitelistController> nodeWhitelistController,
-      final NodePermissioningController nodePermissioningController,
+      final Optional<NodePermissioningController> nodePermissioningController,
       final Blockchain blockchain) {
 
     connections = new PeerConnectionRegistry(metricsSystem);
@@ -230,7 +231,8 @@ public class NettyP2PNetwork implements P2PNetwork {
             config.getDiscovery(),
             peerRequirement,
             peerBlacklist,
-            nodeWhitelistController);
+            nodeWhitelistController,
+            nodePermissioningController);
 
     outboundMessagesCounter =
         metricsSystem.createLabelledCounter(
@@ -301,7 +303,7 @@ public class NettyP2PNetwork implements P2PNetwork {
       throw new RuntimeException("Interrupted before startup completed", e);
     }
 
-    this.nodePermissioningController = Optional.ofNullable(nodePermissioningController);
+    this.nodePermissioningController = nodePermissioningController;
     this.blockchain = Optional.ofNullable(blockchain);
   }
 
