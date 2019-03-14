@@ -23,7 +23,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
-import tech.pegasys.pantheon.ethereum.p2p.PeerNotWhitelistedException;
+import tech.pegasys.pantheon.ethereum.p2p.PeerNotPermittedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 
 import org.junit.Before;
@@ -197,7 +197,7 @@ public class AdminAddPeerTest {
   @Test
   public void requestReturnsErrorWhenPeerNotWhitelisted() {
     when(p2pNetwork.addMaintainConnectionPeer(any()))
-        .thenThrow(new PeerNotWhitelistedException("Cannot add peer that is not whitelisted"));
+        .thenThrow(new PeerNotPermittedException());
 
     final JsonRpcRequest request =
         new JsonRpcRequest(
