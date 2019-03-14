@@ -37,8 +37,9 @@ public class PersistDataStepTest {
       new InMemoryStorageProvider().createWorldStateStorage();
   private final WorldDownloadState downloadState = mock(WorldDownloadState.class);
 
+  private final BytesValue rootNodeData = BytesValue.of(1, 1, 1, 1);
   private final BlockHeader blockHeader =
-      new BlockHeaderTestFixture().stateRoot(Hash.hash(BytesValue.of(1, 1, 1, 1))).buildHeader();
+      new BlockHeaderTestFixture().stateRoot(Hash.hash(rootNodeData)).buildHeader();
 
   private final PersistDataStep persistDataStep = new PersistDataStep(worldStateStorage);
 
@@ -74,7 +75,7 @@ public class PersistDataStepTest {
 
   @Test
   public void shouldStoreRootNodeDataInDownloadStateInsteadOfPersisting() {
-    final Task<NodeDataRequest> rootNode = createTaskWithData(1, 1, 1, 1);
+    final Task<NodeDataRequest> rootNode = createTaskWithData(rootNodeData);
     final List<Task<NodeDataRequest>> tasks = singletonList(rootNode);
     final List<Task<NodeDataRequest>> result =
         persistDataStep.persist(tasks, blockHeader, downloadState);
@@ -85,7 +86,10 @@ public class PersistDataStepTest {
   }
 
   private Task<NodeDataRequest> createTaskWithData(final int... bytes) {
-    final BytesValue data = BytesValue.of(bytes);
+    return createTaskWithData(BytesValue.of(bytes));
+  }
+
+  private Task<NodeDataRequest> createTaskWithData(final BytesValue data) {
     final StubTask task = createTaskWithoutData(data);
     task.getData().setData(data);
     return task;

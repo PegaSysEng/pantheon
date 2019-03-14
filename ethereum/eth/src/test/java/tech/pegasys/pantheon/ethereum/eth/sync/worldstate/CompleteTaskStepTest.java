@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -46,6 +47,7 @@ public class CompleteTaskStepTest {
     assertThat(task.isCompleted()).isFalse();
     assertThat(task.isFailed()).isTrue();
     verify(downloadState).notifyTaskAvailable();
+    verify(downloadState, never()).checkCompletion(worldStateStorage, blockHeader);
   }
 
   @Test
