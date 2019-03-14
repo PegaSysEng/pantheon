@@ -58,7 +58,9 @@ public class RocksDbTaskQueue<T> implements TaskCollection<T> {
     this.deserializer = deserializer;
     try {
       RocksDbUtil.loadNativeLibrary();
-      options = new Options().setCreateIfMissing(true);
+      // We don't support reloading data so ensure we're starting from a clean slate.
+      RocksDB.destroyDB(storageDirectory.toString(), new Options());
+      options = new Options().setCreateIfMissing(true).setErrorIfExists(true);
       db = RocksDB.open(options, storageDirectory.toString());
 
       enqueueLatency =
