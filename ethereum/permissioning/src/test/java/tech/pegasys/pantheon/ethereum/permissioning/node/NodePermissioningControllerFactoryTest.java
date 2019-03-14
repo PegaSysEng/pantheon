@@ -17,9 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodePermissioningControllerFactory;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningController;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
@@ -80,6 +82,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningProvider p1 = providers.get(0);
     assertThat(p1).isNotNull();
+    assertThat(p1).isInstanceOf(SmartContractPermissioningController.class);
   }
 
   @Test
@@ -96,5 +99,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningProvider p1 = providers.get(0);
     assertThat(p1).isNotNull();
+    assertThat(p1).isInstanceOf(NodeLocalConfigPermissioningController.class);
+
   }
 }
