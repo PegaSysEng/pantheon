@@ -35,7 +35,7 @@ transaction, the sending party, or the list of participating addresses.
 - **Privacy group**:   The actors that are involved in a set of transactions.
 
 
-### Privacy Overview
+### How Private Transaction is Processed
 
 1. DApp sends a private transaction through [eea_sendrawtransaction](../Reference/JSON-RPC-API-Methods.md#eea_sendRawTransaction),
   uses the `privateFor` attribute to specify the list of actors,
@@ -97,7 +97,7 @@ as unrestricted private transactions.
 
 ### Privacy JSON-RPC API method
 
-The [new EEA methods](../Reference/JSON-RPC-API-Methods.md#eea_sendRawTransaction) created to
+The [EEA methods](../Reference/JSON-RPC-API-Methods.md#eea_sendRawTransaction) created to
 provide and support privacy.
 
 
