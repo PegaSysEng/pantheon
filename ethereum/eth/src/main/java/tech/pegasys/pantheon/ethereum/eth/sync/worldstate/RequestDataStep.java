@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.RetryingGetNodeDataFromPeerTask;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.tasks.Task;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,12 +37,18 @@ import org.apache.logging.log4j.Logger;
 
 public class RequestDataStep {
   private static final Logger LOG = LogManager.getLogger();
-  private final EthContext ethContext;
-  private final MetricsSystem metricsSystem;
+  private final BiFunction<List<Hash>, Long, EthTask<Map<Hash, BytesValue>>> getNodeDataTaskFactory;
 
   public RequestDataStep(final EthContext ethContext, final MetricsSystem metricsSystem) {
-    this.ethContext = ethContext;
-    this.metricsSystem = metricsSystem;
+    this(
+        (hashes, pivotBlockNumber) ->
+            RetryingGetNodeDataFromPeerTask.forHashes(
+                ethContext, hashes, pivotBlockNumber, metricsSystem));
+  }
+
+  RequestDataStep(
+      final BiFunction<List<Hash>, Long, EthTask<Map<Hash, BytesValue>>> getNodeDataTaskFactory) {
+    this.getNodeDataTaskFactory = getNodeDataTaskFactory;
   }
 
   public CompletableFuture<List<Task<NodeDataRequest>>> requestData(
@@ -71,9 +79,8 @@ public class RequestDataStep {
       final BlockHeader blockHeader,
       final List<Hash> hashes,
       final WorldDownloadState downloadState) {
-    final RetryingGetNodeDataFromPeerTask task =
-        RetryingGetNodeDataFromPeerTask.forHashes(
-            ethContext, hashes, blockHeader.getNumber(), metricsSystem);
+    final EthTask<Map<Hash, BytesValue>> task =
+        getNodeDataTaskFactory.apply(hashes, blockHeader.getNumber());
     downloadState.addOutstandingTask(task);
     return task.run()
         .handle(

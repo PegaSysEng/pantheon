@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.services.tasks.Task;
 
 public class StubTask implements Task<NodeDataRequest> {
@@ -22,6 +23,10 @@ public class StubTask implements Task<NodeDataRequest> {
 
   public StubTask(final NodeDataRequest data) {
     this.data = data;
+  }
+
+  public static StubTask forHash(final Hash hash) {
+    return new StubTask(NodeDataRequest.createCodeRequest(hash));
   }
 
   @Override
