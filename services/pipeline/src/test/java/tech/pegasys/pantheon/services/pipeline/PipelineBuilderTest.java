@@ -248,7 +248,7 @@ public class PipelineBuilderTest {
                       throw new RuntimeException(e);
                     }
                   }
-                  return Stream.of(value.toString());
+                  return Stream.of(value.toString(), "x" + value);
                 },
                 2,
                 10)
@@ -256,7 +256,7 @@ public class PipelineBuilderTest {
     final CompletableFuture<?> result = pipeline.start(executorService);
 
     // One thread will block but the other should process the remaining entries.
-    waitForSize(output, 14);
+    waitForSize(output, 28);
     assertThat(result).isNotDone();
 
     latch.countDown();
@@ -265,7 +265,9 @@ public class PipelineBuilderTest {
 
     assertThat(output)
         .containsExactly(
-            "1", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "2");
+            "1", "x1", "3", "x3", "4", "x4", "5", "x5", "6", "x6", "7", "x7", "8", "x8", "9", "x9",
+            "10", "x10", "11", "x11", "12", "x12", "13", "x13", "14", "x14", "15", "x15", "2",
+            "x2");
   }
 
   @Test
