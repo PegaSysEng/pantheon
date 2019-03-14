@@ -44,7 +44,10 @@ public class NodePermissioningController {
   }
 
   public void startPeerDiscoveryCallback(final Runnable peerDiscoveryCallback) {
-    syncStatusNodePermissioningProvider.ifPresent(
-        (p) -> p.setHasReachedSyncCallback(peerDiscoveryCallback));
+    if (syncStatusNodePermissioningProvider.isPresent()) {
+      syncStatusNodePermissioningProvider.get().setHasReachedSyncCallback(peerDiscoveryCallback);
+    } else {
+      peerDiscoveryCallback.run();
+    }
   }
 }

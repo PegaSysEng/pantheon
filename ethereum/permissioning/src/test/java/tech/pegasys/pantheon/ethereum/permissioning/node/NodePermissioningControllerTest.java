@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.permissioning.node;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
@@ -56,5 +57,15 @@ public class NodePermissioningControllerTest {
     controller.startPeerDiscoveryCallback(() -> {});
 
     verify(syncStatusNodePermissioningProvider).setHasReachedSyncCallback(any(Runnable.class));
+  }
+
+  @Test
+  public void peerDiscoveryCallbackShouldRunWhenSyncStatusProviderDoesNotExist() {
+    final Runnable callback = mock(Runnable.class);
+
+    controller = new NodePermissioningController();
+    controller.startPeerDiscoveryCallback(callback);
+
+    verify(callback).run();
   }
 }
