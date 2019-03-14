@@ -377,12 +377,12 @@ public class NettyP2PNetwork implements P2PNetwork {
                             ch.remoteAddress().getAddress().getHostAddress(),
                             connection.getPeer().getPort(),
                             connection.getPeer().getPort())
-                        .getEnodeURI()))
+                        .getEnodeURLString()))
         .orElse(true);
   }
 
   private boolean isPeerWhitelisted(final Peer peer) {
-    return nodeWhitelistController.map(nwc -> nwc.isPermitted(peer.getEnodeURI())).orElse(true);
+    return nodeWhitelistController.map(nwc -> nwc.isPermitted(peer.getEnodeURLString())).orElse(true);
   }
 
   @Override

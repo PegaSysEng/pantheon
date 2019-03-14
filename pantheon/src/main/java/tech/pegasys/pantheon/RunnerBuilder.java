@@ -226,7 +226,7 @@ public class RunnerBuilder {
 
     final List<EnodeURL> bootnodesAsEnodeURLs =
         discoveryConfiguration.getBootstrapPeers().stream()
-            .map(p -> new EnodeURL(p.getEnodeURI()))
+            .map(p -> new EnodeURL(p.getEnodeURLString()))
             .collect(Collectors.toList());
 
     final Optional<LocalPermissioningConfiguration> localPermissioningConfiguration =

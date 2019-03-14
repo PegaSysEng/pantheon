@@ -464,7 +464,7 @@ public final class NettyP2PNetworkTest {
     final NodeLocalConfigPermissioningController localWhitelistController =
         new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
     // turn on whitelisting by adding a different node NOT remote node
-    localWhitelistController.addNodes(Arrays.asList(mockPeer().getEnodeURI()));
+    localWhitelistController.addNodes(Arrays.asList(mockPeer().getEnodeURLString()));
 
     final SubProtocol subprotocol = subProtocol();
     final Capability cap = Capability.create(subprotocol.getName(), 63);
@@ -725,8 +725,8 @@ public final class NettyP2PNetworkTest {
     final PeerConnection notPermittedPeerConnection =
         mockPeerConnection(localPeer, notPermittedPeer);
 
-    final EnodeURL permittedEnodeURL = new EnodeURL(permittedPeer.getEnodeURI());
-    final EnodeURL notPermittedEnodeURL = new EnodeURL(notPermittedPeer.getEnodeURI());
+    final EnodeURL permittedEnodeURL = new EnodeURL(permittedPeer.getEnodeURLString());
+    final EnodeURL notPermittedEnodeURL = new EnodeURL(notPermittedPeer.getEnodeURLString());
 
     nettyP2PNetwork.start();
     nettyP2PNetwork.connect(permittedPeer).complete(permittedPeerConnection);
@@ -828,7 +828,7 @@ public final class NettyP2PNetworkTest {
 
     when(peer.getId()).thenReturn(id);
     when(peer.getEndpoint()).thenReturn(endpoint);
-    when(peer.getEnodeURI()).thenReturn(enodeURL);
+    when(peer.getEnodeURLString()).thenReturn(enodeURL);
 
     return peer;
   }

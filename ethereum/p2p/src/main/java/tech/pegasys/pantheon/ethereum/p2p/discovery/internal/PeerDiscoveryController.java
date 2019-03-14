@@ -254,7 +254,7 @@ public class PeerDiscoveryController {
     }
 
     if (!isPeerPermitted(sender, localPeer)) {
-      LOG.trace("Dropping packet from peer not in the whitelist ({})", sender.getEnodeURI());
+      LOG.trace("Dropping packet from peer not in the whitelist ({})", sender.getEnodeURLString());
       return;
     }
 
