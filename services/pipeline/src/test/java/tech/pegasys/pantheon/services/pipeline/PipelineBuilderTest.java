@@ -233,6 +233,42 @@ public class PipelineBuilderTest {
   }
 
   @Test
+  public void shouldFlatMapInParallel() throws Exception {
+    final List<String> output = synchronizedList(new ArrayList<>());
+    final CountDownLatch latch = new CountDownLatch(1);
+    final Pipeline pipeline =
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
+            .thenFlatMapInParallel(
+                "stageName",
+                value -> {
+                  if (value == 2) {
+                    try {
+                      latch.await();
+                    } catch (InterruptedException e) {
+                      throw new RuntimeException(e);
+                    }
+                  }
+                  return Stream.of(value.toString());
+                },
+                2,
+                10)
+            .andFinishWith("end", output::add);
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    // One thread will block but the other should process the remaining entries.
+    waitForSize(output, 14);
+    assertThat(result).isNotDone();
+
+    latch.countDown();
+
+    result.get(10, SECONDS);
+
+    assertThat(output)
+        .containsExactly(
+            "1", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "2");
+  }
+
+  @Test
   public void shouldAbortPipeline() throws Exception {
     final int allowProcessingUpTo = 5;
     final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
