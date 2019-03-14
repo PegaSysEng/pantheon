@@ -61,7 +61,7 @@ public class AdminAddPeer implements JsonRpcMethod {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
     } catch (final PeerNotPermittedException e) {
       return new JsonRpcErrorResponse(
-          req.getId(), JsonRpcError.NON_WHITELISTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
+          req.getId(), JsonRpcError.NON_PERMITTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
     } catch (final Exception e) {
       LOG.error("Error processing request: " + req, e);
       throw e;

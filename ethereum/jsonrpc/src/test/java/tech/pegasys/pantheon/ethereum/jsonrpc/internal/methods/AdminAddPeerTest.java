@@ -214,7 +214,7 @@ public class AdminAddPeerTest {
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(
-            request.getId(), JsonRpcError.NON_WHITELISTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
+            request.getId(), JsonRpcError.NON_PERMITTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
 
     final JsonRpcResponse actualResponse = method.response(request);
 
