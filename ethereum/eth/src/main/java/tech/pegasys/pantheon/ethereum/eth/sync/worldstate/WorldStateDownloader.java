@@ -136,6 +136,9 @@ public class WorldStateDownloader {
           (result, error) -> {
             if (error != null
                 && !(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+              // If the pipeline was cancelled it's because the download state cancelled it
+              // so don't propagate the cancellation or we'll interfere with the clean up it's
+              // doing.
               newDownloadState.getDownloadFuture().completeExceptionally(error);
             }
           });
