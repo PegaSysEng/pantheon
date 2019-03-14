@@ -58,7 +58,7 @@ public class NodePermissioningControllerFactoryTest {
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(0);
-    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isFalse();
+    assertThat(controller.getSyncStatusNodePermissioningProvider()).isNotPresent();
   }
 
   @Test
@@ -80,7 +80,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningProvider p1 = providers.get(0);
     assertThat(p1).isInstanceOf(SmartContractPermissioningController.class);
-    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isTrue();
+    assertThat(controller.getSyncStatusNodePermissioningProvider()).isPresent();
   }
 
   @Test
@@ -100,7 +100,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningProvider p1 = providers.get(0);
     assertThat(p1).isInstanceOf(NodeLocalConfigPermissioningController.class);
-    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isFalse();
+    assertThat(controller.getSyncStatusNodePermissioningProvider()).isNotPresent();
   }
 
   @Test
@@ -133,6 +133,6 @@ public class NodePermissioningControllerFactoryTest {
       assertThat(p2).isInstanceOf(NodeLocalConfigPermissioningController.class);
       assertThat(p1).isInstanceOf(SmartContractPermissioningController.class);
     }
-    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isTrue();
+    assertThat(controller.getSyncStatusNodePermissioningProvider()).isPresent();
   }
 }
