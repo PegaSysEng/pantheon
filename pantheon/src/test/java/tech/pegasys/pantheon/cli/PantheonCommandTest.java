@@ -45,6 +45,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -304,6 +305,50 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsSmartContractWithoutOptionMustDisplayUsage() {
+    parseCommand("--permissions-nodes-contract-address");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Missing required parameter for option '--permissions-nodes-contract-address'");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsEnabledWithInvalidContractAddressMustError() {
+    parseCommand(
+        "--permissions-nodes-contract-enabled", "--permissions-nodes-contract-address", "invalid-smart-contract-address");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).contains("Invalid smart contract address");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsSmartContractMustUseOption() throws IOException {
+
+    String smartContractAddress = "0x0000000000000000000000000000000000001234";
+
+    parseCommand(
+        "--permissions-nodes-contract-enabled", "--permissions-nodes-contract-address", smartContractAddress);
+    final SmartContractPermissioningConfiguration permissioningConfiguration =
+        new SmartContractPermissioningConfiguration();
+    permissioningConfiguration.setSmartContractAddress(Address.fromHexString(smartContractAddress));
+
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(permissioningConfigurationArgumentCaptor.getValue())
+        .isEqualToComparingFieldByField(permissioningConfiguration);
+
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandOutput.toString()).isEmpty();
   }
 
   @Test
