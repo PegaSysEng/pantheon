@@ -29,7 +29,6 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
-import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
 import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
@@ -40,6 +39,7 @@ import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
@@ -48,7 +48,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -58,6 +58,7 @@ import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +75,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Suppliers;
@@ -185,9 +187,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Comma separated enode URLs for P2P discovery bootstrap. "
               + "Default is a predefined list.",
       split = ",",
-      arity = "0..*",
-      converter = EnodeToURIPropertyConverter.class)
-  private final Collection<URI> bootNodes = null;
+      arity = "0..*")
+  void setBootnodes(final List<String> values) {
+    try {
+      bootNodes = values.stream().map((s) -> new EnodeURL(s).toURI()).collect(Collectors.toList());
+    } catch (IllegalArgumentException e) {
+      throw new ParameterException(commandLine, e.getMessage());
+    }
+  }
+
+  private Collection<URI> bootNodes = null;
 
   @Option(
       names = {"--max-peers"},
@@ -458,6 +467,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "The address to which the privacy pre-compiled contract will be mapped to (default: ${DEFAULT-VALUE})")
   private final Integer privacyPrecompiledAddress = Address.PRIVACY;
 
+  @Option(
+      names = {"--tx-pool-max-size"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Maximum number of pending transactions that will be kept in the transaction pool (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  private final Integer txPoolMaxSize = PendingTransactions.MAX_PENDING_TRANSACTIONS;
+
   // Inner class so we can get to loggingLevel.
   public class PantheonExceptionHandler
       extends CommandLine.AbstractHandler<List<Object>, PantheonExceptionHandler>
@@ -596,7 +613,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     try {
       final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
       final WebSocketConfiguration webSocketConfiguration = webSocketConfiguration();
-      final Optional<PermissioningConfiguration> permissioningConfiguration =
+      final Optional<LocalPermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
       permissioningConfiguration.ifPresent(
           p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
@@ -625,7 +642,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private void ensureAllBootnodesAreInWhitelist(
       final EthNetworkConfig ethNetworkConfig,
-      final PermissioningConfiguration permissioningConfiguration) {
+      final LocalPermissioningConfiguration permissioningConfiguration) {
     try {
       PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
           ethNetworkConfig, permissioningConfiguration);
@@ -643,6 +660,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .devMode(NetworkName.DEV.equals(getNetwork()))
+          .maxPendingTransactions(txPoolMaxSize)
           .nodePrivateKeyFile(nodePrivateKeyFile())
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
@@ -769,7 +787,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsConfiguration;
   }
 
-  private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
+  private Optional<LocalPermissioningConfiguration> permissioningConfiguration() throws Exception {
 
     if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
@@ -779,8 +797,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Optional.empty();
     }
 
-    final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
+    final LocalPermissioningConfiguration permissioningConfiguration =
+        PermissioningConfigurationBuilder.permissioningConfiguration(
             getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
     return Optional.of(permissioningConfiguration);
   }
@@ -797,6 +815,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
     if (isPrivacyEnabled) {
+      privacyParameters.setEnabled(true);
       privacyParameters.setUrl(privacyUrl.toString());
       if (privacyPublicKeyFile() != null) {
         privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
@@ -828,7 +847,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<PermissioningConfiguration> permissioningConfiguration) {
+      final Optional<LocalPermissioningConfiguration> permissioningConfiguration) {
 
     checkNotNull(runnerBuilder);
 

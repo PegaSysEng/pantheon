@@ -29,7 +29,7 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResu
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult.EvictOutcome;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.util.Subscribers;
@@ -118,7 +118,7 @@ public class PeerDiscoveryController {
   private final DiscoveryPeer localPeer;
   private final OutboundMessageHandler outboundMessageHandler;
   private final PeerBlacklist peerBlacklist;
-  private final Optional<NodeWhitelistController> nodeWhitelistController;
+  private final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController;
   private final Optional<NodePermissioningController> nodePermissioningController;
 
   private RetryDelayFunction retryDelayFunction = RetryDelayFunction.linear(1.5, 2000, 60000);
@@ -149,7 +149,7 @@ public class PeerDiscoveryController {
       final long tableRefreshIntervalMs,
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
-      final Optional<NodeWhitelistController> nodeWhitelistController,
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final Optional<NodePermissioningController> nodePermissioningController,
       final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers,
       final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers) {

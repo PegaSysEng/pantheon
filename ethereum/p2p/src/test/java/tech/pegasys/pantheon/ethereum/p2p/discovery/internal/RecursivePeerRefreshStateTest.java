@@ -29,6 +29,8 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.BondingAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.FindNeighbourDispatcher;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -36,6 +38,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +51,9 @@ public class RecursivePeerRefreshStateTest {
   private final BondingAgent bondingAgent = mock(BondingAgent.class);
   private final FindNeighbourDispatcher neighborFinder = mock(FindNeighbourDispatcher.class);
   private final MockTimerUtil timerUtil = new MockTimerUtil();
+  private final String selfEnodeString =
+      "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:1111";
+  private final EnodeURL selfEnode = new EnodeURL(selfEnodeString);
 
   private final DiscoveryPeer localPeer = new DiscoveryPeer(createId(9), "127.0.0.9", 9, 9);
   private final DiscoveryPeer peer1 = new DiscoveryPeer(createId(1), "127.0.0.1", 1, 1);
@@ -487,8 +493,8 @@ public class RecursivePeerRefreshStateTest {
 
     final Path tempFile = Files.createTempFile("test", "test");
     tempFile.toFile().deleteOnExit();
-    final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
+    final LocalPermissioningConfiguration permissioningConfiguration =
+        LocalPermissioningConfiguration.createDefault();
     permissioningConfiguration.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
 
     final NodePermissioningController nodeWhitelistController =
