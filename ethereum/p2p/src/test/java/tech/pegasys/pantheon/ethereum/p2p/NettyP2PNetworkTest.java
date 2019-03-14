@@ -89,6 +89,10 @@ public final class NettyP2PNetworkTest {
 
   private final Vertx vertx = Vertx.vertx();
 
+  private final String selfEnodeString =
+      "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:1111";
+  private final EnodeURL selfEnode = new EnodeURL(selfEnodeString);
+
   @Before
   public void before() {
     when(blockchain.observeBlockAdded(observerCaptor.capture())).thenReturn(1L);
@@ -447,7 +451,7 @@ public final class NettyP2PNetworkTest {
     config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
 
     final NodeLocalConfigPermissioningController localWhitelistController =
-        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
     // turn on whitelisting by adding a different node NOT remote node
     localWhitelistController.addNodes(Arrays.asList(mockPeer().getEnodeURI()));
 

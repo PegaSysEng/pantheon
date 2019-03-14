@@ -46,6 +46,7 @@ import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
@@ -86,6 +87,9 @@ public class PeerDiscoveryControllerTest {
   private KeyPair localKeyPair;
   private final AtomicInteger counter = new AtomicInteger(1);
   private final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
+  private final String selfEnodeString =
+      "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:1111";
+  private final EnodeURL selfEnode = new EnodeURL(selfEnodeString);
 
   @Before
   public void initializeMocks() {
@@ -992,7 +996,7 @@ public class PeerDiscoveryControllerTest {
     final PeerBlacklist blacklist = new PeerBlacklist();
     final LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
     final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
 
     // Whitelist peers
     nodeLocalConfigPermissioningController.addNodes(Arrays.asList(discoPeer.getEnodeURI()));
@@ -1056,7 +1060,7 @@ public class PeerDiscoveryControllerTest {
     LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
     config.setNodeWhitelist(new ArrayList<>());
     NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
 
     controller =
         getControllerBuilder()
@@ -1082,7 +1086,7 @@ public class PeerDiscoveryControllerTest {
     final URI peerURI = URI.create(peer.getEnodeURI());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
     final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
 
     controller =
         getControllerBuilder()
@@ -1109,7 +1113,7 @@ public class PeerDiscoveryControllerTest {
     final URI peerURI = URI.create(peer.getEnodeURI());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
     final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(config, Collections.emptyList());
+        new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
 
     final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
     final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();

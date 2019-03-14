@@ -58,13 +58,18 @@ public class NodeLocalConfigPermissioningControllerTest {
       "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:4567";
   private final String enode2 =
       "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:4567";
+  private final String selfEnode =
+      "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:1111";
 
   @Before
   public void setUp() {
     bootnodesList.clear();
     controller =
         new NodeLocalConfigPermissioningController(
-            LocalPermissioningConfiguration.createDefault(), bootnodesList, whitelistPersistor);
+            LocalPermissioningConfiguration.createDefault(),
+            bootnodesList,
+            new EnodeURL(selfEnode),
+            whitelistPersistor);
   }
 
   @Test
@@ -74,6 +79,17 @@ public class NodeLocalConfigPermissioningControllerTest {
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
     assertThat(controller.getNodesWhitelist()).containsExactly(enode1);
+  }
+
+  @Test
+  public void whenAddNodesInputIsSelfShouldReturnAddingSelfError() {
+    controller.addNodes(Arrays.asList(enode1));
+
+    NodesWhitelistResult expected =
+        new NodesWhitelistResult(WhitelistOperationResult.ERROR_SELF_CANNOT_BE_ADDED);
+    NodesWhitelistResult actualResult = controller.addNodes(Lists.newArrayList(selfEnode, enode1));
+
+    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
 
   @Test
@@ -246,7 +262,9 @@ public class NodeLocalConfigPermissioningControllerTest {
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist())
         .thenReturn(Arrays.asList(URI.create(expectedEnodeURL)));
-    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
+    controller =
+        new NodeLocalConfigPermissioningController(
+            permissioningConfig, bootnodesList, new EnodeURL(selfEnode));
 
     controller.reload();
 
@@ -264,7 +282,9 @@ public class NodeLocalConfigPermissioningControllerTest {
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist())
         .thenReturn(Arrays.asList(URI.create(expectedEnodeURI)));
-    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
+    controller =
+        new NodeLocalConfigPermissioningController(
+            permissioningConfig, bootnodesList, new EnodeURL(selfEnode));
 
     final Throwable thrown = catchThrowable(() -> controller.reload());
 
@@ -360,7 +380,9 @@ public class NodeLocalConfigPermissioningControllerTest {
         .thenReturn(permissionsFile.toAbsolutePath().toString());
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(enode1)));
-    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
+    controller =
+        new NodeLocalConfigPermissioningController(
+            permissioningConfig, bootnodesList, new EnodeURL(selfEnode));
     controller.subscribeToListUpdatedEvent(consumer);
 
     controller.reload();
@@ -381,7 +403,9 @@ public class NodeLocalConfigPermissioningControllerTest {
         .thenReturn(permissionsFile.toAbsolutePath().toString());
     when(permissioningConfig.isNodeWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getNodeWhitelist()).thenReturn(Arrays.asList(URI.create(enode1)));
-    controller = new NodeLocalConfigPermissioningController(permissioningConfig, bootnodesList);
+    controller =
+        new NodeLocalConfigPermissioningController(
+            permissioningConfig, bootnodesList, new EnodeURL(selfEnode));
     controller.subscribeToListUpdatedEvent(consumer);
 
     controller.reload();

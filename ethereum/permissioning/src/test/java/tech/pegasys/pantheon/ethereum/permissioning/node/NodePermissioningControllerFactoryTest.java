@@ -41,7 +41,10 @@ public class NodePermissioningControllerFactoryTest {
   @Mock private Synchronizer synchronizer;
   @Mock private TransactionSimulator transactionSimulator;
 
+  private final String enode =
+      "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:1111";
   Collection<EnodeURL> bootnodes = Collections.emptyList();
+  EnodeURL selfEnode = new EnodeURL(enode);
   LocalPermissioningConfiguration localPermissioningConfig;
   SmartContractPermissioningConfiguration smartContractPermissioningConfiguration;
   PermissioningConfiguration config;
@@ -51,7 +54,7 @@ public class NodePermissioningControllerFactoryTest {
     config = new PermissioningConfiguration(Optional.empty(), Optional.empty());
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
-        factory.create(config, synchronizer, bootnodes, transactionSimulator);
+        factory.create(config, synchronizer, bootnodes, selfEnode, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(0);
@@ -70,7 +73,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
-        factory.create(config, synchronizer, bootnodes, transactionSimulator);
+        factory.create(config, synchronizer, bootnodes, selfEnode, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(1);
@@ -90,7 +93,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
-        factory.create(config, synchronizer, bootnodes, transactionSimulator);
+        factory.create(config, synchronizer, bootnodes, selfEnode, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(1);
@@ -117,7 +120,7 @@ public class NodePermissioningControllerFactoryTest {
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
-        factory.create(config, synchronizer, bootnodes, transactionSimulator);
+        factory.create(config, synchronizer, bootnodes, selfEnode, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(2);

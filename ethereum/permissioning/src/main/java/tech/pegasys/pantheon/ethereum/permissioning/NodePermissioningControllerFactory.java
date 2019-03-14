@@ -30,6 +30,7 @@ public class NodePermissioningControllerFactory {
       final PermissioningConfiguration permissioningConfiguration,
       final Synchronizer synchronizer,
       final Collection<EnodeURL> bootnodes,
+      final EnodeURL selfEnode,
       final TransactionSimulator transactionSimulator) {
 
     Optional<SyncStatusNodePermissioningProvider> syncStatusProviderOptional;
@@ -41,7 +42,7 @@ public class NodePermissioningControllerFactory {
       if (localPermissioningConfiguration.isNodeWhitelistEnabled()) {
         NodeLocalConfigPermissioningController localProvider =
             new NodeLocalConfigPermissioningController(
-                localPermissioningConfiguration, new ArrayList<>(bootnodes));
+                localPermissioningConfiguration, new ArrayList<>(bootnodes), selfEnode);
         providers.add(localProvider);
       }
     }

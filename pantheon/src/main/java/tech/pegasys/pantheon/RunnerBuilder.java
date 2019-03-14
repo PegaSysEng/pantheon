@@ -92,6 +92,11 @@ public class RunnerBuilder {
   private MetricsSystem metricsSystem;
   private Optional<LocalPermissioningConfiguration> permissioningConfiguration = Optional.empty();
 
+  private EnodeURL getSelfEnode() {
+    String nodeId = pantheonController.getLocalNodeKeyPair().getPublicKey().toString();
+    return new EnodeURL(nodeId, discoveryHost, listenPort);
+  }
+
   public RunnerBuilder vertx(final Vertx vertx) {
     this.vertx = vertx;
     return this;
@@ -223,7 +228,9 @@ public class RunnerBuilder {
         permissioningConfiguration
             .filter(LocalPermissioningConfiguration::isNodeWhitelistEnabled)
             .map(
-                config -> new NodeLocalConfigPermissioningController(config, bootnodesAsEnodeURLs));
+                config ->
+                    new NodeLocalConfigPermissioningController(
+                        config, bootnodesAsEnodeURLs, getSelfEnode()));
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
 

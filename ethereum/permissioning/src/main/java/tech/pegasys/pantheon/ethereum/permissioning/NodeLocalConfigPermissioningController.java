@@ -38,6 +38,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
   private LocalPermissioningConfiguration configuration;
   private final List<EnodeURL> bootnodes;
+  private final EnodeURL selfEnode;
   private final List<EnodeURL> nodesWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
   private final Subscribers<Consumer<NodeWhitelistUpdatedEvent>> nodeWhitelistUpdatedObservers =
@@ -45,19 +46,23 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
   public NodeLocalConfigPermissioningController(
       final LocalPermissioningConfiguration permissioningConfiguration,
-      final List<EnodeURL> bootnodes) {
+      final List<EnodeURL> bootnodes,
+      final EnodeURL selfEnode) {
     this(
         permissioningConfiguration,
         bootnodes,
+        selfEnode,
         new WhitelistPersistor(permissioningConfiguration.getConfigurationFilePath()));
   }
 
   public NodeLocalConfigPermissioningController(
       final LocalPermissioningConfiguration configuration,
       final List<EnodeURL> bootnodes,
+      final EnodeURL selfEnode,
       final WhitelistPersistor whitelistPersistor) {
     this.configuration = configuration;
     this.bootnodes = bootnodes;
+    this.selfEnode = selfEnode;
     this.whitelistPersistor = whitelistPersistor;
     readNodesFromConfig(configuration);
   }
@@ -65,7 +70,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
   private void readNodesFromConfig(final LocalPermissioningConfiguration configuration) {
     if (configuration.isNodeWhitelistEnabled() && configuration.getNodeWhitelist() != null) {
       for (URI uri : configuration.getNodeWhitelist()) {
-        nodesWhitelist.add(new EnodeURL(uri.toString()));
+        addNode(new EnodeURL(uri.toString()));
       }
     }
   }
@@ -83,6 +88,13 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
             WhitelistOperationResult.ERROR_EXISTING_ENTRY,
             String.format("Specified peer: %s already exists in whitelist.", peer.getNodeId()));
       }
+      if (peer.equals(selfEnode)) {
+        return new NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_SELF_CANNOT_BE_ADDED,
+            String.format(
+                "Specified peer %s is equal to self. Cannot add self to whitelist",
+                peer.getNodeId()));
+      }
     }
 
     final List<EnodeURL> oldWhitelist = new ArrayList<>(this.nodesWhitelist);
@@ -98,7 +110,12 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
   }
 
   private boolean addNode(final EnodeURL enodeURL) {
-    return nodesWhitelist.add(enodeURL);
+    // must not add self to whitelist
+    if (!enodeURL.equals(selfEnode)) {
+      return nodesWhitelist.add(enodeURL);
+    } else {
+      return false;
+    }
   }
 
   public NodesWhitelistResult removeNodes(final List<String> enodeURLs) {
