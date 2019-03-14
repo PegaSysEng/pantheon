@@ -211,6 +211,7 @@ public class PipelineBuilder<T> {
    *
    * @param stageName the name of this stage. Used as the label for the output count metric.
    * @param mapper the function to process each item with.
+   * @param numberOfThreads the number of threads to use for processing.
    * @param newBufferSize the output buffer size to use from this stage onwards.
    * @param <O> the type of items to be output from this stage.
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
