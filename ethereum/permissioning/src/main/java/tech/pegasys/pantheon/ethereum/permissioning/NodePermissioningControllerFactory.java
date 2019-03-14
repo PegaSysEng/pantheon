@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class NodePermissioningControllerFactory {
 
@@ -30,13 +31,14 @@ public class NodePermissioningControllerFactory {
       final Synchronizer synchronizer,
       final Collection<EnodeURL> bootnodes,
       final TransactionSimulator transactionSimulator) {
-    final SyncStatusNodePermissioningProvider syncStatusProvider =
-        new SyncStatusNodePermissioningProvider(synchronizer, bootnodes);
+
+    Optional<SyncStatusNodePermissioningProvider> syncStatusProviderOptional;
+
     List<NodePermissioningProvider> providers = new ArrayList<>();
     if (permissioningConfiguration.getLocalConfig().isPresent()) {
       LocalPermissioningConfiguration localPermissioningConfiguration =
           permissioningConfiguration.getLocalConfig().get();
-      if (permissioningConfiguration.getLocalConfig().get().isNodeWhitelistEnabled()) {
+      if (localPermissioningConfiguration.isNodeWhitelistEnabled()) {
         NodeLocalConfigPermissioningController localProvider =
             new NodeLocalConfigPermissioningController(
                 localPermissioningConfiguration, new ArrayList<>(bootnodes));
@@ -54,7 +56,13 @@ public class NodePermissioningControllerFactory {
                 transactionSimulator);
         providers.add(smartContractProvider);
       }
+
+      final SyncStatusNodePermissioningProvider syncStatusProvider =
+          new SyncStatusNodePermissioningProvider(synchronizer, bootnodes);
+      syncStatusProviderOptional = Optional.of(syncStatusProvider);
+    } else {
+      syncStatusProviderOptional = Optional.empty();
     }
-    return new NodePermissioningController(syncStatusProvider, providers);
+    return new NodePermissioningController(syncStatusProviderOptional, providers);
   }
 }

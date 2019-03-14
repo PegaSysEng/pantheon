@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +43,7 @@ public class NodePermissioningControllerTest {
           "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.3:5678");
 
   @Mock private SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider;
+  Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProviderOptional ;
   @Mock private NodeLocalConfigPermissioningController localConfigNodePermissioningProvider;
   @Mock private NodePermissioningProvider otherPermissioningProvider;
 
@@ -49,9 +51,11 @@ public class NodePermissioningControllerTest {
 
   @Before
   public void before() {
+    syncStatusNodePermissioningProviderOptional = Optional.of(syncStatusNodePermissioningProvider);
     List<NodePermissioningProvider> emptyProviders = new ArrayList<>();
     this.controller =
-        new NodePermissioningController(syncStatusNodePermissioningProvider, emptyProviders);
+        new NodePermissioningController(
+            syncStatusNodePermissioningProviderOptional, emptyProviders);
   }
 
   @Test
@@ -69,13 +73,11 @@ public class NodePermissioningControllerTest {
   }
 
   @Test
-  public void whenInSyncWeShouldDelegateToLocalConfigNodePermissioningProvider() {
+  public void whenNoSyncStatusProviderWeShouldDelegateToLocalConfigNodePermissioningProvider() {
     List<NodePermissioningProvider> providers = new ArrayList<>();
     providers.add(localConfigNodePermissioningProvider);
     this.controller =
-        new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
-
-    when(syncStatusNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
+        new NodePermissioningController(Optional.empty(), providers);
 
     controller.isPermitted(enode1, enode2);
 
@@ -87,7 +89,7 @@ public class NodePermissioningControllerTest {
       whenInSyncWeShouldDelegateToAnyOtherNodePermissioningProviderAndIsPermittedIfAllPermitted() {
     List<NodePermissioningProvider> providers = getNodePermissioningProviders();
     this.controller =
-        new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
+        new NodePermissioningController(syncStatusNodePermissioningProviderOptional, providers);
 
     when(syncStatusNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
     when(localConfigNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
@@ -113,7 +115,7 @@ public class NodePermissioningControllerTest {
     List<NodePermissioningProvider> providers = getNodePermissioningProviders();
 
     this.controller =
-        new NodePermissioningController(syncStatusNodePermissioningProvider, providers);
+        new NodePermissioningController(syncStatusNodePermissioningProviderOptional, providers);
 
     when(syncStatusNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);
     when(localConfigNodePermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(true);

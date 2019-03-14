@@ -30,10 +30,10 @@ public class NodePermissioningController {
   private List<NodePermissioningProvider> providers;
 
   public NodePermissioningController(
-      final SyncStatusNodePermissioningProvider syncStatusNodePermissioningProvider,
+      final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider,
       final List<NodePermissioningProvider> providers) {
     this.providers = providers;
-    this.syncStatusNodePermissioningProvider = Optional.of(syncStatusNodePermissioningProvider);
+    this.syncStatusNodePermissioningProvider = syncStatusNodePermissioningProvider;
   }
 
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
@@ -55,6 +55,11 @@ public class NodePermissioningController {
   public void startPeerDiscoveryCallback(final Runnable peerDiscoveryCallback) {
     syncStatusNodePermissioningProvider.ifPresent(
         (p) -> p.setHasReachedSyncCallback(peerDiscoveryCallback));
+  }
+
+  @VisibleForTesting
+  Optional<SyncStatusNodePermissioningProvider> getSyncStatusNodePermissioningProvider() {
+    return syncStatusNodePermissioningProvider;
   }
 
   @VisibleForTesting

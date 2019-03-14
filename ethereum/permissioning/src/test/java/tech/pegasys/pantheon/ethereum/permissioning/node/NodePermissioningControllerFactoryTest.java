@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -47,31 +46,27 @@ public class NodePermissioningControllerFactoryTest {
   SmartContractPermissioningConfiguration smartContractPermissioningConfiguration;
   PermissioningConfiguration config;
 
-  @Before
-  public void setUp() {
-    localPermissioningConfig = LocalPermissioningConfiguration.createDefault();
-    smartContractPermissioningConfiguration = new SmartContractPermissioningConfiguration();
-    config =
-        new PermissioningConfiguration(
-            Optional.of(localPermissioningConfig),
-            Optional.of(smartContractPermissioningConfiguration));
-  }
-
   @Test
   public void testCreateWithNeitherPermissioningEnabled() {
+    config = new PermissioningConfiguration(Optional.empty(), Optional.empty());
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
         factory.create(config, synchronizer, bootnodes, transactionSimulator);
 
     List<NodePermissioningProvider> providers = controller.getProviders();
     assertThat(providers.size()).isEqualTo(0);
+    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isFalse();
   }
 
   @Test
   public void testCreateWithSmartContractNodePermissioningEnabledOnly() {
+    smartContractPermissioningConfiguration = new SmartContractPermissioningConfiguration();
     smartContractPermissioningConfiguration.setSmartContractAddress(
         Address.fromHexString("0x0000000000000000000000000000000000001234"));
     smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
+    config =
+        new PermissioningConfiguration(
+            Optional.empty(), Optional.of(smartContractPermissioningConfiguration));
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
@@ -81,14 +76,17 @@ public class NodePermissioningControllerFactoryTest {
     assertThat(providers.size()).isEqualTo(1);
 
     NodePermissioningProvider p1 = providers.get(0);
-    assertThat(p1).isNotNull();
     assertThat(p1).isInstanceOf(SmartContractPermissioningController.class);
+    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isTrue();
   }
 
   @Test
   public void testCreateWithLocalNodePermissioningEnabledOnly() {
+    localPermissioningConfig = LocalPermissioningConfiguration.createDefault();
     localPermissioningConfig.setNodeWhitelist(Collections.emptyList());
     localPermissioningConfig.setConfigurationFilePath("fake-file-path");
+    config =
+        new PermissioningConfiguration(Optional.of(localPermissioningConfig), Optional.empty());
 
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
@@ -98,8 +96,40 @@ public class NodePermissioningControllerFactoryTest {
     assertThat(providers.size()).isEqualTo(1);
 
     NodePermissioningProvider p1 = providers.get(0);
-    assertThat(p1).isNotNull();
     assertThat(p1).isInstanceOf(NodeLocalConfigPermissioningController.class);
+    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isFalse();
+  }
 
+  @Test
+  public void testCreateWithLocalNodeAndSmartContractPermissioningEnabled() {
+    localPermissioningConfig = LocalPermissioningConfiguration.createDefault();
+    localPermissioningConfig.setNodeWhitelist(Collections.emptyList());
+    localPermissioningConfig.setConfigurationFilePath("fake-file-path");
+
+    smartContractPermissioningConfiguration = new SmartContractPermissioningConfiguration();
+    smartContractPermissioningConfiguration.setSmartContractAddress(
+        Address.fromHexString("0x0000000000000000000000000000000000001234"));
+    smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
+    config =
+        new PermissioningConfiguration(
+            Optional.of(localPermissioningConfig),
+            Optional.of(smartContractPermissioningConfiguration));
+
+    NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
+    NodePermissioningController controller =
+        factory.create(config, synchronizer, bootnodes, transactionSimulator);
+
+    List<NodePermissioningProvider> providers = controller.getProviders();
+    assertThat(providers.size()).isEqualTo(2);
+
+    NodePermissioningProvider p1 = providers.get(0);
+    NodePermissioningProvider p2 = providers.get(1);
+    if (p1.getClass() == NodeLocalConfigPermissioningController.class) {
+      assertThat(p2).isInstanceOf(SmartContractPermissioningController.class);
+    } else {
+      assertThat(p2).isInstanceOf(NodeLocalConfigPermissioningController.class);
+      assertThat(p1).isInstanceOf(SmartContractPermissioningController.class);
+    }
+    assertThat(controller.getSyncStatusNodePermissioningProvider().isPresent()).isTrue();
   }
 }
