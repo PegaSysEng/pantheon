@@ -128,7 +128,7 @@ public class WorldStateDownloader {
 
       newDownloadState.setWorldStateDownloadProcess(downloadProcess);
 
-      return newDownloadState.start(downloadProcess, ethContext.getScheduler());
+      return newDownloadState.startDownload(downloadProcess, ethContext.getScheduler());
     }
   }
 

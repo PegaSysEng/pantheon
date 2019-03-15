@@ -202,7 +202,7 @@ class WorldDownloadState {
     notifyAll();
   }
 
-  public CompletableFuture<Void> start(
+  public CompletableFuture<Void> startDownload(
       final WorldStateDownloadProcess worldStateDownloadProcess, final EthScheduler ethScheduler) {
     this.worldStateDownloadProcess = worldStateDownloadProcess;
     final CompletableFuture<Void> processFuture = worldStateDownloadProcess.start(ethScheduler);
