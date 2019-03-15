@@ -40,10 +40,13 @@ Specific differences between the command line and the TOML file format are:
     
     rpc-http-host="5.6.7.8"
     rpc-http-port=5678
+    rpc-http-apis=["ETH","NET","WEB3"]
+    rpc-http-cors-origins=["*"]
+    host-whitelist=["127.0.0.1","localhost"]
     
     rpc-ws-host="9.10.11.12"
     rpc-ws-port=9101
-    
+        
     # Chain
     genesis-file="~/genesis.json" # Path to the custom genesis file
     
