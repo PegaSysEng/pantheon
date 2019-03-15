@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.BlockSyncTestUtils;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
+import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -38,7 +39,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -111,7 +112,8 @@ public final class RunnerTest {
             PrivacyParameters.noPrivacy(),
             dataDirAhead,
             noOpMetricsSystem,
-            TestClock.fixed())) {
+            TestClock.fixed(),
+            PendingTransactions.MAX_PENDING_TRANSACTIONS)) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
@@ -128,12 +130,14 @@ public final class RunnerTest {
             PrivacyParameters.noPrivacy(),
             dataDirAhead,
             noOpMetricsSystem,
-            TestClock.fixed());
+            TestClock.fixed(),
+            PendingTransactions.MAX_PENDING_TRANSACTIONS);
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
-    final PermissioningConfiguration aheadPermissioningConfiguration = permissioningConfiguration();
+    final LocalPermissioningConfiguration aheadPermissioningConfiguration =
+        permissioningConfiguration();
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
@@ -184,7 +188,8 @@ public final class RunnerTest {
               PrivacyParameters.noPrivacy(),
               dataDirBehind,
               noOpMetricsSystem,
-              TestClock.fixed());
+              TestClock.fixed(),
+              PendingTransactions.MAX_PENDING_TRANSACTIONS);
       final Peer advertisedPeer = runnerAhead.getAdvertisedPeer().get();
       final EthNetworkConfig behindEthNetworkConfiguration =
           new EthNetworkConfig(
@@ -300,8 +305,8 @@ public final class RunnerTest {
     return configuration;
   }
 
-  private PermissioningConfiguration permissioningConfiguration() {
-    return PermissioningConfiguration.createDefault();
+  private LocalPermissioningConfiguration permissioningConfiguration() {
+    return LocalPermissioningConfiguration.createDefault();
   }
 
   private static void setupState(

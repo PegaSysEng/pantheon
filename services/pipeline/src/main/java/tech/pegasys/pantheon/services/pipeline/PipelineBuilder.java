@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -41,7 +42,7 @@ import java.util.stream.Stream;
 public class PipelineBuilder<T> {
 
   private final Pipe<?> inputPipe;
-  private final Collection<Runnable> stages;
+  private final Collection<Stage> stages;
   private final Collection<Pipe<?>> pipes;
   private final ReadPipe<T> pipeEnd;
   private final int bufferSize;
@@ -49,7 +50,7 @@ public class PipelineBuilder<T> {
 
   public PipelineBuilder(
       final Pipe<?> inputPipe,
-      final Collection<Runnable> stages,
+      final Collection<Stage> stages,
       final Collection<Pipe<?>> pipes,
       final ReadPipe<T> pipeEnd,
       final int bufferSize,
@@ -82,7 +83,7 @@ public class PipelineBuilder<T> {
       final int bufferSize,
       final LabelledMetric<Counter> outputCounter) {
     final Pipe<T> pipe = new Pipe<>(bufferSize, outputCounter.labels(sourceName));
-    final IteratorSourceStage<T> sourceStage = new IteratorSourceStage<>(source, pipe);
+    final IteratorSourceStage<T> sourceStage = new IteratorSourceStage<>(sourceName, source, pipe);
     return new PipelineBuilder<>(
         pipe, singleton(sourceStage), singleton(pipe), pipe, bufferSize, outputCounter);
   }
@@ -119,8 +120,8 @@ public class PipelineBuilder<T> {
   }
 
   /**
-   * Adds a 1-to-1 processing stage to the pipeline. Multiple threads processes items in the
-   * pipeline concurrently with <i>processor</i> outputting its return value to the next stage.
+   * Adds a 1-to-1 processing stage to the pipeline. Multiple threads process items in the pipeline
+   * concurrently with <i>processor</i> outputting its return value to the next stage.
    *
    * <p>Note: The order of items is not preserved.
    *
@@ -132,16 +133,8 @@ public class PipelineBuilder<T> {
    */
   public <O> PipelineBuilder<O> thenProcessInParallel(
       final String stageName, final Function<T, O> processor, final int numberOfThreads) {
-    final Pipe<O> newPipeEnd = new Pipe<>(bufferSize, outputCounter.labels(stageName));
-    final WritePipe<O> outputPipe = new SharedWritePipe<>(newPipeEnd, numberOfThreads);
-    final ArrayList<Runnable> newStages = new ArrayList<>(stages);
-    for (int i = 0; i < numberOfThreads; i++) {
-      final Runnable processStage =
-          new ProcessingStage<>(pipeEnd, outputPipe, new MapProcessor<>(processor));
-      newStages.add(processStage);
-    }
-    return new PipelineBuilder<>(
-        inputPipe, newStages, concat(pipes, newPipeEnd), newPipeEnd, bufferSize, outputCounter);
+    return thenProcessInParallel(
+        stageName, () -> new MapProcessor<>(processor), numberOfThreads, bufferSize);
   }
 
   /**
@@ -207,6 +200,32 @@ public class PipelineBuilder<T> {
   }
 
   /**
+   * Adds a 1-to-many processing stage to the pipeline. For each item in the stream, <i>mapper</i>
+   * is called and each item of the {@link Stream} it returns is output as an individual item. The
+   * returned Stream may be empty to remove an item. Multiple threads process items in the pipeline
+   * concurrently.
+   *
+   * <p>This can be used to reverse the effect of {@link #inBatches(String, int)} with:
+   *
+   * <pre>thenFlatMap(List::stream, newBufferSize)</pre>
+   *
+   * @param stageName the name of this stage. Used as the label for the output count metric.
+   * @param mapper the function to process each item with.
+   * @param numberOfThreads the number of threads to use for processing.
+   * @param newBufferSize the output buffer size to use from this stage onwards.
+   * @param <O> the type of items to be output from this stage.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
+  public <O> PipelineBuilder<O> thenFlatMapInParallel(
+      final String stageName,
+      final Function<T, Stream<O>> mapper,
+      final int numberOfThreads,
+      final int newBufferSize) {
+    return thenProcessInParallel(
+        stageName, () -> new FlatMapProcessor<>(mapper), numberOfThreads, newBufferSize);
+  }
+
+  /**
    * End the pipeline with a {@link Consumer} that is the last stage of the pipeline.
    *
    * @param stageName the name of this stage. Used as the label for the output count metric.
@@ -218,7 +237,24 @@ public class PipelineBuilder<T> {
         inputPipe,
         stages,
         pipes,
-        new CompleterStage<>(pipeEnd, completer, outputCounter.labels(stageName)));
+        new CompleterStage<>(stageName, pipeEnd, completer, outputCounter.labels(stageName)));
+  }
+
+  private <O> PipelineBuilder<O> thenProcessInParallel(
+      final String stageName,
+      final Supplier<Processor<T, O>> createProcessor,
+      final int numberOfThreads,
+      final int newBufferSize) {
+    final Pipe<O> newPipeEnd = new Pipe<>(newBufferSize, outputCounter.labels(stageName));
+    final WritePipe<O> outputPipe = new SharedWritePipe<>(newPipeEnd, numberOfThreads);
+    final ArrayList<Stage> newStages = new ArrayList<>(stages);
+    for (int i = 0; i < numberOfThreads; i++) {
+      final Stage processStage =
+          new ProcessingStage<>(stageName, pipeEnd, outputPipe, createProcessor.get());
+      newStages.add(processStage);
+    }
+    return new PipelineBuilder<>(
+        inputPipe, newStages, concat(pipes, newPipeEnd), newPipeEnd, newBufferSize, outputCounter);
   }
 
   private <O> PipelineBuilder<O> addStage(final Processor<T, O> processor, final String stageName) {
@@ -228,12 +264,12 @@ public class PipelineBuilder<T> {
   private <O> PipelineBuilder<O> addStage(
       final Processor<T, O> processor, final int newBufferSize, final String stageName) {
     final Pipe<O> outputPipe = new Pipe<>(newBufferSize, outputCounter.labels(stageName));
-    final Runnable processStage = new ProcessingStage<>(pipeEnd, outputPipe, processor);
+    final Stage processStage = new ProcessingStage<>(stageName, pipeEnd, outputPipe, processor);
     return addStage(processStage, outputPipe);
   }
 
-  private <O> PipelineBuilder<O> addStage(final Runnable stage, final Pipe<O> outputPipe) {
-    final List<Runnable> newStages = concat(stages, stage);
+  private <O> PipelineBuilder<O> addStage(final Stage stage, final Pipe<O> outputPipe) {
+    final List<Stage> newStages = concat(stages, stage);
     return new PipelineBuilder<>(
         inputPipe, newStages, concat(pipes, outputPipe), outputPipe, bufferSize, outputCounter);
   }

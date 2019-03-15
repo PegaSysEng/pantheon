@@ -12,12 +12,9 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static tech.pegasys.pantheon.ethereum.eth.sync.worldstate.NodeDataRequest.createAccountDataRequest;
 
@@ -28,12 +25,10 @@ import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
-import tech.pegasys.pantheon.services.queue.InMemoryTaskQueue;
-import tech.pegasys.pantheon.services.queue.TaskQueue.Task;
+import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
+import tech.pegasys.pantheon.services.tasks.InMemoryTaskQueue;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.util.Arrays;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.Before;
@@ -43,7 +38,6 @@ public class WorldDownloadStateTest {
 
   private static final BytesValue ROOT_NODE_DATA = BytesValue.of(1, 2, 3, 4);
   private static final Hash ROOT_NODE_HASH = Hash.hash(ROOT_NODE_DATA);
-  private static final int MAX_OUTSTANDING_REQUESTS = 3;
   private static final int MAX_REQUESTS_WITHOUT_PROGRESS = 10;
 
   private final WorldStateStorage worldStateStorage =
@@ -51,16 +45,13 @@ public class WorldDownloadStateTest {
 
   private final BlockHeader header =
       new BlockHeaderTestFixture().stateRoot(ROOT_NODE_HASH).buildHeader();
-  private final InMemoryTaskQueue<NodeDataRequest> pendingRequests = new InMemoryTaskQueue<>();
-  private final ArrayBlockingQueue<Task<NodeDataRequest>> requestsToPersist =
-      new ArrayBlockingQueue<>(100);
+  private final CachingTaskCollection<NodeDataRequest> pendingRequests =
+      new CachingTaskCollection<>(new InMemoryTaskQueue<>());
+  private final WorldStateDownloadProcess worldStateDownloadProcess =
+      mock(WorldStateDownloadProcess.class);
 
   private final WorldDownloadState downloadState =
-      new WorldDownloadState(
-          pendingRequests,
-          requestsToPersist,
-          MAX_OUTSTANDING_REQUESTS,
-          MAX_REQUESTS_WITHOUT_PROGRESS);
+      new WorldDownloadState(pendingRequests, MAX_REQUESTS_WITHOUT_PROGRESS);
 
   private final CompletableFuture<Void> future = downloadState.getDownloadFuture();
 
@@ -94,7 +85,7 @@ public class WorldDownloadStateTest {
 
   @Test
   public void shouldNotCompleteWhenThereArePendingTasks() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
+    pendingRequests.add(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
 
     downloadState.checkCompletion(worldStateStorage, header);
 
@@ -104,92 +95,24 @@ public class WorldDownloadStateTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void shouldCancelOutstandingTasksWhenFutureIsCancelled() {
-    final EthTask<?> persistenceTask = mock(EthTask.class);
     final EthTask<?> outstandingTask1 = mock(EthTask.class);
     final EthTask<?> outstandingTask2 = mock(EthTask.class);
-    final Task<NodeDataRequest> toPersist1 = mock(Task.class);
-    final Task<NodeDataRequest> toPersist2 = mock(Task.class);
-    downloadState.setPersistenceTask(persistenceTask);
     downloadState.addOutstandingTask(outstandingTask1);
     downloadState.addOutstandingTask(outstandingTask2);
 
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY));
-    requestsToPersist.add(toPersist1);
-    requestsToPersist.add(toPersist2);
+    pendingRequests.add(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
+    pendingRequests.add(createAccountDataRequest(Hash.EMPTY));
+    downloadState.setWorldStateDownloadProcess(worldStateDownloadProcess);
 
     future.cancel(true);
 
-    verify(persistenceTask).cancel();
     verify(outstandingTask1).cancel();
     verify(outstandingTask2).cancel();
 
     assertThat(pendingRequests.isEmpty()).isTrue();
-    assertThat(requestsToPersist).isEmpty();
+    verify(worldStateDownloadProcess).abort();
     assertThat(downloadState.isDownloading()).isFalse();
-  }
-
-  @Test
-  public void shouldNotSendAdditionalRequestsWhenWaitingForANewPeer() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-
-    downloadState.setWaitingForNewPeer(true);
-    downloadState.whileAdditionalRequestsCanBeSent(mustNotBeCalled());
-  }
-
-  @Test
-  public void shouldResumeSendingAdditionalRequestsWhenNoLongerWaitingForPeer() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    final Runnable sendRequest =
-        mockWithAction(() -> downloadState.addOutstandingTask(mock(EthTask.class)));
-
-    downloadState.setWaitingForNewPeer(true);
-    downloadState.whileAdditionalRequestsCanBeSent(mustNotBeCalled());
-
-    downloadState.setWaitingForNewPeer(false);
-    downloadState.whileAdditionalRequestsCanBeSent(sendRequest);
-    verify(sendRequest, times(MAX_OUTSTANDING_REQUESTS)).run();
-  }
-
-  @Test
-  public void shouldStopSendingAdditionalRequestsWhenPendingRequestsIsEmpty() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-
-    final Runnable sendRequest = mockWithAction(pendingRequests::dequeue);
-    downloadState.whileAdditionalRequestsCanBeSent(sendRequest);
-
-    verify(sendRequest, times(2)).run();
-  }
-
-  @Test
-  public void shouldStopSendingAdditionalRequestsWhenMaximumOutstandingRequestCountReached() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    final Runnable sendRequest =
-        mockWithAction(() -> downloadState.addOutstandingTask(mock(EthTask.class)));
-
-    downloadState.whileAdditionalRequestsCanBeSent(sendRequest);
-    verify(sendRequest, times(MAX_OUTSTANDING_REQUESTS)).run();
-  }
-
-  @Test
-  public void shouldStopSendingAdditionalRequestsWhenFutureIsCancelled() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    final Runnable sendRequest = mockWithAction(() -> future.cancel(true));
-
-    downloadState.whileAdditionalRequestsCanBeSent(sendRequest);
-    verify(sendRequest, times(1)).run();
-  }
-
-  @Test
-  public void shouldStopSendingAdditionalRequestsWhenDownloadIsMarkedAsStalled() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    final Runnable sendRequest = mockWithAction(() -> downloadState.requestComplete(false));
-
-    downloadState.whileAdditionalRequestsCanBeSent(sendRequest);
-    verify(sendRequest, times(MAX_REQUESTS_WITHOUT_PROGRESS)).run();
   }
 
   @Test
@@ -209,50 +132,12 @@ public class WorldDownloadStateTest {
   }
 
   @Test
-  public void shouldNotAllowMultipleCallsToSendAdditionalRequestsAtOnce() {
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    final Runnable sendRequest =
-        mockWithAction(
-            () -> {
-              downloadState.whileAdditionalRequestsCanBeSent(mustNotBeCalled());
-              downloadState.addOutstandingTask(mock(EthTask.class));
-            });
-
-    downloadState.whileAdditionalRequestsCanBeSent(sendRequest);
-    verify(sendRequest, times(MAX_OUTSTANDING_REQUESTS)).run();
-  }
-
-  @Test
-  public void shouldNotEnqueueRequestsAfterDownloadIsStalled() {
+  public void shouldNotAddRequestsAfterDownloadIsStalled() {
     downloadState.checkCompletion(worldStateStorage, header);
 
-    downloadState.enqueueRequests(Arrays.asList(createAccountDataRequest(Hash.EMPTY_TRIE_HASH)));
+    downloadState.enqueueRequests(singletonList(createAccountDataRequest(Hash.EMPTY_TRIE_HASH)));
     downloadState.enqueueRequest(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
 
     assertThat(pendingRequests.isEmpty()).isTrue();
-  }
-
-  @Test // Sanity check for the test structure
-  public void shouldFailWhenMustNotBeCalledIsCalled() {
-
-    pendingRequests.enqueue(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
-    assertThatThrownBy(() -> downloadState.whileAdditionalRequestsCanBeSent(mustNotBeCalled()))
-        .hasMessage("Unexpected invocation");
-  }
-
-  private Runnable mustNotBeCalled() {
-    return () -> fail("Unexpected invocation");
-  }
-
-  private Runnable mockWithAction(final Runnable action) {
-    final Runnable runnable = mock(Runnable.class);
-    doAnswer(
-            invocation -> {
-              action.run();
-              return null;
-            })
-        .when(runnable)
-        .run();
-    return runnable;
   }
 }

@@ -14,13 +14,15 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import java.util.Iterator;
 
-class IteratorSourceStage<T> implements Runnable {
+class IteratorSourceStage<T> implements Stage {
   private final Iterator<T> source;
   private final Pipe<T> pipe;
+  private final String name;
 
-  IteratorSourceStage(final Iterator<T> source, final Pipe<T> pipe) {
+  IteratorSourceStage(final String name, final Iterator<T> source, final Pipe<T> pipe) {
     this.source = source;
     this.pipe = pipe;
+    this.name = name;
   }
 
   @Override
@@ -32,5 +34,10 @@ class IteratorSourceStage<T> implements Runnable {
       }
     }
     pipe.close();
+  }
+
+  @Override
+  public String getName() {
+    return name;
   }
 }
