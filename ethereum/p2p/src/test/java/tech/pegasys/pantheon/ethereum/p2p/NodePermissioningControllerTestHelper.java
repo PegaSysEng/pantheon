@@ -70,9 +70,7 @@ public class NodePermissioningControllerTestHelper {
           "Can't allow all nodes and deny all nodes in the same NodePermissioningController");
     } else if (allowAll) {
       when(nodePermissioningController.isPermitted(any(), any())).thenReturn(true);
-      when(nodePermissioningController.isPermitted(any(), any())).thenReturn(true);
     } else if (denyAll) {
-      when(nodePermissioningController.isPermitted(any(), any())).thenReturn(false);
       when(nodePermissioningController.isPermitted(any(), any())).thenReturn(false);
     } else {
       permittedNodes.forEach(

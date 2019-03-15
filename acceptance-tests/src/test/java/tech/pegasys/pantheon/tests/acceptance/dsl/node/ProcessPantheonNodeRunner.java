@@ -147,8 +147,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     }
 
     node.getPermissioningConfiguration()
-        .map(PermissioningConfiguration::getLocalConfig)
-        .map(Optional::get)
+        .flatMap(PermissioningConfiguration::getLocalConfig)
         .ifPresent(
             permissioningConfiguration -> {
               if (permissioningConfiguration.isNodeWhitelistEnabled()) {
