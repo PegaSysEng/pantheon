@@ -263,7 +263,11 @@ public class RunnerBuilder {
                             peerBlacklist,
                             metricsSystem,
                             nodeWhitelistController,
-                            nodePermissioningController)
+                            nodePermissioningController,
+                            // TODO this dependency on the Blockchain will be removed in PAN-2442
+                            nodePermissioningController.isPresent()
+                                ? context.getBlockchain()
+                                : null)
                     : caps -> new NoopP2PNetwork())
             .metricsSystem(metricsSystem)
             .build();

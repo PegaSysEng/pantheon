@@ -618,8 +618,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           permissioningConfiguration();
 
       permissioningConfiguration
-          .map(PermissioningConfiguration::getLocalConfig)
-          .map(Optional::get)
+          .flatMap(PermissioningConfiguration::getLocalConfig)
           .ifPresent(p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
 
       synchronize(
