@@ -24,9 +24,10 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class NodePermissioningControllerBuilder {
+public class NodePermissioningControllerTestHelper {
 
   private final EnodeURL localNode;
   private final Collection<EnodeURL> permittedNodes = new ArrayList<>();
@@ -34,35 +35,35 @@ public class NodePermissioningControllerBuilder {
   private boolean allowAll = false;
   private boolean denyAll = false;
 
-  public NodePermissioningControllerBuilder(Peer localPeer) {
+  public NodePermissioningControllerTestHelper(final Peer localPeer) {
     this.localNode = new EnodeURL(localPeer.getEnodeURI());
   }
 
-  public NodePermissioningControllerBuilder withPermittedPeers(Peer... peers) {
+  public NodePermissioningControllerTestHelper withPermittedPeers(final Peer... peers) {
     this.permittedNodes.addAll(
         Arrays.stream(peers).map(p -> new EnodeURL(p.getEnodeURI())).collect(Collectors.toList()));
     return this;
   }
 
-  public NodePermissioningControllerBuilder withForbiddenPeers(Peer... peers) {
+  public NodePermissioningControllerTestHelper withForbiddenPeers(final Peer... peers) {
     this.notPermittedNodes.addAll(
         Arrays.stream(peers).map(p -> new EnodeURL(p.getEnodeURI())).collect(Collectors.toList()));
     return this;
   }
 
-  public NodePermissioningControllerBuilder allowAll() {
+  public NodePermissioningControllerTestHelper allowAll() {
     this.allowAll = true;
     return this;
   }
 
-  public NodePermissioningControllerBuilder denyAll() {
+  public NodePermissioningControllerTestHelper denyAll() {
     this.denyAll = true;
     return this;
   }
 
   public NodePermissioningController build() {
     final NodePermissioningController nodePermissioningController =
-        spy(new NodePermissioningController());
+        spy(new NodePermissioningController(Optional.empty(), new ArrayList<>()));
 
     if (allowAll && denyAll) {
       throw new IllegalArgumentException(

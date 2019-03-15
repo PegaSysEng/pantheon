@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNode
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,7 +78,7 @@ public class NodePermissioningControllerTest {
   public void peerDiscoveryCallbackShouldRunWhenSyncStatusProviderDoesNotExist() {
     final Runnable callback = mock(Runnable.class);
 
-    controller = new NodePermissioningController();
+    controller = new NodePermissioningController(Optional.empty(), Collections.emptyList());
     controller.startPeerDiscoveryCallback(callback);
 
     verify(callback).run();

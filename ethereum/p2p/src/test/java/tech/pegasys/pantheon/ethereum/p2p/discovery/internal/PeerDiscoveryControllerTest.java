@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.p2p.NodePermissioningControllerBuilder;
+import tech.pegasys.pantheon.ethereum.p2p.NodePermissioningControllerTestHelper;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
@@ -43,7 +43,6 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -999,7 +998,7 @@ public class PeerDiscoveryControllerTest {
     final PeerBlacklist blacklist = new PeerBlacklist();
 
     final NodePermissioningController nodePermissioningController =
-        new NodePermissioningControllerBuilder(localPeer)
+        new NodePermissioningControllerTestHelper(localPeer)
             .withPermittedPeers(discoveryPeer, permittedPeer)
             .withForbiddenPeers(notPermittedPeer)
             .build();
@@ -1058,7 +1057,7 @@ public class PeerDiscoveryControllerTest {
     final DiscoveryPeer discoPeer = peers.get(0);
 
     final NodePermissioningController nodePermissioningController =
-        new NodePermissioningControllerBuilder(localPeer).withForbiddenPeers(discoPeer).build();
+        new NodePermissioningControllerTestHelper(localPeer).withForbiddenPeers(discoPeer).build();
 
     controller =
         getControllerBuilder()

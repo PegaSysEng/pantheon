@@ -44,7 +44,12 @@ public class MockPeerDiscoveryAgent extends PeerDiscoveryAgent {
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final Optional<NodePermissioningController> nodePermissioningController,
       final Map<BytesValue, MockPeerDiscoveryAgent> agentNetwork) {
-    super(keyPair, config, peerRequirement, peerBlacklist, nodeWhitelistController,
+    super(
+        keyPair,
+        config,
+        peerRequirement,
+        peerBlacklist,
+        nodeWhitelistController,
         nodePermissioningController);
     this.agentNetwork = agentNetwork;
   }

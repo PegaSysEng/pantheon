@@ -17,7 +17,6 @@ import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDistance
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -41,7 +40,6 @@ public class RecursivePeerRefreshState {
   private static final int MAX_CONCURRENT_REQUESTS = 3;
   private BytesValue target;
   private final PeerBlacklist peerBlacklist;
-  private final Optional<NodeLocalConfigPermissioningController> peerWhitelist;
   private final Optional<NodePermissioningController> nodePermissioningController;
   private final PeerTable peerTable;
   private final DiscoveryPeer localPeer;
@@ -62,7 +60,6 @@ public class RecursivePeerRefreshState {
 
   RecursivePeerRefreshState(
       final PeerBlacklist peerBlacklist,
-      final Optional<NodeLocalConfigPermissioningController> peerWhitelist,
       final Optional<NodePermissioningController> nodePermissioningController,
       final BondingAgent bondingAgent,
       final FindNeighbourDispatcher neighborFinder,
