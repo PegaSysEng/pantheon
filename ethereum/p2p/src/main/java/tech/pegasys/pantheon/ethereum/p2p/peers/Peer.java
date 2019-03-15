@@ -15,8 +15,6 @@ package tech.pegasys.pantheon.ethereum.p2p.peers;
 import tech.pegasys.pantheon.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-
-import java.util.OptionalInt;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 public interface Peer extends PeerId {
@@ -68,7 +66,6 @@ public interface Peer extends PeerId {
         this.getId().toUnprefixedString(),
         endpoint.getHost(),
         endpoint.getUdpPort(),
-        endpoint.getTcpPort()
-    );
+        endpoint.getTcpPort());
   }
 }

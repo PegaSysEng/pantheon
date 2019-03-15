@@ -547,16 +547,18 @@ public class NettyP2PNetwork implements P2PNetwork {
     LOG.trace(
         "Checking if connection with peer {} is permitted", peerConnection.getPeer().getNodeId());
 
-
     return nodePermissioningController
-        .map(c -> {
-          final EnodeURL localPeerEnodeURL =
-              peerInfoToEnodeURL(ourPeerInfo, (InetSocketAddress) peerConnection.getLocalAddress());
-          final EnodeURL remotePeerEnodeURL =
-              peerInfoToEnodeURL(
-                  peerConnection.getPeer(), (InetSocketAddress) peerConnection.getRemoteAddress());
-          return c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL);
-        })
+        .map(
+            c -> {
+              final EnodeURL localPeerEnodeURL =
+                  peerInfoToEnodeURL(
+                      ourPeerInfo, (InetSocketAddress) peerConnection.getLocalAddress());
+              final EnodeURL remotePeerEnodeURL =
+                  peerInfoToEnodeURL(
+                      peerConnection.getPeer(),
+                      (InetSocketAddress) peerConnection.getRemoteAddress());
+              return c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL);
+            })
         .orElse(true);
   }
 
@@ -566,12 +568,14 @@ public class NettyP2PNetwork implements P2PNetwork {
     }
 
     return nodePermissioningController
-        .map(c -> {
-          final InetSocketAddress socket = (InetSocketAddress) server.channel().localAddress();
-          final EnodeURL localPeerEnodeUrl = peerInfoToEnodeURL(ourPeerInfo, socket);
+        .map(
+            c -> {
+              final InetSocketAddress socket = (InetSocketAddress) server.channel().localAddress();
+              final EnodeURL localPeerEnodeUrl = peerInfoToEnodeURL(ourPeerInfo, socket);
 
-          return c.isPermitted(localPeerEnodeUrl, peer.getEnodeURL());
-        }).orElse(true);
+              return c.isPermitted(localPeerEnodeUrl, peer.getEnodeURL());
+            })
+        .orElse(true);
   }
 
   private EnodeURL peerInfoToEnodeURL(final PeerInfo ourPeerInfo, final InetSocketAddress address) {

@@ -196,8 +196,7 @@ public class AdminAddPeerTest {
 
   @Test
   public void requestReturnsErrorWhenPeerNotWhitelisted() {
-    when(p2pNetwork.addMaintainConnectionPeer(any()))
-        .thenThrow(new PeerNotPermittedException());
+    when(p2pNetwork.addMaintainConnectionPeer(any())).thenThrow(new PeerNotPermittedException());
 
     final JsonRpcRequest request =
         new JsonRpcRequest(

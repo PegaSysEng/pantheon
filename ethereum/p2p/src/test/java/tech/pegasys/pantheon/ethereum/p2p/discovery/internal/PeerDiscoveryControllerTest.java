@@ -1129,7 +1129,8 @@ public class PeerDiscoveryControllerTest {
 
     ArgumentCaptor<PeerDroppedEvent> captor = ArgumentCaptor.forClass(PeerDroppedEvent.class);
     verify(peerDroppedEventConsumer).accept(captor.capture());
-    assertThat(captor.getValue().getPeer()).isEqualTo(DiscoveryPeer.fromURI(peer.getEnodeURLString()));
+    assertThat(captor.getValue().getPeer())
+        .isEqualTo(DiscoveryPeer.fromURI(peer.getEnodeURLString()));
   }
 
   @Test
