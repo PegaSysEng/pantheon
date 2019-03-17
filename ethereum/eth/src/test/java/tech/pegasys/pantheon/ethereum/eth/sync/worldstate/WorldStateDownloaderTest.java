@@ -732,10 +732,7 @@ public class WorldStateDownloaderTest {
         RespondingEthPeer.wrapResponderWithCollector(blockChainResponder, sentMessages);
 
     CompletableFuture<Void> result = downloader.run(header);
-    while (!result.isDone()) {
-      peer.respond(responder);
-      giveOtherThreadsAGo();
-    }
+    peer.respondWhileOtherThreadsWork(responder, () -> !result.isDone());
     assertThat(localStorage.isWorldStateAvailable(stateRoot)).isTrue();
 
     // Check that already enqueued trie nodes were requested
@@ -918,6 +915,11 @@ public class WorldStateDownloaderTest {
       final CompletableFuture<?> downloaderFuture) {
     final Responder responder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
+    if (peers.size() == 1) {
+      // Use a blocking approach to waiting for the next message when we can.
+      peers.get(0).respondWhileOtherThreadsWork(responder, () -> !downloaderFuture.isDone());
+      return;
+    }
     while (!downloaderFuture.isDone()) {
       for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
@@ -1009,7 +1011,7 @@ public class WorldStateDownloaderTest {
   }
 
   private void giveOtherThreadsAGo() {
-    LockSupport.parkNanos(10);
+    LockSupport.parkNanos(2000);
   }
 
   @FunctionalInterface
