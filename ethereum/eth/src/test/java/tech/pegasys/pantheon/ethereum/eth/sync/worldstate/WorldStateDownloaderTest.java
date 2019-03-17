@@ -895,11 +895,6 @@ public class WorldStateDownloaderTest {
       final CompletableFuture<?> downloaderFuture) {
     final Responder responder =
         RespondingEthPeer.blockchainResponder(mock(Blockchain.class), remoteWorldStateArchive);
-    if (peers.size() == 1) {
-      // Use a blocking approach to waiting for the next message when we can.
-      peers.get(0).respondWhileOtherThreadsWork(responder, () -> !downloaderFuture.isDone());
-      return;
-    }
     respondUntilDone(peers, responder, downloaderFuture);
   }
 
@@ -984,6 +979,11 @@ public class WorldStateDownloaderTest {
       final List<RespondingEthPeer> peers,
       final Responder responder,
       final CompletableFuture<?> result) {
+    if (peers.size() == 1) {
+      // Use a blocking approach to waiting for the next message when we can.
+      peers.get(0).respondWhileOtherThreadsWork(responder, () -> !result.isDone());
+      return;
+    }
     while (!result.isDone()) {
       for (final RespondingEthPeer peer : peers) {
         peer.respond(responder);
