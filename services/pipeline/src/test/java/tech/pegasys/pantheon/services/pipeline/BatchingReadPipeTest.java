@@ -14,7 +14,13 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
+
+import tech.pegasys.pantheon.metrics.Counter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +30,9 @@ import org.junit.Test;
 public class BatchingReadPipeTest {
 
   private final Pipe<String> source = new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
-  private final BatchingReadPipe<String> batchingPipe = new BatchingReadPipe<>(source, 3);
+  private final Counter batchCounter = mock(Counter.class);
+  private final BatchingReadPipe<String> batchingPipe =
+      new BatchingReadPipe<>(source, 3, batchCounter);
 
   @Test
   public void shouldGetABatchOfAvailableItems() {
@@ -89,5 +97,38 @@ public class BatchingReadPipeTest {
     batchingPipe.drainTo(output, 6);
     // Note still only 3 items in the batch.
     assertThat(output).containsExactly(asList("a", "b", "c"));
+  }
+
+  @Test
+  public void shouldCountBatchesReturnedFromGet() {
+    source.put("a");
+    source.close();
+    batchingPipe.get();
+    assertThat(batchingPipe.get()).isNull();
+
+    verify(batchCounter, times(1)).inc();
+  }
+
+  @Test
+  public void shouldCountBatchesReturnedFromPoll() {
+    assertThat(batchingPipe.poll()).isNull();
+    verifyZeroInteractions(batchCounter);
+
+    source.put("a");
+    batchingPipe.poll();
+
+    verify(batchCounter, times(1)).inc();
+  }
+
+  @Test
+  public void shouldCountBatchesReturnedFromDrainTo() {
+    final List<List<String>> output = new ArrayList<>();
+    batchingPipe.drainTo(output, 3);
+    verifyZeroInteractions(batchCounter);
+
+    source.put("a");
+    batchingPipe.drainTo(output, 3);
+
+    verify(batchCounter, times(1)).inc();
   }
 }

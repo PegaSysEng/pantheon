@@ -105,7 +105,7 @@ public class PipelineBuilderTest {
     tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
     final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(input, NO_OP_LABELLED_COUNTER)
+        PipelineBuilder.createPipelineFrom("source", input, NO_OP_LABELLED_COUNTER)
             .inBatches(6)
             .andFinishWith("end", output::offer);
 

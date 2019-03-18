@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
+import tech.pegasys.pantheon.metrics.Counter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,10 +22,12 @@ public class BatchingReadPipe<T> implements ReadPipe<List<T>> {
 
   private final ReadPipe<T> input;
   private final int maximumBatchSize;
+  private final Counter batchCounter;
 
-  public BatchingReadPipe(final ReadPipe<T> input, final int maximumBatchSize) {
+  public BatchingReadPipe(final ReadPipe<T> input, final int maximumBatchSize, final Counter batchCounter) {
     this.input = input;
     this.maximumBatchSize = maximumBatchSize;
+    this.batchCounter = batchCounter;
   }
 
   @Override
@@ -42,6 +46,7 @@ public class BatchingReadPipe<T> implements ReadPipe<List<T>> {
     final List<T> batch = new ArrayList<>();
     batch.add(firstItem);
     input.drainTo(batch, maximumBatchSize - 1);
+    batchCounter.inc();
     return batch;
   }
 
@@ -53,6 +58,7 @@ public class BatchingReadPipe<T> implements ReadPipe<List<T>> {
       // Poll has to return null if the pipe is empty
       return null;
     }
+    batchCounter.inc();
     return batch;
   }
 

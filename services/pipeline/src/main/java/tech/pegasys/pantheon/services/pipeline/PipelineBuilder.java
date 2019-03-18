@@ -44,6 +44,7 @@ public class PipelineBuilder<T> {
   private final Pipe<?> inputPipe;
   private final Collection<Stage> stages;
   private final Collection<Pipe<?>> pipes;
+  private final String lastStageName;
   private final ReadPipe<T> pipeEnd;
   private final int bufferSize;
   private final LabelledMetric<Counter> outputCounter;
@@ -52,11 +53,13 @@ public class PipelineBuilder<T> {
       final Pipe<?> inputPipe,
       final Collection<Stage> stages,
       final Collection<Pipe<?>> pipes,
+      final String lastStageName,
       final ReadPipe<T> pipeEnd,
       final int bufferSize,
       final LabelledMetric<Counter> outputCounter) {
-    this.outputCounter = outputCounter;
     checkArgument(!pipes.isEmpty(), "Must have at least one pipe in a pipeline");
+    this.lastStageName = lastStageName;
+    this.outputCounter = outputCounter;
     this.inputPipe = inputPipe;
     this.stages = stages;
     this.pipes = pipes;
@@ -85,13 +88,14 @@ public class PipelineBuilder<T> {
     final Pipe<T> pipe = createPipe(bufferSize, sourceName, itemCounter);
     final IteratorSourceStage<T> sourceStage = new IteratorSourceStage<>(sourceName, source, pipe);
     return new PipelineBuilder<>(
-        pipe, singleton(sourceStage), singleton(pipe), pipe, bufferSize, itemCounter);
+        pipe, singleton(sourceStage), singleton(pipe), sourceName, pipe, bufferSize, itemCounter);
   }
 
   /**
    * Create a new pipeline that processes inputs added to <i>pipe</i>. The pipeline completes when
    * <i>pipe</i> is closed and the last item has been reached the end of the pipeline.
    *
+   * @param sourceName the name of this stage. Used as the label for the output count metric.
    * @param pipe the pipe feeding the pipeline.
    * @param outputCounter the counter to increment for each output of a stage. Must have a single
    *     label which will be filled with the stage name.
@@ -99,9 +103,9 @@ public class PipelineBuilder<T> {
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
   public static <T> PipelineBuilder<T> createPipelineFrom(
-      final Pipe<T> pipe, final LabelledMetric<Counter> outputCounter) {
+      final String sourceName, final Pipe<T> pipe, final LabelledMetric<Counter> outputCounter) {
     return new PipelineBuilder<>(
-        pipe, emptyList(), singleton(pipe), pipe, pipe.getCapacity(), outputCounter);
+        pipe, emptyList(), singleton(pipe), sourceName, pipe, pipe.getCapacity(), outputCounter);
   }
 
   /**
@@ -178,7 +182,11 @@ public class PipelineBuilder<T> {
         inputPipe,
         stages,
         pipes,
-        new BatchingReadPipe<>(pipeEnd, maximumBatchSize),
+        lastStageName,
+        new BatchingReadPipe<>(
+            pipeEnd,
+            maximumBatchSize,
+            outputCounter.labels(lastStageName + "_outputPipe", "batches")),
         bufferSize / maximumBatchSize + 1,
         outputCounter);
   }
@@ -255,7 +263,13 @@ public class PipelineBuilder<T> {
       newStages.add(processStage);
     }
     return new PipelineBuilder<>(
-        inputPipe, newStages, concat(pipes, newPipeEnd), newPipeEnd, newBufferSize, outputCounter);
+        inputPipe,
+        newStages,
+        concat(pipes, newPipeEnd),
+        stageName,
+        newPipeEnd,
+        newBufferSize,
+        outputCounter);
   }
 
   private <O> PipelineBuilder<O> addStage(final Processor<T, O> processor, final String stageName) {
@@ -272,7 +286,13 @@ public class PipelineBuilder<T> {
   private <O> PipelineBuilder<O> addStage(final Stage stage, final Pipe<O> outputPipe) {
     final List<Stage> newStages = concat(stages, stage);
     return new PipelineBuilder<>(
-        inputPipe, newStages, concat(pipes, outputPipe), outputPipe, bufferSize, outputCounter);
+        inputPipe,
+        newStages,
+        concat(pipes, outputPipe),
+        stage.getName(),
+        outputPipe,
+        bufferSize,
+        outputCounter);
   }
 
   private <X> List<X> concat(final Collection<X> existing, final X newItem) {

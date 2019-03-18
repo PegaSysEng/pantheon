@@ -228,7 +228,7 @@ public class WorldStateDownloadProcess {
                   "batchDataDownloaded", tasks -> tasks.forEach(requestsToComplete::put));
 
       final Pipeline completionPipeline =
-          createPipelineFrom(requestsToComplete, outputCounter)
+          createPipelineFrom("requestDataAvailable", requestsToComplete, outputCounter)
               .andFinishWith(
                   "requestCompleteTask",
                   task ->
