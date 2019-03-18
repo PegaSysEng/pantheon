@@ -29,7 +29,6 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
-import tech.pegasys.pantheon.cli.custom.EnodeToURIPropertyConverter;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
 import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
@@ -50,6 +49,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -60,6 +60,7 @@ import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +77,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Suppliers;
@@ -187,9 +189,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Comma separated enode URLs for P2P discovery bootstrap. "
               + "Default is a predefined list.",
       split = ",",
-      arity = "0..*",
-      converter = EnodeToURIPropertyConverter.class)
-  private final Collection<URI> bootNodes = null;
+      arity = "0..*")
+  void setBootnodes(final List<String> values) {
+    try {
+      bootNodes = values.stream().map((s) -> new EnodeURL(s).toURI()).collect(Collectors.toList());
+    } catch (IllegalArgumentException e) {
+      throw new ParameterException(commandLine, e.getMessage());
+    }
+  }
+
+  private Collection<URI> bootNodes = null;
 
   @Option(
       names = {"--max-peers"},
@@ -614,16 +623,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       }
     }
 
-    final Optional<SmartContractPermissioningConfiguration> smartContractPermissioningConfiguration =
-        smartContractPermissioningConfiguration();
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     try {
       final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
       final WebSocketConfiguration webSocketConfiguration = webSocketConfiguration();
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration =
+      final Optional<PermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
-      permissioningConfiguration.ifPresent(
-          p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
+
+      permissioningConfiguration
+          .flatMap(PermissioningConfiguration::getLocalConfig)
+          .ifPresent(p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
 
       synchronize(
           buildController(),
@@ -794,13 +803,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsConfiguration;
   }
 
-  private boolean anyPermissionsCliOptionsSpecified() {
-    return permissionsAccountsEnabled || permissionsNodesEnabled || permissionsNodesContractEnabled;
-  }
 
-  private Optional<SmartContractPermissioningConfiguration> smartContractPermissioningConfiguration() {
-
-    if (!anyPermissionsCliOptionsSpecified()) {
+  private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
+    if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
         logger.warn(
             "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
@@ -808,25 +813,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Optional.empty();
     }
 
-    final SmartContractPermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
-            permissionsNodesContractAddress, permissionsNodesContractEnabled);
-    return Optional.of(permissioningConfiguration);
-  }
-
-  private Optional<LocalPermissioningConfiguration> permissioningConfiguration() throws Exception {
-
-    if (!anyPermissionsCliOptionsSpecified()) {
-      if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
-        logger.warn(
-            "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
-      }
-      return Optional.empty();
-    }
-
-    final LocalPermissioningConfiguration permissioningConfiguration =
+    final LocalPermissioningConfiguration localPermissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
             getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
+
+    final PermissioningConfiguration permissioningConfiguration =
+        new PermissioningConfiguration(
+            Optional.of(localPermissioningConfiguration), Optional.empty());
+
     return Optional.of(permissioningConfiguration);
   }
 
@@ -874,7 +868,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration) {
+      final Optional<PermissioningConfiguration> permissioningConfiguration) {
 
     checkNotNull(runnerBuilder);
 
