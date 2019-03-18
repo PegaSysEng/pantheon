@@ -130,14 +130,14 @@ public class PermissioningConfigurationBuilder {
   }
 
   private static TomlParseResult readToml(final String filepath) throws Exception {
-    TomlParseResult nodePermissioningToml;
+    TomlParseResult toml;
 
     try {
-      nodePermissioningToml = TomlConfigFileParser.loadConfigurationFromFile(filepath);
+      toml = TomlConfigFileParser.loadConfigurationFromFile(filepath);
     } catch (Exception e) {
       throw new Exception(
           "Unable to read permissioning TOML config file : " + filepath + " " + e.getMessage());
     }
-    return nodePermissioningToml;
+    return toml;
   }
 }
