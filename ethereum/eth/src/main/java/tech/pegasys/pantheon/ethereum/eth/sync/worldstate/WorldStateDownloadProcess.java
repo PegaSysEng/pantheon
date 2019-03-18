@@ -76,13 +76,13 @@ import org.apache.logging.log4j.Logger;
  */
 public class WorldStateDownloadProcess {
   private static final Logger LOG = LogManager.getLogger();
-  private final Pipeline fetchDataPipeline;
-  private final Pipeline completionPipeline;
+  private final Pipeline<Task<NodeDataRequest>> fetchDataPipeline;
+  private final Pipeline<Task<NodeDataRequest>> completionPipeline;
   private final WritePipe<Task<NodeDataRequest>> requestsToComplete;
 
   private WorldStateDownloadProcess(
-      final Pipeline fetchDataPipeline,
-      final Pipeline completionPipeline,
+      final Pipeline<Task<NodeDataRequest>> fetchDataPipeline,
+      final Pipeline<Task<NodeDataRequest>> completionPipeline,
       final WritePipe<Task<NodeDataRequest>> requestsToComplete) {
     this.fetchDataPipeline = fetchDataPipeline;
     this.completionPipeline = completionPipeline;
@@ -202,9 +202,17 @@ public class WorldStateDownloadProcess {
               "step",
               "action");
 
-      final Pipe<Task<NodeDataRequest>> requestsToComplete =
-          PipelineBuilder.createPipe(bufferCapacity, "requestDataAvailable", outputCounter);
-      final Pipeline fetchDataPipeline =
+      final Pipeline<Task<NodeDataRequest>> completionPipeline =
+          PipelineBuilder.<Task<NodeDataRequest>>createPipeline(
+                  "requestDataAvailable", bufferCapacity, outputCounter)
+              .andFinishWith(
+                  "requestCompleteTask",
+                  task ->
+                      completeTaskStep.markAsCompleteOrFailed(
+                          pivotBlockHeader, downloadState, task));
+
+      final Pipe<Task<NodeDataRequest>> requestsToComplete = completionPipeline.getInputPipe();
+      final Pipeline<Task<NodeDataRequest>> fetchDataPipeline =
           createPipelineFrom(
                   "requestDequeued",
                   new TaskQueueIterator(downloadState),
@@ -226,14 +234,6 @@ public class WorldStateDownloadProcess {
                   tasks -> persistDataStep.persist(tasks, pivotBlockHeader, downloadState))
               .andFinishWith(
                   "batchDataDownloaded", tasks -> tasks.forEach(requestsToComplete::put));
-
-      final Pipeline completionPipeline =
-          createPipelineFrom("requestDataAvailable", requestsToComplete, outputCounter)
-              .andFinishWith(
-                  "requestCompleteTask",
-                  task ->
-                      completeTaskStep.markAsCompleteOrFailed(
-                          pivotBlockHeader, downloadState, task));
 
       return new WorldStateDownloadProcess(
           fetchDataPipeline, completionPipeline, requestsToComplete);

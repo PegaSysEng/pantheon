@@ -24,7 +24,8 @@ public class BatchingReadPipe<T> implements ReadPipe<List<T>> {
   private final int maximumBatchSize;
   private final Counter batchCounter;
 
-  public BatchingReadPipe(final ReadPipe<T> input, final int maximumBatchSize, final Counter batchCounter) {
+  public BatchingReadPipe(
+      final ReadPipe<T> input, final int maximumBatchSize, final Counter batchCounter) {
     this.input = input;
     this.maximumBatchSize = maximumBatchSize;
     this.batchCounter = batchCounter;

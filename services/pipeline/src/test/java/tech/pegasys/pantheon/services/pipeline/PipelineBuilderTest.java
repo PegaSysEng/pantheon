@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.waitAtMost;
-import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_COUNTER;
 
 import tech.pegasys.pantheon.metrics.Counter;
@@ -101,13 +100,14 @@ public class PipelineBuilderTest {
 
   @Test
   public void shouldCombineIntoBatches() throws Exception {
-    final Pipe<Integer> input = new Pipe<>(20, NO_OP_COUNTER, NO_OP_COUNTER);
-    tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
-    final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom("source", input, NO_OP_LABELLED_COUNTER)
+    final Pipeline<Integer> pipeline =
+        PipelineBuilder.<Integer>createPipeline("source", 20, NO_OP_LABELLED_COUNTER)
             .inBatches(6)
             .andFinishWith("end", output::offer);
+
+    final Pipe<Integer> input = pipeline.getInputPipe();
+    tasks.forEachRemaining(input::put);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
@@ -384,13 +384,20 @@ public class PipelineBuilderTest {
 
     final List<String> stepNames = asList("input", "map", "parallel", "async", "flatMap");
     final List<String> expectedMetricNames =
-        stepNames.stream()
-            .map(stageName -> stageName + "_outputPipe")
-            .flatMap(metricName -> Stream.of(metricName + "-added", metricName + "-removed"))
+        Stream.concat(
+                Stream.of("async_outputPipe-batches"),
+                stepNames.stream()
+                    .map(stageName -> stageName + "_outputPipe")
+                    .flatMap(
+                        metricName -> Stream.of(metricName + "-added", metricName + "-removed")))
             .collect(toList());
     assertThat(counters).containsOnlyKeys(expectedMetricNames);
 
-    expectedMetricNames.forEach(metric -> assertThat(counters.get(metric).count).hasValue(15));
+    expectedMetricNames.stream()
+        .filter(name -> !name.endsWith("-batches"))
+        .forEach(metric -> assertThat(counters.get(metric).count).hasValue(15));
+
+    assertThat(counters.get("async_outputPipe-batches").count).hasValueBetween(4, 15);
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {
