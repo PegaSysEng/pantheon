@@ -49,7 +49,9 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -442,6 +444,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   @Option(
+      names = {"--permissions-nodes-contract-address"},
+      description = "Address of the node permissioning smart contract",
+      arity = "1")
+  private final Address permissionsNodesContractAddress = null;
+
+  @Option(
+      names = {"--permissions-nodes-contract-enabled"},
+      description = "Enable node level permissions via smart contract (default: ${DEFAULT-VALUE})")
+  private final Boolean permissionsNodesContractEnabled = false;
+
+  @Option(
       names = {"--permissions-nodes-enabled"},
       description = "Enable node level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsNodesEnabled = false;
@@ -602,21 +615,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
 
-    if (permissionsConfigFile() != null) {
-      if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
-        logger.warn(
-            "Permissions config file set {} but no permissions enabled", permissionsConfigFile());
-      }
-    }
-
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     try {
       final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
       final WebSocketConfiguration webSocketConfiguration = webSocketConfiguration();
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration =
+      final Optional<PermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
-      permissioningConfiguration.ifPresent(
-          p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
+
+      permissioningConfiguration
+          .flatMap(PermissioningConfiguration::getLocalConfig)
+          .ifPresent(p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
 
       synchronize(
           buildController(),
@@ -787,9 +795,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsConfiguration;
   }
 
-  private Optional<LocalPermissioningConfiguration> permissioningConfiguration() throws Exception {
+  private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
+    Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
+    Optional<SmartContractPermissioningConfiguration>
+        smartContractPermissioningConfigurationOptional;
 
-    if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+    if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
         logger.warn(
             "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
@@ -797,10 +808,55 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Optional.empty();
     }
 
-    final LocalPermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfiguration(
-            getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
+    if (localPermissionsEnabled()) {
+      final LocalPermissioningConfiguration localPermissioningConfiguration =
+          PermissioningConfigurationBuilder.permissioningConfiguration(
+              getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
+      localPermissioningConfigurationOptional = Optional.of(localPermissioningConfiguration);
+    } else {
+      if (permissionsConfigFile() != null) {
+        logger.warn(
+            "Permissions config file set {} but no local permissions enabled",
+            permissionsConfigFile());
+      }
+      localPermissioningConfigurationOptional = Optional.empty();
+    }
+
+    if (contractPermissionsEnabled()) {
+      if (permissionsNodesContractAddress == null) {
+        throw new ParameterException(
+            this.commandLine,
+            "No contract address specified. Cannot enable contract based permissions.");
+      }
+      final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+          PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
+              permissionsNodesContractAddress, permissionsNodesContractEnabled);
+      smartContractPermissioningConfigurationOptional =
+          Optional.of(smartContractPermissioningConfiguration);
+    } else {
+      if (permissionsNodesContractAddress != null) {
+        logger.warn(
+            "Smart contract address set {} but no contract permissions enabled",
+            permissionsNodesContractAddress);
+      }
+      smartContractPermissioningConfigurationOptional = Optional.empty();
+    }
+
+    final PermissioningConfiguration permissioningConfiguration =
+        new PermissioningConfiguration(
+            localPermissioningConfigurationOptional,
+            smartContractPermissioningConfigurationOptional);
+
     return Optional.of(permissioningConfiguration);
+  }
+
+  private boolean localPermissionsEnabled() {
+    return permissionsAccountsEnabled || permissionsNodesEnabled;
+  }
+
+  private boolean contractPermissionsEnabled() {
+    // TODO add permissionsAccountsContractEnabled
+    return permissionsNodesContractEnabled;
   }
 
   private PrivacyParameters privacyParameters() throws IOException {
@@ -847,7 +903,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration) {
+      final Optional<PermissioningConfiguration> permissioningConfiguration) {
 
     checkNotNull(runnerBuilder);
 
