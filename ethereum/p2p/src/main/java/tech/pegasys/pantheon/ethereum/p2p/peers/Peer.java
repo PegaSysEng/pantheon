@@ -17,6 +17,8 @@ import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.util.OptionalInt;
+
 public interface Peer extends PeerId {
 
   /**
@@ -62,10 +64,18 @@ public interface Peer extends PeerId {
 
   default EnodeURL getEnodeURL() {
     final Endpoint endpoint = this.getEndpoint();
-    return new EnodeURL(
-        this.getId().toUnprefixedString(),
-        endpoint.getHost(),
-        endpoint.getUdpPort(),
-        endpoint.getTcpPort());
+
+    final OptionalInt tcpPort = endpoint.getTcpPort();
+    final int udpPort = endpoint.getUdpPort();
+
+    if (tcpPort.isPresent() && (tcpPort.getAsInt() != udpPort)) {
+      return new EnodeURL(
+          this.getId().toUnprefixedString(),
+          endpoint.getHost(),
+          tcpPort.getAsInt(),
+          OptionalInt.of(endpoint.getUdpPort()));
+    } else {
+      return new EnodeURL(this.getId().toUnprefixedString(), endpoint.getHost(), udpPort);
+    }
   }
 }
