@@ -175,8 +175,20 @@ public class PipelineBuilder<T> {
    */
   public PipelineBuilder<List<T>> inBatches(final String stageName, final int maximumBatchSize) {
     checkArgument(maximumBatchSize > 0, "Maximum batch size must be greater than 0");
-    return addStage(
-        new BatchingProcessor<>(maximumBatchSize), bufferSize / maximumBatchSize + 1, stageName);
+    // Note the output pipe from batches has a capacity of 1 so we create the biggest batch we can
+    // But pipes further downstream have the reduced capacity as described.
+    final Pipe<List<T>> outputPipe = createPipe(1, stageName, outputCounter);
+    final Stage processStage =
+        new ProcessingStage<>(
+            stageName, pipeEnd, outputPipe, new BatchingProcessor<>(maximumBatchSize));
+    final List<Stage> newStages = concat(stages, processStage);
+    return new PipelineBuilder<>(
+        inputPipe,
+        newStages,
+        concat(pipes, outputPipe),
+        outputPipe,
+        bufferSize / maximumBatchSize + 1,
+        outputCounter);
   }
 
   /**
