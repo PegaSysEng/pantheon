@@ -320,6 +320,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void permissionsEnabledWithoutContractAddressMustError() {
+    parseCommand("--permissions-nodes-contract-enabled");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).startsWith("No contract address specified");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void permissionsEnabledWithInvalidContractAddressMustError() {
     parseCommand(
         "--permissions-nodes-contract-enabled",
@@ -328,7 +338,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verifyZeroInteractions(mockRunnerBuilder);
 
-    assertThat(commandErrorOutput.toString()).contains("Invalid smart contract address");
+    assertThat(commandErrorOutput.toString()).contains("Invalid value");
     assertThat(commandOutput.toString()).isEmpty();
   }
 
@@ -341,16 +351,19 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--permissions-nodes-contract-enabled",
         "--permissions-nodes-contract-address",
         smartContractAddress);
-    final SmartContractPermissioningConfiguration permissioningConfiguration =
+    final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
         new SmartContractPermissioningConfiguration();
-    permissioningConfiguration.setSmartContractAddress(Address.fromHexString(smartContractAddress));
+    smartContractPermissioningConfiguration.setSmartContractAddress(
+        Address.fromHexString(smartContractAddress));
+    smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(permissioningConfigurationArgumentCaptor.getValue())
-        .isEqualToComparingFieldByField(permissioningConfiguration);
+    PermissioningConfiguration config = permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(config.getSmartContractConfig().get())
+        .isEqualToComparingFieldByField(smartContractPermissioningConfiguration);
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
@@ -379,7 +392,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsTomlFileWithNoPermissionsEnabledMustError() throws IOException {
+  public void permissionsTomlFileWithNoPermissionsEnabledMustNotError() throws IOException {
 
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
@@ -392,7 +405,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void defaultPermissionsTomlFileWithNoPermissionsEnabledMustError() {
+  public void defaultPermissionsTomlFileWithNoPermissionsEnabledMustNotError() {
     parseCommand("--p2p-enabled", "false");
 
     verify(mockRunnerBuilder).build();

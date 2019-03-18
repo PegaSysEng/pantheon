@@ -51,6 +51,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -802,7 +803,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
-    if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+    Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
+    Optional<SmartContractPermissioningConfiguration>
+        smartContractPermissioningConfigurationOptional;
+    if (!(localPermissionsEnabled() || permissionsNodesContractEnabled)) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
         logger.warn(
             "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
@@ -810,15 +814,39 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Optional.empty();
     }
 
-    final LocalPermissioningConfiguration localPermissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfiguration(
-            getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
+    if (localPermissionsEnabled()) {
+      final LocalPermissioningConfiguration localPermissioningConfiguration =
+          PermissioningConfigurationBuilder.permissioningConfiguration(
+              getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
+      localPermissioningConfigurationOptional = Optional.of(localPermissioningConfiguration);
+    } else {
+      localPermissioningConfigurationOptional = Optional.empty();
+    }
+    if (permissionsNodesContractEnabled) {
+      if (permissionsNodesContractAddress != null) {
+        final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+            PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
+                permissionsNodesContractAddress, permissionsNodesContractEnabled);
+        smartContractPermissioningConfigurationOptional =
+            Optional.of(smartContractPermissioningConfiguration);
+      } else {
+        logger.warn("No contract address specified. Cannot enable contract permissioning.");
+        smartContractPermissioningConfigurationOptional = Optional.empty();
+      }
+    } else {
+      smartContractPermissioningConfigurationOptional = Optional.empty();
+    }
 
     final PermissioningConfiguration permissioningConfiguration =
         new PermissioningConfiguration(
-            Optional.of(localPermissioningConfiguration), Optional.empty());
+            localPermissioningConfigurationOptional,
+            smartContractPermissioningConfigurationOptional);
 
     return Optional.of(permissioningConfiguration);
+  }
+
+  private boolean localPermissionsEnabled() {
+    return permissionsAccountsEnabled || permissionsNodesEnabled;
   }
 
   private PrivacyParameters privacyParameters() throws IOException {
