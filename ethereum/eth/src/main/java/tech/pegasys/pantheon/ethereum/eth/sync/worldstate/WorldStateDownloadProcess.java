@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipe;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
+import tech.pegasys.pantheon.services.pipeline.PipelineBuilder;
 import tech.pegasys.pantheon.services.pipeline.WritePipe;
 import tech.pegasys.pantheon.services.tasks.Task;
 import tech.pegasys.pantheon.util.ExceptionUtils;
@@ -198,10 +199,11 @@ public class WorldStateDownloadProcess {
               MetricCategory.SYNCHRONIZER,
               "world_state_pipeline_processed_total",
               "Number of entries processed by each world state download pipeline stage",
-              "step");
+              "step",
+              "action");
 
       final Pipe<Task<NodeDataRequest>> requestsToComplete =
-          new Pipe<>(bufferCapacity, outputCounter.labels("requestDataAvailable"));
+          PipelineBuilder.createPipe(bufferCapacity, "requestDataAvailable", outputCounter);
       final Pipeline fetchDataPipeline =
           createPipelineFrom(
                   "requestDequeued",

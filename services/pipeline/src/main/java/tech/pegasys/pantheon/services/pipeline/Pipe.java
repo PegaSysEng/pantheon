@@ -40,14 +40,16 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
   private static final Logger LOG = LogManager.getLogger();
   private final BlockingQueue<T> queue;
   private final int capacity;
-  private final Counter itemCounter;
+  private final Counter inputCounter;
+  private final Counter outputCounter;
   private final AtomicBoolean closed = new AtomicBoolean();
   private final AtomicBoolean aborted = new AtomicBoolean();
 
-  public Pipe(final int capacity, final Counter itemCounter) {
+  public Pipe(final int capacity, final Counter inputCounter, final Counter outputCounter) {
     queue = new ArrayBlockingQueue<>(capacity);
     this.capacity = capacity;
-    this.itemCounter = itemCounter;
+    this.inputCounter = inputCounter;
+    this.outputCounter = outputCounter;
   }
 
   @Override
@@ -93,6 +95,7 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
       while (hasMore()) {
         final T value = queue.poll(1, TimeUnit.SECONDS);
         if (value != null) {
+          outputCounter.inc();
           return value;
         }
       }
@@ -104,7 +107,11 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
 
   @Override
   public T poll() {
-    return queue.poll();
+    final T item = queue.poll();
+    if (item != null) {
+      outputCounter.inc();
+    }
+    return item;
   }
 
   @Override
@@ -116,6 +123,8 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
     final List<T> batch = new ArrayList<>();
     batch.add(nextItem);
     queue.drainTo(batch, maximumBatchSize - 1);
+    // The call to get() already counted the first item, hence size() - 1.
+    outputCounter.inc(batch.size() - 1);
     return batch;
   }
 
@@ -124,7 +133,7 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
     while (isOpen()) {
       try {
         if (queue.offer(value, 1, TimeUnit.SECONDS)) {
-          itemCounter.inc();
+          inputCounter.inc();
           return;
         }
       } catch (final InterruptedException e) {

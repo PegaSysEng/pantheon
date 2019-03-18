@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import static com.google.common.primitives.Ints.asList;
+import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
@@ -100,7 +101,7 @@ public class PipelineBuilderTest {
 
   @Test
   public void shouldCombineIntoBatches() throws Exception {
-    final Pipe<Integer> input = new Pipe<>(20, NO_OP_COUNTER);
+    final Pipe<Integer> input = new Pipe<>(20, NO_OP_COUNTER, NO_OP_COUNTER);
     tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
     final Pipeline pipeline =
@@ -365,10 +366,11 @@ public class PipelineBuilderTest {
   }
 
   @Test
-  public void shouldTrackTaskCountMetric() throws Exception {
+  public void shouldTrackTaskCountMetrics() throws Exception {
     final Map<String, SimpleCounter> counters = new ConcurrentHashMap<>();
     final LabelledMetric<Counter> labelledCounter =
-        labels -> counters.computeIfAbsent(labels[0], label -> new SimpleCounter());
+        labels ->
+            counters.computeIfAbsent(labels[0] + "-" + labels[1], label -> new SimpleCounter());
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, labelledCounter)
             .thenProcess("map", Function.identity())
@@ -380,17 +382,24 @@ public class PipelineBuilderTest {
 
     pipeline.start(executorService).get(10, SECONDS);
 
-    assertThat(counters)
-        .containsOnlyKeys("input", "map", "parallel", "async", "batch", "flatMap", "finish");
-    assertThat(counters.get("input").count).hasValue(15);
-    assertThat(counters.get("map").count).hasValue(15);
-    assertThat(counters.get("parallel").count).hasValue(15);
-    assertThat(counters.get("async").count).hasValue(15);
-    assertThat(counters.get("flatMap").count).hasValue(15);
-    assertThat(counters.get("finish").count).hasValue(15);
+    final List<String> stepNames = asList("input", "map", "parallel", "async", "batch", "flatMap");
+    final List<String> expectedMetricNames =
+        stepNames.stream()
+            .map(stageName -> stageName + "_outputPipe")
+            .flatMap(metricName -> Stream.of(metricName + "-added", metricName + "-removed"))
+            .collect(toList());
+    assertThat(counters).containsOnlyKeys(expectedMetricNames);
+
+    expectedMetricNames.stream()
+        .filter(name -> !name.startsWith("batch"))
+        .forEach(metric -> assertThat(counters.get(metric).count).hasValue(15));
     // We don't know how many batches will be produced because it's timing dependent but it must
     // be at least 4 to fit all the items and shouldn't be more than the items we put in.
-    assertThat(counters.get("batch").count).hasValueBetween(4, 15);
+    final AtomicLong batchAddedCount = counters.get("batch_outputPipe-added").count;
+    final AtomicLong batchRemovedCount = counters.get("batch_outputPipe-removed").count;
+    assertThat(batchAddedCount).hasValueBetween(4, 15);
+    assertThat(batchRemovedCount).hasValueBetween(4, 15);
+    assertThat(batchAddedCount.get()).isEqualTo(batchRemovedCount.get());
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {

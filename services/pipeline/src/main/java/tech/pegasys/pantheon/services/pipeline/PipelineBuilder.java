@@ -72,8 +72,8 @@ public class PipelineBuilder<T> {
    * @param sourceName the name of this stage. Used as the label for the output count metric.
    * @param source the source to pull items from for processing.
    * @param bufferSize the number of items to be buffered between each stage in the pipeline.
-   * @param outputCounter the counter to increment for each output of a stage. Must have a single
-   *     label which will be filled with the stage name.
+   * @param itemCounter the counter to increment for each output of a stage. Must accept two labels,
+   *     the stage name and action (output or drained).
    * @param <T> the type of items input into the pipeline.
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
@@ -81,11 +81,11 @@ public class PipelineBuilder<T> {
       final String sourceName,
       final Iterator<T> source,
       final int bufferSize,
-      final LabelledMetric<Counter> outputCounter) {
-    final Pipe<T> pipe = new Pipe<>(bufferSize, outputCounter.labels(sourceName));
+      final LabelledMetric<Counter> itemCounter) {
+    final Pipe<T> pipe = createPipe(bufferSize, sourceName, itemCounter);
     final IteratorSourceStage<T> sourceStage = new IteratorSourceStage<>(sourceName, source, pipe);
     return new PipelineBuilder<>(
-        pipe, singleton(sourceStage), singleton(pipe), pipe, bufferSize, outputCounter);
+        pipe, singleton(sourceStage), singleton(pipe), pipe, bufferSize, itemCounter);
   }
 
   /**
@@ -234,10 +234,7 @@ public class PipelineBuilder<T> {
    */
   public Pipeline andFinishWith(final String stageName, final Consumer<T> completer) {
     return new Pipeline(
-        inputPipe,
-        stages,
-        pipes,
-        new CompleterStage<>(stageName, pipeEnd, completer, outputCounter.labels(stageName)));
+        inputPipe, stages, pipes, new CompleterStage<>(stageName, pipeEnd, completer));
   }
 
   private <O> PipelineBuilder<O> thenProcessInParallel(
@@ -245,7 +242,7 @@ public class PipelineBuilder<T> {
       final Supplier<Processor<T, O>> createProcessor,
       final int numberOfThreads,
       final int newBufferSize) {
-    final Pipe<O> newPipeEnd = new Pipe<>(newBufferSize, outputCounter.labels(stageName));
+    final Pipe<O> newPipeEnd = createPipe(newBufferSize, stageName, outputCounter);
     final WritePipe<O> outputPipe = new SharedWritePipe<>(newPipeEnd, numberOfThreads);
     final ArrayList<Stage> newStages = new ArrayList<>(stages);
     for (int i = 0; i < numberOfThreads; i++) {
@@ -263,7 +260,7 @@ public class PipelineBuilder<T> {
 
   private <O> PipelineBuilder<O> addStage(
       final Processor<T, O> processor, final int newBufferSize, final String stageName) {
-    final Pipe<O> outputPipe = new Pipe<>(newBufferSize, outputCounter.labels(stageName));
+    final Pipe<O> outputPipe = createPipe(newBufferSize, stageName, outputCounter);
     final Stage processStage = new ProcessingStage<>(stageName, pipeEnd, outputPipe, processor);
     return addStage(processStage, outputPipe);
   }
@@ -278,5 +275,16 @@ public class PipelineBuilder<T> {
     final List<X> newList = new ArrayList<>(existing);
     newList.add(newItem);
     return newList;
+  }
+
+  public static <O> Pipe<O> createPipe(
+      final int newBufferSize,
+      final String stageName,
+      final LabelledMetric<Counter> outputCounter) {
+    final String labelName = stageName + "_outputPipe";
+    return new Pipe<>(
+        newBufferSize,
+        outputCounter.labels(labelName, "added"),
+        outputCounter.labels(labelName, "removed"));
   }
 }

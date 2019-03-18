@@ -22,8 +22,9 @@ import tech.pegasys.pantheon.metrics.Counter;
 import org.junit.Test;
 
 public class PipeTest {
-  private final Counter itemCounter = mock(Counter.class);
-  private final Pipe<String> pipe = new Pipe<>(5, itemCounter);
+  private final Counter inputCounter = mock(Counter.class);
+  private final Counter outputCounter = mock(Counter.class);
+  private final Pipe<String> pipe = new Pipe<>(5, inputCounter, outputCounter);
 
   @Test
   public void shouldNotHaveMoreWhenEmptyAndClosed() {
@@ -74,10 +75,39 @@ public class PipeTest {
   }
 
   @Test
-  public void shouldIncrementCounterWhenItemAddedToPipe() {
+  public void shouldIncrementInputCounterWhenItemAddedToPipe() {
     pipe.put("A");
-    verify(itemCounter).inc();
+    verify(inputCounter).inc();
     pipe.put("B");
-    verify(itemCounter, times(2)).inc();
+    verify(inputCounter, times(2)).inc();
+  }
+
+  @Test
+  public void shouldIncrementOutputCounterWhenItemRemovedToPipeWithPoll() {
+    pipe.put("A");
+    pipe.put("B");
+    pipe.poll();
+    verify(outputCounter).inc();
+
+    pipe.poll();
+    verify(outputCounter, times(2)).inc();
+
+    assertThat(pipe.poll()).isNull();
+    verify(outputCounter, times(2)).inc();
+  }
+
+  @Test
+  public void shouldIncrementOutputCounterWhenItemRemovedToPipeWithGet() {
+    pipe.put("A");
+    pipe.put("B");
+    pipe.close();
+    pipe.get();
+    verify(outputCounter).inc();
+
+    pipe.get();
+    verify(outputCounter, times(2)).inc();
+
+    assertThat(pipe.get()).isNull();
+    verify(outputCounter, times(2)).inc();
   }
 }

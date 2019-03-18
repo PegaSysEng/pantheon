@@ -24,8 +24,8 @@ import org.junit.Test;
 
 public class BatchingProcessorTest {
 
-  private final Pipe<Integer> inputPipe = new Pipe<>(10, NO_OP_COUNTER);
-  private final Pipe<List<Integer>> outputPipe = new Pipe<>(10, NO_OP_COUNTER);
+  private final Pipe<Integer> inputPipe = new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
+  private final Pipe<List<Integer>> outputPipe = new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
   private final BatchingProcessor<Integer> stage = new BatchingProcessor<>(3);
 
   @Test
