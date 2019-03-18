@@ -85,6 +85,7 @@ public class WhitelistPersistor {
     TomlParseResult parsedToml = Toml.parse(configurationFilePath);
 
     return Arrays.stream(WHITELIST_TYPE.values())
+        .filter(k -> parsedToml.contains(k.getTomlKey()))
         .map(
             whitelist_type ->
                 new AbstractMap.SimpleImmutableEntry<>(
