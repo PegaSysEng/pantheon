@@ -497,10 +497,8 @@ public class RecursivePeerRefreshStateTest {
 
     final NodePermissioningController nodeWhitelistController =
         mock(NodePermissioningController.class);
-    when(nodeWhitelistController.isPermitted(any(), eq(new EnodeURL(peerA.getEnodeURI()))))
-        .thenReturn(true);
-    when(nodeWhitelistController.isPermitted(any(), eq(new EnodeURL(peerB.getEnodeURI()))))
-        .thenReturn(false);
+    when(nodeWhitelistController.isPermitted(any(), eq(peerA.getEnodeURL()))).thenReturn(true);
+    when(nodeWhitelistController.isPermitted(any(), eq(peerB.getEnodeURL()))).thenReturn(false);
 
     recursivePeerRefreshState =
         new RecursivePeerRefreshState(
