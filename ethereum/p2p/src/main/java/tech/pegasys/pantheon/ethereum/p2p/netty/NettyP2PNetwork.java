@@ -45,6 +45,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.HashSet;
@@ -349,7 +350,7 @@ public class NettyP2PNetwork implements P2PNetwork {
                 return;
               }
 
-              if (isPeerConnectionAllowed(connection)) {
+              if (!isPeerConnectionAllowed(connection)) {
                 connection.disconnect(DisconnectReason.UNKNOWN);
                 return;
               }
@@ -580,7 +581,7 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   private EnodeURL peerInfoToEnodeURL(final PeerInfo ourPeerInfo, final InetSocketAddress address) {
     final String localNodeId = ourPeerInfo.getNodeId().toString().substring(2);
-    final String localHostAddress = address.getHostString();
+    final InetAddress localHostAddress = address.getAddress();
     final int localPort = address.getPort();
     return new EnodeURL(localNodeId, localHostAddress, localPort);
   }

@@ -465,6 +465,9 @@ public final class NettyP2PNetworkTest {
         new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
     // turn on whitelisting by adding a different node NOT remote node
     localWhitelistController.addNodes(Arrays.asList(mockPeer().getEnodeURLString()));
+    final NodePermissioningController nodePermissioningController =
+        new NodePermissioningController(
+            Optional.empty(), Collections.singletonList(localWhitelistController));
 
     final SubProtocol subprotocol = subProtocol();
     final Capability cap = Capability.create(subprotocol.getName(), 63);
@@ -481,7 +484,8 @@ public final class NettyP2PNetworkTest {
                 localBlacklist,
                 new NoOpMetricsSystem(),
                 Optional.of(localWhitelistController),
-                Optional.empty());
+                Optional.of(nodePermissioningController),
+                blockchain);
         final P2PNetwork remoteNetwork =
             new NettyP2PNetwork(
                 vertx,
@@ -791,6 +795,8 @@ public final class NettyP2PNetworkTest {
             .setDiscovery(noDiscovery)
             .setSupportedProtocols(subProtocol())
             .setRlpx(RlpxConfiguration.create().setBindPort(0));
+
+    lenient().when(nodePermissioningController.isPermitted(any(), any())).thenReturn(true);
 
     return new NettyP2PNetwork(
         mock(Vertx.class),
