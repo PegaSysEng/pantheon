@@ -616,9 +616,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     if (permissionsConfigFile() != null) {
-      if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+      if (!localPermissionsEnabled()) {
         logger.warn(
-            "Permissions config file set {} but no permissions enabled", permissionsConfigFile());
+            "Permissions config file set {} but no local permissions enabled",
+            permissionsConfigFile());
+      }
+    }
+
+    if (permissionsNodesContractAddress == null) {
+      if (!permissionsNodesContractEnabled) {
+        logger.warn(
+            "Smart contract address set {} but no contract permissions enabled",
+            permissionsNodesContractAddress);
       }
     }
 

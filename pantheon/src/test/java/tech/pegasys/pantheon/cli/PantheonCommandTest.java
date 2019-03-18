@@ -320,12 +320,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsEnabledWithoutContractAddressMustError() {
+  public void permissionsEnabledWithoutContractAddressMustNotError() {
     parseCommand("--permissions-nodes-contract-enabled");
 
-    verifyZeroInteractions(mockRunnerBuilder);
+    verify(mockRunnerBuilder).build();
 
-    assertThat(commandErrorOutput.toString()).startsWith("No contract address specified");
+    assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
   }
 
