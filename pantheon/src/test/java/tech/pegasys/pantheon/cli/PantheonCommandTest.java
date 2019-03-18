@@ -322,7 +322,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void permissionsEnabledWithInvalidContractAddressMustError() {
     parseCommand(
-        "--permissions-nodes-contract-enabled", "--permissions-nodes-contract-address", "invalid-smart-contract-address");
+        "--permissions-nodes-contract-enabled",
+        "--permissions-nodes-contract-address",
+        "invalid-smart-contract-address");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -336,7 +338,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
     String smartContractAddress = "0x0000000000000000000000000000000000001234";
 
     parseCommand(
-        "--permissions-nodes-contract-enabled", "--permissions-nodes-contract-address", smartContractAddress);
+        "--permissions-nodes-contract-enabled",
+        "--permissions-nodes-contract-address",
+        smartContractAddress);
     final SmartContractPermissioningConfiguration permissioningConfiguration =
         new SmartContractPermissioningConfiguration();
     permissioningConfiguration.setSmartContractAddress(Address.fromHexString(smartContractAddress));
