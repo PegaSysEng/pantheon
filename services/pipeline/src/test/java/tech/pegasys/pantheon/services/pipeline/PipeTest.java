@@ -80,4 +80,10 @@ public class PipeTest {
     pipe.put("B");
     verify(itemCounter, times(2)).inc();
   }
+
+  @Test
+  public void shouldReturnNullFromGetImmediatelyIfThreadIsInterrupted() {
+    Thread.currentThread().interrupt();
+    assertThat(pipe.get()).isNull();
+  }
 }
