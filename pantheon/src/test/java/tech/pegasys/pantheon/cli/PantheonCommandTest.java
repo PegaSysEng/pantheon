@@ -309,7 +309,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsSmartContractWithoutOptionMustDisplayUsage() {
+  public void permissionsSmartContractWithoutOptionMustError() {
     parseCommand("--permissions-nodes-contract-address");
 
     verifyZeroInteractions(mockRunnerBuilder);
@@ -320,12 +320,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsEnabledWithoutContractAddressMustNotError() {
+  public void permissionsEnabledWithoutContractAddressMustError() {
     parseCommand("--permissions-nodes-contract-enabled");
 
-    verify(mockRunnerBuilder).build();
+    verifyZeroInteractions(mockRunnerBuilder);
 
-    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).contains("No contract address specified");
     assertThat(commandOutput.toString()).isEmpty();
   }
 
@@ -343,7 +343,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsSmartContractMustUseOption() throws IOException {
+  public void permissionsSmartContractMustUseOption() {
 
     String smartContractAddress = "0x0000000000000000000000000000000000001234";
 

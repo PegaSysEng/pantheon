@@ -800,19 +800,25 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     Optional<SmartContractPermissioningConfiguration>
         smartContractPermissioningConfigurationOptional;
 
-    if (permissionsConfigFile() != null) {
-      if (!localPermissionsEnabled()) {
-        logger.warn(
-            "Permissions config file set {} but no local permissions enabled",
-            permissionsConfigFile());
-      }
-    }
-
     if (permissionsNodesContractAddress != null) {
       if (!contractPermissionsEnabled()) {
         logger.warn(
             "Smart contract address set {} but no contract permissions enabled",
             permissionsNodesContractAddress);
+      }
+    } else {
+      if (contractPermissionsEnabled()) {
+        throw new ParameterException(
+            this.commandLine,
+            "No contract address specified. Cannot enable contract based permissions.");
+      }
+    }
+
+    if (permissionsConfigFile() != null) {
+      if (!localPermissionsEnabled()) {
+        logger.warn(
+            "Permissions config file set {} but no local permissions enabled",
+            permissionsConfigFile());
       }
     }
 
