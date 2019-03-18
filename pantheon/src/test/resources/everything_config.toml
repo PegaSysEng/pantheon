@@ -75,6 +75,8 @@ permissions-nodes-config-file-enabled=false
 permissions-nodes-config-file="./permissions_config.toml"
 permissions-accounts-config-file-enabled=false
 permissions-accounts-config-file="./permissions_config.toml"
+permissions-nodes-contract-enabled=false
+permissions-nodes-contract-address="0x0000000000000000000000000000000000001234"
 
 # Privacy
 privacy-url="http://127.0.0.1:8888"
