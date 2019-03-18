@@ -800,28 +800,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     Optional<SmartContractPermissioningConfiguration>
         smartContractPermissioningConfigurationOptional;
 
-    if (permissionsNodesContractAddress != null) {
-      if (!contractPermissionsEnabled()) {
-        logger.warn(
-            "Smart contract address set {} but no contract permissions enabled",
-            permissionsNodesContractAddress);
-      }
-    } else {
-      if (contractPermissionsEnabled()) {
-        throw new ParameterException(
-            this.commandLine,
-            "No contract address specified. Cannot enable contract based permissions.");
-      }
-    }
-
-    if (permissionsConfigFile() != null) {
-      if (!localPermissionsEnabled()) {
-        logger.warn(
-            "Permissions config file set {} but no local permissions enabled",
-            permissionsConfigFile());
-      }
-    }
-
     if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
         logger.warn(
@@ -836,20 +814,31 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
       localPermissioningConfigurationOptional = Optional.of(localPermissioningConfiguration);
     } else {
+      if (permissionsConfigFile() != null) {
+        logger.warn(
+            "Permissions config file set {} but no local permissions enabled",
+            permissionsConfigFile());
+      }
       localPermissioningConfigurationOptional = Optional.empty();
     }
+
     if (contractPermissionsEnabled()) {
-      if (permissionsNodesContractAddress != null) {
-        final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
-            PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
-                permissionsNodesContractAddress, permissionsNodesContractEnabled);
-        smartContractPermissioningConfigurationOptional =
-            Optional.of(smartContractPermissioningConfiguration);
-      } else {
-        logger.warn("No contract address specified. Cannot enable contract permissioning.");
-        smartContractPermissioningConfigurationOptional = Optional.empty();
+      if (permissionsNodesContractAddress == null) {
+        throw new ParameterException(
+            this.commandLine,
+            "No contract address specified. Cannot enable contract based permissions.");
       }
+      final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+          PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
+              permissionsNodesContractAddress, permissionsNodesContractEnabled);
+      smartContractPermissioningConfigurationOptional =
+          Optional.of(smartContractPermissioningConfiguration);
     } else {
+      if (permissionsNodesContractAddress != null) {
+        logger.warn(
+            "Smart contract address set {} but no contract permissions enabled",
+            permissionsNodesContractAddress);
+      }
       smartContractPermissioningConfigurationOptional = Optional.empty();
     }
 
