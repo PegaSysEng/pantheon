@@ -615,22 +615,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
 
-    if (permissionsConfigFile() != null) {
-      if (!localPermissionsEnabled()) {
-        logger.warn(
-            "Permissions config file set {} but no local permissions enabled",
-            permissionsConfigFile());
-      }
-    }
-
-    if (permissionsNodesContractAddress == null) {
-      if (!permissionsNodesContractEnabled) {
-        logger.warn(
-            "Smart contract address set {} but no contract permissions enabled",
-            permissionsNodesContractAddress);
-      }
-    }
-
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     try {
       final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
@@ -815,7 +799,24 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
     Optional<SmartContractPermissioningConfiguration>
         smartContractPermissioningConfigurationOptional;
-    if (!(localPermissionsEnabled() || permissionsNodesContractEnabled)) {
+
+    if (permissionsConfigFile() != null) {
+      if (!localPermissionsEnabled()) {
+        logger.warn(
+            "Permissions config file set {} but no local permissions enabled",
+            permissionsConfigFile());
+      }
+    }
+
+    if (permissionsNodesContractAddress != null) {
+      if (!contractPermissionsEnabled()) {
+        logger.warn(
+            "Smart contract address set {} but no contract permissions enabled",
+            permissionsNodesContractAddress);
+      }
+    }
+
+    if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
         logger.warn(
             "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
@@ -831,7 +832,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } else {
       localPermissioningConfigurationOptional = Optional.empty();
     }
-    if (permissionsNodesContractEnabled) {
+    if (contractPermissionsEnabled()) {
       if (permissionsNodesContractAddress != null) {
         final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
             PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
@@ -856,6 +857,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private boolean localPermissionsEnabled() {
     return permissionsAccountsEnabled || permissionsNodesEnabled;
+  }
+
+  private boolean contractPermissionsEnabled() {
+    // TODO add permissionsAccountsContractEnabled
+    return permissionsNodesContractEnabled;
   }
 
   private PrivacyParameters privacyParameters() throws IOException {
