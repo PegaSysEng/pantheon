@@ -19,6 +19,9 @@ import static org.mockito.Mockito.verify;
 
 import tech.pegasys.pantheon.metrics.Counter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
 public class PipeTest {
@@ -53,19 +56,23 @@ public class PipeTest {
   }
 
   @Test
-  public void shouldLimitBatchMaximumSize() {
+  public void shouldLimitNumberOfItemsDrained() {
     pipe.put("a");
     pipe.put("b");
     pipe.put("c");
     pipe.put("d");
 
-    assertThat(pipe.getBatch(3)).containsExactly("a", "b", "c");
+    final List<String> output = new ArrayList<>();
+    pipe.drainTo(output, 3);
+    assertThat(output).containsExactly("a", "b", "c");
   }
 
   @Test
   public void shouldNotWaitToReachMaximumSizeBeforeReturningBatch() {
     pipe.put("a");
-    assertThat(pipe.getBatch(3)).containsExactly("a");
+    final List<String> output = new ArrayList<>();
+    pipe.drainTo(output, 3);
+    assertThat(output).containsExactly("a");
   }
 
   @Test

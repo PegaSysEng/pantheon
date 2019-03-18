@@ -215,7 +215,7 @@ public class WorldStateDownloadProcess {
                   task -> loadLocalDataStep.loadLocalData(task, requestsToComplete),
                   3,
                   bufferCapacity)
-              .inBatches("batchCreate", hashCountPerRequest)
+              .inBatches(hashCountPerRequest)
               .thenProcessAsync(
                   "batchDownloadData",
                   requestTasks ->

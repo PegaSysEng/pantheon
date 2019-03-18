@@ -14,9 +14,7 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import tech.pegasys.pantheon.metrics.Counter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -115,17 +113,9 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
   }
 
   @Override
-  public List<T> getBatch(final int maximumBatchSize) {
-    final T nextItem = get();
-    if (nextItem == null) {
-      return Collections.emptyList();
-    }
-    final List<T> batch = new ArrayList<>();
-    batch.add(nextItem);
-    queue.drainTo(batch, maximumBatchSize - 1);
-    // The call to get() already counted the first item, hence size() - 1.
-    outputCounter.inc(batch.size() - 1);
-    return batch;
+  public void drainTo(final Collection<T> output, final int maxElements) {
+    final int count = queue.drainTo(output, maxElements);
+    outputCounter.inc(count);
   }
 
   @Override

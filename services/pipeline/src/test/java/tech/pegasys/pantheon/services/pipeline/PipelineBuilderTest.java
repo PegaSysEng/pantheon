@@ -106,7 +106,7 @@ public class PipelineBuilderTest {
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
     final Pipeline pipeline =
         PipelineBuilder.createPipelineFrom(input, NO_OP_LABELLED_COUNTER)
-            .inBatches("batch", 6)
+            .inBatches(6)
             .andFinishWith("end", output::offer);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
@@ -376,13 +376,13 @@ public class PipelineBuilderTest {
             .thenProcess("map", Function.identity())
             .thenProcessInParallel("parallel", Function.identity(), 3)
             .thenProcessAsync("async", CompletableFuture::completedFuture, 3)
-            .inBatches("batch", 4)
+            .inBatches(4)
             .thenFlatMap("flatMap", List::stream, 10)
             .andFinishWith("finish", new ArrayList<>()::add);
 
     pipeline.start(executorService).get(10, SECONDS);
 
-    final List<String> stepNames = asList("input", "map", "parallel", "async", "batch", "flatMap");
+    final List<String> stepNames = asList("input", "map", "parallel", "async", "flatMap");
     final List<String> expectedMetricNames =
         stepNames.stream()
             .map(stageName -> stageName + "_outputPipe")
@@ -390,16 +390,7 @@ public class PipelineBuilderTest {
             .collect(toList());
     assertThat(counters).containsOnlyKeys(expectedMetricNames);
 
-    expectedMetricNames.stream()
-        .filter(name -> !name.startsWith("batch"))
-        .forEach(metric -> assertThat(counters.get(metric).count).hasValue(15));
-    // We don't know how many batches will be produced because it's timing dependent but it must
-    // be at least 4 to fit all the items and shouldn't be more than the items we put in.
-    final AtomicLong batchAddedCount = counters.get("batch_outputPipe-added").count;
-    final AtomicLong batchRemovedCount = counters.get("batch_outputPipe-removed").count;
-    assertThat(batchAddedCount).hasValueBetween(4, 15);
-    assertThat(batchRemovedCount).hasValueBetween(4, 15);
-    assertThat(batchAddedCount.get()).isEqualTo(batchRemovedCount.get());
+    expectedMetricNames.forEach(metric -> assertThat(counters.get(metric).count).hasValue(15));
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {

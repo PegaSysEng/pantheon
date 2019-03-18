@@ -169,24 +169,16 @@ public class PipelineBuilder<T> {
    *
    * <p>The output buffer size is reduced to <code>bufferSize / maximumBatchSize + 1</code>.
    *
-   * @param stageName the name of this stage. Used as the label for the output count metric.
    * @param maximumBatchSize the maximum number of items to include in a batch.
    * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
    */
-  public PipelineBuilder<List<T>> inBatches(final String stageName, final int maximumBatchSize) {
+  public PipelineBuilder<List<T>> inBatches(final int maximumBatchSize) {
     checkArgument(maximumBatchSize > 0, "Maximum batch size must be greater than 0");
-    // Note the output pipe from batches has a capacity of 1 so we create the biggest batch we can
-    // But pipes further downstream have the reduced capacity as described.
-    final Pipe<List<T>> outputPipe = createPipe(1, stageName, outputCounter);
-    final Stage processStage =
-        new ProcessingStage<>(
-            stageName, pipeEnd, outputPipe, new BatchingProcessor<>(maximumBatchSize));
-    final List<Stage> newStages = concat(stages, processStage);
     return new PipelineBuilder<>(
         inputPipe,
-        newStages,
-        concat(pipes, outputPipe),
-        outputPipe,
+        stages,
+        pipes,
+        new BatchingReadPipe<>(pipeEnd, maximumBatchSize),
         bufferSize / maximumBatchSize + 1,
         outputCounter);
   }
@@ -196,7 +188,7 @@ public class PipelineBuilder<T> {
    * is called and each item of the {@link Stream} it returns is output as an individual item. The
    * returned Stream may be empty to remove an item.
    *
-   * <p>This can be used to reverse the effect of {@link #inBatches(String, int)} with:
+   * <p>This can be used to reverse the effect of {@link #inBatches(int)} with:
    *
    * <pre>thenFlatMap(List::stream, newBufferSize)</pre>
    *
@@ -217,7 +209,7 @@ public class PipelineBuilder<T> {
    * returned Stream may be empty to remove an item. Multiple threads process items in the pipeline
    * concurrently.
    *
-   * <p>This can be used to reverse the effect of {@link #inBatches(String, int)} with:
+   * <p>This can be used to reverse the effect of {@link #inBatches(int)} with:
    *
    * <pre>thenFlatMap(List::stream, newBufferSize)</pre>
    *
