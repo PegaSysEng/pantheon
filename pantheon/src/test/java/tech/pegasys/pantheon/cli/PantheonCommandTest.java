@@ -33,8 +33,6 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.PERM;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.WEB3;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
-import com.google.common.collect.Lists;
-import java.util.List;
 import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -63,10 +61,12 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import io.vertx.core.json.JsonObject;
 import net.consensys.cava.toml.Toml;
@@ -433,7 +433,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void accountPermissioningTomlFileWithNoPermissionsEnabledMustNotError() throws IOException {
+  public void accountPermissioningTomlFileWithNoPermissionsEnabledMustNotError()
+      throws IOException {
 
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
