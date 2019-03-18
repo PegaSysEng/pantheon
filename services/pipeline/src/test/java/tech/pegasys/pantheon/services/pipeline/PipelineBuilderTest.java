@@ -75,7 +75,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldPipeTasksFromSupplierToCompleter() throws Exception {
     final List<Integer> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
@@ -86,7 +86,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldPassInputThroughIntermediateStage() throws Exception {
     final List<String> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess("toString", Object::toString)
             .andFinishWith("end", output::add);
@@ -132,7 +132,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldProcessAsync() throws Exception {
     final List<String> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcessAsync("toString", value -> completedFuture(Integer.toString(value)), 3)
             .andFinishWith("end", output::add);
@@ -147,7 +147,7 @@ public class PipelineBuilderTest {
   public void shouldLimitInFlightProcessesWhenProcessingAsync() throws Exception {
     final List<String> output = new ArrayList<>();
     final List<CompletableFuture<String>> futures = new CopyOnWriteArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom(
                 "input", asList(1, 2, 3, 4, 5, 6, 7).iterator(), 10, NO_OP_LABELLED_COUNTER)
             .thenProcessAsync(
@@ -185,7 +185,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldFlatMapItems() throws Exception {
     final List<Integer> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenFlatMap("flatMap", input -> Stream.of(input, input * 2), 20)
             .andFinishWith("end", output::add);
@@ -202,7 +202,7 @@ public class PipelineBuilderTest {
   public void shouldProcessInParallel() throws Exception {
     final List<String> output = synchronizedList(new ArrayList<>());
     final CountDownLatch latch = new CountDownLatch(1);
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcessInParallel(
                 "stageName",
@@ -237,7 +237,7 @@ public class PipelineBuilderTest {
   public void shouldFlatMapInParallel() throws Exception {
     final List<String> output = synchronizedList(new ArrayList<>());
     final CountDownLatch latch = new CountDownLatch(1);
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenFlatMapInParallel(
                 "stageName",
@@ -277,7 +277,7 @@ public class PipelineBuilderTest {
     final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
     final List<Integer> output = synchronizedList(new ArrayList<>());
     final CountDownLatch startedProcessingValueSix = new CountDownLatch(1);
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
@@ -313,7 +313,7 @@ public class PipelineBuilderTest {
     final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
     final List<Integer> output = synchronizedList(new ArrayList<>());
     final CountDownLatch startedProcessingValueSix = new CountDownLatch(1);
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
@@ -346,7 +346,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldAbortPipelineWhenProcessorThrowsException() {
     final RuntimeException expectedError = new RuntimeException("Oops");
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
@@ -371,7 +371,7 @@ public class PipelineBuilderTest {
     final LabelledMetric<Counter> labelledCounter =
         labels ->
             counters.computeIfAbsent(labels[0] + "-" + labels[1], label -> new SimpleCounter());
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, labelledCounter)
             .thenProcess("map", Function.identity())
             .thenProcessInParallel("parallel", Function.identity(), 3)
