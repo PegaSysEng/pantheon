@@ -103,7 +103,7 @@ public class LocalPermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_INVALID_ACCOUNT);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    final Throwable thrown = catchThrowable(() -> permissioningConfig(toml));
+    final Throwable thrown = catchThrowable(() -> accountOnlyPermissioningConfig(toml));
 
     assertThat(thrown)
         .isInstanceOf(IllegalArgumentException.class)
@@ -115,7 +115,7 @@ public class LocalPermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_INVALID_ENODE);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    final Throwable thrown = catchThrowable(() -> permissioningConfig(toml));
+    final Throwable thrown = catchThrowable(() -> nodeOnlyPermissioningConfig(toml));
 
     assertThat(thrown)
         .isInstanceOf(IllegalArgumentException.class)
@@ -150,7 +150,7 @@ public class LocalPermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_UNRECOGNIZED_KEY);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    final Throwable thrown = catchThrowable(() -> permissioningConfig(toml));
+    final Throwable thrown = catchThrowable(() -> accountOnlyPermissioningConfig(toml));
 
     assertThat(thrown)
         .isInstanceOf(Exception.class)
@@ -179,7 +179,8 @@ public class LocalPermissioningConfigurationBuilderTest {
 
     assertThat(permissioningConfiguration.getNodePermissioningConfigFilePath())
         .isEqualTo(toml.toString());
-    assertThat(permissioningConfiguration.getAccountWhitelist()).isEqualTo(toml.toString());
+    assertThat(permissioningConfiguration.getAccountPermissioningConfigFilePath())
+        .isEqualTo(toml.toString());
   }
 
   @Test
@@ -202,6 +203,18 @@ public class LocalPermissioningConfigurationBuilderTest {
 
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist().size()).isEqualTo(5);
+  }
+
+  private LocalPermissioningConfiguration accountOnlyPermissioningConfig(final Path toml)
+      throws Exception {
+    return PermissioningConfigurationBuilder.permissioningConfiguration(
+        false, null, true, toml.toAbsolutePath().toString());
+  }
+
+  private LocalPermissioningConfiguration nodeOnlyPermissioningConfig(final Path toml)
+      throws Exception {
+    return PermissioningConfigurationBuilder.permissioningConfiguration(
+        true, toml.toAbsolutePath().toString(), false, null);
   }
 
   private LocalPermissioningConfiguration permissioningConfig(final Path toml) throws Exception {
