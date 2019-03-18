@@ -443,12 +443,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   @Option(
-      names = {"--permissions-nodes-enabled"},
+      names = {"--permissions-nodes-config-file-enabled"},
       description = "Enable node level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsNodesEnabled = false;
 
   @Option(
-      names = {"--permissions-accounts-enabled"},
+      names = {"--permissions-accounts-config-file-enabled"},
       description = "Enable account level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsAccountsEnabled = false;
 
@@ -603,11 +603,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
 
-    if (permissionsConfigFile() != null) {
-      if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
-        logger.warn(
-            "Permissions config file set {} but no permissions enabled", permissionsConfigFile());
-      }
+    if (nodePermissionsConfigFile() != null && !permissionsNodesEnabled) {
+      logger.warn(
+          "Node permissioning config file set {} but no permissions enabled",
+          nodePermissionsConfigFile());
+    }
+
+    if (accountsPermissionsConfigFile() != null && !permissionsAccountsEnabled) {
+      logger.warn(
+          "Account permissioning config file set {} but no permissions enabled",
+          accountsPermissionsConfigFile());
     }
 
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
@@ -673,15 +678,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } catch (final IOException e) {
       throw new ExecutionException(this.commandLine, "Invalid path", e);
     }
-  }
-
-  private String getPermissionsConfigFile() {
-
-    return permissionsConfigFile() != null
-        ? permissionsConfigFile()
-        : dataDir().toAbsolutePath()
-            + System.getProperty("file.separator")
-            + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
@@ -799,9 +795,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Optional.empty();
     }
 
+    final Optional<String> nodePermissioningConfigFile =
+        Optional.ofNullable(nodePermissionsConfigFile());
+    final Optional<String> accountPermissioningConfigFile =
+        Optional.ofNullable(accountsPermissionsConfigFile());
+
     final LocalPermissioningConfiguration localPermissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
+            permissionsNodesEnabled,
+            nodePermissioningConfigFile.orElse(getDefaultPermissioningFilePath()),
+            permissionsAccountsEnabled,
+            accountPermissioningConfigFile.orElse(getDefaultPermissioningFilePath()));
 
     final PermissioningConfiguration permissioningConfiguration =
         new PermissioningConfiguration(
@@ -1068,18 +1072,31 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return filename;
   }
 
-  private String permissionsConfigFile() {
+  private String nodePermissionsConfigFile() {
+    return permissionsConfigFile(standaloneCommands.nodePermissionsConfigFile);
+  }
+
+  private String accountsPermissionsConfigFile() {
+    return permissionsConfigFile(standaloneCommands.accountPermissionsConfigFile);
+  }
+
+  private String permissionsConfigFile(final String permissioningFilename) {
     String filename = null;
     if (isFullInstantiation()) {
-      filename = standaloneCommands.permissionsConfigFile;
+      filename = permissioningFilename;
     } else if (isDocker) {
       final File file = new File(DOCKER_PERMISSIONS_CONFIG_FILE_LOCATION);
       if (file.exists()) {
         filename = file.getAbsolutePath();
       }
     }
-
     return filename;
+  }
+
+  private String getDefaultPermissioningFilePath() {
+    return dataDir().toAbsolutePath()
+        + System.getProperty("file.separator")
+        + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
   private boolean isFullInstantiation() {

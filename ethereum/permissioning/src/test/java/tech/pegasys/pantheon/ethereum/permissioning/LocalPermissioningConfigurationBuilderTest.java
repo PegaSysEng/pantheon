@@ -76,7 +76,7 @@ public class LocalPermissioningConfigurationBuilderTest {
 
     LocalPermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            toml.toAbsolutePath().toString(), true, false);
+            true, toml.toAbsolutePath().toString(), false, toml.toAbsolutePath().toString());
 
     assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isFalse();
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
@@ -90,7 +90,7 @@ public class LocalPermissioningConfigurationBuilderTest {
 
     LocalPermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            toml.toAbsolutePath().toString(), false, true);
+            false, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
 
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isFalse();
     assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isTrue();
@@ -155,7 +155,7 @@ public class LocalPermissioningConfigurationBuilderTest {
     assertThat(thrown)
         .isInstanceOf(Exception.class)
         .hasMessageContaining("config option missing")
-        .hasMessageContaining(PermissioningConfigurationBuilder.ACCOUNTS_WHITELIST);
+        .hasMessageContaining(PermissioningConfigurationBuilder.ACCOUNTS_WHITELIST_KEY);
   }
 
   @Test
@@ -174,9 +174,12 @@ public class LocalPermissioningConfigurationBuilderTest {
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
     LocalPermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfiguration(toml.toString(), true, true);
+        PermissioningConfigurationBuilder.permissioningConfiguration(
+            true, toml.toString(), true, toml.toString());
 
-    assertThat(permissioningConfiguration.getConfigurationFilePath()).isEqualTo(toml.toString());
+    assertThat(permissioningConfiguration.getNodePermissioningConfigFilePath())
+        .isEqualTo(toml.toString());
+    assertThat(permissioningConfiguration.getAccountWhitelist()).isEqualTo(toml.toString());
   }
 
   @Test
@@ -195,7 +198,7 @@ public class LocalPermissioningConfigurationBuilderTest {
         Resources.getResource(PERMISSIONING_CONFIG_NODE_WHITELIST_ONLY_MULTILINE);
     final LocalPermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            configFile.getPath(), true, false);
+            true, configFile.getPath(), false, configFile.getPath());
 
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist().size()).isEqualTo(5);
@@ -203,7 +206,7 @@ public class LocalPermissioningConfigurationBuilderTest {
 
   private LocalPermissioningConfiguration permissioningConfig(final Path toml) throws Exception {
     return PermissioningConfigurationBuilder.permissioningConfiguration(
-        toml.toAbsolutePath().toString(), true, true);
+        true, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
   }
 
   private Path createTempFile(final String filename, final byte[] contents) throws IOException {

@@ -1217,7 +1217,7 @@ public class PeerDiscoveryControllerTest {
     final LocalPermissioningConfiguration config = LocalPermissioningConfiguration.createDefault();
     Path tempFile = Files.createTempFile("test", "test");
     tempFile.toFile().deleteOnExit();
-    config.setConfigurationFilePath(tempFile.toAbsolutePath().toString());
+    config.setNodePermissioningConfigFilePath(tempFile.toAbsolutePath().toString());
     return config;
   }
 
