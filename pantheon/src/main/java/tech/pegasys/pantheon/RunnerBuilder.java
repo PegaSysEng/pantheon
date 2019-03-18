@@ -232,14 +232,6 @@ public class RunnerBuilder {
     final Optional<LocalPermissioningConfiguration> localPermissioningConfiguration =
         permissioningConfiguration.flatMap(PermissioningConfiguration::getLocalConfig);
 
-    final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController =
-        localPermissioningConfiguration
-            .filter(LocalPermissioningConfiguration::isNodeWhitelistEnabled)
-            .map(
-                config ->
-                    new NodeLocalConfigPermissioningController(
-                        config, bootnodesAsEnodeURLs, getSelfEnode()));
-
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
 
     final TransactionSimulator transactionSimulator =
@@ -248,6 +240,15 @@ public class RunnerBuilder {
 
     final Optional<NodePermissioningController> nodePermissioningController =
         buildNodePermissioningController(bootnodesAsEnodeURLs, synchronizer, transactionSimulator);
+
+    final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController =
+        nodePermissioningController
+            .flatMap(
+                n ->
+                    n.getProviders().stream()
+                        .filter(p -> p instanceof NodeLocalConfigPermissioningController)
+                        .findFirst())
+            .map(n -> (NodeLocalConfigPermissioningController) n);
 
     final NetworkRunner networkRunner =
         NetworkRunner.builder()
