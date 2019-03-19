@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,19 +42,25 @@ public class NetEnode implements JsonRpcMethod {
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
     try {
-      final StringBuilder response = new StringBuilder();
-      p2pNetwork
-          .getAdvertisedPeer()
-          .ifPresent(
-              advertisedPeer -> {
-                response.append(advertisedPeer.getEnodeURI());
-              });
-      return new JsonRpcSuccessResponse(req.getId(), response.toString());
+      if (p2pNetwork.isP2pEnabled()) {
+        String enodeURI = p2pNetwork.getAdvertisedPeer().map(Peer::getEnodeURI).orElse("");
+        if (!enodeURI.isEmpty()) {
+          return new JsonRpcSuccessResponse(req.getId(), enodeURI);
+        } else {
+          return p2pDisabledResponse(req);
+        }
+      } else {
+        return p2pDisabledResponse(req);
+      }
     } catch (final P2pDisabledException e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
+      return p2pDisabledResponse(req);
     } catch (final Exception e) {
       LOG.error("Error processing request: " + req, e);
       throw e;
     }
+  }
+
+  private JsonRpcErrorResponse p2pDisabledResponse(final JsonRpcRequest req) {
+    return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
   }
 }
