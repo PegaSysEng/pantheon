@@ -30,14 +30,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessingStageTest {
 
-  private final Pipe<String> inputPipe = new Pipe<>(10, NO_OP_COUNTER);
-  private final Pipe<String> outputPipe = new Pipe<>(10, NO_OP_COUNTER);
+  private final Pipe<String> inputPipe = new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
+  private final Pipe<String> outputPipe = new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
   @Mock private Processor<String, String> singleStep;
   private ProcessingStage<String, String> stage;
 
   @Before
   public void setUp() {
-    stage = new ProcessingStage<>(inputPipe, outputPipe, singleStep);
+    stage = new ProcessingStage<>("name", inputPipe, outputPipe, singleStep);
     doAnswer(
             invocation -> {
               outputPipe.put(inputPipe.get().toLowerCase(Locale.UK));

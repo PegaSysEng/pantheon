@@ -12,22 +12,19 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import tech.pegasys.pantheon.metrics.Counter;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-class CompleterStage<T> implements Runnable {
+class CompleterStage<T> implements Stage {
   private final ReadPipe<T> input;
   private final Consumer<T> completer;
-  private final Counter outputCounter;
+  private final String name;
   private final CompletableFuture<?> future = new CompletableFuture<>();
 
-  CompleterStage(
-      final ReadPipe<T> input, final Consumer<T> completer, final Counter outputCounter) {
+  CompleterStage(final String name, final ReadPipe<T> input, final Consumer<T> completer) {
     this.input = input;
     this.completer = completer;
-    this.outputCounter = outputCounter;
+    this.name = name;
   }
 
   @Override
@@ -36,7 +33,6 @@ class CompleterStage<T> implements Runnable {
       final T value = input.get();
       if (value != null) {
         completer.accept(value);
-        outputCounter.inc();
       }
     }
     future.complete(null);
@@ -44,5 +40,10 @@ class CompleterStage<T> implements Runnable {
 
   public CompletableFuture<?> getFuture() {
     return future;
+  }
+
+  @Override
+  public String getName() {
+    return name;
   }
 }

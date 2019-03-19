@@ -12,21 +12,6 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import java.util.List;
-
-class BatchingProcessor<T> implements Processor<T, List<T>> {
-
-  private final int maximumBatchSize;
-
-  public BatchingProcessor(final int maximumBatchSize) {
-    this.maximumBatchSize = maximumBatchSize;
-  }
-
-  @Override
-  public void processNextInput(final ReadPipe<T> inputPipe, final WritePipe<List<T>> outputPipe) {
-    final List<T> batch = inputPipe.getBatch(maximumBatchSize);
-    if (!batch.isEmpty()) {
-      outputPipe.put(batch);
-    }
-  }
+public interface Stage extends Runnable {
+  String getName();
 }

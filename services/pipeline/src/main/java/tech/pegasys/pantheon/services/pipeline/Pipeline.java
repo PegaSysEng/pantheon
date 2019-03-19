@@ -28,10 +28,10 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Pipeline {
+public class Pipeline<I> {
   private static final Logger LOG = LogManager.getLogger();
-  private final Pipe<?> inputPipe;
-  private final Collection<Runnable> stages;
+  private final Pipe<I> inputPipe;
+  private final Collection<Stage> stages;
   private final Collection<Pipe<?>> pipes;
   private final CompleterStage<?> completerStage;
   private final AtomicBoolean started = new AtomicBoolean(false);
@@ -48,14 +48,23 @@ public class Pipeline {
   private volatile List<Future<?>> futures;
 
   Pipeline(
-      final Pipe<?> inputPipe,
-      final Collection<Runnable> stages,
+      final Pipe<I> inputPipe,
+      final Collection<Stage> stages,
       final Collection<Pipe<?>> pipes,
       final CompleterStage<?> completerStage) {
     this.inputPipe = inputPipe;
     this.stages = stages;
     this.pipes = pipes;
     this.completerStage = completerStage;
+  }
+
+  /**
+   * Get the input pipe for this pipeline.
+   *
+   * @return the input pipe.
+   */
+  public Pipe<I> getInputPipe() {
+    return inputPipe;
   }
 
   /**
@@ -109,11 +118,13 @@ public class Pipeline {
     abort(exception);
   }
 
-  private Future<?> runWithErrorHandling(
-      final ExecutorService executorService, final Runnable task) {
+  private Future<?> runWithErrorHandling(final ExecutorService executorService, final Stage task) {
     return executorService.submit(
         () -> {
+          final Thread thread = Thread.currentThread();
+          final String originalName = thread.getName();
           try {
+            thread.setName(originalName + " (" + task.getName() + ")");
             task.run();
           } catch (final Throwable t) {
             LOG.debug("Unhandled exception in pipeline. Aborting.", t);
@@ -125,6 +136,8 @@ public class Pipeline {
               // need to call get on it which would normally expose the error.
               LOG.error("Failed to abort pipeline after error", t2);
             }
+          } finally {
+            thread.setName(originalName);
           }
         });
   }

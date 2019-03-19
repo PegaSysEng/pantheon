@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.URI;
@@ -23,42 +24,83 @@ import net.consensys.cava.toml.TomlParseResult;
 
 public class PermissioningConfigurationBuilder {
 
-  public static final String ACCOUNTS_WHITELIST = "accounts-whitelist";
-  public static final String NODES_WHITELIST = "nodes-whitelist";
+  public static final String ACCOUNTS_WHITELIST_KEY = "accounts-whitelist";
+  public static final String NODES_WHITELIST_KEY = "nodes-whitelist";
 
-  // will be used to reload the config from a file while node is running
-  public static PermissioningConfiguration permissioningConfigurationFromToml(
-      final String configFilePath,
-      final boolean permissionedNodeEnabled,
-      final boolean permissionedAccountEnabled)
-      throws Exception {
-
-    return permissioningConfiguration(
-        configFilePath, permissionedNodeEnabled, permissionedAccountEnabled);
+  public static SmartContractPermissioningConfiguration smartContractPermissioningConfiguration(
+      final Address address, final boolean smartContractPermissionedNodeEnabled) {
+    SmartContractPermissioningConfiguration config = new SmartContractPermissioningConfiguration();
+    config.setSmartContractAddress(address);
+    config.setSmartContractNodeWhitelistEnabled(smartContractPermissionedNodeEnabled);
+    return config;
   }
 
-  public static PermissioningConfiguration permissioningConfiguration(
-      final String configFilePath,
-      final boolean permissionedNodeEnabled,
-      final boolean permissionedAccountEnabled)
+  public static LocalPermissioningConfiguration permissioningConfiguration(
+      final boolean nodePermissioningEnabled,
+      final String nodePermissioningConfigFilepath,
+      final boolean accountPermissioningEnabled,
+      final String accountPermissioningConfigFilepath)
       throws Exception {
 
-    TomlParseResult permToml;
+    final LocalPermissioningConfiguration permissioningConfiguration =
+        LocalPermissioningConfiguration.createDefault();
 
-    try {
-      permToml = TomlConfigFileParser.loadConfigurationFromFile(configFilePath);
-    } catch (Exception e) {
-      throw new Exception(
-          "Unable to read permissions TOML config file : " + configFilePath + " " + e.getMessage());
+    loadNodePermissioning(
+        permissioningConfiguration, nodePermissioningEnabled, nodePermissioningConfigFilepath);
+    loadAccountPermissioning(
+        permissioningConfiguration,
+        accountPermissioningEnabled,
+        accountPermissioningConfigFilepath);
+
+    return permissioningConfiguration;
+  }
+
+  private static LocalPermissioningConfiguration loadNodePermissioning(
+      final LocalPermissioningConfiguration permissioningConfiguration,
+      final boolean localConfigNodePermissioningEnabled,
+      final String nodePermissioningConfigFilepath)
+      throws Exception {
+
+    if (localConfigNodePermissioningEnabled) {
+      final TomlParseResult nodePermissioningToml = readToml(nodePermissioningConfigFilepath);
+      final TomlArray nodeWhitelistTomlArray = nodePermissioningToml.getArray(NODES_WHITELIST_KEY);
+
+      permissioningConfiguration.setNodePermissioningConfigFilePath(
+          nodePermissioningConfigFilepath);
+
+      if (nodeWhitelistTomlArray != null) {
+        List<URI> nodesWhitelistToml =
+            nodeWhitelistTomlArray
+                .toList()
+                .parallelStream()
+                .map(Object::toString)
+                .map(EnodeURL::asURI)
+                .collect(Collectors.toList());
+        permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
+      } else {
+        throw new Exception(
+            NODES_WHITELIST_KEY
+                + " config option missing in TOML config file "
+                + nodePermissioningConfigFilepath);
+      }
     }
+    return permissioningConfiguration;
+  }
 
-    TomlArray accountWhitelistTomlArray = permToml.getArray(ACCOUNTS_WHITELIST);
-    TomlArray nodeWhitelistTomlArray = permToml.getArray(NODES_WHITELIST);
+  private static LocalPermissioningConfiguration loadAccountPermissioning(
+      final LocalPermissioningConfiguration permissioningConfiguration,
+      final boolean localConfigAccountPermissioningEnabled,
+      final String accountPermissioningConfigFilepath)
+      throws Exception {
 
-    final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfiguration.createDefault();
-    permissioningConfiguration.setConfigurationFilePath(configFilePath);
-    if (permissionedAccountEnabled) {
+    if (localConfigAccountPermissioningEnabled) {
+      final TomlParseResult accountPermissioningToml = readToml(accountPermissioningConfigFilepath);
+      final TomlArray accountWhitelistTomlArray =
+          accountPermissioningToml.getArray(ACCOUNTS_WHITELIST_KEY);
+
+      permissioningConfiguration.setAccountPermissioningConfigFilePath(
+          accountPermissioningConfigFilepath);
+
       if (accountWhitelistTomlArray != null) {
         List<String> accountsWhitelistToml =
             accountWhitelistTomlArray
@@ -78,25 +120,24 @@ public class PermissioningConfigurationBuilder {
         permissioningConfiguration.setAccountWhitelist(accountsWhitelistToml);
       } else {
         throw new Exception(
-            ACCOUNTS_WHITELIST + " config option missing in TOML config file " + configFilePath);
+            ACCOUNTS_WHITELIST_KEY
+                + " config option missing in TOML config file "
+                + accountPermissioningConfigFilepath);
       }
     }
 
-    if (permissionedNodeEnabled) {
-      if (nodeWhitelistTomlArray != null) {
-        List<URI> nodesWhitelistToml =
-            nodeWhitelistTomlArray
-                .toList()
-                .parallelStream()
-                .map(Object::toString)
-                .map(EnodeURL::asURI)
-                .collect(Collectors.toList());
-        permissioningConfiguration.setNodeWhitelist(nodesWhitelistToml);
-      } else {
-        throw new Exception(
-            NODES_WHITELIST + " config option missing in TOML config file " + configFilePath);
-      }
-    }
     return permissioningConfiguration;
+  }
+
+  private static TomlParseResult readToml(final String filepath) throws Exception {
+    TomlParseResult toml;
+
+    try {
+      toml = TomlConfigFileParser.loadConfigurationFromFile(filepath);
+    } catch (Exception e) {
+      throw new Exception(
+          "Unable to read permissioning TOML config file : " + filepath + " " + e.getMessage());
+    }
+    return toml;
   }
 }

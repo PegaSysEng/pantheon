@@ -12,15 +12,15 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import static com.google.common.primitives.Ints.asList;
+import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.waitAtMost;
-import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_COUNTER;
 
 import tech.pegasys.pantheon.metrics.Counter;
@@ -75,7 +75,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldPipeTasksFromSupplierToCompleter() throws Exception {
     final List<Integer> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .andFinishWith("end", output::add);
     final CompletableFuture<?> result = pipeline.start(executorService);
@@ -86,7 +86,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldPassInputThroughIntermediateStage() throws Exception {
     final List<String> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess("toString", Object::toString)
             .andFinishWith("end", output::add);
@@ -100,13 +100,14 @@ public class PipelineBuilderTest {
 
   @Test
   public void shouldCombineIntoBatches() throws Exception {
-    final Pipe<Integer> input = new Pipe<>(20, NO_OP_COUNTER);
-    tasks.forEachRemaining(input::put);
     final BlockingQueue<List<Integer>> output = new ArrayBlockingQueue<>(10);
-    final Pipeline pipeline =
-        PipelineBuilder.createPipelineFrom(input, NO_OP_LABELLED_COUNTER)
-            .inBatches("batch", 6)
+    final Pipeline<Integer> pipeline =
+        PipelineBuilder.<Integer>createPipeline("source", 20, NO_OP_LABELLED_COUNTER)
+            .inBatches(6)
             .andFinishWith("end", output::offer);
+
+    final Pipe<Integer> input = pipeline.getInputPipe();
+    tasks.forEachRemaining(input::put);
 
     final CompletableFuture<?> result = pipeline.start(executorService);
 
@@ -131,7 +132,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldProcessAsync() throws Exception {
     final List<String> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcessAsync("toString", value -> completedFuture(Integer.toString(value)), 3)
             .andFinishWith("end", output::add);
@@ -146,7 +147,7 @@ public class PipelineBuilderTest {
   public void shouldLimitInFlightProcessesWhenProcessingAsync() throws Exception {
     final List<String> output = new ArrayList<>();
     final List<CompletableFuture<String>> futures = new CopyOnWriteArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom(
                 "input", asList(1, 2, 3, 4, 5, 6, 7).iterator(), 10, NO_OP_LABELLED_COUNTER)
             .thenProcessAsync(
@@ -184,7 +185,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldFlatMapItems() throws Exception {
     final List<Integer> output = new ArrayList<>();
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenFlatMap("flatMap", input -> Stream.of(input, input * 2), 20)
             .andFinishWith("end", output::add);
@@ -201,7 +202,7 @@ public class PipelineBuilderTest {
   public void shouldProcessInParallel() throws Exception {
     final List<String> output = synchronizedList(new ArrayList<>());
     final CountDownLatch latch = new CountDownLatch(1);
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcessInParallel(
                 "stageName",
@@ -233,12 +234,50 @@ public class PipelineBuilderTest {
   }
 
   @Test
+  public void shouldFlatMapInParallel() throws Exception {
+    final List<String> output = synchronizedList(new ArrayList<>());
+    final CountDownLatch latch = new CountDownLatch(1);
+    final Pipeline<Integer> pipeline =
+        PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
+            .thenFlatMapInParallel(
+                "stageName",
+                value -> {
+                  if (value == 2) {
+                    try {
+                      latch.await();
+                    } catch (InterruptedException e) {
+                      throw new RuntimeException(e);
+                    }
+                  }
+                  return Stream.of(value.toString(), "x" + value);
+                },
+                2,
+                10)
+            .andFinishWith("end", output::add);
+    final CompletableFuture<?> result = pipeline.start(executorService);
+
+    // One thread will block but the other should process the remaining entries.
+    waitForSize(output, 28);
+    assertThat(result).isNotDone();
+
+    latch.countDown();
+
+    result.get(10, SECONDS);
+
+    assertThat(output)
+        .containsExactly(
+            "1", "x1", "3", "x3", "4", "x4", "5", "x5", "6", "x6", "7", "x7", "8", "x8", "9", "x9",
+            "10", "x10", "11", "x11", "12", "x12", "13", "x13", "14", "x14", "15", "x15", "2",
+            "x2");
+  }
+
+  @Test
   public void shouldAbortPipeline() throws Exception {
     final int allowProcessingUpTo = 5;
     final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
     final List<Integer> output = synchronizedList(new ArrayList<>());
     final CountDownLatch startedProcessingValueSix = new CountDownLatch(1);
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
@@ -274,7 +313,7 @@ public class PipelineBuilderTest {
     final AtomicBoolean processorInterrupted = new AtomicBoolean(false);
     final List<Integer> output = synchronizedList(new ArrayList<>());
     final CountDownLatch startedProcessingValueSix = new CountDownLatch(1);
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
@@ -307,7 +346,7 @@ public class PipelineBuilderTest {
   @Test
   public void shouldAbortPipelineWhenProcessorThrowsException() {
     final RuntimeException expectedError = new RuntimeException("Oops");
-    final Pipeline pipeline =
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, NO_OP_LABELLED_COUNTER)
             .thenProcess(
                 "stageName",
@@ -327,32 +366,38 @@ public class PipelineBuilderTest {
   }
 
   @Test
-  public void shouldTrackTaskCountMetric() throws Exception {
+  public void shouldTrackTaskCountMetrics() throws Exception {
     final Map<String, SimpleCounter> counters = new ConcurrentHashMap<>();
     final LabelledMetric<Counter> labelledCounter =
-        labels -> counters.computeIfAbsent(labels[0], label -> new SimpleCounter());
-    final Pipeline pipeline =
+        labels ->
+            counters.computeIfAbsent(labels[0] + "-" + labels[1], label -> new SimpleCounter());
+    final Pipeline<Integer> pipeline =
         PipelineBuilder.createPipelineFrom("input", tasks, 10, labelledCounter)
             .thenProcess("map", Function.identity())
             .thenProcessInParallel("parallel", Function.identity(), 3)
             .thenProcessAsync("async", CompletableFuture::completedFuture, 3)
-            .inBatches("batch", 4)
+            .inBatches(4)
             .thenFlatMap("flatMap", List::stream, 10)
             .andFinishWith("finish", new ArrayList<>()::add);
 
     pipeline.start(executorService).get(10, SECONDS);
 
-    assertThat(counters)
-        .containsOnlyKeys("input", "map", "parallel", "async", "batch", "flatMap", "finish");
-    assertThat(counters.get("input").count).hasValue(15);
-    assertThat(counters.get("map").count).hasValue(15);
-    assertThat(counters.get("parallel").count).hasValue(15);
-    assertThat(counters.get("async").count).hasValue(15);
-    assertThat(counters.get("flatMap").count).hasValue(15);
-    assertThat(counters.get("finish").count).hasValue(15);
-    // We don't know how many batches will be produced because it's timing dependent but it must
-    // be at least 4 to fit all the items and shouldn't be more than the items we put in.
-    assertThat(counters.get("batch").count).hasValueBetween(4, 15);
+    final List<String> stepNames = asList("input", "map", "parallel", "async", "flatMap");
+    final List<String> expectedMetricNames =
+        Stream.concat(
+                Stream.of("async_outputPipe-batches"),
+                stepNames.stream()
+                    .map(stageName -> stageName + "_outputPipe")
+                    .flatMap(
+                        metricName -> Stream.of(metricName + "-added", metricName + "-removed")))
+            .collect(toList());
+    assertThat(counters).containsOnlyKeys(expectedMetricNames);
+
+    expectedMetricNames.stream()
+        .filter(name -> !name.endsWith("-batches"))
+        .forEach(metric -> assertThat(counters.get(metric).count).hasValue(15));
+
+    assertThat(counters.get("async_outputPipe-batches").count).hasValueBetween(4, 15);
   }
 
   private void waitForSize(final Collection<?> collection, final int targetSize) {

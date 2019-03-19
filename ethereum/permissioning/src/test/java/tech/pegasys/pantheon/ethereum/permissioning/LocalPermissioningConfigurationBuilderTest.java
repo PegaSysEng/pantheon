@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 import com.google.common.io.Resources;
 import org.junit.Test;
 
-public class PermissioningConfigurationBuilderTest {
+public class LocalPermissioningConfigurationBuilderTest {
 
   private static final String PERMISSIONING_CONFIG_VALID = "permissioning_config.toml";
   private static final String PERMISSIONING_CONFIG_ACCOUNT_WHITELIST_ONLY =
@@ -57,7 +57,7 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_VALID);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    PermissioningConfiguration permissioningConfiguration = permissioningConfig(toml);
+    LocalPermissioningConfiguration permissioningConfiguration = permissioningConfig(toml);
 
     assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getAccountWhitelist())
@@ -74,9 +74,9 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_NODE_WHITELIST_ONLY);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    PermissioningConfiguration permissioningConfiguration =
+    LocalPermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            toml.toAbsolutePath().toString(), true, false);
+            true, toml.toAbsolutePath().toString(), false, toml.toAbsolutePath().toString());
 
     assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isFalse();
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
@@ -88,9 +88,9 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_ACCOUNT_WHITELIST_ONLY);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    PermissioningConfiguration permissioningConfiguration =
+    LocalPermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            toml.toAbsolutePath().toString(), false, true);
+            false, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
 
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isFalse();
     assertThat(permissioningConfiguration.isAccountWhitelistEnabled()).isTrue();
@@ -103,7 +103,7 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_INVALID_ACCOUNT);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    final Throwable thrown = catchThrowable(() -> permissioningConfig(toml));
+    final Throwable thrown = catchThrowable(() -> accountOnlyPermissioningConfig(toml));
 
     assertThat(thrown)
         .isInstanceOf(IllegalArgumentException.class)
@@ -115,7 +115,7 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_INVALID_ENODE);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    final Throwable thrown = catchThrowable(() -> permissioningConfig(toml));
+    final Throwable thrown = catchThrowable(() -> nodeOnlyPermissioningConfig(toml));
 
     assertThat(thrown)
         .isInstanceOf(IllegalArgumentException.class)
@@ -127,7 +127,7 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_EMPTY_WHITELISTS);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    PermissioningConfiguration permissioningConfiguration = permissioningConfig(toml);
+    LocalPermissioningConfiguration permissioningConfiguration = permissioningConfig(toml);
 
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist()).isEmpty();
@@ -150,12 +150,12 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_UNRECOGNIZED_KEY);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    final Throwable thrown = catchThrowable(() -> permissioningConfig(toml));
+    final Throwable thrown = catchThrowable(() -> accountOnlyPermissioningConfig(toml));
 
     assertThat(thrown)
         .isInstanceOf(Exception.class)
         .hasMessageContaining("config option missing")
-        .hasMessageContaining(PermissioningConfigurationBuilder.ACCOUNTS_WHITELIST);
+        .hasMessageContaining(PermissioningConfigurationBuilder.ACCOUNTS_WHITELIST_KEY);
   }
 
   @Test
@@ -173,11 +173,14 @@ public class PermissioningConfigurationBuilderTest {
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_VALID);
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
-    PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
-            toml.toString(), true, true);
+    LocalPermissioningConfiguration permissioningConfiguration =
+        PermissioningConfigurationBuilder.permissioningConfiguration(
+            true, toml.toString(), true, toml.toString());
 
-    assertThat(permissioningConfiguration.getConfigurationFilePath()).isEqualTo(toml.toString());
+    assertThat(permissioningConfiguration.getNodePermissioningConfigFilePath())
+        .isEqualTo(toml.toString());
+    assertThat(permissioningConfiguration.getAccountPermissioningConfigFilePath())
+        .isEqualTo(toml.toString());
   }
 
   @Test
@@ -194,17 +197,29 @@ public class PermissioningConfigurationBuilderTest {
   public void permissioningConfigFromMultilineFileMustParseCorrectly() throws Exception {
     final URL configFile =
         Resources.getResource(PERMISSIONING_CONFIG_NODE_WHITELIST_ONLY_MULTILINE);
-    final PermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfigurationFromToml(
-            configFile.getPath(), true, false);
+    final LocalPermissioningConfiguration permissioningConfiguration =
+        PermissioningConfigurationBuilder.permissioningConfiguration(
+            true, configFile.getPath(), false, configFile.getPath());
 
     assertThat(permissioningConfiguration.isNodeWhitelistEnabled()).isTrue();
     assertThat(permissioningConfiguration.getNodeWhitelist().size()).isEqualTo(5);
   }
 
-  private PermissioningConfiguration permissioningConfig(final Path toml) throws Exception {
+  private LocalPermissioningConfiguration accountOnlyPermissioningConfig(final Path toml)
+      throws Exception {
     return PermissioningConfigurationBuilder.permissioningConfiguration(
-        toml.toAbsolutePath().toString(), true, true);
+        false, null, true, toml.toAbsolutePath().toString());
+  }
+
+  private LocalPermissioningConfiguration nodeOnlyPermissioningConfig(final Path toml)
+      throws Exception {
+    return PermissioningConfigurationBuilder.permissioningConfiguration(
+        true, toml.toAbsolutePath().toString(), false, null);
+  }
+
+  private LocalPermissioningConfiguration permissioningConfig(final Path toml) throws Exception {
+    return PermissioningConfigurationBuilder.permissioningConfiguration(
+        true, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
   }
 
   private Path createTempFile(final String filename, final byte[] contents) throws IOException {
