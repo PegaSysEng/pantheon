@@ -879,7 +879,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParameters.setEnabled(true);
       privacyParameters.setUrl(privacyUrl.toString());
       if (privacyPublicKeyFile() != null) {
-        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
+        privacyParameters.setEnclavePublicKeyUsingFile(privacyPublicKeyFile());
       } else {
         throw new ParameterException(
             commandLine, "Please specify Enclave public key file path to enable privacy");
