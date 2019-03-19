@@ -222,29 +222,15 @@ public final class RunnerTest {
                                         MediaType.parse("application/json; charset=utf-8"),
                                         "{\"jsonrpc\":\"2.0\",\"id\":"
                                             + Json.encode(7)
-                                            + ",\"method\":\"eth_syncing\"}"))
+                                            + ",\"method\":\"eth_blockNumber\"}"))
                                 .url(baseUrl)
                                 .build())
                         .execute()) {
 
                   assertThat(resp.code()).isEqualTo(200);
-                  final Response blockNumberResp =
-                      client
-                          .newCall(
-                              new Request.Builder()
-                                  .post(
-                                      RequestBody.create(
-                                          MediaType.parse("application/json; charset=utf-8"),
-                                          "{\"jsonrpc\":\"2.0\",\"id\":"
-                                              + Json.encode(7)
-                                              + ",\"method\":\"eth_blockNumber\"}"))
-                                  .url(baseUrl)
-                                  .build())
-                          .execute();
-
                   final int currentBlock =
                       UInt256.fromHexString(
-                              new JsonObject(blockNumberResp.body().string()).getString("result"))
+                              new JsonObject(resp.body().string()).getString("result"))
                           .toInt();
                   assertThat(currentBlock).isEqualTo(blockCount);
                 }
