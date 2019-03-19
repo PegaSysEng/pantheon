@@ -23,6 +23,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -736,6 +737,8 @@ public final class NettyP2PNetworkTest {
     nettyP2PNetwork.connect(permittedPeer).complete(permittedPeerConnection);
     nettyP2PNetwork.connect(notPermittedPeer).complete(notPermittedPeerConnection);
 
+    reset(nodePermissioningController);
+
     lenient()
         .when(nodePermissioningController.isPermitted(any(), enodeEq(notPermittedEnodeURL)))
         .thenReturn(false);
@@ -769,6 +772,7 @@ public final class NettyP2PNetworkTest {
   private PeerConnection mockPeerConnection(final Peer localPeer, final Peer remotePeer) {
     final PeerInfo peerInfo = mock(PeerInfo.class);
     doReturn(remotePeer.getId()).when(peerInfo).getNodeId();
+    doReturn(remotePeer.getEndpoint().getTcpPort().getAsInt()).when(peerInfo).getPort();
 
     final PeerConnection peerConnection = mock(PeerConnection.class);
     when(peerConnection.getPeer()).thenReturn(peerInfo);

@@ -582,7 +582,7 @@ public class NettyP2PNetwork implements P2PNetwork {
   private EnodeURL peerInfoToEnodeURL(final PeerInfo ourPeerInfo, final InetSocketAddress address) {
     final String localNodeId = ourPeerInfo.getNodeId().toString().substring(2);
     final InetAddress localHostAddress = address.getAddress();
-    final int localPort = address.getPort();
+    final int localPort = ourPeerInfo.getPort();
     return new EnodeURL(localNodeId, localHostAddress, localPort);
   }
 
