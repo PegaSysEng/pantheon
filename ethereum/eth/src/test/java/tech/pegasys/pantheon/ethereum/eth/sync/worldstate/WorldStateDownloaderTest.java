@@ -86,10 +86,12 @@ import java.util.stream.StreamSupport;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
 
+@Ignore("PIE-1434 - Ignored while working to make test more reliable")
 public class WorldStateDownloaderTest {
 
   @Rule public Timeout globalTimeout = Timeout.seconds(60); // 1 minute max per test
@@ -993,7 +995,7 @@ public class WorldStateDownloaderTest {
   }
 
   private void giveOtherThreadsAGo() {
-    LockSupport.parkNanos(2000);
+    LockSupport.parkNanos(200);
   }
 
   @FunctionalInterface

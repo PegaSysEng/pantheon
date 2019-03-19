@@ -45,6 +45,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -59,10 +61,12 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import io.vertx.core.json.JsonObject;
 import net.consensys.cava.toml.Toml;
@@ -307,20 +311,94 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsTomlPathWithoutOptionMustDisplayUsage() {
-    parseCommand("--permissions-config-file");
+  public void permissionsSmartContractWithoutOptionMustError() {
+    parseCommand("--permissions-nodes-contract-address");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
     assertThat(commandErrorOutput.toString())
-        .startsWith("Missing required parameter for option '--permissions-config-file'");
+        .startsWith("Missing required parameter for option '--permissions-nodes-contract-address'");
     assertThat(commandOutput.toString()).isEmpty();
   }
 
   @Test
-  public void permissionsEnabledWithNonexistentConfigFileMustError() {
+  public void permissionsEnabledWithoutContractAddressMustError() {
+    parseCommand("--permissions-nodes-contract-enabled");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).contains("No contract address specified");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsEnabledWithInvalidContractAddressMustError() {
     parseCommand(
-        "--permissions-accounts-enabled", "--permissions-config-file", "file-does-not-exist");
+        "--permissions-nodes-contract-enabled",
+        "--permissions-nodes-contract-address",
+        "invalid-smart-contract-address");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).contains("Invalid value");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsSmartContractMustUseOption() {
+
+    String smartContractAddress = "0x0000000000000000000000000000000000001234";
+
+    parseCommand(
+        "--permissions-nodes-contract-enabled",
+        "--permissions-nodes-contract-address",
+        smartContractAddress);
+    final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+        new SmartContractPermissioningConfiguration();
+    smartContractPermissioningConfiguration.setSmartContractAddress(
+        Address.fromHexString(smartContractAddress));
+    smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(true);
+
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    PermissioningConfiguration config = permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(config.getSmartContractConfig().get())
+        .isEqualToComparingFieldByField(smartContractPermissioningConfiguration);
+
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void nodePermissioningTomlPathWithoutOptionMustDisplayUsage() {
+    parseCommand("--permissions-nodes-config-file");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Missing required parameter for option '--permissions-nodes-config-file'");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void accountPermissioningTomlPathWithoutOptionMustDisplayUsage() {
+    parseCommand("--permissions-accounts-config-file");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString())
+        .startsWith("Missing required parameter for option '--permissions-accounts-config-file'");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void nodePermissioningEnabledWithNonexistentConfigFileMustError() {
+    parseCommand(
+        "--permissions-nodes-config-file-enabled",
+        "--permissions-nodes-config-file",
+        "file-does-not-exist");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -329,11 +407,24 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsTomlFileWithNoPermissionsEnabledMustError() throws IOException {
+  public void accountPermissioningEnabledWithNonexistentConfigFileMustError() {
+    parseCommand(
+        "--permissions-accounts-config-file-enabled",
+        "--permissions-accounts-config-file",
+        "file-does-not-exist");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).contains("Configuration file does not exist");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void nodePermissioningTomlFileWithNoPermissionsEnabledMustNotError() throws IOException {
 
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
-    parseCommand("--permissions-config-file", permToml.toString());
+    parseCommand("--permissions-nodes-config-file", permToml.toString());
 
     verify(mockRunnerBuilder).build();
 
@@ -342,7 +433,21 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void defaultPermissionsTomlFileWithNoPermissionsEnabledMustError() {
+  public void accountPermissioningTomlFileWithNoPermissionsEnabledMustNotError()
+      throws IOException {
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
+    parseCommand("--permissions-accounts-config-file", permToml.toString());
+
+    verify(mockRunnerBuilder).build();
+
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void defaultPermissionsTomlFileWithNoPermissionsEnabledMustNotError() {
     parseCommand("--p2p-enabled", "false");
 
     verify(mockRunnerBuilder).build();
@@ -352,25 +457,65 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void permissionsTomlPathMustUseOption() throws IOException {
+  public void nodePermissioningTomlPathMustUseOption() throws IOException {
+    final List<URI> whitelistedNodes =
+        Lists.newArrayList(
+            URI.create(
+                "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.9:4567"),
+            URI.create(
+                "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.169.0.9:4568"));
+
+    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
+
+    final String whitelistedNodesString =
+        whitelistedNodes.stream().map(Object::toString).collect(Collectors.joining(","));
+    parseCommand(
+        "--permissions-nodes-config-file-enabled",
+        "--permissions-nodes-config-file",
+        permToml.toString(),
+        "--bootnodes",
+        whitelistedNodesString);
+    final LocalPermissioningConfiguration localPermissioningConfiguration =
+        LocalPermissioningConfiguration.createDefault();
+    localPermissioningConfiguration.setNodePermissioningConfigFilePath(permToml.toString());
+    localPermissioningConfiguration.setNodeWhitelist(whitelistedNodes);
+
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    PermissioningConfiguration config = permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(config.getLocalConfig().get())
+        .isEqualToComparingFieldByField(localPermissioningConfiguration);
+
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void accountPermissioningTomlPathMustUseOption() throws IOException {
 
     final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
 
     parseCommand(
-        "--permissions-accounts-enabled", "--permissions-config-file", permToml.toString());
-    final LocalPermissioningConfiguration permissioningConfiguration =
+        "--permissions-accounts-config-file-enabled",
+        "--permissions-accounts-config-file",
+        permToml.toString());
+    final LocalPermissioningConfiguration localPermissioningConfiguration =
         LocalPermissioningConfiguration.createDefault();
-    permissioningConfiguration.setConfigurationFilePath(permToml.toString());
-    permissioningConfiguration.setAccountWhitelist(
+    localPermissioningConfiguration.setAccountPermissioningConfigFilePath(permToml.toString());
+    localPermissioningConfiguration.setAccountWhitelist(
         Collections.singletonList("0x0000000000000000000000000000000000000009"));
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(permissioningConfigurationArgumentCaptor.getValue())
-        .isEqualToComparingFieldByField(permissioningConfiguration);
+    PermissioningConfiguration config = permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(config.getLocalConfig().get())
+        .isEqualToComparingFieldByField(localPermissioningConfiguration);
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
