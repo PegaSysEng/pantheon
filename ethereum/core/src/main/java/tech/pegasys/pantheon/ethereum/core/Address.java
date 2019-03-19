@@ -101,12 +101,12 @@ public class Address extends DelegatingBytesValue {
    *
    * @param str An hexadecimal string representing a valid account address (strictly 20 bytes).
    * @return The parsed address.
-   * @throws NullPointerException if the provided string is {@code null}.
+   * @throws IllegalArgumentException if the provided string is {@code null}.
    * @throws IllegalArgumentException if the string is either not hexadecimal, or not the valid
    *     representation of a 20 byte address.
    */
   public static Address fromHexStringStrict(final String str) {
-    if (str == null) return null;
+    checkArgument(str != null);
 
     return new Address(BytesValue.fromHexString(str));
   }
