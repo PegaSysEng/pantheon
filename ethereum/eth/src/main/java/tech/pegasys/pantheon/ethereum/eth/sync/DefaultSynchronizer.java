@@ -132,7 +132,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   @Override
   public Optional<SyncStatus> getSyncStatus() {
-    if (!started.get()) {
+    if (!started.get() || syncState.isInSync()) {
       return Optional.empty();
     }
     return Optional.of(syncState.syncStatus());
