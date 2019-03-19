@@ -96,6 +96,21 @@ public class Address extends DelegatingBytesValue {
     return new Address(BytesValue.fromHexStringLenient(str, SIZE));
   }
 
+  /**
+   * Parse an hexadecimal string representing an account address.
+   *
+   * @param str An hexadecimal string representing a valid account address (strictly 20 bytes).
+   * @return The parsed address.
+   * @throws NullPointerException if the provided string is {@code null}.
+   * @throws IllegalArgumentException if the string is either not hexadecimal, or not the valid
+   *     representation of a 20 byte address.
+   */
+  public static Address fromHexStringStrict(final String str) {
+    if (str == null) return null;
+
+    return new Address(BytesValue.fromHexString(str));
+  }
+
   private static Address precompiled(final int value) {
     // Keep it simple while we don't need precompiled above 127.
     checkArgument(value < Byte.MAX_VALUE);
