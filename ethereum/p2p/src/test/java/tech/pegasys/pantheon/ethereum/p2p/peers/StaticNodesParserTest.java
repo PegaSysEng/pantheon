@@ -33,7 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class StaticeNodesParserTest {
+public class StaticNodesParserTest {
 
   // NOTE: The invalid_static_nodes file is identical to the valid, however one node's port is set
   // to "A".
@@ -62,7 +62,7 @@ public class StaticeNodesParserTest {
 
   @Test
   public void validFileLoadsWithExpectedEnodes() throws IOException {
-    final URL resource = StaticeNodesParserTest.class.getResource("valid_static_nodes.json");
+    final URL resource = StaticNodesParserTest.class.getResource("valid_static_nodes.json");
     final Path path = Paths.get(resource.getPath());
 
     final Set<EnodeURL> enodes = StaticNodesParser.fromPath(path);
@@ -72,7 +72,7 @@ public class StaticeNodesParserTest {
 
   @Test
   public void invalidFileThrowsAnException() {
-    final URL resource = StaticeNodesParserTest.class.getResource("invalid_static_nodes.json");
+    final URL resource = StaticNodesParserTest.class.getResource("invalid_static_nodes.json");
     final Path path = Paths.get(resource.getPath());
 
     assertThatThrownBy(() -> StaticNodesParser.fromPath(path))
