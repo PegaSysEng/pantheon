@@ -106,7 +106,6 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
     try {
       return privateTransactionHandler.handle(privateTransaction);
     } catch (final IOException e) {
-      LOG.debug(e);
       throw new InvalidJsonRpcRequestException("Unable to handle private transaction", e);
     }
   }
