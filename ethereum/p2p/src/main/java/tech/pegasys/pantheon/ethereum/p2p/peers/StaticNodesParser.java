@@ -37,25 +37,14 @@ public class StaticNodesParser {
   public static Set<EnodeURL> fromPath(final Path path)
       throws IOException, IllegalArgumentException {
 
-    final byte[] staticNodesContent;
     try {
-      staticNodesContent = Files.readAllBytes(path);
-      if (staticNodesContent.length == 0) {
-        return emptySet();
-      }
+      return readEnodesFromPath(path);
     } catch (FileNotFoundException | NoSuchFileException ex) {
       LOG.info("No StaticNodes file  ({}) exists, creating empty cache.", path);
       return emptySet();
     } catch (IOException ex) {
       LOG.info("Unable to parse static nodes file ({})", path);
       throw ex;
-    }
-
-    try {
-      final JsonArray enodeJsonArray = new JsonArray(new String(staticNodesContent, UTF_8));
-      return enodeJsonArray.stream()
-          .map(obj -> decodeString((String) obj))
-          .collect(Collectors.toSet());
     } catch (DecodeException ex) {
       LOG.info("Content of ({}} was invalid json, and could not be decoded.", path);
       throw ex;
@@ -63,6 +52,18 @@ public class StaticNodesParser {
       LOG.info("Parsing ({}) has failed due incorrectly formatted enode element.", path);
       throw ex;
     }
+  }
+
+  private static Set<EnodeURL> readEnodesFromPath(final Path path) throws IOException {
+    final byte[] staticNodesContent = Files.readAllBytes(path);
+    if (staticNodesContent.length == 0) {
+      return emptySet();
+    }
+
+    final JsonArray enodeJsonArray = new JsonArray(new String(staticNodesContent, UTF_8));
+    return enodeJsonArray.stream()
+        .map(obj -> decodeString((String) obj))
+        .collect(Collectors.toSet());
   }
 
   private static EnodeURL decodeString(final String input) {
