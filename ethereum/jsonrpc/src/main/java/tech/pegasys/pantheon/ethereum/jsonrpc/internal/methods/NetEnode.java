@@ -43,7 +43,7 @@ public class NetEnode implements JsonRpcMethod {
   public JsonRpcResponse response(final JsonRpcRequest req) {
     try {
       if (p2pNetwork.isP2pEnabled()) {
-        String enodeURI = p2pNetwork.getAdvertisedPeer().map(Peer::getEnodeURI).orElse("");
+        String enodeURI = p2pNetwork.getAdvertisedPeer().map(Peer::getEnodeURLString).orElse("");
         if (!enodeURI.isEmpty()) {
           return new JsonRpcSuccessResponse(req.getId(), enodeURI);
         } else {
