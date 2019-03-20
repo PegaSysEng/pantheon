@@ -1078,6 +1078,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void rpcApisPropertyIgnoresDuplicatesAndMustBeUsed() {
+    parseCommand("--rpc-http-api", "ETH,NET,NET", "--rpc-http-enabled");
+
+    verify(mockRunnerBuilder).jsonRpcConfiguration(jsonRpcConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(jsonRpcConfigArgumentCaptor.getValue().getRpcApis())
+        .containsExactlyInAnyOrder(ETH, NET);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void rpcHttpOptionsRequiresServiceToBeEnabled() {
     parseCommand(
         "--rpc-http-api",
@@ -1996,7 +2010,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(enclaveArg.getValue().isEnabled()).isEqualTo(true);
     assertThat(enclaveArg.getValue().getUrl()).isEqualTo(ENCLAVE_URI);
-    assertThat(enclaveArg.getValue().getPublicKey()).isEqualTo(ENCLAVE_PUBLIC_KEY);
+    assertThat(enclaveArg.getValue().getEnclavePublicKey()).isEqualTo(ENCLAVE_PUBLIC_KEY);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
