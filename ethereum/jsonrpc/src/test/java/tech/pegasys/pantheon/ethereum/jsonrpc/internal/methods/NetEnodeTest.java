@@ -67,7 +67,7 @@ public class NetEnodeTest {
 
     final JsonRpcRequest request = netEnodeRequest();
     final JsonRpcResponse expectedResponse =
-        new JsonRpcSuccessResponse(request.getId(), advertisedPeer.get().getEnodeURI());
+        new JsonRpcSuccessResponse(request.getId(), advertisedPeer.get().getEnodeURLString());
 
     assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
   }
