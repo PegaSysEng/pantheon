@@ -40,7 +40,7 @@ transaction, the sending party, or the list of participating addresses.
 1. DApp sends a private transaction through [eea_sendrawtransaction](../Reference/JSON-RPC-API-Methods.md#eea_sendRawTransaction),
   uses the `privateFor` attribute to specify the list of actors,
   `privateFrom` with the sender public key, and `restriction` to handle
-  with *restricted* and *unrestricted* transaction.
+  with *restricted*.
  
 2. The JSON RPC detects the private transaction and hands it off to a
    Private Transaction Handler.
@@ -49,34 +49,33 @@ transaction, the sending party, or the list of participating addresses.
    Transaction Manager) instance and sends the transaction through this
    instance.
 
-4. Enclave will authenticated-encrypt and distribute the private
+4. Enclave will authenticate, encrypt and distribute the private
    transaction through the nodes, including the actors, and an id for
    the privacy group that it has generated. Each Enclave node will store
    the transaction, along with the associated privacy group and actor
    list.
 
-5. Enclave sends the Private Transaction Hash back to the Private
+5. Enclave sends the Enclave-key back to the Private
   Transaction Handler (as a response to the synchronous HTTP call),
   along with the privacy group.
  
 6. The Private Transaction Handler will lookup the address of the
   Privacy Precompile Smart Contract and will create and send a
-  transaction to this Precompiled contract, including the Transaction
-  Hash from the Enclave as a parameter. This transaction will be known
-  as a Privacy Marker Transaction.
-  -  The Privacy Marker Transaction will be signed using a Private
-      Transaction Signing Key.
+  transaction to this Precompiled contract, including the Enclave-key as a parameter. 
+  This transaction will be known as a Privacy Marker Transaction.
+  -  The Privacy Marker Transaction will be signed using the Node
+     Signing Key.
 
 7. The Transaction Processor will process the Privacy Marker Transaction
-  as per any other transaction. When this transaction executes, the
-  Privacy Precompile code will be passed the Private Transaction Hash
-  from Enclave.
+  as per any other public transaction. When Privacy Marker transaction is mined into a block, the
+  Privacy Precompile contract executes with the Enclave-key from Privacy Marker Transaction. 
+  The Privacy Marker Transaction is propagated via Ethereum devp2p network.
 
-8. The Privacy Precompile will ask the Enclave for the Private
-  Transaction and Privacy Group based on the Private Transaction Hash.
+8. The Privacy Precompile Contract queries the Enclave for the Private
+  Transaction and Privacy Group Id based on the Enclave-key.
 
-9. The Privacy Precompile executes the Private Transaction using the
- Private Transaction Processor, specifying the state to use by the
+9. The Privacy Precompile Contract executes the Private Transaction using the
+ Private Transaction Processor, specifying the world state to use based on the
  Privacy Group Id. The Private Transaction Processor will need to be
  able to read and write to the Privacy Group State, and read from the
  public world state.

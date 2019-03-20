@@ -108,14 +108,15 @@ provide and support privacy.
 To create a private network: 
 
 1. [Create Folders](#1-create-folders)
-1. [Create Genesis File](#2-create-genesis-file)
-1. [Get Public Key of First Node](#3-get-public-key-of-first-node)
-1. [Start First Node as Bootnode](#4-restart-first-node-as-bootnode)
-1. [Start Node-2](#5-start-node-2)
-6. [Start Node-3-non-privacy](#6-start-node-3)
-7. [Confirm the private is working](#7-confirm-private-network-is-working)
-8. [Create a Private Transaction Node-1 with Node-2](#8-create-a-private-transaction-node-1-with-node-2)
-9. [Confirm Node-3 can't interact with private Transaction](#9-confirm-node-3-can't-interact-with-private-transaction)
+2. [Create Genesis File](#2-create-genesis-file)
+3. [Start instances of Orion for each node](#3-start-instances-of-orion-for-each-node)
+4. [Get Public Key of First Node](#4-get-public-key-of-first-node)
+5. [Start First Node as Bootnode](#5-restart-first-node-as-bootnode)
+6. [Start Node-2](#6-start-node-2)
+7. [Start Node-3-non-privacy](#7-start-node-3)
+8. [Confirm the private is working](#8-confirm-private-network-is-working)
+9. [Create a Private Transaction Node-1 with Node-2](#9-create-a-private-transaction-node-1-with-node-2)
+10. [Confirm Node-3 can't interact with private Transaction](#10-confirm-node-3-can't-interact-with-private-transaction)
 
 
 ### 1. Create Folders 
@@ -177,7 +178,23 @@ Copy the following genesis definition to a file called `privateNetworkGenesis.js
     Do not use the accounts in the genesis file above on mainnet or any public network except for testing.
     The private keys are displayed so the accounts are not secure. 
     
-### 3. Get Public Key of First Node
+### 3. Start instances of Orion for each node
+
+Download and install [*Orion*](https://github.com/PegaSysEng/orion/blob/master/documentation/install/running.md) 
+to be used as an enclave to store and communicate the private transactions in Pantheon.
+
+We can generate key pairs for Orion to use using the following command `orion -f foo`. This will generate
+a public-private key pair which will be used to connect to Orion instance. The public key generated will be used to 
+link the Pantheon node to Orion instance.
+
+Refer to [Configuring Orion](https://github.com/PegaSysEng/orion/blob/master/documentation/install/configure.md)
+for a detailed configuration to be set. 
+
+Start one instance of Orion for each Pantheon node which we intend to perform private transactions using
+`orion foo.conf`
+
+    
+### 4. Get Public Key of First Node
 
 To enable nodes to discover each other, a network requires one or more nodes to be bootnodes. 
 For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url). 
@@ -210,7 +227,7 @@ Your node 1 directory now contains:
       
 The `database` directory contains the blockchain data. 
 
-### 4. Start First Node as Bootnode 
+### 5. Start First Node as Bootnode 
 
 Start Node-1:
 
@@ -218,14 +235,14 @@ Start Node-1:
 pantheon --data-path=Node-1-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes 
 --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled 
 --host-whitelist=* --rpc-http-cors-origins="all" --privacy-enabled=true --privacy-precompiled-address=125
---privacy-url=127.0.0.1 --rpc-http-api=EEA    
+--privacy-url=127.0.0.1:8888 --privacy-public-key-file=../pathToOrion1PublicKey.pub --rpc-http-api=EEA    
 ```
 
 ```bash tab="Windows"
 pantheon --data-path=Node-1-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes
  --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled
  --host-whitelist=* --rpc-http-cors-origins="all" --privacy-enabled=true --privacy-precompiled-address=125
- --privacy-url=127.0.0.1 --rpc-http-api=EEA   
+ --privacy-url=127.0.0.1:8888 --privacy-public-key-file=..\pathToOrion1PublicKey.pub --rpc-http-api=EEA   
 ```
 
 The command line specifies: 
@@ -241,7 +258,9 @@ and [`--miner-coinbase`](../Reference/Pantheon-CLI-Syntax.md#miner-coinbase) opt
 * Changes the default Privacy PreCompiled address
   [`--privacy-precompiled-address=125`](../Reference/Pantheon-CLI-Syntax.md#privacy-precompiled-address)
 * Setup the enclave(orion) URL
-  [`--privacy-url=127.0.0.1`](../Reference/Pantheon-CLI-Syntax.md#privacy-url)
+  [`--privacy-url=127.0.0.1:8888`](../Reference/Pantheon-CLI-Syntax.md#privacy-url)
+* Pass the enclave(orion) public Key
+  [`--privacy-public-key-file`](../Reference/Pantheon-CLI-Syntax.md#privacy-public-key-file)
 * Enable EEA methods
   [`--rpc-http-api=EEA`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api)
 
@@ -252,7 +271,7 @@ the genesis file.
 the same address for each node interacting through the private
 transaction.
 
-### 5. Start Node-2 
+### 6. Start Node-2 
 
 You need the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for Node-1 to specify Node-1 as the bootnode for Node-2 and Node-3. 
 
@@ -262,11 +281,12 @@ Start another terminal, change to the `Node-2` directory and start Node-2 replac
 pantheon --data-path=Node-2-data-path --genesis-file=../privateNetworkGenesis.json 
 --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304  
  --privacy-enabled=true --privacy-precompiled-address=125
- --privacy-url=127.0.0.1 --rpc-http-api=EEA  
+ --privacy-url=127.0.0.1:8888 --privacy-public-key-file=../pathToOrion2PublicKey.pub --rpc-http-api=EEA  
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304      
+pantheon --data-path=Node-2-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --p2p-port=30304
+--privacy-enabled=true --privacy-precompiled-address=125 --privacy-url=127.0.0.1:8888 --privacy-public-key-file=..\pathToOrion2PublicKey.pub --rpc-http-api=EEA      
 ```
 
 The command line specifies: 
@@ -280,11 +300,11 @@ The command line specifies:
 * Changes the default Privacy PreCompiled address
   [`--privacy-precompiled-address=125`](../Reference/Pantheon-CLI-Syntax.md#privacy-precompiled-address)
 * Setup the enclave(orion) URL
-  [`--privacy-url=127.0.0.1`](../Reference/Pantheon-CLI-Syntax.md#privacy-url)
+  [`--privacy-url=127.0.0.1:8888`](../Reference/Pantheon-CLI-Syntax.md#privacy-url)
 * Enable EEA methods
   [`--rpc-http-api=EEA`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api)  
 
-### 6. Start Node-3
+### 7. Start Node-3
 
 Start another terminal, change to the `Node-3` directory and start Node-3 replacing the enode URL with your bootnode: 
 
@@ -305,7 +325,7 @@ The command line specifies:
  * Bootnode and genesis file as for Node-2. 
 *  Without privacy commandline.
 
-### 7. Confirm Private Network is Working 
+### 8. Confirm Private Network is Working 
 
 Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
@@ -323,11 +343,11 @@ The result confirms Node-1 (the node running the JSON-RPC service) has two peers
 ```
  
 
-### 8. Create a Private Transaction Node-1 with Node-2
+### 9. Create a Private Transaction Node-1 with Node-2
 
 
 
-### 9. Confirm Node-3 can't interact with private Transaction
+### 10. Confirm Node-3 can't interact with private Transaction
 
 
 
