@@ -37,6 +37,9 @@ and contain a JSON array of [enode URLs](../Node-Keys.md#enode-url).
     ]
     ``` 
 
+!!! note
+    Each node has a `static-nodes.json` file. Ensure each node in the network has the same `static-nodes.json` file. 
+
 Nodes added by [`admin_addPeer`](../../Reference/JSON-RPC-API-Methods.md#admin_addpeer) are not added to the 
 `static-nodes.json` file.
 
