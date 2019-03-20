@@ -48,6 +48,7 @@ public class FastSyncDownloader<C> {
             .waitForSuitablePeers(fastSyncState)
             .thenCompose(fastSyncActions::selectPivotBlock)
             .thenCompose(fastSyncActions::downloadPivotBlockHeader)
+            .thenApply(this::updateMaxTrailingPeers)
             .thenApply(this::storeState)
             .thenCompose(this::downloadChainAndWorldState),
         this::handleWorldStateUnavailable);
@@ -64,14 +65,18 @@ public class FastSyncDownloader<C> {
     }
   }
 
-  private FastSyncState storeState(final FastSyncState state) {
-    fastSyncStateStorage.storeState(state);
+  private FastSyncState updateMaxTrailingPeers(final FastSyncState state) {
     if (state.getPivotBlockNumber().isPresent()) {
       trailingPeerRequirements =
           Optional.of(new TrailingPeerRequirements(state.getPivotBlockNumber().getAsLong(), 0));
     } else {
       trailingPeerRequirements = Optional.empty();
     }
+    return state;
+  }
+
+  private FastSyncState storeState(final FastSyncState state) {
+    fastSyncStateStorage.storeState(state);
     return state;
   }
 
