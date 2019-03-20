@@ -27,8 +27,6 @@ import org.apache.logging.log4j.Logger;
 
 public class NetEnode implements JsonRpcMethod {
 
-  private static final Logger LOG = LogManager.getLogger();
-
   private final P2PNetwork p2pNetwork;
 
   public NetEnode(final P2PNetwork p2pNetwork) {
