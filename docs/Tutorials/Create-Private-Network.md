@@ -22,7 +22,7 @@ To create a private network:
 1. [Create Folders](#1-create-folders)
 1. [Create Genesis File](#2-create-genesis-file)
 1. [Get Public Key of First Node](#3-get-public-key-of-first-node)
-1. [Start First Node as Bootnode](#4-restart-first-node-as-bootnode)
+1. [Start First Node as Bootnode](#4-start-first-node-as-bootnode)
 1. [Start Node-2](#5-start-node-2)
 1. [Start Node-3](#6-start-node-3)
 1. [Confirm Private Network is Working](#7-confirm-private-network-is-working)
