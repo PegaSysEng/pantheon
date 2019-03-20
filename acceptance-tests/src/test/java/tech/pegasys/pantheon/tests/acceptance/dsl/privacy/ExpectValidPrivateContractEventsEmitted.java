@@ -23,7 +23,7 @@ import java.math.BigInteger;
 
 import org.web3j.utils.Numeric;
 
-public class ExpectValidPrivateContractEventsEmitted extends ExpectValidPrivateTransactionReceipt {
+public class ExpectValidPrivateContractEventsEmitted extends GetValidPrivateTransactionReceipt {
   private final String eventValue;
 
   public ExpectValidPrivateContractEventsEmitted(
@@ -33,12 +33,12 @@ public class ExpectValidPrivateContractEventsEmitted extends ExpectValidPrivateT
   }
 
   public void verify(
-      final PantheonNode node, final String transactionHash, final String PUBLIC_KEY) {
+      final PantheonNode node, final String transactionHash, final String publicKey) {
     ResponseTypes.PrivateTransactionReceipt privateTxReceipt =
-        getPrivateTransactionReceipt(node, transactionHash, PUBLIC_KEY);
+        getPrivateTransactionReceipt(node, transactionHash, publicKey);
 
     String event = privateTxReceipt.getLogs().get(0).getData().substring(66, 130);
     assertEquals(
-        Numeric.decodeQuantity(Numeric.prependHexPrefix(event)), new BigInteger(eventValue));
+        new BigInteger(eventValue), Numeric.decodeQuantity(Numeric.prependHexPrefix(event)));
   }
 }
