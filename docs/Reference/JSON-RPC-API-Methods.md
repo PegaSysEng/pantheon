@@ -77,7 +77,7 @@ Properties of the node object are:
 * `listenAddr` - Host and port for the node
 * `name` - Client name
 * `id` - [Node public key](../Configuring-Pantheon/Node-Keys.md#node-public-key)
-* `ports` - Peer discovery and listening [ports](../Configuring-Pantheon/Networking.md#port-configuration) 
+* `ports` - Peer discovery and listening [ports](../Configuring-Pantheon/Networking/Managing-Peers.md#port-configuration) 
 * `protocols` - List of objects containing information for each Ethereum sub-protocol 
 
 !!! note
