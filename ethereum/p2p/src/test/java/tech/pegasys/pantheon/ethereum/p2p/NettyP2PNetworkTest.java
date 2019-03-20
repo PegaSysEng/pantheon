@@ -753,6 +753,21 @@ public final class NettyP2PNetworkTest {
     verify(permittedPeerConnection, never()).disconnect(any());
   }
 
+  @Test
+  public void beforeStartingNetworkEnodeURLShouldNotBePresent() {
+    final NettyP2PNetwork nettyP2PNetwork = mockNettyP2PNetwork();
+
+    assertThat(nettyP2PNetwork.getSelfEnodeURL()).isNotPresent();
+  }
+
+  @Test
+  public void afterStartingNetworkEnodeURLShouldBePresent() {
+    final NettyP2PNetwork nettyP2PNetwork = mockNettyP2PNetwork();
+    nettyP2PNetwork.start();
+
+    assertThat(nettyP2PNetwork.getSelfEnodeURL()).isPresent();
+  }
+
   private BlockAddedEvent blockAddedEvent() {
     return mock(BlockAddedEvent.class);
   }
