@@ -32,7 +32,6 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,9 +47,6 @@ public class RecursivePeerRefreshStateTest {
   private final BondingAgent bondingAgent = mock(BondingAgent.class);
   private final FindNeighbourDispatcher neighborFinder = mock(FindNeighbourDispatcher.class);
   private final MockTimerUtil timerUtil = new MockTimerUtil();
-  private final String selfEnodeString =
-      "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:1111";
-  private final EnodeURL selfEnode = new EnodeURL(selfEnodeString);
 
   private final DiscoveryPeer localPeer = new DiscoveryPeer(createId(9), "127.0.0.9", 9, 9);
   private final DiscoveryPeer peer1 = new DiscoveryPeer(createId(1), "127.0.0.1", 1, 1);
@@ -497,10 +493,8 @@ public class RecursivePeerRefreshStateTest {
 
     final NodePermissioningController nodeWhitelistController =
         mock(NodePermissioningController.class);
-    when(nodeWhitelistController.isPermitted(any(), eq(new EnodeURL(peerA.getEnodeURI()))))
-        .thenReturn(true);
-    when(nodeWhitelistController.isPermitted(any(), eq(new EnodeURL(peerB.getEnodeURI()))))
-        .thenReturn(false);
+    when(nodeWhitelistController.isPermitted(any(), eq(peerA.getEnodeURL()))).thenReturn(true);
+    when(nodeWhitelistController.isPermitted(any(), eq(peerB.getEnodeURL()))).thenReturn(false);
 
     recursivePeerRefreshState =
         new RecursivePeerRefreshState(

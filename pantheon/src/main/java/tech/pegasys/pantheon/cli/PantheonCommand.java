@@ -48,6 +48,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.peers.StaticNodesParser;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
@@ -193,7 +194,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   void setBootnodes(final List<String> values) {
     try {
       bootNodes = values.stream().map((s) -> new EnodeURL(s).toURI()).collect(Collectors.toList());
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       throw new ParameterException(commandLine, e.getMessage());
     }
   }
@@ -326,8 +327,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Comma separated list of APIs to enable on JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcWsApis = DEFAULT_JSON_RPC_APIS;
-
-  private Long rpcWsRefreshDelay;
 
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
@@ -707,7 +706,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setHost(rpcHttpHost);
     jsonRpcConfiguration.setPort(rpcHttpPort);
     jsonRpcConfiguration.setCorsAllowedDomains(rpcHttpCorsAllowedOrigins);
-    jsonRpcConfiguration.setRpcApis(rpcHttpApis);
+    jsonRpcConfiguration.setRpcApis(rpcHttpApis.stream().distinct().collect(Collectors.toList()));
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     jsonRpcConfiguration.setAuthenticationEnabled(isRpcHttpAuthenticationEnabled);
     jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile());
@@ -880,7 +879,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParameters.setEnabled(true);
       privacyParameters.setUrl(privacyUrl.toString());
       if (privacyPublicKeyFile() != null) {
-        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
+        privacyParameters.setEnclavePublicKeyUsingFile(privacyPublicKeyFile());
       } else {
         throw new ParameterException(
             commandLine, "Please specify Enclave public key file path to enable privacy");
@@ -909,7 +908,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<PermissioningConfiguration> permissioningConfiguration) {
+      final Optional<PermissioningConfiguration> permissioningConfiguration)
+      throws IOException {
 
     checkNotNull(runnerBuilder);
 
@@ -931,6 +931,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem.get())
             .metricsConfiguration(metricsConfiguration)
+            .staticNodes(loadStaticNodes())
             .build();
 
     addShutdownHook(runner);
@@ -1160,5 +1161,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public PantheonExceptionHandler exceptionHandler() {
     return exceptionHandlerSupplier.get();
+  }
+
+  private Set<EnodeURL> loadStaticNodes() throws IOException {
+    final String staticNodesFilname = "static-nodes.json";
+    final Path staticNodesPath = dataDir().resolve(staticNodesFilname);
+
+    return StaticNodesParser.fromPath(staticNodesPath);
   }
 }

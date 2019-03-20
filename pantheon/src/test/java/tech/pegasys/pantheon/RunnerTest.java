@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.cli.EthNetworkConfig.DEV_NETWORK_ID;
 import static tech.pegasys.pantheon.cli.NetworkName.DEV;
@@ -143,7 +144,8 @@ public final class RunnerTest {
             .discoveryPort(0)
             .maxPeers(3)
             .metricsSystem(noOpMetricsSystem)
-            .bannedNodeIds(Collections.emptySet());
+            .bannedNodeIds(emptySet())
+            .staticNodes(emptySet());
 
     Runner runnerBehind = null;
     final Runner runnerAhead =
@@ -191,7 +193,7 @@ public final class RunnerTest {
           new EthNetworkConfig(
               EthNetworkConfig.jsonConfig(DEV),
               DEV_NETWORK_ID,
-              Collections.singletonList(URI.create(advertisedPeer.getEnodeURI())));
+              Collections.singletonList(URI.create(advertisedPeer.getEnodeURLString())));
       runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
