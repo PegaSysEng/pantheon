@@ -145,6 +145,9 @@ public class DefaultSynchronizer<C> implements Synchronizer {
     if (!started.get()) {
       return Optional.empty();
     }
+    if (syncState.syncStatus().getCurrentBlock() == syncState.syncStatus().getHighestBlock()) {
+      return Optional.empty();
+    }
     return Optional.of(syncState.syncStatus());
   }
 
