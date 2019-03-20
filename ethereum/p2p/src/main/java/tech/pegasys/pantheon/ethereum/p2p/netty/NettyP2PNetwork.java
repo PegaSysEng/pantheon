@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -160,6 +161,10 @@ public class NettyP2PNetwork implements P2PNetwork {
   private final List<SubProtocol> subProtocols;
 
   private final LabelledMetric<Counter> outboundMessagesCounter;
+
+  private final String advertisedHost;
+
+  private EnodeURL ourEnodeURL;
 
   private final Optional<NodePermissioningController> nodePermissioningController;
   private final Optional<Blockchain> blockchain;
@@ -302,6 +307,7 @@ public class NettyP2PNetwork implements P2PNetwork {
 
     this.nodePermissioningController = nodePermissioningController;
     this.blockchain = Optional.ofNullable(blockchain);
+    this.advertisedHost = config.getDiscovery().getAdvertisedHost();
   }
 
   private Supplier<Integer> pendingTaskCounter(final EventLoopGroup eventLoopGroup) {
@@ -374,6 +380,21 @@ public class NettyP2PNetwork implements P2PNetwork {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public boolean removeMaintainedConnectionPeer(final Peer peer) {
+    final boolean removed = peerMaintainConnectionList.remove(peer);
+
+    final CompletableFuture<PeerConnection> connectionFuture = pendingConnections.get(peer);
+    if (connectionFuture != null) {
+      connectionFuture.thenAccept(connection -> connection.disconnect(DisconnectReason.REQUESTED));
+    }
+
+    final Optional<PeerConnection> peerConnection = connections.getConnectionForPeer(peer.getId());
+    peerConnection.ifPresent(pc -> pc.disconnect(DisconnectReason.REQUESTED));
+
+    return removed;
   }
 
   @Override
@@ -502,6 +523,9 @@ public class NettyP2PNetwork implements P2PNetwork {
             "NettyP2PNetwork permissioning needs to listen to BlockAddedEvents. Blockchain can't be null.");
       }
     }
+
+    this.ourEnodeURL = buildSelfEnodeURL();
+    LOG.info("Enode URL {}", ourEnodeURL.toString());
   }
 
   private Consumer<PeerBondedEvent> handlePeerBondedEvent() {
@@ -648,6 +672,24 @@ public class NettyP2PNetwork implements P2PNetwork {
   @Override
   public boolean isP2pEnabled() {
     return true;
+  }
+
+  @Override
+  public Optional<EnodeURL> getSelfEnodeURL() {
+    return Optional.ofNullable(ourEnodeURL);
+  }
+
+  private EnodeURL buildSelfEnodeURL() {
+    final String nodeId = ourPeerInfo.getNodeId().toUnprefixedString();
+    final int listeningPort = ourPeerInfo.getPort();
+    final OptionalInt discoveryPort =
+        peerDiscoveryAgent
+            .getAdvertisedPeer()
+            .map(p -> OptionalInt.of(p.getEndpoint().getUdpPort()))
+            .filter(port -> port.getAsInt() != listeningPort)
+            .orElse(OptionalInt.empty());
+
+    return new EnodeURL(nodeId, advertisedHost, listeningPort, discoveryPort);
   }
 
   private void onConnectionEstablished(final PeerConnection connection) {

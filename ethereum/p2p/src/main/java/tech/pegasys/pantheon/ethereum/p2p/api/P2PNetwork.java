@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.p2p.api;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.Closeable;
 import java.util.Collection;
@@ -76,6 +77,16 @@ public interface P2PNetwork extends Closeable {
   boolean addMaintainConnectionPeer(final Peer peer);
 
   /**
+   * Removes a {@link Peer} from a list indicating any existing efforts to connect to a given peer
+   * should be removed, and if connected, the peer should be disconnected
+   *
+   * @param peer The peer to which connections are not longer required
+   * @return boolean representing whether or not the peer has been disconnected, or if it was not
+   *     currently connected.
+   */
+  boolean removeMaintainedConnectionPeer(final Peer peer);
+
+  /**
    * Trigger that an external clock can use to make the network attempt connections to maintained
    * peers
    */
@@ -109,4 +120,12 @@ public interface P2PNetwork extends Closeable {
    * @return true if the P2P network is enabled, false, otherwise.
    */
   boolean isP2pEnabled();
+
+  /**
+   * Returns the EnodeURL used to identify this peer in the network.
+   *
+   * @return the enodeURL associated with this node if P2P has been enabled. Returns empty
+   *     otherwise.
+   */
+  Optional<EnodeURL> getSelfEnodeURL();
 }
