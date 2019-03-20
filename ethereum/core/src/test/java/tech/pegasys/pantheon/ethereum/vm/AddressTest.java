@@ -56,6 +56,7 @@ public class AddressTest {
   public void tooShortAccountAddress() {
     Address.fromHexStringStrict("0x00101010");
   }
+
   @Test(expected = IllegalArgumentException.class)
   public void nullAccountAddress() {
     Address.fromHexStringStrict(null);
