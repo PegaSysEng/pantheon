@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.PeerNotPermittedException;
+import tech.pegasys.pantheon.ethereum.p2p.PreventLocalNodeConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
@@ -50,6 +51,9 @@ public class AdminAddPeer extends AdminModifyPeer {
     } catch (final PeerNotPermittedException e) {
       return new JsonRpcErrorResponse(
           id, JsonRpcError.NON_PERMITTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
+    } catch (final PreventLocalNodeConnection e) {
+      return new JsonRpcErrorResponse(
+          id, JsonRpcError.INVALID_PARAMS);
     }
   }
 }

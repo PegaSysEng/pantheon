@@ -42,6 +42,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.Syn
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
 import tech.pegasys.pantheon.ethereum.p2p.NoopP2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.PreventLocalNodeConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
@@ -303,7 +304,10 @@ public class RunnerBuilder {
     staticNodes.forEach(
         enodeURL -> {
           final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
-          peerNetwork.addMaintainConnectionPeer(peer);
+          try {
+            peerNetwork.addMaintainConnectionPeer(peer);
+          } catch (PreventLocalNodeConnection ex) {
+          }
         });
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
