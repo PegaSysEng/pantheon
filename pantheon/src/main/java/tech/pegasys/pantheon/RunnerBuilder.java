@@ -307,6 +307,7 @@ public class RunnerBuilder {
               jsonRpcConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
+              nodeWhitelistController,
               privacyParameters);
       jsonRpcHttpService =
           Optional.of(
@@ -330,6 +331,7 @@ public class RunnerBuilder {
               webSocketConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
+              nodeWhitelistController,
               privacyParameters);
 
       final SubscriptionManager subscriptionManager =
@@ -404,6 +406,7 @@ public class RunnerBuilder {
       final Collection<RpcApi> jsonRpcApis,
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountWhitelistController,
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
@@ -423,6 +426,7 @@ public class RunnerBuilder {
                 jsonRpcApis,
                 filterManager,
                 accountWhitelistController,
+                nodeWhitelistController,
                 privacyParameters);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
