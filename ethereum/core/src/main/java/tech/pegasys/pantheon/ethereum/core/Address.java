@@ -84,7 +84,6 @@ public class Address extends DelegatingBytesValue {
    *
    * @param str An hexadecimal string (with or without the leading '0x') representing a valid
    *     account address.
-   * @return The parsed address.
    * @return The parsed address: {@code null} if the provided string is {@code null}.
    * @throws IllegalArgumentException if the string is either not hexadecimal, or not the valid
    *     representation of an address.
