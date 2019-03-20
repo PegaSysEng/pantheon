@@ -22,9 +22,6 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class NetEnode implements JsonRpcMethod {
 
   private final P2PNetwork p2pNetwork;
