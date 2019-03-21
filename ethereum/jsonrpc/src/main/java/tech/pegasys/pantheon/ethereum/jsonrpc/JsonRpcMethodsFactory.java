@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminAddPeer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminNodeInfo;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminPeers;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminRemovePeer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugMetrics;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugStorageRangeAt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugTraceTransaction;
@@ -63,6 +64,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSendRawTransac
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSyncing;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthUninstallFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetEnode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetListening;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetPeerCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
@@ -237,7 +239,8 @@ public class JsonRpcMethodsFactory {
           enabledMethods,
           new NetVersion(protocolSchedule.getChainId()),
           new NetListening(p2pNetwork),
-          new NetPeerCount(p2pNetwork));
+          new NetPeerCount(p2pNetwork),
+          new NetEnode(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());
@@ -271,6 +274,7 @@ public class JsonRpcMethodsFactory {
       addMethods(
           enabledMethods,
           new AdminAddPeer(p2pNetwork, parameter),
+          new AdminRemovePeer(p2pNetwork, parameter),
           new AdminNodeInfo(
               clientVersion, networkId, genesisConfigOptions, p2pNetwork, blockchainQueries),
           new AdminPeers(p2pNetwork));
