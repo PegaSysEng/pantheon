@@ -48,6 +48,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.peers.StaticNodesParser;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
@@ -562,7 +563,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.addSubcommand(
         RLPSubCommand.COMMAND_NAME, new RLPSubCommand(resultHandler.out(), in));
 
-    commandLine.registerConverter(Address.class, Address::fromHexString);
+    commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
@@ -620,9 +621,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final Optional<PermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
 
+      final Collection<EnodeURL> staticNodes = loadStaticNodes();
+
       permissioningConfiguration
           .flatMap(PermissioningConfiguration::getLocalConfig)
-          .ifPresent(p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
+          .ifPresent(p -> ensureAllNodesAreInWhitelist(ethNetworkConfig.getBootNodes(), p));
+
+      permissioningConfiguration
+          .flatMap(PermissioningConfiguration::getLocalConfig)
+          .ifPresent(
+              p ->
+                  ensureAllNodesAreInWhitelist(
+                      staticNodes.stream().map(EnodeURL::toURI).collect(Collectors.toList()), p));
 
       synchronize(
           buildController(),
@@ -635,7 +645,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           jsonRpcConfiguration,
           webSocketConfiguration,
           metricsConfiguration(),
-          permissioningConfiguration);
+          permissioningConfiguration,
+          staticNodes);
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
@@ -646,12 +657,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return network == null ? MAINNET : network;
   }
 
-  private void ensureAllBootnodesAreInWhitelist(
-      final EthNetworkConfig ethNetworkConfig,
+  private void ensureAllNodesAreInWhitelist(
+      final Collection<URI> enodeAddresses,
       final LocalPermissioningConfiguration permissioningConfiguration) {
     try {
-      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-          ethNetworkConfig, permissioningConfiguration);
+      PermissioningConfigurationValidator.areAllNodesAreInWhitelist(
+          enodeAddresses, permissioningConfiguration);
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage());
     }
@@ -705,7 +716,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setHost(rpcHttpHost);
     jsonRpcConfiguration.setPort(rpcHttpPort);
     jsonRpcConfiguration.setCorsAllowedDomains(rpcHttpCorsAllowedOrigins);
-    jsonRpcConfiguration.setRpcApis(rpcHttpApis);
+    jsonRpcConfiguration.setRpcApis(rpcHttpApis.stream().distinct().collect(Collectors.toList()));
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     jsonRpcConfiguration.setAuthenticationEnabled(isRpcHttpAuthenticationEnabled);
     jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile());
@@ -878,7 +889,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParameters.setEnabled(true);
       privacyParameters.setUrl(privacyUrl.toString());
       if (privacyPublicKeyFile() != null) {
-        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
+        privacyParameters.setEnclavePublicKeyUsingFile(privacyPublicKeyFile());
       } else {
         throw new ParameterException(
             commandLine, "Please specify Enclave public key file path to enable privacy");
@@ -891,7 +902,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private SynchronizerConfiguration buildSyncConfig() {
     synchronizerConfigurationBuilder.syncMode(syncMode);
-    synchronizerConfigurationBuilder.maxTrailingPeers(MAX_TRAILING_PEERS);
     return synchronizerConfigurationBuilder.build();
   }
 
@@ -907,7 +917,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<PermissioningConfiguration> permissioningConfiguration) {
+      final Optional<PermissioningConfiguration> permissioningConfiguration,
+      final Collection<EnodeURL> staticNodes) {
 
     checkNotNull(runnerBuilder);
 
@@ -929,6 +940,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem.get())
             .metricsConfiguration(metricsConfiguration)
+            .staticNodes(staticNodes)
             .build();
 
     addShutdownHook(runner);
@@ -1158,5 +1170,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public PantheonExceptionHandler exceptionHandler() {
     return exceptionHandlerSupplier.get();
+  }
+
+  private Set<EnodeURL> loadStaticNodes() throws IOException {
+    final String staticNodesFilname = "static-nodes.json";
+    final Path staticNodesPath = dataDir().resolve(staticNodesFilname);
+
+    return StaticNodesParser.fromPath(staticNodesPath);
   }
 }

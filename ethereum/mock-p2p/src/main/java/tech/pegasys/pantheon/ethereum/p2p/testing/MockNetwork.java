@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.util.Subscribers;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
@@ -168,6 +169,11 @@ public final class MockNetwork {
     }
 
     @Override
+    public boolean removeMaintainedConnectionPeer(final Peer peer) {
+      return true;
+    }
+
+    @Override
     public void checkMaintainedConnectionPeers() {}
 
     @Override
@@ -205,6 +211,11 @@ public final class MockNetwork {
 
     @Override
     public Optional<NodeLocalConfigPermissioningController> getNodeWhitelistController() {
+      return Optional.empty();
+    }
+
+    @Override
+    public Optional<EnodeURL> getSelfEnodeURL() {
       return Optional.empty();
     }
   }
