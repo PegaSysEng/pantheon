@@ -40,9 +40,9 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.logs.LogsSu
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.pending.PendingTransactionSubscriptionService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscriptionService;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.p2p.ConnectingToLocalNodeException;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
 import tech.pegasys.pantheon.ethereum.p2p.NoopP2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.PreventLocalNodeConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
@@ -306,7 +306,7 @@ public class RunnerBuilder {
           final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
           try {
             peerNetwork.addMaintainConnectionPeer(peer);
-          } catch (PreventLocalNodeConnection ex) {
+          } catch (ConnectingToLocalNodeException ex) {
           }
         });
 

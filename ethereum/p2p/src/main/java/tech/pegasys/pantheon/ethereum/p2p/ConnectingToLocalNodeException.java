@@ -12,12 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p;
 
-public class PreventLocalNodeConnection extends RuntimeException {
-  public PreventLocalNodeConnection(final String message) {
+public class ConnectingToLocalNodeException extends RuntimeException {
+  public ConnectingToLocalNodeException(final String message) {
     super(message);
   }
 
-  public PreventLocalNodeConnection() {
+  public ConnectingToLocalNodeException() {
     super("Cannot add the local node as a peer connection");
   }
 }
