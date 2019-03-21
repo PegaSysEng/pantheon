@@ -37,18 +37,21 @@ public class NodePermissioningController {
   }
 
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    LOG.trace("Checking node permission: {} -> {}", sourceEnode, destinationEnode);
+    LOG.info("Checking node permission: {} -> {}", sourceEnode, destinationEnode);
 
     if (syncStatusNodePermissioningProvider.isPresent()
         && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
+      LOG.info("not permitted by sync provider");
       return false;
     } else {
       for (NodePermissioningProvider provider : providers) {
         if (!provider.isPermitted(sourceEnode, destinationEnode)) {
+          LOG.info("not permitted by provider {}", provider);
           return false;
         }
       }
     }
+    LOG.info("YES permitted: {} -> {}", sourceEnode, destinationEnode);
     return true;
   }
 

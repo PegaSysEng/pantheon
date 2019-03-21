@@ -191,6 +191,8 @@ public class PeerDiscoveryController {
         bootstrapNodes.stream()
             .filter(p -> isPeerPermitted(localPeer, p))
             .collect(Collectors.toList());
+    LOG.debug(
+        "PeerDiscoController.start with initial discovery peers {}", initialDiscoveryPeers.size());
 
     if (nodePermissioningController.isPresent()) {
       nodePermissioningController
