@@ -55,11 +55,11 @@ In the `Node-1` directory, use the [`public-key`](../Reference/Pantheon-CLI-Synt
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
 
 ```bash tab="MacOS"
-pantheon --data-path=data public-key export --to=data-path/publicKeyNode1
+pantheon --data-path=data public-key export --to=data/publicKeyNode1
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=data public-key export --to=data-path\publicKeyNode1
+pantheon --data-path=data public-key export --to=data\publicKeyNode1
 ```
 
 !!!note
