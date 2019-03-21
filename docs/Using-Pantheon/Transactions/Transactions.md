@@ -148,11 +148,11 @@ All accounts and private keys in the examples are from the `dev.json` genesis fi
 
 You can interact with contracts using [eth_call](../../Reference/JSON-RPC-API-Methods.md#eth_call) or [eth_sendRawTransaction](../../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction). 
 
-|eth_call  | eth_sendRawTransaction |
-|--------|--------|
-|Read-only | Write
-| Invokes contract function locally | Broadcasts to network
-| Does not change state of blockchain | Updates blockchain (for example, transfers ether between accounts)
-| Does not consume gas | Requires gas
-| Synchronous | Asynchronous  | 
-| Return value of contract function available immediately| Returns transaction hash only.  Possible transaction may not be included in a block (for example, if the gas price is too low)
+| eth_call                                                | eth_sendRawTransaction                                                                                                         |
+|---------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| Read-only                                               | Write                                                                                                                          |
+| Invokes contract function locally                       | Broadcasts to network                                                                                                          |
+| Does not change state of blockchain                     | Updates blockchain (for example, transfers ether between accounts)                                                             |
+| Does not consume gas                                    | Requires gas                                                                                                                   |
+| Synchronous                                             | Asynchronous                                                                                                                   |
+| Return value of contract function available immediately | Returns transaction hash only.  Possible transaction may not be included in a block (for example, if the gas price is too low) |
