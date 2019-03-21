@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.p2p.netty;
 import static com.google.common.base.Preconditions.checkState;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.p2p.PeerNotPermittedException;
@@ -28,7 +29,6 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.VertxPeerDiscoveryAgent;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -161,6 +162,10 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   private final LabelledMetric<Counter> outboundMessagesCounter;
 
+  private final String advertisedHost;
+
+  private EnodeURL ourEnodeURL;
+
   private final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController;
   private final Optional<NodePermissioningController> nodePermissioningController;
   private final Optional<Blockchain> blockchain;
@@ -168,10 +173,9 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   public NettyP2PNetwork(
       final Vertx vertx,
-      final SECP256K1.KeyPair keyPair,
+      final KeyPair keyPair,
       final NetworkingConfiguration config,
       final List<Capability> supportedCapabilities,
-      final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
@@ -181,7 +185,6 @@ public class NettyP2PNetwork implements P2PNetwork {
         keyPair,
         config,
         supportedCapabilities,
-        peerRequirement,
         peerBlacklist,
         metricsSystem,
         nodeWhitelistController,
@@ -201,7 +204,6 @@ public class NettyP2PNetwork implements P2PNetwork {
    * @param config The network configuration to use.
    * @param supportedCapabilities The wire protocol capabilities to advertise to connected peers.
    * @param peerBlacklist The peers with which this node will not connect
-   * @param peerRequirement Queried to determine if enough peers are currently connected.
    * @param metricsSystem The metrics system to capture metrics with.
    * @param nodeLocalConfigPermissioningController local file config for permissioning
    * @param nodePermissioningController Controls node permissioning.
@@ -212,13 +214,13 @@ public class NettyP2PNetwork implements P2PNetwork {
       final SECP256K1.KeyPair keyPair,
       final NetworkingConfiguration config,
       final List<Capability> supportedCapabilities,
-      final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final MetricsSystem metricsSystem,
       final Optional<NodeLocalConfigPermissioningController> nodeLocalConfigPermissioningController,
       final Optional<NodePermissioningController> nodePermissioningController,
       final Blockchain blockchain) {
 
+    maxPeers = config.getRlpx().getMaxPeers();
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
     this.peerMaintainConnectionList = new HashSet<>();
@@ -227,7 +229,7 @@ public class NettyP2PNetwork implements P2PNetwork {
             vertx,
             keyPair,
             config.getDiscovery(),
-            peerRequirement,
+            () -> connections.size() >= maxPeers,
             peerBlacklist,
             nodeLocalConfigPermissioningController,
             nodePermissioningController);
@@ -257,7 +259,6 @@ public class NettyP2PNetwork implements P2PNetwork {
     subscribeDisconnect(peerBlacklist);
     subscribeDisconnect(connections);
 
-    maxPeers = config.getRlpx().getMaxPeers();
     this.keyPair = keyPair;
     this.subProtocols = config.getSupportedProtocols();
 
@@ -304,6 +305,7 @@ public class NettyP2PNetwork implements P2PNetwork {
     this.nodeWhitelistController = nodeLocalConfigPermissioningController;
     this.nodePermissioningController = nodePermissioningController;
     this.blockchain = Optional.ofNullable(blockchain);
+    this.advertisedHost = config.getDiscovery().getAdvertisedHost();
   }
 
   private Supplier<Integer> pendingTaskCounter(final EventLoopGroup eventLoopGroup) {
@@ -379,6 +381,21 @@ public class NettyP2PNetwork implements P2PNetwork {
   }
 
   @Override
+  public boolean removeMaintainedConnectionPeer(final Peer peer) {
+    final boolean removed = peerMaintainConnectionList.remove(peer);
+
+    final CompletableFuture<PeerConnection> connectionFuture = pendingConnections.get(peer);
+    if (connectionFuture != null) {
+      connectionFuture.thenAccept(connection -> connection.disconnect(DisconnectReason.REQUESTED));
+    }
+
+    final Optional<PeerConnection> peerConnection = connections.getConnectionForPeer(peer.getId());
+    peerConnection.ifPresent(pc -> pc.disconnect(DisconnectReason.REQUESTED));
+
+    return removed;
+  }
+
+  @Override
   public void checkMaintainedConnectionPeers() {
     for (final Peer peer : peerMaintainConnectionList) {
       if (!(isConnecting(peer) || isConnected(peer))) {
@@ -411,7 +428,7 @@ public class NettyP2PNetwork implements P2PNetwork {
     new Bootstrap()
         .group(workers)
         .channel(NioSocketChannel.class)
-        .remoteAddress(new InetSocketAddress(endpoint.getHost(), endpoint.getTcpPort().getAsInt()))
+        .remoteAddress(new InetSocketAddress(endpoint.getHost(), endpoint.getFunctionalTcpPort()))
         .option(ChannelOption.TCP_NODELAY, true)
         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT_SECONDS * 1000)
         .handler(
@@ -504,15 +521,16 @@ public class NettyP2PNetwork implements P2PNetwork {
             "NettyP2PNetwork permissioning needs to listen to BlockAddedEvents. Blockchain can't be null.");
       }
     }
+
+    this.ourEnodeURL = buildSelfEnodeURL();
+    LOG.info("Enode URL {}", ourEnodeURL.toString());
   }
 
-  private Consumer<PeerBondedEvent> handlePeerBondedEvent() {
+  @VisibleForTesting
+  Consumer<PeerBondedEvent> handlePeerBondedEvent() {
     return event -> {
       final Peer peer = event.getPeer();
-      if (connectionCount() < maxPeers
-          && peer.getEndpoint().getTcpPort().isPresent()
-          && !isConnecting(peer)
-          && !isConnected(peer)) {
+      if (connectionCount() < maxPeers && !isConnecting(peer) && !isConnected(peer)) {
         connect(peer);
       }
     };
@@ -655,6 +673,24 @@ public class NettyP2PNetwork implements P2PNetwork {
   @Override
   public Optional<NodeLocalConfigPermissioningController> getNodeWhitelistController() {
     return nodeWhitelistController;
+  }
+
+  @Override
+  public Optional<EnodeURL> getSelfEnodeURL() {
+    return Optional.ofNullable(ourEnodeURL);
+  }
+
+  private EnodeURL buildSelfEnodeURL() {
+    final String nodeId = ourPeerInfo.getNodeId().toUnprefixedString();
+    final int listeningPort = ourPeerInfo.getPort();
+    final OptionalInt discoveryPort =
+        peerDiscoveryAgent
+            .getAdvertisedPeer()
+            .map(p -> OptionalInt.of(p.getEndpoint().getUdpPort()))
+            .filter(port -> port.getAsInt() != listeningPort)
+            .orElse(OptionalInt.empty());
+
+    return new EnodeURL(nodeId, advertisedHost, listeningPort, discoveryPort);
   }
 
   private void onConnectionEstablished(final PeerConnection connection) {
