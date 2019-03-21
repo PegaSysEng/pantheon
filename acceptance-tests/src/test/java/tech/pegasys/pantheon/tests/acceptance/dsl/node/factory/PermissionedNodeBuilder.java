@@ -31,7 +31,9 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,6 +41,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Charsets;
 import org.assertj.core.util.Lists;
 
 public class PermissionedNodeBuilder {
@@ -135,6 +138,7 @@ public class PermissionedNodeBuilder {
             .setName(name)
             .setJsonRpcConfiguration(jsonRpcConfigWithPermApiEnabled())
             .setPermissioningConfiguration(permissioningConfiguration)
+            .miningEnabled()
             .build();
 
     try {
@@ -219,6 +223,12 @@ public class PermissionedNodeBuilder {
       final Path configFilePath) {
     try {
       WhitelistPersistor.addNewConfigItem(listType, whitelistVal, configFilePath);
+
+      Files.write(
+          configFilePath,
+          System.lineSeparator().getBytes(Charsets.UTF_8),
+          StandardOpenOption.WRITE,
+          StandardOpenOption.APPEND);
     } catch (IOException e) {
       throw new RuntimeException("Error populating permissioning file", e);
     }
