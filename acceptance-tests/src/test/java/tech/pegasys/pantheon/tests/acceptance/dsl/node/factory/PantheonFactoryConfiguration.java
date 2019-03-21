@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
@@ -30,7 +30,8 @@ class PantheonFactoryConfiguration {
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
   private final MetricsConfiguration metricsConfiguration;
-  private final Optional<LocalPermissioningConfiguration> permissioningConfiguration;
+  private final Optional<PermissioningConfiguration> permissioningConfiguration;
+  private final Optional<String> keyFilePath;
   private final boolean devMode;
   private final GenesisConfigProvider genesisConfigProvider;
   private final boolean p2pEnabled;
@@ -44,7 +45,8 @@ class PantheonFactoryConfiguration {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration,
+      final Optional<PermissioningConfiguration> permissioningConfiguration,
+      final Optional<String> keyFilePath,
       final boolean devMode,
       final GenesisConfigProvider genesisConfigProvider,
       final boolean p2pEnabled,
@@ -57,6 +59,7 @@ class PantheonFactoryConfiguration {
     this.webSocketConfiguration = webSocketConfiguration;
     this.metricsConfiguration = metricsConfiguration;
     this.permissioningConfiguration = permissioningConfiguration;
+    this.keyFilePath = keyFilePath;
     this.devMode = devMode;
     this.genesisConfigProvider = genesisConfigProvider;
     this.p2pEnabled = p2pEnabled;
@@ -88,8 +91,12 @@ class PantheonFactoryConfiguration {
     return metricsConfiguration;
   }
 
-  public Optional<LocalPermissioningConfiguration> getPermissioningConfiguration() {
+  public Optional<PermissioningConfiguration> getPermissioningConfiguration() {
     return permissioningConfiguration;
+  }
+
+  public Optional<String> getKeyFilePath() {
+    return keyFilePath;
   }
 
   public boolean isDevMode() {

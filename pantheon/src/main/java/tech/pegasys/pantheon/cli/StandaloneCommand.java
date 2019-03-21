@@ -21,6 +21,9 @@ import picocli.CommandLine;
 
 class StandaloneCommand implements DefaultCommandValues {
 
+  // While this variable is never read it is needed for the PicoCLI to create
+  // the config file option that is read elsewhere.
+  @SuppressWarnings("UnusedVariable")
   @CommandLine.Option(
       names = {CONFIG_FILE_OPTION_NAME},
       paramLabel = MANDATORY_FILE_FORMAT_HELP,
@@ -74,8 +77,14 @@ class StandaloneCommand implements DefaultCommandValues {
   final File privacyPublicKeyFile = null;
 
   @CommandLine.Option(
-      names = {"--permissions-config-file"},
+      names = {"--permissions-nodes-config-file"},
       description =
-          "Permissions config TOML file (default: a file named \"permissions_config.toml\" in the Pantheon data folder)")
-  String permissionsConfigFile = null;
+          "Node permissioning config TOML file (default: a file named \"permissions_config.toml\" in the Pantheon data folder)")
+  String nodePermissionsConfigFile = null;
+
+  @CommandLine.Option(
+      names = {"--permissions-accounts-config-file"},
+      description =
+          "Account permissioning config TOML file (default: a file named \"permissions_config.toml\" in the Pantheon data folder)")
+  String accountPermissionsConfigFile = null;
 }

@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminAddPeer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminNodeInfo;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminPeers;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminRemovePeer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugMetrics;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugStorageRangeAt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugTraceTransaction;
@@ -63,11 +64,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSendRawTransac
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSyncing;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthUninstallFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetEnode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetListening;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetPeerCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.RpcModules;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.TxPoolPendingTransactions;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.TxPoolPantheonTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3Sha3;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerSetCoinbase;
@@ -237,7 +239,8 @@ public class JsonRpcMethodsFactory {
           enabledMethods,
           new NetVersion(protocolSchedule.getChainId()),
           new NetListening(p2pNetwork),
-          new NetPeerCount(p2pNetwork));
+          new NetPeerCount(p2pNetwork),
+          new NetEnode(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());
@@ -249,8 +252,11 @@ public class JsonRpcMethodsFactory {
           new MinerStart(miningCoordinator),
           new MinerStop(miningCoordinator),
           minerSetCoinbase,
-          new MinerSetEtherbase(minerSetCoinbase),
-          new TxPoolPendingTransactions(transactionPool.getPendingTransactions()));
+          new MinerSetEtherbase(minerSetCoinbase));
+    }
+    if (rpcApis.contains(RpcApis.TX_POOL)) {
+      addMethods(
+          enabledMethods, new TxPoolPantheonTransactions(transactionPool.getPendingTransactions()));
     }
     if (rpcApis.contains(RpcApis.PERM)) {
       addMethods(
@@ -268,6 +274,7 @@ public class JsonRpcMethodsFactory {
       addMethods(
           enabledMethods,
           new AdminAddPeer(p2pNetwork, parameter),
+          new AdminRemovePeer(p2pNetwork, parameter),
           new AdminNodeInfo(
               clientVersion, networkId, genesisConfigOptions, p2pNetwork, blockchainQueries),
           new AdminPeers(p2pNetwork));

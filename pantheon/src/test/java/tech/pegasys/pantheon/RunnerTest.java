@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.cli.EthNetworkConfig.DEV_NETWORK_ID;
 import static tech.pegasys.pantheon.cli.NetworkName.DEV;
@@ -39,7 +40,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -136,8 +136,6 @@ public final class RunnerTest {
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
-    final LocalPermissioningConfiguration aheadPermissioningConfiguration =
-        permissioningConfiguration();
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
@@ -146,7 +144,8 @@ public final class RunnerTest {
             .discoveryPort(0)
             .maxPeers(3)
             .metricsSystem(noOpMetricsSystem)
-            .bannedNodeIds(Collections.emptySet());
+            .bannedNodeIds(emptySet())
+            .staticNodes(emptySet());
 
     Runner runnerBehind = null;
     final Runner runnerAhead =
@@ -157,7 +156,6 @@ public final class RunnerTest {
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .metricsConfiguration(aheadMetricsConfiguration)
             .dataDir(dbAhead)
-            .permissioningConfiguration(aheadPermissioningConfiguration)
             .build();
     try {
 
@@ -195,7 +193,7 @@ public final class RunnerTest {
           new EthNetworkConfig(
               EthNetworkConfig.jsonConfig(DEV),
               DEV_NETWORK_ID,
-              Collections.singletonList(URI.create(advertisedPeer.getEnodeURI())));
+              Collections.singletonList(URI.create(advertisedPeer.getEnodeURLString())));
       runnerBehind =
           runnerBuilder
               .pantheonController(controllerBehind)
@@ -226,20 +224,50 @@ public final class RunnerTest {
                                         MediaType.parse("application/json; charset=utf-8"),
                                         "{\"jsonrpc\":\"2.0\",\"id\":"
                                             + Json.encode(7)
-                                            + ",\"method\":\"eth_syncing\"}"))
+                                            + ",\"method\":\"eth_blockNumber\"}"))
                                 .url(baseUrl)
                                 .build())
                         .execute()) {
 
                   assertThat(resp.code()).isEqualTo(200);
+                  final Response syncingResp =
+                      client
+                          .newCall(
+                              new Request.Builder()
+                                  .post(
+                                      RequestBody.create(
+                                          MediaType.parse("application/json; charset=utf-8"),
+                                          "{\"jsonrpc\":\"2.0\",\"id\":"
+                                              + Json.encode(7)
+                                              + ",\"method\":\"eth_syncing\"}"))
+                                  .url(baseUrl)
+                                  .build())
+                          .execute();
+                  assertThat(syncingResp.code()).isEqualTo(200);
 
                   final int currentBlock =
                       UInt256.fromHexString(
-                              new JsonObject(resp.body().string())
-                                  .getJsonObject("result")
-                                  .getString("currentBlock"))
+                              new JsonObject(resp.body().string()).getString("result"))
                           .toInt();
+                  System.out.println("******current block  " + currentBlock);
+                  if (currentBlock < blockCount) {
+                    // if not yet at blockCount, we should get a sync result from eth_syncing
+                    final int syncResultCurrentBlock =
+                        UInt256.fromHexString(
+                                new JsonObject(syncingResp.body().string())
+                                    .getJsonObject("result")
+                                    .getString("currentBlock"))
+                            .toInt();
+                    assertThat(syncResultCurrentBlock).isLessThan(blockCount);
+                  }
                   assertThat(currentBlock).isEqualTo(blockCount);
+                  resp.close();
+
+                  // when we have synced to blockCount, eth_syncing should return false
+                  final boolean syncResult =
+                      new JsonObject(syncingResp.body().string()).getBoolean("result");
+                  assertThat(syncResult).isFalse();
+                  syncingResp.close();
                 }
               });
 
@@ -303,10 +331,6 @@ public final class RunnerTest {
     configuration.setPort(0);
     configuration.setEnabled(false);
     return configuration;
-  }
-
-  private LocalPermissioningConfiguration permissioningConfiguration() {
-    return LocalPermissioningConfiguration.createDefault();
   }
 
   private static void setupState(

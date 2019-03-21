@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PingPacketData;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.URI;
@@ -174,6 +175,7 @@ public class PeerDiscoveryTestHelper {
 
     private PeerBlacklist blacklist = new PeerBlacklist();
     private Optional<NodeLocalConfigPermissioningController> whitelist = Optional.empty();
+    private Optional<NodePermissioningController> nodePermissioningController = Optional.empty();
     private List<URI> bootstrapPeers = Collections.emptyList();
     private boolean active = true;
 
@@ -194,12 +196,20 @@ public class PeerDiscoveryTestHelper {
     }
 
     private List<URI> asEnodes(final List<DiscoveryPeer> peers) {
-      return peers.stream().map(Peer::getEnodeURI).map(URI::create).collect(Collectors.toList());
+      return peers.stream()
+          .map(Peer::getEnodeURLString)
+          .map(URI::create)
+          .collect(Collectors.toList());
     }
 
     public AgentBuilder whiteList(
         final Optional<NodeLocalConfigPermissioningController> whitelist) {
       this.whitelist = whitelist;
+      return this;
+    }
+
+    public AgentBuilder nodePermissioningController(final NodePermissioningController controller) {
+      this.nodePermissioningController = Optional.ofNullable(controller);
       return this;
     }
 
@@ -220,7 +230,13 @@ public class PeerDiscoveryTestHelper {
       config.setActive(active);
 
       return new MockPeerDiscoveryAgent(
-          SECP256K1.KeyPair.generate(), config, () -> true, blacklist, whitelist, agents);
+          SECP256K1.KeyPair.generate(),
+          config,
+          () -> true,
+          blacklist,
+          whitelist,
+          nodePermissioningController,
+          agents);
     }
   }
 }

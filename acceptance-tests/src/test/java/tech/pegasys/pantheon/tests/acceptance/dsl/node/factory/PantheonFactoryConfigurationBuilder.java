@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
@@ -38,7 +38,8 @@ public class PantheonFactoryConfigurationBuilder {
   private JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
   private WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
   private MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
-  private Optional<LocalPermissioningConfiguration> permissioningConfiguration = Optional.empty();
+  private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
+  private Optional<String> keyFilePath = Optional.empty();
   private boolean devMode = true;
   private GenesisConfigProvider genesisConfigProvider = ignore -> Optional.empty();
   private Boolean p2pEnabled = true;
@@ -137,8 +138,13 @@ public class PantheonFactoryConfigurationBuilder {
   }
 
   public PantheonFactoryConfigurationBuilder setPermissioningConfiguration(
-      final LocalPermissioningConfiguration permissioningConfiguration) {
+      final PermissioningConfiguration permissioningConfiguration) {
     this.permissioningConfiguration = Optional.of(permissioningConfiguration);
+    return this;
+  }
+
+  public PantheonFactoryConfigurationBuilder setKeyFilePath(final String keyFilePath) {
+    this.keyFilePath = Optional.of(keyFilePath);
     return this;
   }
 
@@ -172,6 +178,7 @@ public class PantheonFactoryConfigurationBuilder {
         webSocketConfiguration,
         metricsConfiguration,
         permissioningConfiguration,
+        keyFilePath,
         devMode,
         genesisConfigProvider,
         p2pEnabled,

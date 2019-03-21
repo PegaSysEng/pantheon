@@ -48,8 +48,11 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.peers.StaticNodesParser;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -191,7 +194,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   void setBootnodes(final List<String> values) {
     try {
       bootNodes = values.stream().map((s) -> new EnodeURL(s).toURI()).collect(Collectors.toList());
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       throw new ParameterException(commandLine, e.getMessage());
     }
   }
@@ -325,8 +328,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Comma separated list of APIs to enable on JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
   private final Collection<RpcApi> rpcWsApis = DEFAULT_JSON_RPC_APIS;
 
-  private Long rpcWsRefreshDelay;
-
   @Option(
       names = {"--rpc-ws-authentication-enabled"},
       description =
@@ -442,14 +443,25 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   @Option(
-      names = {"--permissions-nodes-enabled"},
+      names = {"--permissions-nodes-config-file-enabled"},
       description = "Enable node level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsNodesEnabled = false;
 
   @Option(
-      names = {"--permissions-accounts-enabled"},
+      names = {"--permissions-accounts-config-file-enabled"},
       description = "Enable account level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsAccountsEnabled = false;
+
+  @Option(
+      names = {"--permissions-nodes-contract-address"},
+      description = "Address of the node permissioning smart contract",
+      arity = "1")
+  private final Address permissionsNodesContractAddress = null;
+
+  @Option(
+      names = {"--permissions-nodes-contract-enabled"},
+      description = "Enable node level permissions via smart contract (default: ${DEFAULT-VALUE})")
+  private final Boolean permissionsNodesContractEnabled = false;
 
   @Option(
       names = {"--privacy-enabled"},
@@ -551,7 +563,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.addSubcommand(
         RLPSubCommand.COMMAND_NAME, new RLPSubCommand(resultHandler.out(), in));
 
-    commandLine.registerConverter(Address.class, Address::fromHexString);
+    commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
@@ -602,21 +614,25 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
 
-    if (permissionsConfigFile() != null) {
-      if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
-        logger.warn(
-            "Permissions config file set {} but no permissions enabled", permissionsConfigFile());
-      }
-    }
-
     final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
     try {
       final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
       final WebSocketConfiguration webSocketConfiguration = webSocketConfiguration();
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration =
+      final Optional<PermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
-      permissioningConfiguration.ifPresent(
-          p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
+
+      final Collection<EnodeURL> staticNodes = loadStaticNodes();
+
+      permissioningConfiguration
+          .flatMap(PermissioningConfiguration::getLocalConfig)
+          .ifPresent(p -> ensureAllNodesAreInWhitelist(ethNetworkConfig.getBootNodes(), p));
+
+      permissioningConfiguration
+          .flatMap(PermissioningConfiguration::getLocalConfig)
+          .ifPresent(
+              p ->
+                  ensureAllNodesAreInWhitelist(
+                      staticNodes.stream().map(EnodeURL::toURI).collect(Collectors.toList()), p));
 
       synchronize(
           buildController(),
@@ -629,7 +645,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           jsonRpcConfiguration,
           webSocketConfiguration,
           metricsConfiguration(),
-          permissioningConfiguration);
+          permissioningConfiguration,
+          staticNodes);
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
@@ -640,12 +657,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return network == null ? MAINNET : network;
   }
 
-  private void ensureAllBootnodesAreInWhitelist(
-      final EthNetworkConfig ethNetworkConfig,
+  private void ensureAllNodesAreInWhitelist(
+      final Collection<URI> enodeAddresses,
       final LocalPermissioningConfiguration permissioningConfiguration) {
     try {
-      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-          ethNetworkConfig, permissioningConfiguration);
+      PermissioningConfigurationValidator.areAllNodesAreInWhitelist(
+          enodeAddresses, permissioningConfiguration);
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage());
     }
@@ -670,15 +687,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } catch (final IOException e) {
       throw new ExecutionException(this.commandLine, "Invalid path", e);
     }
-  }
-
-  private String getPermissionsConfigFile() {
-
-    return permissionsConfigFile() != null
-        ? permissionsConfigFile()
-        : dataDir().toAbsolutePath()
-            + System.getProperty("file.separator")
-            + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
@@ -708,7 +716,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setHost(rpcHttpHost);
     jsonRpcConfiguration.setPort(rpcHttpPort);
     jsonRpcConfiguration.setCorsAllowedDomains(rpcHttpCorsAllowedOrigins);
-    jsonRpcConfiguration.setRpcApis(rpcHttpApis);
+    jsonRpcConfiguration.setRpcApis(rpcHttpApis.stream().distinct().collect(Collectors.toList()));
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     jsonRpcConfiguration.setAuthenticationEnabled(isRpcHttpAuthenticationEnabled);
     jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile());
@@ -787,9 +795,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsConfiguration;
   }
 
-  private Optional<LocalPermissioningConfiguration> permissioningConfiguration() throws Exception {
+  private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
+    Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
+    Optional<SmartContractPermissioningConfiguration>
+        smartContractPermissioningConfigurationOptional;
 
-    if (!permissionsAccountsEnabled && !permissionsNodesEnabled) {
+    if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
         logger.warn(
             "Permissions are disabled. Cannot enable PERM APIs when not using Permissions.");
@@ -797,10 +808,70 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Optional.empty();
     }
 
-    final LocalPermissioningConfiguration permissioningConfiguration =
-        PermissioningConfigurationBuilder.permissioningConfiguration(
-            getPermissionsConfigFile(), permissionsNodesEnabled, permissionsAccountsEnabled);
+    if (localPermissionsEnabled()) {
+      final Optional<String> nodePermissioningConfigFile =
+          Optional.ofNullable(nodePermissionsConfigFile());
+      final Optional<String> accountPermissioningConfigFile =
+          Optional.ofNullable(accountsPermissionsConfigFile());
+
+      final LocalPermissioningConfiguration localPermissioningConfiguration =
+          PermissioningConfigurationBuilder.permissioningConfiguration(
+              permissionsNodesEnabled,
+              nodePermissioningConfigFile.orElse(getDefaultPermissioningFilePath()),
+              permissionsAccountsEnabled,
+              accountPermissioningConfigFile.orElse(getDefaultPermissioningFilePath()));
+
+      localPermissioningConfigurationOptional = Optional.of(localPermissioningConfiguration);
+    } else {
+      if (nodePermissionsConfigFile() != null && !permissionsNodesEnabled) {
+        logger.warn(
+            "Node permissioning config file set {} but no permissions enabled",
+            nodePermissionsConfigFile());
+      }
+
+      if (accountsPermissionsConfigFile() != null && !permissionsAccountsEnabled) {
+        logger.warn(
+            "Account permissioning config file set {} but no permissions enabled",
+            accountsPermissionsConfigFile());
+      }
+      localPermissioningConfigurationOptional = Optional.empty();
+    }
+
+    if (contractPermissionsEnabled()) {
+      if (permissionsNodesContractAddress == null) {
+        throw new ParameterException(
+            this.commandLine,
+            "No contract address specified. Cannot enable contract based permissions.");
+      }
+      final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+          PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
+              permissionsNodesContractAddress, permissionsNodesContractEnabled);
+      smartContractPermissioningConfigurationOptional =
+          Optional.of(smartContractPermissioningConfiguration);
+    } else {
+      if (permissionsNodesContractAddress != null) {
+        logger.warn(
+            "Smart contract address set {} but no contract permissions enabled",
+            permissionsNodesContractAddress);
+      }
+      smartContractPermissioningConfigurationOptional = Optional.empty();
+    }
+
+    final PermissioningConfiguration permissioningConfiguration =
+        new PermissioningConfiguration(
+            localPermissioningConfigurationOptional,
+            smartContractPermissioningConfigurationOptional);
+
     return Optional.of(permissioningConfiguration);
+  }
+
+  private boolean localPermissionsEnabled() {
+    return permissionsAccountsEnabled || permissionsNodesEnabled;
+  }
+
+  private boolean contractPermissionsEnabled() {
+    // TODO add permissionsAccountsContractEnabled
+    return permissionsNodesContractEnabled;
   }
 
   private PrivacyParameters privacyParameters() throws IOException {
@@ -818,7 +889,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParameters.setEnabled(true);
       privacyParameters.setUrl(privacyUrl.toString());
       if (privacyPublicKeyFile() != null) {
-        privacyParameters.setPublicKeyUsingFile(privacyPublicKeyFile());
+        privacyParameters.setEnclavePublicKeyUsingFile(privacyPublicKeyFile());
       } else {
         throw new ParameterException(
             commandLine, "Please specify Enclave public key file path to enable privacy");
@@ -831,7 +902,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private SynchronizerConfiguration buildSyncConfig() {
     synchronizerConfigurationBuilder.syncMode(syncMode);
-    synchronizerConfigurationBuilder.maxTrailingPeers(MAX_TRAILING_PEERS);
     return synchronizerConfigurationBuilder.build();
   }
 
@@ -847,7 +917,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration) {
+      final Optional<PermissioningConfiguration> permissioningConfiguration,
+      final Collection<EnodeURL> staticNodes) {
 
     checkNotNull(runnerBuilder);
 
@@ -869,6 +940,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem.get())
             .metricsConfiguration(metricsConfiguration)
+            .staticNodes(staticNodes)
             .build();
 
     addShutdownHook(runner);
@@ -1061,18 +1133,31 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return filename;
   }
 
-  private String permissionsConfigFile() {
+  private String nodePermissionsConfigFile() {
+    return permissionsConfigFile(standaloneCommands.nodePermissionsConfigFile);
+  }
+
+  private String accountsPermissionsConfigFile() {
+    return permissionsConfigFile(standaloneCommands.accountPermissionsConfigFile);
+  }
+
+  private String permissionsConfigFile(final String permissioningFilename) {
     String filename = null;
     if (isFullInstantiation()) {
-      filename = standaloneCommands.permissionsConfigFile;
+      filename = permissioningFilename;
     } else if (isDocker) {
       final File file = new File(DOCKER_PERMISSIONS_CONFIG_FILE_LOCATION);
       if (file.exists()) {
         filename = file.getAbsolutePath();
       }
     }
-
     return filename;
+  }
+
+  private String getDefaultPermissioningFilePath() {
+    return dataDir().toAbsolutePath()
+        + System.getProperty("file.separator")
+        + DefaultCommandValues.PERMISSIONING_CONFIG_LOCATION;
   }
 
   private boolean isFullInstantiation() {
@@ -1085,5 +1170,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public PantheonExceptionHandler exceptionHandler() {
     return exceptionHandlerSupplier.get();
+  }
+
+  private Set<EnodeURL> loadStaticNodes() throws IOException {
+    final String staticNodesFilname = "static-nodes.json";
+    final Path staticNodesPath = dataDir().resolve(staticNodesFilname);
+
+    return StaticNodesParser.fromPath(staticNodesPath);
   }
 }

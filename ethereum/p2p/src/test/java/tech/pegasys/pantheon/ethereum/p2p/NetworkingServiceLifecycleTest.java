@@ -55,9 +55,9 @@ public class NetworkingServiceLifecycleTest {
             keyPair,
             config,
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       service.start();
       final int udpPort = service.getAdvertisedPeer().get().getEndpoint().getUdpPort();
@@ -85,9 +85,9 @@ public class NetworkingServiceLifecycleTest {
             keyPair,
             config,
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       Assertions.fail("Expected Exception");
     }
@@ -105,9 +105,9 @@ public class NetworkingServiceLifecycleTest {
             keyPair,
             config,
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       Assertions.fail("Expected Exception");
     }
@@ -125,9 +125,9 @@ public class NetworkingServiceLifecycleTest {
             keyPair,
             config,
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       Assertions.fail("Expected Exception");
     }
@@ -141,9 +141,9 @@ public class NetworkingServiceLifecycleTest {
             null,
             configWithRandomPorts(),
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       Assertions.fail("Expected Exception");
     }
@@ -158,9 +158,9 @@ public class NetworkingServiceLifecycleTest {
             keyPair,
             configWithRandomPorts(),
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       service.start();
       service.stop();
@@ -177,9 +177,9 @@ public class NetworkingServiceLifecycleTest {
                 keyPair,
                 configWithRandomPorts(),
                 emptyList(),
-                () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty());
         final NettyP2PNetwork service2 =
             new NettyP2PNetwork(
@@ -187,9 +187,9 @@ public class NetworkingServiceLifecycleTest {
                 keyPair,
                 configWithRandomPorts(),
                 emptyList(),
-                () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
+                Optional.empty(),
                 Optional.empty())) {
       service1.start();
       service1.stop();
@@ -207,9 +207,9 @@ public class NetworkingServiceLifecycleTest {
             keyPair,
             configWithRandomPorts(),
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       service1.start();
       final NetworkingConfiguration config = configWithRandomPorts();
@@ -222,9 +222,9 @@ public class NetworkingServiceLifecycleTest {
               keyPair,
               config,
               emptyList(),
-              () -> true,
               new PeerBlacklist(),
               new NoOpMetricsSystem(),
+              Optional.empty(),
               Optional.empty())) {
         try {
           service2.start();
@@ -252,9 +252,9 @@ public class NetworkingServiceLifecycleTest {
             keyPair,
             configWithRandomPorts(),
             emptyList(),
-            () -> true,
             new PeerBlacklist(),
             new NoOpMetricsSystem(),
+            Optional.empty(),
             Optional.empty())) {
       assertTrue(agent.getDiscoveryPeers().isEmpty());
       assertEquals(0, agent.getPeers().size());
