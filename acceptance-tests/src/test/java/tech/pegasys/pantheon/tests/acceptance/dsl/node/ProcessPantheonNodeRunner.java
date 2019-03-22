@@ -87,7 +87,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       params.add("--privacy-url");
       params.add(node.getPrivacyParameters().getUrl());
       params.add("--privacy-public-key-file");
-      params.add(node.getPrivacyParameters().getPublicKeyFile().getAbsolutePath());
+      params.add(node.getPrivacyParameters().getEnclavePublicKeyFile().getAbsolutePath());
       params.add("--privacy-precompiled-address");
       params.add(String.valueOf(node.getPrivacyParameters().getPrivacyAddress()));
     }
@@ -150,14 +150,18 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
         .ifPresent(
             permissioningConfiguration -> {
               if (permissioningConfiguration.isNodeWhitelistEnabled()) {
-                params.add("--permissions-nodes-enabled");
+                params.add("--permissions-nodes-config-file-enabled");
+              }
+              if (permissioningConfiguration.getNodePermissioningConfigFilePath() != null) {
+                params.add("--permissions-nodes-config-file");
+                params.add(permissioningConfiguration.getNodePermissioningConfigFilePath());
               }
               if (permissioningConfiguration.isAccountWhitelistEnabled()) {
-                params.add("--permissions-accounts-enabled");
+                params.add("--permissions-accounts-config-file-enabled");
               }
-              if (permissioningConfiguration.getConfigurationFilePath() != null) {
-                params.add("--permissions-config-file");
-                params.add(permissioningConfiguration.getConfigurationFilePath());
+              if (permissioningConfiguration.getAccountPermissioningConfigFilePath() != null) {
+                params.add("--permissions-accounts-config-file");
+                params.add(permissioningConfiguration.getAccountPermissioningConfigFilePath());
               }
             });
 

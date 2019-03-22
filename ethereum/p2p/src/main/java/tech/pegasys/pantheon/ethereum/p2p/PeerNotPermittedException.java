@@ -10,23 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.pipeline;
+package tech.pegasys.pantheon.ethereum.p2p;
 
-import java.util.List;
-
-class BatchingProcessor<T> implements Processor<T, List<T>> {
-
-  private final int maximumBatchSize;
-
-  public BatchingProcessor(final int maximumBatchSize) {
-    this.maximumBatchSize = maximumBatchSize;
+public class PeerNotPermittedException extends RuntimeException {
+  public PeerNotPermittedException(final String message) {
+    super(message);
   }
 
-  @Override
-  public void processNextInput(final ReadPipe<T> inputPipe, final WritePipe<List<T>> outputPipe) {
-    final List<T> batch = inputPipe.getBatch(maximumBatchSize);
-    if (!batch.isEmpty()) {
-      outputPipe.put(batch);
-    }
+  public PeerNotPermittedException() {
+    super("Cannot add a peer that is not permitted");
   }
 }

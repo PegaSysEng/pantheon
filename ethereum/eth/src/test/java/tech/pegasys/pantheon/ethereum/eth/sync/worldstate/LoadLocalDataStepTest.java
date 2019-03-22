@@ -40,7 +40,8 @@ public class LoadLocalDataStepTest {
   private final CodeNodeDataRequest request = NodeDataRequest.createCodeRequest(HASH);
   private final Task<NodeDataRequest> task = new StubTask(request);
 
-  private final Pipe<Task<NodeDataRequest>> completedTasks = new Pipe<>(10, NO_OP_COUNTER);
+  private final Pipe<Task<NodeDataRequest>> completedTasks =
+      new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
   private final LoadLocalDataStep loadLocalDataStep =
       new LoadLocalDataStep(worldStateStorage, new NoOpMetricsSystem());
 
@@ -55,7 +56,7 @@ public class LoadLocalDataStepTest {
 
   @Test
   public void shouldReturnEmptyStreamAndSendTaskToCompletedPipeWhenDataIsPresent() {
-    when(worldStateStorage.getNodeData(HASH)).thenReturn(Optional.of(DATA));
+    when(worldStateStorage.getCode(HASH)).thenReturn(Optional.of(DATA));
 
     final Stream<Task<NodeDataRequest>> output =
         loadLocalDataStep.loadLocalData(task, completedTasks);

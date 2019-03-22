@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminAddPeer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminNodeInfo;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminPeers;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.AdminRemovePeer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugMetrics;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugStorageRangeAt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.DebugTraceTransaction;
@@ -63,11 +64,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSendRawTransac
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSyncing;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthUninstallFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetEnode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetListening;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetPeerCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.RpcModules;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.TxPoolPendingTransactions;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.TxPoolPantheonTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3Sha3;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.miner.MinerSetCoinbase;
@@ -92,6 +94,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -124,6 +127,7 @@ public class JsonRpcMethodsFactory {
       final Collection<RpcApi> rpcApis,
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountsWhitelistController,
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
@@ -141,6 +145,7 @@ public class JsonRpcMethodsFactory {
         metricsSystem,
         supportedCapabilities,
         accountsWhitelistController,
+        nodeWhitelistController,
         rpcApis,
         privacyParameters);
   }
@@ -159,6 +164,7 @@ public class JsonRpcMethodsFactory {
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
       final Optional<AccountWhitelistController> accountsWhitelistController,
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final Collection<RpcApi> rpcApis,
       final PrivacyParameters privacyParameters) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
@@ -237,7 +243,8 @@ public class JsonRpcMethodsFactory {
           enabledMethods,
           new NetVersion(protocolSchedule.getChainId()),
           new NetListening(p2pNetwork),
-          new NetPeerCount(p2pNetwork));
+          new NetPeerCount(p2pNetwork),
+          new NetEnode(p2pNetwork));
     }
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());
@@ -249,25 +256,28 @@ public class JsonRpcMethodsFactory {
           new MinerStart(miningCoordinator),
           new MinerStop(miningCoordinator),
           minerSetCoinbase,
-          new MinerSetEtherbase(minerSetCoinbase),
-          new TxPoolPendingTransactions(transactionPool.getPendingTransactions()));
+          new MinerSetEtherbase(minerSetCoinbase));
+    }
+    if (rpcApis.contains(RpcApis.TX_POOL)) {
+      addMethods(
+          enabledMethods, new TxPoolPantheonTransactions(transactionPool.getPendingTransactions()));
     }
     if (rpcApis.contains(RpcApis.PERM)) {
       addMethods(
           enabledMethods,
-          new PermAddNodesToWhitelist(p2pNetwork, parameter),
-          new PermRemoveNodesFromWhitelist(p2pNetwork, parameter),
-          new PermGetNodesWhitelist(p2pNetwork),
+          new PermAddNodesToWhitelist(nodeWhitelistController, parameter),
+          new PermRemoveNodesFromWhitelist(nodeWhitelistController, parameter),
+          new PermGetNodesWhitelist(nodeWhitelistController),
           new PermGetAccountsWhitelist(accountsWhitelistController),
           new PermAddAccountsToWhitelist(accountsWhitelistController, parameter),
           new PermRemoveAccountsFromWhitelist(accountsWhitelistController, parameter),
-          new PermReloadPermissionsFromFile(
-              accountsWhitelistController, p2pNetwork.getNodeWhitelistController()));
+          new PermReloadPermissionsFromFile(accountsWhitelistController, nodeWhitelistController));
     }
     if (rpcApis.contains(RpcApis.ADMIN)) {
       addMethods(
           enabledMethods,
           new AdminAddPeer(p2pNetwork, parameter),
+          new AdminRemovePeer(p2pNetwork, parameter),
           new AdminNodeInfo(
               clientVersion, networkId, genesisConfigOptions, p2pNetwork, blockchainQueries),
           new AdminPeers(p2pNetwork));

@@ -45,10 +45,10 @@ public class LocalPermissioningConfigurationValidatorTest {
 
     LocalPermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            toml.toAbsolutePath().toString(), true, true);
+            true, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
 
-    PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-        ethNetworkConfig, permissioningConfiguration);
+    PermissioningConfigurationValidator.areAllNodesAreInWhitelist(
+        ethNetworkConfig.getBootNodes(), permissioningConfiguration);
   }
 
   @Test
@@ -63,14 +63,14 @@ public class LocalPermissioningConfigurationValidatorTest {
 
     LocalPermissioningConfiguration permissioningConfiguration =
         PermissioningConfigurationBuilder.permissioningConfiguration(
-            toml.toAbsolutePath().toString(), true, true);
+            true, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
 
     try {
-      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-          ethNetworkConfig, permissioningConfiguration);
+      PermissioningConfigurationValidator.areAllNodesAreInWhitelist(
+          ethNetworkConfig.getBootNodes(), permissioningConfiguration);
       fail("expected exception because ropsten bootnodes are not in node-whitelist");
     } catch (Exception e) {
-      assertThat(e.getMessage()).startsWith("Bootnode(s) not in nodes-whitelist");
+      assertThat(e.getMessage()).startsWith("Specified node(s) not in nodes-whitelist");
       assertThat(e.getMessage())
           .contains(
               "enode://6332792c4a00e3e4ee0926ed89e0d27ef985424d97b6a45bf0f23e51f0dcb5e66b875777506458aea7af6f9e4ffb69f43f3778ee73c81ed9d34c51c4b16b0b0f@52.232.243.152:30303");

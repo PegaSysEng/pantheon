@@ -18,6 +18,10 @@ public class SmartContractPermissioningConfiguration {
   private boolean smartContractNodeWhitelistEnabled;
   private Address smartContractAddress;
 
+  public static SmartContractPermissioningConfiguration createDefault() {
+    return new SmartContractPermissioningConfiguration();
+  }
+
   public boolean isSmartContractNodeWhitelistEnabled() {
     return smartContractNodeWhitelistEnabled;
   }
