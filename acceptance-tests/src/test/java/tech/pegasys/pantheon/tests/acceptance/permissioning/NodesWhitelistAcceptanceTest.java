@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.permissioning;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
@@ -75,7 +74,7 @@ public class NodesWhitelistAcceptanceTest extends AcceptanceTestBase {
     permissionedNode.verify(perm.addNodesToWhitelist(forbiddenNode));
     permissionedNode.verify(perm.getNodesWhitelist(3));
 
-    permissionedNode.verify(admin.addPeer(((RunnableNode) forbiddenNode).enodeUrl()));
+    permissionedNode.verify(admin.addPeer(forbiddenNode));
     permissionedNode.verify(net.awaitPeerCount(3));
   }
 
