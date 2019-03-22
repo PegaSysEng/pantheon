@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.p2p;
+package tech.pegasys.pantheon.ethereum.p2p.netty;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,12 +33,14 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.netty.NettyP2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.netty.exceptions.IncompatiblePeerException;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
@@ -118,7 +120,6 @@ public final class NettyP2PNetworkTest {
                     .setSupportedProtocols(subProtocol())
                     .setRlpx(RlpxConfiguration.create().setBindPort(0)),
                 singletonList(cap),
-                () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -132,7 +133,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0))
                     .setDiscovery(noDiscovery),
                 singletonList(cap),
-                () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -174,7 +174,6 @@ public final class NettyP2PNetworkTest {
                     .setDiscovery(noDiscovery)
                     .setRlpx(RlpxConfiguration.create().setBindPort(0)),
                 capabilities,
-                () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -188,7 +187,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0))
                     .setDiscovery(noDiscovery),
                 capabilities,
-                () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -245,7 +243,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0).setMaxPeers(maxPeers))
                     .setSupportedProtocols(subProtocol),
                 cap,
-                () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -259,7 +256,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0))
                     .setSupportedProtocols(subProtocol),
                 cap,
-                () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -273,7 +269,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0))
                     .setSupportedProtocols(subProtocol),
                 cap,
-                () -> true,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -329,7 +324,6 @@ public final class NettyP2PNetworkTest {
                     .setSupportedProtocols(subprotocol1)
                     .setRlpx(RlpxConfiguration.create().setBindPort(0)),
                 singletonList(cap1),
-                () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -343,7 +337,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0))
                     .setDiscovery(noDiscovery),
                 singletonList(cap2),
-                () -> false,
                 new PeerBlacklist(),
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -386,7 +379,6 @@ public final class NettyP2PNetworkTest {
                     .setSupportedProtocols(subprotocol)
                     .setRlpx(RlpxConfiguration.create().setBindPort(0)),
                 singletonList(cap),
-                () -> false,
                 localBlacklist,
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -400,7 +392,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0))
                     .setDiscovery(noDiscovery),
                 singletonList(cap),
-                () -> false,
                 remoteBlacklist,
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -481,7 +472,6 @@ public final class NettyP2PNetworkTest {
                     .setSupportedProtocols(subprotocol)
                     .setRlpx(RlpxConfiguration.create().setBindPort(0)),
                 singletonList(cap),
-                () -> false,
                 localBlacklist,
                 new NoOpMetricsSystem(),
                 Optional.of(localWhitelistController),
@@ -496,7 +486,6 @@ public final class NettyP2PNetworkTest {
                     .setRlpx(RlpxConfiguration.create().setBindPort(0))
                     .setDiscovery(noDiscovery),
                 singletonList(cap),
-                () -> false,
                 remoteBlacklist,
                 new NoOpMetricsSystem(),
                 Optional.empty(),
@@ -798,6 +787,37 @@ public final class NettyP2PNetworkTest {
     verify(peerConnection).disconnect(DisconnectReason.REQUESTED);
   }
 
+  @Test
+  public void beforeStartingNetworkEnodeURLShouldNotBePresent() {
+    final NettyP2PNetwork nettyP2PNetwork = mockNettyP2PNetwork();
+
+    assertThat(nettyP2PNetwork.getSelfEnodeURL()).isNotPresent();
+  }
+
+  @Test
+  public void afterStartingNetworkEnodeURLShouldBePresent() {
+    final NettyP2PNetwork nettyP2PNetwork = mockNettyP2PNetwork();
+    nettyP2PNetwork.start();
+
+    assertThat(nettyP2PNetwork.getSelfEnodeURL()).isPresent();
+  }
+
+  @Test
+  public void handlePeerBondedEvent_forPeerWithNoTcpPort() {
+    final NettyP2PNetwork network = spy(mockNettyP2PNetwork());
+    DiscoveryPeer peer =
+        new DiscoveryPeer(generatePeerId(0), "127.0.0.1", 999, OptionalInt.empty());
+    PeerBondedEvent peerBondedEvent = new PeerBondedEvent(peer, System.currentTimeMillis());
+
+    network.handlePeerBondedEvent().accept(peerBondedEvent);
+    verify(network, times(1)).connect(peer);
+  }
+
+  private BytesValue generatePeerId(final int seed) {
+    BlockDataGenerator gen = new BlockDataGenerator(seed);
+    return gen.bytesValue(DefaultPeer.PEER_ID_SIZE);
+  }
+
   private BlockAddedEvent blockAddedEvent() {
     return mock(BlockAddedEvent.class);
   }
@@ -852,7 +872,6 @@ public final class NettyP2PNetworkTest {
         keyPair,
         networkingConfiguration,
         singletonList(cap),
-        () -> false,
         new PeerBlacklist(),
         new NoOpMetricsSystem(),
         Optional.empty(),
