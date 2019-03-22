@@ -15,16 +15,36 @@ the maximum number of peers. The default is 25.
 
 The [`--discovery-enabled`](../../Reference/Pantheon-CLI-Syntax.md#discovery-enabled) command line option 
 can be used to disable P2P peer discovery.
-Set this option to `false` if you are running a test node or a network with fixed nodes.
-
-Use the [`admin_addPeer`](../../Reference/JSON-RPC-API-Methods.md#admin_addpeer) JSON-RPC method to add peers
-or configure [static nodes](#static-nodes) when [`--discovery-enabled`](../../Reference/Pantheon-CLI-Syntax.md#discovery-enabled) 
-is set to false. 
+Set this option to `false` if you are running a test node or a network with [static nodes](#static-nodes).
 
 ## Static Nodes
 
-Use a `static-nodes.json` file to configure static nodes. The node connects to the listed nodes on startup.
-If a connection to a static node goes down, the node attempts to reconnect every 60 seconds. 
+Static nodes are configured nodes that remain connected rather than nodes connected through P2P discovery. 
+Static nodes attempt to maintain connectivity. If a connection goes down to a static node, 
+the node attempts to reconnect every 60 seconds.
+
+To configure a network of static nodes: 
+
+1. List [enode URLs](../Node-Keys.md#enode-url) of the nodes in the [`static-nodes.json` file](#static-nodesjson-file).
+
+1. Save the `static-nodes.json` file in the data directory of each node. 
+
+1. Start Pantheon with discovery disabled using [`--discovery-enabled=false`](../../Reference/Pantheon-CLI-Syntax.md#discovery-enabled).   
+
+To update the static peers, use the [`admin_addPeer`](../../Reference/JSON-RPC-API-Methods.md#admin_addpeer) 
+and [`admin_removePeer`](../../Reference/JSON-RPC-API-Methods.md#admin_removepeer) JSON-RPC API methods. 
+
+!!! note
+    Updates to static nodes are not persisted through node restarts. The `static-nodes.json` file
+    is not updated by `admin_addPeer` and `admin_removePeer` methods. 
+    
+    Nodes outside of the static nodes are not prevented from connecting.  To prevent nodes from connecting,
+    use [Permissioning](../../Permissions/Permissioning.md). 
+    
+!!! caution 
+    If connections are timing out, ensure the node ID in the [enode URL](../Node-Keys.md#enode-url) is correct. 
+
+### static-nodes.json File
 
 The `static-nodes.json` file must be located in the data directory (specified by [`--data-path`](../../Reference/Pantheon-CLI-Syntax.md#data-path))
 and contain a JSON array of [enode URLs](../Node-Keys.md#enode-url).
@@ -38,10 +58,7 @@ and contain a JSON array of [enode URLs](../Node-Keys.md#enode-url).
     ``` 
 
 !!! note
-    Each node has a `static-nodes.json` file. Ensure each node in the network has the same `static-nodes.json` file. 
-
-Nodes added by [`admin_addPeer`](../../Reference/JSON-RPC-API-Methods.md#admin_addpeer) are not added to the 
-`static-nodes.json` file.
+    Each node has a `static-nodes.json` file. We recommend each node in the network has the same `static-nodes.json` file. 
 
 ## Monitoring Peer Connections
 
