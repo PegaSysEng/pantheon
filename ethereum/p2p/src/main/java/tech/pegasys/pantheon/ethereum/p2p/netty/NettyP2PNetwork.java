@@ -371,7 +371,7 @@ public class NettyP2PNetwork implements P2PNetwork {
       throw new PeerNotPermittedException();
     }
 
-    if (peer.getId().equals(this.getLocalPeerInfo().getNodeId())) {
+    if (peer.getId().equals(ourPeerInfo.getNodeId())) {
       throw new ConnectingToLocalNodeException();
     }
 
