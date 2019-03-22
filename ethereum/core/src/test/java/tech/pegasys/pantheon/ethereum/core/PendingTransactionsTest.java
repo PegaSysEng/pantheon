@@ -39,6 +39,8 @@ public class PendingTransactionsTest {
   private final Transaction transaction2 = createTransaction(1);
 
   private final PendingTransactionListener listener = mock(PendingTransactionListener.class);
+  private final PendingTransactionDroppedListener droppedListener =
+      mock(PendingTransactionDroppedListener.class);
   private static final Address SENDER1 = Util.publicKeyToAddress(KEYS1.getPublicKey());
   private static final Address SENDER2 = Util.publicKeyToAddress(KEYS2.getPublicKey());
 
@@ -131,6 +133,39 @@ public class PendingTransactionsTest {
     transactions.addLocalTransaction(transaction1);
 
     verify(listener).onTransactionAdded(transaction1);
+  }
+
+  @Test
+  public void shouldNotifyDroppedListenerWhenRemoteTransactionDropped() {
+    transactions.addRemoteTransaction(transaction1);
+
+    transactions.addTransactionDroppedListener(droppedListener);
+
+    transactions.removeTransaction(transaction1);
+
+    verify(droppedListener).onTransactionDropped(transaction1);
+  }
+
+  @Test
+  public void shouldNotifyDroppedListenerWhenLocalTransactionDropped() {
+    transactions.addLocalTransaction(transaction1);
+
+    transactions.addTransactionDroppedListener(droppedListener);
+
+    transactions.removeTransaction(transaction1);
+
+    verify(droppedListener).onTransactionDropped(transaction1);
+  }
+
+  @Test
+  public void shouldNotNotifyDroppedListenerWhenTransactionAddedToBlock() {
+    transactions.addRemoteTransaction(transaction1);
+
+    transactions.addTransactionDroppedListener(droppedListener);
+
+    transactions.transactionAddedToBlock(transaction1);
+
+    verifyZeroInteractions(droppedListener);
   }
 
   @Test

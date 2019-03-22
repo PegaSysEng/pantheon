@@ -54,6 +54,9 @@ public class PendingTransactions {
   private final Collection<PendingTransactionListener> listeners =
       newSetFromMap(new ConcurrentHashMap<>());
 
+  private final Collection<PendingTransactionDroppedListener> transactionDroppedListeners =
+      newSetFromMap(new ConcurrentHashMap<>());
+
   private final int maxPendingTransactions;
   private final Clock clock;
 
@@ -73,6 +76,15 @@ public class PendingTransactions {
   }
 
   public void removeTransaction(final Transaction transaction) {
+    doRemoveTransaction(transaction);
+    notifyTransactionDropped(transaction);
+  }
+
+  public void transactionAddedToBlock(final Transaction transaction) {
+    doRemoveTransaction(transaction);
+  }
+
+  private void doRemoveTransaction(final Transaction transaction) {
     synchronized (pendingTransactions) {
       final TransactionInfo removedTransactionInfo = pendingTransactions.remove(transaction.hash());
       if (removedTransactionInfo != null) {
@@ -179,6 +191,10 @@ public class PendingTransactions {
     listeners.forEach(listener -> listener.onTransactionAdded(transaction));
   }
 
+  private void notifyTransactionDropped(final Transaction transaction) {
+    transactionDroppedListeners.forEach(listener -> listener.onTransactionDropped(transaction));
+  }
+
   public int size() {
     synchronized (pendingTransactions) {
       return pendingTransactions.size();
@@ -200,6 +216,10 @@ public class PendingTransactions {
 
   public void addTransactionListener(final PendingTransactionListener listener) {
     listeners.add(listener);
+  }
+
+  public void addTransactionDroppedListener(final PendingTransactionDroppedListener listener) {
+    transactionDroppedListeners.add(listener);
   }
 
   public OptionalLong getNextNonceForSender(final Address sender) {
