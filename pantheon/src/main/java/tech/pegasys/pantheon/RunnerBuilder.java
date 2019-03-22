@@ -40,6 +40,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.logs.LogsSu
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.pending.PendingTransactionSubscriptionService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscriptionService;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.p2p.ConnectingToLocalNodeException;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
 import tech.pegasys.pantheon.ethereum.p2p.NoopP2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -71,6 +72,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,7 +99,7 @@ public class RunnerBuilder {
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
   private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
-  private Collection<EnodeURL> staticNodes;
+  private Collection<EnodeURL> staticNodes = Collections.emptyList();
 
   private EnodeURL getSelfEnode() {
     String nodeId = pantheonController.getLocalNodeKeyPair().getPublicKey().toString();
@@ -303,7 +305,10 @@ public class RunnerBuilder {
     staticNodes.forEach(
         enodeURL -> {
           final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
-          peerNetwork.addMaintainConnectionPeer(peer);
+          try {
+            peerNetwork.addMaintainConnectionPeer(peer);
+          } catch (ConnectingToLocalNodeException ex) {
+          }
         });
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
@@ -322,6 +327,7 @@ public class RunnerBuilder {
               jsonRpcConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
+              nodeWhitelistController,
               privacyParameters);
       jsonRpcHttpService =
           Optional.of(
@@ -345,6 +351,7 @@ public class RunnerBuilder {
               webSocketConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
+              nodeWhitelistController,
               privacyParameters);
 
       final SubscriptionManager subscriptionManager =
@@ -419,6 +426,7 @@ public class RunnerBuilder {
       final Collection<RpcApi> jsonRpcApis,
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountWhitelistController,
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
@@ -438,6 +446,7 @@ public class RunnerBuilder {
                 jsonRpcApis,
                 filterManager,
                 accountWhitelistController,
+                nodeWhitelistController,
                 privacyParameters);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;

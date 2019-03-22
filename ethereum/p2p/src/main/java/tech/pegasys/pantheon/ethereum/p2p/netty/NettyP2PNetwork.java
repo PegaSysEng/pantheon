@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.p2p.ConnectingToLocalNodeException;
 import tech.pegasys.pantheon.ethereum.p2p.PeerNotPermittedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.DisconnectCallback;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
@@ -166,7 +167,6 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   private EnodeURL ourEnodeURL;
 
-  private final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController;
   private final Optional<NodePermissioningController> nodePermissioningController;
   private final Optional<Blockchain> blockchain;
   private OptionalLong blockAddedObserverId = OptionalLong.empty();
@@ -302,7 +302,6 @@ public class NettyP2PNetwork implements P2PNetwork {
       throw new RuntimeException("Interrupted before startup completed", e);
     }
 
-    this.nodeWhitelistController = nodeLocalConfigPermissioningController;
     this.nodePermissioningController = nodePermissioningController;
     this.blockchain = Optional.ofNullable(blockchain);
     this.advertisedHost = config.getDiscovery().getAdvertisedHost();
@@ -371,6 +370,11 @@ public class NettyP2PNetwork implements P2PNetwork {
     if (!isPeerAllowed(peer)) {
       throw new PeerNotPermittedException();
     }
+
+    if (peer.getId().equals(ourPeerInfo.getNodeId())) {
+      throw new ConnectingToLocalNodeException();
+    }
+
     final boolean added = peerMaintainConnectionList.add(peer);
     if (added) {
       connect(peer);
@@ -668,11 +672,6 @@ public class NettyP2PNetwork implements P2PNetwork {
   @Override
   public boolean isP2pEnabled() {
     return true;
-  }
-
-  @Override
-  public Optional<NodeLocalConfigPermissioningController> getNodeWhitelistController() {
-    return nodeWhitelistController;
   }
 
   @Override
