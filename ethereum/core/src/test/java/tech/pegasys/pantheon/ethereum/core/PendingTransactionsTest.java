@@ -19,6 +19,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions.TransactionSelectionResult;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
 
 import java.util.ArrayList;
@@ -33,8 +35,10 @@ public class PendingTransactionsTest {
   private static final int MAX_TRANSACTIONS = 5;
   private static final KeyPair KEYS1 = KeyPair.generate();
   private static final KeyPair KEYS2 = KeyPair.generate();
+
+  private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final PendingTransactions transactions =
-      new PendingTransactions(MAX_TRANSACTIONS, TestClock.fixed());
+      new PendingTransactions(MAX_TRANSACTIONS, TestClock.fixed(), metricsSystem);
   private final Transaction transaction1 = createTransaction(2);
   private final Transaction transaction2 = createTransaction(1);
 
