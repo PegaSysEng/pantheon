@@ -145,7 +145,11 @@ Where `mygenesis.json` is your custom configuration file and `path` is the absol
 
 ## Permissions Configuration File 
 
-Specify a permissions configuration file. This is equivalent to specifying the `--permissions-config-file` option.
+Specify a permissions configuration file. This is equivalent to specifying the `--permissions-accounts-config-file` 
+or the `--permissions-accounts-config-file` option.
+
+!!! note 
+    When using Docker, the accounts and nodes permissions must be contained in the same [permissions file](../Permissions/Permissioning.md#permissions-configuration-file). 
 
 To run Pantheon specifying a permissions configuration file: 
 ```bash
