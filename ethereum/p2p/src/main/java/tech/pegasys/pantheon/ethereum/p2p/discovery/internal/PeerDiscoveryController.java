@@ -191,9 +191,6 @@ public class PeerDiscoveryController {
             PEER_REFRESH_ROUND_TIMEOUT_IN_SECONDS,
             100);
 
-    LOG.debug(
-        "PeerDiscoController.start with initial discovery peers {}", initialDiscoveryPeers.size());
-
     if (nodePermissioningController.isPresent()) {
 
       // if smart contract permissioning is enabled, bond with bootnodes
