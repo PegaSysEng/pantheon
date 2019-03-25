@@ -140,11 +140,12 @@ Copy the following permissions configuration to a file called `permissions_confi
 !!! example "permissions_config.toml"
     ```toml 
     accounts-whitelist=["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"]
+   
+    nodes-whitelist=[]
     ```
 The permissions configuration file includes the first two accounts from the genesis file.
 
-!!! note
-    Node permissions will be added using the JSON-RPC API after starting the nodes. 
+Permissioned nodes will be added using the JSON-RPC API after starting the nodes. 
 
 !!! note
     Permissions are specified at the node level. The [`permissions_config.toml`](../Permissions/Permissioning.md#permissions-configuration-file) 
@@ -153,7 +154,7 @@ The permissions configuration file includes the first two accounts from the gene
     On-chain permissioning is under development. On-chain permissioning will use one on-chain 
     nodes whitelist and accounts whitelist. 
 
-### 5. Start First Node as Bootnode 
+### 5. Start First Node 
 
 Start Node-1:
 
@@ -173,7 +174,7 @@ pantheon --data-path=data --genesis-file=..\cliqueGenesis.json --permissions-nod
 The command line specifies: 
 
 * Nodes and accounts permissions are enabled using the [`--permissions-nodes-config-file-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-config-file-enabled)
-and [`--permissions-accounts-config-file-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-config-file-enabled)
+and [`--permissions-accounts-config-file-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-config-file-enabled) options
 * JSON-RPC API is enabled using the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) option
 * ADMIN,ETH,NET,PERM, and CLIQUE APIs are enabled using the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) option
 * All hosts can access the HTTP JSON-RPC API using the [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist) option 
@@ -212,11 +213,11 @@ The enode URL is required to update the permissions configuration file in the fo
 Start another terminal, change to the `Node-3` directory and start Node-3:
 
 ```bash tab="MacOS"
-pantheon --data-path=data --genesis-file=../cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547    
+pantheon --data-path=data --genesis-file=../cliqueGenesis.json --permissions-nodes-config-file-enabled --permissions-accounts-config-file-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=data --genesis-file=..\cliqueGenesis.json --permissions-nodes-enabled --permissions-accounts-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547   
+pantheon --data-path=data --genesis-file=..\cliqueGenesis.json --permissions-nodes-config-file-enabled --permissions-accounts-config-file-enabled --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30305 --rpc-http-port=8547   
 ```
 
 The command line specifies:
@@ -234,6 +235,8 @@ The enode URL is required to update the permissions configuration file in the fo
 In another terminal, use the [`perm_addNodesToWhitelist`](../Reference/JSON-RPC-API-Methods.md#perm_addnodestowhitelist) 
 JSON-RPC API method to add the nodes to the permissions configuration file for each node. 
 
+Replace `<EnodeNode1>`, `<EnodeNode2>`, and `<EnodeNode3>` with the enode URL displayed when starting each node. 
+
 Node-1:
 ```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"perm_addNodesToWhitelist","params":[["<EnodeNode1>","<EnodeNode2>","<EnodeNode3>"]], "id":1}' http://127.0.0.1:8545
@@ -249,10 +252,15 @@ Node 3:
 curl -X POST --data '{"jsonrpc":"2.0","method":"perm_addNodesToWhitelist","params":[["<EnodeNode1>","<EnodeNode2>","<EnodeNode3>"]], "id":1}' http://127.0.0.1:8547
 ```
 
+!!! tip
+    The curl call is the same for each node except for the JSON-RPC endpoint. 
+
 ### 9. Add Node-1 as a Peer
 
 Use the [`admin_addPeer`](../Reference/JSON-RPC-API-Methods.md#admin_addpeer) JSON-RPC API method to add 
 Node-1 as a peer for Node-2 and Node-3. 
+
+Replace `<EnodeNode1>` with the enode URL displayed when starting Node-1. 
 
 Node 2: 
 ```bash
@@ -264,11 +272,14 @@ Node 3:
 curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["<EnodeNode1"],"id":1}' http://127.0.0.1:8547
 ```
 
+!!! tip
+    The curl call is the same for both nodes except for the JSON-RPC endpoint. 
+
 ### 10. Confirm Permissioned Network is Working 
 
 #### Check Peer Count 
 
-Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
+Use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
 ```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' localhost:8545
