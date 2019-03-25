@@ -1032,9 +1032,6 @@ public class PeerDiscoveryControllerTest {
     verify(outboundMessageHandler, times(1))
         .send(eq(discoveryPeer), matchPacketOfType(PacketType.PING));
 
-//    verify(outboundMessageHandler, times(1))
-//        .send(eq(discoveryPeer), matchPacketOfType(PacketType.FIND_NEIGHBORS));
-
     // Setup ping to be sent to otherPeer after neighbors packet is received
     keyPairs = PeerDiscoveryTestHelper.generateKeyPairs(1);
     pingPacketData = PingPacketData.create(localEndpoint, notPermittedPeer.getEndpoint());

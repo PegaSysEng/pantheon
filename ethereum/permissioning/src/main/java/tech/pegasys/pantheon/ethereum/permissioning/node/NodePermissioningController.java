@@ -41,12 +41,10 @@ public class NodePermissioningController {
 
     if (syncStatusNodePermissioningProvider.isPresent()
         && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
-      LOG.info("not permitted by sync provider");
       return false;
     } else {
       for (NodePermissioningProvider provider : providers) {
         if (!provider.isPermitted(sourceEnode, destinationEnode)) {
-          LOG.info("not permitted by provider {}", provider);
           return false;
         }
       }
@@ -63,8 +61,8 @@ public class NodePermissioningController {
     }
   }
 
-  @VisibleForTesting
-  Optional<SyncStatusNodePermissioningProvider> getSyncStatusNodePermissioningProvider() {
+
+  public Optional<SyncStatusNodePermissioningProvider> getSyncStatusNodePermissioningProvider() {
     return syncStatusNodePermissioningProvider;
   }
 
