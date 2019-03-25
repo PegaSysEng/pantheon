@@ -1028,8 +1028,12 @@ public class PeerDiscoveryControllerTest {
         MockPacketDataFactory.mockPongPacket(discoveryPeer, discoPeerPing.getHash());
     controller.onMessage(pongFromDiscoPeer, discoveryPeer);
 
+    // since NodePermissioningController is turned on, we get a PING NOT FIND_NEIGHBORS
     verify(outboundMessageHandler, times(1))
-        .send(eq(discoveryPeer), matchPacketOfType(PacketType.FIND_NEIGHBORS));
+        .send(eq(discoveryPeer), matchPacketOfType(PacketType.PING));
+
+//    verify(outboundMessageHandler, times(1))
+//        .send(eq(discoveryPeer), matchPacketOfType(PacketType.FIND_NEIGHBORS));
 
     // Setup ping to be sent to otherPeer after neighbors packet is received
     keyPairs = PeerDiscoveryTestHelper.generateKeyPairs(1);
@@ -1048,7 +1052,7 @@ public class PeerDiscoveryControllerTest {
     controller.onMessage(neighborsPacket, discoveryPeer);
 
     verify(controller, times(0)).bond(notPermittedPeer);
-    verify(controller, times(1)).bond(permittedPeer);
+    verify(controller, times(1)).bond(discoveryPeer);
   }
 
   @Test
