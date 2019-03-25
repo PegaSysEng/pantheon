@@ -563,7 +563,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.addSubcommand(
         RLPSubCommand.COMMAND_NAME, new RLPSubCommand(resultHandler.out(), in));
 
-    commandLine.registerConverter(Address.class, Address::fromHexString);
+    commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
@@ -621,9 +621,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final Optional<PermissioningConfiguration> permissioningConfiguration =
           permissioningConfiguration();
 
+      final Collection<EnodeURL> staticNodes = loadStaticNodes();
+      logger.info("Connecting to {} static nodes.", staticNodes.size());
+      logger.trace("Static Nodes = {}", staticNodes);
+
       permissioningConfiguration
           .flatMap(PermissioningConfiguration::getLocalConfig)
-          .ifPresent(p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
+          .ifPresent(p -> ensureAllNodesAreInWhitelist(ethNetworkConfig.getBootNodes(), p));
+
+      permissioningConfiguration
+          .flatMap(PermissioningConfiguration::getLocalConfig)
+          .ifPresent(
+              p ->
+                  ensureAllNodesAreInWhitelist(
+                      staticNodes.stream().map(EnodeURL::toURI).collect(Collectors.toList()), p));
 
       synchronize(
           buildController(),
@@ -636,7 +647,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           jsonRpcConfiguration,
           webSocketConfiguration,
           metricsConfiguration(),
-          permissioningConfiguration);
+          permissioningConfiguration,
+          staticNodes);
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
@@ -647,12 +659,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return network == null ? MAINNET : network;
   }
 
-  private void ensureAllBootnodesAreInWhitelist(
-      final EthNetworkConfig ethNetworkConfig,
+  private void ensureAllNodesAreInWhitelist(
+      final Collection<URI> enodeAddresses,
       final LocalPermissioningConfiguration permissioningConfiguration) {
     try {
-      PermissioningConfigurationValidator.areAllBootnodesAreInWhitelist(
-          ethNetworkConfig, permissioningConfiguration);
+      PermissioningConfigurationValidator.areAllNodesAreInWhitelist(
+          enodeAddresses, permissioningConfiguration);
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage());
     }
@@ -892,7 +904,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private SynchronizerConfiguration buildSyncConfig() {
     synchronizerConfigurationBuilder.syncMode(syncMode);
-    synchronizerConfigurationBuilder.maxTrailingPeers(MAX_TRAILING_PEERS);
     return synchronizerConfigurationBuilder.build();
   }
 
@@ -908,8 +919,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<PermissioningConfiguration> permissioningConfiguration)
-      throws IOException {
+      final Optional<PermissioningConfiguration> permissioningConfiguration,
+      final Collection<EnodeURL> staticNodes) {
 
     checkNotNull(runnerBuilder);
 
@@ -931,7 +942,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem.get())
             .metricsConfiguration(metricsConfiguration)
-            .staticNodes(loadStaticNodes())
+            .staticNodes(staticNodes)
             .build();
 
     addShutdownHook(runner);

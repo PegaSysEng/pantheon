@@ -50,6 +50,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningCo
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +74,9 @@ import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
 import org.apache.commons.text.StringEscapeUtils;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import picocli.CommandLine;
@@ -337,6 +340,17 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--permissions-nodes-contract-enabled",
         "--permissions-nodes-contract-address",
         "invalid-smart-contract-address");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandErrorOutput.toString()).contains("Invalid value");
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void permissionsEnabledWithTooShortContractAddressMustError() {
+    parseCommand(
+        "--permissions-nodes-contract-enabled", "--permissions-nodes-contract-address", "0x1234");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
@@ -1797,7 +1811,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void miningIsEnabledWhenSpecified() throws Exception {
-    final String coinbaseStr = String.format("%020x", 1);
+    final String coinbaseStr = String.format("%040x", 1);
     parseCommand("--miner-enabled", "--miner-coinbase=" + coinbaseStr);
 
     final ArgumentCaptor<MiningParameters> miningArg =
@@ -2164,5 +2178,41 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString())
         .startsWith("Unknown options: --permissions-config-file, .");
     assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Rule public TemporaryFolder testFolder = new TemporaryFolder();
+
+  @Test
+  public void errorIsRaisedIfStaticNodesAreNotWhitelisted() throws IOException {
+    final File staticNodesFile = testFolder.newFile("static-nodes.json");
+    staticNodesFile.deleteOnExit();
+    final File permissioningConfig = testFolder.newFile("permissioning");
+    permissioningConfig.deleteOnExit();
+
+    final EnodeURL staticNodeURI =
+        new EnodeURL(
+            "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa",
+            "127.0.0.1",
+            30303);
+
+    final EnodeURL whiteListedNode =
+        new EnodeURL(
+            "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa",
+            "127.0.0.1",
+            30304);
+
+    Files.write(
+        staticNodesFile.toPath(), ("[\"" + staticNodeURI.toString() + "\"]").getBytes(UTF_8));
+    Files.write(
+        permissioningConfig.toPath(),
+        ("nodes-whitelist=[\"" + whiteListedNode.toString() + "\"]").getBytes(UTF_8));
+
+    parseCommand(
+        "--data-path=" + testFolder.getRoot().getPath(),
+        "--bootnodes",
+        "--permissions-nodes-config-file-enabled=true",
+        "--permissions-nodes-config-file=" + permissioningConfig.getPath());
+    assertThat(commandErrorOutput.toString())
+        .contains(staticNodeURI.toString(), "not in nodes-whitelist");
   }
 }

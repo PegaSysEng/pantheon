@@ -40,8 +40,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private final SynchronizerConfiguration syncConfig;
-  private final EthContext ethContext;
   private final SyncState syncState;
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final BlockPropagationManager<C> blockPropagationManager;
@@ -58,8 +56,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       final SyncState syncState,
       final Path dataDirectory,
       final MetricsSystem metricsSystem) {
-    this.syncConfig = syncConfig;
-    this.ethContext = ethContext;
     this.syncState = syncState;
 
     this.blockPropagationManager =
@@ -74,7 +70,11 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             new BlockBroadcaster(ethContext));
 
     ChainHeadTracker.trackChainHeadForPeers(
-        ethContext, protocolSchedule, protocolContext.getBlockchain(), syncConfig, metricsSystem);
+        ethContext,
+        protocolSchedule,
+        protocolContext.getBlockchain(),
+        this::calculateTrailingPeerRequirements,
+        metricsSystem);
 
     this.fullSyncDownloader =
         new FullSyncDownloader<>(
@@ -90,6 +90,12 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             ethContext,
             worldStateStorage,
             syncState);
+  }
+
+  private TrailingPeerRequirements calculateTrailingPeerRequirements() {
+    return fastSynchronizer
+        .flatMap(FastSynchronizer::calculateTrailingPeerRequirements)
+        .orElse(TrailingPeerRequirements.UNRESTRICTED);
   }
 
   @Override
@@ -139,13 +145,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       return Optional.empty();
     }
     return Optional.of(syncState.syncStatus());
-  }
-
-  @Override
-  public boolean hasSufficientPeers() {
-    final int requiredPeerCount =
-        fastSynchronizer.isPresent() ? syncConfig.getFastSyncMinimumPeerCount() : 1;
-    return ethContext.getEthPeers().availablePeerCount() >= requiredPeerCount;
   }
 
   @Override

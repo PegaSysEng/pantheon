@@ -52,6 +52,7 @@ nav:
         - Running Pantheon from Docker Image: Getting-Started/Run-Docker-Image.md
     - Tutorials:
         - Private Network Quickstart: Tutorials/Private-Network-Quickstart.md
+        - Private Network Quickstart On Azure: Tutorials/Azure/Azure-Private-Network-Quickstart.md
         - Create a Private Network using Ethash (Pow): Tutorials/Create-Private-Network.md
         - Create a Private Network using Clique (PoA): Tutorials/Create-Private-Clique-Network.md
         - Create a Private Network using IBFT 2.0 (PoA): Tutorials/Create-IBFT-Network.md
@@ -79,14 +80,21 @@ nav:
     - Permissions:
         - Nodes and Accounts Whitelists: Permissions/Permissioning.md
     - Using Pantheon:
+        - Transactions:
+          - Creating and Sending Transactions: Using-Pantheon/Transactions/Transactions.md
+          - Transaction Pool: Using-Pantheon/Transactions/Transaction-Pool.md
         - Events and Logs:
           - Overview: Using-Pantheon/Events-and-Logs.md
           - Accessing Logs Using JSON-RPC API: Using-Pantheon/Accessing-Logs-Using-JSON-RPC.md
-        - Creating and Sending Transactions: Using-Pantheon/Transactions.md
         - Using Wallets for Account Management: Using-Pantheon/Account-Management.md
         - Mining: Using-Pantheon/Mining.md
         - RPC Pub/Sub: Using-Pantheon/RPC-PubSub.md
         - Debugging Pantheon: Using-Pantheon/Debugging.md
+    - Monitoring Pantheon:
+        - EthStats:
+          - Overview: EthStats/Overview.md
+          - Lite Block Explorer: EthStats/Lite-Block-Explorer.md
+          - Lite Network Health Monitor: EthStats/Lite-Network-Health-Monitor.md
     - Reference:
         - Pantheon Command Line: Reference/Pantheon-CLI-Syntax.md
         - JSON-RPC API Methods: Reference/JSON-RPC-API-Methods.md
