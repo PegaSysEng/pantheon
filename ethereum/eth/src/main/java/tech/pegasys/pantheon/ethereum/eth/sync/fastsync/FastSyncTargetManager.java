@@ -68,7 +68,7 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
       return completedFuture(Optional.empty());
     } else {
       final EthPeer bestPeer = maybeBestPeer.get();
-      if (bestPeer.chainState().getEstimatedHeight() < pivotBlockHeader.getNumber()) {
+      if (isCaughtUpWithPeer(bestPeer)) {
         LOG.info("No sync target with sufficient chain height, wait for peers.");
         return completedFuture(Optional.empty());
       } else {
@@ -117,5 +117,10 @@ class FastSyncTargetManager<C> extends SyncTargetManager<C> {
   @Override
   public boolean shouldContinueDownloading() {
     return !protocolContext.getBlockchain().getChainHeadHash().equals(pivotBlockHeader.getHash());
+  }
+
+  @Override
+  public boolean isCaughtUpWithPeer(final EthPeer peer) {
+    return peer.chainState().getEstimatedHeight() < pivotBlockHeader.getNumber();
   }
 }

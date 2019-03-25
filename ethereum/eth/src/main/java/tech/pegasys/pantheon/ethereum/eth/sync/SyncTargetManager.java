@@ -59,10 +59,10 @@ public abstract class SyncTargetManager<C> {
   }
 
   public CompletableFuture<SyncTarget> findSyncTarget() {
-    if (syncState.syncTarget().isPresent() && !syncState.isInSync()) {
-      return CompletableFuture.completedFuture(syncState.syncTarget().get());
-    }
-    return selectNewSyncTarget();
+    return syncState
+        .syncTarget()
+        .map(CompletableFuture::completedFuture) // Return an existing sync target if present
+        .orElseGet(this::selectNewSyncTarget);
   }
 
   private CompletableFuture<SyncTarget> selectNewSyncTarget() {
@@ -144,4 +144,15 @@ public abstract class SyncTargetManager<C> {
   public abstract boolean shouldSwitchSyncTarget(final SyncTarget currentTarget);
 
   public abstract boolean shouldContinueDownloading();
+
+  public abstract boolean isCaughtUpWithPeer(final EthPeer peer);
+
+  public boolean syncTargetCanProvideMoreBlocks() {
+    if (!syncState.syncTarget().isPresent()) {
+      LOG.warn("SyncTarget should be set, but is not.");
+      return false;
+    }
+    final EthPeer currentSyncingPeer = syncState.syncTarget().get().peer();
+    return !isSyncTargetDisconnected() && !isCaughtUpWithPeer(currentSyncingPeer);
+  }
 }
