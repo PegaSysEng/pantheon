@@ -37,15 +37,16 @@ public class PendingTransactionDroppedSubscriptionService
   }
 
   private void notifySubscribers(final Hash pendingTransaction) {
-    final List<Subscription> subscriptions = pendingTransactionSubscriptions();
+    final List<Subscription> subscriptions = pendingDroppedTransactionSubscriptions();
 
+    final PendingTransactionResult msg = new PendingTransactionResult(pendingTransaction);
     for (final Subscription subscription : subscriptions) {
       subscriptionManager.sendMessage(
-          subscription.getId(), new PendingTransactionResult(pendingTransaction));
+          subscription.getId(), msg);
     }
   }
 
-  private List<Subscription> pendingTransactionSubscriptions() {
+  private List<Subscription> pendingDroppedTransactionSubscriptions() {
     return subscriptionManager.subscriptionsOfType(
         SubscriptionType.DROPPED_PENDING_TRANSACTIONS, Subscription.class);
   }

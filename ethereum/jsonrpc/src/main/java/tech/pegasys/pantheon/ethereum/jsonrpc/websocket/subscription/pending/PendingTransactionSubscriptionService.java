@@ -37,9 +37,10 @@ public class PendingTransactionSubscriptionService implements PendingTransaction
   private void notifySubscribers(final Hash pendingTransaction) {
     final List<Subscription> subscriptions = pendingTransactionSubscriptions();
 
+    final PendingTransactionResult msg = new PendingTransactionResult(pendingTransaction);
     for (final Subscription subscription : subscriptions) {
       subscriptionManager.sendMessage(
-          subscription.getId(), new PendingTransactionResult(pendingTransaction));
+          subscription.getId(), msg);
     }
   }
 
