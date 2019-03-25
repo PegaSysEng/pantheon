@@ -190,7 +190,7 @@ Removes a [static node](../Configuring-Pantheon/Networking/Managing-Peers.md#sta
 
 **Returns**
 
-`result` : `boolean` - `true` if peer added or `false` if peer not a [static node]((../Configuring-Pantheon/Networking/Managing-Peers.md#static-nodes)). 
+`result` : `boolean` - `true` if peer removed or `false` if peer not a [static node]((../Configuring-Pantheon/Networking/Managing-Peers.md#static-nodes)). 
 
 !!! example
     ```bash tab="curl HTTP request"
