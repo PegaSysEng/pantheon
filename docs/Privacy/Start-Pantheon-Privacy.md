@@ -2,8 +2,8 @@
 ## Start Pantheon with Privacy
 
 The EEA methods are not enabled by default, follow the steps above to
-use the command line options Pantheon/Enclave(Orion) needs to be started
-with when using privacy.
+use the command line options. Pantheon/Enclave(Orion) needs to be started 
+when using privacy.
 
 ### Pantheon
 
@@ -84,7 +84,7 @@ Path to the public key for the enclave.
 --privacy-url=<privacyUrl>
 ```
 
-URL on which enclave is running.    
+URL on which the Enclave is running.    
 
 !!!note
     Privacy is under development and will be available in v1.1.
@@ -92,10 +92,10 @@ URL on which enclave is running.
     
 ### Privacy JSON-RPC API method
 
-The [EEA methods](../Reference/JSON-RPC-API-Methods.md#eea_sendRawTransaction) created to
+The [EEA methods](../Reference/JSON-RPC-API-Methods.md#eea_sendRawTransaction) were created to
 provide and support privacy.
 
-### Set Privacy Up
+### Set-up Privacy
 
 ## Prerequisites 
 
@@ -114,8 +114,8 @@ To create a private network:
 5. [Start First Node as Bootnode](#5-restart-first-node-as-bootnode)
 6. [Start Node-2](#6-start-node-2)
 7. [Start Node-3-non-privacy](#7-start-node-3)
-8. [Confirm the private is working](#8-confirm-private-network-is-working)
-9. [Create a Private Transaction Node-1 with Node-2](#9-create-a-private-transaction-node-1-with-node-2)
+8. [Confirm the private network is working](#8-confirm-private-network-is-working)
+9. [Create a Private Transaction between Node-1 with Node-2](#9-create-a-private-transaction-node-1-with-node-2)
 10. [Confirm Node-3 can't interact with private Transaction](#10-confirm-node-3-can't-interact-with-private-transaction)
 
 
@@ -127,7 +127,7 @@ node is started, the node key is saved in this directory.
 Create directories for your private network, each of the three nodes, and a data directory for each node: 
 
 ```bash
-Private-Network-Privacy/
+Private-Network/
 ├── Node-1
 │   ├── Node-1-data-path
 ├── Node-2
@@ -138,7 +138,7 @@ Private-Network-Privacy/
 
 ### 2. Create Genesis File 
 
-The genesis file defines the genesis block of the blockchain (that is, the start of the blockchain).
+The genesis file defines the genesis block of the blockchain (that is, the initial state of the blockchain).
 The genesis file includes entries for configuring the blockchain such as the mining difficulty and initial 
 accounts and balances.    
 
@@ -184,11 +184,11 @@ Download and install [*Orion*](https://github.com/PegaSysEng/orion/blob/master/d
 to be used as an enclave to store and communicate the private transactions in Pantheon.
 
 We can generate key pairs for Orion to use using the following command `orion -f foo`. This will generate
-a public-private key pair which will be used to connect to Orion instance. The public key generated will be used to 
+a public-private key pair which will be used to connect to Orion instance. The public key generated  
 link the Pantheon node to Orion instance.
 
 Refer to [Configuring Orion](https://github.com/PegaSysEng/orion/blob/master/documentation/install/configure.md)
-for a detailed configuration to be set. 
+for a detailed configuration options. 
 
 Start one instance of Orion for each Pantheon node which we intend to perform private transactions using
 `orion foo.conf`
@@ -343,9 +343,7 @@ The result confirms Node-1 (the node running the JSON-RPC service) has two peers
 ```
  
 
-### 9. Create a Private Transaction Node-1 with Node-2
-
-
+### 9. Create a Private Transaction between Node-1 with Node-2
 
 ### 10. Confirm Node-3 can't interact with private Transaction
 
