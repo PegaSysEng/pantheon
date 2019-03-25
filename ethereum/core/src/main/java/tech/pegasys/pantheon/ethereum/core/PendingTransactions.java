@@ -12,17 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
-import static java.util.Collections.newSetFromMap;
 import static java.util.Comparator.comparing;
 
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.util.Subscribers;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -55,11 +53,10 @@ public class PendingTransactions {
   private final Map<Address, SortedMap<Long, TransactionInfo>> transactionsBySender =
       new HashMap<>();
 
-  private final Collection<PendingTransactionListener> listeners =
-      newSetFromMap(new ConcurrentHashMap<>());
+  private final Subscribers<PendingTransactionListener> listeners = new Subscribers<>();
 
-  private final Collection<PendingTransactionDroppedListener> transactionDroppedListeners =
-      newSetFromMap(new ConcurrentHashMap<>());
+  private final Subscribers<PendingTransactionDroppedListener> transactionDroppedListeners =
+      new Subscribers<>();
 
   private final int maxPendingTransactions;
   private final Clock clock;
@@ -248,11 +245,11 @@ public class PendingTransactions {
   }
 
   public void addTransactionListener(final PendingTransactionListener listener) {
-    listeners.add(listener);
+    listeners.subscribe(listener);
   }
 
   public void addTransactionDroppedListener(final PendingTransactionDroppedListener listener) {
-    transactionDroppedListeners.add(listener);
+    transactionDroppedListeners.subscribe(listener);
   }
 
   public OptionalLong getNextNonceForSender(final Address sender) {
