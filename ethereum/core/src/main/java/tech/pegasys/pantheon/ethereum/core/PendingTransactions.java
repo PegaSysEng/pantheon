@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.core;
 import static java.util.Comparator.comparing;
 
 import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -60,56 +62,64 @@ public class PendingTransactions {
 
   private final int maxPendingTransactions;
   private final Clock clock;
-  private final Counter localTransactionCounter;
-  private final Counter remoteTransactionCounter;
+  private final Counter localTransactionAddedCounter;
+
+  private final Counter remoteTransactionAddedCounter;
+  private Map<DecrementTransactionKey, Counter> transactionRemovedCounters = new HashMap<>();
 
   public PendingTransactions(
       final int maxPendingTransactions, final Clock clock, final MetricsSystem metricsSystem) {
     this.maxPendingTransactions = maxPendingTransactions;
     this.clock = clock;
-    this.localTransactionCounter =
-        metricsSystem
-            .createLabelledCounter(
-                MetricCategory.TRANSACTION_POOL,
-                "localTransactionCounter",
-                "count of locally created transactions in the pending transaction pool",
-                "taskName")
-            .labels(getClass().getSimpleName());
-    this.remoteTransactionCounter =
-        metricsSystem
-            .createLabelledCounter(
-                MetricCategory.TRANSACTION_POOL,
-                "remoteTransactionCounter",
-                "count of remote created transactions in the pending transaction pool",
-                "taskName")
-            .labels(getClass().getSimpleName());
+    final LabelledMetric<Counter> transactionCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.TRANSACTION_POOL,
+            "transactions_total",
+            "Count of transactions changed in the transaction pool",
+            "source");
+    localTransactionAddedCounter = transactionCounter.labels("local", "added");
+    addRemovedCounter(transactionCounter, "local", "addedToBlock");
+    addRemovedCounter(transactionCounter, "local", "dropped");
+
+    remoteTransactionAddedCounter = transactionCounter.labels("remote", "added");
+    addRemovedCounter(transactionCounter, "remote", "addedToBlock");
+    addRemovedCounter(transactionCounter, "remote", "dropped");
+  }
+
+  private void addRemovedCounter(
+      final LabelledMetric<Counter> transactionCounter,
+      final String source,
+      final String addedToBlock) {
+    transactionRemovedCounters.put(
+        new DecrementTransactionKey("local".equals(source), "addedToBlock".equals(addedToBlock)),
+        transactionCounter.labels(source, "removed", addedToBlock));
   }
 
   public boolean addRemoteTransaction(final Transaction transaction) {
     final TransactionInfo transactionInfo =
         new TransactionInfo(transaction, false, clock.instant());
     boolean addTransaction = addTransaction(transactionInfo);
-    remoteTransactionCounter.inc();
+    remoteTransactionAddedCounter.inc();
     return addTransaction;
   }
 
   boolean addLocalTransaction(final Transaction transaction) {
     boolean addTransaction =
         addTransaction(new TransactionInfo(transaction, true, clock.instant()));
-    localTransactionCounter.inc();
+    localTransactionAddedCounter.inc();
     return addTransaction;
   }
 
   public void removeTransaction(final Transaction transaction) {
-    doRemoveTransaction(transaction);
+    doRemoveTransaction(transaction, false);
     notifyTransactionDropped(transaction);
   }
 
   public void transactionAddedToBlock(final Transaction transaction) {
-    doRemoveTransaction(transaction);
+    doRemoveTransaction(transaction, true);
   }
 
-  private void doRemoveTransaction(final Transaction transaction) {
+  private void doRemoveTransaction(final Transaction transaction, boolean addedToBlock) {
     synchronized (pendingTransactions) {
       final TransactionInfo removedTransactionInfo = pendingTransactions.remove(transaction.hash());
       if (removedTransactionInfo != null) {
@@ -122,12 +132,19 @@ public class PendingTransactions {
                     transactionsBySender.remove(transaction.getSender());
                   }
                 });
-        if (removedTransactionInfo.isReceivedFromLocalSource()) {
-          localTransactionCounter.inc(-1);
-        } else {
-          remoteTransactionCounter.inc(-1);
-        }
+        incrementTransactionRemovedCounter(
+            removedTransactionInfo.isReceivedFromLocalSource(), addedToBlock);
       }
+    }
+  }
+
+  private void incrementTransactionRemovedCounter(
+      final boolean receivedFromLocalSource, final boolean addedToBlock) {
+    Counter counter =
+        transactionRemovedCounters.get(
+            new DecrementTransactionKey(receivedFromLocalSource, addedToBlock));
+    if (counter != null) {
+      counter.inc();
     }
   }
 
@@ -323,5 +340,33 @@ public class PendingTransactions {
   @FunctionalInterface
   public interface TransactionSelector {
     TransactionSelectionResult evaluateTransaction(final Transaction transaction);
+  }
+
+  private class DecrementTransactionKey {
+
+    private final boolean local;
+    private final boolean addedToBlock;
+
+    public DecrementTransactionKey(final boolean local, final boolean addedToBlock) {
+      this.local = local;
+      this.addedToBlock = addedToBlock;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      final DecrementTransactionKey that = (DecrementTransactionKey) o;
+      return local == that.local && addedToBlock == that.addedToBlock;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(local, addedToBlock);
+    }
   }
 }
