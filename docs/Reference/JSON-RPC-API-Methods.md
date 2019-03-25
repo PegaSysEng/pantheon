@@ -2605,9 +2605,12 @@ Enabled JSON-RPC APIs.
 
 ### eea_sendRawTransaction
 
-Creates a private transaction, which has already been signed, generates the transaction hash and submits it to the transaction pool, and returns the transaction hash.
+Creates a private transaction, which has already been signed, generates the 
+transaction hash and submits it to the transaction pool, and returns 
+the transaction hash of the Privacy Marker Transaction.
 
-The signed transaction passed as an input parameter is expected to include the privateFrom, privateFor, and restriction fields.
+The signed transaction passed as an input parameter is expected to include 
+the privateFrom, privateFor, and restriction fields.
 
 To avoid exposing your private key, create signed transactions offline
 and send the signed transaction data using `eea_sendRawTransaction`.
@@ -2615,7 +2618,7 @@ and send the signed transaction data using `eea_sendRawTransaction`.
 
 **Parameters**
 
-`data` -  Signed transaction serialized to hexadecimal format. For example:
+`data` -  Signed RLP encoded private transaction. For example:
 
 `params: ["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"]`
 
@@ -2644,8 +2647,8 @@ above}], "id":1}' <JSON-RPC-http-endpoint:port> ```
 
 ### eea_getTransactionReceipt
 
-Returns the contract address, after the transaction was mined. Receipts for pending transactions
-are not available.
+Returns information about the private transaction, after the transaction was 
+mined. Receipts for pending transactions the contract addressare not available.
 
 **Parameters**
 
@@ -2653,7 +2656,7 @@ are not available.
 
 **Returns**
 
-`Object` - [Transaction receipt object](JSON-RPC-API-Objects.md#transaction-receipt-object), or `null` when no receipt is found.
+`Object` - [Private Transaction receipt object](JSON-RPC-API-Objects.md#private-transaction-receipt-object), or `null` when no receipt is found.
 
 !!! example ```bash tab="curl HTTP request" $ curl -X POST --dataFLRY3
 '{"jsonrpc":"2.0","method":"eea_getTransactionReceipt","params":["0x504ce587a65bdbdb6414a0c6c16d86a04dd79bfcc4f2950eec9634b30ce5370f"],"id":53}'
