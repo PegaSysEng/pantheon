@@ -225,5 +225,4 @@ public class PrometheusMetricsSystemTest {
 
     assertThat(localMetricSystem).isInstanceOf(PrometheusMetricsSystem.class);
   }
-
 }
