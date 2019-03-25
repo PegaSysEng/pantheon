@@ -119,7 +119,7 @@ public class PendingTransactions {
     doRemoveTransaction(transaction, true);
   }
 
-  private void doRemoveTransaction(final Transaction transaction, boolean addedToBlock) {
+  private void doRemoveTransaction(final Transaction transaction, final boolean addedToBlock) {
     synchronized (pendingTransactions) {
       final TransactionInfo removedTransactionInfo = pendingTransactions.remove(transaction.hash());
       if (removedTransactionInfo != null) {
@@ -342,7 +342,7 @@ public class PendingTransactions {
     TransactionSelectionResult evaluateTransaction(final Transaction transaction);
   }
 
-  private class DecrementTransactionKey {
+  private static class DecrementTransactionKey {
 
     private final boolean local;
     private final boolean addedToBlock;

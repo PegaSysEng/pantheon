@@ -41,8 +41,7 @@ public class PendingTransactionDroppedSubscriptionService
 
     final PendingTransactionResult msg = new PendingTransactionResult(pendingTransaction);
     for (final Subscription subscription : subscriptions) {
-      subscriptionManager.sendMessage(
-          subscription.getId(), msg);
+      subscriptionManager.sendMessage(subscription.getId(), msg);
     }
   }
 
