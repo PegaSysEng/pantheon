@@ -232,7 +232,8 @@ public class NettyP2PNetwork implements P2PNetwork {
             () -> connections.size() >= maxPeers,
             peerBlacklist,
             nodeLocalConfigPermissioningController,
-            nodePermissioningController);
+            nodePermissioningController,
+            metricsSystem);
 
     outboundMessagesCounter =
         metricsSystem.createLabelledCounter(
@@ -254,6 +255,12 @@ public class NettyP2PNetwork implements P2PNetwork {
         "netty_boss_pending_tasks",
         "The number of pending tasks in the Netty boss event loop",
         pendingTaskCounter(boss));
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.NETWORK,
+        "vertx_eventloop_pending_tasks",
+        "The number of pending tasks in the Vertx event loop",
+        pendingTaskCounter(vertx.nettyEventLoopGroup()));
 
     subscribeDisconnect(peerDiscoveryAgent);
     subscribeDisconnect(peerBlacklist);
