@@ -59,10 +59,10 @@ public abstract class SyncTargetManager<C> {
   }
 
   public CompletableFuture<SyncTarget> findSyncTarget() {
-    return syncState
-        .syncTarget()
-        .map(CompletableFuture::completedFuture) // Return an existing sync target if present
-        .orElseGet(this::selectNewSyncTarget);
+    if (syncState.syncTarget().isPresent() && !syncState.isInSync()) {
+      return CompletableFuture.completedFuture(syncState.syncTarget().get());
+    }
+    return selectNewSyncTarget();
   }
 
   private CompletableFuture<SyncTarget> selectNewSyncTarget() {
