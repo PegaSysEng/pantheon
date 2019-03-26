@@ -31,19 +31,21 @@ To configure a network of static nodes:
 
 1. Start Pantheon with discovery disabled using [`--discovery-enabled=false`](../../Reference/Pantheon-CLI-Syntax.md#discovery-enabled).   
 
-To update the static peers, use the [`admin_addPeer`](../../Reference/JSON-RPC-API-Methods.md#admin_addpeer) 
+To modify the static peers at run time, use the [`admin_addPeer`](../../Reference/JSON-RPC-API-Methods.md#admin_addpeer) 
 and [`admin_removePeer`](../../Reference/JSON-RPC-API-Methods.md#admin_removepeer) JSON-RPC API methods. 
 
 !!! note
-    Updates to static nodes are not persisted through node restarts. The `static-nodes.json` file
+    Runtime modifications of static nodes are not persisted between runs. The `static-nodes.json` file
     is not updated by `admin_addPeer` and `admin_removePeer` methods. 
     
     Nodes outside of the static nodes are not prevented from connecting.  To prevent nodes from connecting,
     use [Permissioning](../../Permissions/Permissioning.md). 
     
 !!! caution 
-    If connections are timing out, ensure the node ID in the [enode URL](../Node-Keys.md#enode-url) is correct. 
-
+    If the added peer does not appear in the peer list (returned by [`admin_peers`](../../Reference/JSON-RPC-API-Methods.md#admin_peers)),
+    check the supplied [enode URL](../Node-Keys.md#enode-url) is correct, the node is running, the node is listening for 
+    TCP connections on the endpoint, and has not reached the [maximum number of peers](#limiting-peers).
+    
 ### static-nodes.json File
 
 The `static-nodes.json` file must be located in the data directory (specified by [`--data-path`](../../Reference/Pantheon-CLI-Syntax.md#data-path))
