@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask.PeerTask
 import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.ImportBlocksTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.ParallelImportChainSegmentTask;
@@ -33,11 +34,13 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.annotations.VisibleForTesting;
 
 public class FullSyncDownloader<C> {
+  private static final int TRAILING_PEER_THRESHOLD = 50;
   private final ChainDownloader<C> chainDownloader;
   private final SynchronizerConfiguration config;
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
+  private final SyncState syncState;
   private final MetricsSystem metricsSystem;
 
   public FullSyncDownloader(
@@ -51,6 +54,7 @@ public class FullSyncDownloader<C> {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
+    this.syncState = syncState;
     this.metricsSystem = metricsSystem;
     chainDownloader =
         new ChainDownloader<>(
@@ -103,5 +107,12 @@ public class FullSyncDownloader<C> {
       importedBlocks = importTask.run();
     }
     return importedBlocks;
+  }
+
+  public TrailingPeerRequirements calculateTrailingPeerRequirements() {
+    return syncState.isInSync()
+        ? TrailingPeerRequirements.UNRESTRICTED
+        : new TrailingPeerRequirements(
+            syncState.chainHeadNumber() - TRAILING_PEER_THRESHOLD, config.getMaxTrailingPeers());
   }
 }
