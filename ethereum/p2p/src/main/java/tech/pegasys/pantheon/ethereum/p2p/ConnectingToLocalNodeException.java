@@ -12,8 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p;
 
-public class PeerNotWhitelistedException extends RuntimeException {
-  public PeerNotWhitelistedException(final String message) {
+public class ConnectingToLocalNodeException extends RuntimeException {
+  public ConnectingToLocalNodeException(final String message) {
     super(message);
+  }
+
+  public ConnectingToLocalNodeException() {
+    super("Cannot add the local node as a peer connection");
   }
 }
