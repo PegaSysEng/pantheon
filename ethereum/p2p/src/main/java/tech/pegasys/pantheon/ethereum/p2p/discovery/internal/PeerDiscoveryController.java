@@ -14,8 +14,6 @@ package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.DiscoveryProtocolLogger.logReceivedPacket;
-import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.DiscoveryProtocolLogger.logSendingPacket;
 import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -32,6 +30,10 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -119,6 +121,9 @@ public class PeerDiscoveryController {
   private final PeerBlacklist peerBlacklist;
   private final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController;
   private final Optional<NodePermissioningController> nodePermissioningController;
+  private final DiscoveryProtocolLogger discoveryProtocolLogger;
+  private final LabelledMetric<Counter> interactionCounter;
+  private final LabelledMetric<Counter> interactionRetryCounter;
 
   private RetryDelayFunction retryDelayFunction = RetryDelayFunction.linear(1.5, 2000, 60000);
 
@@ -151,7 +156,8 @@ public class PeerDiscoveryController {
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final Optional<NodePermissioningController> nodePermissioningController,
       final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers,
-      final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers) {
+      final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers,
+      final MetricsSystem metricsSystem) {
     this.timerUtil = timerUtil;
     this.keypair = keypair;
     this.localPeer = localPeer;
@@ -166,6 +172,27 @@ public class PeerDiscoveryController {
     this.outboundMessageHandler = outboundMessageHandler;
     this.peerBondedObservers = peerBondedObservers;
     this.peerDroppedObservers = peerDroppedObservers;
+    this.discoveryProtocolLogger = new DiscoveryProtocolLogger(metricsSystem);
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.NETWORK,
+        "discovery_inflight_interactions_current",
+        "Current number of inflight discovery interactions",
+        inflightInteractions::size);
+
+    interactionCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.NETWORK,
+            "discovery_interaction_count",
+            "Total number of discovery interactions initiated",
+            "type");
+
+    interactionRetryCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.NETWORK,
+            "discovery_interaction_retry_count",
+            "Total number of interaction retries performed",
+            "type");
   }
 
   public void start() {
@@ -249,7 +276,7 @@ public class PeerDiscoveryController {
    * @param sender The sender.
    */
   public void onMessage(final Packet packet, final DiscoveryPeer sender) {
-    logReceivedPacket(sender, packet);
+    discoveryProtocolLogger.logReceivedPacket(sender, packet);
 
     // Message from self. This should not happen.
     if (sender.getId().equals(localPeer.getId())) {
@@ -441,13 +468,13 @@ public class PeerDiscoveryController {
         type,
         data,
         packet -> {
-          logSendingPacket(peer, packet);
+          discoveryProtocolLogger.logSendingPacket(peer, packet);
           outboundMessageHandler.send(peer, packet);
         });
   }
 
   private void sendPacket(final DiscoveryPeer peer, final Packet packet) {
-    logSendingPacket(peer, packet);
+    discoveryProtocolLogger.logSendingPacket(peer, packet);
     outboundMessageHandler.send(peer, packet);
   }
 
@@ -547,6 +574,8 @@ public class PeerDiscoveryController {
     private final BytesValue peerId;
     /** The expected type of the message that will transition the peer out of this state. */
     private final PacketType expectedType;
+
+    private final Counter retryCounter;
     /** A custom filter to accept transitions out of this state. */
     private Predicate<Packet> filter;
     /** Whether the action associated to this state is retryable or not. */
@@ -565,6 +594,8 @@ public class PeerDiscoveryController {
       this.expectedType = expectedType;
       this.filter = filter;
       this.retryable = retryable;
+      interactionCounter.labels(expectedType.name()).inc();
+      retryCounter = interactionRetryCounter.labels(expectedType.name());
     }
 
     @Override
@@ -589,7 +620,12 @@ public class PeerDiscoveryController {
         final long newTimeout = retryDelayFunction.apply(lastTimeout);
         timerId =
             OptionalLong.of(
-                timerUtil.setTimer(newTimeout, () -> execute(newTimeout, retryCount + 1)));
+                timerUtil.setTimer(
+                    newTimeout,
+                    () -> {
+                      retryCounter.inc();
+                      execute(newTimeout, retryCount + 1);
+                    }));
       } else {
         inflightInteractions.remove(peerId);
       }
