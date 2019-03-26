@@ -34,7 +34,6 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.annotations.VisibleForTesting;
 
 public class FullSyncDownloader<C> {
-  private static final int TRAILING_PEER_THRESHOLD = 50;
   private final ChainDownloader<C> chainDownloader;
   private final SynchronizerConfiguration config;
   private final ProtocolSchedule<C> protocolSchedule;
@@ -112,7 +111,6 @@ public class FullSyncDownloader<C> {
   public TrailingPeerRequirements calculateTrailingPeerRequirements() {
     return syncState.isInSync()
         ? TrailingPeerRequirements.UNRESTRICTED
-        : new TrailingPeerRequirements(
-            syncState.chainHeadNumber() - TRAILING_PEER_THRESHOLD, config.getMaxTrailingPeers());
+        : new TrailingPeerRequirements(syncState.chainHeadNumber(), config.getMaxTrailingPeers());
   }
 }
