@@ -12,30 +12,27 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
-import tech.pegasys.pantheon.ethereum.p2p.PeerNotWhitelistedException;
+import tech.pegasys.pantheon.ethereum.p2p.ConnectingToLocalNodeException;
+import tech.pegasys.pantheon.ethereum.p2p.PeerNotPermittedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AdminAddPeer implements JsonRpcMethod {
+public class AdminAddPeer extends AdminModifyPeer {
+
   private static final Logger LOG = LogManager.getLogger();
-  private final P2PNetwork peerNetwork;
-  private final JsonRpcParameter parameters;
 
   public AdminAddPeer(final P2PNetwork peerNetwork, final JsonRpcParameter parameters) {
-    this.peerNetwork = peerNetwork;
-    this.parameters = parameters;
+    super(peerNetwork, parameters);
   }
 
   @Override
@@ -44,27 +41,18 @@ public class AdminAddPeer implements JsonRpcMethod {
   }
 
   @Override
-  public JsonRpcResponse response(final JsonRpcRequest req) {
-    if (req.getParamLength() != 1) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
-    }
+  protected JsonRpcResponse performOperation(final Object id, final String enode) {
     try {
-      final String enodeString = parameters.required(req.getParams(), 0, String.class);
-      final Peer peer = DefaultPeer.fromURI(enodeString);
-      final boolean added = peerNetwork.addMaintainConnectionPeer(peer);
-      return new JsonRpcSuccessResponse(req.getId(), added);
-    } catch (final InvalidJsonRpcParameters e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
-    } catch (final IllegalArgumentException e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.PARSE_ERROR);
-    } catch (final P2pDisabledException e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
-    } catch (final PeerNotWhitelistedException e) {
+      LOG.debug("Adding ({}) to peers", enode);
+      final EnodeURL enodeURL = new EnodeURL(enode);
+      final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
+      boolean addedToNetwork = peerNetwork.addMaintainConnectionPeer(peer);
+      return new JsonRpcSuccessResponse(id, addedToNetwork);
+    } catch (final PeerNotPermittedException e) {
       return new JsonRpcErrorResponse(
-          req.getId(), JsonRpcError.NON_WHITELISTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
-    } catch (final Exception e) {
-      LOG.error("Error processing request: " + req, e);
-      throw e;
+          id, JsonRpcError.NON_PERMITTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
+    } catch (final ConnectingToLocalNodeException e) {
+      return new JsonRpcErrorResponse(id, JsonRpcError.INVALID_PARAMS);
     }
   }
 }

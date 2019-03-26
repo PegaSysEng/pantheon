@@ -25,7 +25,10 @@ public enum JsonRpcError {
   METHOD_NOT_FOUND(-32601, "Method not found"),
   INVALID_PARAMS(-32602, "Invalid params"),
   INTERNAL_ERROR(-32603, "Internal error"),
+
+  // P2P related errors
   P2P_DISABLED(-32000, "P2P has been disabled. This functionality is not available"),
+  ENODE_NOT_AVAILABLE(-32000, "Enode URL not available"),
 
   // Filter & Subscription Errors
   FILTER_NOT_FOUND(-32000, "Filter not found"),
@@ -77,8 +80,7 @@ public enum JsonRpcError {
       -32000,
       "Error reloading permissions file. Please use perm_getAccountsWhitelist and perm_getNodesWhitelist to review the current state of the whitelists"),
   PERMISSIONING_NOT_ENABLED(-32000, "Node/Account whitelisting has not been enabled"),
-  NON_WHITELISTED_NODE_CANNOT_BE_ADDED_AS_A_PEER(
-      -32000, "Cannot add a non-whitelisted node as a peer"),
+  NON_PERMITTED_NODE_CANNOT_BE_ADDED_AS_A_PEER(-32000, "Cannot add a non-permitted node as a peer"),
 
   // Permissioning/Authorization errors
   UNAUTHORIZED(-40100, "Unauthorized"),

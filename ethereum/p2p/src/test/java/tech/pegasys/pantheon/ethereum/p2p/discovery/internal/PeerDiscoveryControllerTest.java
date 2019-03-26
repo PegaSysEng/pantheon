@@ -44,6 +44,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -1079,7 +1080,7 @@ public class PeerDiscoveryControllerTest {
     peerTableSpy.tryAdd(peer);
 
     final LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final URI peerURI = URI.create(peer.getEnodeURI());
+    final URI peerURI = URI.create(peer.getEnodeURLString());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
     final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
         new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
@@ -1106,7 +1107,7 @@ public class PeerDiscoveryControllerTest {
     peerTableSpy.tryAdd(peer);
 
     final LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final URI peerURI = URI.create(peer.getEnodeURI());
+    final URI peerURI = URI.create(peer.getEnodeURLString());
     config.setNodeWhitelist(Lists.newArrayList(peerURI));
     final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
         new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
@@ -1129,7 +1130,8 @@ public class PeerDiscoveryControllerTest {
 
     ArgumentCaptor<PeerDroppedEvent> captor = ArgumentCaptor.forClass(PeerDroppedEvent.class);
     verify(peerDroppedEventConsumer).accept(captor.capture());
-    assertThat(captor.getValue().getPeer()).isEqualTo(DiscoveryPeer.fromURI(peer.getEnodeURI()));
+    assertThat(captor.getValue().getPeer())
+        .isEqualTo(DiscoveryPeer.fromURI(peer.getEnodeURLString()));
   }
 
   @Test
@@ -1324,7 +1326,8 @@ public class PeerDiscoveryControllerTest {
               whitelist,
               nodePermissioningController,
               peerBondedObservers,
-              peerDroppedObservers));
+              peerDroppedObservers,
+              new NoOpMetricsSystem()));
     }
   }
 }

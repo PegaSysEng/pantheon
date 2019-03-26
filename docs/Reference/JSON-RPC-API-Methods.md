@@ -19,22 +19,12 @@ description: Pantheon JSON-RPC API methods reference
 
 Adds a [static node](../Configuring-Pantheon/Networking/Managing-Peers.md#static-nodes).  
 
+!!! caution 
+    If connections are timing out, ensure the node ID in the [enode URL](../Node-Keys.md#enode-url) is correct. 
+
 **Parameters**
 
-`string` : Enode of peer to add
-
-The enode is `enode://<id>@<host:port>` where:
-             
-* `<id>` is the node public key excluding the initial 0x. 
-* `<host:port>` is the host and port the node is listening on for P2P peer discovery. 
-   Specified by the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and 
-   [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options.
-             
-!!! example
-    If the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) or [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) options are not specified and the node public key is `0xc35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f`            
-    The enode URL is:
-    `enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb9589bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303` 
- 
+`string` : [Enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) of peer to add
 
 **Returns**
 
@@ -188,6 +178,36 @@ match the hex value for `port`. The remote address depends on which node initiat
       ]
     }
     ```
+
+### admin_removePeer
+
+Removes a [static node](../Configuring-Pantheon/Networking/Managing-Peers.md#static-nodes).  
+
+**Parameters**
+
+`string` : [Enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) of peer to remove
+
+**Returns**
+
+`result` : `boolean` - `true` if peer removed or `false` if peer not a [static node]((../Configuring-Pantheon/Networking/Managing-Peers.md#static-nodes)). 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"admin_removePeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"admin_removePeer","params":["enode://f59c0ab603377b6ec88b89d5bb41b98fc385030ab1e4b03752db6f7dab364559d92c757c13116ae6408d2d33f0138e7812eb8b696b2a22fe3332c4b5127b22a3@127.0.0.1:30304"],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": true
+    }
+    ```
+
 
 ## Web3 Methods
 
@@ -351,6 +371,35 @@ None
     }
     ```
 
+### net_enode
+
+Returns the [enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url).
+
+**Parameters**
+
+None
+
+**Returns**
+
+`result` : *string* - [Enode URL](../Configuring-Pantheon/Node-Keys.md#enode-url) for the node
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc" : "2.0",
+      "id" : 1,
+      "result" : "enode://6a63160d0ccef5e4986d270937c6c8d60a9a4d3b25471cda960900d037c61988ea14da67f69dbfb3497c465d0de1f001bb95598f74b68a39a5156a608c42fa1b@127.0.0.1:30303"
+    }
+    ```
+	
 ## Eth Methods
 
 ### eth_syncing
@@ -857,9 +906,9 @@ Returns the code of the smart contract at the specified address. Compiled smart 
 
 ### eth_sendRawTransaction
 
-Sends a [signed transaction](../Using-Pantheon/Transactions.md). A transaction can send ether, deploy a contract, or interact with a contract.  
+Sends a [signed transaction](../Using-Pantheon/Transactions/Transactions.md). A transaction can send ether, deploy a contract, or interact with a contract.  
 
-You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
+You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
 To avoid exposing your private key, create signed transactions offline and send the signed transaction data using `eth_sendRawTransaction`. 
 
@@ -873,7 +922,7 @@ To avoid exposing your private key, create signed transactions offline and send 
 `params: ["0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833"]`
 
 !!! note
-    [Creating and Sending Transactions](../Using-Pantheon/Transactions.md) includes examples of creating signed transactions using the [web3.js](https://github.com/ethereum/web3.js/) library.
+    [Creating and Sending Transactions](../Using-Pantheon/Transactions/Transactions.md) includes examples of creating signed transactions using the [web3.js](https://github.com/ethereum/web3.js/) library.
 
 **Returns**
 
@@ -900,7 +949,7 @@ To avoid exposing your private key, create signed transactions offline and send 
 
 Invokes a contract function locally and does not change the state of the blockchain. 
 
-You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions.md#eth_call-or-eth_sendrawtransaction).
+You can interact with contracts using [eth_sendRawTransaction or eth_call](../Using-Pantheon/Transactions/Transactions.md#eth_call-or-eth_sendrawtransaction).
 
 **Parameters**
 
@@ -2488,6 +2537,52 @@ None
         "result": "Success"
     }
     ```
+
+## Txpool Methods 
+
+!!! note
+    The `TXPOOL` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
+    or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `TXPOOL` API methods.
+
+### txpool_pantheonTransactions
+
+Lists transactions in the node transaction pool. 
+
+**Parameters** 
+
+None
+
+**Returns** 
+
+`result` - List of transactions 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"txpool_pantheonTransactions","params":[],"id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"txpool_pantheonTransactions","params":[],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            {
+                "hash": "0x8a66830098be4006a3f63a03b6e9b67aa721e04bd6b46d420b8f1937689fb4f1",
+                "isReceivedFromLocalSource": true,
+                "addedToPoolAt": "2019-03-21T01:35:50.911Z"
+            },
+            {
+                "hash": "0x41ee803c3987ceb5bcea0fad7a76a8106a2a6dd654409007d9931032ea54579b",
+                "isReceivedFromLocalSource": true,
+                "addedToPoolAt": "2019-03-21T01:36:00.374Z"
+            }
+        ]
+    }
+    ``` 
     
 ## Miscellaneous Methods 
 
