@@ -138,6 +138,8 @@ Start by looking through the 'good first issue' and 'help wanted' labeled issues
 and a test or two.
 * [Help wanted issues][search-label-help-wanted] - issues which are a bit more involved than `good first issue` issues.
 
+When you've indentified an issue you'd like to work on, ping us on [Gitter] and we'll assign it to you. 
+
 ### Contribution Workflow
 The codebase and documentation are maintained using the same "*contributor workflow*" where everyone 
 without exception contributes changes proposals using "*pull-requests*".
