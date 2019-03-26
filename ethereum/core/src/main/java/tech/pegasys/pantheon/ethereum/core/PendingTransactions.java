@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -62,37 +61,23 @@ public class PendingTransactions {
 
   private final int maxPendingTransactions;
   private final Clock clock;
-  private final Counter localTransactionAddedCounter;
 
+  private final LabelledMetric<Counter> transactionCounter;
+  private final Counter localTransactionAddedCounter;
   private final Counter remoteTransactionAddedCounter;
-  private Map<DecrementTransactionKey, Counter> transactionRemovedCounters = new HashMap<>();
 
   public PendingTransactions(
       final int maxPendingTransactions, final Clock clock, final MetricsSystem metricsSystem) {
     this.maxPendingTransactions = maxPendingTransactions;
     this.clock = clock;
-    final LabelledMetric<Counter> transactionCounter =
+    transactionCounter =
         metricsSystem.createLabelledCounter(
             MetricCategory.TRANSACTION_POOL,
             "transactions_total",
             "Count of transactions changed in the transaction pool",
             "source");
     localTransactionAddedCounter = transactionCounter.labels("local", "added");
-    addRemovedCounter(transactionCounter, "local", "addedToBlock");
-    addRemovedCounter(transactionCounter, "local", "dropped");
-
     remoteTransactionAddedCounter = transactionCounter.labels("remote", "added");
-    addRemovedCounter(transactionCounter, "remote", "addedToBlock");
-    addRemovedCounter(transactionCounter, "remote", "dropped");
-  }
-
-  private void addRemovedCounter(
-      final LabelledMetric<Counter> transactionCounter,
-      final String source,
-      final String addedToBlock) {
-    transactionRemovedCounters.put(
-        new DecrementTransactionKey("local".equals(source), "addedToBlock".equals(addedToBlock)),
-        transactionCounter.labels(source, "removed", addedToBlock));
   }
 
   public boolean addRemoteTransaction(final Transaction transaction) {
@@ -140,12 +125,9 @@ public class PendingTransactions {
 
   private void incrementTransactionRemovedCounter(
       final boolean receivedFromLocalSource, final boolean addedToBlock) {
-    Counter counter =
-        transactionRemovedCounters.get(
-            new DecrementTransactionKey(receivedFromLocalSource, addedToBlock));
-    if (counter != null) {
-      counter.inc();
-    }
+    final String location = receivedFromLocalSource ? "local" : "remote";
+    final String operation = addedToBlock ? "addedToBlock" : "dropped";
+    transactionCounter.labels(location, "removed", operation).inc();
   }
 
   /*
@@ -340,33 +322,5 @@ public class PendingTransactions {
   @FunctionalInterface
   public interface TransactionSelector {
     TransactionSelectionResult evaluateTransaction(final Transaction transaction);
-  }
-
-  private static class DecrementTransactionKey {
-
-    private final boolean local;
-    private final boolean addedToBlock;
-
-    public DecrementTransactionKey(final boolean local, final boolean addedToBlock) {
-      this.local = local;
-      this.addedToBlock = addedToBlock;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      final DecrementTransactionKey that = (DecrementTransactionKey) o;
-      return local == that.local && addedToBlock == that.addedToBlock;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(local, addedToBlock);
-    }
   }
 }
