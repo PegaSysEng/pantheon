@@ -34,13 +34,15 @@ import org.apache.logging.log4j.Logger;
 public abstract class SyncTargetManager<C> {
 
   private static final Logger LOG = LogManager.getLogger();
+
+  protected final SyncState syncState;
+
   private volatile long syncTargetDisconnectListenerId;
   private volatile boolean syncTargetDisconnected = false;
   private final SynchronizerConfiguration config;
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
-  private final SyncState syncState;
   private final MetricsSystem metricsSystem;
 
   public SyncTargetManager(
@@ -145,7 +147,7 @@ public abstract class SyncTargetManager<C> {
 
   public abstract boolean shouldContinueDownloading();
 
-  public abstract boolean isCaughtUpWithPeer(final EthPeer peer);
+  public abstract boolean isSyncTargetReached(final EthPeer peer);
 
   public boolean syncTargetCanProvideMoreBlocks() {
     if (!syncState.syncTarget().isPresent()) {
@@ -153,6 +155,6 @@ public abstract class SyncTargetManager<C> {
       return false;
     }
     final EthPeer currentSyncingPeer = syncState.syncTarget().get().peer();
-    return !isSyncTargetDisconnected() && !isCaughtUpWithPeer(currentSyncingPeer);
+    return !isSyncTargetDisconnected() && !isSyncTargetReached(currentSyncingPeer);
   }
 }
