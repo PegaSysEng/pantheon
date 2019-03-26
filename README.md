@@ -41,6 +41,11 @@ Instructions for how to get started with developing on the Pantheon codebase. Pl
 * [Code Coverage](docs/development/code-coverage.md)
 * [Logging](docs/development/logging.md)
 
+## Issues 
+
+Pantheon issues are tracked in [Jira](https://pegasys1.atlassian.net/secure/Dashboard.jspa) not GitHub. 
+See our [contribution guidelines](CONTRIBUTING.md) for more detail on searching and creating issues. 
+
 [User Documentation]: https://docs.pantheon.pegasys.tech/en/latest/
 [Installation]: https://docs.pantheon.pegasys.tech/en/latest/Installation/Overview/
 [Getting Started]: https://docs.pantheon.pegasys.tech/en/latest/Getting-Started/Getting-Started/
