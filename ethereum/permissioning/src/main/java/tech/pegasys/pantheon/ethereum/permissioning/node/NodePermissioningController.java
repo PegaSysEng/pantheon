@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,6 +37,12 @@ public class NodePermissioningController {
 
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     LOG.trace("Checking node permission: {} -> {}", sourceEnode, destinationEnode);
+
+    if (syncStatusNodePermissioningProvider
+        .map(p -> !p.hasReachedSync() && p.isPermitted(sourceEnode, destinationEnode))
+        .orElse(false)) {
+      return true;
+    }
 
     if (syncStatusNodePermissioningProvider.isPresent()
         && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
@@ -60,8 +65,7 @@ public class NodePermissioningController {
     }
   }
 
-  @VisibleForTesting
-  Optional<SyncStatusNodePermissioningProvider> getSyncStatusNodePermissioningProvider() {
+  public Optional<SyncStatusNodePermissioningProvider> getSyncStatusNodePermissioningProvider() {
     return syncStatusNodePermissioningProvider;
   }
 
