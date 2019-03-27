@@ -264,12 +264,12 @@ Replace `<EnodeNode1>` with the enode URL displayed when starting Node-1.
 
 Node 2: 
 ```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["<EnodeNode1"],"id":1}' http://127.0.0.1:8546
+curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["<EnodeNode1>"],"id":1}' http://127.0.0.1:8546
 ```
 
 Node 3:
 ```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["<EnodeNode1"],"id":1}' http://127.0.0.1:8547
+curl -X POST --data '{"jsonrpc":"2.0","method":"admin_addPeer","params":["<EnodeNode1>"],"id":1}' http://127.0.0.1:8547
 ```
 
 !!! tip
@@ -298,7 +298,7 @@ The result confirms Node-1 (the node running the JSON-RPC service) has two peers
 
 Import the first account from the genesis file into MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask):
 
-!!! example "Account 1 (Miner Coinbase Account)"
+!!! example "Account 1"
     * Address: `0xfe3b557e8fb62b89f4916b721be55ceb828dbd73`
     * Private key : `0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63`
     * Initial balance : `0xad78ebc5ac6200000` (200000000000000000000 in decimal)   
@@ -319,8 +319,7 @@ Import the last account from the genesis file into MetaMask and try to send a tr
 
 In your `Permissioned-Network` directory, create a `Node-4` directory and `data` directory inside it. 
 
-Change to the `Node-4` directory and start Node-4 replacing the public key in the enode URL with your bootnode as when
-starting Node-1 and Node-2:
+Change to the `Node-4` directory and start Node-4 specifying the Node-1 enode URL as the bootnode:
 
 ```bash tab="MacOS"
 pantheon --data-path=data --bootnodes="<EnodeNode1>" --genesis-file=../cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
