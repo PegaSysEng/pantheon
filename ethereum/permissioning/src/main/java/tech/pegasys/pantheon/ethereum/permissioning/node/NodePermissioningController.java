@@ -38,6 +38,12 @@ public class NodePermissioningController {
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     LOG.trace("Checking node permission: {} -> {}", sourceEnode, destinationEnode);
 
+    if (syncStatusNodePermissioningProvider
+        .map(p -> !p.hasReachedSync() && p.isPermitted(sourceEnode, destinationEnode))
+        .orElse(false)) {
+      return true;
+    }
+
     if (syncStatusNodePermissioningProvider.isPresent()
         && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
       return false;
