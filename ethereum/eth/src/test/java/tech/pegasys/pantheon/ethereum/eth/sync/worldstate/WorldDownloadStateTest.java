@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.InMemoryTaskQueue;
+import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.concurrent.CompletableFuture;
@@ -39,6 +40,7 @@ public class WorldDownloadStateTest {
   private static final BytesValue ROOT_NODE_DATA = BytesValue.of(1, 2, 3, 4);
   private static final Hash ROOT_NODE_HASH = Hash.hash(ROOT_NODE_DATA);
   private static final int MAX_REQUESTS_WITHOUT_PROGRESS = 10;
+  private static final long MIN_MILLIS_BEFORE_STALLING = 50_000;
 
   private final WorldStateStorage worldStateStorage =
       new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage());
@@ -50,8 +52,10 @@ public class WorldDownloadStateTest {
   private final WorldStateDownloadProcess worldStateDownloadProcess =
       mock(WorldStateDownloadProcess.class);
 
+  private final TestClock clock = new TestClock();
   private final WorldDownloadState downloadState =
-      new WorldDownloadState(pendingRequests, MAX_REQUESTS_WITHOUT_PROGRESS);
+      new WorldDownloadState(
+          pendingRequests, MAX_REQUESTS_WITHOUT_PROGRESS, MIN_MILLIS_BEFORE_STALLING, clock);
 
   private final CompletableFuture<Void> future = downloadState.getDownloadFuture();
 
@@ -121,12 +125,25 @@ public class WorldDownloadStateTest {
     downloadState.requestComplete(false);
 
     downloadState.requestComplete(true);
+    clock.stepMillis(MIN_MILLIS_BEFORE_STALLING + 1);
 
     for (int i = 0; i < MAX_REQUESTS_WITHOUT_PROGRESS - 1; i++) {
       downloadState.requestComplete(false);
       assertThat(downloadState.getDownloadFuture()).isNotDone();
     }
 
+    downloadState.requestComplete(false);
+    assertThat(downloadState.getDownloadFuture()).isCompletedExceptionally();
+  }
+
+  @Test
+  public void shouldNotBeStalledWhenMaxRequestsReachedButNotMinimumTime() {
+    for (int i = 0; i < MAX_REQUESTS_WITHOUT_PROGRESS; i++) {
+      downloadState.requestComplete(false);
+      assertThat(downloadState.getDownloadFuture()).isNotDone();
+    }
+
+    clock.stepMillis(MIN_MILLIS_BEFORE_STALLING + 1);
     downloadState.requestComplete(false);
     assertThat(downloadState.getDownloadFuture()).isCompletedExceptionally();
   }
