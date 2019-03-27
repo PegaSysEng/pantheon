@@ -41,8 +41,12 @@
    - Added IBFT 2.0 [future message configuration options](https://docs.pantheon.pegasys.tech/en/latest/Consensus-Protocols/IBFT/#optional-configuration-options) 
  
 ### Technical Improvements
+- Fixed so self persists to the whitelist [\#1176](https://github.com/PegaSysEng/pantheon/pull/1176)
+- Fixed to add self to permissioning whitelist [\#1175](https://github.com/PegaSysEng/pantheon/pull/1175)
+- Fixed permissioning issues [\#1174](https://github.com/PegaSysEng/pantheon/pull/1174)
+- AdminAddPeer returns custom Json RPC error code [\#1171](https://github.com/PegaSysEng/pantheon/pull/1171)
+- Periodically connect to peers from table [\#1170](https://github.com/PegaSysEng/pantheon/pull/1170)
 - Improved bootnodes option error message [\#1092](https://github.com/PegaSysEng/pantheon/pull/1092) 
-- When multiple name options only search for the longest one [\#776](https://github.com/PegaSysEng/pantheon/pull/776) 
 - Automatically restrict trailing peers while syncing [\#1167](https://github.com/PegaSysEng/pantheon/pull/1167) 
 - Avoid bonding to ourselves [\#1166](https://github.com/PegaSysEng/pantheon/pull/1166) 
 - Fix Push Metrics [\#1164](https://github.com/PegaSysEng/pantheon/pull/1164) 
