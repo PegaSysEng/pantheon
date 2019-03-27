@@ -44,6 +44,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
@@ -57,6 +58,7 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
+import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
@@ -84,7 +86,9 @@ import java.util.stream.Stream;
 import com.google.common.base.Suppliers;
 import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.DecodeException;
+import io.vertx.core.metrics.MetricsOptions;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -903,8 +907,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private SynchronizerConfiguration buildSyncConfig() {
-    synchronizerConfigurationBuilder.syncMode(syncMode);
-    return synchronizerConfigurationBuilder.build();
+    return synchronizerConfigurationBuilder
+        .syncMode(syncMode)
+        .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
+        .build();
   }
 
   // Blockchain synchronisation from peers.
@@ -926,9 +932,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     permissioningConfiguration.ifPresent(runnerBuilder::permissioningConfiguration);
 
+    final MetricsSystem metricsSystem = this.metricsSystem.get();
     final Runner runner =
         runnerBuilder
-            .vertx(Vertx.vertx())
+            .vertx(Vertx.vertx(createVertxOptions(metricsSystem)))
             .pantheonController(controller)
             .p2pEnabled(p2pEnabled)
             .discovery(peerDiscoveryEnabled)
@@ -940,7 +947,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .webSocketConfiguration(webSocketConfiguration)
             .dataDir(dataDir())
             .bannedNodeIds(bannedNodeIds)
-            .metricsSystem(metricsSystem.get())
+            .metricsSystem(metricsSystem)
             .metricsConfiguration(metricsConfiguration)
             .staticNodes(staticNodes)
             .build();
@@ -948,6 +955,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     addShutdownHook(runner);
     runner.start();
     runner.awaitStop();
+  }
+
+  private VertxOptions createVertxOptions(final MetricsSystem metricsSystem) {
+    return new VertxOptions()
+        .setMetricsOptions(
+            new MetricsOptions()
+                .setEnabled(true)
+                .setFactory(new VertxMetricsAdapterFactory(metricsSystem)));
   }
 
   private void addShutdownHook(final Runner runner) {
