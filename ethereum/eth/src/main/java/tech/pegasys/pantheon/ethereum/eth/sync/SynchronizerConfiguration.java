@@ -30,7 +30,9 @@ public class SynchronizerConfiguration {
   private static final Duration DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME = Duration.ofMinutes(5);
   private static final int DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST = 384;
   private static final int DEFAULT_WORLD_STATE_REQUEST_PARALLELISM = 10;
-  private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 100;
+  private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 1000;
+  private static final long DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING =
+      TimeUnit.MINUTES.toMillis(5);
 
   // Fast sync config
   private final int fastSyncPivotDistance;
@@ -230,7 +232,7 @@ public class SynchronizerConfiguration {
     private int worldStateRequestParallelism = DEFAULT_WORLD_STATE_REQUEST_PARALLELISM;
     private int worldStateMaxRequestsWithoutProgress =
         DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS;
-    private long worldStateMinMillisBeforeStalling = TimeUnit.MINUTES.toMillis(5);
+    private long worldStateMinMillisBeforeStalling = DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING;
     private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
     private int maxTrailingPeers = Integer.MAX_VALUE;
 
