@@ -145,7 +145,7 @@ Copy the following permissions configuration to a file called `permissions_confi
     ```
 The permissions configuration file includes the first two accounts from the genesis file.
 
-Permissioned nodes will be added using the JSON-RPC API after starting the nodes. 
+Permissioned nodes are added using the JSON-RPC API after starting the nodes. 
 
 !!! note
     Permissions are specified at the node level. The [`permissions_config.toml`](../Permissions/Permissioning.md#permissions-configuration-file) 
@@ -323,11 +323,11 @@ Change to the `Node-4` directory and start Node-4 replacing the public key in th
 starting Node-1 and Node-2:
 
 ```bash tab="MacOS"
-pantheon --data-path=data --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=../cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
+pantheon --data-path=data --bootnodes="<EnodeNode1>" --genesis-file=../cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=data --bootnodes="enode://<publicKeyNode1 ex 0x>@127.0.0.1:30303" --genesis-file=..\cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
+pantheon --data-path=data --bootnodes="<EnodeNode1>" --genesis-file=..\cliqueGenesis.json --rpc-http-enabled --rpc-http-api=ADMIN,ETH,NET,PERM,CLIQUE --host-whitelist=* --rpc-http-cors-origins=* --p2p-port=30306 --rpc-http-port=8548    
 ```
 
 Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method: 
