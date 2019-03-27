@@ -207,6 +207,10 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
     return peers.parallelStream().map(EnodeURL::toString).collect(Collectors.toList());
   }
 
+  private boolean checkSelfEnode(final EnodeURL node) {
+    return selfEnode.getNodeId().equals(node.getNodeId());
+  }
+
   private boolean compareEnodes(final EnodeURL nodeA, final EnodeURL nodeB) {
     boolean idsMatch = nodeA.getNodeId().equals(nodeB.getNodeId());
     boolean hostsMatch = nodeA.getIp().equals(nodeB.getIp());
@@ -225,7 +229,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
   }
 
   public boolean isPermitted(final EnodeURL node) {
-    if (compareEnodes(selfEnode, node)) {
+    if (checkSelfEnode(node)) {
       return true;
     }
     return nodesWhitelist.stream().anyMatch(p -> compareEnodes(p, node));
