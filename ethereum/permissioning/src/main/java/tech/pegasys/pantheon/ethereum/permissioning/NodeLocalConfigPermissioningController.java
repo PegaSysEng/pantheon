@@ -207,25 +207,28 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
     return peers.parallelStream().map(EnodeURL::toString).collect(Collectors.toList());
   }
 
+  private boolean compareEnodes(final EnodeURL nodeA, final EnodeURL nodeB) {
+    boolean idsMatch = nodeA.getNodeId().equals(nodeB.getNodeId());
+    boolean hostsMatch = nodeA.getIp().equals(nodeB.getIp());
+    boolean listeningPortsMatch = nodeA.getListeningPort().equals(nodeB.getListeningPort());
+    boolean discoveryPortsMatch = true;
+    if (nodeA.getDiscoveryPort().isPresent() && nodeB.getDiscoveryPort().isPresent()) {
+      discoveryPortsMatch =
+          nodeA.getDiscoveryPort().getAsInt() == nodeB.getDiscoveryPort().getAsInt();
+    }
+
+    return idsMatch && hostsMatch && listeningPortsMatch && discoveryPortsMatch;
+  }
+
   public boolean isPermitted(final String enodeURL) {
     return isPermitted(new EnodeURL(enodeURL));
   }
 
   public boolean isPermitted(final EnodeURL node) {
-    return nodesWhitelist.stream()
-        .anyMatch(
-            p -> {
-              boolean idsMatch = node.getNodeId().equals(p.getNodeId());
-              boolean hostsMatch = node.getIp().equals(p.getIp());
-              boolean listeningPortsMatch = node.getListeningPort().equals(p.getListeningPort());
-              boolean discoveryPortsMatch = true;
-              if (node.getDiscoveryPort().isPresent() && p.getDiscoveryPort().isPresent()) {
-                discoveryPortsMatch =
-                    node.getDiscoveryPort().getAsInt() == p.getDiscoveryPort().getAsInt();
-              }
-
-              return idsMatch && hostsMatch && listeningPortsMatch && discoveryPortsMatch;
-            });
+    if (compareEnodes(selfEnode, node)) {
+      return true;
+    }
+    return nodesWhitelist.stream().anyMatch(p -> compareEnodes(p, node));
   }
 
   public List<String> getNodesWhitelist() {
@@ -315,6 +318,6 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    return isPermitted(sourceEnode) || isPermitted(destinationEnode);
+    return isPermitted(sourceEnode) && isPermitted(destinationEnode);
   }
 }
