@@ -5,7 +5,6 @@
 ### Additions and Improvements
 
 - Removed DB init when using `public-key` subcommand [\#1049](https://github.com/PegaSysEng/pantheon/pull/1049) 
-- Added `public-key address export` subcommand [\#888](https://github.com/PegaSysEng/pantheon/pull/888) 
 - Output enode URL on startup [\#1137](https://github.com/PegaSysEng/pantheon/pull/1137) 
 - Added Remove Peer JSON-RPC [\#1129](https://github.com/PegaSysEng/pantheon/pull/1129) 
 - Added `net_enode` JSON-RPC [\#1119](https://github.com/PegaSysEng/pantheon/pull/1119) (thanks to [mbergstrand](https://github.com/mbergstrand))
@@ -23,7 +22,7 @@
    - Added [Transaction Pool content](https://docs.pantheon.pegasys.tech/en/latest/Using-Pantheon/Transactions/Transaction-Pool/) 
    - Added [`tx-pool-max-size` CLI option](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#tx-pool-max-size) 
    - Updated [developer build instructions to use installDist](https://github.com/PegaSysEng/pantheon/blob/master/docs/development/running-developer-builds.md) 
-   - Added [Azure one click tutorial](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Azure/Azure-Private-Network-Quickstart/) 
+   - Added [Azure quickstart tutorial](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Azure/Azure-Private-Network-Quickstart/) 
    - Enabled copy button in code blocks 
    - Added [IBFT 1.0](https://docs.pantheon.pegasys.tech/en/latest/Consensus-Protocols/QuorumIBFT/) 
    - Added section on using [Geth attach with Pantheon](https://docs.pantheon.pegasys.tech/en/latest/JSON-RPC-API/Using-JSON-RPC-API/#geth-console)    
