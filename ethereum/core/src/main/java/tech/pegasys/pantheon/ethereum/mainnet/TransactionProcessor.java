@@ -114,7 +114,8 @@ public interface TransactionProcessor {
       final ProcessableBlockHeader blockHeader,
       final Transaction transaction,
       final Address miningBeneficiary,
-      final BlockHashLookup blockHashLookup) {
+      final BlockHashLookup blockHashLookup,
+      final Boolean isPersistingState) {
     return processTransaction(
         blockchain,
         worldState,
@@ -122,7 +123,8 @@ public interface TransactionProcessor {
         transaction,
         miningBeneficiary,
         NO_TRACING,
-        blockHashLookup);
+        blockHashLookup,
+        isPersistingState);
   }
 
   /**
@@ -144,5 +146,6 @@ public interface TransactionProcessor {
       Transaction transaction,
       Address miningBeneficiary,
       OperationTracer operationTracer,
-      BlockHashLookup blockHashLookup);
+      BlockHashLookup blockHashLookup,
+      Boolean isPersisitingState);
 }
