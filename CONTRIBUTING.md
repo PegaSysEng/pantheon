@@ -52,12 +52,12 @@ open a new issue and include a link to the original issue in the body of your ne
 #### Before Submitting A Bug Report
 * **Confirm the problem** is reproducible in the latest version of the software
 * **Check the [Debugging documentation]**. You might be able to find the cause of the problem and fix things yourself. 
-* **Perform a [cursory search of project issues](https://pegasys1.atlassian.net/secure/Dashboard.jspa)** 
+* **Perform a [cursory search of project issues](https://pegasys1.atlassian.net/browse/PAN-2502?jql=project%20%3D%20PAN)** 
 to see if the problem has already been reported. If it has **and the issue is still open**, add a comment 
 to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Bug Report?
-Bugs are tracked as [Jira issues](https://pegasys1.atlassian.net/secure/Dashboard.jspa).  
+Bugs are tracked as [Jira issues](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000).  
 
 Explain the problem and include additional details to help maintainers reproduce the problem:
 
@@ -111,13 +111,13 @@ When you are creating an enhancement suggestion, please
 #### Before Submitting An Enhancement Suggestion
 
 * **Check the [Debugging documentation].** You might be able to find the cause of the problem and fix things yourself. 
-* **Perform a [cursory search of project issues](https://pegasys1.atlassian.net/secure/Dashboard.jspa)** 
+* **Perform a [cursory search of project issues](https://pegasys1.atlassian.net/browse/PAN-2502?jql=project%20%3D%20PAN)** 
 to see if the problem has already been reported. If it has **and the issue is still open**, add a comment 
 to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Enhancement Suggestion?
 
-Enhancement suggestions are tracked as [Jira issues](https://pegasys1.atlassian.net/secure/Dashboard.jspa).
+Enhancement suggestions are tracked as [Jira issues](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000).
 Provide the following information:
 
 * **Use a clear and descriptive title** for the issue to identify the suggestion.
@@ -133,7 +133,7 @@ Provide the following information:
 * **Specify the name and version of the OS you're using.**
 
 ## Your First Contribution
-Start by looking through the 'good first issue' and 'help wanted' labeled issues on the [Jira dashboard](https://pegasys1.atlassian.net/secure/Dashboard.jspa):
+Start by looking through the 'good first issue' and 'help wanted' labeled issues on the [Jira dashboard](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000):
 * [Good First Issue][search-label-good-first-issue] - issues which should only require a few lines of code or documentation, 
 and a test or two.
 * [Help wanted issues][search-label-help-wanted] - issues which are a bit more involved than `good first issue` issues.
