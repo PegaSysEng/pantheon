@@ -12,14 +12,19 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
-import static java.util.Collections.newSetFromMap;
 import static java.util.Comparator.comparing;
+
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.util.Subscribers;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,9 +34,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * Holds the current set of pending transactions with the ability to iterate them based on priority
@@ -51,28 +54,65 @@ public class PendingTransactions {
   private final Map<Address, SortedMap<Long, TransactionInfo>> transactionsBySender =
       new HashMap<>();
 
-  private final Collection<PendingTransactionListener> listeners =
-      newSetFromMap(new ConcurrentHashMap<>());
+  private final Subscribers<PendingTransactionListener> listeners = new Subscribers<>();
+
+  private final Subscribers<PendingTransactionDroppedListener> transactionDroppedListeners =
+      new Subscribers<>();
 
   private final int maxPendingTransactions;
   private final Clock clock;
 
-  public PendingTransactions(final int maxPendingTransactions, final Clock clock) {
+  private final LabelledMetric<Counter> transactionRemovedCounter;
+  private final Counter localTransactionAddedCounter;
+  private final Counter remoteTransactionAddedCounter;
+
+  public PendingTransactions(
+      final int maxPendingTransactions, final Clock clock, final MetricsSystem metricsSystem) {
     this.maxPendingTransactions = maxPendingTransactions;
     this.clock = clock;
+    final LabelledMetric<Counter> transactionAddedCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.TRANSACTION_POOL,
+            "transactions_added_total",
+            "Count of transactions added to the transaction pool",
+            "source");
+    localTransactionAddedCounter = transactionAddedCounter.labels("local");
+    remoteTransactionAddedCounter = transactionAddedCounter.labels("remote");
+
+    transactionRemovedCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.TRANSACTION_POOL,
+            "transactions_removed_total",
+            "Count of transactions removed from the transaction pool",
+            "source",
+            "operation");
   }
 
   public boolean addRemoteTransaction(final Transaction transaction) {
     final TransactionInfo transactionInfo =
         new TransactionInfo(transaction, false, clock.instant());
-    return addTransaction(transactionInfo);
+    final boolean addTransaction = addTransaction(transactionInfo);
+    remoteTransactionAddedCounter.inc();
+    return addTransaction;
   }
 
   boolean addLocalTransaction(final Transaction transaction) {
-    return addTransaction(new TransactionInfo(transaction, true, clock.instant()));
+    final boolean addTransaction =
+        addTransaction(new TransactionInfo(transaction, true, clock.instant()));
+    localTransactionAddedCounter.inc();
+    return addTransaction;
   }
 
-  public void removeTransaction(final Transaction transaction) {
+  void removeTransaction(final Transaction transaction) {
+    doRemoveTransaction(transaction, false);
+    notifyTransactionDropped(transaction);
+  }
+
+  void transactionAddedToBlock(final Transaction transaction) {
+    doRemoveTransaction(transaction, true);
+  }
+
+  private void doRemoveTransaction(final Transaction transaction, final boolean addedToBlock) {
     synchronized (pendingTransactions) {
       final TransactionInfo removedTransactionInfo = pendingTransactions.remove(transaction.hash());
       if (removedTransactionInfo != null) {
@@ -85,8 +125,17 @@ public class PendingTransactions {
                     transactionsBySender.remove(transaction.getSender());
                   }
                 });
+        incrementTransactionRemovedCounter(
+            removedTransactionInfo.isReceivedFromLocalSource(), addedToBlock);
       }
     }
+  }
+
+  private void incrementTransactionRemovedCounter(
+      final boolean receivedFromLocalSource, final boolean addedToBlock) {
+    final String location = receivedFromLocalSource ? "local" : "remote";
+    final String operation = addedToBlock ? "addedToBlock" : "dropped";
+    transactionRemovedCounter.labels(location, operation).inc();
   }
 
   /*
@@ -179,6 +228,10 @@ public class PendingTransactions {
     listeners.forEach(listener -> listener.onTransactionAdded(transaction));
   }
 
+  private void notifyTransactionDropped(final Transaction transaction) {
+    transactionDroppedListeners.forEach(listener -> listener.onTransactionDropped(transaction));
+  }
+
   public int size() {
     synchronized (pendingTransactions) {
       return pendingTransactions.size();
@@ -194,12 +247,16 @@ public class PendingTransactions {
 
   public Set<TransactionInfo> getTransactionInfo() {
     synchronized (pendingTransactions) {
-      return pendingTransactions.values().stream().collect(Collectors.toSet());
+      return new HashSet<>(pendingTransactions.values());
     }
   }
 
-  public void addTransactionListener(final PendingTransactionListener listener) {
-    listeners.add(listener);
+  void addTransactionListener(final PendingTransactionListener listener) {
+    listeners.subscribe(listener);
+  }
+
+  void addTransactionDroppedListener(final PendingTransactionDroppedListener listener) {
+    transactionDroppedListeners.subscribe(listener);
   }
 
   public OptionalLong getNextNonceForSender(final Address sender) {
