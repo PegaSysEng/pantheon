@@ -106,6 +106,7 @@ public interface TransactionProcessor {
    * @param transaction The transaction to process
    * @param miningBeneficiary The address which is to receive the transaction fee
    * @param blockHashLookup The {@link BlockHashLookup} to use for BLOCKHASH operations
+   * @param isPersistingState Whether the state will be modified by this process
    * @return the transaction result
    */
   default Result processTransaction(
@@ -137,6 +138,7 @@ public interface TransactionProcessor {
    * @param operationTracer The tracer to record results of each EVM operation
    * @param miningBeneficiary The address which is to receive the transaction fee
    * @param blockHashLookup The {@link BlockHashLookup} to use for BLOCKHASH operations
+   * @param isPersistingState Whether the state will be modified by this process
    * @return the transaction result
    */
   Result processTransaction(
@@ -147,5 +149,5 @@ public interface TransactionProcessor {
       Address miningBeneficiary,
       OperationTracer operationTracer,
       BlockHashLookup blockHashLookup,
-      Boolean isPersisitingState);
+      Boolean isPersistingState);
 }
