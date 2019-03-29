@@ -30,7 +30,6 @@ contract('Authority ', () => {
 
       // add them a second time, result should be false
       result = await proxy.addAdmin(newAdmin);
-      console.log(result);
 
       resultAdmins = await proxy.getAllAdmins();
       console.log(resultAdmins);
