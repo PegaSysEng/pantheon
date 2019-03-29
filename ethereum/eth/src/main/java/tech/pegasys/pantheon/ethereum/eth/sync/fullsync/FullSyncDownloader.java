@@ -111,6 +111,8 @@ public class FullSyncDownloader<C> {
   public TrailingPeerRequirements calculateTrailingPeerRequirements() {
     return syncState.isInSync()
         ? TrailingPeerRequirements.UNRESTRICTED
-        : new TrailingPeerRequirements(syncState.chainHeadNumber(), config.getMaxTrailingPeers());
+        : new TrailingPeerRequirements(
+            protocolContext.getBlockchain().getChainHeadBlockNumber(),
+            config.getMaxTrailingPeers());
   }
 }
