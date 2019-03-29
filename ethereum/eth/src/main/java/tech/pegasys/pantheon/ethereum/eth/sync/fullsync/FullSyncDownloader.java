@@ -61,7 +61,7 @@ public class FullSyncDownloader<C> {
             ethContext,
             syncState,
             new FullSyncTargetManager<>(
-                config, protocolSchedule, protocolContext, ethContext, syncState, metricsSystem),
+                config, protocolSchedule, protocolContext, ethContext, metricsSystem),
             new CheckpointHeaderManager<>(
                 config, protocolContext, ethContext, syncState, protocolSchedule, metricsSystem),
             this::importBlocksForCheckpoints,
