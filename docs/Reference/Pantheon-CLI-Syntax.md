@@ -60,10 +60,10 @@ When connecting to MainNet or public testnets, the default is a predefined list 
 
 On custom networks defined by [`--genesis-file`](#genesis-file) option,
 an empty list of bootnodes is defined by default unless you define custom bootnodes as described in 
-[private network documentation](../Configuring-Pantheon/Bootnodes.md#bootnodes).
+[private network documentation](../Configuring-Pantheon/Networking/Bootnodes.md#bootnodes).
 
 !!! note
-    Specifying that a node is a [bootnode](../Configuring-Pantheon/Bootnodes.md#bootnodes) 
+    Specifying that a node is a [bootnode](../Configuring-Pantheon/Networking/Bootnodes.md#bootnodes) 
     must be done on the command line using [`--bootnodes`](#bootnodes) option without value,
     not in a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md).  
 
@@ -97,7 +97,7 @@ The default is `none`.
 data-path="/home/me/me_node"
 ```
 
-The path to the Pantheon data directory. The default is the `/build/distributions/pantheon-<version>` directory in the Pantheon installation directory.
+The path to the Pantheon data directory. The default is the directory in which Pantheon is installed.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#data-directory). 
@@ -247,7 +247,7 @@ metrics-port="6174"
 ```
 
 Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
-The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
+The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
 
 ### metrics-push-enabled 
 
@@ -321,7 +321,7 @@ metrics-push-port="6174"
 ```
 
 Port (TCP) of the [Prometheus Push Gateway](https://github.com/prometheus/pushgateway).
-The default is `9001`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
+The default is `9001`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
 
 ### metrics-push-prometheus-job
 
@@ -545,65 +545,128 @@ p2p-port="1789"
 ```
 
 Specifies the P2P listening ports (UDP and TCP).
-The default is 30303. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
+The default is 30303. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
-### permissions-accounts-enabled
+### permissions-accounts-config-file-enabled
 
 ```bash tab="Syntax"
---permissions-accounts-enabled[=<true|false>]
+--permissions-accounts-config-file-enabled[=<true|false>]
 ```
 
 ```bash tab="Example Command Line"
---permissions-accounts-enabled
+--permissions-accounts-config-file-enabled
 ```
 
 ```bash tab="Example Configuration File"
-permissions-accounts-enabled=true
+permissions-accounts-config-file-enabled=true
 ```
 
-Set to enable account level permissions.
+Set to enable file-based account level permissions. Default is `false`. 
 
-The default is `false`. 
-    
-### permissions-config-file    
+### permissions-accounts-config-file    
 
 ```bash tab="Syntax"
---permissions-config-file=<FILE>
+--permissions-accounts-config-file=<FILE>
 ```
 
 ```bash tab="Example Command Line"
---permissions-config-file=/home/me/me_configFiles/myPermissionsFile
+--permissions-accounts-config-file=/home/me/me_configFiles/myPermissionsFile
 ```
 
 ```bash tab="Example Configuration File"
-permissions-config-file="/home/me/me_configFiles/myPermissionsFile"
+permissions-accounts-config-file="/home/me/me_configFiles/myPermissionsFile"
 ```
 
-Path to the [permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file).
-The default is the `permissions_config.toml` file in the [data directory](#data-path).
+Path to the [accounts permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file).
+Default is the `permissions_config.toml` file in the [data directory](#data-path).
+
+!!! tip
+    `--permissions-accounts-config-file` and [`--permissions-nodes-config-file`](#permissions-nodes-config-file)
+    can use the same file. 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
 
-### permissions-nodes-enabled
+### permissions-nodes-config-file-enabled
 
 ```bash tab="Syntax"
---permissions-nodes-enabled[=<true|false>]
+--permissions-nodes-config-file-enabled[=<true|false>]
 ```
 
 ```bash tab="Example Command Line"
---permissions-nodes-enabled
+--permissions-nodes-config-file-enabled
 ```
 
 ```bash tab="Example Configuration File"
-permissions-nodes-enabled=true
+permissions-nodes-config-file-enabled=true
 ```
 
-Set to enable node level permissions.
-The default is `false`.
+Set to enable file-based node level permissions. Default is `false`.
+
+### permissions-nodes-config-file    
+
+```bash tab="Syntax"
+--permissions-nodes-config-file=<FILE>
+```
+
+```bash tab="Example Command Line"
+--permissions-nodes-config-file=/home/me/me_configFiles/myPermissionsFile
+```
+
+```bash tab="Example Configuration File"
+permissions-nodes-config-file="/home/me/me_configFiles/myPermissionsFile"
+```
+
+Path to the [nodes permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file).
+Default is the `permissions_config.toml` file in the [data directory](#data-path).
+
+!!! tip
+    `--permissions-nodes-config-file` and [`--permissions-accounts-config-file`](#permissions-accounts-config-file)
+    can use the same file. 
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
+
+### permissions-nodes-contract-address
+
+```bash tab="Syntax"
+--permissions-nodes-contract-address=<ContractAddress>
+```
+
+```bash tab="Example Command Line"
+--permissions-nodes-contract-address=xyz
+```
+
+```bash tab="Example Configuration File"
+permissions-nodes-contract-address=xyz
+```
+
+Specifies the contract address for contract-based nodes permissions.
+
+!!!note
+    Contract-based nodes permissions are under development and will be available in v1.1.  
+
+### permissions-nodes-contract-enabled
+
+```bash tab="Syntax"
+--permissions-nodes-contract-enabled[=<true|false>]
+```
+
+```bash tab="Example Command Line"
+--permissions-nodes-contract-enabled
+```
+
+```bash tab="Example Configuration File"
+permissions-nodes-contract-enabled=true
+```
+
+Set to enable contract-based node level permissions. Default is `false`.
+
+!!!note
+    Contract-based nodes permissions are under development and will be available in v1.1.  
 
 ### privacy-enabled
 
@@ -819,7 +882,7 @@ rpc-http-port="3435"
 ```
 
 Specifies HTTP JSON-RPC listening port (TCP).
-The default is 8545. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration). 
+The default is 8545. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md). 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
@@ -941,7 +1004,7 @@ rpc-ws-port="6174"
 ```
 
 Specifies Websockets JSON-RPC listening port (TCP).
-The default is 8546. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking.md#port-configuration).
+The default is 8546. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 

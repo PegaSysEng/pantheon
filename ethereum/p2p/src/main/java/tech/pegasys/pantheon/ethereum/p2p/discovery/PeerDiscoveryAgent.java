@@ -36,14 +36,13 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.NetworkUtility;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -51,6 +50,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
@@ -74,6 +74,7 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
   private final PeerBlacklist peerBlacklist;
   private final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController;
   private final Optional<NodePermissioningController> nodePermissioningController;
+  private final MetricsSystem metricsSystem;
   /* The peer controller, which takes care of the state machine of peers. */
   protected Optional<PeerDiscoveryController> controller = Optional.empty();
 
@@ -97,7 +98,9 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
       final PeerRequirement peerRequirement,
       final PeerBlacklist peerBlacklist,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
-      final Optional<NodePermissioningController> nodePermissioningController) {
+      final Optional<NodePermissioningController> nodePermissioningController,
+      final MetricsSystem metricsSystem) {
+    this.metricsSystem = metricsSystem;
     checkArgument(keyPair != null, "keypair cannot be null");
     checkArgument(config != null, "provided configuration cannot be null");
 
@@ -171,7 +174,8 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
         nodeWhitelistController,
         nodePermissioningController,
         peerBondedObservers,
-        peerDroppedObservers);
+        peerDroppedObservers,
+        metricsSystem);
   }
 
   protected boolean validatePacketSize(final int packetSize) {
@@ -221,12 +225,8 @@ public abstract class PeerDiscoveryAgent implements DisconnectCallback {
             });
   }
 
-  @VisibleForTesting
-  public Collection<DiscoveryPeer> getPeers() {
-    return controller
-        .map(PeerDiscoveryController::getPeers)
-        .map(Collections::unmodifiableCollection)
-        .orElse(Collections.emptyList());
+  public Stream<DiscoveryPeer> getPeers() {
+    return controller.map(PeerDiscoveryController::getPeers).orElse(Stream.empty());
   }
 
   public Optional<DiscoveryPeer> getAdvertisedPeer() {

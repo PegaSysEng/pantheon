@@ -38,6 +38,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.BlockchainSetupUt
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -230,8 +231,8 @@ public class FullSyncDownloaderTest {
     peer.respondWhileOtherThreadsWork(
         responder, () -> localBlockchain.getChainHeadBlockNumber() < targetBlock);
 
-    assertThat(syncState.syncTarget()).isPresent();
-    assertThat(syncState.syncTarget().get().peer()).isEqualTo(peer.getEthPeer());
+    // Synctarget should not exist as chain has fully downloaded.
+    assertThat(syncState.syncTarget().isPresent()).isFalse();
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(targetBlock);
   }
 
@@ -575,6 +576,36 @@ public class FullSyncDownloaderTest {
         otherPeer.respond(otherResponder);
       }
     }
+  }
+
+  @Test
+  public void shouldLimitTrailingPeersWhenBehindChain() {
+    localBlockchainSetup.importFirstBlocks(2);
+    final int maxTailingPeers = 5;
+    final FullSyncDownloader<?> downloader =
+        downloader(SynchronizerConfiguration.builder().maxTrailingPeers(maxTailingPeers).build());
+
+    final RespondingEthPeer bestPeer =
+        EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 100);
+    syncState.setSyncTarget(bestPeer.getEthPeer(), localBlockchain.getChainHeadHeader());
+
+    final TrailingPeerRequirements expected =
+        new TrailingPeerRequirements(localBlockchain.getChainHeadBlockNumber(), maxTailingPeers);
+    assertThat(downloader.calculateTrailingPeerRequirements()).isEqualTo(expected);
+  }
+
+  @Test
+  public void shouldNotLimitTrailingPeersWhenInSync() {
+    localBlockchainSetup.importFirstBlocks(2);
+    final int maxTailingPeers = 5;
+    final FullSyncDownloader<?> downloader =
+        downloader(SynchronizerConfiguration.builder().maxTrailingPeers(maxTailingPeers).build());
+
+    final RespondingEthPeer bestPeer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 2);
+    syncState.setSyncTarget(bestPeer.getEthPeer(), localBlockchain.getChainHeadHeader());
+
+    assertThat(downloader.calculateTrailingPeerRequirements())
+        .isEqualTo(TrailingPeerRequirements.UNRESTRICTED);
   }
 
   private MutableBlockchain createShortChain(

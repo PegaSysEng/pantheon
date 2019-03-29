@@ -61,7 +61,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
   PrometheusMetricsSystem() {}
 
   public static MetricsSystem init(final MetricsConfiguration metricsConfiguration) {
-    if (!metricsConfiguration.isEnabled()) {
+    if (!metricsConfiguration.isEnabled() && !metricsConfiguration.isPushEnabled()) {
       return new NoOpMetricsSystem();
     }
     final PrometheusMetricsSystem metricsSystem = new PrometheusMetricsSystem();
@@ -99,7 +99,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
             addCollector(category, counter);
             return new PrometheusCounter(counter);
           } else {
-            return NoOpMetricsSystem.NO_OP_LABELLED_COUNTER;
+            return NoOpMetricsSystem.getCounterLabelledMetric(labelNames.length);
           }
         });
   }
@@ -128,7 +128,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
             addCollector(category, summary);
             return new PrometheusTimer(summary);
           } else {
-            return NoOpMetricsSystem.NO_OP_LABELLED_TIMER;
+            return NoOpMetricsSystem.getOperationTimerLabelledMetric(labelNames.length);
           }
         });
   }

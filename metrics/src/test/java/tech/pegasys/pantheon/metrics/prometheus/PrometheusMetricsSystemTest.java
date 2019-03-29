@@ -181,7 +181,7 @@ public class PrometheusMetricsSystemTest {
     // do a category we are not watching
     final LabelledMetric<Counter> counterN =
         localMetricSystem.createLabelledCounter(NETWORK, "ABC", "Not that kind of network", "show");
-    assertThat(counterN).isSameAs(NoOpMetricsSystem.NO_OP_LABELLED_COUNTER);
+    assertThat(counterN).isSameAs(NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER);
 
     counterN.labels("show").inc();
     assertThat(localMetricSystem.getMetrics()).isEmpty();
@@ -189,10 +189,40 @@ public class PrometheusMetricsSystemTest {
     // do a category we are watching
     final LabelledMetric<Counter> counterR =
         localMetricSystem.createLabelledCounter(RPC, "name", "Not useful", "method");
-    assertThat(counterR).isNotSameAs(NoOpMetricsSystem.NO_OP_LABELLED_COUNTER);
+    assertThat(counterR).isNotSameAs(NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER);
 
     counterR.labels("op").inc();
     assertThat(localMetricSystem.getMetrics())
         .containsExactly(new Observation(RPC, "name", 1.0, singletonList("op")));
+  }
+
+  @Test
+  public void returnsNoOpMetricsWhenAllDisabled() {
+    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    metricsConfiguration.setEnabled(false);
+    metricsConfiguration.setPushEnabled(false);
+    final MetricsSystem localMetricSystem = PrometheusMetricsSystem.init(metricsConfiguration);
+
+    assertThat(localMetricSystem).isInstanceOf(NoOpMetricsSystem.class);
+  }
+
+  @Test
+  public void returnsPrometheusMetricsWhenEnabled() {
+    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    metricsConfiguration.setEnabled(true);
+    metricsConfiguration.setPushEnabled(false);
+    final MetricsSystem localMetricSystem = PrometheusMetricsSystem.init(metricsConfiguration);
+
+    assertThat(localMetricSystem).isInstanceOf(PrometheusMetricsSystem.class);
+  }
+
+  @Test
+  public void returnsNoOpMetricsWhenPushEnabled() {
+    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    metricsConfiguration.setEnabled(false);
+    metricsConfiguration.setPushEnabled(true);
+    final MetricsSystem localMetricSystem = PrometheusMetricsSystem.init(metricsConfiguration);
+
+    assertThat(localMetricSystem).isInstanceOf(PrometheusMetricsSystem.class);
   }
 }
