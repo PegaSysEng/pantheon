@@ -15,7 +15,8 @@ Private transactions are defined as *restricted* or *unrestricted*:
 * In restricted private transactions the payload of the private transaction is only stored in the nodes
 participating in the transaction. 
 
-* In unrestricted private transactions .... 
+* In unrestricted private transactions the payload of the private transaction is transmitted to all nodes
+in the network but readable only by actors involved in the transaction.   
 
 !!! important 
     Pantheon implements restricted private transactions only.
@@ -39,6 +40,10 @@ data can represent arrangements involving multiple parties. For example, data in
 
 - **Private Transaction Manager**: Subsystem of an Enterprise network for implementing privacy. Also known as an Enclave.
 For example, [Orion](https://github.com/PegaSysEng/orion).
+
+- **Private Marker Transaction**: Public Ethereum transaction with a payload of the Enclave-key of the 
+private transaction. The `to` attribute of the Privacy Marker Transaction is the privacy precompile contract. 
+The Privacy Marker Transaction is signed with the nodes default key.
 
 
 ### How a Private Transaction is Processed
@@ -67,9 +72,6 @@ privacy group id.
 Transaction Handler (as a response to the synchronous HTTP call).
      
 7. The Private Transaction Handler will create a Privacy Marker Transaction (PMT).
-A PMT is a standard public Ethereum transaction. The payload of the PMT 
-is the Enclave-key of the private transaction. The `to` attribute of the PMT the 
-privacy precompile contract. The PMT is signed with the nodes default key.
 The PMT is sent to the transaction pool. Once the PMT has been mined in a block
 it is distributed to all nodes in the network. 
 
