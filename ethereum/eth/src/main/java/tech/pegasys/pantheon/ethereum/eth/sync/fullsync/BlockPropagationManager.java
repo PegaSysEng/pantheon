@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.eth.sync;
+package tech.pegasys.pantheon.ethereum.eth.sync.fullsync;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
@@ -28,6 +28,8 @@ import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockHashesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockHashesMessage.NewBlockHash;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
+import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
+import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.PersistBlockTask;
