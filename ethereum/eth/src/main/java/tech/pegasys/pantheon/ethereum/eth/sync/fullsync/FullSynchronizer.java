@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync.fullsync;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
+import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
@@ -25,7 +26,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 public class FullSynchronizer<C> {
 
   private final BlockPropagationManager<C> blockPropagationManager;
-  private final FullSyncDownloader<C> fullSyncDownloader;
+  private final ChainDownloader chainDownloader;
   private final SynchronizerConfiguration syncConfig;
   private final ProtocolContext<C> protocolContext;
   private final SyncState syncState;
@@ -52,14 +53,14 @@ public class FullSynchronizer<C> {
             metricsSystem,
             new BlockBroadcaster(ethContext));
 
-    this.fullSyncDownloader =
-        new FullSyncDownloader<>(
+    this.chainDownloader =
+        FullSyncChainDownloader.create(
             syncConfig, protocolSchedule, protocolContext, ethContext, syncState, metricsSystem);
   }
 
   public void start() {
     blockPropagationManager.start();
-    fullSyncDownloader.start();
+    chainDownloader.start();
   }
 
   public TrailingPeerRequirements calculateTrailingPeerRequirements() {
