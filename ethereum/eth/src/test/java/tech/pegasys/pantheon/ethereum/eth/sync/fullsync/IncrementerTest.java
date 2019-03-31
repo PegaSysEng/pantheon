@@ -82,7 +82,7 @@ public class IncrementerTest {
 
     final SynchronizerConfiguration syncConfig =
         SynchronizerConfiguration.builder().downloaderChainSegmentSize(10).build();
-    final FullSyncDownloader<?> downloader = downloader(syncConfig);
+    final FullSyncDownloader downloader = downloader(syncConfig);
     downloader.start();
 
     peer.respondWhileOtherThreadsWork(responder, () -> !syncState.syncTarget().isPresent());
@@ -135,8 +135,8 @@ public class IncrementerTest {
     }
   }
 
-  private FullSyncDownloader<?> downloader(final SynchronizerConfiguration syncConfig) {
-    return new FullSyncDownloader<>(
+  private FullSyncDownloader downloader(final SynchronizerConfiguration syncConfig) {
+    return new FullSyncDownloader(
         syncConfig, protocolSchedule, protocolContext, ethContext, syncState, metricsSystem);
   }
 }

@@ -17,8 +17,8 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask.PeerTaskResult;
-import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderManager;
+import tech.pegasys.pantheon.ethereum.eth.sync.EthTaskChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
@@ -34,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.annotations.VisibleForTesting;
 
 public class FullSyncDownloader<C> {
-  private final ChainDownloader<C> chainDownloader;
+  private final EthTaskChainDownloader<C> chainDownloader;
   private final SynchronizerConfiguration config;
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
@@ -56,7 +56,7 @@ public class FullSyncDownloader<C> {
     this.syncState = syncState;
     this.metricsSystem = metricsSystem;
     chainDownloader =
-        new ChainDownloader<>(
+        new EthTaskChainDownloader<>(
             config,
             ethContext,
             syncState,
