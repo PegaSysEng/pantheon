@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class FastSyncEthTaskChainDownloader {
+public class FastSyncChainDownloader {
 
-  private FastSyncEthTaskChainDownloader() {}
+  private FastSyncChainDownloader() {}
 
   public static <C> ChainDownloader create(
       final SynchronizerConfiguration config,

@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FastSyncEthTaskChainDownloaderTest {
+public class FastSyncChainDownloaderTest {
 
   private final FastSyncValidationPolicy validationPolicy = mock(FastSyncValidationPolicy.class);
 
@@ -74,7 +74,7 @@ public class FastSyncEthTaskChainDownloaderTest {
 
   private ChainDownloader downloader(
       final SynchronizerConfiguration syncConfig, final long pivotBlockNumber) {
-    return FastSyncEthTaskChainDownloader.create(
+    return FastSyncChainDownloader.create(
         syncConfig,
         protocolSchedule,
         protocolContext,

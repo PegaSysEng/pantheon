@@ -155,7 +155,7 @@ public class FastSyncActions<C> {
 
   public CompletableFuture<FastSyncState> downloadChain(final FastSyncState currentState) {
     final ChainDownloader downloader =
-        FastSyncEthTaskChainDownloader.create(
+        FastSyncChainDownloader.create(
             syncConfig,
             protocolSchedule,
             protocolContext,
