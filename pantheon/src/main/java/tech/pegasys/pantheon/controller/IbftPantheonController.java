@@ -202,7 +202,12 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final TransactionPool transactionPool =
         TransactionPoolFactory.createTransactionPool(
-            protocolSchedule, protocolContext, ethContext, clock, maxPendingTransactions);
+            protocolSchedule,
+            protocolContext,
+            ethContext,
+            clock,
+            maxPendingTransactions,
+            metricsSystem);
 
     final IbftEventQueue ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
 
