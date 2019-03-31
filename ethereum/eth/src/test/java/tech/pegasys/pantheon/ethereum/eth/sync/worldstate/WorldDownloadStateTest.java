@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static tech.pegasys.pantheon.ethereum.eth.sync.worldstate.NodeDataRequest.createAccountDataRequest;
@@ -31,6 +32,7 @@ import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -133,28 +135,63 @@ public class WorldDownloadStateTest {
     }
 
     downloadState.requestComplete(false);
-    assertThat(downloadState.getDownloadFuture()).isCompletedExceptionally();
+    assertWorldStateStalled(downloadState);
   }
 
   @Test
-  public void shouldNotBeStalledWhenMaxRequestsReachedButNotMinimumTime() {
+  public void shouldNotBeStalledWhenMaxRequestsReachedUntilMinimumTimeAlsoReached() {
     for (int i = 0; i < MAX_REQUESTS_WITHOUT_PROGRESS; i++) {
       downloadState.requestComplete(false);
       assertThat(downloadState.getDownloadFuture()).isNotDone();
     }
 
+    // Exceeding the requests without progress limit doesn't trigger stalled state
+    downloadState.requestComplete(false);
+    assertThat(downloadState.getDownloadFuture()).isNotDone();
+
+    // Until the minimum time has elapsed, then the next request with no progress marks as stalled
     clock.stepMillis(MIN_MILLIS_BEFORE_STALLING + 1);
     downloadState.requestComplete(false);
-    assertThat(downloadState.getDownloadFuture()).isCompletedExceptionally();
+    assertWorldStateStalled(downloadState);
   }
 
   @Test
-  public void shouldNotAddRequestsAfterDownloadIsStalled() {
+  public void shouldNotBeStalledIfMinimumTimeIsReachedButMaximumRequestsIsNot() {
+    clock.stepMillis(MIN_MILLIS_BEFORE_STALLING + 1);
+    downloadState.requestComplete(false);
+    assertThat(downloadState.getDownloadFuture()).isNotDone();
+  }
+
+  @Test
+  public void shouldResetTimeSinceProgressWhenProgressIsMade() {
+    // Enough time has progressed but the next request makes progress so we are not stalled.
+    clock.stepMillis(MIN_MILLIS_BEFORE_STALLING + 1);
+    downloadState.requestComplete(true);
+    assertThat(downloadState.getDownloadFuture()).isNotDone();
+
+    // We then reach the max number of requests without progress but the timer should have reset
+    for (int i = 0; i < MAX_REQUESTS_WITHOUT_PROGRESS; i++) {
+      downloadState.requestComplete(false);
+      assertThat(downloadState.getDownloadFuture()).isNotDone();
+    }
+    assertThat(downloadState.getDownloadFuture()).isNotDone();
+  }
+
+  @Test
+  public void shouldNotAddRequestsAfterDownloadIsCompleted() {
     downloadState.checkCompletion(worldStateStorage, header);
 
     downloadState.enqueueRequests(singletonList(createAccountDataRequest(Hash.EMPTY_TRIE_HASH)));
     downloadState.enqueueRequest(createAccountDataRequest(Hash.EMPTY_TRIE_HASH));
 
     assertThat(pendingRequests.isEmpty()).isTrue();
+  }
+
+  private void assertWorldStateStalled(final WorldDownloadState state) {
+    final CompletableFuture<Void> future = state.getDownloadFuture();
+    assertThat(future).isCompletedExceptionally();
+    assertThatThrownBy(future::get)
+        .isInstanceOf(ExecutionException.class)
+        .hasRootCauseInstanceOf(StalledDownloadException.class);
   }
 }
