@@ -163,17 +163,22 @@ try {
                 docker.image(docker_image).inside("-e DOCKER_HOST=tcp://docker:2375 --link ${d.id}:docker") {
                     stage('build image') {
                         sh "cd docker && cp ../build/distributions/pantheon-*.tar.gz ."
-                        pantheon = docker.build("pegasyseng/pantheon:develop", "docker")
+                        pantheon = docker.build("pegasyseng/pantheon-develop:develop", "docker")
                     }
                     try {
                         stage('test image') {
                             sh "apk add bash"
                             sh "mkdir -p docker/reports"
-                            sh "cd docker && bash test.sh pegasyseng/pantheon-private:develop"
+                            sh "cd docker && bash test.sh pegasyseng/pantheon-develop:develop"
                         }
                     } finally {
                         junit 'docker/reports/*.xml'
                         sh "rm -rf docker/reports"
+                    }
+                    stage('push image') {
+                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-pegasysengci') {
+                            pantheon.push()
+                        }
                     }
                 }
             }
