@@ -26,6 +26,8 @@ public class NodePermissioningController {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider;
+  private Optional<ContextualNodePermissioningProvider> insufficientPeersPermissioningProvider =
+      Optional.empty();
   private final List<NodePermissioningProvider> providers;
 
   public NodePermissioningController(
@@ -44,11 +46,19 @@ public class NodePermissioningController {
       return true;
     }
 
+    final Optional<Boolean> insufficientPeerPermission =
+        insufficientPeersPermissioningProvider.flatMap(
+            p -> p.isPermitted(sourceEnode, destinationEnode));
+
+    if (insufficientPeerPermission.isPresent()) {
+      return insufficientPeerPermission.get();
+    }
+
     if (syncStatusNodePermissioningProvider.isPresent()
         && !syncStatusNodePermissioningProvider.get().isPermitted(sourceEnode, destinationEnode)) {
       return false;
     } else {
-      for (NodePermissioningProvider provider : providers) {
+      for (final NodePermissioningProvider provider : providers) {
         if (!provider.isPermitted(sourceEnode, destinationEnode)) {
           return false;
         }
@@ -63,6 +73,12 @@ public class NodePermissioningController {
     } else {
       peerDiscoveryCallback.run();
     }
+  }
+
+  public void setInsufficientPeersPermissioningProvider(
+      final ContextualNodePermissioningProvider insufficientPeersPermissioningProvider) {
+    this.insufficientPeersPermissioningProvider =
+        Optional.of(insufficientPeersPermissioningProvider);
   }
 
   public Optional<SyncStatusNodePermissioningProvider> getSyncStatusNodePermissioningProvider() {
