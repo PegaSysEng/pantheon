@@ -155,7 +155,7 @@ try {
             }
         }
     }
-    if (env.BRANCH_NAME == "master") {
+    if (env.BRANCH_NAME == "feature/dockers_of_master") {
         node {
             checkout scm
             unstash 'distTarBall'
