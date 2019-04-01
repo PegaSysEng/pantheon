@@ -46,7 +46,7 @@ module.exports = {
 
 ### Start Pantheon Node 
 
-Start a Pantheon node with the JSON-RPC enabled on the endpoint specified in the Truffle configuration 
+Start a Pantheon node with JSON-RPC enabled on the endpoint specified in the Truffle configuration 
 file.  
 
 ### Deploy Contract 
