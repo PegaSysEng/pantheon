@@ -32,7 +32,7 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FullSynchronizerTest {
+public class FullDownloaderFactoryTest {
 
   protected ProtocolSchedule<Void> protocolSchedule;
   protected EthProtocolManager ethProtocolManager;
@@ -60,8 +60,8 @@ public class FullSynchronizerTest {
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
   }
 
-  private FullSynchronizer<Void> downloader(final SynchronizerConfiguration syncConfig) {
-    return new FullSynchronizer<>(
+  private FullDownloaderFactory<Void> downloader(final SynchronizerConfiguration syncConfig) {
+    return new FullDownloaderFactory<>(
         syncConfig, protocolSchedule, protocolContext, ethContext, syncState, metricsSystem);
   }
 
@@ -69,7 +69,7 @@ public class FullSynchronizerTest {
   public void shouldLimitTrailingPeersWhenBehindChain() {
     localBlockchainSetup.importFirstBlocks(2);
     final int maxTailingPeers = 5;
-    final FullSynchronizer<Void> synchronizer =
+    final FullDownloaderFactory<Void> synchronizer =
         downloader(SynchronizerConfiguration.builder().maxTrailingPeers(maxTailingPeers).build());
 
     final RespondingEthPeer bestPeer =
@@ -85,7 +85,7 @@ public class FullSynchronizerTest {
   public void shouldNotLimitTrailingPeersWhenInSync() {
     localBlockchainSetup.importFirstBlocks(2);
     final int maxTailingPeers = 5;
-    final FullSynchronizer<Void> synchronizer =
+    final FullDownloaderFactory<Void> synchronizer =
         downloader(SynchronizerConfiguration.builder().maxTrailingPeers(maxTailingPeers).build());
 
     final RespondingEthPeer bestPeer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 2);

@@ -41,7 +41,7 @@ import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class FastSynchronizer<C> {
+public class FastDownloaderFactory<C> {
   private static final Logger LOG = LogManager.getLogger();
 
   private final FastSyncDownloader<C> fastSyncDownloader;
@@ -50,7 +50,7 @@ public class FastSynchronizer<C> {
   private final WorldStateDownloader worldStateDownloader;
   private final FastSyncState initialSyncState;
 
-  private FastSynchronizer(
+  private FastDownloaderFactory(
       final FastSyncDownloader<C> fastSyncDownloader,
       final Path fastSyncDataDirectory,
       final CachingTaskCollection<NodeDataRequest> taskCollection,
@@ -63,7 +63,7 @@ public class FastSynchronizer<C> {
     this.initialSyncState = initialSyncState;
   }
 
-  public static <C> Optional<FastSynchronizer<C>> create(
+  public static <C> Optional<FastDownloaderFactory<C>> create(
       final SynchronizerConfiguration syncConfig,
       final Path dataDirectory,
       final ProtocolSchedule<C> protocolSchedule,
@@ -116,7 +116,7 @@ public class FastSynchronizer<C> {
             worldStateDownloader,
             fastSyncStateStorage);
     return Optional.of(
-        new FastSynchronizer<>(
+        new FastDownloaderFactory<>(
             fastSyncDownloader,
             fastSyncDataDirectory,
             taskCollection,
