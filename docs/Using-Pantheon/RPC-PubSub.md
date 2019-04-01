@@ -244,8 +244,8 @@ dropped from the transaction pool for the node.
 The dropped transactions subscription returns the transaction hashes of the dropped transactions. 
 
 Transactions can be re-added to the transaction pool from a variety of sources after being dropped. For example, 
-re-receiving the dropped transaction from a peer. As a result it's possible to receive multiple dropped transaction 
-notifications for the same transaction.
+receiving a previously dropped transaction from a peer. As a result it's possible to receive multiple dropped 
+transaction notifications for the same transaction.
 
 !!!example
     To subscribe to dropped transaction notifications:
