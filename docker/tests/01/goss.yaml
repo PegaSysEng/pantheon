@@ -45,7 +45,7 @@ file:
     filetype: file
     contains: []
 package:
-  libc6-compat:
+  libc6:
     installed: true
 port:
   tcp:8545:
