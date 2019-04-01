@@ -243,8 +243,9 @@ dropped from the transaction pool for the node.
 
 The dropped transactions subscription returns the transaction hashes of the dropped transactions. 
 
-If a chain reorganization occurs, transactions are resubmitted to be included in the new canonical chain. 
-This means the subscription can publish notifications for the same dropped transaction more than once.
+Transactions can be re-added to the transaction pool from a variety of sources after being dropped. For example, 
+re-receiving the dropped transaction from a peer. As a result it's possible to receive multiple dropped transaction 
+notifications for the same transaction.
 
 !!!example
     To subscribe to dropped transaction notifications:
