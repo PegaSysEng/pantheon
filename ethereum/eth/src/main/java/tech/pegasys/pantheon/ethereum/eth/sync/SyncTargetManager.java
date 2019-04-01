@@ -128,6 +128,6 @@ public abstract class SyncTargetManager<C> {
 
   public boolean syncTargetCanProvideMoreBlocks(final SyncTarget syncTarget) {
     final EthPeer currentSyncingPeer = syncTarget.peer();
-    return currentSyncingPeer.isDisconnected() && !isSyncTargetReached(currentSyncingPeer);
+    return !currentSyncingPeer.isDisconnected() && !isSyncTargetReached(currentSyncingPeer);
   }
 }
