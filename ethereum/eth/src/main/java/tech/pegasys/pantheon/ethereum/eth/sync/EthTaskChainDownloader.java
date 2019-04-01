@@ -150,7 +150,7 @@ public class EthTaskChainDownloader<C> implements ChainDownloader {
   }
 
   private CompletableFuture<List<BlockHeader>> pullCheckpointHeaders(final SyncTarget syncTarget) {
-    return syncTargetManager.isSyncTargetDisconnected()
+    return syncTarget.peer().isDisconnected()
         ? CompletableFuture.completedFuture(emptyList())
         : checkpointHeaderManager.pullCheckpointHeaders(syncTarget);
   }
@@ -202,7 +202,6 @@ public class EthTaskChainDownloader<C> implements ChainDownloader {
   private void clearSyncTarget(final SyncTarget syncTarget) {
     chainSegmentTimeouts = 0;
     checkpointHeaderManager.clearSyncTarget();
-    syncTargetManager.clearSyncTarget(syncTarget);
     syncState.clearSyncTarget();
   }
 

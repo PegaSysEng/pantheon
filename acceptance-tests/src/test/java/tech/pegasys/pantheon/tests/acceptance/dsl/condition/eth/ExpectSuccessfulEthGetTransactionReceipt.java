@@ -14,13 +14,10 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptTransaction;
-
-import java.util.Optional;
-
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 public class ExpectSuccessfulEthGetTransactionReceipt implements Condition {
 
@@ -33,8 +30,6 @@ public class ExpectSuccessfulEthGetTransactionReceipt implements Condition {
 
   @Override
   public void verify(final Node node) {
-    final Optional<TransactionReceipt> response = node.execute(transaction);
-    assertThat(response.isPresent()).isTrue();
-    assertThat(response.get().getStatus()).isEqualToIgnoringCase("0x1");
+    WaitUtils.waitFor(() -> assertThat(node.execute(transaction)).isPresent());
   }
 }
