@@ -44,7 +44,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   private final SyncState syncState;
   private final AtomicBoolean started = new AtomicBoolean(false);
-  private final Optional<FastDownloaderFactory<C>> fastSynchronizer;
+  private final Optional<FastDownloaderFactory<C>> fastDownloaderFactory;
   private final Subscribers<SyncStatusListener> syncStatusListeners = new Subscribers<>();
   private final BlockPropagationManager<C> blockPropagationManager;
   private final FullDownloaderFactory<C> fullDownloaderFactory;
@@ -82,7 +82,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
     this.fullDownloaderFactory =
         new FullDownloaderFactory<>(
             syncConfig, protocolSchedule, protocolContext, ethContext, syncState, metricsSystem);
-    this.fastSynchronizer =
+    this.fastDownloaderFactory =
         FastDownloaderFactory.create(
             syncConfig,
             dataDirectory,
@@ -96,7 +96,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   }
 
   private TrailingPeerRequirements calculateTrailingPeerRequirements() {
-    return fastSynchronizer
+    return fastDownloaderFactory
         .flatMap(FastDownloaderFactory::calculateTrailingPeerRequirements)
         .orElseGet(fullDownloaderFactory::calculateTrailingPeerRequirements);
   }
@@ -105,8 +105,8 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   public void start() {
     if (started.compareAndSet(false, true)) {
       syncState.addSyncStatusListener(this::syncStatusCallback);
-      if (fastSynchronizer.isPresent()) {
-        fastSynchronizer.get().start().whenComplete(this::handleFastSyncResult);
+      if (fastDownloaderFactory.isPresent()) {
+        fastDownloaderFactory.get().start().whenComplete(this::handleFastSyncResult);
       } else {
         startFullSync();
       }
@@ -128,7 +128,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
           "Fast sync completed successfully with pivot block {}",
           result.getPivotBlockNumber().getAsLong());
     }
-    fastSynchronizer.ifPresent(FastDownloaderFactory::deleteFastSyncState);
+    fastDownloaderFactory.ifPresent(FastDownloaderFactory::deleteFastSyncState);
 
     startFullSync();
   }
