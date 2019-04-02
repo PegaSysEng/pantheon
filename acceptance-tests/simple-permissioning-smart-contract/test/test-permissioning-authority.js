@@ -16,14 +16,12 @@ contract('Authority ', () => {
       proxy = await TestPermissioning.new();
       
       let resultAdmins = await proxy.getAllAdmins();
-      console.log(resultAdmins);
       assert.equal(resultAdmins[0].toLowerCase(), '0x' + originalAdmin, 'expected first admin to be the deployer');
       assert.equal(resultAdmins.length, 1, 'expected 1 only');
 
       let result = await proxy.addAdmin(newAdmin);
 
       resultAdmins = await proxy.getAllAdmins();
-      console.log(resultAdmins);
       assert.equal(resultAdmins[0].toLowerCase(), '0x' + originalAdmin, 'expected first admin to be the deployer');
       assert.equal(resultAdmins[1].toLowerCase(), '0x' + newAdmin, 'expected first added admin');
       assert.equal(resultAdmins.length, 2, 'expected 2 only');
@@ -32,7 +30,6 @@ contract('Authority ', () => {
       result = await proxy.addAdmin(newAdmin);
 
       resultAdmins = await proxy.getAllAdmins();
-      console.log(resultAdmins);
       assert.equal(resultAdmins[0].toLowerCase(), '0x' + originalAdmin, 'expected first admin to be the deployer');
       assert.equal(resultAdmins[1].toLowerCase(), '0x' + newAdmin, 'expected first added admin');
       assert.equal(resultAdmins.length, 2, 'expected 2 only - second add should have failed');
@@ -45,7 +42,6 @@ contract('Authority ', () => {
       assert.equal(result, false, 'expected disallowed since admin was removed');
 
       resultAdmins = await proxy.getAllAdmins();
-      console.log(resultAdmins);
       assert.equal(resultAdmins[0].toLowerCase(), '0x' + originalAdmin, 'expected first admin to be the deployer');
       assert.equal(resultAdmins.length, 1, 'expected 1 only');
     });
@@ -87,7 +83,6 @@ contract('Authority ', () => {
       assert.equal(result, true, 'expected new admin to be authorized');
 
       let resultAdmins = await proxy.getAllAdmins();
-      console.log(resultAdmins);
       assert.equal(resultAdmins[0].toLowerCase(), '0x' + originalAdmin, 'expected first admin to be the deployer');
       assert.equal(resultAdmins[1].toLowerCase(), '0x' + newAdmin, 'expected first added admin');
       assert.equal(resultAdmins[2].toLowerCase(), '0x' + newAdmin2, 'expected second added admin');
