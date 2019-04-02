@@ -125,7 +125,8 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
               privateTransaction,
               messageFrame.getMiningBeneficiary(),
               OperationTracer.NO_TRACING,
-              messageFrame.getBlockHashLookup());
+              messageFrame.getBlockHashLookup(),
+              privacyGroupId);
 
       if (result.isInvalid() || !result.isSuccessful()) {
         throw new Exception("Unable to process the private transaction");

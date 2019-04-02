@@ -99,7 +99,8 @@ public class PrivacyPrecompiledContractTest {
             nullable(PrivateTransaction.class),
             nullable(Address.class),
             nullable(OperationTracer.class),
-            nullable(BlockHashLookup.class)))
+            nullable(BlockHashLookup.class),
+            nullable(BytesValue.class)))
         .thenReturn(result);
 
     return mockPrivateTransactionProcessor;
