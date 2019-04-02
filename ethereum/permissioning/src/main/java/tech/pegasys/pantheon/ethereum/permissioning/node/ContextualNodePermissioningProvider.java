@@ -16,8 +16,10 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Optional;
 
-@FunctionalInterface
 public interface ContextualNodePermissioningProvider {
-
   Optional<Boolean> isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode);
+
+  long subscribeToUpdates(final Runnable callback);
+
+  boolean unsubscribeFromUpdates(final long id);
 }

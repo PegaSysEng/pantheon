@@ -27,8 +27,7 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
   private final P2PNetwork p2pNetwork;
   private final Collection<EnodeURL> bootnodeEnodes;
   private long nonBootnodePeerConnections;
-  private final Subscribers<Runnable> permissioningUpdateSubscribers =
-      new Subscribers<>();
+  private final Subscribers<Runnable> permissioningUpdateSubscribers = new Subscribers<>();
 
   public InsufficientPeersPermissioningProvider(
       final P2PNetwork p2pNetwork,
@@ -55,7 +54,7 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
       final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     if (nonBootnodePeerConnections > 0) {
       return Optional.empty();
-    } else if (checkEnode(sourceEnode) && checkEnode(destinationEnode)){
+    } else if (checkEnode(sourceEnode) && checkEnode(destinationEnode)) {
       return Optional.of(true);
     } else {
       return Optional.empty();
@@ -87,10 +86,12 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
     }
   }
 
+  @Override
   public long subscribeToUpdates(final Runnable callback) {
     return permissioningUpdateSubscribers.subscribe(callback);
   }
 
+  @Override
   public boolean unsubscribeFromUpdates(final long id) {
     return permissioningUpdateSubscribers.unsubscribe(id);
   }
