@@ -122,6 +122,7 @@ public class CheckpointRangeSourceTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void shouldDelayBeforeRetryingRequestForCheckpointHeadersAfterEmptyResponse() {
     when(syncTargetChecker.shouldContinueDownloadingFromSyncTarget(any(), any())).thenReturn(true);
     when(checkpointFetcher.getNextCheckpointHeaders(peer, commonAncestor))
@@ -129,11 +130,11 @@ public class CheckpointRangeSourceTest {
 
     assertThat(source.next()).isNull();
     verify(checkpointFetcher).getNextCheckpointHeaders(peer, commonAncestor);
-    //noinspection unchecked
     verify(ethScheduler).scheduleFutureTask(any(Supplier.class), eq(RETRY_DELAY_DURATION));
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void shouldDelayBeforeRetryingRequestForCheckpointHeadersAfterFailure() {
     when(syncTargetChecker.shouldContinueDownloadingFromSyncTarget(any(), any())).thenReturn(true);
     when(checkpointFetcher.getNextCheckpointHeaders(peer, commonAncestor))
@@ -141,7 +142,6 @@ public class CheckpointRangeSourceTest {
 
     assertThat(source.next()).isNull();
     verify(checkpointFetcher).getNextCheckpointHeaders(peer, commonAncestor);
-    //noinspection unchecked
     verify(ethScheduler).scheduleFutureTask(any(Supplier.class), eq(RETRY_DELAY_DURATION));
   }
 
