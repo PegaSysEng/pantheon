@@ -63,6 +63,7 @@ public class FastSyncDownloadPipelineFactory implements DownloadPipelineFactory 
                     new FastSyncCheckpointFilter(pivotBlockHeader),
                     metricsSystem),
                 this::shouldContinueDownloadingFromPeer,
+                ethContext.getScheduler(),
                 target.peer(),
                 target.commonAncestor(),
                 syncConfig.downloaderCheckpointTimeoutsPermitted(),

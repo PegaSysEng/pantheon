@@ -18,6 +18,7 @@ import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,6 +29,7 @@ import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource.SyncTargetChecker;
 
@@ -35,21 +37,25 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
 public class CheckpointRangeSourceTest {
 
   private static final int CHECKPOINT_TIMEOUTS_PERMITTED = 3;
+  private static final Duration RETRY_DELAY_DURATION = Duration.ofSeconds(2);
   private final EthPeer peer = mock(EthPeer.class);
   private final CheckpointHeaderFetcher checkpointFetcher = mock(CheckpointHeaderFetcher.class);
   private final SyncTargetChecker syncTargetChecker = mock(SyncTargetChecker.class);
+  private final EthScheduler ethScheduler = mock(EthScheduler.class);
 
   private final BlockHeader commonAncestor = header(10);
   private final CheckpointRangeSource source =
       new CheckpointRangeSource(
           checkpointFetcher,
           syncTargetChecker,
+          ethScheduler,
           peer,
           commonAncestor,
           CHECKPOINT_TIMEOUTS_PERMITTED,
@@ -113,6 +119,30 @@ public class CheckpointRangeSourceTest {
 
     // Too many timeouts, give up on this sync target.
     assertThat(source).isExhausted();
+  }
+
+  @Test
+  public void shouldDelayBeforeRetryingRequestForCheckpointHeadersAfterEmptyResponse() {
+    when(syncTargetChecker.shouldContinueDownloadingFromSyncTarget(any(), any())).thenReturn(true);
+    when(checkpointFetcher.getNextCheckpointHeaders(peer, commonAncestor))
+        .thenReturn(completedFuture(emptyList()));
+
+    assertThat(source.next()).isNull();
+    verify(checkpointFetcher).getNextCheckpointHeaders(peer, commonAncestor);
+    //noinspection unchecked
+    verify(ethScheduler).scheduleFutureTask(any(Supplier.class), eq(RETRY_DELAY_DURATION));
+  }
+
+  @Test
+  public void shouldDelayBeforeRetryingRequestForCheckpointHeadersAfterFailure() {
+    when(syncTargetChecker.shouldContinueDownloadingFromSyncTarget(any(), any())).thenReturn(true);
+    when(checkpointFetcher.getNextCheckpointHeaders(peer, commonAncestor))
+        .thenReturn(completedExceptionally(new RuntimeException("Nope")));
+
+    assertThat(source.next()).isNull();
+    verify(checkpointFetcher).getNextCheckpointHeaders(peer, commonAncestor);
+    //noinspection unchecked
+    verify(ethScheduler).scheduleFutureTask(any(Supplier.class), eq(RETRY_DELAY_DURATION));
   }
 
   @Test

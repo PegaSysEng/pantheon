@@ -12,10 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync;
 
+import static java.util.Collections.emptyList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 
 import java.time.Duration;
 import java.util.ArrayDeque;
@@ -32,10 +35,12 @@ import org.apache.logging.log4j.Logger;
 
 public class CheckpointRangeSource implements Iterator<CheckpointRange> {
   private static final Logger LOG = LogManager.getLogger();
+  private static final Duration RETRY_DELAY_DURATION = Duration.ofSeconds(2);
 
   private final CheckpointHeaderFetcher checkpointFetcher;
   private final SyncTargetChecker syncTargetChecker;
   private final EthPeer peer;
+  private final EthScheduler ethScheduler;
   private final int checkpointTimeoutsPermitted;
   private final Duration newHeaderWaitDuration;
 
@@ -48,12 +53,14 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
   public CheckpointRangeSource(
       final CheckpointHeaderFetcher checkpointFetcher,
       final SyncTargetChecker syncTargetChecker,
+      final EthScheduler ethScheduler,
       final EthPeer peer,
       final BlockHeader commonAncestor,
       final int checkpointTimeoutsPermitted,
       final Duration newHeaderWaitDuration) {
     this.checkpointFetcher = checkpointFetcher;
     this.syncTargetChecker = syncTargetChecker;
+    this.ethScheduler = ethScheduler;
     this.peer = peer;
     this.lastRangeEnd = commonAncestor;
     this.checkpointTimeoutsPermitted = checkpointTimeoutsPermitted;
@@ -75,9 +82,31 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
     if (pendingCheckpointsRequest.isPresent()) {
       return getCheckpointRangeFromPendingRequest();
     }
-    pendingCheckpointsRequest =
-        Optional.of(checkpointFetcher.getNextCheckpointHeaders(peer, lastRangeEnd));
+    pendingCheckpointsRequest = Optional.of(getNextCheckpointHeaders());
     return getCheckpointRangeFromPendingRequest();
+  }
+
+  private CompletableFuture<List<BlockHeader>> getNextCheckpointHeaders() {
+    return checkpointFetcher
+        .getNextCheckpointHeaders(peer, lastRangeEnd)
+        .exceptionally(
+            error -> {
+              LOG.debug("Failed to retrieve checkpoint headers", error);
+              return emptyList();
+            })
+        .thenCompose(
+            checkpoints -> checkpoints.isEmpty() ? pauseBriefly() : completedFuture(checkpoints));
+  }
+
+  /**
+   * Pause after failing to get new checkpoints to prevent requesting new checkpoint headers in a
+   * tight loop.
+   *
+   * @return a future that after the pause completes with an empty list.
+   */
+  private CompletableFuture<List<BlockHeader>> pauseBriefly() {
+    return ethScheduler.scheduleFutureTask(
+        () -> completedFuture(emptyList()), RETRY_DELAY_DURATION);
   }
 
   private CheckpointRange getCheckpointRangeFromPendingRequest() {
