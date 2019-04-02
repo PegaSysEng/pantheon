@@ -12,9 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +25,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,8 +37,7 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
   private final SyncTargetChecker syncTargetChecker;
   private final EthPeer peer;
   private final int checkpointTimeoutsPermitted;
-  private final int newHeaderWaitDuration;
-  private final TimeUnit newHeaderWaitDurationUnit;
+  private final Duration newHeaderWaitDuration;
 
   private final Queue<CheckpointRange> retrievedRanges = new ArrayDeque<>();
   private BlockHeader lastRangeEnd;
@@ -50,15 +51,13 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
       final EthPeer peer,
       final BlockHeader commonAncestor,
       final int checkpointTimeoutsPermitted,
-      final int newHeaderWaitDuration,
-      final TimeUnit newHeaderWaitDurationUnit) {
+      final Duration newHeaderWaitDuration) {
     this.checkpointFetcher = checkpointFetcher;
     this.syncTargetChecker = syncTargetChecker;
     this.peer = peer;
     this.lastRangeEnd = commonAncestor;
     this.checkpointTimeoutsPermitted = checkpointTimeoutsPermitted;
     this.newHeaderWaitDuration = newHeaderWaitDuration;
-    this.newHeaderWaitDurationUnit = newHeaderWaitDurationUnit;
   }
 
   @Override
@@ -85,7 +84,7 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
     final CompletableFuture<List<BlockHeader>> pendingRequest = pendingCheckpointsRequest.get();
     try {
       final List<BlockHeader> newCheckpointHeaders =
-          pendingRequest.get(newHeaderWaitDuration, newHeaderWaitDurationUnit);
+          pendingRequest.get(newHeaderWaitDuration.toMillis(), MILLISECONDS);
       pendingCheckpointsRequest = Optional.empty();
       if (newCheckpointHeaders.isEmpty()) {
         requestFailureCount++;

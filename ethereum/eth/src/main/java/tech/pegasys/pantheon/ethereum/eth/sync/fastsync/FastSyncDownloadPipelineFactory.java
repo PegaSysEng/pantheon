@@ -26,7 +26,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
 import tech.pegasys.pantheon.services.pipeline.PipelineBuilder;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class FastSyncDownloadPipelineFactory implements DownloadPipelineFactory {
   private final SynchronizerConfiguration syncConfig;
@@ -66,8 +66,7 @@ public class FastSyncDownloadPipelineFactory implements DownloadPipelineFactory 
                 target.peer(),
                 target.commonAncestor(),
                 syncConfig.downloaderCheckpointTimeoutsPermitted(),
-                5,
-                TimeUnit.SECONDS),
+                Duration.ofSeconds(5)),
             singleHeaderBufferSize,
             metricsSystem.createLabelledCounter(
                 MetricCategory.SYNCHRONIZER,

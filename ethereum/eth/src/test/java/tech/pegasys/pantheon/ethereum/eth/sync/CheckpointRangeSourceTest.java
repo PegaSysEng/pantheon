@@ -31,9 +31,9 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource.SyncTargetChecker;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
@@ -53,8 +53,7 @@ public class CheckpointRangeSourceTest {
           peer,
           commonAncestor,
           CHECKPOINT_TIMEOUTS_PERMITTED,
-          1,
-          TimeUnit.NANOSECONDS);
+          Duration.ofMillis(1));
 
   @Test
   public void shouldHaveNextWhenNoCheckpointsLoadedButSyncTargetCheckerSaysToContinue() {
