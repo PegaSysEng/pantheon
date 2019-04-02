@@ -35,6 +35,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   private final DownloadPipelineFactory downloadPipelineFactory;
   private final EthScheduler scheduler;
 
+  private final AtomicBoolean started = new AtomicBoolean(false);
   private final AtomicBoolean cancelled = new AtomicBoolean(false);
   private Pipeline<?> currentDownloadPipeline;
 
@@ -49,6 +50,9 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
 
   @Override
   public CompletableFuture<Void> start() {
+    if (!started.compareAndSet(false, true)) {
+      throw new IllegalStateException("Cannot start a chain download twice");
+    }
     return performDownload();
   }
 
@@ -60,7 +64,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
     }
   }
 
-  private synchronized CompletableFuture<Void> performDownload() {
+  private CompletableFuture<Void> performDownload() {
     return exceptionallyCompose(selectSyncTargetAndDownload(), this::handleFailedDownload)
         .thenCompose(this::repeatUnlessDownloadComplete);
   }
@@ -71,7 +75,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
         .thenCompose(this::startDownloadForSyncTarget);
   }
 
-  private synchronized CompletionStage<Void> repeatUnlessDownloadComplete(
+  private CompletionStage<Void> repeatUnlessDownloadComplete(
       @SuppressWarnings("unused") final Void result) {
     if (syncTargetManager.shouldContinueDownloading()) {
       return performDownload();
