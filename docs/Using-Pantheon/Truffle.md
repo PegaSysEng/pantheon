@@ -5,11 +5,11 @@ description: Using Pantheon with Truffle
 
 Developing for Pantheon using Truffle is the same as using Truffle to develop for the public Ethereum networks. 
 Truffle supports Pantheon with the only difference being Pantheon does not implement private key management. 
-To use Pantheon with Truffle, you must configure the Truffle wallet.
+To use Pantheon with Truffle, you must configure a Truffle wallet.
 
 ## Install Truffle Wallet 
 
-To install the [Truffle wallet](https://github.com/trufflesuite/truffle-hdwallet-provider):
+To install the Truffle wallet:
 
 ```bash
 npm install --save truffle-hdwallet-provider@web3-one
@@ -17,8 +17,6 @@ npm install --save truffle-hdwallet-provider@web3-one
 
 !!!note
     With Truffle 5, you must use a Web3 1.0 enabled wallet or the Truffle tasks hang.
-
-    `npm` requires `sudo` on Linux.
 
 #### Modify the Truffle Configuration File 
 
