@@ -21,14 +21,14 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-public class FullDownloaderFactory<C> {
+public class FullSyncDownloader<C> {
 
   private final ChainDownloader chainDownloader;
   private final SynchronizerConfiguration syncConfig;
   private final ProtocolContext<C> protocolContext;
   private final SyncState syncState;
 
-  public FullDownloaderFactory(
+  public FullSyncDownloader(
       final SynchronizerConfiguration syncConfig,
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
