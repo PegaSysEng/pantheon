@@ -45,8 +45,13 @@ public class FastSyncChainDownloader {
     if (USE_PIPELINE_DOWNLOADER) {
       return new PipelineChainDownloader<>(
           syncTargetManager,
-          new FastSyncDownloadPipelineFactory(
-              config, protocolSchedule, ethContext, pivotBlockHeader, metricsSystem),
+          new FastSyncDownloadPipelineFactory<>(
+              config,
+              protocolSchedule,
+              protocolContext,
+              ethContext,
+              pivotBlockHeader,
+              metricsSystem),
           ethContext.getScheduler());
     }
 

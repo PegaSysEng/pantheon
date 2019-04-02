@@ -59,4 +59,8 @@ public class CheckpointRange {
         .add("end", end.getNumber())
         .toString();
   }
+
+  public int getSegmentLength() {
+    return (int) (end.getNumber() - start.getNumber());
+  }
 }
