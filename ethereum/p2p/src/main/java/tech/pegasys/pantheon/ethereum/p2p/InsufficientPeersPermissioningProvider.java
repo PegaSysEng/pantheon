@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.permissioning.node.ContextualNodePermissioningProvider;
+import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Collection;
@@ -26,6 +27,8 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
   private final P2PNetwork p2pNetwork;
   private final Collection<EnodeURL> bootnodeEnodes;
   private long nonBootnodePeerConnections;
+  private final Subscribers<Runnable> permissioningUpdateSubscribers =
+      new Subscribers<>();
 
   public InsufficientPeersPermissioningProvider(
       final P2PNetwork p2pNetwork,
@@ -52,8 +55,10 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
       final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     if (nonBootnodePeerConnections > 0) {
       return Optional.empty();
+    } else if (checkEnode(sourceEnode) && checkEnode(destinationEnode)){
+      return Optional.of(true);
     } else {
-      return Optional.of(checkEnode(sourceEnode) && checkEnode(destinationEnode));
+      return Optional.empty();
     }
   }
 
@@ -63,7 +68,10 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
 
   private void handleConnect(final PeerConnection peerConnection) {
     if (isNotABootnode(peerConnection)) {
-      nonBootnodePeerConnections++;
+      // if the first non bootnode peer seen
+      if (++nonBootnodePeerConnections == 1) {
+        permissioningUpdateSubscribers.forEach(Runnable::run);
+      }
     }
   }
 
@@ -72,7 +80,18 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
       final DisconnectReason reason,
       final boolean initiatedByPeer) {
     if (isNotABootnode(peerConnection)) {
-      nonBootnodePeerConnections--;
+      // if we just lost the last non bootnode
+      if (--nonBootnodePeerConnections == 0) {
+        permissioningUpdateSubscribers.forEach(Runnable::run);
+      }
     }
+  }
+
+  public long subscribeToUpdates(final Runnable callback) {
+    return permissioningUpdateSubscribers.subscribe(callback);
+  }
+
+  public boolean unsubscribeFromUpdates(final long id) {
+    return permissioningUpdateSubscribers.unsubscribe(id);
   }
 }
