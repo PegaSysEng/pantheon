@@ -110,11 +110,6 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
     }
   }
 
-  public interface CheckpointHeaderFetcher {
-    CompletableFuture<List<BlockHeader>> getNextCheckpointHeaders(
-        EthPeer peer, BlockHeader lastCheckpointHeader);
-  }
-
   public interface SyncTargetChecker {
     boolean shouldContinueDownloadingFromSyncTarget(EthPeer peer, BlockHeader lastCheckpointHeader);
   }

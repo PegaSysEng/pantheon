@@ -29,7 +29,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
-import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource.CheckpointHeaderFetcher;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource.SyncTargetChecker;
 
 import java.util.List;

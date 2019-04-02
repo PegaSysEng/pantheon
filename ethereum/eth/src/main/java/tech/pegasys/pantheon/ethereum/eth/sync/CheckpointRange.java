@@ -35,10 +35,6 @@ public class CheckpointRange {
     return end;
   }
 
-  public int getSegmentLength() {
-    return (int) (end.getNumber() - start.getNumber());
-  }
-
   @Override
   public boolean equals(final Object o) {
     if (this == o) {
