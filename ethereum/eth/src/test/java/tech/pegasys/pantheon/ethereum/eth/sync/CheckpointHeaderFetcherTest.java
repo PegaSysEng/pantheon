@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth.sync;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -30,16 +32,22 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.UnaryOperator;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CheckpointHeaderFetcherTest {
   private static Blockchain blockchain;
   private static ProtocolSchedule<Void> protocolSchedule;
   private static ProtocolContext<Void> protocolContext;
   private static final MetricsSystem metricsSystem = new NoOpMetricsSystem();
+  @Mock private UnaryOperator<List<BlockHeader>> filter;
   private EthProtocolManager ethProtocolManager;
   private CheckpointHeaderFetcher checkpointHeaderFetcher;
 
@@ -66,11 +74,13 @@ public class CheckpointHeaderFetcherTest {
                 .build(),
             protocolSchedule,
             ethContext,
+            filter,
             metricsSystem);
   }
 
   @Test
   public void shouldRequestHeadersFromPeerAndExcludeExistingHeader() {
+    when(filter.apply(any())).thenAnswer(invocation -> invocation.getArgument(0));
     final Responder responder =
         RespondingEthPeer.blockchainResponder(blockchain, protocolContext.getWorldStateArchive());
     final RespondingEthPeer respondingPeer =
@@ -84,6 +94,26 @@ public class CheckpointHeaderFetcherTest {
     respondingPeer.respond(responder);
 
     assertThat(result).isCompletedWithValue(asList(header(6), header(11), header(16)));
+  }
+
+  @Test
+  public void shouldApplyFilterToDownloadedCheckpoints() {
+    final List<BlockHeader> filteredResult = asList(header(7), header(9));
+    final List<BlockHeader> unfilteredResult = asList(header(6), header(11), header(16));
+    when(filter.apply(unfilteredResult)).thenReturn(filteredResult);
+    final Responder responder =
+        RespondingEthPeer.blockchainResponder(blockchain, protocolContext.getWorldStateArchive());
+    final RespondingEthPeer respondingPeer =
+        EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
+
+    final CompletableFuture<List<BlockHeader>> result =
+        checkpointHeaderFetcher.getNextCheckpointHeaders(respondingPeer.getEthPeer(), header(1));
+
+    assertThat(result).isNotDone();
+
+    respondingPeer.respond(responder);
+
+    assertThat(result).isCompletedWithValue(filteredResult);
   }
 
   private BlockHeader header(final long blockNumber) {

@@ -22,22 +22,26 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.UnaryOperator;
 
 public class CheckpointHeaderFetcher {
 
   private final SynchronizerConfiguration syncConfig;
   private final ProtocolSchedule<?> protocolSchedule;
   private final EthContext ethContext;
+  private final UnaryOperator<List<BlockHeader>> checkpointFilter;
   private final MetricsSystem metricsSystem;
 
   public CheckpointHeaderFetcher(
       final SynchronizerConfiguration syncConfig,
       final ProtocolSchedule<?> protocolSchedule,
       final EthContext ethContext,
+      final UnaryOperator<List<BlockHeader>> checkpointFilter,
       final MetricsSystem metricsSystem) {
     this.syncConfig = syncConfig;
     this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
+    this.checkpointFilter = checkpointFilter;
     this.metricsSystem = metricsSystem;
   }
 
@@ -57,7 +61,8 @@ public class CheckpointHeaderFetcher {
         .assignPeer(peer)
         .run()
         .thenApply(PeerTaskResult::getResult)
-        .thenApply(headers -> stripExistingCheckpointHeader(lastHeader, headers));
+        .thenApply(
+            headers -> checkpointFilter.apply(stripExistingCheckpointHeader(lastHeader, headers)));
   }
 
   private List<BlockHeader> stripExistingCheckpointHeader(
