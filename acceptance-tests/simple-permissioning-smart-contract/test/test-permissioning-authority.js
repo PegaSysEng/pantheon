@@ -37,6 +37,7 @@ contract('Authority ', () => {
       result = await proxy.isAuthorized(newAdmin);
       assert.equal(result, true, 'expected new admin to be authorized');
 
+      // remove an admin and test that they are NOT authorized
       result = await proxy.removeAdmin(newAdmin);
       result = await proxy.isAuthorized(newAdmin);
       assert.equal(result, false, 'expected disallowed since admin was removed');
