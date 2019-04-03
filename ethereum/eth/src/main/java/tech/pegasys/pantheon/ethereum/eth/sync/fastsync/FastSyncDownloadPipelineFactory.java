@@ -19,10 +19,11 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderDownloadStep;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderFetcher;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderValidationStep;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource;
+import tech.pegasys.pantheon.ethereum.eth.sync.DownloadBodiesStep;
+import tech.pegasys.pantheon.ethereum.eth.sync.DownloadHeadersStep;
 import tech.pegasys.pantheon.ethereum.eth.sync.DownloadPipelineFactory;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
@@ -78,21 +79,33 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
     final int downloaderParallelism = syncConfig.downloaderParallelism();
     final int headerRequestSize = syncConfig.downloaderHeaderRequestSize();
     final int singleHeaderBufferSize = downloaderParallelism * headerRequestSize * 10;
+    final CheckpointRangeSource checkpointRangeSource =
+        new CheckpointRangeSource(
+            new CheckpointHeaderFetcher(
+                syncConfig,
+                protocolSchedule,
+                ethContext,
+                new FastSyncCheckpointFilter(pivotBlockHeader),
+                metricsSystem),
+            this::shouldContinueDownloadingFromPeer,
+            ethContext.getScheduler(),
+            target.peer(),
+            target.commonAncestor(),
+            syncConfig.downloaderCheckpointTimeoutsPermitted(),
+            Duration.ofSeconds(5));
+    final DownloadHeadersStep<C> downloadHeadersStep =
+        new DownloadHeadersStep<>(
+            protocolSchedule, protocolContext, ethContext, detachedValidationPolicy, metricsSystem);
+    final CheckpointHeaderValidationStep<C> validateHeadersJoinUpStep =
+        new CheckpointHeaderValidationStep<>(
+            protocolSchedule, protocolContext, detachedValidationPolicy);
+    final DownloadBodiesStep<C> downloadBodiesStep =
+        new DownloadBodiesStep<>(protocolSchedule, ethContext, metricsSystem);
+    // TODO: Use async preserving order when that's ready.
+
     return PipelineBuilder.createPipelineFrom(
             "fetchCheckpoints",
-            new CheckpointRangeSource(
-                new CheckpointHeaderFetcher(
-                    syncConfig,
-                    protocolSchedule,
-                    ethContext,
-                    new FastSyncCheckpointFilter(pivotBlockHeader),
-                    metricsSystem),
-                this::shouldContinueDownloadingFromPeer,
-                ethContext.getScheduler(),
-                target.peer(),
-                target.commonAncestor(),
-                syncConfig.downloaderCheckpointTimeoutsPermitted(),
-                Duration.ofSeconds(5)),
+            checkpointRangeSource,
             singleHeaderBufferSize,
             metricsSystem.createLabelledCounter(
                 MetricCategory.SYNCHRONIZER,
@@ -100,21 +113,10 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
                 "Number of entries process by each chain download pipeline stage",
                 "step",
                 "action"))
-        .thenProcessAsync( // TODO: Will need to be async preserving order when that's ready.
-            "downloadHeaders",
-            new CheckpointHeaderDownloadStep<>(
-                protocolSchedule,
-                protocolContext,
-                ethContext,
-                detachedValidationPolicy,
-                metricsSystem),
-            downloaderParallelism)
-        .thenFlatMap(
-            "validateHeadersJoin",
-            new CheckpointHeaderValidationStep<>(
-                protocolSchedule, protocolContext, detachedValidationPolicy),
-            singleHeaderBufferSize)
-        .thenProcess("downloadBodies", Function.identity())
+        .thenProcessAsync("downloadHeaders", downloadHeadersStep, downloaderParallelism)
+        .thenFlatMap("validateHeadersJoin", validateHeadersJoinUpStep, singleHeaderBufferSize)
+        .inBatches(headerRequestSize)
+        .thenProcessAsync("downloadBodies", downloadBodiesStep, downloaderParallelism)
         .thenProcess("downloadReceipts", Function.identity())
         .andFinishWith("complete", result -> {});
   }

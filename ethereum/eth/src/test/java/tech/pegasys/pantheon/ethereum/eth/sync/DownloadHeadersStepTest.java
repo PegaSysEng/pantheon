@@ -34,14 +34,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class CheckpointHeaderDownloadStepTest {
+public class DownloadHeadersStepTest {
 
   private static ProtocolSchedule<Void> protocolSchedule;
   private static ProtocolContext<Void> protocolContext;
   private static MutableBlockchain blockchain;
 
   private EthProtocolManager ethProtocolManager;
-  private CheckpointHeaderDownloadStep<Void> downloader;
+  private DownloadHeadersStep<Void> downloader;
   private CheckpointRange checkpointRange;
 
   @BeforeClass
@@ -58,7 +58,7 @@ public class CheckpointHeaderDownloadStepTest {
     ethProtocolManager =
         EthProtocolManagerTestUtil.create(blockchain, protocolContext.getWorldStateArchive());
     downloader =
-        new CheckpointHeaderDownloadStep<>(
+        new DownloadHeadersStep<>(
             protocolSchedule,
             protocolContext,
             ethProtocolManager.ethContext(),
