@@ -160,6 +160,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             istanbul64ProtocolManager.ethContext(),
             syncState,
             dataDirectory,
+            clock,
             metricsSystem);
 
     final Runnable closer =
@@ -180,7 +181,8 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             protocolContext,
             istanbul64ProtocolManager.ethContext(),
             clock,
-            maxPendingTransactions);
+            maxPendingTransactions,
+            metricsSystem);
 
     return new IbftLegacyPantheonController(
         protocolSchedule,

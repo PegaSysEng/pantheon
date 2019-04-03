@@ -135,6 +135,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
             ethProtocolManager.ethContext(),
             syncState,
             dataDirectory,
+            clock,
             metricsSystem);
 
     final OptionalLong daoBlock = genesisConfig.getConfigOptions().getDaoForkBlock();
@@ -153,7 +154,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
             protocolContext,
             ethProtocolManager.ethContext(),
             clock,
-            maxPendingTransactions);
+            maxPendingTransactions,
+            metricsSystem);
 
     final ExecutorService minerThreadPool = Executors.newCachedThreadPool();
     final EthHashMinerExecutor executor =

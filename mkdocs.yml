@@ -23,6 +23,7 @@ extra:
     gitter: https://gitter.im/PegaSysEng/pantheon
     email: support@pegasys.tech
     pegasys_website: https://pegasys.tech/
+    issues: https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000
   google:
     analytics_id: 'UA-117921923-2'
     site_verification: 'za1cLzyS6LXDGO-pMzvfQdYTZ0Zc67uZtY0asA4YXZ0'
@@ -46,6 +47,8 @@ nav:
         - Installation Overview: Installation/Overview.md
         - Install Binary Distribution: Installation/Install-Binaries.md
         - Build from Source: Installation/Build-From-Source.md
+    - Architecture:
+        - Overview: Architecture/Overview.md
     - Getting Started:
         - Getting Started Overview: Getting-Started/Getting-Started.md
         - Starting Pantheon: Getting-Started/Starting-Pantheon.md
@@ -85,6 +88,7 @@ nav:
         - Transactions:
           - Creating and Sending Transactions: Using-Pantheon/Transactions/Transactions.md
           - Transaction Pool: Using-Pantheon/Transactions/Transaction-Pool.md
+        - Using Truffle with Panthen: Using-Pantheon/Truffle.md
         - Events and Logs:
           - Overview: Using-Pantheon/Events-and-Logs.md
           - Accessing Logs Using JSON-RPC API: Using-Pantheon/Accessing-Logs-Using-JSON-RPC.md

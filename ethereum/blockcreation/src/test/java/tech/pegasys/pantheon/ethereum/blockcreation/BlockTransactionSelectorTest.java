@@ -46,6 +46,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
 import tech.pegasys.pantheon.ethereum.vm.TestBlockchain;
 import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutableWorldState;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -61,6 +63,7 @@ import org.junit.Test;
 public class BlockTransactionSelectorTest {
 
   private static final KeyPair keyPair = KeyPair.generate();
+  private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
   @Test
   public void emptyPendingTransactionsResultsInEmptyVettingResult() {
@@ -71,7 +74,9 @@ public class BlockTransactionSelectorTest {
     final TransactionProcessor transactionProcessor =
         protocolSchedule.getByBlockNumber(0).getTransactionProcessor();
     final DefaultMutableWorldState worldState = inMemoryWorldState();
-    final PendingTransactions pendingTransactions = new PendingTransactions(5, TestClock.fixed());
+
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(5, TestClock.fixed(), metricsSystem);
     final Supplier<Boolean> isCancelled = () -> false;
 
     final ProcessableBlockHeader blockHeader =
@@ -108,7 +113,8 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void failedTransactionsAreIncludedInTheBlock() {
-    final PendingTransactions pendingTransactions = new PendingTransactions(5, TestClock.fixed());
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(5, TestClock.fixed(), metricsSystem);
 
     final Transaction transaction = createTransaction(1);
     pendingTransactions.addRemoteTransaction(transaction);
@@ -116,7 +122,7 @@ public class BlockTransactionSelectorTest {
     final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
 
     when(transactionProcessor.processTransaction(
-            any(), any(), any(), eq(transaction), any(), any()))
+            any(), any(), any(), eq(transaction), any(), any(), any()))
         .thenReturn(MainnetTransactionProcessor.Result.failed(5, ValidationResult.valid()));
 
     final Blockchain blockchain = new TestBlockchain();
@@ -159,7 +165,8 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void invalidTransactionsTransactionProcessingAreSkippedButBlockStillFills() {
-    final PendingTransactions pendingTransactions = new PendingTransactions(5, TestClock.fixed());
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(5, TestClock.fixed(), metricsSystem);
 
     final List<Transaction> transactionsToInject = Lists.newArrayList();
     for (int i = 0; i < 5; i++) {
@@ -169,7 +176,7 @@ public class BlockTransactionSelectorTest {
     }
 
     final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -177,7 +184,7 @@ public class BlockTransactionSelectorTest {
                 BytesValue.EMPTY,
                 ValidationResult.valid()));
     when(transactionProcessor.processTransaction(
-            any(), any(), any(), eq(transactionsToInject.get(1)), any(), any()))
+            any(), any(), any(), eq(transactionsToInject.get(1)), any(), any(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.invalid(ValidationResult.invalid(NONCE_TOO_LOW)));
 
@@ -221,7 +228,8 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void subsetOfPendingTransactionsIncludedWhenBlockGasLimitHit() {
-    final PendingTransactions pendingTransactions = new PendingTransactions(5, TestClock.fixed());
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(5, TestClock.fixed(), metricsSystem);
 
     final List<Transaction> transactionsToInject = Lists.newArrayList();
     // Transactions are reported in reverse order.
@@ -231,7 +239,7 @@ public class BlockTransactionSelectorTest {
       pendingTransactions.addRemoteTransaction(tx);
     }
     final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -286,7 +294,8 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void transactionOfferingGasPriceLessThanMinimumIsIdentifiedAndRemovedFromPending() {
-    final PendingTransactions pendingTransactions = new PendingTransactions(5, TestClock.fixed());
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(5, TestClock.fixed(), metricsSystem);
 
     final Blockchain blockchain = new TestBlockchain();
 
@@ -330,7 +339,8 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void transactionTooLargeForBlockDoesNotPreventMoreBeingAddedIfBlockOccupancyNotReached() {
-    final PendingTransactions pendingTransactions = new PendingTransactions(5, TestClock.fixed());
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(5, TestClock.fixed(), metricsSystem);
     final Blockchain blockchain = new TestBlockchain();
     final DefaultMutableWorldState worldState = inMemoryWorldState();
     final Supplier<Boolean> isCancelled = () -> false;
@@ -347,7 +357,7 @@ public class BlockTransactionSelectorTest {
 
     // TransactionProcessor mock assumes all gas in the transaction was used (i.e. gasLimit).
     final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -400,7 +410,8 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void transactionSelectionStopsWhenSufficientBlockOccupancyIsReached() {
-    final PendingTransactions pendingTransactions = new PendingTransactions(10, TestClock.fixed());
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(10, TestClock.fixed(), metricsSystem);
     final Blockchain blockchain = new TestBlockchain();
     final DefaultMutableWorldState worldState = inMemoryWorldState();
     final Supplier<Boolean> isCancelled = () -> false;
@@ -417,7 +428,7 @@ public class BlockTransactionSelectorTest {
 
     // TransactionProcessor mock assumes all gas in the transaction was used (i.e. gasLimit).
     final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -481,7 +492,8 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void shouldDiscardTransactionsThatFailValidation() {
-    final PendingTransactions pendingTransactions = new PendingTransactions(10, TestClock.fixed());
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(10, TestClock.fixed(), metricsSystem);
     final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
     final Blockchain blockchain = new TestBlockchain();
     final DefaultMutableWorldState worldState = inMemoryWorldState();
@@ -525,6 +537,7 @@ public class BlockTransactionSelectorTest {
             eq(blockHeader),
             eq(validTransaction),
             any(),
+            any(),
             any()))
         .thenReturn(
             Result.successful(
@@ -534,6 +547,7 @@ public class BlockTransactionSelectorTest {
             any(WorldUpdater.class),
             eq(blockHeader),
             eq(invalidTransaction),
+            any(),
             any(),
             any()))
         .thenReturn(
