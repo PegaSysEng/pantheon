@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-public class CheckpointHeaderDownloader<C>
+public class CheckpointHeaderDownloadStep<C>
     implements Function<CheckpointRange, CompletableFuture<CheckpointRangeHeaders>> {
 
   private final ProtocolSchedule<C> protocolSchedule;
@@ -34,7 +34,7 @@ public class CheckpointHeaderDownloader<C>
   private final ValidationPolicy validationPolicy;
   private final MetricsSystem metricsSystem;
 
-  public CheckpointHeaderDownloader(
+  public CheckpointHeaderDownloadStep(
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,

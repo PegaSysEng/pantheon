@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.util.List;
@@ -25,6 +27,7 @@ public class CheckpointRangeHeaders {
 
   public CheckpointRangeHeaders(
       final CheckpointRange checkpointRange, final List<BlockHeader> headersToImport) {
+    checkArgument(!headersToImport.isEmpty(), "Must have at least one header to import");
     this.checkpointRange = checkpointRange;
     this.headersToImport = headersToImport;
   }
@@ -35,6 +38,10 @@ public class CheckpointRangeHeaders {
 
   public List<BlockHeader> getHeadersToImport() {
     return headersToImport;
+  }
+
+  public BlockHeader getFirstHeaderToImport() {
+    return headersToImport.get(0);
   }
 
   @Override

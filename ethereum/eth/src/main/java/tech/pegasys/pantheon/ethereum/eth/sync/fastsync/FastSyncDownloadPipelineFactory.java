@@ -19,8 +19,9 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderDownloader;
+import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderDownloadStep;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderFetcher;
+import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderValidationStep;
 import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource;
 import tech.pegasys.pantheon.ethereum.eth.sync.DownloadPipelineFactory;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -101,14 +102,18 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
                 "action"))
         .thenProcessAsync( // TODO: Will need to be async preserving order when that's ready.
             "downloadHeaders",
-            new CheckpointHeaderDownloader<>(
+            new CheckpointHeaderDownloadStep<>(
                 protocolSchedule,
                 protocolContext,
                 ethContext,
                 detachedValidationPolicy,
                 metricsSystem),
             downloaderParallelism)
-        .thenProcess("validateHeadersJoin", Function.identity())
+        .thenFlatMap(
+            "validateHeadersJoin",
+            new CheckpointHeaderValidationStep<>(
+                protocolSchedule, protocolContext, detachedValidationPolicy),
+            singleHeaderBufferSize)
         .thenProcess("downloadBodies", Function.identity())
         .thenProcess("downloadReceipts", Function.identity())
         .andFinishWith("complete", result -> {});
