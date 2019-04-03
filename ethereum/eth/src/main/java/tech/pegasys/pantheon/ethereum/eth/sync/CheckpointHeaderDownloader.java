@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.DownloadHeaderSequenceTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.util.FutureUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,15 @@ public class CheckpointHeaderDownloader<C>
 
   @Override
   public CompletableFuture<CheckpointRangeHeaders> apply(final CheckpointRange checkpointRange) {
+    final CompletableFuture<List<BlockHeader>> taskFuture = downloadHeaders(checkpointRange);
+    final CompletableFuture<CheckpointRangeHeaders> processedFuture =
+        taskFuture.thenApply(headers -> processHeaders(checkpointRange, headers));
+    FutureUtils.propagateCancellation(processedFuture, taskFuture);
+    return processedFuture;
+  }
+
+  private CompletableFuture<List<BlockHeader>> downloadHeaders(
+      final CheckpointRange checkpointRange) {
     return DownloadHeaderSequenceTask.endingAtHeader(
             protocolSchedule,
             protocolContext,
@@ -56,12 +66,13 @@ public class CheckpointHeaderDownloader<C>
             checkpointRange.getSegmentLength() - 1,
             validationPolicy,
             metricsSystem)
-        .run()
-        .thenApply(
-            headers -> {
-              final List<BlockHeader> headersToImport = new ArrayList<>(headers);
-              headersToImport.add(checkpointRange.getEnd());
-              return new CheckpointRangeHeaders(checkpointRange, headersToImport);
-            });
+        .run();
+  }
+
+  private CheckpointRangeHeaders processHeaders(
+      final CheckpointRange checkpointRange, final List<BlockHeader> headers) {
+    final List<BlockHeader> headersToImport = new ArrayList<>(headers);
+    headersToImport.add(checkpointRange.getEnd());
+    return new CheckpointRangeHeaders(checkpointRange, headersToImport);
   }
 }

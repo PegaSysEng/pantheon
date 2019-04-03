@@ -53,6 +53,10 @@ public class DeterministicEthScheduler extends EthScheduler {
     executors.forEach(MockExecutorService::runPendingFutures);
   }
 
+  public int getPendingFuturesCount() {
+    return executors.stream().mapToInt(MockExecutorService::getPendingFuturesCount).sum();
+  }
+
   public void disableAutoRun() {
     executors.forEach(e -> e.setAutoRun(false));
   }

@@ -82,6 +82,21 @@ public class CheckpointHeaderDownloaderTest {
         .isCompletedWithValue(new CheckpointRangeHeaders(checkpointRange, headersFromChain(2, 10)));
   }
 
+  @Test
+  public void shouldCancelRequestToPeerWhenReturnedFutureIsCancelled() {
+    final RespondingEthPeer peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
+
+    final CompletableFuture<CheckpointRangeHeaders> result = this.downloader.apply(checkpointRange);
+
+    result.cancel(true);
+
+    EthProtocolManagerTestUtil.disableEthSchedulerAutoRun(ethProtocolManager);
+
+    peer.respond(RespondingEthPeer.blockchainResponder(blockchain));
+
+    assertThat(EthProtocolManagerTestUtil.getPendingFuturesCount(ethProtocolManager)).isZero();
+  }
+
   private List<BlockHeader> headersFromChain(final long startNumber, final long endNumber) {
     final List<BlockHeader> headers = new ArrayList<>();
     for (long i = startNumber; i <= endNumber; i++) {
