@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
@@ -74,8 +73,7 @@ public class FastImportBlocksStepTest {
               protocolContext, blockWithReceipts.getBlock(), blockWithReceipts.getReceipts(), FULL))
           .thenReturn(true);
     }
-    final List<BlockWithReceipts> result = importBlocksStep.apply(blocksWithReceipts);
-    assertThat(result).isSameAs(blocksWithReceipts);
+    importBlocksStep.accept(blocksWithReceipts);
 
     for (final BlockWithReceipts blockWithReceipts : blocksWithReceipts) {
       verify(protocolSchedule).getByBlockNumber(blockWithReceipts.getNumber());
@@ -91,7 +89,7 @@ public class FastImportBlocksStepTest {
     when(blockImporter.fastImportBlock(
             protocolContext, block, blockWithReceipts.getReceipts(), FULL))
         .thenReturn(false);
-    assertThatThrownBy(() -> importBlocksStep.apply(singletonList(blockWithReceipts)))
+    assertThatThrownBy(() -> importBlocksStep.accept(singletonList(blockWithReceipts)))
         .isInstanceOf(InvalidBlockException.class);
   }
 }

@@ -109,8 +109,12 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             protocolSchedule, protocolContext, detachedValidationPolicy);
     final DownloadBodiesStep<C> downloadBodiesStep =
         new DownloadBodiesStep<>(protocolSchedule, ethContext, metricsSystem);
-    // TODO: Use async preserving order when that's ready.
+    final DownloadReceiptsStep downloadReceiptsStep =
+        new DownloadReceiptsStep(ethContext, metricsSystem);
+    final FastImportBlocksStep<C> importBlockStep =
+        new FastImportBlocksStep<>(protocolSchedule, protocolContext, attachedValidationPolicy);
 
+    // TODO: Use async preserving order when that's ready.
     return PipelineBuilder.createPipelineFrom(
             "fetchCheckpoints",
             checkpointRangeSource,
@@ -125,14 +129,8 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
         .thenFlatMap("validateHeadersJoin", validateHeadersJoinUpStep, singleHeaderBufferSize)
         .inBatches(headerRequestSize)
         .thenProcessAsync("downloadBodies", downloadBodiesStep, downloaderParallelism)
-        .thenProcessAsync(
-            "downloadReceipts",
-            new DownloadReceiptsStep(ethContext, metricsSystem),
-            downloaderParallelism)
-        .thenProcess(
-            "importBlock",
-            new FastImportBlocksStep<>(protocolSchedule, protocolContext, attachedValidationPolicy))
-        .andFinishWith("complete", result -> {});
+        .thenProcessAsync("downloadReceipts", downloadReceiptsStep, downloaderParallelism)
+        .andFinishWith("importBlock", importBlockStep);
   }
 
   private boolean shouldContinueDownloadingFromPeer(

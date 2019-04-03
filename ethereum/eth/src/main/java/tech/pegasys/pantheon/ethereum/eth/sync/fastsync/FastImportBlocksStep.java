@@ -19,10 +19,9 @@ import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockExce
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
-public class FastImportBlocksStep<C>
-    implements Function<List<BlockWithReceipts>, List<BlockWithReceipts>> {
+public class FastImportBlocksStep<C> implements Consumer<List<BlockWithReceipts>> {
 
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
@@ -38,7 +37,7 @@ public class FastImportBlocksStep<C>
   }
 
   @Override
-  public List<BlockWithReceipts> apply(final List<BlockWithReceipts> blocksWithReceipts) {
+  public void accept(final List<BlockWithReceipts> blocksWithReceipts) {
     for (final BlockWithReceipts blockWithReceipts : blocksWithReceipts) {
       if (!importBlock(blockWithReceipts)) {
         throw new InvalidBlockException(
@@ -47,7 +46,6 @@ public class FastImportBlocksStep<C>
             blockWithReceipts.getHash());
       }
     }
-    return blocksWithReceipts;
   }
 
   private boolean importBlock(final BlockWithReceipts blockWithReceipts) {
