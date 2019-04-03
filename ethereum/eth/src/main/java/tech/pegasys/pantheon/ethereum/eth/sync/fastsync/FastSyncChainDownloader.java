@@ -52,7 +52,8 @@ public class FastSyncChainDownloader {
               ethContext,
               pivotBlockHeader,
               metricsSystem),
-          ethContext.getScheduler());
+          ethContext.getScheduler(),
+          metricsSystem);
     }
 
     return new EthTaskChainDownloader<>(
