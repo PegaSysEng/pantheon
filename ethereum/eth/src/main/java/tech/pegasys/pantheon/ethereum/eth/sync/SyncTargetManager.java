@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.WaitForPeerTask;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.DetermineCommonAncestorTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -35,10 +34,6 @@ public abstract class SyncTargetManager<C> {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  protected final SyncState syncState;
-
-  private volatile long syncTargetDisconnectListenerId;
-  private volatile boolean syncTargetDisconnected = false;
   private final SynchronizerConfiguration config;
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
@@ -50,19 +45,17 @@ public abstract class SyncTargetManager<C> {
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final EthContext ethContext,
-      final SyncState syncState,
       final MetricsSystem metricsSystem) {
     this.config = config;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
-    this.syncState = syncState;
     this.metricsSystem = metricsSystem;
   }
 
-  public CompletableFuture<SyncTarget> findSyncTarget() {
-    return syncState
-        .syncTarget()
+  public CompletableFuture<SyncTarget> findSyncTarget(
+      final Optional<SyncTarget> currentSyncTarget) {
+    return currentSyncTarget
         .map(CompletableFuture::completedFuture) // Return an existing sync target if present
         .orElseGet(this::selectNewSyncTarget);
   }
@@ -93,13 +86,11 @@ public abstract class SyncTargetManager<C> {
                           if (target == null) {
                             return waitForPeerAndThenSetSyncTarget();
                           }
-                          final SyncTarget syncTarget = syncState.setSyncTarget(bestPeer, target);
+                          final SyncTarget syncTarget = new SyncTarget(bestPeer, target);
                           LOG.info(
                               "Found common ancestor with peer {} at block {}",
                               bestPeer,
                               target.getNumber());
-                          syncTargetDisconnectListenerId =
-                              bestPeer.subscribeDisconnect(this::onSyncTargetPeerDisconnect);
                           return completedFuture(syncTarget);
                         })
                     .thenCompose(
@@ -120,7 +111,7 @@ public abstract class SyncTargetManager<C> {
   protected abstract CompletableFuture<Optional<EthPeer>> selectBestAvailableSyncTarget();
 
   private CompletableFuture<SyncTarget> waitForPeerAndThenSetSyncTarget() {
-    return waitForNewPeer().handle((r, t) -> r).thenCompose((r) -> findSyncTarget());
+    return waitForNewPeer().handle((r, t) -> r).thenCompose((r) -> selectNewSyncTarget());
   }
 
   private CompletableFuture<?> waitForNewPeer() {
@@ -129,32 +120,14 @@ public abstract class SyncTargetManager<C> {
         .timeout(WaitForPeerTask.create(ethContext, metricsSystem), Duration.ofSeconds(5));
   }
 
-  private void onSyncTargetPeerDisconnect(final EthPeer ethPeer) {
-    LOG.info("Sync target disconnected: {}", ethPeer);
-    syncTargetDisconnected = true;
-  }
-
-  public boolean isSyncTargetDisconnected() {
-    return syncTargetDisconnected;
-  }
-
-  public void clearSyncTarget(final SyncTarget syncTarget) {
-    syncTarget.peer().unsubscribeDisconnect(syncTargetDisconnectListenerId);
-    syncTargetDisconnected = false;
-  }
-
   public abstract boolean shouldSwitchSyncTarget(final SyncTarget currentTarget);
 
   public abstract boolean shouldContinueDownloading();
 
   public abstract boolean isSyncTargetReached(final EthPeer peer);
 
-  public boolean syncTargetCanProvideMoreBlocks() {
-    if (!syncState.syncTarget().isPresent()) {
-      LOG.warn("SyncTarget should be set, but is not.");
-      return false;
-    }
-    final EthPeer currentSyncingPeer = syncState.syncTarget().get().peer();
-    return !isSyncTargetDisconnected() && !isSyncTargetReached(currentSyncingPeer);
+  public boolean syncTargetCanProvideMoreBlocks(final SyncTarget syncTarget) {
+    final EthPeer currentSyncingPeer = syncTarget.peer();
+    return !currentSyncingPeer.isDisconnected() && !isSyncTargetReached(currentSyncingPeer);
   }
 }
