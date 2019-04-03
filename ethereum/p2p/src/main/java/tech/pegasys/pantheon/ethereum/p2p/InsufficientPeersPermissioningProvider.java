@@ -23,7 +23,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 /**
- * A permissioning provider that only provides an answer when we have no peers outside of our bootnodes
+ * A permissioning provider that only provides an answer when we have no peers outside of our
+ * bootnodes
  */
 public class InsufficientPeersPermissioningProvider implements ContextualNodePermissioningProvider {
   private final EnodeURL selfEnode;
@@ -34,6 +35,7 @@ public class InsufficientPeersPermissioningProvider implements ContextualNodePer
 
   /**
    * Creates the provider observing the provided p2p network
+   *
    * @param p2pNetwork the p2p network to observe
    * @param selfEnode the advertised enode address of this node
    * @param bootnodeEnodes the bootnodes that this node is configured to connection to

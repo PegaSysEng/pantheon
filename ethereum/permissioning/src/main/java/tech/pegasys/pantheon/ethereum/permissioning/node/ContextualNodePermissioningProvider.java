@@ -16,21 +16,23 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Optional;
 
-/**
- * A permissioning provider that only answers under some conditions
- */
+/** A permissioning provider that only answers under some conditions */
 public interface ContextualNodePermissioningProvider {
 
   /**
    * Returns whether a connection is permitted if the conditions allow for a decision to be made
+   *
    * @param sourceEnode The node originating the connection
    * @param destinationEnode The node receiving the connection
-   * @return True if permitted, false if not, Empty if an answer is not possible under current conditions
+   * @return True if permitted, false if not, Empty if an answer is not possible under current
+   *     conditions
    */
   Optional<Boolean> isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode);
 
   /**
-   * Subscribe a callback that will be invoked whenever this provider has changed such that it would deliver different answers
+   * Subscribe a callback that will be invoked whenever this provider has changed such that it would
+   * deliver different answers
+   *
    * @param callback The runnable to invoke when the provider has updated
    * @return the subscription id that can be used to unsubscribe
    */
@@ -38,6 +40,7 @@ public interface ContextualNodePermissioningProvider {
 
   /**
    * Unsubscribe an existing subscription
+   *
    * @param id
    * @return true if the subscriber id was found, false if not
    */

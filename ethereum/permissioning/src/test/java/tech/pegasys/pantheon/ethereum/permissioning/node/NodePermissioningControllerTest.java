@@ -150,10 +150,12 @@ public class NodePermissioningControllerTest {
     this.controller =
         new NodePermissioningController(syncStatusNodePermissioningProviderOptional, providers);
 
-    final ContextualNodePermissioningProvider insufficientPeersPermissioningProvider = mock(ContextualNodePermissioningProvider.class);
+    final ContextualNodePermissioningProvider insufficientPeersPermissioningProvider =
+        mock(ContextualNodePermissioningProvider.class);
 
     when(syncStatusNodePermissioningProvider.hasReachedSync()).thenReturn(true);
-    when(insufficientPeersPermissioningProvider.isPermitted(eq(enode1), eq(enode2))).thenReturn(Optional.of(true));
+    when(insufficientPeersPermissioningProvider.isPermitted(eq(enode1), eq(enode2)))
+        .thenReturn(Optional.of(true));
 
     controller.setInsufficientPeersPermissioningProvider(insufficientPeersPermissioningProvider);
 
@@ -170,11 +172,13 @@ public class NodePermissioningControllerTest {
     this.controller =
         new NodePermissioningController(syncStatusNodePermissioningProviderOptional, providers);
 
-    final ContextualNodePermissioningProvider insufficientPeersPermissioningProvider = mock(ContextualNodePermissioningProvider.class);
+    final ContextualNodePermissioningProvider insufficientPeersPermissioningProvider =
+        mock(ContextualNodePermissioningProvider.class);
 
     when(syncStatusNodePermissioningProvider.isPermitted(any(), any())).thenReturn(true);
     when(syncStatusNodePermissioningProvider.hasReachedSync()).thenReturn(true);
-    when(insufficientPeersPermissioningProvider.isPermitted(any(), any())).thenReturn(Optional.empty());
+    when(insufficientPeersPermissioningProvider.isPermitted(any(), any()))
+        .thenReturn(Optional.empty());
     when(localConfigNodePermissioningProvider.isPermitted(any(), any())).thenReturn(true);
     when(otherPermissioningProvider.isPermitted(any(), any())).thenReturn(true);
 
