@@ -13,8 +13,9 @@ Each Pantheon node that sends or receives private transactions requires an assoc
 
 ![Orion Nodes](../images/OrionNodes.png)
 
-Private transactions are passed from the Pantheon node to the associated to the Orion node. The Orion node
-encrypts and directly distributes the private transaction to Orion nodes participating in the transaction. 
+Private transactions are passed from the Pantheon node to the associated Orion node. The Orion node
+encrypts and directly distributes (that is, point to point) the private transaction to Orion nodes 
+participating in the transaction. 
 
 !!! tip
     Private Transaction Managers are also known as Enclaves.  
@@ -55,8 +56,8 @@ of the Orion nodes sending and receiving the transaction.
 The group of nodes specified by `privateFrom`and `privateFor` form a privacy group and 
 are given a unique privacy group ID by Orion. The private transaction is stored in Orion with the privacy group ID. 
 
-The Pantheon nodes maintain the public world state and a private state for each privacy group. The private 
-states contain data that is not shared in the globally replicated world state. Private transactions read 
+The Pantheon nodes maintain the public world state for the blockchain and a private state for each privacy group. 
+The private states contain data that is not shared in the globally replicated world state. Private transactions read 
 and write to the private world state for the privacy group, and read from the public world state.
 
 ![Privacy Groups](../images/PrivacyGroups.png)
@@ -77,7 +78,7 @@ and write to the private world state for the privacy group, and read from the pu
     A, B, and C must be included on transactions (as either `privateFrom` or `privateFor`) even if they are 
     between two of the three parties.
 
-    To send private trasactions between A, C, and D, C initialises a different contract in a private transaction with
+    To send private transactions between A, C, and D, C initialises a different contract in a private transaction with
     A and D specified as the `privateFor` and C specified as the `privateFrom`. Initialising the contract 
     creates a privacy group consisting of  A, C, and D. For the ACD private state to remain consistent, 
     A, C, and D must be included on transactions (as either `privateFrom` or `privateFor`) even if they are 
