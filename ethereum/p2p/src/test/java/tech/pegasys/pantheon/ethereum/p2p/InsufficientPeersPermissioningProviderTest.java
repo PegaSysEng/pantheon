@@ -158,8 +158,9 @@ public class InsufficientPeersPermissioningProviderTest {
     final InsufficientPeersPermissioningProvider provider =
         new InsufficientPeersPermissioningProvider(p2pNetwork, SELF_ENODE, bootnodes);
 
+    @SuppressWarnings("unchecked")
     final ArgumentCaptor<Consumer<PeerConnection>> callbackCaptor =
-        ArgumentCaptor.forClass((Class) Consumer.class);
+        ArgumentCaptor.forClass(Consumer.class);
 
     verify(p2pNetwork).subscribeConnect(callbackCaptor.capture());
     final Consumer<PeerConnection> connectCallback = callbackCaptor.getValue();
@@ -190,8 +191,9 @@ public class InsufficientPeersPermissioningProviderTest {
     final InsufficientPeersPermissioningProvider provider =
         new InsufficientPeersPermissioningProvider(p2pNetwork, SELF_ENODE, bootnodes);
 
+    @SuppressWarnings("unchecked")
     final ArgumentCaptor<Consumer<PeerConnection>> connectCallbackCaptor =
-        ArgumentCaptor.forClass((Class) Consumer.class);
+        ArgumentCaptor.forClass(Consumer.class);
     verify(p2pNetwork).subscribeConnect(connectCallbackCaptor.capture());
     final Consumer<PeerConnection> connectCallback = connectCallbackCaptor.getValue();
 
