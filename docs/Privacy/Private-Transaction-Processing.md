@@ -3,7 +3,7 @@ description: Private Transaction Processing
 
 ## Processing Private Transactions
 
-Processing private transactions involves the following concepts: 
+Processing private transactions involves the following: 
 
 - **Precompiled Contract**: Smart contract compiled from the source language to EVM bytecode and stored by an 
 Ethereum node for later execution.
@@ -12,7 +12,7 @@ Ethereum node for later execution.
 private transaction. The `to` attribute of the Privacy Marker Transaction is the address of the privacy precompile contract. 
 The Privacy Marker Transaction is signed with the [Ethereum node private key](../Configuring-Pantheon/Node-Keys.md#node-private-key).
 
-Private transactions are processed as illustrated and described below. The Private Transaction Manager is Orion. 
+Private transactions are processed as illustrated and described below.  
 
 ![Processing Private Transctions](../images/PrivateTransactionProcessing.png)
 
