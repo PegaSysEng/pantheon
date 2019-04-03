@@ -59,6 +59,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
+import tech.pegasys.pantheon.services.kvstore.RocksDBPerformanceOptions;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
@@ -556,6 +557,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isFullInstantiation()) {
       commandLine.addMixin("standaloneCommands", standaloneCommands);
     }
+
+    // add performance options not exposed to the help menu
+    commandLine.addMixin("rocksDBPerformanceOptions", RocksDBPerformanceOptions.get());
 
     commandLine.addSubcommand(
         BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));

@@ -55,7 +55,10 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
   private RocksDbKeyValueStorage(final Path storageDirectory, final MetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
     try {
-      options = new Options().setCreateIfMissing(true);
+      options =
+          new Options()
+              .setCreateIfMissing(true)
+              .setMaxOpenFiles(RocksDBPerformanceOptions.get().maxOpenFiles);
       txOptions = new TransactionDBOptions();
       db = TransactionDB.open(options, txOptions, storageDirectory.toString());
 
