@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.DETACHED_ONLY;
 import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT_DETACHED_ONLY;
+import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT_SKIP_DETACHED;
+import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.SKIP_DETACHED;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -44,6 +46,7 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
   private final EthContext ethContext;
   private final BlockHeader pivotBlockHeader;
   private final MetricsSystem metricsSystem;
+  private final FastSyncValidationPolicy attachedValidationPolicy;
   private final FastSyncValidationPolicy detachedValidationPolicy;
 
   public FastSyncDownloadPipelineFactory(
@@ -65,6 +68,12 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             "fast_sync_validation_mode",
             "Number of blocks validated using light vs full validation during fast sync",
             "validationMode");
+    attachedValidationPolicy =
+        new FastSyncValidationPolicy(
+            this.syncConfig.fastSyncFullValidationRate(),
+            LIGHT_SKIP_DETACHED,
+            SKIP_DETACHED,
+            fastSyncValidationCounter);
     detachedValidationPolicy =
         new FastSyncValidationPolicy(
             this.syncConfig.fastSyncFullValidationRate(),
@@ -120,6 +129,9 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             "downloadReceipts",
             new DownloadReceiptsStep(ethContext, metricsSystem),
             downloaderParallelism)
+        .thenProcess(
+            "importBlock",
+            new FastImportBlocksStep<>(protocolSchedule, protocolContext, attachedValidationPolicy))
         .andFinishWith("complete", result -> {});
   }
 
