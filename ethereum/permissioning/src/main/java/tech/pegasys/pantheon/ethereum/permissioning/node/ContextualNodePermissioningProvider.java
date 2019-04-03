@@ -41,7 +41,7 @@ public interface ContextualNodePermissioningProvider {
   /**
    * Unsubscribe an existing subscription
    *
-   * @param id
+   * @param id the id of the subscriber to unsubscribe
    * @return true if the subscriber id was found, false if not
    */
   boolean unsubscribeFromUpdates(final long id);
