@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.services.pipeline.Pipeline;
 import tech.pegasys.pantheon.services.pipeline.PipelineBuilder;
 
 import java.time.Duration;
+import java.util.function.Function;
 
 public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFactory {
   private final SynchronizerConfiguration syncConfig;
@@ -107,6 +108,9 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
                 detachedValidationPolicy,
                 metricsSystem),
             downloaderParallelism)
+        .thenProcess("validateHeadersJoin", Function.identity())
+        .thenProcess("downloadBodies", Function.identity())
+        .thenProcess("downloadReceipts", Function.identity())
         .andFinishWith("complete", result -> {});
   }
 
