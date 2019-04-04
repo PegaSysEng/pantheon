@@ -39,13 +39,19 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
   private final BlockingQueue<T> queue;
   private final Counter inputCounter;
   private final Counter outputCounter;
+  private final Counter abortedItemCounter;
   private final AtomicBoolean closed = new AtomicBoolean();
   private final AtomicBoolean aborted = new AtomicBoolean();
 
-  public Pipe(final int capacity, final Counter inputCounter, final Counter outputCounter) {
+  public Pipe(
+      final int capacity,
+      final Counter inputCounter,
+      final Counter outputCounter,
+      final Counter abortedItemCounter) {
     queue = new ArrayBlockingQueue<>(capacity);
     this.inputCounter = inputCounter;
     this.outputCounter = outputCounter;
+    this.abortedItemCounter = abortedItemCounter;
   }
 
   @Override
@@ -70,7 +76,9 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
 
   @Override
   public void abort() {
-    aborted.set(true);
+    if (aborted.compareAndSet(false, true)) {
+      abortedItemCounter.inc(queue.size());
+    }
   }
 
   @Override
