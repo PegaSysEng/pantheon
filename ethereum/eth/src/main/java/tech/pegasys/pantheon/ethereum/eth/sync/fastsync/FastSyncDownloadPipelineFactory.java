@@ -38,6 +38,7 @@ import tech.pegasys.pantheon.services.pipeline.Pipeline;
 import tech.pegasys.pantheon.services.pipeline.PipelineBuilder;
 
 import java.time.Duration;
+import java.util.Optional;
 
 public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFactory {
   private final SynchronizerConfiguration syncConfig;
@@ -93,7 +94,7 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
                 syncConfig,
                 protocolSchedule,
                 ethContext,
-                new FastSyncCheckpointFilter(pivotBlockHeader),
+                Optional.of(pivotBlockHeader),
                 metricsSystem),
             this::shouldContinueDownloadingFromPeer,
             ethContext.getScheduler(),

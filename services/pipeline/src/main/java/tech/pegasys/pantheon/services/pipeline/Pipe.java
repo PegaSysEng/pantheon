@@ -54,6 +54,11 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
   }
 
   @Override
+  public boolean isAborted() {
+    return aborted.get();
+  }
+
+  @Override
   public boolean hasRemainingCapacity() {
     return queue.remainingCapacity() > 0 && isOpen();
   }
