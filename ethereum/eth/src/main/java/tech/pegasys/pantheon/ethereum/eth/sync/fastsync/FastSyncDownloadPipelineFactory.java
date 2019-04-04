@@ -86,7 +86,7 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
   public Pipeline<?> createDownloadPipelineForSyncTarget(final SyncTarget target) {
     final int downloaderParallelism = syncConfig.downloaderParallelism();
     final int headerRequestSize = syncConfig.downloaderHeaderRequestSize();
-    final int singleHeaderBufferSize = downloaderParallelism * headerRequestSize * 10;
+    final int singleHeaderBufferSize = headerRequestSize * downloaderParallelism;
     final CheckpointRangeSource checkpointRangeSource =
         new CheckpointRangeSource(
             new CheckpointHeaderFetcher(
@@ -118,7 +118,7 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
     return PipelineBuilder.createPipelineFrom(
             "fetchCheckpoints",
             checkpointRangeSource,
-            singleHeaderBufferSize,
+            downloaderParallelism,
             metricsSystem.createLabelledCounter(
                 MetricCategory.SYNCHRONIZER,
                 "chain_download_pipeline_processed_total",

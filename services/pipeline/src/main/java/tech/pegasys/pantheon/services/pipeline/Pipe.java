@@ -37,7 +37,6 @@ import org.apache.logging.log4j.Logger;
 public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
   private static final Logger LOG = LogManager.getLogger();
   private final BlockingQueue<T> queue;
-  private final int capacity;
   private final Counter inputCounter;
   private final Counter outputCounter;
   private final AtomicBoolean closed = new AtomicBoolean();
@@ -45,7 +44,6 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
 
   public Pipe(final int capacity, final Counter inputCounter, final Counter outputCounter) {
     queue = new ArrayBlockingQueue<>(capacity);
-    this.capacity = capacity;
     this.inputCounter = inputCounter;
     this.outputCounter = outputCounter;
   }
@@ -53,15 +51,6 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
   @Override
   public boolean isOpen() {
     return !closed.get() && !aborted.get();
-  }
-
-  /**
-   * Get the number of items that can be queued inside this pipe.
-   *
-   * @return the pipe's capacity.
-   */
-  public int getCapacity() {
-    return capacity;
   }
 
   @Override
