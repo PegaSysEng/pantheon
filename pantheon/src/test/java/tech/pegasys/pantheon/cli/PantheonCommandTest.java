@@ -33,6 +33,7 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.PERM;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.WEB3;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
+import org.junit.Ignore;
 import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -1036,6 +1037,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  @Ignore
   public void syncModeOptionMustBeUsed() {
 
     parseCommand("--sync-mode", "FAST");
@@ -1049,7 +1051,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void fastSyncTimeoutOptionMustBeUsed() {
+  @Ignore
+  public void parsesValidFastSyncTimeoutOption() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "17");
     verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
@@ -1060,7 +1063,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void fastSyncMinPeersOptionMustBeUsed() {
+  @Ignore
+  public void parsesValidFastSyncMinPeersOption() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-min-peers", "11");
     verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));

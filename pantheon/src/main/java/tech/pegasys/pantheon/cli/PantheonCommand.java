@@ -230,7 +230,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
   @Option(
-      hidden = true,
+      hidden = false,
       names = {"--fast-sync-min-peers"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =

@@ -74,7 +74,7 @@ public class FastSyncActions<C> {
     final EthScheduler scheduler = ethContext.getScheduler();
     final CompletableFuture<Void> fastSyncTask;
     if (!syncConfig.getFastSyncMaximumPeerWaitTime().isZero()) {
-      LOG.info(
+      LOG.debug(
           format(
               "Waiting for at least %d peers, maximum wait time set to %s.",
               syncConfig.getFastSyncMinimumPeerCount(),
@@ -82,7 +82,7 @@ public class FastSyncActions<C> {
       fastSyncTask =
           scheduler.timeout(waitForPeersTask, syncConfig.getFastSyncMaximumPeerWaitTime());
     } else {
-      LOG.info(
+      LOG.debug(
           format(
               "Waiting for at least %d peers, no maximum wait time set.",
               syncConfig.getFastSyncMinimumPeerCount()));
