@@ -17,6 +17,7 @@ import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
 import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -35,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 
 public class PipelineChainDownloader<C> implements ChainDownloader {
   private static final Logger LOG = LogManager.getLogger();
+  private final SyncState syncState;
   private final SyncTargetManager<C> syncTargetManager;
   private final DownloadPipelineFactory downloadPipelineFactory;
   private final EthScheduler scheduler;
@@ -46,10 +48,12 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   private Pipeline<?> currentDownloadPipeline;
 
   public PipelineChainDownloader(
+      final SyncState syncState,
       final SyncTargetManager<C> syncTargetManager,
       final DownloadPipelineFactory downloadPipelineFactory,
       final EthScheduler scheduler,
       final MetricsSystem metricsSystem) {
+    this.syncState = syncState;
     this.syncTargetManager = syncTargetManager;
     this.downloadPipelineFactory = downloadPipelineFactory;
     this.scheduler = scheduler;
@@ -98,6 +102,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
       return performDownload();
     } else {
       LOG.info("Chain download complete");
+      syncState.clearSyncTarget();
       return completedFuture(null);
     }
   }
@@ -117,6 +122,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
     if (cancelled.get()) {
       return completedExceptionally(new CancellationException("Chain download was cancelled"));
     }
+    syncState.setSyncTarget(target.peer(), target.commonAncestor());
     currentDownloadPipeline = downloadPipelineFactory.createDownloadPipelineForSyncTarget(target);
     return scheduler.startPipeline(currentDownloadPipeline);
   }

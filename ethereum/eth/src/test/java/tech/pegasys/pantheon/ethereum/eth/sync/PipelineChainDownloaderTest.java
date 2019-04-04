@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
@@ -51,15 +52,21 @@ public class PipelineChainDownloaderTest {
   @Mock private Pipeline<Object> downloadPipeline2;
   @Mock private EthPeer peer1;
   @Mock private EthPeer peer2;
+  @Mock private SyncState syncState;
   private final BlockHeader commonAncestor = new BlockHeaderTestFixture().buildHeader();
-  private final SyncTarget syncTarget = new SyncTarget(peer1, commonAncestor);
+  private SyncTarget syncTarget;
   private PipelineChainDownloader<Void> chainDownloader;
 
   @Before
   public void setUp() {
+    syncTarget = new SyncTarget(peer1, commonAncestor);
     chainDownloader =
         new PipelineChainDownloader<>(
-            syncTargetManager, downloadPipelineFactory, scheduler, new NoOpMetricsSystem());
+            syncState,
+            syncTargetManager,
+            downloadPipelineFactory,
+            scheduler,
+            new NoOpMetricsSystem());
   }
 
   @Test
@@ -83,6 +90,20 @@ public class PipelineChainDownloaderTest {
 
     verify(downloadPipelineFactory).createDownloadPipelineForSyncTarget(syncTarget);
     verify(scheduler).startPipeline(downloadPipeline);
+  }
+
+  @Test
+  public void shouldUpdateSyncStateWhenTargetSelected() {
+    final CompletableFuture<SyncTarget> selectTargetFuture = new CompletableFuture<>();
+    when(syncTargetManager.findSyncTarget(Optional.empty())).thenReturn(selectTargetFuture);
+    expectPipelineCreation(syncTarget, downloadPipeline);
+    when(scheduler.startPipeline(downloadPipeline)).thenReturn(new CompletableFuture<>());
+    chainDownloader.start();
+    verifyZeroInteractions(downloadPipelineFactory);
+
+    selectTargetFuture.complete(syncTarget);
+
+    verify(syncState).setSyncTarget(peer1, commonAncestor);
   }
 
   @Test
@@ -129,6 +150,7 @@ public class PipelineChainDownloaderTest {
     pipelineFuture.complete(null);
 
     verify(syncTargetManager).shouldContinueDownloading();
+    verify(syncState).clearSyncTarget();
     verifyNoMoreInteractions(syncTargetManager);
     assertThat(result).isCompleted();
   }
