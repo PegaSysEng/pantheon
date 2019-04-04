@@ -1048,13 +1048,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
-
   @Test
   public void fastSyncTimeoutOptionMustBeUsed() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "17");
     verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
-    verify(mockSyncConfBuilder).fastSyncMaximumPeerWaitTime(ArgumentMatchers.eq(Duration.ofSeconds(17)));
+    verify(mockSyncConfBuilder)
+        .fastSyncMaximumPeerWaitTime(ArgumentMatchers.eq(Duration.ofSeconds(17)));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
