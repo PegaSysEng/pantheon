@@ -82,8 +82,9 @@ public class Pipe<T> implements ReadPipe<T>, WritePipe<T> {
 
   @Override
   public void abort() {
-    aborted.set(true);
-    abortedItemCounter.inc(queue.size());
+    if (aborted.compareAndSet(false, true)) {
+      abortedItemCounter.inc(queue.size());
+    }
   }
 
   @Override
