@@ -234,7 +234,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--fast-sync-min-peers"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
-          "Minimum number of peers before starting fast sync. (default: ${DEFAULT-VALUE})")
+          "Minimum number of peers required before starting fast sync. (default: ${DEFAULT-VALUE})")
   private final Integer fastSyncMinPeerCount = FAST_SYNC_MIN_PEER_COUNT;
 
   @Option(
