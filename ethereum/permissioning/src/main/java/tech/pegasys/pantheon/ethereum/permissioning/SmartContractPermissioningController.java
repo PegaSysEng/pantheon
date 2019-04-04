@@ -29,7 +29,7 @@ import java.util.Optional;
 
 /**
  * Controller that can read from a smart contract that exposes the permissioning call
- * connectionAllowed(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes4,uint16)
+ * connectionAllowed(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)
  */
 public class SmartContractPermissioningController implements NodePermissioningProvider {
   private final Address contractAddress;
