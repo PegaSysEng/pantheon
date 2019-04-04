@@ -112,7 +112,8 @@ public abstract class CommandTestAbstract {
     when(mockSyncConfBuilder.syncMode(any())).thenReturn(mockSyncConfBuilder);
     when(mockSyncConfBuilder.maxTrailingPeers(anyInt())).thenReturn(mockSyncConfBuilder);
     when(mockSyncConfBuilder.fastSyncMinimumPeerCount(anyInt())).thenReturn(mockSyncConfBuilder);
-    when(mockSyncConfBuilder.fastSyncMaximumPeerWaitTime(any(Duration.class))).thenReturn(mockSyncConfBuilder);
+    when(mockSyncConfBuilder.fastSyncMaximumPeerWaitTime(any(Duration.class)))
+        .thenReturn(mockSyncConfBuilder);
 
     when(mockSyncConfBuilder.build()).thenReturn(mockSyncConf);
 

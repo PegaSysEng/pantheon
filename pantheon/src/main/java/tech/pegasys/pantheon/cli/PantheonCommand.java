@@ -75,7 +75,6 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -231,19 +230,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
   @Option(
-          hidden = true,
-          names = {"--fast-sync-min-peers"},
-          paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-          description =
-                  "Minimum number of peers before starting fast sync, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
+      hidden = true,
+      names = {"--fast-sync-min-peers"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Minimum number of peers before starting fast sync, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
   private final Integer fastSyncMinPeerCount = DEFAULT_FAST_SYNC_MIN_PEER_COUNT;
 
   @Option(
-          hidden = true,
-          names = {"--fast-sync-max-wait-time"},
-          paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-          description =
-                  "Maximum time to wait the required number of peers before starting fast sync, expressed in seconds, 0 means no timeout, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
+      hidden = true,
+      names = {"--fast-sync-max-wait-time"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Maximum time to wait the required number of peers before starting fast sync, expressed in seconds, 0 means no timeout, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
   private final Integer fastSyncMaxWaitTime = DEFAULT_FAST_SYNC_MAX_WAIT_TIME;
 
   @Option(
@@ -679,19 +678,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private void checkFastSyncOptions() throws ParameterException{
+  private void checkFastSyncOptions() throws ParameterException {
     if (fastSyncMaxWaitTime < 0) {
-      throw new ParameterException(commandLine, "--fast-sync-max-wait-time must be a positive or zero integer");
+      throw new ParameterException(
+          commandLine, "--fast-sync-max-wait-time must be a positive or zero integer");
     }
     checkOptionDependencies(
-            logger,
-            commandLine,
-            "--sync-mode",
-            syncMode.equals(SyncMode.FAST),
-            asList(
-                    "--fast-sync-num-peers",
-                    "--fast-sync-timeout"
-            ));
+        logger,
+        commandLine,
+        "--sync-mode",
+        syncMode.equals(SyncMode.FAST),
+        asList("--fast-sync-num-peers", "--fast-sync-timeout"));
   }
 
   private NetworkName getNetwork() {
@@ -923,8 +920,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         commandLine,
         "--privacy-enabled",
         !isPrivacyEnabled,
-        asList(
-            "--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
+        asList("--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
 
     final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
     if (isPrivacyEnabled) {
