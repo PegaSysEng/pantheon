@@ -104,7 +104,7 @@ public class EthProtocolManagerTestUtil {
    * <p>Works with {@code disableEthSchedulerAutoRun} - tasks will only be pending if autoRun has
    * been disabled.
    */
-  public static int getPendingFuturesCount(final EthProtocolManager ethProtocolManager) {
+  public static long getPendingFuturesCount(final EthProtocolManager ethProtocolManager) {
     final EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
     checkArgument(
         scheduler instanceof DeterministicEthScheduler,

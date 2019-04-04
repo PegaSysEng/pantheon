@@ -63,6 +63,7 @@ public class DownloadHeadersStep<C>
             protocolContext,
             ethContext,
             checkpointRange.getEnd(),
+            // -1 because we don't want to request the range starting header
             checkpointRange.getSegmentLength() - 1,
             validationPolicy,
             metricsSystem)

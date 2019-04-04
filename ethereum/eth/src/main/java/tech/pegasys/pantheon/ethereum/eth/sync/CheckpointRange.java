@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync;
 
+import static java.lang.Math.toIntExact;
+
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.util.Objects;
@@ -61,6 +63,6 @@ public class CheckpointRange {
   }
 
   public int getSegmentLength() {
-    return (int) (end.getNumber() - start.getNumber());
+    return toIntExact(end.getNumber() - start.getNumber());
   }
 }
