@@ -76,4 +76,14 @@ public class ProcessingStageTest {
     verifyNoMoreInteractions(singleStep);
     assertThat(outputPipe.isOpen()).isFalse();
   }
+
+  @Test
+  public void shouldAbortProcessorIfReadPipeIsAborted() {
+    inputPipe.abort();
+    stage.run();
+
+    verify(singleStep).abort();
+    verify(singleStep).finalize(outputPipe);
+    assertThat(outputPipe.isOpen()).isFalse();
+  }
 }
