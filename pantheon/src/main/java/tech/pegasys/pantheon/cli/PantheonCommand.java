@@ -234,16 +234,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--fast-sync-min-peers"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
-          "Minimum number of peers before starting fast sync, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
-  private final Integer fastSyncMinPeerCount = DEFAULT_FAST_SYNC_MIN_PEER_COUNT;
+          "Minimum number of peers before starting fast sync. (default: ${DEFAULT-VALUE})")
+  private final Integer fastSyncMinPeerCount = FAST_SYNC_MIN_PEER_COUNT;
 
   @Option(
       hidden = true,
       names = {"--fast-sync-max-wait-time"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
-          "Maximum time to wait the required number of peers before starting fast sync, expressed in seconds, 0 means no timeout, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
-  private final Integer fastSyncMaxWaitTime = DEFAULT_FAST_SYNC_MAX_WAIT_TIME;
+          "Maximum time to wait the required number of peers before starting fast sync, expressed in seconds, 0 means no timeout(default: ${DEFAULT-VALUE})")
+  private final Integer fastSyncMaxWaitTime = FAST_SYNC_MAX_WAIT_TIME;
 
   @Option(
       names = {"--network"},
@@ -687,7 +687,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         logger,
         commandLine,
         "--sync-mode",
-        syncMode.equals(SyncMode.FAST),
+        SyncMode.FAST.equals(syncMode),
         asList("--fast-sync-num-peers", "--fast-sync-timeout"));
   }
 
