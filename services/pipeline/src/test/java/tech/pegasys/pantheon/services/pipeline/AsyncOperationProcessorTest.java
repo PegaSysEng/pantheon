@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.services.pipeline;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -159,6 +160,22 @@ public class AsyncOperationProcessorTest {
     processor.finalize(writePipe);
     verify(writePipe).put("c");
     verify(writePipe).put("d");
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenFutureCompletesExceptionally() {
+    final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
+        createProcessor(false);
+    final CompletableFuture<String> task1 = new CompletableFuture<>();
+    when(readPipe.get()).thenReturn(task1);
+
+    processor.processNextInput(readPipe, writePipe);
+
+    final Exception exception = new IndexOutOfBoundsException("Oh dear");
+    task1.completeExceptionally(exception);
+
+    assertThatThrownBy(() -> processor.processNextInput(readPipe, writePipe))
+        .hasRootCause(exception);
   }
 
   private AsyncOperationProcessor<CompletableFuture<String>, String> createProcessor(
