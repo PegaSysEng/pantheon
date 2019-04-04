@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -108,12 +109,13 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   }
 
   private CompletionStage<Void> handleFailedDownload(final Throwable error) {
-    LOG.debug("Chain download failed. Will restart if required.", error);
     pipelineErrorCounter.inc();
     if (!cancelled.get() && syncTargetManager.shouldContinueDownloading()) {
-      // Drop the error, allowing the normal looping logic to retry.
-      return completedFuture(null);
+      LOG.debug("Chain download failed. Restarting after short delay.", error);
+      // Allowing the normal looping logic to retry after a brief delay.
+      return scheduler.scheduleFutureTask(() -> completedFuture(null), Duration.ofSeconds(2));
     }
+    LOG.debug("Chain download failed.", error);
     // Propagate the error out, terminating this chain download.
     return completedExceptionally(error);
   }
