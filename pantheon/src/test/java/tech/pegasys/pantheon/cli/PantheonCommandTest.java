@@ -1051,7 +1051,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  @Ignore
   public void parsesValidFastSyncTimeoutOption() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "17");
@@ -1063,7 +1062,18 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  @Ignore
+  public void parsesInvalidFastSyncTimeoutOptionShouldFail() {
+    parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "-1");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    // PicoCLI uses longest option name for message when option has multiple names, so here plural.
+    assertThat(commandErrorOutput.toString())
+        .contains("--fast-sync-max-wait-time must be greater than or equal to 0");
+  }
+
+  @Test
   public void parsesValidFastSyncMinPeersOption() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-min-peers", "11");
