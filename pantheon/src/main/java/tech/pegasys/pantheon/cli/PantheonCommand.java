@@ -681,7 +681,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private void checkFastSyncOptions() throws ParameterException {
     if (fastSyncMaxWaitTime < 0) {
       throw new ParameterException(
-          commandLine, "--fast-sync-max-wait-time must be a positive or zero integer");
+          commandLine, "--fast-sync-max-wait-time must be greater than or equal to 0");
     }
     checkOptionDependencies(
         logger,
