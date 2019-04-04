@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.time.Duration.ofSeconds;
 import static java.util.Arrays.asList;
 import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
@@ -75,6 +74,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -628,7 +628,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
 
     // Check that fast sync options are able to work or send an error
-    checkFastSyncOptions();
+    if (fastSyncMaxWaitTime < 0) {
+      throw new ParameterException(
+          commandLine, "--fast-sync-max-wait-time must be greater than or equal to 0");
+    }
+    checkOptionDependencies(
+        logger,
+        commandLine,
+        "--sync-mode",
+        SyncMode.FAST.equals(syncMode),
+        asList("--fast-sync-num-peers", "--fast-sync-timeout"));
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -676,19 +685,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
-  }
-
-  private void checkFastSyncOptions() throws ParameterException {
-    if (fastSyncMaxWaitTime < 0) {
-      throw new ParameterException(
-          commandLine, "--fast-sync-max-wait-time must be greater than or equal to 0");
-    }
-    checkOptionDependencies(
-        logger,
-        commandLine,
-        "--sync-mode",
-        SyncMode.FAST.equals(syncMode),
-        asList("--fast-sync-num-peers", "--fast-sync-timeout"));
   }
 
   private NetworkName getNetwork() {
@@ -942,7 +938,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return synchronizerConfigurationBuilder
         .syncMode(syncMode)
         .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
-        .fastSyncMaximumPeerWaitTime(ofSeconds(fastSyncMaxWaitTime))
+        .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(fastSyncMaxWaitTime))
         .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
         .build();
   }
