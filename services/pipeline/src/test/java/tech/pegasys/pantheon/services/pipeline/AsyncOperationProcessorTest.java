@@ -33,11 +33,10 @@ public class AsyncOperationProcessorTest {
   @SuppressWarnings("unchecked")
   private final WritePipe<String> writePipe = mock(WritePipe.class);
 
-  private final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
-      new AsyncOperationProcessor<>(Function.identity(), 3);
-
   @Test
   public void shouldImmediatelyOutputTasksThatAreAlreadyCompleteEvenIfOutputPipeIsFull() {
+    final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
+        createProcessor(false);
     when(writePipe.hasRemainingCapacity()).thenReturn(false);
     when(readPipe.get()).thenReturn(completedFuture("a"));
 
@@ -47,7 +46,8 @@ public class AsyncOperationProcessorTest {
 
   @Test
   public void shouldNotExceedConcurrentJobLimit() {
-
+    final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
+        createProcessor(false);
     final CompletableFuture<String> task1 = new CompletableFuture<>();
     final CompletableFuture<String> task2 = new CompletableFuture<>();
     final CompletableFuture<String> task3 = new CompletableFuture<>();
@@ -77,6 +77,8 @@ public class AsyncOperationProcessorTest {
 
   @Test
   public void shouldOutputRemainingInProgressTasksWhenFinalizing() {
+    final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
+        createProcessor(false);
     final CompletableFuture<String> task1 = new CompletableFuture<>();
     final CompletableFuture<String> task2 = new CompletableFuture<>();
     when(readPipe.get()).thenReturn(task1).thenReturn(task2);
@@ -99,6 +101,8 @@ public class AsyncOperationProcessorTest {
   @Test
   public void shouldInterruptThreadWhenFutureCompletes() {
     // Ensures that if we're waiting for the next input we wake up and output completed tasks
+    final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
+        createProcessor(false);
 
     final CompletableFuture<String> task1 = new CompletableFuture<>();
     when(readPipe.get()).thenReturn(task1);
@@ -109,5 +113,56 @@ public class AsyncOperationProcessorTest {
     task1.complete("a");
 
     assertThat(Thread.currentThread().isInterrupted()).isTrue();
+  }
+
+  @Test
+  public void shouldPreserveOrderWhenRequested() {
+    final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
+        createProcessor(true);
+    final CompletableFuture<String> task1 = new CompletableFuture<>();
+    final CompletableFuture<String> task2 = new CompletableFuture<>();
+    final CompletableFuture<String> task3 = new CompletableFuture<>();
+    final CompletableFuture<String> task4 = new CompletableFuture<>();
+    when(readPipe.get()).thenReturn(task1).thenReturn(task2).thenReturn(task3).thenReturn(task4);
+
+    // 3 tasks started
+    processor.processNextInput(readPipe, writePipe);
+    processor.processNextInput(readPipe, writePipe);
+    processor.processNextInput(readPipe, writePipe);
+    verify(readPipe, times(3)).get();
+
+    // Reached limit of concurrent tasks so this round does nothing.
+    processor.processNextInput(readPipe, writePipe);
+    verify(readPipe, times(3)).get();
+
+    // Second task completes but shouldn't be output because task1 is not complete yet
+    task2.complete("b");
+
+    processor.processNextInput(readPipe, writePipe);
+    verify(readPipe, times(3)).get();
+    verifyZeroInteractions(writePipe);
+
+    task1.complete("a");
+
+    // Next round will output the two completed tasks in order
+    processor.processNextInput(readPipe, writePipe);
+    verify(writePipe).put("a");
+    verify(writePipe).put("b");
+
+    // And so now we are able to start another one.
+    processor.processNextInput(readPipe, writePipe);
+    verify(readPipe, times(4)).get();
+
+    // And should finalize in order
+    task4.complete("d");
+    task3.complete("c");
+    processor.finalize(writePipe);
+    verify(writePipe).put("c");
+    verify(writePipe).put("d");
+  }
+
+  private AsyncOperationProcessor<CompletableFuture<String>, String> createProcessor(
+      final boolean preserveOrder) {
+    return new AsyncOperationProcessor<>(Function.identity(), 3, preserveOrder);
   }
 }
