@@ -1035,7 +1035,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
-  @Ignore("Ignored as we only have one mode available for now. See NC-1057/NC-1681")
   @Test
   public void syncModeOptionMustBeUsed() {
 

@@ -14,6 +14,9 @@ package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.Duration.ofSeconds;
+import static java.util.Arrays.asList;
+import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
@@ -72,8 +75,8 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -221,12 +224,27 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Collection<String> bannedNodeIds = new ArrayList<>();
 
   @Option(
-      hidden = true,
       names = {"--sync-mode"},
       paramLabel = MANDATORY_MODE_FORMAT_HELP,
       description =
           "Synchronization mode, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
+
+  @Option(
+          hidden = true,
+          names = {"--fast-sync-min-peers"},
+          paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+          description =
+                  "Minimum number of peers before starting fast sync, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
+  private final Integer fastSyncMinPeerCount = DEFAULT_FAST_SYNC_MIN_PEER_COUNT;
+
+  @Option(
+          hidden = true,
+          names = {"--fast-sync-max-wait-time"},
+          paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+          description =
+                  "Maximum time to wait the required number of peers before starting fast sync, expressed in seconds, 0 means no timeout, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
+  private final Integer fastSyncMaxWaitTime = DEFAULT_FAST_SYNC_MAX_WAIT_TIME;
 
   @Option(
       names = {"--network"},
@@ -590,12 +608,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     // Check that P2P options are able to work or send an error
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--p2p-enabled",
         !p2pEnabled,
-        Arrays.asList(
+        asList(
             "--bootnodes",
             "--discovery-enabled",
             "--max-peers",
@@ -603,12 +621,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--banned-node-ids"));
 
     // Check that mining options are able to work or send an error
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--miner-enabled",
         !isMiningEnabled,
-        Arrays.asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
+        asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
+
+    // Check that fast sync options are able to work or send an error
+    checkFastSyncOptions();
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -658,6 +679,21 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
+  private void checkFastSyncOptions() throws ParameterException{
+    if (fastSyncMaxWaitTime < 0) {
+      throw new ParameterException(commandLine, "--fast-sync-max-wait-time must be a positive or zero integer");
+    }
+    checkOptionDependencies(
+            logger,
+            commandLine,
+            "--sync-mode",
+            syncMode.equals(SyncMode.FAST),
+            asList(
+                    "--fast-sync-num-peers",
+                    "--fast-sync-timeout"
+            ));
+  }
+
   private NetworkName getNetwork() {
     //noinspection ConstantConditions network is not always null but injected by PicoCLI if used
     return network == null ? MAINNET : network;
@@ -697,12 +733,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--rpc-http-enabled",
         !isRpcHttpEnabled,
-        Arrays.asList(
+        asList(
             "--rpc-http-api",
             "--rpc-http-apis",
             "--rpc-http-cors-origins",
@@ -731,12 +767,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private WebSocketConfiguration webSocketConfiguration() {
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--rpc-ws-enabled",
         !isRpcWsEnabled,
-        Arrays.asList(
+        asList(
             "--rpc-ws-api",
             "--rpc-ws-apis",
             "--rpc-ws-host",
@@ -769,19 +805,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + "time.  Please refer to CLI reference for more details about this constraint.");
     }
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--metrics-enabled",
         !isMetricsEnabled,
-        Arrays.asList("--metrics-host", "--metrics-port"));
+        asList("--metrics-host", "--metrics-port"));
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--metrics-push-enabled",
         !isMetricsPushEnabled,
-        Arrays.asList(
+        asList(
             "--metrics-push-host",
             "--metrics-push-port",
             "--metrics-push-interval",
@@ -882,12 +918,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private PrivacyParameters privacyParameters() throws IOException {
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--privacy-enabled",
         !isPrivacyEnabled,
-        Arrays.asList(
+        asList(
             "--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
 
     final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
@@ -909,6 +945,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private SynchronizerConfiguration buildSyncConfig() {
     return synchronizerConfigurationBuilder
         .syncMode(syncMode)
+        .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
+        .fastSyncMaximumPeerWaitTime(ofSeconds(fastSyncMaxWaitTime))
         .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
         .build();
   }

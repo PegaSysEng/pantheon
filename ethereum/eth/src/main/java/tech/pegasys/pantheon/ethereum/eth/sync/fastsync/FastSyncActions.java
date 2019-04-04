@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
+import static java.lang.String.format;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncError.CHAIN_TOO_SHORT;
 import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
@@ -71,8 +72,25 @@ public class FastSyncActions<C> {
             ethContext, syncConfig.getFastSyncMinimumPeerCount(), metricsSystem);
 
     final EthScheduler scheduler = ethContext.getScheduler();
+    final CompletableFuture<Void> fastSyncTask;
+    if(!syncConfig.getFastSyncMaximumPeerWaitTime().isZero()) {
+      LOG.info(
+              format(
+                "Waiting for at least %d peers, maximum wait time set to %s.",
+                syncConfig.getFastSyncMinimumPeerCount(),
+                syncConfig.getFastSyncMaximumPeerWaitTime().toString())
+      );
+      fastSyncTask = scheduler.timeout(waitForPeersTask, syncConfig.getFastSyncMaximumPeerWaitTime());
+    }else {
+      LOG.info(
+              format(
+                      "Waiting for at least %d peers, no maximum wait time set.",
+                      syncConfig.getFastSyncMinimumPeerCount())
+      );
+      fastSyncTask = scheduler.scheduleServiceTask(waitForPeersTask);
+    }
     return exceptionallyCompose(
-            scheduler.timeout(waitForPeersTask, syncConfig.getFastSyncMaximumPeerWaitTime()),
+            fastSyncTask,
             error -> {
               if (ExceptionUtils.rootCause(error) instanceof TimeoutException) {
                 if (ethContext.getEthPeers().availablePeerCount() > 0) {
