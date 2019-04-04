@@ -101,6 +101,8 @@ public class AsyncOperationProcessorTest {
 
   @Test
   public void shouldCancelInProgressTasksWhenAborted() {
+    final AsyncOperationProcessor<CompletableFuture<String>, String> processor =
+        createProcessor(false);
     final CompletableFuture<String> task1 = new CompletableFuture<>();
     final CompletableFuture<String> task2 = new CompletableFuture<>();
     when(readPipe.get()).thenReturn(task1).thenReturn(task2);
