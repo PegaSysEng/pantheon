@@ -77,7 +77,7 @@ class AsyncOperationProcessor<I, O> implements Processor<I, O> {
     } catch (final InterruptedException e) {
       LOG.trace("Interrupted while waiting for processing to complete", e);
     } catch (final ExecutionException e) {
-      LOG.error("Processing failed and we don't handle exceptions properly yet", e);
+      throw new RuntimeException("Async operation failed", e);
     } catch (final TimeoutException e) {
       // Ignore and go back around the loop.
     }
