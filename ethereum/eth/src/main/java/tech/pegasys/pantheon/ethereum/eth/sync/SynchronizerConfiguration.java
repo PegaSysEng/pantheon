@@ -17,22 +17,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Range;
 
 public class SynchronizerConfiguration {
-
-  // TODO: Determine reasonable defaults here
-  private static final int DEFAULT_PIVOT_DISTANCE_FROM_HEAD = 50;
-  private static final float DEFAULT_FULL_VALIDATION_RATE = .1f;
-  private static final int DEFAULT_FAST_SYNC_MINIMUM_PEERS = 5;
-  private static final Duration DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME = Duration.ofMinutes(5);
-  private static final int DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST = 384;
-  private static final int DEFAULT_WORLD_STATE_REQUEST_PARALLELISM = 10;
-  private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 1000;
-  private static final long DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING =
-      TimeUnit.MINUTES.toMillis(5);
 
   // Fast sync config
   private final int fastSyncPivotDistance;
@@ -216,24 +204,36 @@ public class SynchronizerConfiguration {
   public static class Builder {
     private SyncMode syncMode = SyncMode.FULL;
     private Range<Long> blockPropagationRange = Range.closed(-10L, 30L);
-    private long downloaderChangeTargetThresholdByHeight = 20L;
-    private UInt256 downloaderChangeTargetThresholdByTd = UInt256.of(1_000_000_000L);
-    private int downloaderHeaderRequestSize = 200;
-    private int downloaderCheckpointTimeoutsPermitted = 5;
-    private int downloaderChainSegmentTimeoutsPermitted = 5;
-    private int downloaderChainSegmentSize = 200;
-    private int downloaderParallelism = 4;
-    private int transactionsParallelism = 2;
-    private int computationParallelism = Runtime.getRuntime().availableProcessors();
-    private int fastSyncPivotDistance = DEFAULT_PIVOT_DISTANCE_FROM_HEAD;
-    private float fastSyncFullValidationRate = DEFAULT_FULL_VALIDATION_RATE;
-    private int fastSyncMinimumPeerCount = DEFAULT_FAST_SYNC_MINIMUM_PEERS;
-    private int worldStateHashCountPerRequest = DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST;
-    private int worldStateRequestParallelism = DEFAULT_WORLD_STATE_REQUEST_PARALLELISM;
+    private long downloaderChangeTargetThresholdByHeight =
+        SynchronizerPerformanceOptions.get().downloaderChangeTargetThresholdByHeight;
+    private UInt256 downloaderChangeTargetThresholdByTd =
+        SynchronizerPerformanceOptions.get().downloaderChangeTargetThresholdByTd;
+    private int downloaderHeaderRequestSize =
+        SynchronizerPerformanceOptions.get().downloaderHeaderRequestSize;
+    private int downloaderCheckpointTimeoutsPermitted =
+        SynchronizerPerformanceOptions.get().downloaderCheckpointTimeoutsPermitted;
+    private int downloaderChainSegmentTimeoutsPermitted =
+        SynchronizerPerformanceOptions.get().downloaderChainSegmentTimeoutsPermitted;
+    private int downloaderChainSegmentSize =
+        SynchronizerPerformanceOptions.get().downloaderChainSegmentSize;
+    private int downloaderParallelism = SynchronizerPerformanceOptions.get().downloaderParallelism;
+    private int transactionsParallelism =
+        SynchronizerPerformanceOptions.get().transactionsParallelism;
+    private int computationParallelism =
+        SynchronizerPerformanceOptions.get().computationParallelism;
+    private int fastSyncPivotDistance = SynchronizerPerformanceOptions.get().fastSyncPivotDistance;
+    private float fastSyncFullValidationRate =
+        SynchronizerPerformanceOptions.get().fastSyncFullValidationRate;
+    private int fastSyncMinimumPeerCount = 5;
+    private int worldStateHashCountPerRequest =
+        SynchronizerPerformanceOptions.get().worldStateHashCountPerRequest;
+    private int worldStateRequestParallelism =
+        SynchronizerPerformanceOptions.get().worldStateRequestParallelism;
     private int worldStateMaxRequestsWithoutProgress =
-        DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS;
-    private long worldStateMinMillisBeforeStalling = DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING;
-    private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
+        SynchronizerPerformanceOptions.get().worldStateMaxRequestsWithoutProgress;
+    private long worldStateMinMillisBeforeStalling =
+        SynchronizerPerformanceOptions.get().worldStateMinMillisBeforeStalling;
+    private Duration fastSyncMaximumPeerWaitTime = Duration.ofMinutes(5);
     private int maxTrailingPeers = Integer.MAX_VALUE;
 
     public Builder fastSyncPivotDistance(final int distance) {
@@ -329,6 +329,11 @@ public class SynchronizerConfiguration {
 
     public Builder fastSyncMaximumPeerWaitTime(final Duration fastSyncMaximumPeerWaitTime) {
       this.fastSyncMaximumPeerWaitTime = fastSyncMaximumPeerWaitTime;
+      return this;
+    }
+
+    public Builder worldStateMinMillisBeforeStalling(final long worldStateMinMillisBeforeStalling) {
+      this.worldStateMinMillisBeforeStalling = worldStateMinMillisBeforeStalling;
       return this;
     }
 

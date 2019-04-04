@@ -1,0 +1,78 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package tech.pegasys.pantheon.cli;
+
+import static tech.pegasys.pantheon.cli.PerformanceOptionsSubCommand.COMMAND_NAME;
+
+import java.io.PrintStream;
+
+import picocli.CommandLine;
+
+@CommandLine.Command(
+    name = COMMAND_NAME,
+    aliases = {"-X", "--Xhelp"},
+    description = "This command provides help text for all performance options.",
+    hidden = true,
+    helpCommand = true)
+public class PerformanceOptionsSubCommand
+    implements Runnable, CommandLine.IHelpCommandInitializable {
+
+  static final String COMMAND_NAME = "Xhelp";
+
+  private final CommandLine commandLine;
+  private CommandLine.Help.Ansi ansi;
+  private PrintStream out;
+
+  private PerformanceOptionsSubCommand(final CommandLine commandLine) {
+    this.commandLine = commandLine;
+  }
+
+  @Override
+  public void run() {
+    commandLine.getCommandSpec().mixins().forEach(this::printPerformanceOptions);
+  }
+
+  @Override
+  public void init(
+      final CommandLine helpCommandLine,
+      final CommandLine.Help.Ansi ansi,
+      final PrintStream out,
+      final PrintStream err) {
+    this.ansi = ansi;
+    this.out = out;
+  }
+
+  static void createPerformanceOptions(
+      final CommandLine commandLine, final Object... performanceOptions) {
+    final PerformanceOptionsSubCommand listOptionsCommand =
+        new PerformanceOptionsSubCommand(commandLine);
+    for (final Object o : performanceOptions) {
+      commandLine.addMixin(o.getClass().getSimpleName(), o);
+    }
+    commandLine.addSubcommand(COMMAND_NAME, listOptionsCommand);
+  }
+
+  private void printPerformanceOptions(
+      final String mixinName, final CommandLine.Model.CommandSpec commandSpec) {
+    // Don't process the standard help mixin.
+    if ("mixinStandardHelpOptions".equals(mixinName)) return;
+
+    // Recreate the options but flip hidden to false.
+    final CommandLine.Model.CommandSpec cs = CommandLine.Model.CommandSpec.create();
+    commandSpec.options().forEach(o -> cs.addOption(o.toBuilder().hidden(false).build()));
+
+    // Print out the help text.
+    out.printf("Performance options for %s%n", mixinName);
+    out.println(new CommandLine.Help(cs, ansi).optionList());
+  }
+}

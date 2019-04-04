@@ -44,6 +44,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerPerformanceOptions;
 import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
@@ -558,9 +559,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       commandLine.addMixin("standaloneCommands", standaloneCommands);
     }
 
-    // add performance options not exposed to the help menu
-    commandLine.addMixin("rocksDBPerformanceOptions", RocksDBPerformanceOptions.get());
-
     commandLine.addSubcommand(
         BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
     commandLine.addSubcommand(
@@ -576,6 +574,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(Level.class, Level::valueOf);
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
+
+    // Add performance options
+    PerformanceOptionsSubCommand.createPerformanceOptions(
+        commandLine, RocksDBPerformanceOptions.get(), SynchronizerPerformanceOptions.get());
 
     // Create a handler that will search for a config file option and use it for default values
     // and eventually it will run regular parsing of the remaining options.

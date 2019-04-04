@@ -24,7 +24,7 @@ import picocli.CommandLine;
  * that are used to configure Pantheon. Generally speaking you will want to leave these options
  * alone unless you know that configuring them will improve your performace.
  *
- * <p>Each of these options starts with <code>--XX</code>. This is a Java convention communicating
+ * <p>Each of these options starts with <code>--X</code>. This is a Java convention communicating
  * that there is no API stability commitment to these options. While these flags may persist on a
  * long term bases it should be noted they may be added or removed in future updates and no
  * announcement needs to be made for their modifications. Use these at your own risk.
@@ -41,7 +41,10 @@ public class RocksDBPerformanceOptions {
   }
 
   @CommandLine.Option(
-      names = {"--XXrocksdb-max-open-files"},
-      hidden = true)
+      names = {"--Xrocksdb-max-open-files"},
+      hidden = true,
+      defaultValue = "1024",
+      paramLabel = "<INTEGER>",
+      description = "Max number of files RocksDB will open (default: ${DEFAULT-VALUE})")
   public final Integer maxOpenFiles = 1024;
 }
