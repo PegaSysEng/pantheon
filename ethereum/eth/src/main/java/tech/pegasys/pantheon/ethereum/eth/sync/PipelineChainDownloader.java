@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
+import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -37,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 
 public class PipelineChainDownloader<C> implements ChainDownloader {
   private static final Logger LOG = LogManager.getLogger();
+  static final Duration PAUSE_AFTER_ERROR_DURATION = Duration.ofSeconds(2);
   private final SyncState syncState;
   private final SyncTargetManager<C> syncTargetManager;
   private final DownloadPipelineFactory downloadPipelineFactory;
@@ -110,10 +112,19 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
 
   private CompletionStage<Void> handleFailedDownload(final Throwable error) {
     pipelineErrorCounter.inc();
-    if (!cancelled.get() && syncTargetManager.shouldContinueDownloading()) {
+    final Throwable rootCause = ExceptionUtils.rootCause(error);
+    if (!cancelled.get() && rootCause instanceof CancellationException) {
+      // Weird but when Pantheon shuts down we get an unexpected CancellationException
+      // when the scheduler shuts down and to prevent the fast sync state from being deleted have
+      // to ensure we stop doing anything, but never complete.
+      return new CompletableFuture<>();
+    }
+    if (!cancelled.get()
+        && syncTargetManager.shouldContinueDownloading()
+        && !(rootCause instanceof CancellationException)) {
       LOG.debug("Chain download failed. Restarting after short delay.", error);
       // Allowing the normal looping logic to retry after a brief delay.
-      return scheduler.scheduleFutureTask(() -> completedFuture(null), Duration.ofSeconds(2));
+      return scheduler.scheduleFutureTask(() -> completedFuture(null), PAUSE_AFTER_ERROR_DURATION);
     }
     LOG.debug("Chain download failed.", error);
     // Propagate the error out, terminating this chain download.
