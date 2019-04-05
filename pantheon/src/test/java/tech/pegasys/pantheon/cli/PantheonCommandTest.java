@@ -307,8 +307,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata").toAbsolutePath()));
     verify(mockControllerBuilder).ethNetworkConfig(eq(networkConfig));
 
-    // TODO: Re-enable as per NC-1057/NC-1681
-    // verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
+    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
+    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(ArgumentMatchers.eq(13));
+    verify(mockSyncConfBuilder)
+        .fastSyncMaximumPeerWaitTime(ArgumentMatchers.eq(Duration.ofSeconds(57)));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -609,8 +611,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .maxPendingTransactions(eq(PendingTransactions.MAX_PENDING_TRANSACTIONS));
     verify(mockControllerBuilder).build();
 
-    // TODO: Re-enable as per NC-1057/NC-1681
-    // verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
+    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
+    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(ArgumentMatchers.eq(5));
+    verify(mockSyncConfBuilder)
+        .fastSyncMaximumPeerWaitTime(ArgumentMatchers.eq(Duration.ofSeconds(0)));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
 
@@ -1068,7 +1072,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verifyZeroInteractions(mockRunnerBuilder);
 
     assertThat(commandOutput.toString()).isEmpty();
-    // PicoCLI uses longest option name for message when option has multiple names, so here plural.
     assertThat(commandErrorOutput.toString())
         .contains("--fast-sync-max-wait-time must be greater than or equal to 0");
   }
@@ -1081,6 +1084,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(ArgumentMatchers.eq(11));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void parsesInvalidFastSyncMinPeersOptionWrongFormatShouldFail() {
+
+    parseCommand("--sync-mode", "FAST", "--fast-sync-min-peers", "ten");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Invalid value for option '--fast-sync-min-peers': 'ten' is not an int");
   }
 
   @Test
