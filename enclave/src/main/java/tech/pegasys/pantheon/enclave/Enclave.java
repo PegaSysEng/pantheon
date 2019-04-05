@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
 
 import java.io.IOException;
+import java.net.URI;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.MediaType;
@@ -34,16 +35,17 @@ public class Enclave {
   private static final MediaType JSON = MediaType.parse("application/json");
   private static final MediaType ORION = MediaType.get("application/vnd.orion.v1+json");
 
-  private final String url;
+  private final URI uri;
   private final OkHttpClient client;
 
-  public Enclave(final String enclaveUrl) {
-    this.url = enclaveUrl;
+  public Enclave(final URI enclaveUri) {
+    this.uri = enclaveUri;
     this.client = new OkHttpClient();
   }
 
   public Boolean upCheck() throws IOException {
-    Request request = new Request.Builder().url(url + "/upcheck").get().build();
+    String url = uri.resolve("/upcheck").toString();
+    Request request = new Request.Builder().url(url).get().build();
 
     try (Response response = client.newCall(request).execute()) {
       return response.isSuccessful();
@@ -67,6 +69,7 @@ public class Enclave {
   private Request buildPostRequest(
       final MediaType mediaType, final Object content, final String endpoint) throws IOException {
     RequestBody body = RequestBody.create(mediaType, objectMapper.writeValueAsString(content));
+    String url = uri.resolve(endpoint).toString();
     return new Request.Builder().url(url + endpoint).post(body).build();
   }
 
