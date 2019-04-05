@@ -86,6 +86,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -576,8 +577,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
 
     // Add performance options
-    PerformanceOptionsSubCommand.createPerformanceOptions(
-        commandLine, RocksDBPerformanceOptions.get(), SynchronizerPerformanceOptions.get());
+    UnstableOptionsSubCommand.createUnstableOptions(
+        commandLine, ImmutableMap.of("Synchronizer", synchronizerConfigurationBuilder));
 
     // Create a handler that will search for a config file option and use it for default values
     // and eventually it will run regular parsing of the remaining options.

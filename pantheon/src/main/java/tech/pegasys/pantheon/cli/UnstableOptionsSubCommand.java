@@ -12,20 +12,20 @@
  */
 package tech.pegasys.pantheon.cli;
 
-import static tech.pegasys.pantheon.cli.PerformanceOptionsSubCommand.COMMAND_NAME;
+import static tech.pegasys.pantheon.cli.UnstableOptionsSubCommand.COMMAND_NAME;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import picocli.CommandLine;
 
 @CommandLine.Command(
     name = COMMAND_NAME,
     aliases = {"-X", "--Xhelp"},
-    description = "This command provides help text for all performance options.",
+    description = "This command provides help text for all unstable options.",
     hidden = true,
     helpCommand = true)
-public class PerformanceOptionsSubCommand
-    implements Runnable, CommandLine.IHelpCommandInitializable {
+public class UnstableOptionsSubCommand implements Runnable, CommandLine.IHelpCommandInitializable {
 
   static final String COMMAND_NAME = "Xhelp";
 
@@ -33,13 +33,13 @@ public class PerformanceOptionsSubCommand
   private CommandLine.Help.Ansi ansi;
   private PrintStream out;
 
-  private PerformanceOptionsSubCommand(final CommandLine commandLine) {
+  private UnstableOptionsSubCommand(final CommandLine commandLine) {
     this.commandLine = commandLine;
   }
 
   @Override
   public void run() {
-    commandLine.getCommandSpec().mixins().forEach(this::printPerformanceOptions);
+    commandLine.getCommandSpec().mixins().forEach(this::printUnstableOptions);
   }
 
   @Override
@@ -52,27 +52,26 @@ public class PerformanceOptionsSubCommand
     this.out = out;
   }
 
-  static void createPerformanceOptions(
-      final CommandLine commandLine, final Object... performanceOptions) {
-    final PerformanceOptionsSubCommand listOptionsCommand =
-        new PerformanceOptionsSubCommand(commandLine);
-    for (final Object o : performanceOptions) {
-      commandLine.addMixin(o.getClass().getSimpleName(), o);
-    }
+  static void createUnstableOptions(
+      final CommandLine commandLine, final Map<String, Object> mixins) {
+    final UnstableOptionsSubCommand listOptionsCommand = new UnstableOptionsSubCommand(commandLine);
+    mixins.forEach(commandLine::addMixin);
     commandLine.addSubcommand(COMMAND_NAME, listOptionsCommand);
   }
 
-  private void printPerformanceOptions(
+  private void printUnstableOptions(
       final String mixinName, final CommandLine.Model.CommandSpec commandSpec) {
     // Don't process the standard help mixin.
     if ("mixinStandardHelpOptions".equals(mixinName)) return;
 
     // Recreate the options but flip hidden to false.
     final CommandLine.Model.CommandSpec cs = CommandLine.Model.CommandSpec.create();
-    commandSpec.options().forEach(o -> cs.addOption(o.toBuilder().hidden(false).build()));
+    commandSpec.options().stream()
+        .filter(option -> option.hidden() && option.names()[0].startsWith("--X"))
+        .forEach(option -> cs.addOption(option.toBuilder().hidden(false).build()));
 
     // Print out the help text.
-    out.printf("Performance options for %s%n", mixinName);
+    out.printf("Unstable options for %s%n", mixinName);
     out.println(new CommandLine.Help(cs, ansi).optionList());
   }
 }

@@ -17,10 +17,21 @@ import static com.google.common.base.Preconditions.checkArgument;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Range;
+import picocli.CommandLine;
 
 public class SynchronizerConfiguration {
+
+  // TODO: Determine reasonable defaults here
+  private static final int DEFAULT_PIVOT_DISTANCE_FROM_HEAD = 50;
+  private static final float DEFAULT_FULL_VALIDATION_RATE = .1f;
+  private static final int DEFAULT_FAST_SYNC_MINIMUM_PEERS = 5;
+  private static final Duration DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME = Duration.ofMinutes(5);
+  private static final int DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST = 384;
+  private static final int DEFAULT_WORLD_STATE_REQUEST_PARALLELISM = 10;
+  private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 100;
 
   // Fast sync config
   private final int fastSyncPivotDistance;
@@ -204,36 +215,132 @@ public class SynchronizerConfiguration {
   public static class Builder {
     private SyncMode syncMode = SyncMode.FULL;
     private Range<Long> blockPropagationRange = Range.closed(-10L, 30L);
-    private long downloaderChangeTargetThresholdByHeight =
-        SynchronizerPerformanceOptions.get().downloaderChangeTargetThresholdByHeight;
-    private UInt256 downloaderChangeTargetThresholdByTd =
-        SynchronizerPerformanceOptions.get().downloaderChangeTargetThresholdByTd;
-    private int downloaderHeaderRequestSize =
-        SynchronizerPerformanceOptions.get().downloaderHeaderRequestSize;
-    private int downloaderCheckpointTimeoutsPermitted =
-        SynchronizerPerformanceOptions.get().downloaderCheckpointTimeoutsPermitted;
-    private int downloaderChainSegmentTimeoutsPermitted =
-        SynchronizerPerformanceOptions.get().downloaderChainSegmentTimeoutsPermitted;
-    private int downloaderChainSegmentSize =
-        SynchronizerPerformanceOptions.get().downloaderChainSegmentSize;
-    private int downloaderParallelism = SynchronizerPerformanceOptions.get().downloaderParallelism;
-    private int transactionsParallelism =
-        SynchronizerPerformanceOptions.get().transactionsParallelism;
-    private int computationParallelism =
-        SynchronizerPerformanceOptions.get().computationParallelism;
-    private int fastSyncPivotDistance = SynchronizerPerformanceOptions.get().fastSyncPivotDistance;
-    private float fastSyncFullValidationRate =
-        SynchronizerPerformanceOptions.get().fastSyncFullValidationRate;
-    private int fastSyncMinimumPeerCount = 5;
-    private int worldStateHashCountPerRequest =
-        SynchronizerPerformanceOptions.get().worldStateHashCountPerRequest;
-    private int worldStateRequestParallelism =
-        SynchronizerPerformanceOptions.get().worldStateRequestParallelism;
-    private int worldStateMaxRequestsWithoutProgress =
-        SynchronizerPerformanceOptions.get().worldStateMaxRequestsWithoutProgress;
-    private long worldStateMinMillisBeforeStalling =
-        SynchronizerPerformanceOptions.get().worldStateMinMillisBeforeStalling;
-    private Duration fastSyncMaximumPeerWaitTime = Duration.ofMinutes(5);
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-downloaderChangeTargetThresholdByHeight",
+        hidden = true,
+        defaultValue = "20",
+        paramLabel = "<LONG>",
+        description =
+            "Performance config for downloaderChangeTargetThresholdByHeight (default: ${DEFAULT-VALUE})")
+    public long downloaderChangeTargetThresholdByHeight = 20L;
+
+    //  @CommandLine.Option(
+    //      names = "--Xsynchronizer-downloaderChangeTargetThresholdByTd",
+    //      hidden = true,
+    //      defaultValue = "1000000000",
+    //      paramLabel = "<UINT256>",
+    //      description =
+    //          "Performance config for downloaderChangeTargetThresholdByTd (default:
+    // ${DEFAULT-VALUE})")
+    public UInt256 downloaderChangeTargetThresholdByTd = UInt256.of(1_000_000_000L);
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-downloaderHeaderRequestSize",
+        hidden = true,
+        defaultValue = "200",
+        paramLabel = "<INTEGER>",
+        description =
+            "Performance config for downloaderHeaderRequestSize (default: ${DEFAULT-VALUE})")
+    public int downloaderHeaderRequestSize = 200;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-downloaderCheckpointTimeoutsPermitted",
+        hidden = true,
+        defaultValue = "5",
+        paramLabel = "<INTEGER>",
+        description =
+            "Performance config for downloaderCheckpointTimeoutsPermitted (default: ${DEFAULT-VALUE})")
+    public int downloaderCheckpointTimeoutsPermitted = 5;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-downloaderChainSegmentTimeoutsPermitted",
+        hidden = true,
+        defaultValue = "5",
+        paramLabel = "<INTEGER>",
+        description =
+            "Performance config for downloaderChainSegmentTimeoutsPermitted (default: ${DEFAULT-VALUE})")
+    public int downloaderChainSegmentTimeoutsPermitted = 5;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-downloaderChainSegmentSize",
+        hidden = true,
+        defaultValue = "200",
+        paramLabel = "<INTEGER>",
+        description = "Performance config for downloaderChainSegmentSize (default: ${DEFAULT-VALUE})")
+    public int downloaderChainSegmentSize = 200;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-downloaderParallelism",
+        hidden = true,
+        defaultValue = "4",
+        paramLabel = "<INTEGER>",
+        description = "Performance config for downloaderParallelism (default: ${DEFAULT-VALUE})")
+    public int downloaderParallelism = 4;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-transactionsParallelism",
+        hidden = true,
+        defaultValue = "2",
+        paramLabel = "<INTEGER>",
+        description = "Performance config for transactionsParallelism (default: ${DEFAULT-VALUE})")
+    public int transactionsParallelism = 2;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-computationParallelism",
+        hidden = true,
+        paramLabel = "<INTEGER>",
+        description = "Performance config for computationParallelism (default: # of processors)")
+    public int computationParallelism = Runtime.getRuntime().availableProcessors();
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-fastSyncPivotDistance",
+        hidden = true,
+        defaultValue = "50",
+        paramLabel = "<INTEGER>",
+        description = "Performance config for fastSyncPivotDistance (default: ${DEFAULT-VALUE})")
+    public int fastSyncPivotDistance = DEFAULT_PIVOT_DISTANCE_FROM_HEAD;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-fastSyncFullValidationRate",
+        hidden = true,
+        defaultValue = "0.1",
+        paramLabel = "<FLOAT>",
+        description = "Performance config for fastSyncFullValidationRate (default: ${DEFAULT-VALUE})")
+    public float fastSyncFullValidationRate = DEFAULT_FULL_VALIDATION_RATE;
+
+    private int fastSyncMinimumPeerCount = DEFAULT_FAST_SYNC_MINIMUM_PEERS;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-worldStateHashCountPerRequest",
+        hidden = true,
+        defaultValue = "348",
+        paramLabel = "<INTEGER>",
+        description =
+            "Performance config for worldStateHashCountPerRequest (default: ${DEFAULT-VALUE})")
+    public int worldStateHashCountPerRequest = DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-worldStateRequestParallelism",
+        hidden = true,
+        defaultValue = "10",
+        paramLabel = "<INTEGER>",
+        description =
+            "Performance config for worldStateRequestParallelism (default: ${DEFAULT-VALUE})")
+    public int worldStateRequestParallelism = DEFAULT_WORLD_STATE_REQUEST_PARALLELISM;
+
+    @CommandLine.Option(
+        names = "--Xsynchronizer-worldStateMaxRequestsWithoutProgress",
+        hidden = true,
+        defaultValue = "1000",
+        paramLabel = "<INTEGER>",
+        description =
+            "Performance config for worldStateMaxRequestsWithoutProgress (default: ${DEFAULT-VALUE})")
+    public int worldStateMaxRequestsWithoutProgress = DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS;
+
+    public long worldStateMinMillisBeforeStalling = 5;
+
+    private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
     private int maxTrailingPeers = Integer.MAX_VALUE;
 
     public Builder fastSyncPivotDistance(final int distance) {
@@ -332,6 +439,13 @@ public class SynchronizerConfiguration {
       return this;
     }
 
+    @CommandLine.Option(
+        names = "--Xsynchronizer-worldStateMinMillisBeforeStalling",
+        hidden = true,
+        defaultValue = "5",
+        paramLabel = "<LONG>",
+        description =
+            "Performance config for worldStateMinMillisBeforeStalling (default: ${DEFAULT-VALUE})")
     public Builder worldStateMinMillisBeforeStalling(final long worldStateMinMillisBeforeStalling) {
       this.worldStateMinMillisBeforeStalling = worldStateMinMillisBeforeStalling;
       return this;
