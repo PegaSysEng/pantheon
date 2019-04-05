@@ -368,7 +368,7 @@ public class SynchronizerConfiguration {
     @CommandLine.Option(
         names = "--Xsynchronizer-world-state-min-millis-before-stalling",
         hidden = true,
-        defaultValue = "5",
+        defaultValue = "300000",
         paramLabel = "<LONG>",
         description =
             "Minimum time in ms without progress before considering a world state download as stalled (default: ${DEFAULT-VALUE})")
