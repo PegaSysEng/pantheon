@@ -37,7 +37,7 @@ public class PrivacyParametersBuilder {
 
   private boolean enabled;
   private URI enclaveUrl;
-  private Integer privacyAddress;
+  private Integer privacyAddress = Address.PRIVACY;
   private MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private Path dataDir;
   private File enclavePublicKeyFile;
