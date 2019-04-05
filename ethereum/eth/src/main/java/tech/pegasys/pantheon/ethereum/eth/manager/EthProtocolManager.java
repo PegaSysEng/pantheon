@@ -70,7 +70,6 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
-      final int requestLimit,
       final EthScheduler scheduler) {
     this.networkId = networkId;
     this.scheduler = scheduler;
@@ -87,26 +86,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     this.blockBroadcaster = new BlockBroadcaster(ethContext);
 
     // Set up request handlers
-    new EthServer(blockchain, worldStateArchive, ethMessages, requestLimit);
-  }
-
-  EthProtocolManager(
-      final Blockchain blockchain,
-      final WorldStateArchive worldStateArchive,
-      final int networkId,
-      final boolean fastSyncEnabled,
-      final int syncWorkers,
-      final int txWorkers,
-      final int computationWorkers,
-      final int requestLimit,
-      final MetricsSystem metricsSystem) {
-    this(
-        blockchain,
-        worldStateArchive,
-        networkId,
-        fastSyncEnabled,
-        requestLimit,
-        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem));
+    new EthServer(blockchain, worldStateArchive, ethMessages);
   }
 
   public EthProtocolManager(
@@ -123,11 +103,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         worldStateArchive,
         networkId,
         fastSyncEnabled,
-        syncWorkers,
-        txWorkers,
-        computationWorkers,
-        DEFAULT_REQUEST_LIMIT,
-        metricsSystem);
+        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem));
   }
 
   public EthContext ethContext() {

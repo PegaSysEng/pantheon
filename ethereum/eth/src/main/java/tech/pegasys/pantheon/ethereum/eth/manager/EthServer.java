@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.eth.EthLimits;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockBodiesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
@@ -50,17 +51,14 @@ class EthServer {
   private final Blockchain blockchain;
   private final WorldStateArchive worldStateArchive;
   private final EthMessages ethMessages;
-  private final int requestLimit;
 
   EthServer(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
-      final EthMessages ethMessages,
-      final int requestLimit) {
+      final EthMessages ethMessages) {
     this.blockchain = blockchain;
     this.worldStateArchive = worldStateArchive;
     this.ethMessages = ethMessages;
-    this.requestLimit = requestLimit;
     this.setupListeners();
   }
 
@@ -75,7 +73,8 @@ class EthServer {
     LOG.trace("Responding to GET_BLOCK_HEADERS request");
     try {
       final MessageData response =
-          constructGetHeadersResponse(blockchain, message.getData(), requestLimit);
+          constructGetHeadersResponse(
+              blockchain, message.getData(), EthLimits.MAX_GET_BLOCK_HEADERS);
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
@@ -88,7 +87,7 @@ class EthServer {
     LOG.trace("Responding to GET_BLOCK_BODIES request");
     try {
       final MessageData response =
-          constructGetBodiesResponse(blockchain, message.getData(), requestLimit);
+          constructGetBodiesResponse(blockchain, message.getData(), EthLimits.MAX_GET_BLOCK_BODIES);
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
@@ -101,7 +100,7 @@ class EthServer {
     LOG.trace("Responding to GET_RECEIPTS request");
     try {
       final MessageData response =
-          constructGetReceiptsResponse(blockchain, message.getData(), requestLimit);
+          constructGetReceiptsResponse(blockchain, message.getData(), EthLimits.MAX_GET_RECEIPTS);
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
@@ -114,7 +113,8 @@ class EthServer {
     LOG.trace("Responding to GET_NODE_DATA request");
     try {
       final MessageData response =
-          constructGetNodeDataResponse(worldStateArchive, message.getData(), requestLimit);
+          constructGetNodeDataResponse(
+              worldStateArchive, message.getData(), EthLimits.MAX_GET_NODE_DATA);
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
