@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Range;
 import picocli.CommandLine;
@@ -30,7 +31,9 @@ public class SynchronizerConfiguration {
   private static final Duration DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME = Duration.ofMinutes(5);
   private static final int DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST = 384;
   private static final int DEFAULT_WORLD_STATE_REQUEST_PARALLELISM = 10;
-  private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 100;
+  private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 1000;
+  private static final long DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING =
+      TimeUnit.MINUTES.toMillis(5);
 
   // Fast sync config
   private final int fastSyncPivotDistance;
@@ -349,7 +352,7 @@ public class SynchronizerConfiguration {
         paramLabel = "<LONG>",
         description =
             "Minimum time in ms to permit world state queries to stall (default: ${DEFAULT-VALUE})")
-    private long worldStateMinMillisBeforeStalling = 5;
+    private long worldStateMinMillisBeforeStalling = DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING;
 
     private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
     private int maxTrailingPeers = Integer.MAX_VALUE;
