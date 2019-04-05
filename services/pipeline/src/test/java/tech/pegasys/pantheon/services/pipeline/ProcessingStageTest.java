@@ -30,8 +30,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessingStageTest {
 
-  private final Pipe<String> inputPipe = new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
-  private final Pipe<String> outputPipe = new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER);
+  private final Pipe<String> inputPipe =
+      new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER, NO_OP_COUNTER);
+  private final Pipe<String> outputPipe =
+      new Pipe<>(10, NO_OP_COUNTER, NO_OP_COUNTER, NO_OP_COUNTER);
   @Mock private Processor<String, String> singleStep;
   private ProcessingStage<String, String> stage;
 
@@ -72,6 +74,16 @@ public class ProcessingStageTest {
 
     verify(singleStep).finalize(outputPipe);
     verifyNoMoreInteractions(singleStep);
+    assertThat(outputPipe.isOpen()).isFalse();
+  }
+
+  @Test
+  public void shouldAbortProcessorIfReadPipeIsAborted() {
+    inputPipe.abort();
+    stage.run();
+
+    verify(singleStep).abort();
+    verify(singleStep).finalize(outputPipe);
     assertThat(outputPipe.isOpen()).isFalse();
   }
 }
