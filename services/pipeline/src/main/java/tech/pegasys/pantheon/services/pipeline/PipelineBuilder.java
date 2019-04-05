@@ -107,7 +107,7 @@ public class PipelineBuilder<I, T> {
       final String sourceName, final int bufferSize, final LabelledMetric<Counter> outputCounter) {
     final Pipe<T> pipe = createPipe(bufferSize, sourceName, outputCounter);
     return new PipelineBuilder<>(
-        pipe, emptyList(), singleton(pipe), sourceName, pipe, pipe.getCapacity(), outputCounter);
+        pipe, emptyList(), singleton(pipe), sourceName, pipe, bufferSize, outputCounter);
   }
 
   /**
@@ -164,7 +164,31 @@ public class PipelineBuilder<I, T> {
       final String stageName,
       final Function<T, CompletableFuture<O>> processor,
       final int maxConcurrency) {
-    return addStage(new AsyncOperationProcessor<>(processor, maxConcurrency), stageName);
+    return addStage(new AsyncOperationProcessor<>(processor, maxConcurrency, false), stageName);
+  }
+
+  /**
+   * Adds a 1-to-1, asynchronous processing stage to the pipeline. A single thread reads items from
+   * the input and calls <i>processor</i> to begin processing. While a single thread is used to
+   * begin processing, up to <i>maxConcurrency</i> items may be in progress concurrently. As each
+   * returned {@link CompletableFuture} completes successfully the result is passed to the next
+   * stage in order.
+   *
+   * <p>If the returned {@link CompletableFuture} completes exceptionally the pipeline will abort.
+   *
+   * <p>Note: While processing may occur concurrently, order is preserved when results are output.
+   *
+   * @param stageName the name of this stage. Used as the label for the output count metric.
+   * @param processor the processing to apply to each item.
+   * @param maxConcurrency the maximum number of items being processed concurrently.
+   * @param <O> the output type for this processing step.
+   * @return a {@link PipelineBuilder} ready to extend the pipeline with additional stages.
+   */
+  public <O> PipelineBuilder<I, O> thenProcessAsyncOrdered(
+      final String stageName,
+      final Function<T, CompletableFuture<O>> processor,
+      final int maxConcurrency) {
+    return addStage(new AsyncOperationProcessor<>(processor, maxConcurrency, true), stageName);
   }
 
   /**
@@ -189,7 +213,7 @@ public class PipelineBuilder<I, T> {
             pipeEnd,
             maximumBatchSize,
             outputCounter.labels(lastStageName + "_outputPipe", "batches")),
-        bufferSize / maximumBatchSize + 1,
+        (int) Math.ceil(((double) bufferSize) / maximumBatchSize),
         outputCounter);
   }
 
@@ -283,18 +307,14 @@ public class PipelineBuilder<I, T> {
       final Processor<T, O> processor, final int newBufferSize, final String stageName) {
     final Pipe<O> outputPipe = createPipe(newBufferSize, stageName, outputCounter);
     final Stage processStage = new ProcessingStage<>(stageName, pipeEnd, outputPipe, processor);
-    return addStage(processStage, outputPipe);
-  }
-
-  private <O> PipelineBuilder<I, O> addStage(final Stage stage, final Pipe<O> outputPipe) {
-    final List<Stage> newStages = concat(stages, stage);
+    final List<Stage> newStages = concat(stages, processStage);
     return new PipelineBuilder<>(
         inputPipe,
         newStages,
         concat(pipes, outputPipe),
-        stage.getName(),
+        processStage.getName(),
         outputPipe,
-        bufferSize,
+        newBufferSize,
         outputCounter);
   }
 
@@ -312,6 +332,7 @@ public class PipelineBuilder<I, T> {
     return new Pipe<>(
         newBufferSize,
         outputCounter.labels(labelName, "added"),
-        outputCounter.labels(labelName, "removed"));
+        outputCounter.labels(labelName, "removed"),
+        outputCounter.labels(labelName, "aborted"));
   }
 }

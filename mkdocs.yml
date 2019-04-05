@@ -25,9 +25,8 @@ extra:
     pegasys_website: https://pegasys.tech/
     issues: https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000
   google:
-    analytics_id: 'UA-117921923-2'
     site_verification: 'za1cLzyS6LXDGO-pMzvfQdYTZ0Zc67uZtY0asA4YXZ0'
-
+    tag_manager: 'GTM-5B7N84J'
 
 # Repository
 repo_name: PegaSysEng/pantheon
@@ -82,6 +81,9 @@ nav:
         - Accounts for Testing: Configuring-Pantheon/Accounts-for-Testing.md
         - Logging: Configuring-Pantheon/Logging.md
         - Passing JVM Options: Configuring-Pantheon/Passing-JVM-Options.md
+    - Privacy:
+        - Overview: Privacy/Privacy-Overview.md
+        - Processing Private Transactions: Privacy/Private-Transaction-Processing.md
     - Permissions:
         - Nodes and Accounts Whitelists: Permissions/Permissioning.md
     - Using Pantheon:
