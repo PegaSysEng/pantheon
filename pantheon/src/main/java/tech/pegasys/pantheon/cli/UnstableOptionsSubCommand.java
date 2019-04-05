@@ -76,17 +76,16 @@ public class UnstableOptionsSubCommand implements Runnable, CommandLine.IHelpCom
 
   private void printUnstableOptions(
       final String mixinName, final CommandLine.Model.CommandSpec commandSpec) {
-    // Don't process the standard help mixin.
-    if ("mixinStandardHelpOptions".equals(mixinName)) return;
-
     // Recreate the options but flip hidden to false.
     final CommandLine.Model.CommandSpec cs = CommandLine.Model.CommandSpec.create();
     commandSpec.options().stream()
         .filter(option -> option.hidden() && option.names()[0].startsWith("--X"))
         .forEach(option -> cs.addOption(option.toBuilder().hidden(false).build()));
 
-    // Print out the help text.
-    out.printf("Unstable options for %s%n", mixinName);
-    out.println(new CommandLine.Help(cs, ansi).optionList());
+    if (cs.options().size() > 0) {
+      // Print out the help text.
+      out.printf("Unstable options for %s%n", mixinName);
+      out.println(new CommandLine.Help(cs, ansi).optionList());
+    }
   }
 }
