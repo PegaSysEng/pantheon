@@ -19,6 +19,21 @@ import java.util.Map;
 
 import picocli.CommandLine;
 
+/**
+ * This class provides a CLI command to enumerate the unstable options available in Pantheon.
+ *
+ * <p>Unstable options are distinguished by
+ *
+ * <ul>
+ *   <li>Not being configured in the main PantheonCommand
+ *   <li>Being marked as 'hidden'
+ *   <li>Having their first option name start with <code>--X</code>
+ * </ul>
+ *
+ * There is no stability or compatibility guarantee for options marked as unstable between releases.
+ * They can be added and removed without announcement and their meaning and values can similarly
+ * change without announcement or warning.
+ */
 @CommandLine.Command(
     name = COMMAND_NAME,
     aliases = {"-X", "--Xhelp"},

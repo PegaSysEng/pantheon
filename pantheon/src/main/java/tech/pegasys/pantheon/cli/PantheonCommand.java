@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
+import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
@@ -44,7 +45,6 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerPerformanceOptions;
 import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
@@ -60,7 +60,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
-import tech.pegasys.pantheon.services.kvstore.RocksDBPerformanceOptions;
+import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
@@ -150,6 +150,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private final PantheonControllerBuilder controllerBuilder;
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
+  private final RocksDbConfiguration.Builder rocksDbConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
   protected KeyLoader getKeyLoader() {
@@ -534,12 +535,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
-      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder) {
+      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder,
+      final RocksDbConfiguration.Builder rocksDbConfigurationBuilder) {
     this.logger = logger;
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
     this.synchronizerConfigurationBuilder = synchronizerConfigurationBuilder;
+    this.rocksDbConfigurationBuilder = rocksDbConfigurationBuilder;
   }
 
   private StandaloneCommand standaloneCommands;
@@ -578,7 +581,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     // Add performance options
     UnstableOptionsSubCommand.createUnstableOptions(
-        commandLine, ImmutableMap.of("Synchronizer", synchronizerConfigurationBuilder));
+        commandLine,
+        ImmutableMap.of(
+            "Synchronizer",
+            synchronizerConfigurationBuilder,
+            "RocksDB",
+            rocksDbConfigurationBuilder));
 
     // Create a handler that will search for a config file option and use it for default values
     // and eventually it will run regular parsing of the remaining options.
@@ -685,6 +693,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     try {
       return controllerBuilder
           .synchronizerConfiguration(buildSyncConfig())
+          .rocksDbConfiguration(buildRocksDbConfiguration())
           .homePath(dataDir())
           .ethNetworkConfig(updateNetworkConfig(getNetwork()))
           .miningParameters(
@@ -809,8 +818,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
-    Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
-    Optional<SmartContractPermissioningConfiguration>
+    final Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
+    final Optional<SmartContractPermissioningConfiguration>
         smartContractPermissioningConfigurationOptional;
 
     if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
@@ -918,6 +927,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .syncMode(syncMode)
         .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
         .build();
+  }
+
+  private RocksDbConfiguration buildRocksDbConfiguration() {
+    return rocksDbConfigurationBuilder.databaseDir(dataDir().resolve(DATABASE_PATH)).build();
   }
 
   // Blockchain synchronisation from peers.
