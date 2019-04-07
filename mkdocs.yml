@@ -25,9 +25,10 @@ extra:
     pegasys_website: https://pegasys.tech/
     issues: https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000
   google:
-    analytics_id: 'UA-117921923-2'
     site_verification: 'za1cLzyS6LXDGO-pMzvfQdYTZ0Zc67uZtY0asA4YXZ0'
-
+    tag_manager: 'GTM-5B7N84J'
+  hotjar:
+    site_id: '1161123'
 
 # Repository
 repo_name: PegaSysEng/pantheon
@@ -71,6 +72,7 @@ nav:
         - Using the JSON-RPC API: JSON-RPC-API/Using-JSON-RPC-API.md
         - Authentication: JSON-RPC-API/Authentication.md
     - Configuring Pantheon:
+        - Network vs Node Configuration: Configuring-Pantheon/Network-vs-Node.md
         - Configuration File: Configuring-Pantheon/Using-Configuration-File.md
         - Networking:
           - Bootnodes: Configuring-Pantheon/Networking/Bootnodes.md
