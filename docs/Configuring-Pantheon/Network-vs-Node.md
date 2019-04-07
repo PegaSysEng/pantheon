@@ -5,8 +5,9 @@ description: Configuring Pantheon at the network level compared to the node leve
 
 Pantheon is configured at the network level and the node level. 
 
-Network wide settings are specified in the genesis file.  For example, `difficulty` for Proof of Work 
-networks or `epochlength` for IBFT 2.0 networks. 
+Network wide settings are specified in the genesis file.  Examples include `difficulty` for Proof of Work 
+networks and the [consensus mechanism](../Consensus-Protocols/Overview-Consensus.md). 
 
 Node settings are specified on the command line or in the [node configuration file](Using-Configuration-File.md). 
-For example, the JSON-RPC API methods to enable or the data directory for the node. 
+For example, the [JSON-RPC API methods to enable](../Reference/JSON-RPC-API-Methods.md) or the 
+[data directory](../Reference/Pantheon-CLI-Syntax.md#data-path) for the node. 
