@@ -407,8 +407,7 @@ public class SynchronizerConfiguration {
         description =
             "Minimum time in ms without progress before considering a world state download as stalled (default: ${DEFAULT-VALUE})")
     private long worldStateMinMillisBeforeStalling = DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING;
-    private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
-    private int maxTrailingPeers = Integer.MAX_VALUE;
+
     private int maxGetBlockHeaders = DEFAULT_MAX_GET_BLOCK_HEADERS;
     private int maxGetBlockBodies = DEFAULT_MAX_GET_BLOCK_BODIES;
     private int maxGetReceipts = DEFAULT_MAX_GET_RECEIPTS;
