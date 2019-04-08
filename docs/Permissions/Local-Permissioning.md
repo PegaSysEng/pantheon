@@ -1,15 +1,9 @@
-description: Pantheon Permissions feature
+description: Local Permissions 
 <!--- END of page meta data -->
 
-# Permissions 
+# Local Permissions 
 
-A permissioned network is a network where only specified nodes and accounts (participants) can participate. 
-Nodes and accounts outside those specified are prevented from participating. Permissioned networks can have node permissions enabled, 
-account permissions enabled, or both. 
-
-![Node Permissions](../images/node-permissioning-bad-actor.png)
-
-![Account Permissions](../images/account-permissioning.png)
+Local permissions supports node and account whitelisting. 
 
 ## Node Whitelisting 
 
