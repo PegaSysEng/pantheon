@@ -46,7 +46,7 @@ import org.apache.logging.log4j.Logger;
 
 class EthServer {
   private static final Logger LOG = LogManager.getLogger();
-  
+
   public static final int DEFAULT_MAX_GET_BLOCK_HEADERS = 192;
   public static final int DEFAULT_MAX_GET_BLOCK_BODIES = 128;
   public static final int DEFAULT_MAX_GET_RECEIPTS = 256;
