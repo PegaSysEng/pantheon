@@ -123,7 +123,11 @@ public class MainnetPantheonController implements PantheonController<Void> {
             syncConfig.downloaderParallelism(),
             syncConfig.transactionsParallelism(),
             syncConfig.computationParallelism(),
-            metricsSystem);
+            metricsSystem,
+            syncConfig.getMaxGetBlockHeaders(),
+            syncConfig.getMaxGetBlockBodies(),
+            syncConfig.getMaxGetReceipts(),
+            syncConfig.getMaxGetNodeData());
     final SyncState syncState =
         new SyncState(blockchain, ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =

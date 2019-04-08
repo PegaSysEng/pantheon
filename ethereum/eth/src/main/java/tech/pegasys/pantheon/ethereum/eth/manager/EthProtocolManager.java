@@ -44,7 +44,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
-  static final int DEFAULT_REQUEST_LIMIT = 200;
   private static final Logger LOG = LogManager.getLogger();
   private static final List<Capability> FAST_SYNC_CAPS =
       Collections.singletonList(EthProtocol.ETH63);
@@ -70,7 +69,11 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
-      final EthScheduler scheduler) {
+      final EthScheduler scheduler,
+      final int maxGetBlockHeaders,
+      final int maxGetBlockBodies,
+      final int maxGetReceipts,
+      final int maxGetNodeData) {
     this.networkId = networkId;
     this.scheduler = scheduler;
     this.blockchain = blockchain;
@@ -86,7 +89,14 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     this.blockBroadcaster = new BlockBroadcaster(ethContext);
 
     // Set up request handlers
-    new EthServer(blockchain, worldStateArchive, ethMessages);
+    new EthServer(
+        blockchain,
+        worldStateArchive,
+        ethMessages,
+        maxGetBlockHeaders,
+        maxGetBlockBodies,
+        maxGetReceipts,
+        maxGetNodeData);
   }
 
   public EthProtocolManager(
@@ -97,13 +107,21 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int syncWorkers,
       final int txWorkers,
       final int computationWorkers,
-      final MetricsSystem metricsSystem) {
+      final MetricsSystem metricsSystem,
+      final int maxGetBlockHeaders,
+      final int maxGetBlockBodies,
+      final int maxGetReceipts,
+      final int maxGetNodeData) {
     this(
         blockchain,
         worldStateArchive,
         networkId,
         fastSyncEnabled,
-        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem));
+        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
+        maxGetBlockHeaders,
+        maxGetBlockBodies,
+        maxGetReceipts,
+        maxGetNodeData);
   }
 
   public EthContext ethContext() {

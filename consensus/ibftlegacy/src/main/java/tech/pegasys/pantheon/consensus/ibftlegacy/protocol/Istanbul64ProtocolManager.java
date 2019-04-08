@@ -33,7 +33,11 @@ public class Istanbul64ProtocolManager extends EthProtocolManager {
       final int syncWorkers,
       final int txWorkers,
       final int computationWorkers,
-      final MetricsSystem metricsSystem) {
+      final MetricsSystem metricsSystem,
+      final int maxGetBlockHeaders,
+      final int maxGetBlockBodies,
+      final int maxGetReceipts,
+      final int maxGetNodeData) {
     super(
         blockchain,
         worldStateArchive,
@@ -42,7 +46,11 @@ public class Istanbul64ProtocolManager extends EthProtocolManager {
         syncWorkers,
         txWorkers,
         computationWorkers,
-        metricsSystem);
+        metricsSystem,
+        maxGetBlockHeaders,
+        maxGetBlockBodies,
+        maxGetReceipts,
+        maxGetNodeData);
   }
 
   @Override
