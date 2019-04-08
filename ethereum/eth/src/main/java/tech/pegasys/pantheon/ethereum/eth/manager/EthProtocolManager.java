@@ -107,6 +107,27 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int syncWorkers,
       final int txWorkers,
       final int computationWorkers,
+      final MetricsSystem metricsSystem) {
+    this(
+        blockchain,
+        worldStateArchive,
+        networkId,
+        fastSyncEnabled,
+        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
+        EthServer.DEFAULT_MAX_GET_BLOCK_HEADERS,
+        EthServer.DEFAULT_MAX_GET_BLOCK_BODIES,
+        EthServer.DEFAULT_MAX_GET_RECEIPTS,
+        EthServer.DEFAULT_MAX_GET_NODE_DATA);
+  }
+
+  public EthProtocolManager(
+      final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
+      final int networkId,
+      final boolean fastSyncEnabled,
+      final int syncWorkers,
+      final int txWorkers,
+      final int computationWorkers,
       final MetricsSystem metricsSystem,
       final int maxGetBlockHeaders,
       final int maxGetBlockBodies,

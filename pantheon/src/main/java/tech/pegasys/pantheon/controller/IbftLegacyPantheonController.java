@@ -147,11 +147,7 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
             syncConfig.downloaderParallelism(),
             syncConfig.transactionsParallelism(),
             syncConfig.computationParallelism(),
-            metricsSystem,
-            syncConfig.getMaxGetBlockHeaders(),
-            syncConfig.getMaxGetBlockBodies(),
-            syncConfig.getMaxGetReceipts(),
-            syncConfig.getMaxGetNodeData());
+            metricsSystem);
 
     final SyncState syncState =
         new SyncState(blockchain, istanbul64ProtocolManager.ethContext().getEthPeers());

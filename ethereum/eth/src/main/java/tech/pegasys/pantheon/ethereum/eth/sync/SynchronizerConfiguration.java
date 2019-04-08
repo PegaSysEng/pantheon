@@ -36,10 +36,6 @@ public class SynchronizerConfiguration {
   private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 1000;
   private static final long DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING =
       TimeUnit.MINUTES.toMillis(5);
-  private static final int DEFAULT_MAX_GET_BLOCK_HEADERS = 192;
-  private static final int DEFAULT_MAX_GET_BLOCK_BODIES = 128;
-  private static final int DEFAULT_MAX_GET_RECEIPTS = 256;
-  private static final int DEFAULT_MAX_GET_NODE_DATA = 384;
 
   // Fast sync config
   private final int fastSyncPivotDistance;
@@ -69,12 +65,6 @@ public class SynchronizerConfiguration {
   private final int maxTrailingPeers;
   private final long worldStateMinMillisBeforeStalling;
 
-  // Ethereum Wire Protocol config
-  private final int maxGetBlockHeaders;
-  private final int maxGetBlockBodies;
-  private final int maxGetReceipts;
-  private final int maxGetNodeData;
-
   private SynchronizerConfiguration(
       final int fastSyncPivotDistance,
       final float fastSyncFullValidationRate,
@@ -95,11 +85,7 @@ public class SynchronizerConfiguration {
       final int downloaderParallelism,
       final int transactionsParallelism,
       final int computationParallelism,
-      final int maxTrailingPeers,
-      final int maxGetBlockHeaders,
-      final int maxGetBlockBodies,
-      final int maxGetReceipts,
-      final int maxGetNodeData) {
+      final int maxTrailingPeers) {
     this.fastSyncPivotDistance = fastSyncPivotDistance;
     this.fastSyncFullValidationRate = fastSyncFullValidationRate;
     this.fastSyncMinimumPeerCount = fastSyncMinimumPeerCount;
@@ -120,10 +106,6 @@ public class SynchronizerConfiguration {
     this.transactionsParallelism = transactionsParallelism;
     this.computationParallelism = computationParallelism;
     this.maxTrailingPeers = maxTrailingPeers;
-    this.maxGetBlockHeaders = maxGetBlockHeaders;
-    this.maxGetBlockBodies = maxGetBlockBodies;
-    this.maxGetReceipts = maxGetReceipts;
-    this.maxGetNodeData = maxGetNodeData;
   }
 
   public static Builder builder() {
@@ -232,22 +214,6 @@ public class SynchronizerConfiguration {
 
   public int getMaxTrailingPeers() {
     return maxTrailingPeers;
-  }
-
-  public int getMaxGetBlockHeaders() {
-    return maxGetBlockHeaders;
-  }
-
-  public int getMaxGetBlockBodies() {
-    return maxGetBlockBodies;
-  }
-
-  public int getMaxGetReceipts() {
-    return maxGetReceipts;
-  }
-
-  public int getMaxGetNodeData() {
-    return maxGetNodeData;
   }
 
   public static class Builder {
@@ -408,11 +374,6 @@ public class SynchronizerConfiguration {
             "Minimum time in ms without progress before considering a world state download as stalled (default: ${DEFAULT-VALUE})")
     private long worldStateMinMillisBeforeStalling = DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING;
 
-    private int maxGetBlockHeaders = DEFAULT_MAX_GET_BLOCK_HEADERS;
-    private int maxGetBlockBodies = DEFAULT_MAX_GET_BLOCK_BODIES;
-    private int maxGetReceipts = DEFAULT_MAX_GET_RECEIPTS;
-    private int maxGetNodeData = DEFAULT_MAX_GET_NODE_DATA;
-
     public Builder fastSyncPivotDistance(final int distance) {
       fastSyncPivotDistance = distance;
       return this;
@@ -519,26 +480,6 @@ public class SynchronizerConfiguration {
       return this;
     }
 
-    public Builder maxGetBlockHeaders(final int maxGetBlockHeaders) {
-      this.maxGetBlockHeaders = maxGetBlockHeaders;
-      return this;
-    }
-
-    public Builder maxGetBlockBodies(final int maxGetBlockBodies) {
-      this.maxGetBlockBodies = maxGetBlockBodies;
-      return this;
-    }
-
-    public Builder maxGetReceipts(final int maxGetReceipts) {
-      this.maxGetReceipts = maxGetReceipts;
-      return this;
-    }
-
-    public Builder maxGetNodeData(final int maxGetNodeData) {
-      this.maxGetNodeData = maxGetNodeData;
-      return this;
-    }
-
     public SynchronizerConfiguration build() {
       return new SynchronizerConfiguration(
           fastSyncPivotDistance,
@@ -560,11 +501,7 @@ public class SynchronizerConfiguration {
           downloaderParallelism,
           transactionsParallelism,
           computationParallelism,
-          maxTrailingPeers,
-          maxGetBlockHeaders,
-          maxGetBlockBodies,
-          maxGetReceipts,
-          maxGetNodeData);
+          maxTrailingPeers);
     }
   }
 }

@@ -48,6 +48,12 @@ class EthServer {
   private static final Logger LOG = LogManager.getLogger();
 
   static final int DEFAULT_REQUEST_LIMIT = 200;
+
+  public static final int DEFAULT_MAX_GET_BLOCK_HEADERS = 192;
+  public static final int DEFAULT_MAX_GET_BLOCK_BODIES = 128;
+  public static final int DEFAULT_MAX_GET_RECEIPTS = 256;
+  public static final int DEFAULT_MAX_GET_NODE_DATA = 384;
+
   private final Blockchain blockchain;
   private final WorldStateArchive worldStateArchive;
   private final EthMessages ethMessages;
@@ -72,6 +78,20 @@ class EthServer {
     this.maxGetReceipts = maxGetReceipts;
     this.maxGetNodeData = maxGetNodeData;
     this.setupListeners();
+  }
+
+  EthServer(
+      final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
+      final EthMessages ethMessages) {
+    this(
+        blockchain,
+        worldStateArchive,
+        ethMessages,
+        DEFAULT_MAX_GET_BLOCK_HEADERS,
+        DEFAULT_MAX_GET_BLOCK_BODIES,
+        DEFAULT_MAX_GET_RECEIPTS,
+        DEFAULT_MAX_GET_NODE_DATA);
   }
 
   private void setupListeners() {

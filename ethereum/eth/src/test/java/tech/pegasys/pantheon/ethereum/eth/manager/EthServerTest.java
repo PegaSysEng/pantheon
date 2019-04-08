@@ -44,14 +44,7 @@ public class EthServerTest {
 
   @Test
   public void shouldRespondToNodeDataRequests() throws Exception {
-    new EthServer(
-        blockchain,
-        worldStateArchive,
-        ethMessages,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT);
+    new EthServer(blockchain, worldStateArchive, ethMessages);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.of(VALUE2));
     ethMessages.dispatch(new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2))));
@@ -61,14 +54,7 @@ public class EthServerTest {
 
   @Test
   public void shouldHandleDataBeingUnavailableWhenRespondingToNodeDataRequests() throws Exception {
-    new EthServer(
-        blockchain,
-        worldStateArchive,
-        ethMessages,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT);
+    new EthServer(blockchain, worldStateArchive, ethMessages);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.empty());
     ethMessages.dispatch(new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2))));
@@ -78,14 +64,7 @@ public class EthServerTest {
 
   @Test
   public void shouldLimitNumberOfResponsesToNodeDataRequests() throws Exception {
-    new EthServer(
-        blockchain,
-        worldStateArchive,
-        ethMessages,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT);
+    new EthServer(blockchain, worldStateArchive, ethMessages);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.of(VALUE2));
     ethMessages.dispatch(
