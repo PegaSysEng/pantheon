@@ -18,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetNodeDataMessage;
@@ -28,6 +27,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Optional;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class EthServerTest {

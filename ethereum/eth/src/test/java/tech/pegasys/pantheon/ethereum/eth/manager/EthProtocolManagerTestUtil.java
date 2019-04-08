@@ -49,10 +49,10 @@ public class EthProtocolManagerTestUtil {
         networkId,
         false,
         ethScheduler,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT);
+        200,
+        200,
+        200,
+        200);
   }
 
   public static EthProtocolManager create(
