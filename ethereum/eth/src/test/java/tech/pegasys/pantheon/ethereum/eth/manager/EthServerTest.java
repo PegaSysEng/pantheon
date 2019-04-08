@@ -45,7 +45,14 @@ public class EthServerTest {
 
   @Before
   public void setUp() {
-    new EthServer(blockchain, worldStateArchive, ethMessages);
+    new EthServer(
+        blockchain,
+        worldStateArchive,
+        ethMessages,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT);
   }
 
   @Test
