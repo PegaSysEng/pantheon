@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.Before;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.messages.GetNodeDataMessage;
@@ -42,9 +43,13 @@ public class EthServerTest {
   private final EthPeer ethPeer = mock(EthPeer.class);
   private final EthMessages ethMessages = new EthMessages();
 
+  @Before
+  public void setUp() {
+    new EthServer(blockchain, worldStateArchive, ethMessages, 2, 2, 2, 2);
+  }
+
   @Test
   public void shouldRespondToNodeDataRequests() throws Exception {
-    new EthServer(blockchain, worldStateArchive, ethMessages);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.of(VALUE2));
     ethMessages.dispatch(new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2))));
@@ -54,7 +59,6 @@ public class EthServerTest {
 
   @Test
   public void shouldHandleDataBeingUnavailableWhenRespondingToNodeDataRequests() throws Exception {
-    new EthServer(blockchain, worldStateArchive, ethMessages);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.empty());
     ethMessages.dispatch(new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2))));
@@ -64,7 +68,6 @@ public class EthServerTest {
 
   @Test
   public void shouldLimitNumberOfResponsesToNodeDataRequests() throws Exception {
-    new EthServer(blockchain, worldStateArchive, ethMessages);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.of(VALUE2));
     ethMessages.dispatch(
@@ -76,14 +79,6 @@ public class EthServerTest {
   @Test
   public void shouldLimitTheNumberOfNodeDataResponsesLookedUpNotTheNumberReturned()
       throws Exception {
-    new EthServer(
-        blockchain,
-        worldStateArchive,
-        ethMessages,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        EthServer.DEFAULT_REQUEST_LIMIT,
-        1);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.empty());
     when(worldStateArchive.getNodeData(HASH3)).thenReturn(Optional.of(VALUE3));
