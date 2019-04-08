@@ -43,7 +43,16 @@ public class EthProtocolManagerTestUtil {
       final WorldStateArchive worldStateArchive,
       final EthScheduler ethScheduler) {
     final int networkId = 1;
-    return new EthProtocolManager(blockchain, worldStateArchive, networkId, false, ethScheduler);
+    return new EthProtocolManager(
+        blockchain,
+        worldStateArchive,
+        networkId,
+        false,
+        ethScheduler,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT);
   }
 
   public static EthProtocolManager create(
