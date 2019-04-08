@@ -804,10 +804,10 @@ public final class EthProtocolManagerTest {
             1,
             1,
             new NoOpMetricsSystem(),
-            200,
-            200,
-            200,
-            200)) {
+            limit,
+            limit,
+            limit,
+            limit)) {
       // Setup blocks query
       final int blockCount = 10;
       final long startBlock = blockchain.getChainHeadBlockNumber() - blockCount;
