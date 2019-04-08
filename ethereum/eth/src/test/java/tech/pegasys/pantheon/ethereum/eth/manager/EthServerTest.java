@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Optional;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class EthServerTest {
@@ -43,8 +42,8 @@ public class EthServerTest {
   private final EthPeer ethPeer = mock(EthPeer.class);
   private final EthMessages ethMessages = new EthMessages();
 
-  @Before
-  public void setUp() {
+  @Test
+  public void shouldRespondToNodeDataRequests() throws Exception {
     new EthServer(
         blockchain,
         worldStateArchive,
@@ -53,10 +52,6 @@ public class EthServerTest {
         EthServer.DEFAULT_REQUEST_LIMIT,
         EthServer.DEFAULT_REQUEST_LIMIT,
         EthServer.DEFAULT_REQUEST_LIMIT);
-  }
-
-  @Test
-  public void shouldRespondToNodeDataRequests() throws Exception {
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.of(VALUE2));
     ethMessages.dispatch(new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2))));
@@ -66,6 +61,14 @@ public class EthServerTest {
 
   @Test
   public void shouldHandleDataBeingUnavailableWhenRespondingToNodeDataRequests() throws Exception {
+    new EthServer(
+        blockchain,
+        worldStateArchive,
+        ethMessages,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.empty());
     ethMessages.dispatch(new EthMessage(ethPeer, GetNodeDataMessage.create(asList(HASH1, HASH2))));
@@ -75,6 +78,14 @@ public class EthServerTest {
 
   @Test
   public void shouldLimitNumberOfResponsesToNodeDataRequests() throws Exception {
+    new EthServer(
+        blockchain,
+        worldStateArchive,
+        ethMessages,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.of(VALUE2));
     ethMessages.dispatch(
@@ -86,6 +97,14 @@ public class EthServerTest {
   @Test
   public void shouldLimitTheNumberOfNodeDataResponsesLookedUpNotTheNumberReturned()
       throws Exception {
+    new EthServer(
+        blockchain,
+        worldStateArchive,
+        ethMessages,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        EthServer.DEFAULT_REQUEST_LIMIT,
+        1);
     when(worldStateArchive.getNodeData(HASH1)).thenReturn(Optional.of(VALUE1));
     when(worldStateArchive.getNodeData(HASH2)).thenReturn(Optional.empty());
     when(worldStateArchive.getNodeData(HASH3)).thenReturn(Optional.of(VALUE3));
