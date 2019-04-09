@@ -246,41 +246,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Minimum number of peers required before starting fast sync. (default: ${DEFAULT-VALUE})")
   private final Integer fastSyncMinPeerCount = FAST_SYNC_MIN_PEER_COUNT;
 
-  @Option(
-      hidden = true,
-      names = {"--ewp-max-get-headers"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description =
-          "Maximum request limit for Ethereum Wire Protocol GET_BLOCK_HEADERS. (default: ${DEFAULT-VALUE})")
-  private final PositiveNumber ewpMaxGetHeaders =
-      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS;
-
-  @Option(
-      hidden = true,
-      names = {"--ewp-max-get-bodies"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description =
-          "Maximum request limit for Ethereum Wire Protocol GET_BLOCK_BODIES. (default: ${DEFAULT-VALUE})")
-  private final PositiveNumber ewpMaxGetBodies =
-      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES;
-
-  @Option(
-      hidden = true,
-      names = {"--ewp-max-get-receipts"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description =
-          "Maximum request limit for Ethereum Wire Protocol GET_RECEIPTS. (default: ${DEFAULT-VALUE})")
-  private final PositiveNumber ewpMaxGetReceipts =
-      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS;
-
-  @Option(
-      hidden = true,
-      names = {"--ewp-max-get-node-data"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description =
-          "Maximum request limit for Ethereum Wire Protocol GET_NODE_DATA. (default: ${DEFAULT-VALUE})")
-  private final PositiveNumber ewpMaxGetNodeData =
-      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA;
 
   @Option(
       hidden = true,
@@ -646,7 +611,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "Synchronizer",
             synchronizerConfigurationBuilder,
             "RocksDB",
-            rocksDbConfigurationBuilder));
+            rocksDbConfigurationBuilder,
+                ));
 
     // Create a handler that will search for a config file option and use it for default values
     // and eventually it will run regular parsing of the remaining options.

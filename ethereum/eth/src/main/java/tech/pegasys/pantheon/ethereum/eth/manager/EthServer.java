@@ -82,10 +82,10 @@ class EthServer {
         blockchain,
         worldStateArchive,
         ethMessages,
-        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
-        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
-        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS.getValue(),
-        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA.getValue());
+        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS,
+        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES,
+        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS,
+        EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA);
   }
 
   private void setupListeners() {

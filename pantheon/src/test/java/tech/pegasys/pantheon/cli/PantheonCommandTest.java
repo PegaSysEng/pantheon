@@ -1106,9 +1106,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
             eq(
                 new EthereumWireProtocolConfiguration(
                     13,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS.getValue(),
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA.getValue())));
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA)));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1132,10 +1132,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .ethereumWireProtocolConfiguration(
             eq(
                 new EthereumWireProtocolConfiguration(
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS,
                     14,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS.getValue(),
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA.getValue())));
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA)));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1159,10 +1159,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .ethereumWireProtocolConfiguration(
             eq(
                 new EthereumWireProtocolConfiguration(
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES,
                     15,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA.getValue())));
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA)));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1186,9 +1186,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .ethereumWireProtocolConfiguration(
             eq(
                 new EthereumWireProtocolConfiguration(
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS,
                     16)));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
