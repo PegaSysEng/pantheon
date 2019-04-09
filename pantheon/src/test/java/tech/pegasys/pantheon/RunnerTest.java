@@ -97,11 +97,10 @@ public final class RunnerTest {
     final int blockCount = 500;
     final KeyPair aheadDbNodeKeys = loadKeyPair(dbAhead);
     final SynchronizerConfiguration syncConfigAhead =
-        SynchronizerConfiguration
-                .builder()
-                .syncMode(SyncMode.FULL)
-                .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.builder().build())
-                .build();
+        SynchronizerConfiguration.builder()
+            .syncMode(SyncMode.FULL)
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.builder().build())
+            .build();
     final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
     final int networkId = 2929;
 
