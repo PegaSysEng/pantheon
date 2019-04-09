@@ -184,15 +184,10 @@ public class PrivacyParameters {
         WorldStateArchive privateWorldStateArchive =
             new WorldStateArchive(privateWorldStateStorage);
 
-        Path privateStateDbPath = dataDir.resolve(PRIVATE_STATE_DATABASE_PATH);
-        StorageProvider privateStateStorageProvider =
-            RocksDbStorageProvider.create(
-                new RocksDbConfiguration.Builder().databaseDir(privateStateDbPath).build(),
-                metricsSystem);
         PrivateTransactionStorage privateTransactionStorage =
-            privateStateStorageProvider.createPrivateTransactionStorage();
+            privateStorageProvider.createPrivateTransactionStorage();
         PrivateStateStorage privateStateStorage =
-            privateStateStorageProvider.createPrivateStateStorage();
+            privateStorageProvider.createPrivateStateStorage();
 
         config.setPrivateWorldStateArchive(privateWorldStateArchive);
         config.setEnclavePublicKey(enclavePublicKey);
