@@ -266,7 +266,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       hidden = true,
-      names = {"--ewp-max-get-receipts"},
+      names = {"--Xewp-max-get-receipts"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
           "Maximum request limit for Ethereum Wire Protocol GET_RECEIPTS. (default: ${DEFAULT-VALUE})")
