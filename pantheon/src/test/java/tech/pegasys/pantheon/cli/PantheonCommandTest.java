@@ -40,7 +40,6 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
@@ -1100,15 +1099,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void parsesValidEwpMaxGetHeadersOptions() {
 
-    parseCommand("--ewp-max-get-headers", "13");
-    verify(mockSyncConfBuilder)
-        .ethereumWireProtocolConfiguration(
-            eq(
-                new EthereumWireProtocolConfiguration(
-                    13,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA)));
+    parseCommand("--Xewp-max-get-headers", "13");
+    verify(mockEthereumWireProtocolConfigurationBuilder).build();
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1116,26 +1108,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void parsesInvalidEwpMaxGetHeadersOptionsShouldFail() {
 
-    parseCommand("--ewp-max-get-headers", "-13");
+    parseCommand("--Xewp-max-get-headers", "-13");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--ewp-max-get-headers': cannot convert '-13' to PositiveNumber");
+            "Invalid value for option '--Xewp-max-get-headers': cannot convert '-13' to PositiveNumber");
   }
 
   @Test
   public void parsesValidEwpMaxGetBodiesOptions() {
 
-    parseCommand("--ewp-max-get-bodies", "14");
-    verify(mockSyncConfBuilder)
-        .ethereumWireProtocolConfiguration(
-            eq(
-                new EthereumWireProtocolConfiguration(
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS,
-                    14,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA)));
+    parseCommand("--Xewp-max-get-bodies", "14");
+    verify(mockEthereumWireProtocolConfigurationBuilder).build();
+
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1143,26 +1129,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void parsesInvalidEwpMaxGetBodiesOptionsShouldFail() {
 
-    parseCommand("--ewp-max-get-bodies", "-14");
+    parseCommand("--Xewp-max-get-bodies", "-14");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--ewp-max-get-bodies': cannot convert '-14' to PositiveNumber");
+            "Invalid value for option '--Xewp-max-get-bodies': cannot convert '-14' to PositiveNumber");
   }
 
   @Test
   public void parsesValidEwpMaxGetReceiptsOptions() {
 
-    parseCommand("--ewp-max-get-receipts", "15");
-    verify(mockSyncConfBuilder)
-        .ethereumWireProtocolConfiguration(
-            eq(
-                new EthereumWireProtocolConfiguration(
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES,
-                    15,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA)));
+    parseCommand("--Xewp-max-get-receipts", "15");
+    verify(mockEthereumWireProtocolConfigurationBuilder).build();
+
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1170,26 +1150,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void parsesInvalidEwpMaxGetReceiptsOptionsShouldFail() {
 
-    parseCommand("--ewp-max-get-receipts", "-15");
+    parseCommand("--Xewp-max-get-receipts", "-15");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--ewp-max-get-receipts': cannot convert '-15' to PositiveNumber");
+            "Invalid value for option '--Xewp-max-get-receipts': cannot convert '-15' to PositiveNumber");
   }
 
   @Test
   public void parsesValidEwpMaxGetNodeDataOptions() {
 
-    parseCommand("--ewp-max-get-node-data", "16");
-    verify(mockSyncConfBuilder)
-        .ethereumWireProtocolConfiguration(
-            eq(
-                new EthereumWireProtocolConfiguration(
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES,
-                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS,
-                    16)));
+    parseCommand("--Xewp-max-get-node-data", "16");
+    verify(mockEthereumWireProtocolConfigurationBuilder).build();
+
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1197,12 +1171,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void parsesInvalidEwpMaxGetNodeDataOptionsShouldFail() {
 
-    parseCommand("--ewp-max-get-node-data", "-16");
+    parseCommand("--Xewp-max-get-node-data", "-16");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--ewp-max-get-node-data': cannot convert '-16' to PositiveNumber");
+            "Invalid value for option '--Xewp-max-get-node-data': cannot convert '-16' to PositiveNumber");
   }
 
   @Test

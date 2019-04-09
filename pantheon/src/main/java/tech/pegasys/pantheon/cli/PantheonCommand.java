@@ -156,6 +156,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private final PantheonControllerBuilder controllerBuilder;
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
+  private final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder;
   private final RocksDbConfiguration.Builder rocksDbConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
@@ -245,7 +246,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Minimum number of peers required before starting fast sync. (default: ${DEFAULT-VALUE})")
   private final Integer fastSyncMinPeerCount = FAST_SYNC_MIN_PEER_COUNT;
-
 
   @Option(
       hidden = true,
@@ -559,12 +559,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
       final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder,
+      final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder,
       final RocksDbConfiguration.Builder rocksDbConfigurationBuilder) {
     this.logger = logger;
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
     this.synchronizerConfigurationBuilder = synchronizerConfigurationBuilder;
+    this.ethereumWireConfigurationBuilder = ethereumWireConfigurationBuilder;
     this.rocksDbConfigurationBuilder = rocksDbConfigurationBuilder;
   }
 
@@ -612,7 +614,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             synchronizerConfigurationBuilder,
             "RocksDB",
             rocksDbConfigurationBuilder,
-                ));
+            "Ethereum Wire Protocol",
+            ethereumWireConfigurationBuilder));
 
     // Create a handler that will search for a config file option and use it for default values
     // and eventually it will run regular parsing of the remaining options.
@@ -965,13 +968,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
         .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(fastSyncMaxWaitTime))
         .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
-        .ethereumWireProtocolConfiguration(
-            EthereumWireProtocolConfiguration.builder()
-                .maxGetBlockHeaders(ewpMaxGetHeaders.getValue())
-                .maxGetBlockBodies(ewpMaxGetBodies.getValue())
-                .maxGetReceipts(ewpMaxGetReceipts.getValue())
-                .maxGetNodeData(ewpMaxGetNodeData.getValue())
-                .build())
+        .ethereumWireProtocolConfiguration(ethereumWireConfigurationBuilder.build())
         .build();
   }
 

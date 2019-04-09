@@ -12,8 +12,9 @@
  */
 package tech.pegasys.pantheon.ethereum.eth;
 
-import picocli.CommandLine;
 import tech.pegasys.pantheon.util.number.PositiveNumber;
+
+import picocli.CommandLine;
 
 public class EthereumWireProtocolConfiguration {
 
@@ -75,7 +76,7 @@ public class EthereumWireProtocolConfiguration {
     return maxGetBlockHeaders == other.maxGetBlockHeaders
         && maxGetBlockBodies == other.maxGetBlockBodies
         && maxGetReceipts == other.maxGetReceipts
-        && maxGetNodeData == other.maxGetNodeData;
+        && maxGetReceipts == other.maxGetNodeData;
   }
 
   @Override
@@ -83,10 +84,17 @@ public class EthereumWireProtocolConfiguration {
     return super.hashCode();
   }
 
+  @Override
+  public String toString() {
+    return String.format(
+        "maxGetBlockHeaders=%s\tmaxGetBlockBodies=%s\tmaxGetReceipts=%s\tmaxGetReceipts=%s",
+        maxGetBlockHeaders, maxGetBlockBodies, maxGetReceipts, maxGetNodeData);
+  }
+
   public static class Builder {
     @CommandLine.Option(
         hidden = true,
-        names = {"--ewp-max-get-headers"},
+        names = {"--Xewp-max-get-headers"},
         paramLabel = "<INTEGER>",
         description =
             "Maximum request limit for Ethereum Wire Protocol GET_BLOCK_HEADERS. (default: ${DEFAULT-VALUE})")
@@ -95,7 +103,7 @@ public class EthereumWireProtocolConfiguration {
 
     @CommandLine.Option(
         hidden = true,
-        names = {"--ewp-max-get-bodies"},
+        names = {"--Xewp-max-get-bodies"},
         paramLabel = "<INTEGER>",
         description =
             "Maximum request limit for Ethereum Wire Protocol GET_BLOCK_BODIES. (default: ${DEFAULT-VALUE})")
@@ -104,7 +112,7 @@ public class EthereumWireProtocolConfiguration {
 
     @CommandLine.Option(
         hidden = true,
-        names = {"--ewp-max-get-receipts"},
+        names = {"--Xewp-max-get-receipts"},
         paramLabel = "<INTEGER>",
         description =
             "Maximum request limit for Ethereum Wire Protocol GET_RECEIPTS. (default: ${DEFAULT-VALUE})")
@@ -113,7 +121,7 @@ public class EthereumWireProtocolConfiguration {
 
     @CommandLine.Option(
         hidden = true,
-        names = {"--ewp-max-get-node-data"},
+        names = {"--Xewp-max-get-node-data"},
         paramLabel = "<INTEGER>",
         description =
             "Maximum request limit for Ethereum Wire Protocol GET_NODE_DATA. (default: ${DEFAULT-VALUE})")
