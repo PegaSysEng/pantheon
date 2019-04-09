@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer.SyncStatusListener;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.JsonRpcResult;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.SyncingResult;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
@@ -71,6 +70,7 @@ public class SyncingSubscriptionServiceTest {
 
     syncStatusListener.onSyncStatus(syncStatus);
 
-    verify(subscriptionManager).sendMessage(eq(subscription.getId()), any(NotSynchronisingResult.class));
+    verify(subscriptionManager)
+        .sendMessage(eq(subscription.getId()), any(NotSynchronisingResult.class));
   }
 }
