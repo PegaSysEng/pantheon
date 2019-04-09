@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParametersBuilder;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.PrecompiledContract;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -45,7 +44,7 @@ public class PrivacyTest {
   public void privacyPrecompiled() throws IOException {
     final Path dataDir = folder.newFolder().toPath();
     PrivacyParameters privacyParameters =
-        new PrivacyParametersBuilder()
+        new PrivacyParameters.Builder()
             .setPrivacyAddress(ADDRESS)
             .setEnabled(true)
             .setDataDir(dataDir)

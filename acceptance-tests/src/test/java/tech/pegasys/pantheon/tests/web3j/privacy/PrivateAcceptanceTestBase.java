@@ -17,7 +17,6 @@ import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParametersBuilder;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
@@ -121,7 +120,7 @@ public class PrivateAcceptanceTestBase extends AcceptanceTestBase {
   }
 
   static PrivacyParameters getPrivacyParams(final OrionTestHarness testHarness) throws IOException {
-    return new PrivacyParametersBuilder()
+    return new PrivacyParameters.Builder()
         .setEnabled(true)
         .setEnclaveUrl(testHarness.clientUrl())
         .setEnclavePublicKeyUsingFile(testHarness.getConfig().publicKeys().get(0).toFile())

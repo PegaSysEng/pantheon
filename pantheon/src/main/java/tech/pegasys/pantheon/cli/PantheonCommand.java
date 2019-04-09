@@ -44,7 +44,6 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParametersBuilder;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -939,7 +938,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         !isPrivacyEnabled,
         asList("--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
 
-    final PrivacyParametersBuilder privacyParametersBuilder = new PrivacyParametersBuilder();
+    final PrivacyParameters.Builder privacyParametersBuilder = new PrivacyParameters.Builder();
     if (isPrivacyEnabled) {
       privacyParametersBuilder.setEnabled(true);
       privacyParametersBuilder.setEnclaveUrl(privacyUrl);
