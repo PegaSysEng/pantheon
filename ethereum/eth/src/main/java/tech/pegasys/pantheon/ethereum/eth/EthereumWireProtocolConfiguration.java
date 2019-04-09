@@ -37,6 +37,14 @@ public class EthereumWireProtocolConfiguration {
     this.maxGetNodeData = maxGetNodeData;
   }
 
+  public static EthereumWireProtocolConfiguration defaultConfig() {
+    return new EthereumWireProtocolConfiguration(
+        DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
+        DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
+        DEFAULT_MAX_GET_RECEIPTS.getValue(),
+        DEFAULT_MAX_GET_NODE_DATA.getValue());
+  }
+
   public static Builder builder() {
     return new Builder();
   }

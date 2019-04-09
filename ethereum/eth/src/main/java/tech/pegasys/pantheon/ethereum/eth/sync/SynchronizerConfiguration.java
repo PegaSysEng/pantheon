@@ -231,7 +231,8 @@ public class SynchronizerConfiguration {
     private int fastSyncMinimumPeerCount = DEFAULT_FAST_SYNC_MINIMUM_PEERS;
     private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
     private int maxTrailingPeers = Integer.MAX_VALUE;
-    private EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
+    private EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration =
+        EthereumWireProtocolConfiguration.defaultConfig();
 
     @CommandLine.Option(
         names = "--Xsynchronizer-block-propagation-range",
