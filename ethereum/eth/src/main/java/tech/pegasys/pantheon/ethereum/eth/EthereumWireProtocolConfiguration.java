@@ -58,7 +58,7 @@ public class EthereumWireProtocolConfiguration {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (!(obj instanceof EthereumWireProtocolConfiguration)) {
       return false;
     }
@@ -67,6 +67,11 @@ public class EthereumWireProtocolConfiguration {
         && maxGetBlockBodies == other.maxGetBlockBodies
         && maxGetReceipts == other.maxGetReceipts
         && maxGetNodeData == other.maxGetNodeData;
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
   }
 
   public static class Builder {
