@@ -45,6 +45,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
@@ -68,6 +69,7 @@ import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
+import tech.pegasys.pantheon.util.number.PositiveNumber;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.File;
@@ -243,6 +245,42 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Minimum number of peers required before starting fast sync. (default: ${DEFAULT-VALUE})")
   private final Integer fastSyncMinPeerCount = FAST_SYNC_MIN_PEER_COUNT;
+
+  @Option(
+      hidden = true,
+      names = {"--ewp-max-get-headers"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Maximum request limit for Ethereum Wire Protocol GET_BLOCK_HEADERS. (default: ${DEFAULT-VALUE})")
+  private final PositiveNumber ewpMaxGetHeaders =
+      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS;
+
+  @Option(
+      hidden = true,
+      names = {"--ewp-max-get-bodies"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Maximum request limit for Ethereum Wire Protocol GET_BLOCK_BODIES. (default: ${DEFAULT-VALUE})")
+  private final PositiveNumber ewpMaxGetBodies =
+      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES;
+
+  @Option(
+      hidden = true,
+      names = {"--ewp-max-get-receipts"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Maximum request limit for Ethereum Wire Protocol GET_RECEIPTS. (default: ${DEFAULT-VALUE})")
+  private final PositiveNumber ewpMaxGetReceipts =
+      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS;
+
+  @Option(
+      hidden = true,
+      names = {"--ewp-max-get-node-data"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Maximum request limit for Ethereum Wire Protocol GET_NODE_DATA. (default: ${DEFAULT-VALUE})")
+  private final PositiveNumber ewpMaxGetNodeData =
+      EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA;
 
   @Option(
       hidden = true,
@@ -599,6 +637,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
+    commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
 
     // Add performance options
     UnstableOptionsSubCommand.createUnstableOptions(
@@ -960,6 +999,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
         .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(fastSyncMaxWaitTime))
         .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
+        .ethereumWireProtocolConfiguration(
+            EthereumWireProtocolConfiguration.builder()
+                .maxGetBlockHeaders(ewpMaxGetHeaders.getValue())
+                .maxGetBlockBodies(ewpMaxGetBodies.getValue())
+                .maxGetReceipts(ewpMaxGetReceipts.getValue())
+                .maxGetNodeData(ewpMaxGetNodeData.getValue())
+                .build())
         .build();
   }
 

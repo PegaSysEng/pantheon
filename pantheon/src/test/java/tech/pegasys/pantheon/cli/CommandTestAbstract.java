@@ -118,6 +118,8 @@ public abstract class CommandTestAbstract {
     when(mockSyncConfBuilder.fastSyncMinimumPeerCount(anyInt())).thenReturn(mockSyncConfBuilder);
     when(mockSyncConfBuilder.fastSyncMaximumPeerWaitTime(any(Duration.class)))
         .thenReturn(mockSyncConfBuilder);
+    when(mockSyncConfBuilder.ethereumWireProtocolConfiguration(any()))
+        .thenReturn(mockSyncConfBuilder);
 
     when(mockSyncConfBuilder.build()).thenReturn(mockSyncConf);
 

@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.atLeast;
@@ -40,6 +41,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
@@ -79,7 +81,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import picocli.CommandLine;
 
 public class PantheonCommandTest extends CommandTestAbstract {
@@ -168,7 +169,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).nodePrivateKeyFile(isNotNull());
     verify(mockControllerBuilder).build();
 
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
+    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(miningArg.getValue().getCoinbase()).isEqualTo(Optional.empty());
@@ -307,10 +308,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata").toAbsolutePath()));
     verify(mockControllerBuilder).ethNetworkConfig(eq(networkConfig));
 
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
-    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(ArgumentMatchers.eq(13));
-    verify(mockSyncConfBuilder)
-        .fastSyncMaximumPeerWaitTime(ArgumentMatchers.eq(Duration.ofSeconds(57)));
+    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FAST));
+    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(eq(13));
+    verify(mockSyncConfBuilder).fastSyncMaximumPeerWaitTime(eq(Duration.ofSeconds(57)));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -615,10 +615,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
         .maxPendingTransactions(eq(PendingTransactions.MAX_PENDING_TRANSACTIONS));
     verify(mockControllerBuilder).build();
 
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
-    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(ArgumentMatchers.eq(5));
-    verify(mockSyncConfBuilder)
-        .fastSyncMaximumPeerWaitTime(ArgumentMatchers.eq(Duration.ofSeconds(0)));
+    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));
+    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(eq(5));
+    verify(mockSyncConfBuilder).fastSyncMaximumPeerWaitTime(eq(Duration.ofSeconds(0)));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
 
@@ -1049,10 +1048,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void syncModeOptionMustBeUsed() {
 
     parseCommand("--sync-mode", "FAST");
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
+    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FAST));
 
     parseCommand("--sync-mode", "FULL");
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FULL));
+    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1062,9 +1061,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void parsesValidFastSyncTimeoutOption() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "17");
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
-    verify(mockSyncConfBuilder)
-        .fastSyncMaximumPeerWaitTime(ArgumentMatchers.eq(Duration.ofSeconds(17)));
+    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FAST));
+    verify(mockSyncConfBuilder).fastSyncMaximumPeerWaitTime(eq(Duration.ofSeconds(17)));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1084,8 +1082,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void parsesValidFastSyncMinPeersOption() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-min-peers", "11");
-    verify(mockSyncConfBuilder).syncMode(ArgumentMatchers.eq(SyncMode.FAST));
-    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(ArgumentMatchers.eq(11));
+    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FAST));
+    verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(eq(11));
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -1098,6 +1096,114 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains("Invalid value for option '--fast-sync-min-peers': 'ten' is not an int");
+  }
+
+  @Test
+  public void parsesValidEwpMaxGetHeadersOptions() {
+
+    parseCommand("--ewp-max-get-headers", "13");
+    verify(mockSyncConfBuilder)
+        .ethereumWireProtocolConfiguration(
+            eq(
+                new EthereumWireProtocolConfiguration(
+                    13,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA.getValue())));
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void parsesInvalidEwpMaxGetHeadersOptionsShouldFail() {
+
+    parseCommand("--ewp-max-get-headers", "-13");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--ewp-max-get-headers': cannot convert '-13' to PositiveNumber");
+  }
+
+  @Test
+  public void parsesValidEwpMaxGetBodiesOptions() {
+
+    parseCommand("--ewp-max-get-bodies", "14");
+    verify(mockSyncConfBuilder)
+        .ethereumWireProtocolConfiguration(
+            eq(
+                new EthereumWireProtocolConfiguration(
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
+                    14,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA.getValue())));
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void parsesInvalidEwpMaxGetBodiesOptionsShouldFail() {
+
+    parseCommand("--ewp-max-get-bodies", "-14");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--ewp-max-get-bodies': cannot convert '-14' to PositiveNumber");
+  }
+
+  @Test
+  public void parsesValidEwpMaxGetReceiptsOptions() {
+
+    parseCommand("--ewp-max-get-receipts", "15");
+    verify(mockSyncConfBuilder)
+        .ethereumWireProtocolConfiguration(
+            eq(
+                new EthereumWireProtocolConfiguration(
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
+                    15,
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_NODE_DATA.getValue())));
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void parsesInvalidEwpMaxGetReceiptsOptionsShouldFail() {
+
+    parseCommand("--ewp-max-get-receipts", "-15");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--ewp-max-get-receipts': cannot convert '-15' to PositiveNumber");
+  }
+
+  @Test
+  public void parsesValidEwpMaxGetNodeDataOptions() {
+
+    parseCommand("--ewp-max-get-node-data", "16");
+    verify(mockSyncConfBuilder)
+        .ethereumWireProtocolConfiguration(
+            eq(
+                new EthereumWireProtocolConfiguration(
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_HEADERS.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_BLOCK_BODIES.getValue(),
+                    EthereumWireProtocolConfiguration.DEFAULT_MAX_GET_RECEIPTS.getValue(),
+                    16)));
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void parsesInvalidEwpMaxGetNodeDataOptionsShouldFail() {
+
+    parseCommand("--ewp-max-get-node-data", "-16");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--ewp-max-get-node-data': cannot convert '-16' to PositiveNumber");
   }
 
   @Test
