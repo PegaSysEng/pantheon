@@ -136,7 +136,6 @@ public class PrivacyParameters {
 
   public static class Builder {
     private final String PRIVATE_DATABASE_PATH = "private";
-    private final String PRIVATE_STATE_DATABASE_PATH = "privateState";
 
     private boolean enabled;
     private URI enclaveUrl;
