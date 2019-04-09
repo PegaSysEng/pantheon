@@ -248,7 +248,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       hidden = true,
-      names = {"--ewp-max-get-headers"},
+      names = {"--Xewp-max-get-headers"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
           "Maximum request limit for Ethereum Wire Protocol GET_BLOCK_HEADERS. (default: ${DEFAULT-VALUE})")
