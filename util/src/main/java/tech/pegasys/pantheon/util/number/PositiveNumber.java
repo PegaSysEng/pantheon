@@ -26,7 +26,7 @@ public class PositiveNumber {
   /**
    * Parse a string representing a positive number.
    *
-   * @param str A string representing a valid positive (strictly > 0).
+   * @param str A string representing a valid positive number strictly greater than 0.
    * @return The parsed int.
    * @throws IllegalArgumentException if the provided string is {@code null}.
    * @throws IllegalArgumentException if the string is either not a number, or not a positive number

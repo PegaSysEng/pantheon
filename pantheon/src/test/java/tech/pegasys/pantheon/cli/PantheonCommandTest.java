@@ -1285,6 +1285,17 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void fastSyncOptionsRequiresFastSyncModeToBeSet() {
+    parseCommand("--fast-sync-min-peers", "5", "--fast-sync-max-wait-time", "30");
+
+    verifyOptionsConstraintLoggerCall(
+        "--sync-mode", "--fast-sync-min-peers", "--fast-sync-max-wait-time");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void rpcApisPropertyWithInvalidEntryMustDisplayError() {
     parseCommand("--rpc-http-api", "BOB");
 
