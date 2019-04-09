@@ -76,7 +76,7 @@ public class EthereumWireProtocolConfiguration {
     return maxGetBlockHeaders == other.maxGetBlockHeaders
         && maxGetBlockBodies == other.maxGetBlockBodies
         && maxGetReceipts == other.maxGetReceipts
-        && maxGetReceipts == other.maxGetNodeData;
+        && maxGetNodeData == other.maxGetNodeData;
   }
 
   @Override
