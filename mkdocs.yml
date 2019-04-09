@@ -88,7 +88,7 @@ nav:
         - Overview: Privacy/Privacy-Overview.md
         - Processing Private Transactions: Privacy/Private-Transaction-Processing.md
     - Permissions:
-        - Overview: Permissions/Permissions-Overview.md
+        - Overview: Permissions/Permissioning-Overview.md
         - Local Permissions: Permissions/Local-Permissioning.md
     - Using Pantheon:
         - Transactions:
