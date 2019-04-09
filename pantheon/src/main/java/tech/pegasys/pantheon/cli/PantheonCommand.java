@@ -275,7 +275,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       hidden = true,
-      names = {"--ewp-max-get-node-data"},
+      names = {"--Xewp-max-get-node-data"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
           "Maximum request limit for Ethereum Wire Protocol GET_NODE_DATA. (default: ${DEFAULT-VALUE})")
