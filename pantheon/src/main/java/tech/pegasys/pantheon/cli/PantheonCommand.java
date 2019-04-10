@@ -31,13 +31,12 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.crea
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
 import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
-import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -129,28 +128,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private CommandLine commandLine;
 
-  public static class RpcApisConverter implements ITypeConverter<RpcApi> {
-
-    @Override
-    public RpcApi convert(final String name) throws RpcApisConversionException {
-      final String uppercaseName = name.trim().toUpperCase();
-
-      return Stream.<Function<String, Optional<RpcApi>>>of(
-              RpcApis::valueOf, CliqueRpcApis::valueOf, IbftRpcApis::valueOf)
-          .map(f -> f.apply(uppercaseName))
-          .filter(Optional::isPresent)
-          .map(Optional::get)
-          .findFirst()
-          .orElseThrow(() -> new RpcApisConversionException("Invalid value: " + name));
-    }
-  }
-
-  public static class RpcApisConversionException extends Exception {
-
-    RpcApisConversionException(final String s) {
-      super(s);
-    }
-  }
 
   private final BlockImporter blockImporter;
 
