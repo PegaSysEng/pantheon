@@ -19,6 +19,7 @@
 
 ### Technical Improvements 
 
+- Choose sync target based on td rather than height [\#1256](https://github.com/PegaSysEng/pantheon/pull/1256)
 - CLI ewp options [\#1246](https://github.com/PegaSysEng/pantheon/pull/1246)
 - Update PantheonCommand.java [\#1245](https://github.com/PegaSysEng/pantheon/pull/1245)
 - Reduce memory usage in import [\#1239](https://github.com/PegaSysEng/pantheon/pull/1239)
