@@ -20,6 +20,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTrac
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTracer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
@@ -54,7 +56,21 @@ public class DebugTraceTransaction implements JsonRpcMethod {
         parameters.optional(request.getParams(), 1, TransactionTraceParams.class);
     final Optional<TransactionWithMetadata> transactionWithMetadata =
         blockchain.transactionByHash(hash);
-    final Hash blockHash = transactionWithMetadata.get().getBlockHash();
+    if (transactionWithMetadata.isPresent()) {
+      DebugTraceTransactionResult debugTraceTransactionResult =
+          debugTraceTransactionResult(hash, transactionWithMetadata.get(), transactionTraceParams);
+
+      return new JsonRpcSuccessResponse(request.getId(), debugTraceTransactionResult);
+    } else {
+      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.TX_NOT_FOUND);
+    }
+  }
+
+  private DebugTraceTransactionResult debugTraceTransactionResult(
+      final Hash hash,
+      final TransactionWithMetadata transactionWithMetadata,
+      final Optional<TransactionTraceParams> transactionTraceParams) {
+    final Hash blockHash = transactionWithMetadata.getBlockHash();
     final TraceOptions traceOptions =
         transactionTraceParams
             .map(TransactionTraceParams::traceOptions)
@@ -62,11 +78,9 @@ public class DebugTraceTransaction implements JsonRpcMethod {
 
     final DebugOperationTracer execTracer = new DebugOperationTracer(traceOptions);
 
-    final DebugTraceTransactionResult result =
-        transactionTracer
-            .traceTransaction(blockHash, hash, execTracer)
-            .map(DebugTraceTransactionResult::new)
-            .orElse(null);
-    return new JsonRpcSuccessResponse(request.getId(), result);
+    return transactionTracer
+        .traceTransaction(blockHash, hash, execTracer)
+        .map(DebugTraceTransactionResult::new)
+        .orElse(null);
   }
 }
