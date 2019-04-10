@@ -8,10 +8,10 @@ Nodes and accounts outside those specified are prevented from participating. Per
 account permissioning enabled, or both. 
 
 !!! note
-    Implementing node-level permissions only is not a trustless solution. Each node
-    has no control or view of who other nodes in the network are communicating with. With either off-chain or 
-    on-chain permissions, a bad actor could violate the network governance agreed on, and act as a proxy to other nodes.
-
+    In peer-to-peer networks, node-level permissions can be used to enforce rules on nodes you control. 
+    With node-level permissions only, it is still possible a bad actor could violate network governance 
+    and act as a proxy to other nodes.  
+    
 ![Node Permissioning](../images/node-permissioning-bad-actor.png)
 
 ![Account Permissioning](../images/account-permissioning.png)
