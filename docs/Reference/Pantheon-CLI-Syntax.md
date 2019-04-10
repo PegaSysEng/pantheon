@@ -580,7 +580,7 @@ Set to enable file-based account level permissions. Default is `false`.
 permissions-accounts-config-file="/home/me/me_configFiles/myPermissionsFile"
 ```
 
-Path to the [accounts permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file).
+Path to the [accounts permissions configuration file](../Permissions/Local-Permissioning.md#permissions-configuration-file).
 Default is the `permissions_config.toml` file in the [data directory](#data-path).
 
 !!! tip
@@ -620,7 +620,7 @@ Set to enable file-based node level permissions. Default is `false`.
 permissions-nodes-config-file="/home/me/me_configFiles/myPermissionsFile"
 ```
 
-Path to the [nodes permissions configuration file](../Permissions/Permissioning.md#permissions-configuration-file).
+Path to the [nodes permissions configuration file](../Permissions/Local-Permissioning.md#permissions-configuration-file).
 Default is the `permissions_config.toml` file in the [data directory](#data-path).
 
 !!! tip
@@ -1067,7 +1067,7 @@ Pantheon subcommands are:
 
 This command provides blocks related actions.
 
-#### import
+### import
 
 ```bash tab="Syntax"
 $ pantheon blocks import --from=<block-file>
@@ -1083,7 +1083,7 @@ Imports blocks from the specified file into the blockchain database
 
 This command provides node public key related actions.
 
-#### export
+### export
 
 ```bash tab="Syntax"
 $ pantheon public-key export [--to=<key-file>]
@@ -1100,7 +1100,7 @@ $ pantheon --data-path=<node data path> public-key export --to=/home/me/me_proje
 Outputs the node public key to standard output or writes it to the specified file if 
 `--to=<key-file>` is specified. 
 
-#### export-address
+### export-address
 
 ```bash tab="Syntax"
 $ pantheon public-key export-address [--to=<address-file>]
@@ -1121,7 +1121,7 @@ Outputs the node public key address to standard output or writes it to the speci
 
 This command provides password related actions.
 
-#### hash
+### hash
 
 This command generates the hash of a given password. Include the hash in the [credentials file](../JSON-RPC-API/Authentication.md#credentials-file)
  for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
@@ -1138,7 +1138,7 @@ $ pantheon password hash --password=myPassword123
 
 This command provides RLP related actions.
 
-#### encode
+### encode
 
 This command encodes a typed JSON value from a file or from the standard input into an RLP hexadecimal string.
 
