@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
@@ -45,6 +46,7 @@ import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -106,10 +108,11 @@ public final class RunnerTest {
             GenesisConfigFile.mainnet(),
             MainnetProtocolSchedule.create(),
             syncConfigAhead,
+            EthereumWireProtocolConfiguration.defaultConfig(),
             new MiningParametersTestBuilder().enabled(false).build(),
             networkId,
             aheadDbNodeKeys,
-            PrivacyParameters.noPrivacy(),
+            PrivacyParameters.DEFAULT,
             dataDirAhead,
             noOpMetricsSystem,
             TestClock.fixed(),
@@ -124,10 +127,11 @@ public final class RunnerTest {
             GenesisConfigFile.mainnet(),
             MainnetProtocolSchedule.create(),
             syncConfigAhead,
+            EthereumWireProtocolConfiguration.defaultConfig(),
             new MiningParametersTestBuilder().enabled(false).build(),
             networkId,
             aheadDbNodeKeys,
-            PrivacyParameters.noPrivacy(),
+            PrivacyParameters.DEFAULT,
             dataDirAhead,
             noOpMetricsSystem,
             TestClock.fixed(),
@@ -180,10 +184,11 @@ public final class RunnerTest {
               GenesisConfigFile.mainnet(),
               MainnetProtocolSchedule.create(),
               syncConfigBehind,
+              EthereumWireProtocolConfiguration.defaultConfig(),
               new MiningParametersTestBuilder().enabled(false).build(),
               networkId,
               KeyPair.generate(),
-              PrivacyParameters.noPrivacy(),
+              PrivacyParameters.DEFAULT,
               dataDirBehind,
               noOpMetricsSystem,
               TestClock.fixed(),
@@ -307,7 +312,8 @@ public final class RunnerTest {
   }
 
   private StorageProvider createKeyValueStorageProvider(final Path dbAhead) throws IOException {
-    return RocksDbStorageProvider.create(dbAhead, new NoOpMetricsSystem());
+    return RocksDbStorageProvider.create(
+        new RocksDbConfiguration.Builder().databaseDir(dbAhead).build(), new NoOpMetricsSystem());
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {

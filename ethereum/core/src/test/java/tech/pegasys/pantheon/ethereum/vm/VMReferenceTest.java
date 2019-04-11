@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.testutil.JsonTestParameters;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.OptionalInt;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -116,8 +117,8 @@ public class VMReferenceTest extends AbstractRetryingTest {
     final EnvironmentInformation execEnv = spec.getExec();
 
     final ProtocolSpec<Void> protocolSpec =
-        MainnetProtocolSpecs.frontierDefinition()
-            .privacyParameters(PrivacyParameters.noPrivacy())
+        MainnetProtocolSpecs.frontierDefinition(OptionalInt.empty())
+            .privacyParameters(PrivacyParameters.DEFAULT)
             .build(new MutableProtocolSchedule<>(CHAIN_ID));
 
     final TestBlockchain blockchain = new TestBlockchain(execEnv.getBlockHeader().getNumber());

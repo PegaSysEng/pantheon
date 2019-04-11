@@ -85,7 +85,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     if (node.getPrivacyParameters().isEnabled()) {
       params.add("--privacy-enabled");
       params.add("--privacy-url");
-      params.add(node.getPrivacyParameters().getUrl());
+      params.add(node.getPrivacyParameters().getEnclaveUri().toString());
       params.add("--privacy-public-key-file");
       params.add(node.getPrivacyParameters().getEnclavePublicKeyFile().getAbsolutePath());
       params.add("--privacy-precompiled-address");
@@ -162,6 +162,19 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
               if (permissioningConfiguration.getAccountPermissioningConfigFilePath() != null) {
                 params.add("--permissions-accounts-config-file");
                 params.add(permissioningConfiguration.getAccountPermissioningConfigFilePath());
+              }
+            });
+
+    node.getPermissioningConfiguration()
+        .flatMap(PermissioningConfiguration::getSmartContractConfig)
+        .ifPresent(
+            permissioningConfiguration -> {
+              if (permissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
+                params.add("--permissions-nodes-contract-enabled");
+              }
+              if (permissioningConfiguration.getSmartContractAddress() != null) {
+                params.add("--permissions-nodes-contract-address");
+                params.add(permissioningConfiguration.getSmartContractAddress().toString());
               }
             });
 

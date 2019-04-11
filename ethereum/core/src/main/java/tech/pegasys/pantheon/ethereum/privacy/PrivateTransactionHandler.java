@@ -42,7 +42,7 @@ public class PrivateTransactionHandler {
 
   public PrivateTransactionHandler(final PrivacyParameters privacyParameters) {
     this(
-        new Enclave(privacyParameters.getUrl()),
+        new Enclave(privacyParameters.getEnclaveUri()),
         Address.privacyPrecompiled(privacyParameters.getPrivacyAddress()),
         privacyParameters.getSigningKeyPair());
   }
@@ -78,7 +78,9 @@ public class PrivateTransactionHandler {
             .collect(Collectors.toList());
 
     // FIXME: Orion should concatenate to and from - not it pantheon
-    privateFor.add(BytesValues.asString(privateTransaction.getPrivateFrom()));
+    if (privateFor.isEmpty()) {
+      privateFor.add(BytesValues.asString(privateTransaction.getPrivateFrom()));
+    }
 
     final BytesValueRLPOutput bvrlp = new BytesValueRLPOutput();
     privateTransaction.writeTo(bvrlp);

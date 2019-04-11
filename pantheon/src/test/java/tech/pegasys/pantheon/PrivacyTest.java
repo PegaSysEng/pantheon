@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.PrecompiledContract;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -43,16 +44,19 @@ public class PrivacyTest {
   @Test
   public void privacyPrecompiled() throws IOException {
     final Path dataDir = folder.newFolder().toPath();
-    PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
-    privacyParameters.setPrivacyAddress(ADDRESS);
-    privacyParameters.setEnabled(true);
-    privacyParameters.enablePrivateDB(dataDir);
+    PrivacyParameters privacyParameters =
+        new PrivacyParameters.Builder()
+            .setPrivacyAddress(ADDRESS)
+            .setEnabled(true)
+            .setDataDir(dataDir)
+            .build();
 
     MainnetPantheonController mainnetPantheonController =
         (MainnetPantheonController)
             PantheonController.fromConfig(
                 GenesisConfigFile.mainnet(),
                 SynchronizerConfiguration.builder().build(),
+                EthereumWireProtocolConfiguration.defaultConfig(),
                 new InMemoryStorageProvider(),
                 1,
                 new MiningParametersTestBuilder().enabled(false).build(),

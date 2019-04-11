@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.enclave;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
@@ -24,6 +25,7 @@ import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -75,11 +77,12 @@ public class EnclaveTest {
     ReceiveResponse rr = enclave.receive(rc);
 
     assertEquals(PAYLOAD, new String(rr.getPayload(), UTF_8));
+    assertNotNull(rr.getPrivacyGroupId());
   }
 
   @Test(expected = IOException.class)
   public void whenUpCheckFailsThrows() throws IOException {
-    Enclave broken = new Enclave("http:");
+    Enclave broken = new Enclave(URI.create("http://null"));
 
     broken.upCheck();
   }

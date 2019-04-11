@@ -15,14 +15,21 @@ package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
 import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
 
+import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
+import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.NodeDataRequest;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.StalledDownloadException;
 import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
+import tech.pegasys.pantheon.services.tasks.TaskCollection;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,18 +38,31 @@ public class FastSyncDownloader<C> {
   private final FastSyncActions<C> fastSyncActions;
   private final WorldStateDownloader worldStateDownloader;
   private final FastSyncStateStorage fastSyncStateStorage;
+  private final TaskCollection<NodeDataRequest> taskCollection;
+  private final Path fastSyncDataDirectory;
+  private final FastSyncState initialFastSyncState;
   private volatile Optional<TrailingPeerRequirements> trailingPeerRequirements = Optional.empty();
 
   public FastSyncDownloader(
       final FastSyncActions<C> fastSyncActions,
       final WorldStateDownloader worldStateDownloader,
-      final FastSyncStateStorage fastSyncStateStorage) {
+      final FastSyncStateStorage fastSyncStateStorage,
+      final TaskCollection<NodeDataRequest> taskCollection,
+      final Path fastSyncDataDirectory,
+      final FastSyncState initialFastSyncState) {
     this.fastSyncActions = fastSyncActions;
     this.worldStateDownloader = worldStateDownloader;
     this.fastSyncStateStorage = fastSyncStateStorage;
+    this.taskCollection = taskCollection;
+    this.fastSyncDataDirectory = fastSyncDataDirectory;
+    this.initialFastSyncState = initialFastSyncState;
   }
 
-  public CompletableFuture<FastSyncState> start(final FastSyncState fastSyncState) {
+  public CompletableFuture<FastSyncState> start() {
+    return start(initialFastSyncState);
+  }
+
+  private CompletableFuture<FastSyncState> start(final FastSyncState fastSyncState) {
     return exceptionallyCompose(
         fastSyncActions
             .waitForSuitablePeers(fastSyncState)
@@ -65,6 +85,20 @@ public class FastSyncDownloader<C> {
     }
   }
 
+  public void deleteFastSyncState() {
+    // Make sure downloader is stopped before we start cleaning up its dependencies
+    worldStateDownloader.cancel();
+    try {
+      taskCollection.close();
+      if (fastSyncDataDirectory.toFile().exists()) {
+        // Clean up this data for now (until fast sync resume functionality is in place)
+        MoreFiles.deleteRecursively(fastSyncDataDirectory, RecursiveDeleteOption.ALLOW_INSECURE);
+      }
+    } catch (final IOException e) {
+      LOG.error("Unable to clean up fast sync state", e);
+    }
+  }
+
   private FastSyncState updateMaxTrailingPeers(final FastSyncState state) {
     if (state.getPivotBlockNumber().isPresent()) {
       trailingPeerRequirements =
@@ -84,8 +118,8 @@ public class FastSyncDownloader<C> {
       final FastSyncState currentState) {
     final CompletableFuture<Void> worldStateFuture =
         worldStateDownloader.run(currentState.getPivotBlockHeader().get());
-    final CompletableFuture<FastSyncState> chainFuture =
-        fastSyncActions.downloadChain(currentState);
+    final ChainDownloader chainDownloader = fastSyncActions.createChainDownloader(currentState);
+    final CompletableFuture<Void> chainFuture = chainDownloader.start();
 
     // If either download fails, cancel the other one.
     chainFuture.exceptionally(
@@ -95,7 +129,7 @@ public class FastSyncDownloader<C> {
         });
     worldStateFuture.exceptionally(
         error -> {
-          chainFuture.cancel(true);
+          chainDownloader.cancel();
           return null;
         });
 
@@ -107,7 +141,7 @@ public class FastSyncDownloader<C> {
             });
   }
 
-  public Optional<TrailingPeerRequirements> getTrailingPeerRequirements() {
+  public Optional<TrailingPeerRequirements> calculateTrailingPeerRequirements() {
     return trailingPeerRequirements;
   }
 }

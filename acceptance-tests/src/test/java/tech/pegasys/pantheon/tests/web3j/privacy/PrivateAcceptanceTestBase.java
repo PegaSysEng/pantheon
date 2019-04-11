@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.web3j.privacy;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -29,9 +27,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransac
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
-import java.math.BigInteger;
+import java.util.List;
 
-import com.google.common.collect.Lists;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
@@ -39,7 +36,7 @@ public class PrivateAcceptanceTestBase extends AcceptanceTestBase {
   @ClassRule public static final TemporaryFolder privacy = new TemporaryFolder();
 
   protected final Eea eea;
-  protected final PrivateTransactionFactory privateTx;
+  protected static PrivateTransactionFactory privateTx;
   protected final PrivateTransactionVerifier privateTransactionVerifier;
 
   PrivateAcceptanceTestBase() {
@@ -49,63 +46,85 @@ public class PrivateAcceptanceTestBase extends AcceptanceTestBase {
     privateTransactionVerifier = new PrivateTransactionVerifier(eea, transactions);
   }
 
+  public static PrivateAcceptanceTestBase.Builder builder() {
+    return new PrivateAcceptanceTestBase.Builder();
+  }
+
   static OrionTestHarness createEnclave(
       final String pubKey, final String privKey, final String... othernode) throws Exception {
     return OrionTestHarnessFactory.create(privacy.newFolder().toPath(), pubKey, privKey, othernode);
   }
 
-  String getDeployEventEmitter() {
-    Address from = Address.fromHexString("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
-    BytesValue privateFrom =
-        BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8));
-    SECP256K1.KeyPair keypair =
-        SECP256K1.KeyPair.create(
-            SECP256K1.PrivateKey.create(
-                new BigInteger(
-                    "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63", 16)));
-    PrivateTransaction pTx =
-        privateTx.createContractTransaction(0, from, privateFrom, Lists.newArrayList(), keypair);
-    return RLP.encode(pTx::writeTo).toString();
+  enum TransactionType {
+    CREATE_CONTRACT,
+    STORE,
+    GET
   }
 
-  String getExecuteStoreFunc() {
-    Address to = Address.fromHexString("0x0bac79b78b9866ef11c989ad21a7fcf15f7a18d7");
-    Address from = Address.fromHexString("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
-    BytesValue privateFrom =
-        BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8));
-    SECP256K1.KeyPair keypair =
-        SECP256K1.KeyPair.create(
-            SECP256K1.PrivateKey.create(
-                new BigInteger(
-                    "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63", 16)));
-    PrivateTransaction pTx =
-        privateTx.storeFunctionTransaction(1, to, from, privateFrom, Lists.newArrayList(), keypair);
-    return RLP.encode(pTx::writeTo).toString();
-  }
+  public static class Builder {
+    long nonce;
+    Address from;
+    Address to;
+    BytesValue privateFrom;
+    List<BytesValue> privateFor;
+    SECP256K1.KeyPair keyPair;
 
-  String getExecuteGetFunc() {
-    Address to = Address.fromHexString("0x0bac79b78b9866ef11c989ad21a7fcf15f7a18d7");
-    Address from = Address.fromHexString("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
-    BytesValue privateFrom =
-        BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8));
-    SECP256K1.KeyPair keypair =
-        SECP256K1.KeyPair.create(
-            SECP256K1.PrivateKey.create(
-                new BigInteger(
-                    "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63", 16)));
-    PrivateTransaction pTx =
-        privateTx.getFunctionTransaction(2, to, from, privateFrom, Lists.newArrayList(), keypair);
-    return RLP.encode(pTx::writeTo).toString();
+    public Builder nonce(final long nonce) {
+      this.nonce = nonce;
+      return this;
+    }
+
+    public Builder from(final Address from) {
+      this.from = from;
+      return this;
+    }
+
+    public Builder to(final Address to) {
+      this.to = to;
+      return this;
+    }
+
+    public Builder privateFrom(final BytesValue privateFrom) {
+      this.privateFrom = privateFrom;
+      return this;
+    }
+
+    public Builder privateFor(final List<BytesValue> privateFor) {
+      this.privateFor = privateFor;
+      return this;
+    }
+
+    public Builder keyPair(final SECP256K1.KeyPair keyPair) {
+      this.keyPair = keyPair;
+      return this;
+    }
+
+    public String build(final TransactionType type) {
+      PrivateTransaction pTx;
+      switch (type) {
+        case CREATE_CONTRACT:
+          pTx = privateTx.createContractTransaction(nonce, from, privateFrom, privateFor, keyPair);
+          break;
+        case STORE:
+          pTx =
+              privateTx.storeFunctionTransaction(nonce, to, from, privateFrom, privateFor, keyPair);
+          break;
+        case GET:
+          pTx = privateTx.getFunctionTransaction(nonce, to, from, privateFrom, privateFor, keyPair);
+          break;
+        default:
+          throw new IllegalStateException("Unexpected value: " + type);
+      }
+      return RLP.encode(pTx::writeTo).toString();
+    }
   }
 
   static PrivacyParameters getPrivacyParams(final OrionTestHarness testHarness) throws IOException {
-    final PrivacyParameters privacyParameters = new PrivacyParameters();
-    privacyParameters.setEnabled(true);
-    privacyParameters.setUrl(testHarness.clientUrl());
-    privacyParameters.setPrivacyAddress(Address.PRIVACY);
-    privacyParameters.setEnclavePublicKeyUsingFile(
-        testHarness.getConfig().publicKeys().get(0).toFile());
-    privacyParameters.enablePrivateDB(privacy.newFolder().toPath());
-    return privacyParameters;
+    return new PrivacyParameters.Builder()
+        .setEnabled(true)
+        .setEnclaveUrl(testHarness.clientUrl())
+        .setEnclavePublicKeyUsingFile(testHarness.getConfig().publicKeys().get(0).toFile())
+        .setDataDir(privacy.newFolder().toPath())
+        .build();
   }
 }

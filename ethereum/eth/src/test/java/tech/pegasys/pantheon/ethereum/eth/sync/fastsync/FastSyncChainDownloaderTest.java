@@ -28,13 +28,16 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.BlockchainSetupUtil;
+import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
+import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockHeadersMessage;
+import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.LockSupport;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -72,9 +75,9 @@ public class FastSyncChainDownloaderTest {
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
   }
 
-  private FastSyncChainDownloader<?> downloader(
+  private ChainDownloader downloader(
       final SynchronizerConfiguration syncConfig, final long pivotBlockNumber) {
-    return new FastSyncChainDownloader<>(
+    return FastSyncChainDownloader.create(
         syncConfig,
         protocolSchedule,
         protocolContext,
@@ -85,8 +88,7 @@ public class FastSyncChainDownloaderTest {
   }
 
   @Test
-  public void shouldSyncToPivotBlockInMultipleSegments()
-      throws ExecutionException, InterruptedException {
+  public void shouldSyncToPivotBlockInMultipleSegments() {
     otherBlockchainSetup.importFirstBlocks(30);
 
     final RespondingEthPeer peer =
@@ -99,7 +101,7 @@ public class FastSyncChainDownloaderTest {
             .downloaderHeadersRequestSize(3)
             .build();
     final long pivotBlockNumber = 25;
-    final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
+    final ChainDownloader downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
 
     peer.respondWhileOtherThreadsWork(responder, () -> !result.isDone());
@@ -120,7 +122,7 @@ public class FastSyncChainDownloaderTest {
 
     final long pivotBlockNumber = 5;
     final SynchronizerConfiguration syncConfig = SynchronizerConfiguration.builder().build();
-    final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
+    final ChainDownloader downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
 
     peer.respondWhileOtherThreadsWork(responder, () -> !result.isDone());
@@ -141,23 +143,38 @@ public class FastSyncChainDownloaderTest {
 
     final RespondingEthPeer bestPeer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final Responder bestResponder = RespondingEthPeer.blockchainResponder(otherBlockchain);
     final RespondingEthPeer secondBestPeer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, shorterChain);
     final Responder shorterResponder = RespondingEthPeer.blockchainResponder(shorterChain);
+    // Doesn't respond to requests for checkpoints unless it's starting from geneis
+    // So the import can only make it as far as block 15 (3 checkpoints 5 blocks apart)
+    final Responder shorterLimitedRangeResponder =
+        RespondingEthPeer.targetedResponder(
+            (cap, msg) -> {
+              if (msg.getCode() == EthPV62.GET_BLOCK_HEADERS) {
+                final GetBlockHeadersMessage request = GetBlockHeadersMessage.readFrom(msg);
+                return request.skip() == 0
+                    || (request.hash().equals(localBlockchain.getBlockHashByNumber(0)));
+              } else {
+                return true;
+              }
+            },
+            (cap, msg) -> shorterResponder.respond(cap, msg).get());
 
     final SynchronizerConfiguration syncConfig =
         SynchronizerConfiguration.builder()
             .downloaderChainSegmentSize(5)
             .downloaderHeadersRequestSize(3)
+            .downloaderParallelisim(1)
             .build();
     final long pivotBlockNumber = 25;
-    final FastSyncChainDownloader<?> downloader = downloader(syncConfig, pivotBlockNumber);
+    final ChainDownloader downloader = downloader(syncConfig, pivotBlockNumber);
     final CompletableFuture<Void> result = downloader.start();
 
     while (localBlockchain.getChainHeadBlockNumber() < 15) {
-      bestPeer.respond(bestResponder);
-      secondBestPeer.respond(shorterResponder);
+      bestPeer.respond(shorterLimitedRangeResponder);
+      secondBestPeer.respond(shorterLimitedRangeResponder);
+      LockSupport.parkNanos(200);
     }
 
     assertThat(localBlockchain.getChainHeadBlockNumber()).isEqualTo(15);

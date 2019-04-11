@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.WaitForPeersTask;
+import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -70,8 +71,22 @@ public class FastSyncActions<C> {
             ethContext, syncConfig.getFastSyncMinimumPeerCount(), metricsSystem);
 
     final EthScheduler scheduler = ethContext.getScheduler();
+    final CompletableFuture<Void> fastSyncTask;
+    if (!syncConfig.getFastSyncMaximumPeerWaitTime().isZero()) {
+      LOG.debug(
+          "Waiting for at least {} peers, maximum wait time set to {}.",
+          syncConfig.getFastSyncMinimumPeerCount(),
+          syncConfig.getFastSyncMaximumPeerWaitTime().toString());
+      fastSyncTask =
+          scheduler.timeout(waitForPeersTask, syncConfig.getFastSyncMaximumPeerWaitTime());
+    } else {
+      LOG.debug(
+          "Waiting for at least {} peers, no maximum wait time set.",
+          syncConfig.getFastSyncMinimumPeerCount());
+      fastSyncTask = scheduler.scheduleServiceTask(waitForPeersTask);
+    }
     return exceptionallyCompose(
-            scheduler.timeout(waitForPeersTask, syncConfig.getFastSyncMaximumPeerWaitTime()),
+            fastSyncTask,
             error -> {
               if (ExceptionUtils.rootCause(error) instanceof TimeoutException) {
                 if (ethContext.getEthPeers().availablePeerCount() > 0) {
@@ -114,7 +129,7 @@ public class FastSyncActions<C> {
   private CompletableFuture<FastSyncState> selectPivotBlockFromPeers() {
     return ethContext
         .getEthPeers()
-        .highestTotalDifficultyPeer()
+        .bestPeer()
         .filter(peer -> peer.chainState().hasEstimatedHeight())
         .map(
             peer -> {
@@ -152,16 +167,14 @@ public class FastSyncActions<C> {
         .downloadPivotBlockHeader();
   }
 
-  public CompletableFuture<FastSyncState> downloadChain(final FastSyncState currentState) {
-    final FastSyncChainDownloader<C> downloader =
-        new FastSyncChainDownloader<>(
-            syncConfig,
-            protocolSchedule,
-            protocolContext,
-            ethContext,
-            syncState,
-            metricsSystem,
-            currentState.getPivotBlockHeader().get());
-    return downloader.start().thenApply(ignore -> currentState);
+  public ChainDownloader createChainDownloader(final FastSyncState currentState) {
+    return FastSyncChainDownloader.create(
+        syncConfig,
+        protocolSchedule,
+        protocolContext,
+        ethContext,
+        syncState,
+        metricsSystem,
+        currentState.getPivotBlockHeader().get());
   }
 }

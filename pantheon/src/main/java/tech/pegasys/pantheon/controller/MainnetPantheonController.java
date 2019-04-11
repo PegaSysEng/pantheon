@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.peervalidation.DaoForkPeerValidator;
@@ -98,6 +99,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final GenesisConfigFile genesisConfig,
       final ProtocolSchedule<Void> protocolSchedule,
       final SynchronizerConfiguration syncConfig,
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
       final MiningParameters miningParams,
       final int networkId,
       final KeyPair nodeKeys,
@@ -123,7 +125,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
             syncConfig.downloaderParallelism(),
             syncConfig.transactionsParallelism(),
             syncConfig.computationParallelism(),
-            metricsSystem);
+            metricsSystem,
+            ethereumWireProtocolConfiguration);
     final SyncState syncState =
         new SyncState(blockchain, ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =
@@ -135,6 +138,7 @@ public class MainnetPantheonController implements PantheonController<Void> {
             ethProtocolManager.ethContext(),
             syncState,
             dataDirectory,
+            clock,
             metricsSystem);
 
     final OptionalLong daoBlock = genesisConfig.getConfigOptions().getDaoForkBlock();
@@ -153,7 +157,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
             protocolContext,
             ethProtocolManager.ethContext(),
             clock,
-            maxPendingTransactions);
+            maxPendingTransactions,
+            metricsSystem);
 
     final ExecutorService minerThreadPool = Executors.newCachedThreadPool();
     final EthHashMinerExecutor executor =

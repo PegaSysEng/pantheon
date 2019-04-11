@@ -64,7 +64,11 @@ public class EnodeURL {
       final InetAddress address,
       final Integer listeningPort,
       final OptionalInt discoveryPort) {
-    this.nodeId = nodeId;
+    if (nodeId.startsWith("0x")) {
+      this.nodeId = nodeId.substring(2);
+    } else {
+      this.nodeId = nodeId;
+    }
     this.ip = address;
     this.listeningPort = listeningPort;
     this.discoveryPort = discoveryPort;
@@ -158,6 +162,12 @@ public class EnodeURL {
 
   public OptionalInt getDiscoveryPort() {
     return discoveryPort;
+  }
+
+  public boolean sameEndpoint(final EnodeURL enode) {
+    return Objects.equal(nodeId, enode.nodeId)
+        && Objects.equal(ip, enode.ip)
+        && Objects.equal(listeningPort, enode.listeningPort);
   }
 
   @Override

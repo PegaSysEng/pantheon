@@ -14,8 +14,11 @@ package tech.pegasys.pantheon.cli;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
+import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
+import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
@@ -42,8 +45,10 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
@@ -58,21 +63,25 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
+import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
+import tech.pegasys.pantheon.util.number.PositiveNumber;
+import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -83,6 +92,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -96,7 +106,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExecutionException;
-import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
@@ -115,11 +124,7 @@ import picocli.CommandLine.ParameterException;
     footer = "Pantheon is licensed under the Apache License 2.0")
 public class PantheonCommand implements DefaultCommandValues, Runnable {
 
-  private final Logger logger;
-
-  private CommandLine commandLine;
-
-  public static class RpcApisConverter implements ITypeConverter<RpcApi> {
+  static class RpcApisConverter implements CommandLine.ITypeConverter<RpcApi> {
 
     @Override
     public RpcApi convert(final String name) throws RpcApisConversionException {
@@ -135,17 +140,23 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  public static class RpcApisConversionException extends Exception {
+  static class RpcApisConversionException extends Exception {
 
-    RpcApisConversionException(final String s) {
+    public RpcApisConversionException(final String s) {
       super(s);
     }
   }
+
+  private final Logger logger;
+
+  private CommandLine commandLine;
 
   private final BlockImporter blockImporter;
 
   private final PantheonControllerBuilder controllerBuilder;
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
+  private final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder;
+  private final RocksDbConfiguration.Builder rocksDbConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
 
   protected KeyLoader getKeyLoader() {
@@ -226,6 +237,22 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Synchronization mode, possible values are ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
+
+  @Option(
+      hidden = true,
+      names = {"--fast-sync-min-peers"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Minimum number of peers required before starting fast sync. (default: ${DEFAULT-VALUE})")
+  private final Integer fastSyncMinPeerCount = FAST_SYNC_MIN_PEER_COUNT;
+
+  @Option(
+      hidden = true,
+      names = {"--fast-sync-max-wait-time"},
+      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
+      description =
+          "Maximum time to wait for the required number of peers before starting fast sync, expressed in seconds, 0 means no timeout (default: ${DEFAULT-VALUE})")
+  private final Integer fastSyncMaxWaitTime = FAST_SYNC_MAX_WAIT_TIME;
 
   @Option(
       names = {"--network"},
@@ -530,12 +557,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
       final PantheonControllerBuilder controllerBuilder,
-      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder) {
+      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder,
+      final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder,
+      final RocksDbConfiguration.Builder rocksDbConfigurationBuilder) {
     this.logger = logger;
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilder = controllerBuilder;
     this.synchronizerConfigurationBuilder = synchronizerConfigurationBuilder;
+    this.ethereumWireConfigurationBuilder = ethereumWireConfigurationBuilder;
+    this.rocksDbConfigurationBuilder = rocksDbConfigurationBuilder;
   }
 
   private StandaloneCommand standaloneCommands;
@@ -570,7 +601,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
+    commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
+    commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+
+    // Add performance options
+    UnstableOptionsSubCommand.createUnstableOptions(
+        commandLine,
+        ImmutableMap.of(
+            "Synchronizer",
+            synchronizerConfigurationBuilder,
+            "RocksDB",
+            rocksDbConfigurationBuilder,
+            "Ethereum Wire Protocol",
+            ethereumWireConfigurationBuilder));
 
     // Create a handler that will search for a config file option and use it for default values
     // and eventually it will run regular parsing of the remaining options.
@@ -589,12 +633,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
 
     // Check that P2P options are able to work or send an error
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--p2p-enabled",
         !p2pEnabled,
-        Arrays.asList(
+        asList(
             "--bootnodes",
             "--discovery-enabled",
             "--max-peers",
@@ -602,12 +646,24 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--banned-node-ids"));
 
     // Check that mining options are able to work or send an error
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--miner-enabled",
         !isMiningEnabled,
-        Arrays.asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
+        asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
+
+    // Check that fast sync options are able to work or send an error
+    if (fastSyncMaxWaitTime < 0) {
+      throw new ParameterException(
+          commandLine, "--fast-sync-max-wait-time must be greater than or equal to 0");
+    }
+    checkOptionDependencies(
+        logger,
+        commandLine,
+        "--sync-mode",
+        !SyncMode.FAST.equals(syncMode),
+        asList("--fast-sync-min-peers", "--fast-sync-max-wait-time"));
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -677,6 +733,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     try {
       return controllerBuilder
           .synchronizerConfiguration(buildSyncConfig())
+          .ethereumWireProtocolConfiguration(ethereumWireConfigurationBuilder.build())
+          .rocksDbConfiguration(buildRocksDbConfiguration())
           .homePath(dataDir())
           .ethNetworkConfig(updateNetworkConfig(getNetwork()))
           .miningParameters(
@@ -696,12 +754,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private JsonRpcConfiguration jsonRpcConfiguration() {
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--rpc-http-enabled",
         !isRpcHttpEnabled,
-        Arrays.asList(
+        asList(
             "--rpc-http-api",
             "--rpc-http-apis",
             "--rpc-http-cors-origins",
@@ -730,12 +788,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private WebSocketConfiguration webSocketConfiguration() {
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--rpc-ws-enabled",
         !isRpcWsEnabled,
-        Arrays.asList(
+        asList(
             "--rpc-ws-api",
             "--rpc-ws-apis",
             "--rpc-ws-host",
@@ -768,19 +826,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               + "time.  Please refer to CLI reference for more details about this constraint.");
     }
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--metrics-enabled",
         !isMetricsEnabled,
-        Arrays.asList("--metrics-host", "--metrics-port"));
+        asList("--metrics-host", "--metrics-port"));
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--metrics-push-enabled",
         !isMetricsPushEnabled,
-        Arrays.asList(
+        asList(
             "--metrics-push-host",
             "--metrics-push-port",
             "--metrics-push-interval",
@@ -801,8 +859,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
-    Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
-    Optional<SmartContractPermissioningConfiguration>
+    final Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
+    final Optional<SmartContractPermissioningConfiguration>
         smartContractPermissioningConfigurationOptional;
 
     if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
@@ -881,33 +939,41 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private PrivacyParameters privacyParameters() throws IOException {
 
-    CommandLineUtils.checkOptionDependencies(
+    checkOptionDependencies(
         logger,
         commandLine,
         "--privacy-enabled",
         !isPrivacyEnabled,
-        Arrays.asList(
-            "--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
+        asList("--privacy-url", "--privacy-public-key-file", "--privacy-precompiled-address"));
 
-    final PrivacyParameters privacyParameters = PrivacyParameters.noPrivacy();
+    final PrivacyParameters.Builder privacyParametersBuilder = new PrivacyParameters.Builder();
     if (isPrivacyEnabled) {
-      privacyParameters.setEnabled(true);
-      privacyParameters.setUrl(privacyUrl.toString());
+      privacyParametersBuilder.setEnabled(true);
+      privacyParametersBuilder.setEnclaveUrl(privacyUrl);
       if (privacyPublicKeyFile() != null) {
-        privacyParameters.setEnclavePublicKeyUsingFile(privacyPublicKeyFile());
+        privacyParametersBuilder.setEnclavePublicKeyUsingFile(privacyPublicKeyFile());
       } else {
         throw new ParameterException(
             commandLine, "Please specify Enclave public key file path to enable privacy");
       }
-      privacyParameters.setPrivacyAddress(privacyPrecompiledAddress);
-      privacyParameters.enablePrivateDB(dataDir());
+      privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
+      privacyParametersBuilder.setMetricsSystem(metricsSystem.get());
+      privacyParametersBuilder.setDataDir(dataDir());
     }
-    return privacyParameters;
+    return privacyParametersBuilder.build();
   }
 
   private SynchronizerConfiguration buildSyncConfig() {
-    synchronizerConfigurationBuilder.syncMode(syncMode);
-    return synchronizerConfigurationBuilder.build();
+    return synchronizerConfigurationBuilder
+        .syncMode(syncMode)
+        .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
+        .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(fastSyncMaxWaitTime))
+        .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
+        .build();
+  }
+
+  private RocksDbConfiguration buildRocksDbConfiguration() {
+    return rocksDbConfigurationBuilder.databaseDir(dataDir().resolve(DATABASE_PATH)).build();
   }
 
   // Blockchain synchronisation from peers.

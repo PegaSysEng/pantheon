@@ -32,11 +32,15 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
+import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.RocksDbTaskQueue;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -85,7 +89,10 @@ public class WorldStateDownloaderBenchmark {
     peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, blockHeader.getNumber());
 
     final EthContext ethContext = ethProtocolManager.ethContext();
-    storageProvider = RocksDbStorageProvider.create(tempDir.resolve("database"), metricsSystem);
+    storageProvider =
+        RocksDbStorageProvider.create(
+            new RocksDbConfiguration.Builder().databaseDir(tempDir.resolve("database")).build(),
+            metricsSystem);
     worldStateStorage = storageProvider.createWorldStateStorage();
 
     pendingRequests =
@@ -104,6 +111,8 @@ public class WorldStateDownloaderBenchmark {
             syncConfig.getWorldStateHashCountPerRequest(),
             syncConfig.getWorldStateRequestParallelism(),
             syncConfig.getWorldStateMaxRequestsWithoutProgress(),
+            syncConfig.getWorldStateMinMillisBeforeStalling(),
+            Clock.fixed(Instant.ofEpochSecond(1000), ZoneOffset.UTC),
             metricsSystem);
   }
 

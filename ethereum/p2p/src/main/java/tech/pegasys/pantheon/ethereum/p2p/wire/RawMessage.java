@@ -27,4 +27,9 @@ public final class RawMessage extends AbstractMessageData {
   public int getCode() {
     return code;
   }
+
+  @Override
+  public String toString() {
+    return "RawMessage{" + "code=" + code + ", data=" + data + '}';
+  }
 }

@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
@@ -44,7 +45,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
-  static final int DEFAULT_REQUEST_LIMIT = 200;
   private static final Logger LOG = LogManager.getLogger();
   private static final List<Capability> FAST_SYNC_CAPS =
       Collections.singletonList(EthProtocol.ETH63);
@@ -65,13 +65,13 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
   private final Blockchain blockchain;
   private final BlockBroadcaster blockBroadcaster;
 
-  EthProtocolManager(
+  public EthProtocolManager(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
-      final int requestLimit,
-      final EthScheduler scheduler) {
+      final EthScheduler scheduler,
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
     this.networkId = networkId;
     this.scheduler = scheduler;
     this.blockchain = blockchain;
@@ -87,26 +87,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     this.blockBroadcaster = new BlockBroadcaster(ethContext);
 
     // Set up request handlers
-    new EthServer(blockchain, worldStateArchive, ethMessages, requestLimit);
-  }
-
-  EthProtocolManager(
-      final Blockchain blockchain,
-      final WorldStateArchive worldStateArchive,
-      final int networkId,
-      final boolean fastSyncEnabled,
-      final int syncWorkers,
-      final int txWorkers,
-      final int computationWorkers,
-      final int requestLimit,
-      final MetricsSystem metricsSystem) {
-    this(
-        blockchain,
-        worldStateArchive,
-        networkId,
-        fastSyncEnabled,
-        requestLimit,
-        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem));
+    new EthServer(blockchain, worldStateArchive, ethMessages, ethereumWireProtocolConfiguration);
   }
 
   public EthProtocolManager(
@@ -123,11 +104,27 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         worldStateArchive,
         networkId,
         fastSyncEnabled,
-        syncWorkers,
-        txWorkers,
-        computationWorkers,
-        DEFAULT_REQUEST_LIMIT,
-        metricsSystem);
+        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
+        EthereumWireProtocolConfiguration.defaultConfig());
+  }
+
+  public EthProtocolManager(
+      final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
+      final int networkId,
+      final boolean fastSyncEnabled,
+      final int syncWorkers,
+      final int txWorkers,
+      final int computationWorkers,
+      final MetricsSystem metricsSystem,
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
+    this(
+        blockchain,
+        worldStateArchive,
+        networkId,
+        fastSyncEnabled,
+        new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
+        ethereumWireProtocolConfiguration);
   }
 
   public EthContext ethContext() {

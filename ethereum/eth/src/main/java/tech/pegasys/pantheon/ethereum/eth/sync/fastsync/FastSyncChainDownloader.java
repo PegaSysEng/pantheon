@@ -12,37 +12,24 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
-import static java.util.Collections.emptyList;
-
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
+import tech.pegasys.pantheon.ethereum.eth.sync.EthTaskChainDownloader;
+import tech.pegasys.pantheon.ethereum.eth.sync.PipelineChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.ParallelImportChainSegmentTask;
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+public class FastSyncChainDownloader {
 
-public class FastSyncChainDownloader<C> {
-  private final ChainDownloader<C> chainDownloader;
-  private final SynchronizerConfiguration config;
-  private final ProtocolSchedule<C> protocolSchedule;
-  private final ProtocolContext<C> protocolContext;
-  private final EthContext ethContext;
-  private final MetricsSystem metricsSystem;
-  private final LabelledMetric<Counter> fastSyncValidationCounter;
+  private static final boolean USE_PIPELINE_DOWNLOADER = true;
 
-  FastSyncChainDownloader(
+  private FastSyncChainDownloader() {}
+
+  public static <C> ChainDownloader create(
       final SynchronizerConfiguration config,
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
@@ -50,84 +37,41 @@ public class FastSyncChainDownloader<C> {
       final SyncState syncState,
       final MetricsSystem metricsSystem,
       final BlockHeader pivotBlockHeader) {
-    this.config = config;
-    this.protocolSchedule = protocolSchedule;
-    this.protocolContext = protocolContext;
-    this.ethContext = ethContext;
-    this.metricsSystem = metricsSystem;
 
-    chainDownloader =
-        new ChainDownloader<>(
-            config,
-            ethContext,
-            syncState,
-            new FastSyncTargetManager<>(
-                config,
-                protocolSchedule,
-                protocolContext,
-                ethContext,
-                syncState,
-                metricsSystem,
-                pivotBlockHeader),
-            new FastSyncCheckpointHeaderManager<>(
-                config,
-                protocolContext,
-                ethContext,
-                syncState,
-                protocolSchedule,
-                metricsSystem,
-                pivotBlockHeader),
-            this::importBlocksForCheckpoints,
-            metricsSystem);
-    this.fastSyncValidationCounter =
-        metricsSystem.createLabelledCounter(
-            MetricCategory.SYNCHRONIZER,
-            "fast_sync_validation_mode",
-            "Number of blocks validated using light vs full validation during fast sync",
-            "validationMode");
-  }
+    final FastSyncTargetManager<C> syncTargetManager =
+        new FastSyncTargetManager<>(
+            config, protocolSchedule, protocolContext, ethContext, metricsSystem, pivotBlockHeader);
 
-  public CompletableFuture<Void> start() {
-    return chainDownloader.start();
-  }
-
-  private CompletableFuture<List<Block>> importBlocksForCheckpoints(
-      final List<BlockHeader> checkpointHeaders) {
-    if (checkpointHeaders.size() < 2) {
-      return CompletableFuture.completedFuture(emptyList());
+    if (USE_PIPELINE_DOWNLOADER) {
+      return new PipelineChainDownloader<>(
+          syncState,
+          syncTargetManager,
+          new FastSyncDownloadPipelineFactory<>(
+              config,
+              protocolSchedule,
+              protocolContext,
+              ethContext,
+              pivotBlockHeader,
+              metricsSystem),
+          ethContext.getScheduler(),
+          metricsSystem);
     }
-    final FastSyncValidationPolicy attachedValidationPolicy =
-        new FastSyncValidationPolicy(
-            config.fastSyncFullValidationRate(),
-            HeaderValidationMode.LIGHT_SKIP_DETACHED,
-            HeaderValidationMode.SKIP_DETACHED,
-            fastSyncValidationCounter);
-    final FastSyncValidationPolicy detatchedValidationPolicy =
-        new FastSyncValidationPolicy(
-            config.fastSyncFullValidationRate(),
-            HeaderValidationMode.LIGHT_DETACHED_ONLY,
-            HeaderValidationMode.DETACHED_ONLY,
-            fastSyncValidationCounter);
 
-    final ParallelImportChainSegmentTask<C, BlockWithReceipts> importTask =
-        ParallelImportChainSegmentTask.forCheckpoints(
-            protocolSchedule,
+    return new EthTaskChainDownloader<>(
+        config,
+        ethContext,
+        syncState,
+        syncTargetManager,
+        new FastSyncCheckpointHeaderManager<>(
+            config,
             protocolContext,
             ethContext,
-            config.downloaderParallelism(),
-            new FastSyncBlockHandler<>(
-                protocolSchedule,
-                protocolContext,
-                ethContext,
-                metricsSystem,
-                attachedValidationPolicy),
-            detatchedValidationPolicy,
-            checkpointHeaders,
-            metricsSystem);
-    return importTask
-        .run()
-        .thenApply(
-            results ->
-                results.stream().map(BlockWithReceipts::getBlock).collect(Collectors.toList()));
+            syncState,
+            protocolSchedule,
+            metricsSystem,
+            pivotBlockHeader),
+        new FastSyncBlockImportTaskFactory<>(
+            config, protocolSchedule, protocolContext, ethContext, metricsSystem),
+        metricsSystem);
   }
 }

@@ -23,11 +23,13 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.util.BlockImporter;
 
 import java.io.ByteArrayOutputStream;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
@@ -69,7 +72,10 @@ public abstract class CommandTestAbstract {
   @Mock Runner mockRunner;
   @Mock PantheonControllerBuilder mockControllerBuilder;
   @Mock SynchronizerConfiguration.Builder mockSyncConfBuilder;
+  @Mock EthereumWireProtocolConfiguration.Builder mockEthereumWireProtocolConfigurationBuilder;
   @Mock SynchronizerConfiguration mockSyncConf;
+  @Mock RocksDbConfiguration.Builder mockRocksDbConfBuilder;
+  @Mock RocksDbConfiguration mockRocksDbConf;
   @Mock PantheonController<?> mockController;
   @Mock BlockImporter mockBlockImporter;
   @Mock Logger mockLogger;
@@ -99,6 +105,9 @@ public abstract class CommandTestAbstract {
     // doReturn used because of generic PantheonController
     Mockito.doReturn(mockController).when(mockControllerBuilder).build();
     when(mockControllerBuilder.synchronizerConfiguration(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.ethereumWireProtocolConfiguration(any()))
+        .thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.rocksDbConfiguration(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.homePath(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.ethNetworkConfig(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.miningParameters(any())).thenReturn(mockControllerBuilder);
@@ -108,7 +117,18 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
 
+    when(mockSyncConfBuilder.syncMode(any())).thenReturn(mockSyncConfBuilder);
+    when(mockSyncConfBuilder.maxTrailingPeers(anyInt())).thenReturn(mockSyncConfBuilder);
+    when(mockSyncConfBuilder.fastSyncMinimumPeerCount(anyInt())).thenReturn(mockSyncConfBuilder);
+    when(mockSyncConfBuilder.fastSyncMaximumPeerWaitTime(any(Duration.class)))
+        .thenReturn(mockSyncConfBuilder);
     when(mockSyncConfBuilder.build()).thenReturn(mockSyncConf);
+
+    when(mockEthereumWireProtocolConfigurationBuilder.build())
+        .thenReturn(EthereumWireProtocolConfiguration.defaultConfig());
+
+    when(mockRocksDbConfBuilder.databaseDir(any())).thenReturn(mockRocksDbConfBuilder);
+    when(mockRocksDbConfBuilder.build()).thenReturn(mockRocksDbConf);
 
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
@@ -166,6 +186,8 @@ public abstract class CommandTestAbstract {
             mockRunnerBuilder,
             mockControllerBuilder,
             mockSyncConfBuilder,
+            mockEthereumWireProtocolConfigurationBuilder,
+            mockRocksDbConfBuilder,
             keyLoader);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
@@ -193,13 +215,17 @@ public abstract class CommandTestAbstract {
         final RunnerBuilder mockRunnerBuilder,
         final PantheonControllerBuilder mockControllerBuilder,
         final SynchronizerConfiguration.Builder mockSyncConfBuilder,
+        final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
+        final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
         final KeyLoader keyLoader) {
       super(
           mockLogger,
           mockBlockImporter,
           mockRunnerBuilder,
           mockControllerBuilder,
-          mockSyncConfBuilder);
+          mockSyncConfBuilder,
+          mockEthereumConfigurationMockBuilder,
+          mockRocksDbConfBuilder);
       this.keyLoader = keyLoader;
     }
   }

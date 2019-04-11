@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol.EthVersion;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.MockPeerConnection.PeerSendHandler;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.BlockchainSetupUtil;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockBodiesMessage;
@@ -58,6 +59,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 import tech.pegasys.pantheon.ethereum.p2p.wire.RawMessage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -91,6 +93,7 @@ public final class EthProtocolManagerTest {
   private static ProtocolSchedule<Void> protocolSchedule;
   private static BlockDataGenerator gen;
   private static ProtocolContext<Void> protocolContext;
+  private static final MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
   @BeforeClass
   public static void setup() {
@@ -114,7 +117,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer = setupPeer(ethManager, (cap, msg, conn) -> {});
@@ -134,7 +138,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer =
@@ -155,7 +160,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer =
@@ -187,7 +193,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final MessageData messageData =
           BlockHeadersMessage.create(Collections.singletonList(blockchain.getBlockHeader(1).get()));
       final MockPeerConnection peer =
@@ -219,7 +226,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final MessageData messageData =
           GetBlockBodiesMessage.create(Collections.singletonList(gen.hash()));
       final MockPeerConnection peer = setupPeer(ethManager, (cap, msg, conn) -> {});
@@ -243,7 +251,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final long startBlock = 5L;
       final int blockCount = 5;
       final MessageData messageData =
@@ -283,8 +292,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            limit,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            new EthereumWireProtocolConfiguration(limit, limit, limit, limit))) {
       final long startBlock = 5L;
       final int blockCount = 10;
       final MessageData messageData =
@@ -323,7 +332,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final long endBlock = 10L;
       final int blockCount = 5;
       final MessageData messageData = GetBlockHeadersMessage.create(endBlock, blockCount, 0, true);
@@ -361,7 +371,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final long startBlock = 5L;
       final int blockCount = 5;
       final int skip = 1;
@@ -402,7 +413,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final long endBlock = 10L;
       final int blockCount = 5;
       final int skip = 1;
@@ -464,7 +476,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final long startBlock = blockchain.getChainHeadBlockNumber() - 1L;
       final int blockCount = 5;
       final MessageData messageData =
@@ -503,7 +516,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final long startBlock = blockchain.getChainHeadBlockNumber() + 1;
       final int blockCount = 5;
       final MessageData messageData =
@@ -539,7 +553,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       // Setup blocks query
       final long startBlock = blockchain.getChainHeadBlockNumber() - 5;
       final int blockCount = 2;
@@ -591,8 +606,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            limit,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            new EthereumWireProtocolConfiguration(limit, limit, limit, limit))) {
       // Setup blocks query
       final int blockCount = 10;
       final long startBlock = blockchain.getChainHeadBlockNumber() - blockCount;
@@ -643,7 +658,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       // Setup blocks query
       final long expectedBlockNumber = blockchain.getChainHeadBlockNumber() - 1;
       final BlockHeader header = blockchain.getBlockHeader(expectedBlockNumber).get();
@@ -688,7 +704,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       // Setup blocks query
       final long startBlock = blockchain.getChainHeadBlockNumber() - 5;
       final int blockCount = 2;
@@ -739,8 +756,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            limit,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            new EthereumWireProtocolConfiguration(limit, limit, limit, limit))) {
       // Setup blocks query
       final int blockCount = 10;
       final long startBlock = blockchain.getChainHeadBlockNumber() - blockCount;
@@ -790,7 +807,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       // Setup blocks query
       final long blockNumber = blockchain.getChainHeadBlockNumber() - 5;
       final BlockHeader header = blockchain.getBlockHeader(blockNumber).get();
@@ -830,7 +848,15 @@ public final class EthProtocolManagerTest {
 
     try (final EthProtocolManager ethManager =
         new EthProtocolManager(
-            blockchain, worldStateArchive, 1, true, 1, 1, 1, new NoOpMetricsSystem())) {
+            blockchain,
+            worldStateArchive,
+            1,
+            true,
+            1,
+            1,
+            1,
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       // Setup node data query
 
       final List<BytesValue> expectedResults = new ArrayList<>();
@@ -880,7 +906,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem());
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig());
 
     // Define handler to validate response
     final PeerSendHandler onSend = mock(PeerSendHandler.class);
@@ -951,7 +978,8 @@ public final class EthProtocolManagerTest {
             1,
             1,
             1,
-            new NoOpMetricsSystem())) {
+            new NoOpMetricsSystem(),
+            EthereumWireProtocolConfiguration.defaultConfig())) {
       final long startBlock = 1L;
       final int requestedBlockCount = 13;
       final int receivedBlockCount = 2;
@@ -1011,7 +1039,12 @@ public final class EthProtocolManagerTest {
 
     try (final EthProtocolManager ethManager =
         new EthProtocolManager(
-            blockchain, protocolContext.getWorldStateArchive(), 1, true, 1, ethScheduler)) {
+            blockchain,
+            protocolContext.getWorldStateArchive(),
+            1,
+            true,
+            ethScheduler,
+            EthereumWireProtocolConfiguration.defaultConfig())) {
 
       // Create a transaction pool.  This has a side effect of registring a listener for the
       // transactions message.
@@ -1020,7 +1053,8 @@ public final class EthProtocolManagerTest {
           protocolContext,
           ethManager.ethContext(),
           TestClock.fixed(),
-          PendingTransactions.MAX_PENDING_TRANSACTIONS);
+          PendingTransactions.MAX_PENDING_TRANSACTIONS,
+          metricsSystem);
 
       // Send just a transaction message.
       final PeerConnection peer = setupPeer(ethManager, (cap, msg, connection) -> {});

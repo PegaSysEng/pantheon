@@ -15,15 +15,7 @@ consensus protocol](../Consensus-Protocols/Clique.md).
 
 ## Steps
 
-To create a private network: 
-
-1. [Create Folders](#1-create-folders)
-1. [Get Address for Node-1](#2-get-address-for-node-1)
-1. [Create Genesis File](#3-create-genesis-file)
-1. [Start First Node as Bootnode](#4-start-first-node-as-bootnode)
-1. [Start Node-2](#5-start-node-2)
-1. [Start Node-3](#6-start-node-3)
-1. [Confirm Private Network is Working](#7-confirm-private-network-is-working)
+The steps to create a private network using Clique are displayed on the right.
 
 ### 1. Create Folders 
 
@@ -46,7 +38,7 @@ Clique-Network/
 In Clique networks, the address of at least one initial signer must be included in the genesis file. 
 For this Clique network, we will use Node-1 as the initial signer. This requires obtaining the address for Node-1. 
 
-To obtain the address for Node-1, in the `Node-1` directory, use the [`public-key export-address`](../Reference/Pantheon-CLI-Syntax.md#public-key)
+To obtain the address for Node-1, in the `Node-1` directory, use the [`public-key export-address`](../Reference/Pantheon-CLI-Syntax.md#export-address)
 subcommand to write the node address to the specified file (`node1Address` in this example)
 
 ```bash tab="MacOS"

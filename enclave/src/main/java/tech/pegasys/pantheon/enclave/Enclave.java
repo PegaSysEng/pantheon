@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
 
 import java.io.IOException;
+import java.net.URI;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.MediaType;
@@ -29,20 +30,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Enclave {
-  private static final MediaType JSON = MediaType.parse("application/json");
-  private static final ObjectMapper objectMapper = new ObjectMapper();
   private static final Logger LOG = LogManager.getLogger();
+  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final MediaType JSON = MediaType.parse("application/json");
+  private static final MediaType ORION = MediaType.get("application/vnd.orion.v1+json");
 
-  private final String url;
+  private final URI enclaveUri;
   private final OkHttpClient client;
 
-  public Enclave(final String enclaveUrl) {
-    this.url = enclaveUrl;
+  public Enclave(final URI enclaveUri) {
+    this.enclaveUri = enclaveUri;
     this.client = new OkHttpClient();
   }
 
   public Boolean upCheck() throws IOException {
-    Request request = new Request.Builder().url(url + "/upcheck").get().build();
+    String url = enclaveUri.resolve("/upcheck").toString();
+    Request request = new Request.Builder().url(url).get().build();
 
     try (Response response = client.newCall(request).execute()) {
       return response.isSuccessful();
@@ -53,25 +56,30 @@ public class Enclave {
   }
 
   public SendResponse send(final SendRequest content) throws IOException {
-    return executePost("/send", objectMapper.writeValueAsString(content), SendResponse.class);
+    Request request = buildPostRequest(JSON, content, "/send");
+    return executePost(request, SendResponse.class);
   }
 
   public ReceiveResponse receive(final ReceiveRequest content) throws IOException {
-    return executePost("/receive", objectMapper.writeValueAsString(content), ReceiveResponse.class);
+    Request request = buildPostRequest(ORION, content, "/receive");
+    return executePost(request, ReceiveResponse.class);
   }
 
-  private <T> T executePost(final String path, final String content, final Class<T> responseType)
-      throws IOException {
-    OkHttpClient client = new OkHttpClient();
+  private Request buildPostRequest(
+      final MediaType mediaType, final Object content, final String endpoint) throws IOException {
+    RequestBody body = RequestBody.create(mediaType, objectMapper.writeValueAsString(content));
+    String url = enclaveUri.resolve(endpoint).toString();
+    return new Request.Builder().url(url).post(body).build();
+  }
 
-    RequestBody body = RequestBody.create(JSON, content);
-    Request request = new Request.Builder().url(url + path).post(body).build();
+  private <T> T executePost(final Request request, final Class<T> responseType) throws IOException {
+    OkHttpClient client = new OkHttpClient();
 
     try (Response response = client.newCall(request).execute()) {
       return objectMapper.readValue(response.body().string(), responseType);
     } catch (IOException e) {
-      LOG.error("Enclave failed to execute ", path);
-      throw new IOException("Failed to execute post", e);
+      LOG.error("Enclave failed to execute ", request);
+      throw new IOException("Enclave failed to execute post", e);
     }
   }
 }

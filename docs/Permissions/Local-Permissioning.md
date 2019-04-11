@@ -1,15 +1,9 @@
-description: Pantheon Permissions feature
+description: Local Permissioning 
 <!--- END of page meta data -->
 
-# Permissions 
+# Local Permissioning 
 
-A permissioned network is a network where only specified nodes and accounts (participants) can participate. 
-Nodes and accounts outside those specified are prevented from participating. Permissioned networks can have node permissions enabled, 
-account permissions enabled, or both. 
-
-![Node Permissions](../images/node-permissioning-bad-actor.png)
-
-![Account Permissions](../images/account-permissioning.png)
+Local permissioning supports node and account whitelisting. 
 
 ## Node Whitelisting 
 
@@ -56,7 +50,7 @@ To view the nodes whitelist, use the [perm_getNodesWhitelist](../Reference/JSON-
 The bootnodes must be included in the nodes whitelist or Pantheon does not start when node permissions are enabled. 
 
 !!! example 
-    If you start Pantheon with specified bootnodes and have node permissions enabled:
+    If you start Pantheon with specified bootnodes and have node permissioning enabled:
     
      ```bash
      --bootnodes="enode://7e4ef30e9ec683f26ad76ffca5b5148fa7a6575f4cfad4eb0f52f9c3d8335f4a9b6f9e66fcc73ef95ed7a2a52784d4f372e7750ac8ae0b544309a5b391a23dd7@127.0.0.1:30303","enode://2feb33b3c6c4a8f77d84a5ce44954e83e5f163e7a65f7f7a7fec499ceb0ddd76a46ef635408c513d64c076470eac86b7f2c8ae4fcd112cb28ce82c0d64ec2c94@127.0.0.1:30304","enode://7b61d5ee4b44335873e6912cb5dd3e3877c860ba21417c9b9ef1f7e500a82213737d4b269046d0669fb2299a234ca03443f25fe5f706b693b3669e5c92478ade@127.0.0.1:30305" 
@@ -66,7 +60,7 @@ The bootnodes must be included in the nodes whitelist or Pantheon does not start
 
 ### Enabling Node Whitelisting     
 
-To enable node whitelisting, specify the [`--permissions-nodes-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-enabled) option 
+To enable node whitelisting, specify the [`--permissions-nodes-config-file-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-enabled) option 
 when starting Pantheon. 
 
 The `PERM` API methods are not enabled by default. Use the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) 
@@ -75,7 +69,7 @@ or [`--rpc-ws-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-api) options to e
 ## Account Whitelisting 
 
 Account whitelisting is specified by the accounts whitelist in the [permissions configuration file](#permissions-configuration-file).
-A node with account permissions accepts transactions only from accounts in the accounts whitelist. 
+A node with account permissioning accepts transactions only from accounts in the accounts whitelist. 
 
 !!! example "Accounts Whitelist in Permissions Configuration File"
     `accounts-whitelist=["0x0000000000000000000000000000000000000009"]`
@@ -129,7 +123,7 @@ To view the accounts whitelist, use the [`perm_getAccountsWhitelist`](../Referen
 
 ### Enabling Account Whitelisting 
 
-To enable account whitelisting, specify the [`--permissions-accounts-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-enabled) option 
+To enable account whitelisting, specify the [`--permissions-accounts-config-file-enabled`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-enabled) option 
 when starting Pantheon. 
 
 The `PERM` API methods are not enabled by default. Use the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) 
@@ -137,16 +131,21 @@ or [`--rpc-ws-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-api) options to e
 
 ## Permissions Configuration File 
 
-The permissions configuration file contains the nodes and accounts whitelists. If the [`--permissions-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-config-file)
-option is not specified, the permissions configuration file must be called `permissions_config.toml` and
+The permissions configuration file contains the nodes and accounts whitelists. If the [`--permissions-accounts-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-config-file)
+and [`permissions-nodes-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-config-file) 
+options are not specified, the permissions configuration file must be called `permissions_config.toml` and
 must be in the [data directory](../Reference/Pantheon-CLI-Syntax.md#data-path) for the node.
 
-Use the [`--permissions-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-config-file) option to specify a permissions configuration file
- in any location.
+The accounts and nodes whitelists can be specified in the same file or in separate files for accounts and nodes. 
+
+Use the [`--permissions-accounts-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-config-file) 
+and [`permissions-nodes-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-config-file) 
+options to specify a permissions configuration file (or separate files for accounts and nodes) in any location.
  
 !!!note
-    The [`--permissions-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-config-file) option is 
-    not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). 
+    The [`--permissions-accounts-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-config-file) 
+    and [`permissions-nodes-config-file`](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-config-file) 
+    options are not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). 
     Use a bind mount to [specify a permissions configuration file with Docker](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
 
 !!! example "Example Permissions Configuration File"  

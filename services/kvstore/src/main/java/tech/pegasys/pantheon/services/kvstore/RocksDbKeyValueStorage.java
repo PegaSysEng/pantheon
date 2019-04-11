@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.services.util.RocksDbUtil;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.Closeable;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -198,17 +197,25 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
   private final Statistics stats;
 
   public static KeyValueStorage create(
-      final Path storageDirectory, final MetricsSystem metricsSystem) throws StorageException {
-    return new RocksDbKeyValueStorage(storageDirectory, metricsSystem);
+      final RocksDbConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
+      throws StorageException {
+    return new RocksDbKeyValueStorage(rocksDbConfiguration, metricsSystem);
   }
 
-  private RocksDbKeyValueStorage(final Path storageDirectory, final MetricsSystem metricsSystem) {
+  private RocksDbKeyValueStorage(
+      final RocksDbConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
     try {
       stats = new Statistics();
-      options = new Options().setCreateIfMissing(true).setStatistics(stats);
+      options =
+          new Options()
+              .setCreateIfMissing(true)
+              .setMaxOpenFiles(rocksDbConfiguration.getMaxOpenFiles())
+              .setTableFormatConfig(rocksDbConfiguration.getBlockBasedTableConfig())
+              .setStatistics(stats);
+
       txOptions = new TransactionDBOptions();
-      db = TransactionDB.open(options, txOptions, storageDirectory.toString());
+      db = TransactionDB.open(options, txOptions, rocksDbConfiguration.getDatabaseDir().toString());
 
       readLatency =
           metricsSystem.createTimer(
@@ -234,12 +241,12 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
             () -> stats.getTickerCount(ticker));
       }
 
-      if (metricsSystem instanceof PrometheusMetricsSystem) {
-        for (final HistogramType histogram : HISTOGRAMS) {
-          ((PrometheusMetricsSystem) metricsSystem)
-              .addCollector(ROCKSDB_STATS, histogramToCollector(histogram));
-        }
-      }
+//      if (metricsSystem instanceof PrometheusMetricsSystem) {
+//        for (final HistogramType histogram : HISTOGRAMS) {
+//          ((PrometheusMetricsSystem) metricsSystem)
+//              .addCollector(ROCKSDB_STATS, histogramToCollector(histogram));
+//        }
+//      }
 
       metricsSystem.createLongGauge(
           MetricCategory.ROCKSDB,

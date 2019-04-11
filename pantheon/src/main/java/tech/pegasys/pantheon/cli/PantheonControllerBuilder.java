@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.cli;
 
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
-import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -21,10 +20,12 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +35,8 @@ import java.time.Clock;
 public class PantheonControllerBuilder {
 
   private SynchronizerConfiguration synchronizerConfiguration;
+  private EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
+  private RocksDbConfiguration rocksDbConfiguration;
   private Path homePath;
   private EthNetworkConfig ethNetworkConfig;
   private MiningParameters miningParameters;
@@ -46,6 +49,18 @@ public class PantheonControllerBuilder {
   public PantheonControllerBuilder synchronizerConfiguration(
       final SynchronizerConfiguration synchronizerConfiguration) {
     this.synchronizerConfiguration = synchronizerConfiguration;
+    return this;
+  }
+
+  public PantheonControllerBuilder ethereumWireProtocolConfiguration(
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
+    this.ethereumWireProtocolConfiguration = ethereumWireProtocolConfiguration;
+    return this;
+  }
+
+  public PantheonControllerBuilder rocksDbConfiguration(
+      final RocksDbConfiguration rocksDbConfiguration) {
+    this.rocksDbConfiguration = rocksDbConfiguration;
     return this;
   }
 
@@ -96,7 +111,7 @@ public class PantheonControllerBuilder {
     privacyParameters.setSigningKeyPair(nodeKeys);
 
     final StorageProvider storageProvider =
-        RocksDbStorageProvider.create(homePath.resolve(DATABASE_PATH), metricsSystem);
+        RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
 
     final GenesisConfigFile genesisConfigFile;
     if (devMode) {
@@ -109,6 +124,7 @@ public class PantheonControllerBuilder {
     return PantheonController.fromConfig(
         genesisConfigFile,
         synchronizerConfiguration,
+        ethereumWireProtocolConfiguration,
         storageProvider,
         ethNetworkConfig.getNetworkId(),
         miningParameters,

@@ -42,6 +42,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.IOException;
 import java.util.Base64;
 
+import com.google.common.base.Charsets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,7 +62,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
     this(
         gasCalculator,
         privacyParameters.getEnclavePublicKey(),
-        new Enclave(privacyParameters.getUrl()),
+        new Enclave(privacyParameters.getEnclaveUri()),
         privacyParameters.getPrivateWorldStateArchive(),
         privacyParameters.getPrivateTransactionStorage(),
         privacyParameters.getPrivateStateStorage());
@@ -106,9 +107,10 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
       PrivateTransaction privateTransaction = PrivateTransaction.readFrom(bytesValueRLPInput);
 
       WorldUpdater publicWorldState = messageFrame.getWorldState();
-      // get the last world state root hash - or create a new one
-      BytesValue privacyGroupId = BytesValue.wrap("0".getBytes(UTF_8));
 
+      BytesValue privacyGroupId =
+          BytesValue.wrap(receiveResponse.getPrivacyGroupId().getBytes(Charsets.UTF_8));
+      // get the last world state root hash - or create a new one
       Hash lastRootHash =
           privateStateStorage.getPrivateAccountState(privacyGroupId).orElse(EMPTY_ROOT_HASH);
       MutableWorldState disposablePrivateState =
@@ -125,23 +127,27 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
               privateTransaction,
               messageFrame.getMiningBeneficiary(),
               OperationTracer.NO_TRACING,
-              messageFrame.getBlockHashLookup());
+              messageFrame.getBlockHashLookup(),
+              privacyGroupId);
 
       if (result.isInvalid() || !result.isSuccessful()) {
         throw new Exception("Unable to process the private transaction");
       }
 
-      privateWorldStateUpdater.commit();
-      disposablePrivateState.persist();
-      PrivateStateStorage.Updater privateStateUpdater = privateStateStorage.updater();
-      privateStateUpdater.putPrivateAccountState(privacyGroupId, disposablePrivateState.rootHash());
-      privateStateUpdater.commit();
+      if (messageFrame.isPersistingState()) {
+        privateWorldStateUpdater.commit();
+        disposablePrivateState.persist();
+        PrivateStateStorage.Updater privateStateUpdater = privateStateStorage.updater();
+        privateStateUpdater.putPrivateAccountState(
+            privacyGroupId, disposablePrivateState.rootHash());
+        privateStateUpdater.commit();
 
-      Bytes32 txHash = keccak256(RLP.encode(privateTransaction::writeTo));
-      PrivateTransactionStorage.Updater privateUpdater = privateTransactionStorage.updater();
-      privateUpdater.putTransactionLogs(txHash, result.getLogs());
-      privateUpdater.putTransactionResult(txHash, result.getOutput());
-      privateUpdater.commit();
+        Bytes32 txHash = keccak256(RLP.encode(privateTransaction::writeTo));
+        PrivateTransactionStorage.Updater privateUpdater = privateTransactionStorage.updater();
+        privateUpdater.putTransactionLogs(txHash, result.getLogs());
+        privateUpdater.putTransactionResult(txHash, result.getOutput());
+        privateUpdater.commit();
+      }
 
       return result.getOutput();
     } catch (IOException e) {

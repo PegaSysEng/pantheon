@@ -82,17 +82,6 @@ public class NodeLocalConfigPermissioningControllerTest {
   }
 
   @Test
-  public void whenAddNodesInputContainsSelfShouldReturnAddingSelfError() {
-    controller.addNodes(Arrays.asList(enode1));
-
-    NodesWhitelistResult expected =
-        new NodesWhitelistResult(WhitelistOperationResult.ERROR_SELF_CANNOT_BE_ADDED);
-    NodesWhitelistResult actualResult = controller.addNodes(Lists.newArrayList(selfEnode, enode1));
-
-    assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
-  }
-
-  @Test
   public void whenAddNodesInputHasExistingNodeShouldReturnAddErrorExistingEntry() {
     controller.addNodes(Arrays.asList(enode1));
 
@@ -232,8 +221,6 @@ public class NodeLocalConfigPermissioningControllerTest {
     controller.addNodes(Arrays.asList(enode1));
     assertThat(controller.isPermitted(new EnodeURL(enode1), new EnodeURL(selfEnode))).isTrue();
     assertThat(controller.isPermitted(new EnodeURL(selfEnode), new EnodeURL(enode1))).isTrue();
-
-    assertThat(controller.isPermitted(new EnodeURL(selfEnode), new EnodeURL(selfEnode))).isFalse();
   }
 
   @Test

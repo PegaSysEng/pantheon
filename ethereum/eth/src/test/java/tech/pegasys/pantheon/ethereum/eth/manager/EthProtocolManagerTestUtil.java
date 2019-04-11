@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler.TimeoutPolicy;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -48,8 +49,8 @@ public class EthProtocolManagerTestUtil {
         worldStateArchive,
         networkId,
         false,
-        EthProtocolManager.DEFAULT_REQUEST_LIMIT,
-        ethScheduler);
+        ethScheduler,
+        EthereumWireProtocolConfiguration.defaultConfig());
   }
 
   public static EthProtocolManager create(
@@ -76,7 +77,7 @@ public class EthProtocolManagerTestUtil {
 
   // Utility to prevent scheduler from automatically running submitted tasks
   public static void disableEthSchedulerAutoRun(final EthProtocolManager ethProtocolManager) {
-    EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
+    final EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
     checkArgument(
         scheduler instanceof DeterministicEthScheduler,
         "EthProtocolManager must be set up with "
@@ -89,13 +90,29 @@ public class EthProtocolManagerTestUtil {
   // Works with {@code disableEthSchedulerAutoRun} - tasks will only be pending if
   // autoRun has been disabled.
   public static void runPendingFutures(final EthProtocolManager ethProtocolManager) {
-    EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
+    final EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
     checkArgument(
         scheduler instanceof DeterministicEthScheduler,
         "EthProtocolManager must be set up with "
             + DeterministicEthScheduler.class.getSimpleName()
             + " in order to manually run pending futures.");
     ((DeterministicEthScheduler) scheduler).runPendingFutures();
+  }
+
+  /**
+   * Gets the number of pending tasks submitted to the EthScheduler.
+   *
+   * <p>Works with {@code disableEthSchedulerAutoRun} - tasks will only be pending if autoRun has
+   * been disabled.
+   */
+  public static long getPendingFuturesCount(final EthProtocolManager ethProtocolManager) {
+    final EthScheduler scheduler = ethProtocolManager.ethContext().getScheduler();
+    checkArgument(
+        scheduler instanceof DeterministicEthScheduler,
+        "EthProtocolManager must be set up with "
+            + DeterministicEthScheduler.class.getSimpleName()
+            + " in order to manually run pending futures.");
+    return ((DeterministicEthScheduler) scheduler).getPendingFuturesCount();
   }
 
   public static void broadcastMessage(
