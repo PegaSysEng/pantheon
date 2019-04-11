@@ -34,7 +34,7 @@ public class TraceFrame {
   private final Optional<Bytes32[]> stack;
   private final Optional<Bytes32[]> memory;
   private final Optional<Map<UInt256, UInt256>> storage;
-  private final String reason;
+  private final String revertReason;
 
   public TraceFrame(
       final int pc,
@@ -46,7 +46,7 @@ public class TraceFrame {
       final Optional<Bytes32[]> stack,
       final Optional<Bytes32[]> memory,
       final Optional<Map<UInt256, UInt256>> storage,
-      final String reason) {
+      final String revertReason) {
     this.pc = pc;
     this.opcode = opcode;
     this.gasRemaining = gasRemaining;
@@ -56,7 +56,7 @@ public class TraceFrame {
     this.stack = stack;
     this.memory = memory;
     this.storage = storage;
-    this.reason = reason;
+    this.revertReason = revertReason;
   }
 
   public TraceFrame(
@@ -118,8 +118,8 @@ public class TraceFrame {
     return storage;
   }
 
-  public String getReason() {
-    return reason;
+  public String getRevertReason() {
+    return revertReason;
   }
 
   @Override

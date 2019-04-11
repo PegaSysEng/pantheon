@@ -66,7 +66,7 @@ public class RevertOperationTest {
     assertTrue(code.contains("726576657274206d657373616765"));
     ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
     operation.execute(messageFrame);
-    Mockito.verify(messageFrame).setReason(arg.capture());
+    Mockito.verify(messageFrame).setRevertReason(arg.capture());
     assertEquals("revert message", arg.getValue());
   }
 }

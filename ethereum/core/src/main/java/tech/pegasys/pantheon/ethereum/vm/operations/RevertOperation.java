@@ -43,7 +43,7 @@ public class RevertOperation extends AbstractOperation {
     BytesValue reason = frame.readMemory(from, length);
     frame.setOutputData(reason);
     String reasonMessage = new String(reason.extractArray(), CHARSET);
-    frame.setReason(reasonMessage);
+    frame.setRevertReason(reasonMessage);
     frame.setState(MessageFrame.State.REVERT);
   }
 }

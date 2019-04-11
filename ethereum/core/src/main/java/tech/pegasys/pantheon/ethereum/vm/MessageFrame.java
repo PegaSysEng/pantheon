@@ -29,7 +29,11 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
-import java.util.*;
+import java.util.Deque;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -212,7 +216,7 @@ public class MessageFrame {
   private final Deque<MessageFrame> messageFrameStack;
   private final Address miningBeneficiary;
   private final Boolean isPersistingState;
-  private Optional<String> reason;
+  private Optional<String> revertReason;
 
   // Miscellaneous fields.
   private final EnumSet<ExceptionalHaltReason> exceptionalHaltReasons =
@@ -246,7 +250,7 @@ public class MessageFrame {
       final Address miningBeneficiary,
       final BlockHashLookup blockHashLookup,
       final Boolean isPersistingState,
-      final Optional<String> reason) {
+      final Optional<String> revertReason) {
     this.type = type;
     this.blockchain = blockchain;
     this.messageFrameStack = messageFrameStack;
@@ -277,7 +281,7 @@ public class MessageFrame {
     this.completer = completer;
     this.miningBeneficiary = miningBeneficiary;
     this.isPersistingState = isPersistingState;
-    this.reason = reason;
+    this.revertReason = revertReason;
   }
 
   /**
@@ -496,16 +500,16 @@ public class MessageFrame {
   }
 
   /**
-   * Returns the reason as string
+   * Returns the revertReason as string
    *
-   * @return the reason string
+   * @return the revertReason string
    */
-  public Optional<String> getReason() {
-    return reason;
+  public Optional<String> getRevertReason() {
+    return revertReason;
   }
 
-  public void setReason(final String reason) {
-    this.reason = Optional.ofNullable(reason);
+  public void setRevertReason(final String revertReason) {
+    this.revertReason = Optional.ofNullable(revertReason);
   }
 
   /**

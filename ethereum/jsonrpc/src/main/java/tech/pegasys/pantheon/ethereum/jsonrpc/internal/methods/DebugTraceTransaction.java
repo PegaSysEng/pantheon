@@ -62,7 +62,7 @@ public class DebugTraceTransaction implements JsonRpcMethod {
 
       return new JsonRpcSuccessResponse(request.getId(), debugTraceTransactionResult);
     } else {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.TX_NOT_FOUND);
+      return new JsonRpcSuccessResponse(request.getId(), null);
     }
   }
 

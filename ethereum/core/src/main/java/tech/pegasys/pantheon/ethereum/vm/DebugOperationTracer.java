@@ -68,7 +68,7 @@ public class DebugOperationTracer implements OperationTracer {
               stack,
               memory,
               storage,
-              frame.getReason().orElse(null)));
+              frame.getRevertReason().orElse(null)));
     }
   }
 
