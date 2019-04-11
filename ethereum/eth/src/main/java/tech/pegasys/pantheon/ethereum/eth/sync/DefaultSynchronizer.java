@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 import tech.pegasys.pantheon.util.Subscribers;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Optional;
@@ -113,6 +114,15 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       }
     } else {
       throw new IllegalStateException("Attempt to start an already started synchronizer.");
+    }
+  }
+
+  @Override
+  public void stop() throws IOException {
+    if (fastSyncDownloader.isPresent()) {
+      fastSyncDownloader.get().cancel();
+    } else {
+      fullSyncDownloader.cancel();
     }
   }
 

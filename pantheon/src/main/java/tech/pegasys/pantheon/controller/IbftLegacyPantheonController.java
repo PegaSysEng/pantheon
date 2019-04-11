@@ -176,6 +176,11 @@ public class IbftLegacyPantheonController implements PantheonController<IbftCont
           } catch (final IOException e) {
             LOG.error("Failed to close storage provider", e);
           }
+          try {
+            synchronizer.stop();
+          } catch (final IOException e) {
+            LOG.error("Failed to stop synchronizer", e);
+          }
         };
 
     final TransactionPool transactionPool =

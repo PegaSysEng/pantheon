@@ -12,12 +12,15 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /** Provides an interface to block synchronization processes. */
 public interface Synchronizer {
 
   void start();
+
+  void stop() throws IOException;
 
   /**
    * @return the status, based on SyncingResult When actively synchronizing blocks, alternatively

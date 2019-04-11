@@ -318,6 +318,11 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
           } catch (final IOException e) {
             LOG.error("Failed to close storage provider", e);
           }
+          try {
+            synchronizer.stop();
+          } catch (final IOException e) {
+            LOG.error("Failed to stop synchronizer", e);
+          }
         };
 
     return new IbftPantheonController(

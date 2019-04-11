@@ -99,6 +99,10 @@ public class FastSyncDownloader<C> {
     }
   }
 
+  public void cancel() {
+    worldStateDownloader.cancel();
+  }
+
   private FastSyncState updateMaxTrailingPeers(final FastSyncState state) {
     if (state.getPivotBlockNumber().isPresent()) {
       trailingPeerRequirements =
