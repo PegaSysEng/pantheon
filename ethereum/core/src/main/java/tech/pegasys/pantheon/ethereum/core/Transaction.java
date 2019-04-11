@@ -63,7 +63,7 @@ public class Transaction {
   // Note that this hash does not include the transaction signature so it does not
   // fully identify the transaction (use the result of the {@code hash()} for that).
   // It is only used to compute said signature and recover the sender from it.
-  protected volatile Bytes32 hashNoSignature;
+  private volatile Bytes32 hashNoSignature;
 
   // Caches the transaction sender.
   protected volatile Address sender;
@@ -73,19 +73,6 @@ public class Transaction {
 
   public static Builder builder() {
     return new Builder();
-  }
-
-  public static void main(String[] args) {
-    SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
-    Transaction t = Transaction.builder()
-            .gasLimit(21_000)
-            .gasPrice(Wei.ZERO)
-            .value(Wei.ZERO)
-            .to(Address.fromHexString("0x0011223344556677889900112233445566778899"))
-            .payload(BytesValue.EMPTY)
-            .nonce(0)
-            .signAndBuild(keyPair);
-    System.out.println(RLP.encode(t::writeTo));
   }
 
   public static Transaction readFrom(final RLPInput input) throws RLPException {

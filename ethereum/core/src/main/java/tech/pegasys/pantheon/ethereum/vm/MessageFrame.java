@@ -215,6 +215,7 @@ public class MessageFrame {
   private final Deque<MessageFrame> messageFrameStack;
   private final Address miningBeneficiary;
   private final Boolean isPersistingState;
+  private String reason;
 
   // Miscellaneous fields.
   private final EnumSet<ExceptionalHaltReason> exceptionalHaltReasons =
@@ -247,7 +248,8 @@ public class MessageFrame {
       final Consumer<MessageFrame> completer,
       final Address miningBeneficiary,
       final BlockHashLookup blockHashLookup,
-      final Boolean isPersistingState) {
+      final Boolean isPersistingState,
+      final String reason) {
     this.type = type;
     this.blockchain = blockchain;
     this.messageFrameStack = messageFrameStack;
@@ -278,6 +280,7 @@ public class MessageFrame {
     this.completer = completer;
     this.miningBeneficiary = miningBeneficiary;
     this.isPersistingState = isPersistingState;
+    this.reason = reason;
   }
 
   /**
@@ -493,6 +496,19 @@ public class MessageFrame {
    */
   public UInt256 memoryWordSize() {
     return memory.getActiveWords();
+  }
+
+  /**
+   * Returns the reason as string
+   *
+   * @return the reason string
+   */
+  public String getReason() {
+    return reason;
+  }
+
+  public void setReason(String reason) {
+    this.reason = reason;
   }
 
   /**
@@ -845,6 +861,7 @@ public class MessageFrame {
     private Address miningBeneficiary;
     private BlockHashLookup blockHashLookup;
     private Boolean isPersistingState = false;
+    private String reason = null;
 
     public Builder type(final Type type) {
       this.type = type;
@@ -951,6 +968,11 @@ public class MessageFrame {
       return this;
     }
 
+    public Builder reason(String reason) {
+      this.reason = reason;
+      return this;
+    }
+
     private void validate() {
       checkState(type != null, "Missing message frame type");
       checkState(blockchain != null, "Missing message frame blockchain");
@@ -998,7 +1020,8 @@ public class MessageFrame {
           completer,
           miningBeneficiary,
           blockHashLookup,
-          isPersistingState);
+          isPersistingState,
+          reason);
     }
   }
 }

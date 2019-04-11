@@ -85,10 +85,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
@@ -105,7 +103,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExecutionException;
-import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
@@ -127,7 +124,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Logger logger;
 
   private CommandLine commandLine;
-
 
   private final BlockImporter blockImporter;
 

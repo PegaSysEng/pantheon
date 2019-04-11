@@ -67,7 +67,8 @@ public class DebugOperationTracer implements OperationTracer {
               exceptionalHaltReasons,
               stack,
               memory,
-              storage));
+              storage,
+              frame.getReason()));
     }
   }
 

@@ -85,7 +85,8 @@ public class DebugTraceTransactionTest {
             EnumSet.noneOf(ExceptionalHaltReason.class),
             Optional.empty(),
             Optional.empty(),
-            Optional.empty());
+            Optional.empty(),
+            "revert message");
     final List<TraceFrame> traceFrames = Collections.singletonList(traceFrame);
     final TransactionTrace transactionTrace =
         new TransactionTrace(transaction, result, traceFrames);
