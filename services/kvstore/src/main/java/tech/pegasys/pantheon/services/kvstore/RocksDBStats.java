@@ -166,10 +166,8 @@ class RocksDBStats {
           () -> stats.getTickerCount(ticker));
     }
 
-    if (metricsSystem instanceof PrometheusMetricsSystem) {
-      for (final HistogramType histogram : HISTOGRAMS) {
-        metricsSystem.addCollector(KVSTORE_ROCKSDB_STATS, histogramToCollector(stats, histogram));
-      }
+    for (final HistogramType histogram : HISTOGRAMS) {
+      metricsSystem.addCollector(KVSTORE_ROCKSDB_STATS, histogramToCollector(stats, histogram));
     }
   }
 
