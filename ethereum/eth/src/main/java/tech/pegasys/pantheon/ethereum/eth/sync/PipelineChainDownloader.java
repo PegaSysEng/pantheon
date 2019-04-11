@@ -113,7 +113,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   private CompletionStage<Void> handleFailedDownload(final Throwable error) {
     pipelineErrorCounter.inc();
     final Throwable rootCause = ExceptionUtils.rootCause(error);
-        if (!cancelled.get()
+    if (!cancelled.get()
         && syncTargetManager.shouldContinueDownloading()
         && !(rootCause instanceof CancellationException)) {
       LOG.debug("Chain download failed. Restarting after short delay.", error);
