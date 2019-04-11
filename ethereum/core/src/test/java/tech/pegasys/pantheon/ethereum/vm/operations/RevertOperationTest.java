@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.vm.operations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +34,6 @@ import org.mockito.Mockito;
 @RunWith(Parameterized.class)
 public class RevertOperationTest {
 
-  private final String sender;
   private final String code;
 
   private final MessageFrame messageFrame = mock(MessageFrame.class);
@@ -43,14 +43,12 @@ public class RevertOperationTest {
   public static Object[][] params() {
     return new Object[][] {
       {
-        "0xcd1722f3947def4cf144679da39c4c32bdc35681",
         "0x6c726576657274656420646174616000557f726576657274206d657373616765000000000000000000000000000000000000600052600e6000fd",
       }
     };
   }
 
-  public RevertOperationTest(final String sender, final String code) {
-    this.sender = sender;
+  public RevertOperationTest(final String code) {
     this.code = code;
   }
 
@@ -65,6 +63,7 @@ public class RevertOperationTest {
 
   @Test
   public void shouldReturnReason() {
+    assertTrue(code.contains("726576657274206d657373616765"));
     ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
     operation.execute(messageFrame);
     Mockito.verify(messageFrame).setReason(arg.capture());
