@@ -241,12 +241,12 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
             () -> stats.getTickerCount(ticker));
       }
 
-//      if (metricsSystem instanceof PrometheusMetricsSystem) {
-//        for (final HistogramType histogram : HISTOGRAMS) {
-//          ((PrometheusMetricsSystem) metricsSystem)
-//              .addCollector(ROCKSDB_STATS, histogramToCollector(histogram));
-//        }
-//      }
+      if (metricsSystem instanceof PrometheusMetricsSystem) {
+        for (final HistogramType histogram : HISTOGRAMS) {
+          ((PrometheusMetricsSystem) metricsSystem)
+              .addCollector(ROCKSDB_STATS, histogramToCollector(histogram));
+        }
+      }
 
       metricsSystem.createLongGauge(
           MetricCategory.ROCKSDB,
