@@ -507,7 +507,7 @@ public class MessageFrame {
     return reason;
   }
 
-  public void setReason(String reason) {
+  public void setReason(final String reason) {
     this.reason = reason;
   }
 
@@ -968,7 +968,7 @@ public class MessageFrame {
       return this;
     }
 
-    public Builder reason(String reason) {
+    public Builder reason(final String reason) {
       this.reason = reason;
       return this;
     }
