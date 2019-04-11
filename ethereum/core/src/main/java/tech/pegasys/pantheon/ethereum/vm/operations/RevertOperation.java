@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import java.nio.charset.Charset;
 
 public class RevertOperation extends AbstractOperation {
-  private static final Charset CHARSET = Charset.forName("ASCII");
+  private static final Charset CHARSET = Charset.forName("UTF-8");
 
   public RevertOperation(final GasCalculator gasCalculator) {
     super(0xFD, "REVERT", 2, 0, false, 1, gasCalculator);

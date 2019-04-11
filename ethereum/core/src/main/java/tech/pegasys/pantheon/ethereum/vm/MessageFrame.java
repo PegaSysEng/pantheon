@@ -29,10 +29,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
-import java.util.Deque;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -215,7 +212,7 @@ public class MessageFrame {
   private final Deque<MessageFrame> messageFrameStack;
   private final Address miningBeneficiary;
   private final Boolean isPersistingState;
-  private String reason;
+  private Optional<String> reason;
 
   // Miscellaneous fields.
   private final EnumSet<ExceptionalHaltReason> exceptionalHaltReasons =
@@ -249,7 +246,7 @@ public class MessageFrame {
       final Address miningBeneficiary,
       final BlockHashLookup blockHashLookup,
       final Boolean isPersistingState,
-      final String reason) {
+      final Optional<String> reason) {
     this.type = type;
     this.blockchain = blockchain;
     this.messageFrameStack = messageFrameStack;
@@ -503,12 +500,12 @@ public class MessageFrame {
    *
    * @return the reason string
    */
-  public String getReason() {
+  public Optional<String> getReason() {
     return reason;
   }
 
   public void setReason(final String reason) {
-    this.reason = reason;
+    this.reason = Optional.ofNullable(reason);
   }
 
   /**
@@ -861,7 +858,7 @@ public class MessageFrame {
     private Address miningBeneficiary;
     private BlockHashLookup blockHashLookup;
     private Boolean isPersistingState = false;
-    private String reason = null;
+    private Optional<String> reason = Optional.empty();
 
     public Builder type(final Type type) {
       this.type = type;
@@ -969,7 +966,7 @@ public class MessageFrame {
     }
 
     public Builder reason(final String reason) {
-      this.reason = reason;
+      this.reason = Optional.ofNullable(reason);
       return this;
     }
 

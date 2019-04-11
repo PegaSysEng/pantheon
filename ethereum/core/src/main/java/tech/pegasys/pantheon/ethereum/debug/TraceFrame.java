@@ -69,16 +69,17 @@ public class TraceFrame {
       final Optional<Bytes32[]> stack,
       final Optional<Bytes32[]> memory,
       final Optional<Map<UInt256, UInt256>> storage) {
-    this.pc = pc;
-    this.opcode = opcode;
-    this.gasRemaining = gasRemaining;
-    this.gasCost = gasCost;
-    this.depth = depth;
-    this.exceptionalHaltReasons = exceptionalHaltReasons;
-    this.stack = stack;
-    this.memory = memory;
-    this.storage = storage;
-    this.reason = null;
+    this(
+        pc,
+        opcode,
+        gasRemaining,
+        gasCost,
+        depth,
+        exceptionalHaltReasons,
+        stack,
+        memory,
+        storage,
+        null);
   }
 
   public int getPc() {
