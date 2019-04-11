@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
-import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -71,11 +70,12 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
       db = TransactionDB.open(options, txOptions, rocksDbConfiguration.getDatabaseDir().toString());
 
       readLatency =
-          metricsSystem.createLabelledTimer(
-              MetricCategory.KVSTORE_ROCKSDB,
-              "read_latency_seconds",
-              "Latency for read from RocksDB.",
-              rocksDbConfiguration.getLabel())
+          metricsSystem
+              .createLabelledTimer(
+                  MetricCategory.KVSTORE_ROCKSDB,
+                  "read_latency_seconds",
+                  "Latency for read from RocksDB.",
+                  rocksDbConfiguration.getLabel())
               .labels(rocksDbConfiguration.getLabel());
       removeLatency =
           metricsSystem

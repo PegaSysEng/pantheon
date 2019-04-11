@@ -56,7 +56,7 @@ public class RocksDbConfiguration {
 
     Path databaseDir;
     LRUCache cache = null;
-    String label = "public";
+    String label = "blockchain";
 
     @CommandLine.Option(
         names = {"--Xrocksdb-max-open-files"},
