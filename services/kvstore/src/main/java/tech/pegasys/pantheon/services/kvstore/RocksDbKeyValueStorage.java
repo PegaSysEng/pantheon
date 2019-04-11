@@ -92,7 +92,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
               "Latency for commits to RocksDB.");
 
       if (metricsSystem instanceof PrometheusMetricsSystem) {
-        RocksDBMetrics.registerRocksDBMetrics(stats, (PrometheusMetricsSystem) metricsSystem);
+        RocksDBStats.registerRocksDBMetrics(stats, (PrometheusMetricsSystem) metricsSystem);
       }
 
       metricsSystem.createLongGauge(
