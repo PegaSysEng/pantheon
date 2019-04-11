@@ -27,7 +27,7 @@ jar {
 
 dependencies {
   api project(':util')
-  
+
   implementation project(':metrics')
   implementation project(':services:util')
 
