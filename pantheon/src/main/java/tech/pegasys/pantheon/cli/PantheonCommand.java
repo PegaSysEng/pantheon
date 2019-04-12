@@ -16,6 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
+import static tech.pegasys.pantheon.cli.CommandLineUtils.entryOf;
+import static tech.pegasys.pantheon.cli.CommandLineUtils.registerConverters;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
@@ -571,13 +573,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.addSubcommand(
         RLPSubCommand.COMMAND_NAME, new RLPSubCommand(resultHandler.out(), in));
 
-    commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
-    commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
-    commandLine.registerConverter(Level.class, Level::valueOf);
-    commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
-    commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
-    commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
-    commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+    registerConverters(
+        commandLine,
+        entryOf(Address.class, Address::fromHexStringStrict),
+        entryOf(BytesValue.class, BytesValue::fromHexString),
+        entryOf(Level.class, Level::valueOf),
+        entryOf(SyncMode.class, SyncMode::fromString),
+        entryOf(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg))),
+        entryOf(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg))),
+        entryOf(PositiveNumber.class, PositiveNumber::fromString));
 
     // Add performance options
     UnstableOptionsSubCommand.createUnstableOptions(
