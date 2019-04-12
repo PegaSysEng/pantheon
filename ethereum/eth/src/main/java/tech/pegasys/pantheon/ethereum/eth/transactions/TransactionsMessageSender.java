@@ -12,36 +12,42 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.transactions;
 
-import static java.util.stream.Collectors.toSet;
-
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.messages.LimitedTransactionsMessages;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
+import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessageLimiter;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 class TransactionsMessageSender {
 
-  private static final int MAX_BATCH_SIZE = 10;
   private final PeerTransactionTracker transactionTracker;
+  private final TransactionsMessageLimiter transactionsMessageLimiter;
 
-  public TransactionsMessageSender(final PeerTransactionTracker transactionTracker) {
+  public TransactionsMessageSender(
+      final PeerTransactionTracker transactionTracker,
+      final TransactionsMessageLimiter transactionsMessageLimiter) {
     this.transactionTracker = transactionTracker;
+    this.transactionsMessageLimiter = transactionsMessageLimiter;
   }
 
   public void sendTransactionsToPeers() {
-    transactionTracker.getEthPeersWithUnsentTransactions().forEach(this::sendTransactionsToPeer);
+    StreamSupport.stream(transactionTracker.getEthPeersWithUnsentTransactions().spliterator(), true)
+        .parallel()
+        .forEach(this::sendTransactionsToPeer);
   }
 
   private void sendTransactionsToPeer(final EthPeer peer) {
     final Set<Transaction> allTxToSend = transactionTracker.claimTransactionsToSendToPeer(peer);
     while (!allTxToSend.isEmpty()) {
-      final Set<Transaction> subsetToSend =
-          allTxToSend.stream().limit(MAX_BATCH_SIZE).collect(toSet());
-      allTxToSend.removeAll(subsetToSend);
+      LimitedTransactionsMessages limitedTransactionsMessages =
+          TransactionsMessage.createLimited(allTxToSend, transactionsMessageLimiter);
+      allTxToSend.removeAll(limitedTransactionsMessages.getIncludedTransactions());
       try {
-        peer.send(TransactionsMessage.create(subsetToSend));
+        peer.send(limitedTransactionsMessages.getTransactionsMessage());
       } catch (final PeerNotConnected e) {
         return;
       }

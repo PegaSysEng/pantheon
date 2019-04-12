@@ -20,7 +20,9 @@ import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.function.Function;
 
 public class TransactionsMessage extends AbstractMessageData {
@@ -47,7 +49,24 @@ public class TransactionsMessage extends AbstractMessageData {
     return new TransactionsMessage(tmp.encoded());
   }
 
-  private TransactionsMessage(final BytesValue data) {
+  public static LimitedTransactionsMessages createLimited(
+      final Iterable<Transaction> transactions, TransactionsMessageLimiter limiter) {
+    final Set<Transaction> includedTransactions = new HashSet<>();
+    final BytesValueRLPOutput tmp = new BytesValueRLPOutput();
+    tmp.startList();
+    for (final Transaction transaction : transactions) {
+      transaction.writeTo(tmp);
+      includedTransactions.add(transaction);
+      if (limiter.isLastTransactionToIncludeWithoutExceedingLimit(tmp)) {
+        break;
+      }
+    }
+    tmp.endList();
+    return new LimitedTransactionsMessages(
+        new TransactionsMessage(tmp.encoded()), includedTransactions);
+  }
+
+  TransactionsMessage(final BytesValue data) {
     super(data);
   }
 

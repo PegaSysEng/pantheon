@@ -141,6 +141,10 @@ abstract class AbstractRLPOutput implements RLPOutput {
     return payloadSizes[0];
   }
 
+  public int uncheckedEncodedSize() {
+    return payloadSizes[0];
+  }
+
   /**
    * Write the rlp encoded value to the provided {@link MutableBytesValue}
    *
