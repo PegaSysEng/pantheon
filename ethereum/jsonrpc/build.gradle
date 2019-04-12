@@ -44,6 +44,9 @@ dependencies {
   implementation 'org.springframework.security:spring-security-crypto'
   implementation 'io.vertx:vertx-auth-jwt:3.6.2'
 
+
+  implementation 'io.nats:jnats:2.4.3'
+
   testImplementation project(':config')
   testImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   testImplementation project(path: ':ethereum:core', configuration: 'testArtifacts')

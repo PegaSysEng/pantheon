@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -30,6 +32,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterRepository;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import tech.pegasys.pantheon.ethereum.jsonrpc.nats.NatsJsonRpcConfiguration;
+import tech.pegasys.pantheon.ethereum.jsonrpc.nats.NatsJsonRpcService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketRequestHandler;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketService;
@@ -71,6 +75,7 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -86,6 +91,7 @@ import io.vertx.core.Vertx;
 
 public class RunnerBuilder {
 
+  private static final Logger LOG = LogManager.getLogger();
   private Vertx vertx;
   private PantheonController<?> pantheonController;
   private boolean p2pEnabled = true;
@@ -341,6 +347,13 @@ public class RunnerBuilder {
           Optional.of(
               new JsonRpcHttpService(
                   vertx, dataDir, jsonRpcConfiguration, metricsSystem, jsonRpcMethods));
+
+      // TODO define specific configuration and instantiate it elsewhere
+      try {
+        new NatsJsonRpcService(NatsJsonRpcConfiguration.builder().build(), jsonRpcMethods).start();
+      } catch (IOException | InterruptedException e) {
+        LOG.error("Cannot start NatsJsonRpcService.", e);
+      }
     }
 
     Optional<WebSocketService> webSocketService = Optional.empty();
