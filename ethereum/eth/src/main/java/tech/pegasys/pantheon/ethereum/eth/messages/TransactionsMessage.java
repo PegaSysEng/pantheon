@@ -20,9 +20,7 @@ import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.function.Function;
 
 public class TransactionsMessage extends AbstractMessageData {
@@ -48,7 +46,6 @@ public class TransactionsMessage extends AbstractMessageData {
     tmp.endList();
     return new TransactionsMessage(tmp.encoded());
   }
-
 
   TransactionsMessage(final BytesValue data) {
     super(data);

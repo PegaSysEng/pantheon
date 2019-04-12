@@ -143,6 +143,7 @@ abstract class AbstractRLPOutput implements RLPOutput {
 
   /**
    * Computes a temporary encoded data size
+   *
    * @return The size of the RLP-encoded data written to this output.
    */
   public int uncheckedEncodedSize() {
