@@ -12,32 +12,32 @@
  */
 package tech.pegasys.pantheon.cli;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Arrays.asList;
-import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
-import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
-import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
-import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
-import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
-import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
-import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
-import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
-import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
-import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
-import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
-import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
-
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Resources;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
+import io.vertx.core.json.DecodeException;
+import io.vertx.core.metrics.MetricsOptions;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+import picocli.CommandLine;
+import picocli.CommandLine.AbstractParseResultHandler;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.ExecutionException;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
 import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueRpcApis;
-import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftRpcApis;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -86,28 +86,24 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Resources;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
-import io.vertx.core.json.DecodeException;
-import io.vertx.core.metrics.MetricsOptions;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
-import picocli.CommandLine;
-import picocli.CommandLine.AbstractParseResultHandler;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.ExecutionException;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
+import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
+import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
+import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
+import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
+import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
+import static tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer.DEFAULT_PORT;
+import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
+import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
+import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
 @SuppressWarnings("FieldCanBeLocal") // because Picocli injected fields report false positives
 @Command(
@@ -123,29 +119,6 @@ import picocli.CommandLine.ParameterException;
     footerHeading = "%n",
     footer = "Pantheon is licensed under the Apache License 2.0")
 public class PantheonCommand implements DefaultCommandValues, Runnable {
-
-  static class RpcApisConverter implements CommandLine.ITypeConverter<RpcApi> {
-
-    @Override
-    public RpcApi convert(final String name) throws RpcApisConversionException {
-      final String uppercaseName = name.trim().toUpperCase();
-
-      return Stream.<Function<String, Optional<RpcApi>>>of(
-              RpcApis::valueOf, CliqueRpcApis::valueOf, IbftRpcApis::valueOf)
-          .map(f -> f.apply(uppercaseName))
-          .filter(Optional::isPresent)
-          .map(Optional::get)
-          .findFirst()
-          .orElseThrow(() -> new RpcApisConversionException("Invalid value: " + name));
-    }
-  }
-
-  static class RpcApisConversionException extends Exception {
-
-    public RpcApisConversionException(final String s) {
-      super(s);
-    }
-  }
 
   private final Logger logger;
 
