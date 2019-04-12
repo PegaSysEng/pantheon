@@ -12,13 +12,10 @@
  */
 package tech.pegasys.pantheon.cli;
 
-import static java.util.Arrays.stream;
-
 import tech.pegasys.pantheon.util.StringUtils;
 
-import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
@@ -53,7 +50,7 @@ class CommandLineUtils {
           commandLine.getCommandSpec().options().stream()
               .filter(
                   option ->
-                      stream(option.names()).anyMatch(dependentOptionsNames::contains)
+                      Arrays.stream(option.names()).anyMatch(dependentOptionsNames::contains)
                           && !option.stringValues().isEmpty())
               .map(option -> option.names()[0])
               .collect(
@@ -67,16 +64,5 @@ class CommandLineUtils {
             mainOptionName);
       }
     }
-  }
-
-  @SafeVarargs
-  static void registerConverters(
-      final CommandLine commandLine, Map.Entry<Class, CommandLine.ITypeConverter>... converters) {
-    stream(converters)
-        .forEach(entry -> commandLine.registerConverter(entry.getKey(), entry.getValue()));
-  }
-
-  static <K, V> Map.Entry<K, V> entryOf(K key, V value) {
-    return new AbstractMap.SimpleImmutableEntry<>(key, value);
   }
 }
