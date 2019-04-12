@@ -181,7 +181,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "0..*")
   void setBootnodes(final List<String> values) {
     try {
-      bootNodes = values.stream().map((s) -> new EnodeURL(s).toURI()).collect(Collectors.toList());
+      bootNodes =
+          values.stream().map((s) -> EnodeURL.fromString(s).toURI()).collect(Collectors.toList());
     } catch (final IllegalArgumentException e) {
       throw new ParameterException(commandLine, e.getMessage());
     }
@@ -205,7 +206,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Collection<String> bannedNodeIds = new ArrayList<>();
 
   @Option(
-      hidden = true,
       names = {"--sync-mode"},
       paramLabel = MANDATORY_MODE_FORMAT_HELP,
       description =
@@ -213,7 +213,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final SyncMode syncMode = DEFAULT_SYNC_MODE;
 
   @Option(
-      hidden = true,
       names = {"--fast-sync-min-peers"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
