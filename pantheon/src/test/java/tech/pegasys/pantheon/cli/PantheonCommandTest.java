@@ -1054,6 +1054,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void helpShouldDisplayFastSyncOptions() {
+    parseCommand("--help");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).contains("--fast-sync-min-peers");
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void parsesValidFastSyncTimeoutOption() {
 
     parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "17");
