@@ -44,7 +44,7 @@ class TransactionsMessageSender {
     final Set<Transaction> allTxToSend = transactionTracker.claimTransactionsToSendToPeer(peer);
     while (!allTxToSend.isEmpty()) {
       final LimitedTransactionsMessages limitedTransactionsMessages =
-          TransactionsMessage.createLimited(allTxToSend, transactionsMessageLimiter);
+          LimitedTransactionsMessages.createLimited(allTxToSend, transactionsMessageLimiter);
       allTxToSend.removeAll(limitedTransactionsMessages.getIncludedTransactions());
       try {
         peer.send(limitedTransactionsMessages.getTransactionsMessage());

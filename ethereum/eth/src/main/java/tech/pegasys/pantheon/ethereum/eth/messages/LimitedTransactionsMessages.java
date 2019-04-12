@@ -13,7 +13,9 @@
 package tech.pegasys.pantheon.ethereum.eth.messages;
 
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public final class LimitedTransactionsMessages {
@@ -25,6 +27,23 @@ public final class LimitedTransactionsMessages {
       final TransactionsMessage transactionsMessage, final Set<Transaction> includedTransactions) {
     this.transactionsMessage = transactionsMessage;
     this.includedTransactions = includedTransactions;
+  }
+
+  public static LimitedTransactionsMessages createLimited(
+      final Iterable<Transaction> transactions, final TransactionsMessageLimiter limiter) {
+    final Set<Transaction> includedTransactions = new HashSet<>();
+    final BytesValueRLPOutput tmp = new BytesValueRLPOutput();
+    tmp.startList();
+    for (final Transaction transaction : transactions) {
+      transaction.writeTo(tmp);
+      includedTransactions.add(transaction);
+      if (limiter.isLastTransactionToIncludeWithoutExceedingLimit(tmp)) {
+        break;
+      }
+    }
+    tmp.endList();
+    return new LimitedTransactionsMessages(
+        new TransactionsMessage(tmp.encoded()), includedTransactions);
   }
 
   public final TransactionsMessage getTransactionsMessage() {

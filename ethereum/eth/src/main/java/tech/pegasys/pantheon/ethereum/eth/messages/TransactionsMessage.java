@@ -49,22 +49,6 @@ public class TransactionsMessage extends AbstractMessageData {
     return new TransactionsMessage(tmp.encoded());
   }
 
-  public static LimitedTransactionsMessages createLimited(
-      final Iterable<Transaction> transactions, final TransactionsMessageLimiter limiter) {
-    final Set<Transaction> includedTransactions = new HashSet<>();
-    final BytesValueRLPOutput tmp = new BytesValueRLPOutput();
-    tmp.startList();
-    for (final Transaction transaction : transactions) {
-      transaction.writeTo(tmp);
-      includedTransactions.add(transaction);
-      if (limiter.isLastTransactionToIncludeWithoutExceedingLimit(tmp)) {
-        break;
-      }
-    }
-    tmp.endList();
-    return new LimitedTransactionsMessages(
-        new TransactionsMessage(tmp.encoded()), includedTransactions);
-  }
 
   TransactionsMessage(final BytesValue data) {
     super(data);
