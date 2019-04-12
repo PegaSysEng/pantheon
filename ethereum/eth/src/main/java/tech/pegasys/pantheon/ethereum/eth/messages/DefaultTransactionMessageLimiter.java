@@ -19,7 +19,7 @@ public class DefaultTransactionMessageLimiter implements TransactionsMessageLimi
   private static final int LIMIT = 1048576;
 
   @Override
-  public boolean isLastTransactionToIncludeWithoutExceedingLimit(BytesValueRLPOutput tmp) {
+  public boolean isLastTransactionToIncludeWithoutExceedingLimit(final BytesValueRLPOutput tmp) {
     return tmp.uncheckedEncodedSize() >= LIMIT;
   }
 }

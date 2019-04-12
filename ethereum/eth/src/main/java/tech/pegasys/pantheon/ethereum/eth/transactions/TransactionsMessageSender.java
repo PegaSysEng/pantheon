@@ -43,7 +43,7 @@ class TransactionsMessageSender {
   private void sendTransactionsToPeer(final EthPeer peer) {
     final Set<Transaction> allTxToSend = transactionTracker.claimTransactionsToSendToPeer(peer);
     while (!allTxToSend.isEmpty()) {
-      LimitedTransactionsMessages limitedTransactionsMessages =
+      final LimitedTransactionsMessages limitedTransactionsMessages =
           TransactionsMessage.createLimited(allTxToSend, transactionsMessageLimiter);
       allTxToSend.removeAll(limitedTransactionsMessages.getIncludedTransactions());
       try {

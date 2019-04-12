@@ -50,7 +50,7 @@ public class TransactionsMessage extends AbstractMessageData {
   }
 
   public static LimitedTransactionsMessages createLimited(
-      final Iterable<Transaction> transactions, TransactionsMessageLimiter limiter) {
+      final Iterable<Transaction> transactions, final TransactionsMessageLimiter limiter) {
     final Set<Transaction> includedTransactions = new HashSet<>();
     final BytesValueRLPOutput tmp = new BytesValueRLPOutput();
     tmp.startList();
