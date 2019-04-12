@@ -1042,7 +1042,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  @Ignore
   public void syncModeOptionMustBeUsed() {
 
     parseCommand("--sync-mode", "FAST");

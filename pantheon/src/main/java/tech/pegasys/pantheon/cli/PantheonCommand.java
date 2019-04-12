@@ -231,7 +231,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Collection<String> bannedNodeIds = new ArrayList<>();
 
   @Option(
-      hidden = true,
       names = {"--sync-mode"},
       paramLabel = MANDATORY_MODE_FORMAT_HELP,
       description =
