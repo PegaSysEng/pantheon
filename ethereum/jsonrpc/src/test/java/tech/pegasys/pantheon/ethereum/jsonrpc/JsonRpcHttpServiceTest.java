@@ -40,12 +40,14 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockWithMetadata
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -130,7 +132,10 @@ public class JsonRpcHttpServiceTest {
                     Optional.of(mock(AccountWhitelistController.class)),
                     Optional.of(mock(NodeLocalConfigPermissioningController.class)),
                     JSON_RPC_APIS,
-                    mock(PrivacyParameters.class)));
+                    mock(PrivacyParameters.class),
+                    mock(JsonRpcConfiguration.class),
+                    mock(WebSocketConfiguration.class),
+                    mock(MetricsConfiguration.class)));
     service = createJsonRpcHttpService();
     service.start().join();
 
@@ -199,6 +204,28 @@ public class JsonRpcHttpServiceTest {
   public void handleEmptyRequest() throws Exception {
     try (final Response resp = client.newCall(buildGetRequest("")).execute()) {
       assertThat(resp.code()).isEqualTo(201);
+    }
+  }
+
+  @Test
+  public void handleUnknownRequestFields() throws Exception {
+    final String id = "123";
+    // Create a request with an extra "beta" param
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"net_version\", \"beta\":true}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body)).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+      // Check general format of result
+      final JsonObject json = new JsonObject(resp.body().string());
+      testHelper.assertValidJsonRpcResult(json, id);
+      // Check result
+      final String result = json.getString("result");
+      assertThat(result).isEqualTo(String.valueOf(CHAIN_ID));
     }
   }
 

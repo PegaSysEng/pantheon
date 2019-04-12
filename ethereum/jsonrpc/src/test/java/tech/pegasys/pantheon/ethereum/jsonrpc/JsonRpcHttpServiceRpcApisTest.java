@@ -12,12 +12,14 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
+import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
@@ -27,12 +29,18 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.p2p.NetworkingTestHelper;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.netty.NettyP2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -186,7 +194,10 @@ public class JsonRpcHttpServiceRpcApisTest {
                     Optional.of(mock(AccountWhitelistController.class)),
                     Optional.of(mock(NodeLocalConfigPermissioningController.class)),
                     config.getRpcApis(),
-                    mock(PrivacyParameters.class)));
+                    mock(PrivacyParameters.class),
+                    mock(JsonRpcConfiguration.class),
+                    mock(WebSocketConfiguration.class),
+                    mock(MetricsConfiguration.class)));
     final JsonRpcHttpService jsonRpcHttpService =
         new JsonRpcHttpService(
             vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
@@ -198,5 +209,138 @@ public class JsonRpcHttpServiceRpcApisTest {
 
   private Request buildRequest(final RequestBody body) {
     return new Request.Builder().post(body).url(baseUrl).build();
+  }
+
+  private JsonRpcConfiguration createJsonRpcConfiguration() {
+    final JsonRpcConfiguration config = JsonRpcConfiguration.createDefault();
+    config.setEnabled(true);
+    return config;
+  }
+
+  private WebSocketConfiguration createWebSocketConfiguration() {
+    final WebSocketConfiguration config = WebSocketConfiguration.createDefault();
+    config.setEnabled(true);
+    return config;
+  }
+
+  private P2PNetwork createP2pNetwork() {
+    final SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
+    final NetworkingConfiguration config = NetworkingTestHelper.configWithRandomPorts();
+
+    final NettyP2PNetwork p2pNetwork =
+        new NettyP2PNetwork(
+            vertx,
+            keyPair,
+            config,
+            emptyList(),
+            new PeerBlacklist(),
+            new NoOpMetricsSystem(),
+            Optional.empty(),
+            Optional.empty());
+    p2pNetwork.start();
+    return p2pNetwork;
+  }
+
+  private MetricsConfiguration createMetricsConfiguration() {
+    final MetricsConfiguration config = MetricsConfiguration.createDefault();
+    config.setEnabled(true);
+    return config;
+  }
+
+  private JsonRpcHttpService createJsonRpcHttpService(
+      final JsonRpcConfiguration jsonRpcConfiguration,
+      WebSocketConfiguration webSocketConfiguration,
+      P2PNetwork p2pNetwork,
+      MetricsConfiguration metricsConfiguration)
+      throws Exception {
+    final Set<Capability> supportedCapabilities = new HashSet<>();
+    supportedCapabilities.add(EthProtocol.ETH62);
+    supportedCapabilities.add(EthProtocol.ETH63);
+
+    final Map<String, JsonRpcMethod> rpcMethods =
+        spy(
+            new JsonRpcMethodsFactory()
+                .methods(
+                    CLIENT_VERSION,
+                    NETWORK_ID,
+                    new StubGenesisConfigOptions(),
+                    p2pNetwork,
+                    blockchainQueries,
+                    mock(Synchronizer.class),
+                    MainnetProtocolSchedule.create(),
+                    mock(FilterManager.class),
+                    mock(TransactionPool.class),
+                    mock(EthHashMiningCoordinator.class),
+                    new NoOpMetricsSystem(),
+                    supportedCapabilities,
+                    Optional.of(mock(AccountWhitelistController.class)),
+                    Optional.of(mock(NodeLocalConfigPermissioningController.class)),
+                    jsonRpcConfiguration.getRpcApis(),
+                    mock(PrivacyParameters.class),
+                    jsonRpcConfiguration,
+                    webSocketConfiguration,
+                    metricsConfiguration));
+    final JsonRpcHttpService jsonRpcHttpService =
+        new JsonRpcHttpService(
+            vertx,
+            folder.newFolder().toPath(),
+            jsonRpcConfiguration,
+            new NoOpMetricsSystem(),
+            rpcMethods);
+    jsonRpcHttpService.start().join();
+
+    baseUrl = jsonRpcHttpService.url();
+    return jsonRpcHttpService;
+  }
+
+  @Test
+  public void netServicesTestWhenJsonrpcWebsocketP2pNetworkAndMatricesIsEnabled() throws Exception {
+    service =
+        createJsonRpcHttpService(
+            createJsonRpcConfiguration(),
+            createWebSocketConfiguration(),
+            createP2pNetwork(),
+            createMetricsConfiguration());
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_services\"}");
+
+    try (final Response resp = client.newCall(buildRequest(body)).execute()) {
+      final JsonObject json = new JsonObject(resp.body().string());
+      final JsonObject result = json.getJsonObject("result");
+      assertThat(
+          result.containsKey("jsonrpc")
+              && result.containsKey("ws")
+              && result.containsKey("p2p")
+              && result.containsKey("metrics"));
+    }
+  }
+
+  @Test
+  public void netServicesTestWhenJsonrpcWebsocketP2pNetworkAndMatricesIsDisabled()
+      throws Exception {
+    service =
+        createJsonRpcHttpService(
+            JsonRpcConfiguration.createDefault(),
+            WebSocketConfiguration.createDefault(),
+            mock(P2PNetwork.class),
+            MetricsConfiguration.createDefault());
+    final String id = "123";
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_services\"}");
+
+    try (final Response resp = client.newCall(buildRequest(body)).execute()) {
+      final JsonObject json = new JsonObject(resp.body().string());
+      final JsonObject result = json.getJsonObject("result");
+      assertThat(
+          !result.containsKey("jsonrpc")
+              && !result.containsKey("ws")
+              && !result.containsKey("p2p")
+              && !result.containsKey("metrics"));
+    }
   }
 }

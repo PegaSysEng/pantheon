@@ -67,6 +67,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetEnode;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetListening;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetPeerCount;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetServices;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.RpcModules;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.TxPoolPantheonTransactions;
@@ -90,6 +91,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockReplay;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTracer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.BlockResultFactory;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
@@ -99,6 +101,7 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -128,7 +131,10 @@ public class JsonRpcMethodsFactory {
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountsWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
-      final PrivacyParameters privacyParameters) {
+      final PrivacyParameters privacyParameters,
+      final JsonRpcConfiguration jsonRpcConfiguration,
+      final WebSocketConfiguration webSocketConfiguration,
+      final MetricsConfiguration metricsConfiguration) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
     return methods(
@@ -147,7 +153,10 @@ public class JsonRpcMethodsFactory {
         accountsWhitelistController,
         nodeWhitelistController,
         rpcApis,
-        privacyParameters);
+        privacyParameters,
+        jsonRpcConfiguration,
+        webSocketConfiguration,
+        metricsConfiguration);
   }
 
   public Map<String, JsonRpcMethod> methods(
@@ -166,7 +175,10 @@ public class JsonRpcMethodsFactory {
       final Optional<AccountWhitelistController> accountsWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final Collection<RpcApi> rpcApis,
-      final PrivacyParameters privacyParameters) {
+      final PrivacyParameters privacyParameters,
+      final JsonRpcConfiguration jsonRpcConfiguration,
+      final WebSocketConfiguration webSocketConfiguration,
+      final MetricsConfiguration metricsConfiguration) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
     if (!rpcApis.isEmpty()) {
       addMethods(enabledMethods, new RpcModules(rpcApis));
@@ -244,7 +256,9 @@ public class JsonRpcMethodsFactory {
           new NetVersion(protocolSchedule.getChainId()),
           new NetListening(p2pNetwork),
           new NetPeerCount(p2pNetwork),
-          new NetEnode(p2pNetwork));
+          new NetEnode(p2pNetwork),
+          new NetServices(
+              jsonRpcConfiguration, webSocketConfiguration, p2pNetwork, metricsConfiguration));
     }
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());
