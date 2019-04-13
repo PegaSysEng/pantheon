@@ -104,7 +104,6 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
                   "database")
               .labels(rocksDbConfiguration.getLabel());
 
-
       if (metricsSystem instanceof PrometheusMetricsSystem) {
         RocksDBStats.registerRocksDBMetrics(stats, (PrometheusMetricsSystem) metricsSystem);
       }
