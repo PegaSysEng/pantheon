@@ -75,7 +75,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
                   MetricCategory.KVSTORE_ROCKSDB,
                   "read_latency_seconds",
                   "Latency for read from RocksDB.",
-                  rocksDbConfiguration.getLabel())
+                  "database")
               .labels(rocksDbConfiguration.getLabel());
       removeLatency =
           metricsSystem
@@ -83,7 +83,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
                   MetricCategory.KVSTORE_ROCKSDB,
                   "remove_latency_seconds",
                   "Latency of remove requests from RocksDB.",
-                  rocksDbConfiguration.getLabel())
+                  "database")
               .labels(rocksDbConfiguration.getLabel());
       writeLatency =
           metricsSystem
@@ -91,7 +91,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
                   MetricCategory.KVSTORE_ROCKSDB,
                   "write_latency_seconds",
                   "Latency for write to RocksDB.",
-                  rocksDbConfiguration.getLabel())
+                  "database")
               .labels(rocksDbConfiguration.getLabel());
       commitLatency =
           metricsSystem
@@ -99,7 +99,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
                   MetricCategory.KVSTORE_ROCKSDB,
                   "commit_latency_seconds",
                   "Latency for commits to RocksDB.",
-                  rocksDbConfiguration.getLabel())
+                  "database")
               .labels(rocksDbConfiguration.getLabel());
 
       metricsSystem.createLongGauge(
@@ -121,7 +121,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
                   MetricCategory.KVSTORE_ROCKSDB,
                   "rollback_count",
                   "Number of RocksDB transactions rolled back.",
-                  rocksDbConfiguration.getLabel())
+                  "database")
               .labels(rocksDbConfiguration.getLabel());
     } catch (final RocksDBException e) {
       throw new StorageException(e);
