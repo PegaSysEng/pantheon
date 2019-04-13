@@ -16,6 +16,8 @@ import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
+import tech.pegasys.pantheon.metrics.rocksdb.RocksDBStats;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -101,6 +103,11 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
                   "Latency for commits to RocksDB.",
                   "database")
               .labels(rocksDbConfiguration.getLabel());
+
+
+      if (metricsSystem instanceof PrometheusMetricsSystem) {
+        RocksDBStats.registerRocksDBMetrics(stats, (PrometheusMetricsSystem) metricsSystem);
+      }
 
       metricsSystem.createLongGauge(
           MetricCategory.KVSTORE_ROCKSDB,
