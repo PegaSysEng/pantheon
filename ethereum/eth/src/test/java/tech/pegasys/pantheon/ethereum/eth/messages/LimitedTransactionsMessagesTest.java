@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.messages;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
@@ -22,6 +23,8 @@ import java.util.Set;
 import org.junit.Test;
 
 public class LimitedTransactionsMessagesTest {
+
+  private static final int LIMIT = 1048576;
 
   private final BlockDataGenerator generator = new BlockDataGenerator();
   private final Set<Transaction> sampleTxs = generator.transactions(1);
@@ -42,6 +45,28 @@ public class LimitedTransactionsMessagesTest {
     assertEquals(781, secondMessage.getIncludedTransactions().size());
     txs.removeAll(secondMessage.getIncludedTransactions());
     assertEquals(0, txs.size());
+    assertTrue(
+        (firstMessage.getTransactionsMessage().getSize()
+                + secondMessage.getTransactionsMessage().getSize())
+            < 2 * LIMIT);
+  }
+
+  @Test
+  public void createLimitedWithFirstTransactionExceedingLimit() {
+    final Set<Transaction> txs = generator.transactions(6000);
+    final LimitedTransactionsMessages firstMessage = LimitedTransactionsMessages.createLimited(txs);
+    assertEquals(5219, firstMessage.getIncludedTransactions().size());
+    txs.removeAll(firstMessage.getIncludedTransactions());
+    assertEquals(781, txs.size());
+    final LimitedTransactionsMessages secondMessage =
+        LimitedTransactionsMessages.createLimited(txs);
+    assertEquals(781, secondMessage.getIncludedTransactions().size());
+    txs.removeAll(secondMessage.getIncludedTransactions());
+    assertEquals(0, txs.size());
+    assertTrue(
+        (firstMessage.getTransactionsMessage().getSize()
+                + secondMessage.getTransactionsMessage().getSize())
+            < 2 * LIMIT);
   }
 
   @Test

@@ -53,7 +53,6 @@ public final class LimitedTransactionsMessages {
       if (messageSize > LIMIT) {
         break;
       }
-      messageSize += encodedBytes.size();
     }
     message.endList();
     return new LimitedTransactionsMessages(
