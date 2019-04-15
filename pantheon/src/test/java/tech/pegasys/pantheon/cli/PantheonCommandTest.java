@@ -74,7 +74,6 @@ import io.vertx.core.json.JsonObject;
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseResult;
 import org.apache.commons.text.StringEscapeUtils;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -1042,7 +1041,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  @Ignore
   public void syncModeOptionMustBeUsed() {
 
     parseCommand("--sync-mode", "FAST");
@@ -1052,6 +1050,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));
 
     assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void helpShouldDisplayFastSyncOptions() {
+    parseCommand("--help");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).contains("--fast-sync-min-peers");
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
@@ -2331,16 +2339,19 @@ public class PantheonCommandTest extends CommandTestAbstract {
     permissioningConfig.deleteOnExit();
 
     final EnodeURL staticNodeURI =
-        new EnodeURL(
-            "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa",
-            "127.0.0.1",
-            30303);
+        EnodeURL.builder()
+            .nodeId(
+                "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa")
+            .ipAddress("127.0.0.1")
+            .build();
 
     final EnodeURL whiteListedNode =
-        new EnodeURL(
-            "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa",
-            "127.0.0.1",
-            30304);
+        EnodeURL.builder()
+            .nodeId(
+                "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa")
+            .ipAddress("127.0.0.1")
+            .listeningPort(30304)
+            .build();
 
     Files.write(
         staticNodesFile.toPath(), ("[\"" + staticNodeURI.toString() + "\"]").getBytes(UTF_8));
