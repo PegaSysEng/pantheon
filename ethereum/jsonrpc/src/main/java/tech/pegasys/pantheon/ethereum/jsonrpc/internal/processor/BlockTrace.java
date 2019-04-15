@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -10,10 +10,19 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.core;
+package tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor;
 
-@FunctionalInterface
-public interface PendingTransactionListener {
+import java.util.List;
 
-  void onTransactionAdded(Transaction transaction);
+public class BlockTrace {
+
+  private final List<TransactionTrace> transactionTraces;
+
+  public BlockTrace(final List<TransactionTrace> transactionTraces) {
+    this.transactionTraces = transactionTraces;
+  }
+
+  public List<TransactionTrace> getTransactionTraces() {
+    return transactionTraces;
+  }
 }
