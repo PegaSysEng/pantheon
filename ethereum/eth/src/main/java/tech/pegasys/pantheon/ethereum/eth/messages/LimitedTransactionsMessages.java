@@ -49,7 +49,8 @@ public final class LimitedTransactionsMessages {
       message.writeRLPUnsafe(encodedBytes);
       includedTransactions.add(transaction);
       // Check if last transaction to add to the message
-      if (messageSize + encodedBytes.size() > LIMIT) {
+      messageSize += encodedBytes.size();
+      if (messageSize > LIMIT) {
         break;
       }
       messageSize += encodedBytes.size();
