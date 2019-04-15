@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockBodiesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
@@ -47,34 +48,20 @@ import org.apache.logging.log4j.Logger;
 class EthServer {
   private static final Logger LOG = LogManager.getLogger();
 
-  public static final int DEFAULT_MAX_GET_BLOCK_HEADERS = 192;
-  public static final int DEFAULT_MAX_GET_BLOCK_BODIES = 128;
-  public static final int DEFAULT_MAX_GET_RECEIPTS = 256;
-  public static final int DEFAULT_MAX_GET_NODE_DATA = 384;
-
   private final Blockchain blockchain;
   private final WorldStateArchive worldStateArchive;
   private final EthMessages ethMessages;
-  private final int maxGetBlockHeaders;
-  private final int maxGetBlockBodies;
-  private final int maxGetReceipts;
-  private final int maxGetNodeData;
+  private final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
 
   EthServer(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final EthMessages ethMessages,
-      final int maxGetBlockHeaders,
-      final int maxGetBlockBodies,
-      final int maxGetReceipts,
-      final int maxGetNodeData) {
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
     this.blockchain = blockchain;
     this.worldStateArchive = worldStateArchive;
     this.ethMessages = ethMessages;
-    this.maxGetBlockHeaders = maxGetBlockHeaders;
-    this.maxGetBlockBodies = maxGetBlockBodies;
-    this.maxGetReceipts = maxGetReceipts;
-    this.maxGetNodeData = maxGetNodeData;
+    this.ethereumWireProtocolConfiguration = ethereumWireProtocolConfiguration;
     this.setupListeners();
   }
 
@@ -86,10 +73,7 @@ class EthServer {
         blockchain,
         worldStateArchive,
         ethMessages,
-        DEFAULT_MAX_GET_BLOCK_HEADERS,
-        DEFAULT_MAX_GET_BLOCK_BODIES,
-        DEFAULT_MAX_GET_RECEIPTS,
-        DEFAULT_MAX_GET_NODE_DATA);
+        EthereumWireProtocolConfiguration.defaultConfig());
   }
 
   private void setupListeners() {
@@ -103,7 +87,10 @@ class EthServer {
     LOG.trace("Responding to GET_BLOCK_HEADERS request");
     try {
       final MessageData response =
-          constructGetHeadersResponse(blockchain, message.getData(), maxGetBlockHeaders);
+          constructGetHeadersResponse(
+              blockchain,
+              message.getData(),
+              ethereumWireProtocolConfiguration.getMaxGetBlockHeaders());
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
@@ -116,7 +103,10 @@ class EthServer {
     LOG.trace("Responding to GET_BLOCK_BODIES request");
     try {
       final MessageData response =
-          constructGetBodiesResponse(blockchain, message.getData(), maxGetBlockBodies);
+          constructGetBodiesResponse(
+              blockchain,
+              message.getData(),
+              ethereumWireProtocolConfiguration.getMaxGetBlockBodies());
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
@@ -129,7 +119,8 @@ class EthServer {
     LOG.trace("Responding to GET_RECEIPTS request");
     try {
       final MessageData response =
-          constructGetReceiptsResponse(blockchain, message.getData(), maxGetReceipts);
+          constructGetReceiptsResponse(
+              blockchain, message.getData(), ethereumWireProtocolConfiguration.getMaxGetReceipts());
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
@@ -142,7 +133,10 @@ class EthServer {
     LOG.trace("Responding to GET_NODE_DATA request");
     try {
       final MessageData response =
-          constructGetNodeDataResponse(worldStateArchive, message.getData(), maxGetNodeData);
+          constructGetNodeDataResponse(
+              worldStateArchive,
+              message.getData(),
+              ethereumWireProtocolConfiguration.getMaxGetNodeData());
       message.getPeer().send(response);
     } catch (final RLPException e) {
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);

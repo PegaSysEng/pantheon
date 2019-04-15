@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibftlegacy.protocol;
 import static java.util.Collections.singletonList;
 
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -24,6 +25,28 @@ import java.util.List;
 
 /** This allows for interoperability with Quorum, but shouldn't be used otherwise. */
 public class Istanbul64ProtocolManager extends EthProtocolManager {
+
+  public Istanbul64ProtocolManager(
+      final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
+      final int networkId,
+      final boolean fastSyncEnabled,
+      final int syncWorkers,
+      final int txWorkers,
+      final int computationWorkers,
+      final MetricsSystem metricsSystem,
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
+    super(
+        blockchain,
+        worldStateArchive,
+        networkId,
+        fastSyncEnabled,
+        syncWorkers,
+        txWorkers,
+        computationWorkers,
+        metricsSystem,
+        ethereumWireProtocolConfiguration);
+  }
 
   public Istanbul64ProtocolManager(
       final Blockchain blockchain,

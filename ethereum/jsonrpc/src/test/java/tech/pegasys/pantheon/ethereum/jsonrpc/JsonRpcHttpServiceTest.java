@@ -121,8 +121,7 @@ public class JsonRpcHttpServiceTest {
                     blockchainQueries,
                     synchronizer,
                     MainnetProtocolSchedule.fromConfig(
-                        new StubGenesisConfigOptions().constantinopleBlock(0).chainId(CHAIN_ID),
-                        PrivacyParameters.noPrivacy()),
+                        new StubGenesisConfigOptions().constantinopleBlock(0).chainId(CHAIN_ID)),
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),
@@ -200,6 +199,28 @@ public class JsonRpcHttpServiceTest {
   public void handleEmptyRequest() throws Exception {
     try (final Response resp = client.newCall(buildGetRequest("")).execute()) {
       assertThat(resp.code()).isEqualTo(201);
+    }
+  }
+
+  @Test
+  public void handleUnknownRequestFields() throws Exception {
+    final String id = "123";
+    // Create a request with an extra "beta" param
+    final RequestBody body =
+        RequestBody.create(
+            JSON,
+            "{\"jsonrpc\":\"2.0\",\"id\":"
+                + Json.encode(id)
+                + ",\"method\":\"net_version\", \"beta\":true}");
+
+    try (final Response resp = client.newCall(buildPostRequest(body)).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+      // Check general format of result
+      final JsonObject json = new JsonObject(resp.body().string());
+      testHelper.assertValidJsonRpcResult(json, id);
+      // Check result
+      final String result = json.getString("result");
+      assertThat(result).isEqualTo(String.valueOf(CHAIN_ID));
     }
   }
 

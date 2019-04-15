@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
@@ -64,16 +65,13 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
   private final Blockchain blockchain;
   private final BlockBroadcaster blockBroadcaster;
 
-  EthProtocolManager(
+  public EthProtocolManager(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final int networkId,
       final boolean fastSyncEnabled,
       final EthScheduler scheduler,
-      final int maxGetBlockHeaders,
-      final int maxGetBlockBodies,
-      final int maxGetReceipts,
-      final int maxGetNodeData) {
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
     this.networkId = networkId;
     this.scheduler = scheduler;
     this.blockchain = blockchain;
@@ -89,14 +87,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     this.blockBroadcaster = new BlockBroadcaster(ethContext);
 
     // Set up request handlers
-    new EthServer(
-        blockchain,
-        worldStateArchive,
-        ethMessages,
-        maxGetBlockHeaders,
-        maxGetBlockBodies,
-        maxGetReceipts,
-        maxGetNodeData);
+    new EthServer(blockchain, worldStateArchive, ethMessages, ethereumWireProtocolConfiguration);
   }
 
   public EthProtocolManager(
@@ -114,10 +105,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         networkId,
         fastSyncEnabled,
         new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
-        EthServer.DEFAULT_MAX_GET_BLOCK_HEADERS,
-        EthServer.DEFAULT_MAX_GET_BLOCK_BODIES,
-        EthServer.DEFAULT_MAX_GET_RECEIPTS,
-        EthServer.DEFAULT_MAX_GET_NODE_DATA);
+        EthereumWireProtocolConfiguration.defaultConfig());
   }
 
   public EthProtocolManager(
@@ -129,20 +117,14 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int txWorkers,
       final int computationWorkers,
       final MetricsSystem metricsSystem,
-      final int maxGetBlockHeaders,
-      final int maxGetBlockBodies,
-      final int maxGetReceipts,
-      final int maxGetNodeData) {
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
     this(
         blockchain,
         worldStateArchive,
         networkId,
         fastSyncEnabled,
         new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
-        maxGetBlockHeaders,
-        maxGetBlockBodies,
-        maxGetReceipts,
-        maxGetNodeData);
+        ethereumWireProtocolConfiguration);
   }
 
   public EthContext ethContext() {
