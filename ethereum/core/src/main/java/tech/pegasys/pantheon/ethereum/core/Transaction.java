@@ -494,7 +494,7 @@ public class Transaction {
       return build();
     }
 
-    SECP256K1.Signature computeSignature(final SECP256K1.KeyPair keys) {
+    protected SECP256K1.Signature computeSignature(final SECP256K1.KeyPair keys) {
       final OptionalInt optionalChainId =
           chainId > 0 ? OptionalInt.of(chainId) : OptionalInt.empty();
       final Bytes32 hash =
