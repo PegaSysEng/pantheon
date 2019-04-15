@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.util.enode;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import tech.pegasys.pantheon.util.NetworkUtility;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.InetAddress;
 import java.net.URI;
@@ -38,43 +39,34 @@ public class EnodeURL {
           + "(?<listening>\\d+)"
           + "(\\?discport=(?<discovery>\\d+))?$";
 
-  private final String nodeId;
+  private final BytesValue nodeId;
   private final InetAddress ip;
   private final Integer listeningPort;
+  // DiscoveryPort will only be present if it differs from listening port, otherwise
+  // the discovery port is assumed to match the listening port
   private final OptionalInt discoveryPort;
 
-  public EnodeURL(
-      final String nodeId,
-      final String ip,
-      final Integer listeningPort,
-      final OptionalInt discoveryPort) {
-    this(nodeId, InetAddresses.forUriString(ip), listeningPort, discoveryPort);
-  }
-
-  public EnodeURL(final String nodeId, final String ip, final Integer listeningPort) {
-    this(nodeId, ip, listeningPort, OptionalInt.empty());
-  }
-
-  public EnodeURL(final String nodeId, final InetAddress address, final Integer listeningPort) {
-    this(nodeId, address, listeningPort, OptionalInt.empty());
-  }
-
-  public EnodeURL(
-      final String nodeId,
+  private EnodeURL(
+      final BytesValue nodeId,
       final InetAddress address,
       final Integer listeningPort,
       final OptionalInt discoveryPort) {
-    if (nodeId.startsWith("0x")) {
-      this.nodeId = nodeId.substring(2);
-    } else {
-      this.nodeId = nodeId;
-    }
+    this.nodeId = nodeId;
     this.ip = address;
     this.listeningPort = listeningPort;
-    this.discoveryPort = discoveryPort;
+    // Only explicitly define a discovery port if it differs from the listening port
+    if (discoveryPort.isPresent() && discoveryPort.getAsInt() != listeningPort) {
+      this.discoveryPort = discoveryPort;
+    } else {
+      this.discoveryPort = OptionalInt.empty();
+    }
   }
 
-  public EnodeURL(final String value) {
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static EnodeURL fromString(final String value) {
     checkArgument(
         value != null && !value.isEmpty(), "Can't convert null/empty string to EnodeURLProperty.");
 
@@ -83,15 +75,23 @@ public class EnodeURL {
         enodeMatcher.matches(),
         "Invalid enode URL syntax. Enode URL should have the following format 'enode://<node_id>@<ip>:<listening_port>[?discport=<discovery_port>]'.");
 
-    this.nodeId = getAndValidateNodeId(enodeMatcher);
-    this.ip = getAndValidateIp(enodeMatcher);
-    this.listeningPort = getAndValidatePort(enodeMatcher, "listening");
-    this.discoveryPort = getAndValidateDiscoveryPort(enodeMatcher);
+    final String nodeId = getAndValidateNodeId(enodeMatcher);
+    final InetAddress ip = getAndValidateIp(enodeMatcher);
+    final int listeningPort = getAndValidatePort(enodeMatcher, "listening");
+    final OptionalInt discoveryPort = getAndValidateDiscoveryPort(enodeMatcher);
+    return builder()
+        .nodeId(nodeId)
+        .ipAddress(ip)
+        .listeningPort(listeningPort)
+        .discoveryPort(discoveryPort)
+        .build();
   }
 
   public URI toURI() {
     final String uri =
-        String.format("enode://%s@%s:%d", nodeId, InetAddresses.toUriString(ip), listeningPort);
+        String.format(
+            "enode://%s@%s:%d",
+            nodeId.toUnprefixedString(), InetAddresses.toUriString(ip), listeningPort);
     if (discoveryPort.isPresent()) {
       return URI.create(uri + String.format("?discport=%d", discoveryPort.getAsInt()));
     } else {
@@ -100,7 +100,7 @@ public class EnodeURL {
   }
 
   public static URI asURI(final String url) {
-    return new EnodeURL(url).toURI();
+    return fromString(url).toURI();
   }
 
   private static String getAndValidateNodeId(final Matcher matcher) {
@@ -144,7 +144,7 @@ public class EnodeURL {
     }
   }
 
-  public String getNodeId() {
+  public BytesValue getNodeId() {
     return nodeId;
   }
 
@@ -193,5 +193,54 @@ public class EnodeURL {
   @Override
   public String toString() {
     return this.toURI().toString();
+  }
+
+  public static class Builder {
+
+    private BytesValue nodeId;
+    private Integer listeningPort = 30303;
+    private OptionalInt discoveryPort = OptionalInt.empty();
+    private InetAddress ip;
+
+    private Builder() {};
+
+    public EnodeURL build() {
+      return new EnodeURL(nodeId, ip, listeningPort, discoveryPort);
+    }
+
+    public Builder nodeId(final BytesValue nodeId) {
+      this.nodeId = nodeId;
+      return this;
+    }
+
+    public Builder nodeId(final String nodeId) {
+      this.nodeId = BytesValue.fromHexString(nodeId);
+      return this;
+    }
+
+    public Builder ipAddress(final InetAddress ip) {
+      this.ip = ip;
+      return this;
+    }
+
+    public Builder ipAddress(final String ip) {
+      this.ip = InetAddresses.forUriString(ip);
+      return this;
+    }
+
+    public Builder listeningPort(final Integer listeningPort) {
+      this.listeningPort = listeningPort;
+      return this;
+    }
+
+    public Builder discoveryPort(final OptionalInt discoveryPort) {
+      this.discoveryPort = discoveryPort;
+      return this;
+    }
+
+    public Builder discoveryPort(final int discoveryPort) {
+      this.discoveryPort = OptionalInt.of(discoveryPort);
+      return this;
+    }
   }
 }
