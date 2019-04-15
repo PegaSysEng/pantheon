@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.eth.transactions;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.messages.LimitedTransactionsMessages;
-import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessageLimiter;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 
 import java.util.Set;
@@ -24,13 +23,9 @@ import java.util.stream.StreamSupport;
 class TransactionsMessageSender {
 
   private final PeerTransactionTracker transactionTracker;
-  private final TransactionsMessageLimiter transactionsMessageLimiter;
 
-  public TransactionsMessageSender(
-      final PeerTransactionTracker transactionTracker,
-      final TransactionsMessageLimiter transactionsMessageLimiter) {
+  public TransactionsMessageSender(final PeerTransactionTracker transactionTracker) {
     this.transactionTracker = transactionTracker;
-    this.transactionsMessageLimiter = transactionsMessageLimiter;
   }
 
   public void sendTransactionsToPeers() {
@@ -43,7 +38,7 @@ class TransactionsMessageSender {
     final Set<Transaction> allTxToSend = transactionTracker.claimTransactionsToSendToPeer(peer);
     while (!allTxToSend.isEmpty()) {
       final LimitedTransactionsMessages limitedTransactionsMessages =
-          LimitedTransactionsMessages.createLimited(allTxToSend, transactionsMessageLimiter);
+          LimitedTransactionsMessages.createLimited(allTxToSend);
       allTxToSend.removeAll(limitedTransactionsMessages.getIncludedTransactions());
       try {
         peer.send(limitedTransactionsMessages.getTransactionsMessage());

@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.eth.transactions;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.messages.DefaultTransactionMessageLimiter;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -35,7 +34,7 @@ public class TransactionPoolFactory {
 
     final PeerTransactionTracker transactionTracker = new PeerTransactionTracker();
     final TransactionsMessageSender transactionsMessageSender =
-        new TransactionsMessageSender(transactionTracker, new DefaultTransactionMessageLimiter());
+        new TransactionsMessageSender(transactionTracker);
 
     final TransactionPool transactionPool =
         new TransactionPool(

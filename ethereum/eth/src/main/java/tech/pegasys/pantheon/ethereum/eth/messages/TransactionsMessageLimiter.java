@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.messages;
 
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 
+@FunctionalInterface
 public interface TransactionsMessageLimiter {
 
   boolean isLastTransactionToIncludeWithoutExceedingLimit(final BytesValueRLPOutput tmp);

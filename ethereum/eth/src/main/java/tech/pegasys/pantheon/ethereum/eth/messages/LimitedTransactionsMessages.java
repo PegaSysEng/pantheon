@@ -20,8 +20,12 @@ import java.util.Set;
 
 public final class LimitedTransactionsMessages {
 
+  private static final int LIMIT = 1048576;
+
   private final TransactionsMessage transactionsMessage;
   private final Set<Transaction> includedTransactions;
+
+  private static TransactionsMessageLimiter limiter = tmp -> tmp.uncheckedEncodedSize() >= LIMIT;
 
   public LimitedTransactionsMessages(
       final TransactionsMessage transactionsMessage, final Set<Transaction> includedTransactions) {
@@ -30,7 +34,7 @@ public final class LimitedTransactionsMessages {
   }
 
   public static LimitedTransactionsMessages createLimited(
-      final Iterable<Transaction> transactions, final TransactionsMessageLimiter limiter) {
+      final Iterable<Transaction> transactions) {
     final Set<Transaction> includedTransactions = new HashSet<>();
     final BytesValueRLPOutput tmp = new BytesValueRLPOutput();
     tmp.startList();
@@ -52,5 +56,9 @@ public final class LimitedTransactionsMessages {
 
   public final Set<Transaction> getIncludedTransactions() {
     return includedTransactions;
+  }
+
+  public static void setLimiter(TransactionsMessageLimiter limiter) {
+    LimitedTransactionsMessages.limiter = limiter;
   }
 }

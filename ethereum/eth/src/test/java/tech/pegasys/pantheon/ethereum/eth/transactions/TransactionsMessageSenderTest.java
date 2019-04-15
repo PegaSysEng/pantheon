@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
+import tech.pegasys.pantheon.ethereum.eth.messages.LimitedTransactionsMessages;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessageLimiter;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -53,7 +54,7 @@ public class TransactionsMessageSenderTest {
 
   private final PeerTransactionTracker transactionTracker = new PeerTransactionTracker();
   private final TransactionsMessageSender messageSender =
-      new TransactionsMessageSender(transactionTracker, transactionsMessageLimiter);
+      new TransactionsMessageSender(transactionTracker);
 
   @Test
   public void shouldSendTransactionsToEachPeer() throws Exception {
@@ -74,7 +75,7 @@ public class TransactionsMessageSenderTest {
         IntStream.range(0, 3).mapToObj(number -> generator.transaction()).collect(toSet());
     threeTransactions.forEach(
         transaction -> transactionTracker.addToPeerSendQueue(peer1, transaction));
-
+    LimitedTransactionsMessages.setLimiter(transactionsMessageLimiter);
     when(transactionsMessageLimiter.isLastTransactionToIncludeWithoutExceedingLimit(any()))
         .thenReturn(false)
         .thenReturn(true);
