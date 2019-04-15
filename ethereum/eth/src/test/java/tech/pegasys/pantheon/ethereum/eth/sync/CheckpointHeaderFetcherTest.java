@@ -42,6 +42,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CheckpointHeaderFetcherTest {
+
+  private static final int SEGMENT_SIZE = 5;
   private static Blockchain blockchain;
   private static ProtocolSchedule<Void> protocolSchedule;
   private static ProtocolContext<Void> protocolContext;
@@ -66,7 +68,9 @@ public class CheckpointHeaderFetcherTest {
             blockchain, protocolContext.getWorldStateArchive(), () -> false);
     responder =
         RespondingEthPeer.blockchainResponder(blockchain, protocolContext.getWorldStateArchive());
-    respondingPeer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
+    respondingPeer =
+        EthProtocolManagerTestUtil.createPeer(
+            ethProtocolManager, blockchain.getChainHeadBlockNumber());
   }
 
   @Test
@@ -141,12 +145,42 @@ public class CheckpointHeaderFetcherTest {
     assertThat(result).isCompletedWithValue(emptyList());
   }
 
+  @Test
+  public void shouldRequestRemoteChainHeadWhenNextCheckpointHeaderIsAfterHead() {
+    final long remoteChainHeight = blockchain.getChainHeadBlockNumber();
+    final CheckpointHeaderFetcher checkpointHeaderFetcher =
+        createCheckpointHeaderFetcher(Optional.empty());
+
+    final CompletableFuture<List<BlockHeader>> result =
+        checkpointHeaderFetcher.getNextCheckpointHeaders(
+            respondingPeer.getEthPeer(), header(remoteChainHeight - SEGMENT_SIZE + 1));
+
+    respondingPeer.respond(responder);
+
+    assertThat(result).isCompletedWithValue(singletonList(header(remoteChainHeight)));
+  }
+
+  @Test
+  public void shouldReturnRemoteChainHeadWhenNextCheckpointHeaderIsTheRemoteHead() {
+    final long remoteChainHeight = blockchain.getChainHeadBlockNumber();
+    final CheckpointHeaderFetcher checkpointHeaderFetcher =
+        createCheckpointHeaderFetcher(Optional.empty());
+
+    final CompletableFuture<List<BlockHeader>> result =
+        checkpointHeaderFetcher.getNextCheckpointHeaders(
+            respondingPeer.getEthPeer(), header(remoteChainHeight - SEGMENT_SIZE));
+
+    respondingPeer.respond(responder);
+
+    assertThat(result).isCompletedWithValue(singletonList(header(remoteChainHeight)));
+  }
+
   private CheckpointHeaderFetcher createCheckpointHeaderFetcher(
       final Optional<BlockHeader> targetHeader) {
     final EthContext ethContext = ethProtocolManager.ethContext();
     return new CheckpointHeaderFetcher(
         SynchronizerConfiguration.builder()
-            .downloaderChainSegmentSize(5)
+            .downloaderChainSegmentSize(SEGMENT_SIZE)
             .downloaderHeadersRequestSize(3)
             .build(),
         protocolSchedule,

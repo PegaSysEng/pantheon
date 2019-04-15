@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask.PeerTaskResult;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByHashTask;
+import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByNumberTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -66,6 +67,12 @@ public class CheckpointHeaderFetcher {
       if (additionalHeaderCount == 0) {
         return completedFuture(singletonList(targetHeader));
       }
+    } else if (lastHeader.getNumber() + skip >= peer.chainState().getEstimatedHeight()) {
+      return GetHeadersFromPeerByNumberTask.forSingleNumber(
+              protocolSchedule, ethContext, peer.chainState().getEstimatedHeight(), metricsSystem)
+          .assignPeer(peer)
+          .run()
+          .thenApply(PeerTaskResult::getResult);
     } else {
       additionalHeaderCount = maximumHeaderRequestSize;
     }
