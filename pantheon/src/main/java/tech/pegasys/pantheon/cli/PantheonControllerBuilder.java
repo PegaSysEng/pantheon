@@ -35,7 +35,8 @@ import java.time.Clock;
 public class PantheonControllerBuilder {
 
   private SynchronizerConfiguration synchronizerConfiguration;
-  private EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
+  private EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration =
+      EthereumWireProtocolConfiguration.defaultConfig();
   private RocksDbConfiguration rocksDbConfiguration;
   private Path homePath;
   private EthNetworkConfig ethNetworkConfig;
