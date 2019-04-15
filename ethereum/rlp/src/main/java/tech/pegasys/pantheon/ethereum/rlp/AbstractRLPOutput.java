@@ -140,16 +140,6 @@ abstract class AbstractRLPOutput implements RLPOutput {
     checkState(stackSize == 1, "A list has been entered (startList()) but not left (endList())");
     return payloadSizes[0];
   }
-
-  /**
-   * Computes a temporary encoded data size
-   *
-   * @return The size of the RLP-encoded data written to this output.
-   */
-  public int uncheckedEncodedSize() {
-    return payloadSizes[0];
-  }
-
   /**
    * Write the rlp encoded value to the provided {@link MutableBytesValue}
    *
