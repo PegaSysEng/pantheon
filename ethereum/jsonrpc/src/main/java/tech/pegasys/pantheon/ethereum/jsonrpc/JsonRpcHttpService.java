@@ -456,7 +456,7 @@ public class JsonRpcHttpService {
         return errorResponse(id, JsonRpcError.INVALID_PARAMS);
       } catch (final RuntimeException e) {
         LOG.debug("Problem decoding JSON request", e);
-        return errorResponse(id, JsonRpcError.INVALID_REQUEST);
+        return errorResponse(id, JsonRpcError.INTERNAL_ERROR);
       }
     } else {
       return unauthorizedResponse(id, JsonRpcError.UNAUTHORIZED);
