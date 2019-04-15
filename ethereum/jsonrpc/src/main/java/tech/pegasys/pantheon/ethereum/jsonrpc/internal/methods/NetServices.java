@@ -24,9 +24,11 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 public class NetServices implements JsonRpcMethod {
 
-  private final Map<String, Map<String, String>> services;
+  private final ImmutableMap<String, ImmutableMap<String, String>> services;
 
   public NetServices(
       final JsonRpcConfiguration jsonRpcConfiguration,
@@ -34,16 +36,19 @@ public class NetServices implements JsonRpcMethod {
       final P2PNetwork p2pNetwork,
       final MetricsConfiguration metricsConfiguration) {
 
-    services = new LinkedHashMap<String, Map<String, String>>();
+    Map<String, ImmutableMap<String, String>> activeServices =
+        new LinkedHashMap<String, ImmutableMap<String, String>>();
+
     if (jsonRpcConfiguration.isEnabled()) {
-      services.put(
+      activeServices.put(
           "jsonrpc",
-          getServiceDetailsMap(jsonRpcConfiguration.getHost(), jsonRpcConfiguration.getPort()));
+          createServiceDetailsMap(jsonRpcConfiguration.getHost(), jsonRpcConfiguration.getPort()));
     }
     if (webSocketConfiguration.isEnabled()) {
-      services.put(
+      activeServices.put(
           "ws",
-          getServiceDetailsMap(webSocketConfiguration.getHost(), webSocketConfiguration.getPort()));
+          createServiceDetailsMap(
+              webSocketConfiguration.getHost(), webSocketConfiguration.getPort()));
     }
     if (p2pNetwork.isP2pEnabled()) {
       final PeerInfo peerInfo = p2pNetwork.getLocalPeerInfo();
@@ -51,17 +56,20 @@ public class NetServices implements JsonRpcMethod {
           .getAdvertisedPeer()
           .ifPresent(
               advertisedPeer -> {
-                services.put(
+                activeServices.put(
                     "p2p",
-                    getServiceDetailsMap(
+                    createServiceDetailsMap(
                         advertisedPeer.getEndpoint().getHost(), peerInfo.getPort()));
               });
     }
     if (metricsConfiguration.isEnabled()) {
-      services.put(
+      activeServices.put(
           "metrics",
-          getServiceDetailsMap(metricsConfiguration.getHost(), metricsConfiguration.getPort()));
+          createServiceDetailsMap(metricsConfiguration.getHost(), metricsConfiguration.getPort()));
     }
+
+    services =
+        ImmutableMap.<String, ImmutableMap<String, String>>builder().putAll(activeServices).build();
   }
 
   @Override
@@ -74,10 +82,7 @@ public class NetServices implements JsonRpcMethod {
     return new JsonRpcSuccessResponse(req.getId(), services);
   }
 
-  private Map<String, String> getServiceDetailsMap(final String host, final int port) {
-    Map<String, String> serviceDetails = new LinkedHashMap<String, String>();
-    serviceDetails.put("host", host);
-    serviceDetails.put("port", String.valueOf((port)));
-    return serviceDetails;
+  private ImmutableMap<String, String> createServiceDetailsMap(final String host, final int port) {
+    return ImmutableMap.of("host", host, "port", String.valueOf(port));
   }
 }

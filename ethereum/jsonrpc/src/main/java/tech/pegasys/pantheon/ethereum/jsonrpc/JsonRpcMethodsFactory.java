@@ -12,12 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
@@ -109,6 +103,12 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 public class JsonRpcMethodsFactory {
 
   private final BlockResultFactory blockResult = new BlockResultFactory();
@@ -156,8 +156,7 @@ public class JsonRpcMethodsFactory {
         privacyParameters,
         jsonRpcConfiguration,
         webSocketConfiguration,
-        metricsConfiguration
-        );
+        metricsConfiguration);
   }
 
   public Map<String, JsonRpcMethod> methods(
@@ -259,7 +258,7 @@ public class JsonRpcMethodsFactory {
           new NetPeerCount(p2pNetwork),
           new NetEnode(p2pNetwork),
           new NetServices(
-                  jsonRpcConfiguration, webSocketConfiguration, p2pNetwork, metricsConfiguration));
+              jsonRpcConfiguration, webSocketConfiguration, p2pNetwork, metricsConfiguration));
     }
     if (rpcApis.contains(RpcApis.WEB3)) {
       addMethods(enabledMethods, new Web3ClientVersion(clientVersion), new Web3Sha3());

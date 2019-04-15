@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -44,7 +45,11 @@ import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioning
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -79,6 +84,8 @@ public class JsonRpcHttpServiceRpcApisTest {
   private static final String CLIENT_VERSION = "TestClientVersion/0.1.0";
   private static final int NETWORK_ID = 123;
   private JsonRpcConfiguration configuration;
+  private static final List<String> netServices =
+      new ArrayList<>(Arrays.asList("jsonrpc", "ws", "p2p", "metrics"));
 
   @Mock protected static BlockchainQueries blockchainQueries;
 
@@ -300,27 +307,94 @@ public class JsonRpcHttpServiceRpcApisTest {
 
   @Test
   public void netServicesTestWhenJsonrpcWebsocketP2pNetworkAndMatricesIsEnabled() throws Exception {
-    service =
-        createJsonRpcHttpService(
-            createJsonRpcConfiguration(),
-            createWebSocketConfiguration(),
-            createP2pNetwork(),
-            createMetricsConfiguration());
-    final String id = "123";
-    final RequestBody body =
-        RequestBody.create(
-            JSON,
-            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_services\"}");
+    boolean[] servicesStates = new boolean[netServices.size()];
+    Arrays.fill(servicesStates, Boolean.TRUE); // All services are enabled
+    service = getJsonRpcHttpService(servicesStates);
+
+    final RequestBody body = createNetServicesRequestBody();
 
     try (final Response resp = client.newCall(buildRequest(body)).execute()) {
-      final JsonObject json = new JsonObject(resp.body().string());
-      final JsonObject result = json.getJsonObject("result");
-      assertTrue(
-          result.containsKey("jsonrpc")
-              && result.containsKey("ws")
-              && result.containsKey("p2p")
-              && result.containsKey("metrics"));
+
+      final JsonObject responseBody = new JsonObject(resp.body().string());
+      for (int j = 0; j < netServices.size(); j++) {
+        assertNetService(servicesStates, responseBody, netServices.get(j));
+      }
     }
+  }
+
+  @Test
+  public void netServicesTestWhenOneIsEnabled() throws Exception {
+
+    for (int i = 0; i < netServices.size(); i++) {
+
+      boolean[] servicesStates = new boolean[netServices.size()];
+      int enabledServiceIndex = i % netServices.size();
+      servicesStates[enabledServiceIndex] = true; // enable only one service at a time
+      service = getJsonRpcHttpService(servicesStates);
+
+      final RequestBody body = createNetServicesRequestBody();
+      try (final Response resp = client.newCall(buildRequest(body)).execute()) {
+        final JsonObject responseBody = new JsonObject(resp.body().string());
+
+        for (int j = 0; j < netServices.size(); j++) {
+          assertNetService(servicesStates, responseBody, netServices.get(j));
+        }
+      }
+      service.stop().join();
+    }
+  }
+
+  private void assertNetService(
+      final boolean[] servicesStates, final JsonObject jsonBody, final String serviceName)
+      throws IOException {
+
+    boolean isAssertTrue = servicesStates[netServices.indexOf(serviceName)];
+
+    final JsonObject result = jsonBody.getJsonObject("result");
+    final JsonObject serviceElement = result.getJsonObject(serviceName);
+    if (isAssertTrue) {
+      assertTrue(
+          serviceElement != null
+              && serviceElement.containsKey("host")
+              && serviceElement.containsKey("port"));
+    } else {
+      assertFalse(
+          serviceElement != null
+              && serviceElement.containsKey("host")
+              && serviceElement.containsKey("port"));
+    }
+  }
+
+  public RequestBody createNetServicesRequestBody() {
+    String id = "123";
+    return RequestBody.create(
+        JSON, "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_services\"}");
+  }
+
+  public JsonRpcHttpService getJsonRpcHttpService(final boolean[] enabledNetServices)
+      throws Exception {
+
+    JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
+    WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
+    P2PNetwork p2pNetwork = mock(P2PNetwork.class);
+    MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+
+    if (enabledNetServices[netServices.indexOf("jsonrpc")]) {
+      jsonRpcConfiguration = createJsonRpcConfiguration();
+    }
+
+    if (enabledNetServices[netServices.indexOf("ws")]) {
+      webSocketConfiguration = createWebSocketConfiguration();
+    }
+    if (enabledNetServices[netServices.indexOf("p2p")]) {
+      p2pNetwork = createP2pNetwork();
+    }
+    if (enabledNetServices[netServices.indexOf("metrics")]) {
+      metricsConfiguration = createMetricsConfiguration();
+    }
+
+    return createJsonRpcHttpService(
+        jsonRpcConfiguration, webSocketConfiguration, p2pNetwork, metricsConfiguration);
   }
 
   @Test
@@ -332,20 +406,12 @@ public class JsonRpcHttpServiceRpcApisTest {
             WebSocketConfiguration.createDefault(),
             mock(P2PNetwork.class),
             MetricsConfiguration.createDefault());
-    final String id = "123";
-    final RequestBody body =
-        RequestBody.create(
-            JSON,
-            "{\"jsonrpc\":\"2.0\",\"id\":" + Json.encode(id) + ",\"method\":\"net_services\"}");
+    final RequestBody body = createNetServicesRequestBody();
 
     try (final Response resp = client.newCall(buildRequest(body)).execute()) {
       final JsonObject json = new JsonObject(resp.body().string());
       final JsonObject result = json.getJsonObject("result");
-      assertTrue(
-          !result.containsKey("jsonrpc")
-              && !result.containsKey("ws")
-              && !result.containsKey("p2p")
-              && !result.containsKey("metrics"));
+      assertTrue(result.isEmpty());
     }
   }
 }
