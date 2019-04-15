@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.cli;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
@@ -35,8 +36,7 @@ import java.time.Clock;
 public class PantheonControllerBuilder {
 
   private SynchronizerConfiguration synchronizerConfiguration;
-  private EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration =
-      EthereumWireProtocolConfiguration.defaultConfig();
+  private EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
   private RocksDbConfiguration rocksDbConfiguration;
   private Path homePath;
   private EthNetworkConfig ethNetworkConfig;
@@ -106,6 +106,16 @@ public class PantheonControllerBuilder {
   }
 
   public PantheonController<?> build() throws IOException {
+    checkNotNull(nodePrivateKeyFile, "Missing node private key file");
+    checkNotNull(synchronizerConfiguration, "Missing synchronizer configuration");
+    checkNotNull(rocksDbConfiguration, "Missing rocksdb configuration");
+    checkNotNull(homePath, "Missing home path");
+    checkNotNull(ethNetworkConfig, "Missing Ethereum network config");
+    checkNotNull(miningParameters, "Missing mining parameters");
+    checkNotNull(metricsSystem, "Missing metrics system");
+    checkNotNull(privacyParameters, "Missing privacy parameters");
+    checkNotNull(ethereumWireProtocolConfiguration, "Missing Ethereum wire protocol config");
+
     // instantiate a controller with mainnet config if no genesis file is defined
     // otherwise use the indicated genesis file
     final KeyPair nodeKeys = loadKeyPair(nodePrivateKeyFile);
