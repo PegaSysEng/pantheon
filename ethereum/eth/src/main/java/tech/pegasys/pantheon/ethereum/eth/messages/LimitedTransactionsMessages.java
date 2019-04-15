@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.messages;
 
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +26,6 @@ public final class LimitedTransactionsMessages {
   private final TransactionsMessage transactionsMessage;
   private final Set<Transaction> includedTransactions;
 
-  private static TransactionsMessageLimiter limiter = tmp -> tmp.uncheckedEncodedSize() >= LIMIT;
-
   public LimitedTransactionsMessages(
       final TransactionsMessage transactionsMessage, final Set<Transaction> includedTransactions) {
     this.transactionsMessage = transactionsMessage;
@@ -36,18 +35,28 @@ public final class LimitedTransactionsMessages {
   public static LimitedTransactionsMessages createLimited(
       final Iterable<Transaction> transactions) {
     final Set<Transaction> includedTransactions = new HashSet<>();
-    final BytesValueRLPOutput tmp = new BytesValueRLPOutput();
-    tmp.startList();
+    final BytesValueRLPOutput message = new BytesValueRLPOutput();
+    int messageSize = 0;
+    message.startList();
     for (final Transaction transaction : transactions) {
-      transaction.writeTo(tmp);
-      includedTransactions.add(transaction);
-      if (limiter.isLastTransactionToIncludeWithoutExceedingLimit(tmp)) {
+      final BytesValueRLPOutput encodedTransaction = new BytesValueRLPOutput();
+      transaction.writeTo(encodedTransaction);
+      BytesValue encodedBytes = encodedTransaction.encoded();
+      // Break if individual transaction size exceeds limit
+      if (encodedBytes.size() > LIMIT && (messageSize != 0)) {
         break;
       }
+      message.writeRLPUnsafe(encodedBytes);
+      includedTransactions.add(transaction);
+      // Check if last transaction to add to the message
+      if (messageSize + encodedBytes.size() > LIMIT) {
+        break;
+      }
+      messageSize += encodedBytes.size();
     }
-    tmp.endList();
+    message.endList();
     return new LimitedTransactionsMessages(
-        new TransactionsMessage(tmp.encoded()), includedTransactions);
+        new TransactionsMessage(message.encoded()), includedTransactions);
   }
 
   public final TransactionsMessage getTransactionsMessage() {
@@ -56,9 +65,5 @@ public final class LimitedTransactionsMessages {
 
   public final Set<Transaction> getIncludedTransactions() {
     return includedTransactions;
-  }
-
-  public static void setLimiter(final TransactionsMessageLimiter limiter) {
-    LimitedTransactionsMessages.limiter = limiter;
   }
 }

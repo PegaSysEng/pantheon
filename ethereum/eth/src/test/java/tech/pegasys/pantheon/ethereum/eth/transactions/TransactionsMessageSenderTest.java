@@ -13,28 +13,22 @@
 package tech.pegasys.pantheon.ethereum.eth.transactions;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
-import tech.pegasys.pantheon.ethereum.eth.messages.LimitedTransactionsMessages;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
-import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessageLimiter;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import com.google.common.collect.Sets;
 import org.junit.Test;
@@ -44,8 +38,6 @@ public class TransactionsMessageSenderTest {
 
   private final EthPeer peer1 = mock(EthPeer.class);
   private final EthPeer peer2 = mock(EthPeer.class);
-  private final TransactionsMessageLimiter transactionsMessageLimiter =
-      mock(TransactionsMessageLimiter.class);
 
   private final BlockDataGenerator generator = new BlockDataGenerator();
   private final Transaction transaction1 = generator.transaction();
@@ -71,14 +63,10 @@ public class TransactionsMessageSenderTest {
 
   @Test
   public void shouldSendTransactionsInBatchesWithLimit() throws Exception {
-    final Set<Transaction> threeTransactions =
-        IntStream.range(0, 3).mapToObj(number -> generator.transaction()).collect(toSet());
-    threeTransactions.forEach(
-        transaction -> transactionTracker.addToPeerSendQueue(peer1, transaction));
-    LimitedTransactionsMessages.setLimiter(transactionsMessageLimiter);
-    when(transactionsMessageLimiter.isLastTransactionToIncludeWithoutExceedingLimit(any()))
-        .thenReturn(false)
-        .thenReturn(true);
+    final Set<Transaction> transactions = generator.transactions(6000);
+
+    transactions.forEach(transaction -> transactionTracker.addToPeerSendQueue(peer1, transaction));
+
     messageSender.sendTransactionsToPeers();
     final ArgumentCaptor<MessageData> messageDataArgumentCaptor =
         ArgumentCaptor.forClass(MessageData.class);
@@ -91,10 +79,10 @@ public class TransactionsMessageSenderTest {
     final Set<Transaction> firstBatch = getTransactionsFromMessage(sentMessages.get(0));
     final Set<Transaction> secondBatch = getTransactionsFromMessage(sentMessages.get(1));
 
-    assertThat(firstBatch).hasSize(2);
-    assertThat(secondBatch).hasSize(1);
+    assertThat(firstBatch).hasSize(5219);
+    assertThat(secondBatch).hasSize(781);
 
-    assertThat(Sets.union(firstBatch, secondBatch)).isEqualTo(threeTransactions);
+    assertThat(Sets.union(firstBatch, secondBatch)).isEqualTo(transactions);
   }
 
   private MessageData transactionsMessageContaining(final Transaction... transactions) {
