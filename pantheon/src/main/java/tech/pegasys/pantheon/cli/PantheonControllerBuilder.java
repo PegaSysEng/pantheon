@@ -120,7 +120,7 @@ public class PantheonControllerBuilder {
       final String genesisConfig = ethNetworkConfig.getGenesisConfig();
       genesisConfigFile = GenesisConfigFile.fromConfig(genesisConfig);
     }
-    Clock clock = Clock.systemUTC();
+    final Clock clock = Clock.systemUTC();
     return PantheonController.fromConfig(
         genesisConfigFile,
         synchronizerConfiguration,
