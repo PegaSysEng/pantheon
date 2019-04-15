@@ -58,7 +58,7 @@ public final class LimitedTransactionsMessages {
     return includedTransactions;
   }
 
-  public static void setLimiter(TransactionsMessageLimiter limiter) {
+  public static void setLimiter(final TransactionsMessageLimiter limiter) {
     LimitedTransactionsMessages.limiter = limiter;
   }
 }
