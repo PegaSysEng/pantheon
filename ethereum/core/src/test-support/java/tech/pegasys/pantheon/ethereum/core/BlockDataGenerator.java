@@ -244,6 +244,18 @@ public class BlockDataGenerator {
     return new BlockBody(options.getTransactions(defaultTxs), ommers);
   }
 
+  public Transaction transaction(BytesValue payload) {
+    return Transaction.builder()
+        .nonce(positiveLong())
+        .gasPrice(Wei.wrap(bytes32()))
+        .gasLimit(positiveLong())
+        .to(address())
+        .value(Wei.wrap(bytes32()))
+        .payload(payload)
+        .chainId(1)
+        .signAndBuild(SECP256K1.KeyPair.generate());
+  }
+
   public Transaction transaction() {
     return Transaction.builder()
         .nonce(positiveLong())

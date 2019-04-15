@@ -17,7 +17,9 @@ import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
@@ -53,20 +55,18 @@ public class LimitedTransactionsMessagesTest {
 
   @Test
   public void createLimitedWithFirstTransactionExceedingLimit() {
-    final Set<Transaction> txs = generator.transactions(6000);
+    final Set<Transaction> txs = new HashSet<>();
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT + 1])));
+    txs.add(generator.transaction());
     final LimitedTransactionsMessages firstMessage = LimitedTransactionsMessages.createLimited(txs);
-    assertEquals(5219, firstMessage.getIncludedTransactions().size());
+    assertEquals(1, firstMessage.getIncludedTransactions().size());
     txs.removeAll(firstMessage.getIncludedTransactions());
-    assertEquals(781, txs.size());
+    assertEquals(1, txs.size());
     final LimitedTransactionsMessages secondMessage =
         LimitedTransactionsMessages.createLimited(txs);
-    assertEquals(781, secondMessage.getIncludedTransactions().size());
+    assertEquals(1, secondMessage.getIncludedTransactions().size());
     txs.removeAll(secondMessage.getIncludedTransactions());
     assertEquals(0, txs.size());
-    assertTrue(
-        (firstMessage.getTransactionsMessage().getSize()
-                + secondMessage.getTransactionsMessage().getSize())
-            < 2 * LIMIT);
   }
 
   @Test
