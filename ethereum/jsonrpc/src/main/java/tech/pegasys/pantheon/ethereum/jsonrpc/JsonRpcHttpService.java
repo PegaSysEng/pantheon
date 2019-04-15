@@ -454,9 +454,8 @@ public class JsonRpcHttpService {
       } catch (final InvalidJsonRpcParameters e) {
         LOG.debug(e);
         return errorResponse(id, JsonRpcError.INVALID_PARAMS);
-      }
-      catch(final RuntimeException e){
-        LOG.error("Problem decoding JSON request",e);
+      } catch (final RuntimeException e) {
+        LOG.debug("Problem decoding JSON request", e);
         return errorResponse(id, JsonRpcError.INVALID_REQUEST);
       }
     } else {
