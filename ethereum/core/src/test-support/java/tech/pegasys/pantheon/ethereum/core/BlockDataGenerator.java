@@ -244,7 +244,7 @@ public class BlockDataGenerator {
     return new BlockBody(options.getTransactions(defaultTxs), ommers);
   }
 
-  public Transaction transaction(BytesValue payload) {
+  public Transaction transaction(final BytesValue payload) {
     return Transaction.builder()
         .nonce(positiveLong())
         .gasPrice(Wei.wrap(bytes32()))
