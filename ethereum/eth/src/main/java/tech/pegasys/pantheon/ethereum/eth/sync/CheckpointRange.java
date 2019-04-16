@@ -62,7 +62,7 @@ public class CheckpointRange {
         .toString();
   }
 
-  public int getSegmentLength() {
-    return toIntExact(end.getNumber() - start.getNumber());
+  public int getSegmentLengthExclusive() {
+    return toIntExact(end.getNumber() - start.getNumber() - 1);
   }
 }

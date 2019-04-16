@@ -97,6 +97,17 @@ public class DownloadHeadersStepTest {
     assertThat(EthProtocolManagerTestUtil.getPendingFuturesCount(ethProtocolManager)).isZero();
   }
 
+  @Test
+  public void shouldReturnOnlyEndHeaderWhenCheckpointRangeHasLengthOfOne() {
+    final CheckpointRange checkpointRange =
+        new CheckpointRange(blockchain.getBlockHeader(3).get(), blockchain.getBlockHeader(4).get());
+
+    final CompletableFuture<CheckpointRangeHeaders> result = this.downloader.apply(checkpointRange);
+
+    assertThat(result)
+        .isCompletedWithValue(new CheckpointRangeHeaders(checkpointRange, headersFromChain(4, 4)));
+  }
+
   private List<BlockHeader> headersFromChain(final long startNumber, final long endNumber) {
     final List<BlockHeader> headers = new ArrayList<>();
     for (long i = startNumber; i <= endNumber; i++) {

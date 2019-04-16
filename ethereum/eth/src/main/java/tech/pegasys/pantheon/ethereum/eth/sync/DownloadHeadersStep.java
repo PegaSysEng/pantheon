@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync;
 
+import static java.util.Collections.emptyList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
@@ -25,9 +28,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class DownloadHeadersStep<C>
     implements Function<CheckpointRange, CompletableFuture<CheckpointRangeHeaders>> {
-
+  private static final Logger LOG = LogManager.getLogger();
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
   private final EthContext ethContext;
@@ -58,13 +64,20 @@ public class DownloadHeadersStep<C>
 
   private CompletableFuture<List<BlockHeader>> downloadHeaders(
       final CheckpointRange checkpointRange) {
+    LOG.debug(
+        "Downloading headers for range {} to {}",
+        checkpointRange.getStart().getNumber(),
+        checkpointRange.getEnd().getNumber());
+    if (checkpointRange.getSegmentLengthExclusive() == 0) {
+      // There are now extra headers to download.
+      return completedFuture(emptyList());
+    }
     return DownloadHeaderSequenceTask.endingAtHeader(
             protocolSchedule,
             protocolContext,
             ethContext,
             checkpointRange.getEnd(),
-            // -1 because we don't want to request the range starting header
-            checkpointRange.getSegmentLength() - 1,
+            checkpointRange.getSegmentLengthExclusive(),
             validationPolicy,
             metricsSystem)
         .run();
