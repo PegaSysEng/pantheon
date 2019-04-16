@@ -63,10 +63,16 @@ public class SmartContractPermissioningNodeIsAllowedTransaction implements Trans
     }
 
     // 0 is false
-    if (result.compareTo(BytesValue.fromHexString("0x0000000000000000000000000000000000000000000000000000000000000000")) == 0) {
+    if (result.compareTo(
+            BytesValue.fromHexString(
+                "0x0000000000000000000000000000000000000000000000000000000000000000"))
+        == 0) {
       return false;
       // 1 filled to 32 bytes is true
-    } else if (result.compareTo(BytesValue.fromHexString("0x0000000000000000000000000000000000000000000000000000000000000001")) == 0) {
+    } else if (result.compareTo(
+            BytesValue.fromHexString(
+                "0x0000000000000000000000000000000000000000000000000000000000000001"))
+        == 0) {
       return true;
       // Anything else is wrong
     } else {
