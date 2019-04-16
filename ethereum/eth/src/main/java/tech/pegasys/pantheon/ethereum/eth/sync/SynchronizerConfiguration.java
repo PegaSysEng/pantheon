@@ -63,6 +63,7 @@ public class SynchronizerConfiguration {
   private final int transactionsParallelism;
   private final int computationParallelism;
   private final int maxTrailingPeers;
+  private final boolean piplineDownloaderForFullSyncEnabled;
   private final long worldStateMinMillisBeforeStalling;
 
   private SynchronizerConfiguration(
@@ -85,7 +86,8 @@ public class SynchronizerConfiguration {
       final int downloaderParallelism,
       final int transactionsParallelism,
       final int computationParallelism,
-      final int maxTrailingPeers) {
+      final int maxTrailingPeers,
+      final boolean piplineDownloaderForFullSyncEnabled) {
     this.fastSyncPivotDistance = fastSyncPivotDistance;
     this.fastSyncFullValidationRate = fastSyncFullValidationRate;
     this.fastSyncMinimumPeerCount = fastSyncMinimumPeerCount;
@@ -106,6 +108,7 @@ public class SynchronizerConfiguration {
     this.transactionsParallelism = transactionsParallelism;
     this.computationParallelism = computationParallelism;
     this.maxTrailingPeers = maxTrailingPeers;
+    this.piplineDownloaderForFullSyncEnabled = piplineDownloaderForFullSyncEnabled;
   }
 
   public static Builder builder() {
@@ -214,6 +217,10 @@ public class SynchronizerConfiguration {
 
   public int getMaxTrailingPeers() {
     return maxTrailingPeers;
+  }
+
+  public boolean isPiplineDownloaderForFullSyncEnabled() {
+    return piplineDownloaderForFullSyncEnabled;
   }
 
   public static class Builder {
@@ -374,6 +381,14 @@ public class SynchronizerConfiguration {
             "Minimum time in ms without progress before considering a world state download as stalled (default: ${DEFAULT-VALUE})")
     private long worldStateMinMillisBeforeStalling = DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING;
 
+    @CommandLine.Option(
+        names = "--Xsynchronizer-pipeline-full-sync-enabled",
+        hidden = true,
+        defaultValue = "false",
+        paramLabel = "<BOOLEAN>",
+        description = "Enable the pipeline based chain downloader during full synchronization")
+    private Boolean piplineDownloaderForFullSyncEnabled = false;
+
     public Builder fastSyncPivotDistance(final int distance) {
       fastSyncPivotDistance = distance;
       return this;
@@ -480,6 +495,12 @@ public class SynchronizerConfiguration {
       return this;
     }
 
+    public Builder piplineDownloaderForFullSyncEnabled(
+        final Boolean piplineDownloaderForFullSyncEnabled) {
+      this.piplineDownloaderForFullSyncEnabled = piplineDownloaderForFullSyncEnabled;
+      return this;
+    }
+
     public SynchronizerConfiguration build() {
       return new SynchronizerConfiguration(
           fastSyncPivotDistance,
@@ -501,7 +522,8 @@ public class SynchronizerConfiguration {
           downloaderParallelism,
           transactionsParallelism,
           computationParallelism,
-          maxTrailingPeers);
+          maxTrailingPeers,
+          piplineDownloaderForFullSyncEnabled);
     }
   }
 }

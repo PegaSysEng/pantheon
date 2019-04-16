@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fullsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeFalse;
 import static org.mockito.Mockito.spy;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -41,7 +40,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class IncrementerTest {
@@ -52,13 +50,6 @@ public class IncrementerTest {
   private SyncState syncState;
   private MutableBlockchain localBlockchain;
   private MetricsSystem metricsSystem;
-
-  @Before
-  public void setUp() {
-    assumeFalse(
-        "These metrics are only exposed by the eth task based downloader",
-        FullSyncChainDownloader.USE_PIPELINE_DOWNLOADER);
-  }
 
   @Test
   public void parallelDownloadPipelineCounterShouldIncrement() {

@@ -23,9 +23,11 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-public class FullSyncChainDownloader {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-  static final boolean USE_PIPELINE_DOWNLOADER = false;
+public class FullSyncChainDownloader {
+  private static final Logger LOG = LogManager.getLogger();
 
   private FullSyncChainDownloader() {}
 
@@ -41,7 +43,8 @@ public class FullSyncChainDownloader {
         new FullSyncTargetManager<>(
             config, protocolSchedule, protocolContext, ethContext, metricsSystem);
 
-    if (USE_PIPELINE_DOWNLOADER) {
+    if (config.isPiplineDownloaderForFullSyncEnabled()) {
+      LOG.info("Using PipelineChainDownloader");
       return new PipelineChainDownloader<>(
           syncState,
           syncTargetManager,
