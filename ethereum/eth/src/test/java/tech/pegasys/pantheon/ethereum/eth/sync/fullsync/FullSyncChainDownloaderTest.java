@@ -599,7 +599,7 @@ public class FullSyncChainDownloaderTest {
       final ChainDownloader rawDownloader,
       final RespondingEthPeer... peers) {
     // This breaks encapsulation and depends on the particular semantics of EthTaskChainDownloader
-    //
+    // These cases are now handled by unit tests in BetterSyncTargetEvaluatorTest
     assumeThatObject(rawDownloader).isInstanceOf(EthTaskChainDownloader.class);
     final EthTaskChainDownloader<Void> downloader = (EthTaskChainDownloader<Void>) rawDownloader;
     // Process through first task cycle
