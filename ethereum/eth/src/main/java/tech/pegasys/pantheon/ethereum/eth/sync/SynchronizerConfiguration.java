@@ -251,11 +251,11 @@ public class SynchronizerConfiguration {
     @CommandLine.Option(
         names = "--Xsynchronizer-downloader-change-target-threshold-by-height",
         hidden = true,
-        defaultValue = "20",
+        defaultValue = "200",
         paramLabel = "<LONG>",
         description =
             "Minimum height difference before switching fast sync download peers (default: ${DEFAULT-VALUE})")
-    private long downloaderChangeTargetThresholdByHeight = 20L;
+    private long downloaderChangeTargetThresholdByHeight = 200L;
 
     @CommandLine.Option(
         names = "--Xsynchronizer-downloader-change-target-threshold-by-td",
