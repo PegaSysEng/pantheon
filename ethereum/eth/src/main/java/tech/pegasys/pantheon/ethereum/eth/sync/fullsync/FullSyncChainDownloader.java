@@ -25,7 +25,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 public class FullSyncChainDownloader {
 
-  static final boolean USE_PIPELINE_DOWNLOADER = true;
+  static final boolean USE_PIPELINE_DOWNLOADER = false;
 
   private FullSyncChainDownloader() {}
 
