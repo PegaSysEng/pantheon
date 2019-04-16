@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.ChainState;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Optional;
@@ -32,8 +31,7 @@ public class BetterSyncTargetEvaluator {
     this.ethPeers = ethPeers;
   }
 
-  public boolean shouldSwitchSyncTarget(final SyncTarget currentTarget) {
-    final EthPeer currentPeer = currentTarget.peer();
+  public boolean shouldSwitchSyncTarget(final EthPeer currentPeer) {
     final ChainState currentPeerChainState = currentPeer.chainState();
     final Optional<EthPeer> maybeBestPeer = ethPeers.bestPeer();
 

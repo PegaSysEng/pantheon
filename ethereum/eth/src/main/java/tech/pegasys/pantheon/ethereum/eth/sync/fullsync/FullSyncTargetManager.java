@@ -98,7 +98,7 @@ class FullSyncTargetManager<C> extends SyncTargetManager<C> {
 
   @Override
   public boolean shouldSwitchSyncTarget(final SyncTarget currentTarget) {
-    return betterSyncTargetEvaluator.shouldSwitchSyncTarget(currentTarget);
+    return betterSyncTargetEvaluator.shouldSwitchSyncTarget(currentTarget.peer());
   }
 
   @Override
