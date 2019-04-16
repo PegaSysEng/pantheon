@@ -69,7 +69,7 @@ public class DownloadHeadersStep<C>
         checkpointRange.getStart().getNumber(),
         checkpointRange.getEnd().getNumber());
     if (checkpointRange.getSegmentLengthExclusive() == 0) {
-      // There are now extra headers to download.
+      // There are no extra headers to download.
       return completedFuture(emptyList());
     }
     return DownloadHeaderSequenceTask.endingAtHeader(
