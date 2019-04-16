@@ -44,6 +44,7 @@ public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
   private final MetricsSystem metricsSystem;
   private final ValidationPolicy detachedValidationPolicy =
       () -> HeaderValidationMode.DETACHED_ONLY;
+  private final BetterSyncTargetEvaluator betterSyncTargetEvaluator;
 
   public FullSyncDownloadPipelineFactory(
       final SynchronizerConfiguration syncConfig,
@@ -56,6 +57,7 @@ public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
     this.protocolContext = protocolContext;
     this.ethContext = ethContext;
     this.metricsSystem = metricsSystem;
+    betterSyncTargetEvaluator = new BetterSyncTargetEvaluator(syncConfig, ethContext.getEthPeers());
   }
 
   @Override
@@ -107,6 +109,8 @@ public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
       final EthPeer peer, final BlockHeader lastCheckpointHeader) {
     final boolean caughtUpToPeer =
         peer.chainState().getEstimatedHeight() <= lastCheckpointHeader.getNumber();
-    return !peer.isDisconnected() && !caughtUpToPeer;
+    return !peer.isDisconnected()
+        && !caughtUpToPeer
+        && !betterSyncTargetEvaluator.shouldSwitchSyncTarget(peer);
   }
 }
