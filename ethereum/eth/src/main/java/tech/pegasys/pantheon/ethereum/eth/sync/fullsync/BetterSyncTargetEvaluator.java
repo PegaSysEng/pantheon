@@ -31,14 +31,14 @@ public class BetterSyncTargetEvaluator {
     this.ethPeers = ethPeers;
   }
 
-  public boolean shouldSwitchSyncTarget(final EthPeer currentPeer) {
-    final ChainState currentPeerChainState = currentPeer.chainState();
+  public boolean shouldSwitchSyncTarget(final EthPeer currentSyncTarget) {
+    final ChainState currentPeerChainState = currentSyncTarget.chainState();
     final Optional<EthPeer> maybeBestPeer = ethPeers.bestPeer();
 
     return maybeBestPeer
         .map(
             bestPeer -> {
-              if (EthPeers.BEST_CHAIN.compare(bestPeer, currentPeer) <= 0) {
+              if (EthPeers.BEST_CHAIN.compare(bestPeer, currentSyncTarget) <= 0) {
                 // Our current target is better or equal to the best peer
                 return false;
               }
