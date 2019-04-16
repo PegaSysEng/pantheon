@@ -32,7 +32,6 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
 import tech.pegasys.pantheon.services.pipeline.PipelineBuilder;
 
-import java.time.Duration;
 import java.util.Optional;
 
 public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFactory {
@@ -73,8 +72,7 @@ public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             ethContext.getScheduler(),
             target.peer(),
             target.commonAncestor(),
-            syncConfig.downloaderCheckpointTimeoutsPermitted(),
-            Duration.ofSeconds(5));
+            syncConfig.downloaderCheckpointTimeoutsPermitted());
     final DownloadHeadersStep<C> downloadHeadersStep =
         new DownloadHeadersStep<>(
             protocolSchedule, protocolContext, ethContext, detachedValidationPolicy, metricsSystem);

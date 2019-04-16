@@ -56,6 +56,23 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
       final EthScheduler ethScheduler,
       final EthPeer peer,
       final BlockHeader commonAncestor,
+      final int checkpointTimeoutsPermitted) {
+    this(
+        checkpointFetcher,
+        syncTargetChecker,
+        ethScheduler,
+        peer,
+        commonAncestor,
+        checkpointTimeoutsPermitted,
+        Duration.ofSeconds(5));
+  }
+
+  CheckpointRangeSource(
+      final CheckpointHeaderFetcher checkpointFetcher,
+      final SyncTargetChecker syncTargetChecker,
+      final EthScheduler ethScheduler,
+      final EthPeer peer,
+      final BlockHeader commonAncestor,
       final int checkpointTimeoutsPermitted,
       final Duration newHeaderWaitDuration) {
     this.checkpointFetcher = checkpointFetcher;
