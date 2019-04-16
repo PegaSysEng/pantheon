@@ -16,13 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.manager.ChainState;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Optional;
@@ -35,10 +33,8 @@ public class BetterSyncTargetEvaluatorTest {
   private static final int CURRENT_TARGET_TD = 50;
   private static final int HEIGHT_THRESHOLD = 100;
   private static final int TD_THRESHOLD = 5;
-  private final BlockDataGenerator gen = new BlockDataGenerator();
   private final EthPeers ethPeers = mock(EthPeers.class);
-  private final SyncTarget currentTarget =
-      new SyncTarget(peer(CURRENT_TARGET_HEIGHT, CURRENT_TARGET_TD), gen.header());
+  private final EthPeer currentTarget = peer(CURRENT_TARGET_HEIGHT, CURRENT_TARGET_TD);
   private final BetterSyncTargetEvaluator evaluator =
       new BetterSyncTargetEvaluator(
           SynchronizerConfiguration.builder()
