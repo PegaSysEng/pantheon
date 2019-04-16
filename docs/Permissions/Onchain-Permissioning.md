@@ -101,9 +101,13 @@ and click the *Process* button.
 
 1. Paste the copied command into the Truffle Console. 
 
-## Get Whitelist 
+   When the transaction is included in a block, the transaction receipt is displayed. 
+   
+1. Use [`admin_addPeer`](../Reference/JSON-RPC-API-Methods.md#admin_addpeer) to add the 
+
+## Display Whitelist 
  
-To show the whitelist, paste the following into the Truffle Console: 
+To display the whitelist, paste the following into the Truffle Console: 
 
 ```bash
 Rules.deployed().then(function(instance) {instance.getKeyCount().then(function(txCount) {console.log("size of whitelist: " + txCount); var i=txCount; while(i>=0) {instance.getWhitelistKey(i--).then(function(tx) {console.log(tx)})}});});
