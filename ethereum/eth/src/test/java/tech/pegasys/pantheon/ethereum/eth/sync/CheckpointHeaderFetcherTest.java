@@ -146,18 +146,27 @@ public class CheckpointHeaderFetcherTest {
   }
 
   @Test
-  public void shouldRequestRemoteChainHeadWhenNextCheckpointHeaderIsAfterHead() {
+  public void nextCheckpointShouldEndAtChainHeadWhenNextCheckpointHeaderIsAfterHead() {
     final long remoteChainHeight = blockchain.getChainHeadBlockNumber();
     final CheckpointHeaderFetcher checkpointHeaderFetcher =
         createCheckpointHeaderFetcher(Optional.empty());
 
-    final CompletableFuture<List<BlockHeader>> result =
-        checkpointHeaderFetcher.getNextCheckpointHeaders(
-            respondingPeer.getEthPeer(), header(remoteChainHeight - SEGMENT_SIZE + 1));
+    assertThat(
+            checkpointHeaderFetcher.nextCheckpointEndsAtChainHead(
+                respondingPeer.getEthPeer(), header(remoteChainHeight - SEGMENT_SIZE + 1)))
+        .isTrue();
+  }
 
-    respondingPeer.respond(responder);
+  @Test
+  public void nextCheckpointShouldNotEndAtChainHeadWhenAFinalCheckpointHeaderIsSpecified() {
+    final long remoteChainHeight = blockchain.getChainHeadBlockNumber();
+    final CheckpointHeaderFetcher checkpointHeaderFetcher =
+        createCheckpointHeaderFetcher(Optional.of(header(remoteChainHeight)));
 
-    assertThat(result).isCompletedWithValue(singletonList(header(remoteChainHeight)));
+    assertThat(
+            checkpointHeaderFetcher.nextCheckpointEndsAtChainHead(
+                respondingPeer.getEthPeer(), header(remoteChainHeight - SEGMENT_SIZE + 1)))
+        .isFalse();
   }
 
   @Test
@@ -165,6 +174,11 @@ public class CheckpointHeaderFetcherTest {
     final long remoteChainHeight = blockchain.getChainHeadBlockNumber();
     final CheckpointHeaderFetcher checkpointHeaderFetcher =
         createCheckpointHeaderFetcher(Optional.empty());
+
+    assertThat(
+            checkpointHeaderFetcher.nextCheckpointEndsAtChainHead(
+                respondingPeer.getEthPeer(), header(remoteChainHeight - SEGMENT_SIZE)))
+        .isFalse();
 
     final CompletableFuture<List<BlockHeader>> result =
         checkpointHeaderFetcher.getNextCheckpointHeaders(

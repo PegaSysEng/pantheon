@@ -28,7 +28,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class CheckpointHeaderFetcher {
+  private static final Logger LOG = LogManager.getLogger();
 
   private final SynchronizerConfiguration syncConfig;
   private final ProtocolSchedule<?> protocolSchedule;
@@ -69,14 +73,7 @@ public class CheckpointHeaderFetcher {
         return completedFuture(singletonList(targetHeader));
       }
     } else {
-      final long peerEstimatedHeight = peer.chainState().getEstimatedHeight();
-      if (previousCheckpointNumber + skip >= peerEstimatedHeight) {
-        final int skipToGetPeersLastHeader =
-            (int) (peerEstimatedHeight - previousCheckpointNumber - 1);
-        return requestHeaders(peer, previousCheckpointHeader, 1, skipToGetPeersLastHeader);
-      } else {
-        additionalHeaderCount = maximumHeaderRequestSize;
-      }
+      additionalHeaderCount = maximumHeaderRequestSize;
     }
 
     return requestHeaders(peer, previousCheckpointHeader, additionalHeaderCount, skip);
@@ -87,6 +84,11 @@ public class CheckpointHeaderFetcher {
       final BlockHeader referenceHeader,
       final int headerCount,
       final int skip) {
+    LOG.debug(
+        "Requesting {} checkpoint headers, starting from {}, {} blocks apart",
+        headerCount,
+        referenceHeader.getNumber(),
+        skip);
     return GetHeadersFromPeerByHashTask.startingAtHash(
             protocolSchedule,
             ethContext,
@@ -108,5 +110,16 @@ public class CheckpointHeaderFetcher {
       return headers.subList(1, headers.size());
     }
     return headers;
+  }
+
+  public boolean nextCheckpointEndsAtChainHead(
+      final EthPeer peer, final BlockHeader previousCheckpointHeader) {
+    if (finalCheckpointHeader.isPresent()) {
+      return false;
+    }
+    final int skip = syncConfig.downloaderChainSegmentSize() - 1;
+    final long peerEstimatedHeight = peer.chainState().getEstimatedHeight();
+    final long previousCheckpointNumber = previousCheckpointHeader.getNumber();
+    return previousCheckpointNumber + skip >= peerEstimatedHeight;
   }
 }

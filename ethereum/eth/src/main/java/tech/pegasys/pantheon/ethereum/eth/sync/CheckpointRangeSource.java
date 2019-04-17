@@ -46,6 +46,7 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
 
   private final Queue<CheckpointRange> retrievedRanges = new ArrayDeque<>();
   private BlockHeader lastRangeEnd;
+  private boolean reachedEndOfCheckpoints = false;
   private Optional<CompletableFuture<List<BlockHeader>>> pendingCheckpointsRequest =
       Optional.empty();
   private int requestFailureCount = 0;
@@ -88,7 +89,8 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
   public boolean hasNext() {
     return !retrievedRanges.isEmpty()
         || (requestFailureCount < checkpointTimeoutsPermitted
-            && syncTargetChecker.shouldContinueDownloadingFromSyncTarget(peer, lastRangeEnd));
+            && syncTargetChecker.shouldContinueDownloadingFromSyncTarget(peer, lastRangeEnd)
+            && !reachedEndOfCheckpoints);
   }
 
   @Override
@@ -98,6 +100,13 @@ public class CheckpointRangeSource implements Iterator<CheckpointRange> {
     }
     if (pendingCheckpointsRequest.isPresent()) {
       return getCheckpointRangeFromPendingRequest();
+    }
+    if (reachedEndOfCheckpoints) {
+      return null;
+    }
+    if (checkpointFetcher.nextCheckpointEndsAtChainHead(peer, lastRangeEnd)) {
+      reachedEndOfCheckpoints = true;
+      return new CheckpointRange(lastRangeEnd);
     }
     pendingCheckpointsRequest = Optional.of(getNextCheckpointHeaders());
     return getCheckpointRangeFromPendingRequest();

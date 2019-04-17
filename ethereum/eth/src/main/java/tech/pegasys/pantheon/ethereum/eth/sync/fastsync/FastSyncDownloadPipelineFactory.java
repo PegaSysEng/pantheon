@@ -102,7 +102,12 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             syncConfig.downloaderCheckpointTimeoutsPermitted());
     final DownloadHeadersStep<C> downloadHeadersStep =
         new DownloadHeadersStep<>(
-            protocolSchedule, protocolContext, ethContext, detachedValidationPolicy, metricsSystem);
+            protocolSchedule,
+            protocolContext,
+            ethContext,
+            detachedValidationPolicy,
+            headerRequestSize,
+            metricsSystem);
     final CheckpointHeaderValidationStep<C> validateHeadersJoinUpStep =
         new CheckpointHeaderValidationStep<>(
             protocolSchedule, protocolContext, detachedValidationPolicy);
