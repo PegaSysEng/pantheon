@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask.PeerTaskResult;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByHashTask;
-import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByNumberTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -55,12 +54,12 @@ public class CheckpointHeaderFetcher {
       final EthPeer peer, final BlockHeader previousCheckpointHeader) {
     final int skip = syncConfig.downloaderChainSegmentSize() - 1;
     final int maximumHeaderRequestSize = syncConfig.downloaderHeaderRequestSize();
+    final long previousCheckpointNumber = previousCheckpointHeader.getNumber();
 
     final int additionalHeaderCount;
     if (finalCheckpointHeader.isPresent()) {
       final BlockHeader targetHeader = finalCheckpointHeader.get();
-      final long blocksUntilTarget =
-          targetHeader.getNumber() - previousCheckpointHeader.getNumber();
+      final long blocksUntilTarget = targetHeader.getNumber() - previousCheckpointNumber;
       if (blocksUntilTarget <= 0) {
         return completedFuture(emptyList());
       }
@@ -69,15 +68,15 @@ public class CheckpointHeaderFetcher {
       if (additionalHeaderCount == 0) {
         return completedFuture(singletonList(targetHeader));
       }
-    } else if (previousCheckpointHeader.getNumber() + skip
-        >= peer.chainState().getEstimatedHeight()) {
-      return GetHeadersFromPeerByNumberTask.forSingleNumber(
-              protocolSchedule, ethContext, peer.chainState().getEstimatedHeight(), metricsSystem)
-          .assignPeer(peer)
-          .run()
-          .thenApply(PeerTaskResult::getResult);
     } else {
-      additionalHeaderCount = maximumHeaderRequestSize;
+      final long peerEstimatedHeight = peer.chainState().getEstimatedHeight();
+      if (previousCheckpointNumber + skip >= peerEstimatedHeight) {
+        final int skipToGetPeersLastHeader =
+            (int) (peerEstimatedHeight - previousCheckpointNumber - 1);
+        return requestHeaders(peer, previousCheckpointHeader, 1, skipToGetPeersLastHeader);
+      } else {
+        additionalHeaderCount = maximumHeaderRequestSize;
+      }
     }
 
     return requestHeaders(peer, previousCheckpointHeader, additionalHeaderCount, skip);
