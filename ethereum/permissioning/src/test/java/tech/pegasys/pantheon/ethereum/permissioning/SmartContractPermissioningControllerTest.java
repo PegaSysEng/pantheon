@@ -158,13 +158,15 @@ public class SmartContractPermissioningControllerTest {
             "SmartContractPermissioningControllerTest/noSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
-    assertThatThrownBy(() ->
-        controller.isPermitted(
-            EnodeURL.fromString(
-                "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab61@[1:2:3:4:5:6:7:8]:30303"),
-            EnodeURL.fromString(
-                "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab63@[1:2:3:4:5:6:7:8]:30304"))
-    ).isInstanceOf(IllegalStateException.class).hasMessage("Permissioning contract does not exist");
+    assertThatThrownBy(
+            () ->
+                controller.isPermitted(
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab61@[1:2:3:4:5:6:7:8]:30303"),
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab63@[1:2:3:4:5:6:7:8]:30304")))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Permissioning contract does not exist");
   }
 
   @Test
@@ -174,12 +176,14 @@ public class SmartContractPermissioningControllerTest {
             "SmartContractPermissioningControllerTest/corruptSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
-    assertThatThrownBy(() ->
-        controller.isPermitted(
-            EnodeURL.fromString(
-                "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab61@[1:2:3:4:5:6:7:8]:30303"),
-            EnodeURL.fromString(
-                "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab63@[1:2:3:4:5:6:7:8]:30304"))
-    ).isInstanceOf(IllegalStateException.class).hasMessage("Permissioning transaction failed when processing");
+    assertThatThrownBy(
+            () ->
+                controller.isPermitted(
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab61@[1:2:3:4:5:6:7:8]:30303"),
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab63@[1:2:3:4:5:6:7:8]:30304")))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Permissioning transaction failed when processing");
   }
 }
