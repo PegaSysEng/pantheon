@@ -20,7 +20,9 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.junit.Test;
 
@@ -72,9 +74,10 @@ public class LimitedTransactionsMessagesTest {
 
   @Test
   public void createLimitedWithFirstTransactionExceedingLimit_2() {
-    final Set<Transaction> txs = new HashSet<>();
+    final Set<Transaction> txs = new LinkedHashSet<>();
+
     txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT - 180])));
-    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT + 1 - 180])));
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT + 100 - 180])));
     txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT - 180])));
     final LimitedTransactionsMessages firstMessage = LimitedTransactionsMessages.createLimited(txs);
     assertEquals(1, firstMessage.getIncludedTransactions().size());
