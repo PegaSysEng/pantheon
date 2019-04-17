@@ -93,25 +93,6 @@ public class FastSyncActionsTest {
   }
 
   @Test
-  public void waitForPeersShouldReportSuccessWhenTimeLimitReachedAndAPeerIsAvailable() {
-    EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
-    timeoutCount.set(Integer.MAX_VALUE);
-    assertThat(fastSyncActions.waitForSuitablePeers(EMPTY_SYNC_STATE))
-        .isCompletedWithValue(EMPTY_SYNC_STATE);
-  }
-
-  @Test
-  public void waitForPeersShouldContinueWaitingUntilAtLeastOnePeerIsAvailable() {
-    timeoutCount.set(1);
-    final CompletableFuture<FastSyncState> result =
-        fastSyncActions.waitForSuitablePeers(EMPTY_SYNC_STATE);
-    assertThat(result).isNotCompleted();
-
-    EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
-    assertThat(result).isCompletedWithValue(EMPTY_SYNC_STATE);
-  }
-
-  @Test
   public void waitForPeersShouldOnlyRequireOnePeerWhenPivotBlockIsAlreadySelected() {
     final BlockHeader pivotHeader = new BlockHeaderTestFixture().number(1024).buildHeader();
     final FastSyncState fastSyncState = new FastSyncState(pivotHeader);
