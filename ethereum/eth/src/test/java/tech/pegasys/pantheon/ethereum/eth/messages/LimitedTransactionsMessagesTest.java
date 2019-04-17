@@ -56,16 +56,39 @@ public class LimitedTransactionsMessagesTest {
   @Test
   public void createLimitedWithFirstTransactionExceedingLimit() {
     final Set<Transaction> txs = new HashSet<>();
-    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT + 1])));
-    txs.add(generator.transaction());
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT - 180])));
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT - 180])));
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT - 180])));
     final LimitedTransactionsMessages firstMessage = LimitedTransactionsMessages.createLimited(txs);
-    assertEquals(1, firstMessage.getIncludedTransactions().size());
+    assertEquals(2, firstMessage.getIncludedTransactions().size());
     txs.removeAll(firstMessage.getIncludedTransactions());
     assertEquals(1, txs.size());
     final LimitedTransactionsMessages secondMessage =
         LimitedTransactionsMessages.createLimited(txs);
     assertEquals(1, secondMessage.getIncludedTransactions().size());
     txs.removeAll(secondMessage.getIncludedTransactions());
+    assertEquals(0, txs.size());
+  }
+
+  @Test
+  public void createLimitedWithFirstTransactionExceedingLimit_2() {
+    final Set<Transaction> txs = new HashSet<>();
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT - 180])));
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT + 1 - 180])));
+    txs.add(generator.transaction(BytesValue.wrap(new byte[LIMIT - 180])));
+    final LimitedTransactionsMessages firstMessage = LimitedTransactionsMessages.createLimited(txs);
+    assertEquals(1, firstMessage.getIncludedTransactions().size());
+    txs.removeAll(firstMessage.getIncludedTransactions());
+    assertEquals(2, txs.size());
+    final LimitedTransactionsMessages secondMessage =
+            LimitedTransactionsMessages.createLimited(txs);
+    assertEquals(1, secondMessage.getIncludedTransactions().size());
+    txs.removeAll(secondMessage.getIncludedTransactions());
+    assertEquals(1, txs.size());
+    final LimitedTransactionsMessages thirdMessage =
+            LimitedTransactionsMessages.createLimited(txs);
+    assertEquals(1, thirdMessage.getIncludedTransactions().size());
+    txs.removeAll(thirdMessage.getIncludedTransactions());
     assertEquals(0, txs.size());
   }
 
