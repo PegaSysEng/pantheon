@@ -1,6 +1,8 @@
 description: Onchain Permissioning
 <!--- END of page meta data -->
 
+xyz - need bootnodes to catch up? 
+
 # Onchain Permissioning 
 
 Onchain permissioning uses a smart contract to store and maintain the node whitelist. Using onchain permissioning
