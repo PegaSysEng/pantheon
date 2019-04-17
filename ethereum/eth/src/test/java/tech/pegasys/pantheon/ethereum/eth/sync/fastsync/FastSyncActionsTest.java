@@ -38,7 +38,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,7 +50,6 @@ public class FastSyncActionsTest {
   private final SynchronizerConfiguration syncConfig =
       new SynchronizerConfiguration.Builder()
           .syncMode(SyncMode.FAST)
-          .fastSyncMaximumPeerWaitTime(Duration.ofMinutes(5))
           .fastSyncPivotDistance(1000)
           .build();
 
