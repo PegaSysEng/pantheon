@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.cli;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
@@ -79,7 +80,6 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -220,14 +220,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer fastSyncMinPeerCount = FAST_SYNC_MIN_PEER_COUNT;
 
   @Option(
-      hidden = true,
-      names = {"--fast-sync-max-wait-time"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description =
-          "Maximum time to wait for the required number of peers before starting fast sync, expressed in seconds, 0 means no timeout (default: ${DEFAULT-VALUE})")
-  private final Integer fastSyncMaxWaitTime = FAST_SYNC_MAX_WAIT_TIME;
-
-  @Option(
       names = {"--network"},
       paramLabel = MANDATORY_NETWORK_FORMAT_HELP,
       description =
@@ -239,14 +231,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--p2p-host"},
       paramLabel = MANDATORY_HOST_FORMAT_HELP,
-      description = "Host for P2P peer discovery to listen on (default: ${DEFAULT-VALUE})",
+      description = "Ip address this node advertises to its peers (default: ${DEFAULT-VALUE})",
       arity = "1")
   private String p2pHost = autoDiscoverDefaultIP().getHostAddress();
 
   @Option(
       names = {"--p2p-port"},
       paramLabel = MANDATORY_PORT_FORMAT_HELP,
-      description = "Port for P2P peer discovery to listen on (default: ${DEFAULT-VALUE})",
+      description = "Port on which to listen for p2p communication (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer p2pPort = DEFAULT_PORT;
 
@@ -626,17 +618,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         !isMiningEnabled,
         asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
 
-    // Check that fast sync options are able to work or send an error
-    if (fastSyncMaxWaitTime < 0) {
-      throw new ParameterException(
-          commandLine, "--fast-sync-max-wait-time must be greater than or equal to 0");
-    }
     checkOptionDependencies(
         logger,
         commandLine,
         "--sync-mode",
         !SyncMode.FAST.equals(syncMode),
-        asList("--fast-sync-min-peers", "--fast-sync-max-wait-time"));
+        singletonList("--fast-sync-min-peers"));
 
     //noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -940,7 +927,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return synchronizerConfigurationBuilder
         .syncMode(syncMode)
         .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
-        .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(fastSyncMaxWaitTime))
         .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
         .build();
   }
@@ -956,8 +942,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final boolean peerDiscoveryEnabled,
       final EthNetworkConfig ethNetworkConfig,
       final int maxPeers,
-      final String discoveryHost,
-      final int discoveryPort,
+      final String p2pAdvertisedHost,
+      final int p2pListenPort,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
@@ -976,8 +962,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .p2pEnabled(p2pEnabled)
             .discovery(peerDiscoveryEnabled)
             .ethNetworkConfig(ethNetworkConfig)
-            .discoveryHost(discoveryHost)
-            .discoveryPort(discoveryPort)
+            .p2pAdvertisedHost(p2pAdvertisedHost)
+            .p2pListenPort(p2pListenPort)
             .maxPeers(maxPeers)
             .jsonRpcConfiguration(jsonRpcConfiguration)
             .webSocketConfiguration(webSocketConfiguration)

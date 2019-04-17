@@ -53,7 +53,6 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -143,8 +142,8 @@ public final class RunnerTest {
         new RunnerBuilder()
             .vertx(Vertx.vertx())
             .discovery(true)
-            .discoveryHost(listenHost)
-            .discoveryPort(0)
+            .p2pAdvertisedHost(listenHost)
+            .p2pListenPort(0)
             .maxPeers(3)
             .metricsSystem(noOpMetricsSystem)
             .bannedNodeIds(emptySet())
@@ -169,7 +168,6 @@ public final class RunnerTest {
               .syncMode(mode)
               .fastSyncPivotDistance(5)
               .fastSyncMinimumPeerCount(1)
-              .fastSyncMaximumPeerWaitTime(Duration.ofSeconds(1))
               .build();
       final Path dataDirBehind = temp.newFolder().toPath();
       final JsonRpcConfiguration behindJsonRpcConfiguration = jsonRpcConfiguration();
