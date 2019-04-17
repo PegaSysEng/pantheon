@@ -43,7 +43,6 @@ import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.EthTaskChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -121,7 +120,7 @@ public class FullSyncChainDownloaderTest {
     return downloader(syncConfig);
   }
 
-  private Builder syncConfigBuilder() {
+  private SynchronizerConfiguration.Builder syncConfigBuilder() {
     return SynchronizerConfiguration.builder()
         .piplineDownloaderForFullSyncEnabled(usePipelineDownloader);
   }
