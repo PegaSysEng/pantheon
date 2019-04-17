@@ -34,31 +34,33 @@ public class CheckpointHeaderFetcher {
   private final SynchronizerConfiguration syncConfig;
   private final ProtocolSchedule<?> protocolSchedule;
   private final EthContext ethContext;
-  private final Optional<BlockHeader> lastCheckpointHeader;
+  // The checkpoint we're aiming to reach at the end of this sync.
+  private final Optional<BlockHeader> finalCheckpointHeader;
   private final MetricsSystem metricsSystem;
 
   public CheckpointHeaderFetcher(
       final SynchronizerConfiguration syncConfig,
       final ProtocolSchedule<?> protocolSchedule,
       final EthContext ethContext,
-      final Optional<BlockHeader> lastCheckpointHeader,
+      final Optional<BlockHeader> finalCheckpointHeader,
       final MetricsSystem metricsSystem) {
     this.syncConfig = syncConfig;
     this.protocolSchedule = protocolSchedule;
     this.ethContext = ethContext;
-    this.lastCheckpointHeader = lastCheckpointHeader;
+    this.finalCheckpointHeader = finalCheckpointHeader;
     this.metricsSystem = metricsSystem;
   }
 
   public CompletableFuture<List<BlockHeader>> getNextCheckpointHeaders(
-      final EthPeer peer, final BlockHeader lastHeader) {
+      final EthPeer peer, final BlockHeader previousCheckpointHeader) {
     final int skip = syncConfig.downloaderChainSegmentSize() - 1;
     final int maximumHeaderRequestSize = syncConfig.downloaderHeaderRequestSize();
 
     final int additionalHeaderCount;
-    if (lastCheckpointHeader.isPresent()) {
-      final BlockHeader targetHeader = lastCheckpointHeader.get();
-      final long blocksUntilTarget = targetHeader.getNumber() - lastHeader.getNumber();
+    if (finalCheckpointHeader.isPresent()) {
+      final BlockHeader targetHeader = finalCheckpointHeader.get();
+      final long blocksUntilTarget =
+          targetHeader.getNumber() - previousCheckpointHeader.getNumber();
       if (blocksUntilTarget <= 0) {
         return completedFuture(emptyList());
       }
@@ -67,7 +69,8 @@ public class CheckpointHeaderFetcher {
       if (additionalHeaderCount == 0) {
         return completedFuture(singletonList(targetHeader));
       }
-    } else if (lastHeader.getNumber() + skip >= peer.chainState().getEstimatedHeight()) {
+    } else if (previousCheckpointHeader.getNumber() + skip
+        >= peer.chainState().getEstimatedHeight()) {
       return GetHeadersFromPeerByNumberTask.forSingleNumber(
               protocolSchedule, ethContext, peer.chainState().getEstimatedHeight(), metricsSystem)
           .assignPeer(peer)
@@ -77,7 +80,7 @@ public class CheckpointHeaderFetcher {
       additionalHeaderCount = maximumHeaderRequestSize;
     }
 
-    return requestHeaders(peer, lastHeader, additionalHeaderCount, skip);
+    return requestHeaders(peer, previousCheckpointHeader, additionalHeaderCount, skip);
   }
 
   private CompletableFuture<List<BlockHeader>> requestHeaders(
