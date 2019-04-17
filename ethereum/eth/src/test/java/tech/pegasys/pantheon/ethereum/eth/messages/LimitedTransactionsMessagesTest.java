@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.junit.Test;
 
