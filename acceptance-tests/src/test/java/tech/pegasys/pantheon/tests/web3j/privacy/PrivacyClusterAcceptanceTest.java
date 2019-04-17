@@ -218,6 +218,97 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
     node2.execute(transactions.createPrivateRawTransaction(invalidStoreValueFromNode2));
   }
 
+  @Test
+  public void breakingTest() {
+    String contract_address = "0x1efee0ab2c1ec40c4b48410e5832d254c2eda0b0";
+    String deployContractFromNode1_first =
+        PrivateAcceptanceTestBase.builder()
+            .nonce(0)
+            .from(node1.getAddress())
+            .to(null)
+            .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
+            .privateFor(
+                Lists.newArrayList(
+                    BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8)),
+                    BytesValue.wrap(PUBLIC_KEY_3.getBytes(UTF_8))))
+            .keyPair(keypair1)
+            .build(TransactionType.CREATE_CONTRACT);
+
+    String transactionHash =
+        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1_first));
+
+    privateTransactionVerifier
+        .validPrivateContractDeployed(contract_address)
+        .verify(node1, transactionHash);
+
+    String storeValueFromNode1_first =
+        PrivateAcceptanceTestBase.builder()
+            .nonce(1)
+            .from(node1.getAddress())
+            .to(Address.fromHexString(contract_address))
+            .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
+            .privateFor(
+                Lists.newArrayList(
+                    BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8)),
+                    BytesValue.wrap(PUBLIC_KEY_3.getBytes(UTF_8))))
+            .keyPair(keypair1)
+            .build(TransactionType.STORE);
+
+    transactionHash =
+        node1.execute(transactions.createPrivateRawTransaction(storeValueFromNode1_first));
+
+    privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
+
+    String storeValueFromNode1_wrong =
+        PrivateAcceptanceTestBase.builder()
+            .nonce(2)
+            .from(node1.getAddress())
+            .to(Address.fromHexString(contract_address))
+            .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
+            .privateFor(Lists.newArrayList(BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8))))
+            .keyPair(keypair1)
+            .build(TransactionType.STORE);
+
+    node1.execute(
+        transactions.createPrivateRawTransaction(
+            storeValueFromNode1_wrong)); // no need to verify as it fails
+
+    final Address CONTRACT_ADDRESS_second =
+        Address.fromHexString("0xf209cdbb484d982f71050076cde0b145904a6f52");
+
+    String deployContractFromNode1_second =
+        PrivateAcceptanceTestBase.builder()
+            .nonce(3)
+            .from(node1.getAddress())
+            .to(null)
+            .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
+            .privateFor(Lists.newArrayList(BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8))))
+            .keyPair(keypair1)
+            .build(TransactionType.CREATE_CONTRACT);
+
+    transactionHash =
+        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1_second));
+
+    privateTransactionVerifier
+        .validPrivateContractDeployed(CONTRACT_ADDRESS_second.toString())
+        .verify(node1, transactionHash);
+
+    String storeValueFromNode1_second =
+        PrivateAcceptanceTestBase.builder()
+            .nonce(4)
+            .from(node1.getAddress())
+            .to(CONTRACT_ADDRESS_second)
+            .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
+            .privateFor(Lists.newArrayList(BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8))))
+            .keyPair(keypair1)
+            .build(TransactionType.STORE);
+
+    transactionHash =
+        node1.execute(transactions.createPrivateRawTransaction(storeValueFromNode1_second));
+
+    privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
+  }
+
   @After
   public void tearDown() {
     enclave1.getOrion().stop();
