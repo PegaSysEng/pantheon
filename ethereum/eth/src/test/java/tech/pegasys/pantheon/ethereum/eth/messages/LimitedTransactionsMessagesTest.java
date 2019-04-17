@@ -81,12 +81,11 @@ public class LimitedTransactionsMessagesTest {
     txs.removeAll(firstMessage.getIncludedTransactions());
     assertEquals(2, txs.size());
     final LimitedTransactionsMessages secondMessage =
-            LimitedTransactionsMessages.createLimited(txs);
+        LimitedTransactionsMessages.createLimited(txs);
     assertEquals(1, secondMessage.getIncludedTransactions().size());
     txs.removeAll(secondMessage.getIncludedTransactions());
     assertEquals(1, txs.size());
-    final LimitedTransactionsMessages thirdMessage =
-            LimitedTransactionsMessages.createLimited(txs);
+    final LimitedTransactionsMessages thirdMessage = LimitedTransactionsMessages.createLimited(txs);
     assertEquals(1, thirdMessage.getIncludedTransactions().size());
     txs.removeAll(thirdMessage.getIncludedTransactions());
     assertEquals(0, txs.size());
