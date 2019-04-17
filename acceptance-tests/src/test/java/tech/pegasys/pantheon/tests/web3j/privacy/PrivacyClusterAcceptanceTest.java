@@ -97,6 +97,13 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             "SGVsbG8sIFdvcmxkIQ==", enclave2.getPublicKeys().get(0), enclave3.getPublicKeys());
     waitFor(() -> orion2.send(sendRequest2));
 
+    // Wait for enclave 1 and enclave 3 to connect
+    Enclave orion3 = new Enclave(enclave3.clientUrl());
+    SendRequest sendRequest3 =
+        new SendRequest(
+            "SGVsbG8sIFdvcmxkIQ==", enclave3.getPublicKeys().get(0), enclave1.getPublicKeys());
+    waitFor(() -> orion3.send(sendRequest3));
+
     deployContractFromNode1 =
         PrivateAcceptanceTestBase.builder()
             .nonce(0)
