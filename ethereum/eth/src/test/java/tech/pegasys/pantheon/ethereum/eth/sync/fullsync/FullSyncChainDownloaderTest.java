@@ -43,6 +43,7 @@ import tech.pegasys.pantheon.ethereum.eth.messages.GetBlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.EthTaskChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration.Builder;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -60,8 +61,23 @@ import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class FullSyncChainDownloaderTest {
+
+  @Parameter public boolean usePipelineDownloader;
+
+  @Parameter(1)
+  public String name;
+
+  @Parameters(name = "{1}")
+  public static Object[][] params() {
+    return new Object[][] {{false, "EthTask"}, {true, "Pipeline"}};
+  }
 
   protected ProtocolSchedule<Void> protocolSchedule;
   protected EthProtocolManager ethProtocolManager;
@@ -101,8 +117,13 @@ public class FullSyncChainDownloaderTest {
   }
 
   private ChainDownloader downloader() {
-    final SynchronizerConfiguration syncConfig = SynchronizerConfiguration.builder().build();
+    final SynchronizerConfiguration syncConfig = syncConfigBuilder().build();
     return downloader(syncConfig);
+  }
+
+  private Builder syncConfigBuilder() {
+    return SynchronizerConfiguration.builder()
+        .piplineDownloaderForFullSyncEnabled(usePipelineDownloader);
   }
 
   @Test
@@ -117,7 +138,7 @@ public class FullSyncChainDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder().downloaderChainSegmentSize(10).build();
+        syncConfigBuilder().downloaderChainSegmentSize(10).build();
     final ChainDownloader downloader = downloader(syncConfig);
     downloader.start();
 
@@ -143,7 +164,7 @@ public class FullSyncChainDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder().downloaderChainSegmentSize(10).build();
+        syncConfigBuilder().downloaderChainSegmentSize(10).build();
     final ChainDownloader downloader = downloader(syncConfig);
     downloader.start();
 
@@ -169,7 +190,7 @@ public class FullSyncChainDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder().downloaderChainSegmentSize(4).build();
+        syncConfigBuilder().downloaderChainSegmentSize(4).build();
     final ChainDownloader downloader = downloader(syncConfig);
     downloader.start();
 
@@ -228,7 +249,7 @@ public class FullSyncChainDownloaderTest {
     final Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder().downloaderChainSegmentSize(10).build();
+        syncConfigBuilder().downloaderChainSegmentSize(10).build();
     final ChainDownloader downloader = downloader(syncConfig);
     downloader.start();
 
@@ -297,7 +318,7 @@ public class FullSyncChainDownloaderTest {
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, localTd.plus(100), 50);
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
+        syncConfigBuilder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByHeight(10)
             .build();
@@ -330,7 +351,7 @@ public class FullSyncChainDownloaderTest {
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, localTd.plus(100));
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
+        syncConfigBuilder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByHeight(1000)
             .build();
@@ -363,7 +384,7 @@ public class FullSyncChainDownloaderTest {
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, localTd.plus(100));
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
+        syncConfigBuilder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByTd(UInt256.of(10))
             .build();
@@ -404,7 +425,7 @@ public class FullSyncChainDownloaderTest {
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, localTd.plus(100));
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
+        syncConfigBuilder()
             .downloaderChainSegmentSize(5)
             .downloaderChangeTargetThresholdByTd(UInt256.of(100_000_000L))
             .build();
@@ -438,10 +459,7 @@ public class FullSyncChainDownloaderTest {
     assertThat(targetBlock).isGreaterThan(localBlockchain.getChainHeadBlockNumber());
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
-            .downloaderChainSegmentSize(5)
-            .downloaderHeadersRequestSize(3)
-            .build();
+        syncConfigBuilder().downloaderChainSegmentSize(5).downloaderHeadersRequestSize(3).build();
     final ChainDownloader downloader = downloader(syncConfig);
 
     final long bestPeerChainHead = otherBlockchain.getChainHeadBlockNumber();
@@ -507,10 +525,7 @@ public class FullSyncChainDownloaderTest {
     assertThat(targetBlock).isGreaterThan(localBlockchain.getChainHeadBlockNumber());
 
     final SynchronizerConfiguration syncConfig =
-        SynchronizerConfiguration.builder()
-            .downloaderChainSegmentSize(5)
-            .downloaderHeadersRequestSize(3)
-            .build();
+        syncConfigBuilder().downloaderChainSegmentSize(5).downloaderHeadersRequestSize(3).build();
     final ChainDownloader downloader = downloader(syncConfig);
 
     // Setup the best peer we should use as our sync target
