@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,13 +13,10 @@
 package tech.pegasys.pantheon.controller;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.blockcreation.DefaultBlockScheduler;
-import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMinerExecutor;
-import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
@@ -37,98 +34,83 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderValidator;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Clock;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.OptionalLong;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class MainnetPantheonController implements PantheonController<Void> {
-
+public abstract class ConsensusAwarePantheonControllerBuilder<C> {
   private static final Logger LOG = LogManager.getLogger();
 
-  private final ProtocolSchedule<Void> protocolSchedule;
-  private final ProtocolContext<Void> protocolContext;
-  private final GenesisConfigOptions genesisConfigOptions;
-  private final ProtocolManager ethProtocolManager;
-  private final KeyPair keyPair;
-  private final Synchronizer synchronizer;
+  protected final GenesisConfigFile genesisConfig;
+  protected final SynchronizerConfiguration syncConfig;
+  protected final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
+  protected final StorageProvider storageProvider;
+  protected final int networkId;
+  protected final MiningParameters miningParameters;
+  protected final KeyPair nodeKeys;
+  protected final MetricsSystem metricsSystem;
+  protected final PrivacyParameters privacyParameters;
+  protected final Path dataDirectory;
+  protected final Clock clock;
+  protected final int maxPendingTransactions;
+  private final List<Runnable> shutdownActions = new ArrayList<>();
 
-  private final TransactionPool transactionPool;
-  private final MiningCoordinator miningCoordinator;
-  private final PrivacyParameters privacyParameters;
-  private final Runnable close;
-
-  private MainnetPantheonController(
-      final ProtocolSchedule<Void> protocolSchedule,
-      final ProtocolContext<Void> protocolContext,
-      final GenesisConfigOptions genesisConfigOptions,
-      final ProtocolManager ethProtocolManager,
-      final Synchronizer synchronizer,
-      final KeyPair keyPair,
-      final TransactionPool transactionPool,
-      final MiningCoordinator miningCoordinator,
-      final PrivacyParameters privacyParameters,
-      final Runnable close) {
-    this.protocolSchedule = protocolSchedule;
-    this.protocolContext = protocolContext;
-    this.genesisConfigOptions = genesisConfigOptions;
-    this.ethProtocolManager = ethProtocolManager;
-    this.synchronizer = synchronizer;
-    this.keyPair = keyPair;
-    this.transactionPool = transactionPool;
-    this.miningCoordinator = miningCoordinator;
-    this.privacyParameters = privacyParameters;
-    this.close = close;
-  }
-
-  public static PantheonController<Void> init(
-      final StorageProvider storageProvider,
+  protected ConsensusAwarePantheonControllerBuilder(
       final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration syncConfig,
       final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
-      final MiningParameters miningParams,
+      final StorageProvider storageProvider,
       final int networkId,
+      final MiningParameters miningParameters,
       final KeyPair nodeKeys,
+      final MetricsSystem metricsSystem,
       final PrivacyParameters privacyParameters,
       final Path dataDirectory,
-      final MetricsSystem metricsSystem,
       final Clock clock,
       final int maxPendingTransactions) {
-    final ProtocolSchedule<Void> protocolSchedule =
-        MainnetProtocolSchedule.fromConfig(genesisConfig.getConfigOptions(), privacyParameters);
+    this.genesisConfig = genesisConfig;
+    this.syncConfig = syncConfig;
+    this.ethereumWireProtocolConfiguration = ethereumWireProtocolConfiguration;
+    this.storageProvider = storageProvider;
+    this.networkId = networkId;
+    this.miningParameters = miningParameters;
+    this.nodeKeys = nodeKeys;
+    this.metricsSystem = metricsSystem;
+    this.privacyParameters = privacyParameters;
+    this.dataDirectory = dataDirectory;
+    this.clock = clock;
+    this.maxPendingTransactions = maxPendingTransactions;
+  }
 
+  public PantheonController<C> createPantheonController() {
+    final ProtocolSchedule<C> protocolSchedule = createProtocolSchedule();
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
-    final ProtocolContext<Void> protocolContext =
+    final ProtocolContext<C> protocolContext =
         ProtocolContext.init(
-            storageProvider, genesisState, protocolSchedule, metricsSystem, (a, b) -> null);
+            storageProvider,
+            genesisState,
+            protocolSchedule,
+            metricsSystem,
+            this::createConsensusContext);
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
     final EthProtocolManager ethProtocolManager =
-        new EthProtocolManager(
-            blockchain,
-            protocolContext.getWorldStateArchive(),
-            networkId,
-            fastSyncEnabled,
-            syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism(),
-            syncConfig.computationParallelism(),
-            metricsSystem,
-            ethereumWireProtocolConfiguration);
+        createEthProtocolManager(protocolContext, fastSyncEnabled);
     final SyncState syncState =
         new SyncState(blockchain, ethProtocolManager.ethContext().getEthPeers());
     final Synchronizer synchronizer =
@@ -163,44 +145,33 @@ public class MainnetPantheonController implements PantheonController<Void> {
             metricsSystem,
             syncState);
 
-    final ExecutorService minerThreadPool = Executors.newCachedThreadPool();
-    final EthHashMinerExecutor executor =
-        new EthHashMinerExecutor(
-            protocolContext,
-            minerThreadPool,
+    final MiningCoordinator miningCoordinator =
+        createMiningCoordinator(
             protocolSchedule,
-            transactionPool.getPendingTransactions(),
-            miningParams,
-            new DefaultBlockScheduler(
-                MainnetBlockHeaderValidator.MINIMUM_SECONDS_SINCE_PARENT,
-                MainnetBlockHeaderValidator.TIMESTAMP_TOLERANCE_S,
-                clock));
+            protocolContext,
+            transactionPool,
+            miningParameters,
+            syncState,
+            ethProtocolManager);
 
-    final EthHashMiningCoordinator miningCoordinator =
-        new EthHashMiningCoordinator(blockchain, executor, syncState);
-    miningCoordinator.addMinedBlockObserver(ethProtocolManager);
-    if (miningParams.isMiningEnabled()) {
-      miningCoordinator.enable();
-    }
+    final SubProtocolConfiguration subProtocolConfiguration =
+        createSubProtocolConfiguration(ethProtocolManager);
 
-    return new MainnetPantheonController(
+    final JsonRpcMethodFactory additionalJsonRpcMethodFactory =
+        createAdditionalJsonRpcMethodFactory(protocolContext);
+    return new PantheonController<>(
         protocolSchedule,
         protocolContext,
         genesisConfig.getConfigOptions(),
-        ethProtocolManager,
+        subProtocolConfiguration,
         synchronizer,
+        additionalJsonRpcMethodFactory,
         nodeKeys,
         transactionPool,
         miningCoordinator,
         privacyParameters,
         () -> {
-          miningCoordinator.disable();
-          minerThreadPool.shutdownNow();
-          try {
-            minerThreadPool.awaitTermination(5, TimeUnit.SECONDS);
-          } catch (final InterruptedException e) {
-            LOG.error("Failed to shutdown miner executor");
-          }
+          shutdownActions.forEach(Runnable::run);
           try {
             storageProvider.close();
             if (privacyParameters.getPrivateStorageProvider() != null) {
@@ -212,53 +183,44 @@ public class MainnetPantheonController implements PantheonController<Void> {
         });
   }
 
-  @Override
-  public ProtocolContext<Void> getProtocolContext() {
-    return protocolContext;
+  protected JsonRpcMethodFactory createAdditionalJsonRpcMethodFactory(
+      final ProtocolContext<C> protocolContext) {
+    return apis -> Collections.emptyMap();
   }
 
-  @Override
-  public ProtocolSchedule<Void> getProtocolSchedule() {
-    return protocolSchedule;
-  }
-
-  @Override
-  public GenesisConfigOptions getGenesisConfigOptions() {
-    return genesisConfigOptions;
-  }
-
-  @Override
-  public Synchronizer getSynchronizer() {
-    return synchronizer;
-  }
-
-  @Override
-  public SubProtocolConfiguration subProtocolConfiguration() {
+  protected SubProtocolConfiguration createSubProtocolConfiguration(
+      final EthProtocolManager ethProtocolManager) {
     return new SubProtocolConfiguration().withSubProtocol(EthProtocol.get(), ethProtocolManager);
   }
 
-  @Override
-  public KeyPair getLocalNodeKeyPair() {
-    return keyPair;
+  protected final void addShutdownAction(final Runnable action) {
+    shutdownActions.add(action);
   }
 
-  @Override
-  public TransactionPool getTransactionPool() {
-    return transactionPool;
-  }
+  protected abstract MiningCoordinator createMiningCoordinator(
+      ProtocolSchedule<C> protocolSchedule,
+      ProtocolContext<C> protocolContext,
+      TransactionPool transactionPool,
+      MiningParameters miningParameters,
+      SyncState syncState,
+      EthProtocolManager ethProtocolManager);
 
-  @Override
-  public MiningCoordinator getMiningCoordinator() {
-    return miningCoordinator;
-  }
+  protected abstract ProtocolSchedule<C> createProtocolSchedule();
 
-  @Override
-  public void close() {
-    close.run();
-  }
+  protected abstract C createConsensusContext(
+      Blockchain blockchain, WorldStateArchive worldStateArchive);
 
-  @Override
-  public PrivacyParameters getPrivacyParameters() {
-    return privacyParameters;
+  protected EthProtocolManager createEthProtocolManager(
+      final ProtocolContext<C> protocolContext, final boolean fastSyncEnabled) {
+    return new EthProtocolManager(
+        protocolContext.getBlockchain(),
+        protocolContext.getWorldStateArchive(),
+        networkId,
+        fastSyncEnabled,
+        syncConfig.downloaderParallelism(),
+        syncConfig.transactionsParallelism(),
+        syncConfig.computationParallelism(),
+        metricsSystem,
+        ethereumWireProtocolConfiguration);
   }
 }

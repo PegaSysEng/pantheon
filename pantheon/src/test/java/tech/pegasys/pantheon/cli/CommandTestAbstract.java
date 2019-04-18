@@ -75,7 +75,7 @@ public abstract class CommandTestAbstract {
   @Mock SynchronizerConfiguration mockSyncConf;
   @Mock RocksDbConfiguration.Builder mockRocksDbConfBuilder;
   @Mock RocksDbConfiguration mockRocksDbConf;
-  @Mock PantheonController<?> mockController;
+  @Mock PantheonController<Object> mockController;
   @Mock BlockImporter mockBlockImporter;
   @Mock Logger mockLogger;
 

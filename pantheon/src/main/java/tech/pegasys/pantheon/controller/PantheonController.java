@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,8 +11,6 @@
  * specific language governing permissions and limitations under the License.
  */
 package tech.pegasys.pantheon.controller;
-
-import static java.util.Collections.emptyMap;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
@@ -27,22 +25,59 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-import java.io.Closeable;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Map;
 
-public interface PantheonController<C> extends Closeable {
+public class PantheonController<C> implements java.io.Closeable {
 
-  String DATABASE_PATH = "database";
+  public static final String DATABASE_PATH = "database";
+  private final ProtocolSchedule<C> protocolSchedule;
+  private final ProtocolContext<C> protocolContext;
+  private final GenesisConfigOptions genesisConfigOptions;
+  private final SubProtocolConfiguration subProtocolConfiguration;
+  private final KeyPair keyPair;
+  private final Synchronizer synchronizer;
+  private final JsonRpcMethodFactory additionalJsonRpcMethodsFactory;
 
-  static PantheonController<?> fromConfig(
+  private final TransactionPool transactionPool;
+  private final MiningCoordinator miningCoordinator;
+  private final PrivacyParameters privacyParameters;
+  private final Runnable close;
+
+  PantheonController(
+      final ProtocolSchedule<C> protocolSchedule,
+      final ProtocolContext<C> protocolContext,
+      final GenesisConfigOptions genesisConfigOptions,
+      final SubProtocolConfiguration subProtocolConfiguration,
+      final Synchronizer synchronizer,
+      final JsonRpcMethodFactory additionalJsonRpcMethodsFactory,
+      final KeyPair keyPair,
+      final TransactionPool transactionPool,
+      final MiningCoordinator miningCoordinator,
+      final PrivacyParameters privacyParameters,
+      final Runnable close) {
+    this.protocolSchedule = protocolSchedule;
+    this.protocolContext = protocolContext;
+    this.genesisConfigOptions = genesisConfigOptions;
+    this.subProtocolConfiguration = subProtocolConfiguration;
+    this.synchronizer = synchronizer;
+    this.additionalJsonRpcMethodsFactory = additionalJsonRpcMethodsFactory;
+    this.keyPair = keyPair;
+    this.transactionPool = transactionPool;
+    this.miningCoordinator = miningCoordinator;
+    this.privacyParameters = privacyParameters;
+    this.close = close;
+  }
+
+  public static PantheonController<?> fromConfig(
       final GenesisConfigFile genesisConfigFile,
       final SynchronizerConfiguration syncConfig,
       final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
@@ -57,87 +92,117 @@ public interface PantheonController<C> extends Closeable {
       final int maxPendingTransactions) {
 
     final GenesisConfigOptions configOptions = genesisConfigFile.getConfigOptions();
+    final ConsensusAwarePantheonControllerBuilder<?> builder;
 
     if (configOptions.isEthHash()) {
-      return MainnetPantheonController.init(
-          storageProvider,
-          genesisConfigFile,
-          syncConfig,
-          ethereumWireProtocolConfiguration,
-          miningParameters,
-          networkId,
-          nodeKeys,
-          privacyParameters,
-          dataDirectory,
-          metricsSystem,
-          clock,
-          maxPendingTransactions);
+      builder =
+          new EthashPantheonControllerBuilder(
+              genesisConfigFile,
+              syncConfig,
+              ethereumWireProtocolConfiguration,
+              storageProvider,
+              networkId,
+              miningParameters,
+              nodeKeys,
+              metricsSystem,
+              privacyParameters,
+              dataDirectory,
+              clock,
+              maxPendingTransactions);
     } else if (configOptions.isIbft2()) {
-      return IbftPantheonController.init(
-          storageProvider,
-          genesisConfigFile,
-          syncConfig,
-          ethereumWireProtocolConfiguration,
-          miningParameters,
-          networkId,
-          nodeKeys,
-          dataDirectory,
-          metricsSystem,
-          clock,
-          maxPendingTransactions,
-          privacyParameters);
+      builder =
+          new IbftPantheonControllerBuilder(
+              genesisConfigFile,
+              syncConfig,
+              ethereumWireProtocolConfiguration,
+              storageProvider,
+              networkId,
+              miningParameters,
+              nodeKeys,
+              metricsSystem,
+              privacyParameters,
+              dataDirectory,
+              clock,
+              maxPendingTransactions);
     } else if (configOptions.isIbftLegacy()) {
-      return IbftLegacyPantheonController.init(
-          storageProvider,
-          genesisConfigFile,
-          syncConfig,
-          ethereumWireProtocolConfiguration,
-          networkId,
-          nodeKeys,
-          dataDirectory,
-          metricsSystem,
-          clock,
-          maxPendingTransactions,
-          privacyParameters);
+      builder =
+          new IbftLegacyPantheonControllerBuilder(
+              genesisConfigFile,
+              syncConfig,
+              ethereumWireProtocolConfiguration,
+              storageProvider,
+              networkId,
+              miningParameters,
+              nodeKeys,
+              metricsSystem,
+              privacyParameters,
+              dataDirectory,
+              clock,
+              maxPendingTransactions);
     } else if (configOptions.isClique()) {
-      return CliquePantheonController.init(
-          storageProvider,
-          genesisConfigFile,
-          syncConfig,
-          ethereumWireProtocolConfiguration,
-          miningParameters,
-          networkId,
-          nodeKeys,
-          dataDirectory,
-          metricsSystem,
-          clock,
-          maxPendingTransactions,
-          privacyParameters);
+      builder =
+          new CliquePantheonControllerBuilder(
+              genesisConfigFile,
+              syncConfig,
+              ethereumWireProtocolConfiguration,
+              storageProvider,
+              networkId,
+              miningParameters,
+              nodeKeys,
+              metricsSystem,
+              privacyParameters,
+              dataDirectory,
+              clock,
+              maxPendingTransactions);
     } else {
       throw new IllegalArgumentException("Unknown consensus mechanism defined");
     }
+    return builder.createPantheonController();
   }
 
-  ProtocolContext<C> getProtocolContext();
+  public ProtocolContext<C> getProtocolContext() {
+    return protocolContext;
+  }
 
-  ProtocolSchedule<C> getProtocolSchedule();
+  public ProtocolSchedule<C> getProtocolSchedule() {
+    return protocolSchedule;
+  }
 
-  GenesisConfigOptions getGenesisConfigOptions();
+  public GenesisConfigOptions getGenesisConfigOptions() {
+    return genesisConfigOptions;
+  }
 
-  Synchronizer getSynchronizer();
+  public Synchronizer getSynchronizer() {
+    return synchronizer;
+  }
 
-  SubProtocolConfiguration subProtocolConfiguration();
+  public SubProtocolConfiguration getSubProtocolConfiguration() {
+    return subProtocolConfiguration;
+  }
 
-  KeyPair getLocalNodeKeyPair();
+  public KeyPair getLocalNodeKeyPair() {
+    return keyPair;
+  }
 
-  TransactionPool getTransactionPool();
+  public TransactionPool getTransactionPool() {
+    return transactionPool;
+  }
 
-  MiningCoordinator getMiningCoordinator();
+  public MiningCoordinator getMiningCoordinator() {
+    return miningCoordinator;
+  }
 
-  PrivacyParameters getPrivacyParameters();
+  @Override
+  public void close() {
+    close.run();
+  }
 
-  default Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
+  public PrivacyParameters getPrivacyParameters() {
+    return privacyParameters;
+  }
+
+  public Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
       final Collection<RpcApi> enabledRpcApis) {
-    return emptyMap();
+    return additionalJsonRpcMethodsFactory.createJsonRpcMethods(enabledRpcApis);
   }
 }

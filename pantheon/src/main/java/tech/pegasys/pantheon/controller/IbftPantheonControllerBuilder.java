@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,11 +12,9 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.config.IbftConfigOptions;
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
@@ -52,168 +50,97 @@ import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.GenesisState;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
-import tech.pegasys.pantheon.ethereum.eth.sync.DefaultSynchronizer;
-import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Clock;
-import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class IbftPantheonController implements PantheonController<IbftContext> {
+public class IbftPantheonControllerBuilder
+    extends ConsensusAwarePantheonControllerBuilder<IbftContext> {
+  private static final Logger LOG = LogManager.getLogger();
+  private final IbftEventQueue ibftEventQueue;
+  private final IbftConfigOptions ibftConfig;
+  private ValidatorPeers peers;
 
-  private static final Logger LOG = getLogger();
-  private final ProtocolSchedule<IbftContext> protocolSchedule;
-  private final ProtocolContext<IbftContext> context;
-  private final GenesisConfigOptions genesisConfigOptions;
-  private final Synchronizer synchronizer;
-  private final SubProtocol ethSubProtocol;
-  private final ProtocolManager ethProtocolManager;
-  private final IbftProtocolManager ibftProtocolManager;
-  private final KeyPair keyPair;
-  private final TransactionPool transactionPool;
-  private final MiningCoordinator ibftMiningCoordinator;
-  private final Runnable closer;
-  private final PrivacyParameters privacyParameters;
-
-  private IbftPantheonController(
-      final ProtocolSchedule<IbftContext> protocolSchedule,
-      final ProtocolContext<IbftContext> context,
-      final GenesisConfigOptions genesisConfigOptions,
-      final SubProtocol ethSubProtocol,
-      final ProtocolManager ethProtocolManager,
-      final IbftProtocolManager ibftProtocolManager,
-      final Synchronizer synchronizer,
-      final KeyPair keyPair,
-      final TransactionPool transactionPool,
-      final MiningCoordinator ibftMiningCoordinator,
-      final PrivacyParameters privacyParameters,
-      final Runnable closer) {
-    this.protocolSchedule = protocolSchedule;
-    this.context = context;
-    this.genesisConfigOptions = genesisConfigOptions;
-    this.ethSubProtocol = ethSubProtocol;
-    this.ethProtocolManager = ethProtocolManager;
-    this.ibftProtocolManager = ibftProtocolManager;
-    this.synchronizer = synchronizer;
-    this.keyPair = keyPair;
-    this.transactionPool = transactionPool;
-    this.ibftMiningCoordinator = ibftMiningCoordinator;
-    this.privacyParameters = privacyParameters;
-    this.closer = closer;
-  }
-
-  static PantheonController<IbftContext> init(
-      final StorageProvider storageProvider,
+  protected IbftPantheonControllerBuilder(
       final GenesisConfigFile genesisConfig,
       final SynchronizerConfiguration syncConfig,
       final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
-      final MiningParameters miningParams,
+      final StorageProvider storageProvider,
       final int networkId,
+      final MiningParameters miningParameters,
       final KeyPair nodeKeys,
-      final Path dataDirectory,
       final MetricsSystem metricsSystem,
+      final PrivacyParameters privacyParameters,
+      final Path dataDirectory,
       final Clock clock,
-      final int maxPendingTransactions,
-      final PrivacyParameters privacyParameters) {
-    final ProtocolSchedule<IbftContext> protocolSchedule =
-        IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), privacyParameters);
-    final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
+      final int maxPendingTransactions) {
+    super(
+        genesisConfig,
+        syncConfig,
+        ethereumWireProtocolConfiguration,
+        storageProvider,
+        networkId,
+        miningParameters,
+        nodeKeys,
+        metricsSystem,
+        privacyParameters,
+        dataDirectory,
+        clock,
+        maxPendingTransactions);
 
-    final BlockInterface blockInterface = new IbftBlockInterface();
+    ibftConfig = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
+    ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
+  }
 
-    final IbftConfigOptions ibftConfig = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
+  @Override
+  protected JsonRpcMethodFactory createAdditionalJsonRpcMethodFactory(
+      final ProtocolContext<IbftContext> protocolContext) {
+    return new IbftJsonRpcMethodsFactory(protocolContext);
+  }
 
-    final ProtocolContext<IbftContext> protocolContext =
-        ProtocolContext.init(
-            storageProvider,
-            genesisState,
-            protocolSchedule,
-            metricsSystem,
-            (blockchain, worldStateArchive) -> {
-              final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
-              return new IbftContext(
-                  new VoteTallyCache(
-                      blockchain,
-                      new VoteTallyUpdater(epochManager, new IbftBlockInterface()),
-                      epochManager,
-                      new IbftBlockInterface()),
-                  new VoteProposer());
-            });
+  @Override
+  protected SubProtocolConfiguration createSubProtocolConfiguration(
+      final EthProtocolManager ethProtocolManager) {
+    return new SubProtocolConfiguration()
+        .withSubProtocol(EthProtocol.get(), ethProtocolManager)
+        .withSubProtocol(IbftSubProtocol.get(), new IbftProtocolManager(ibftEventQueue, peers));
+  }
+
+  @Override
+  protected MiningCoordinator createMiningCoordinator(
+      final ProtocolSchedule<IbftContext> protocolSchedule,
+      final ProtocolContext<IbftContext> protocolContext,
+      final TransactionPool transactionPool,
+      final MiningParameters miningParameters,
+      final SyncState syncState,
+      final EthProtocolManager ethProtocolManager) {
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
-
-    final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
-    final EthProtocolManager ethProtocolManager =
-        new EthProtocolManager(
-            protocolContext.getBlockchain(),
-            protocolContext.getWorldStateArchive(),
-            networkId,
-            fastSyncEnabled,
-            syncConfig.downloaderParallelism(),
-            syncConfig.transactionsParallelism(),
-            syncConfig.computationParallelism(),
-            metricsSystem,
-            ethereumWireProtocolConfiguration);
-    final SubProtocol ethSubProtocol = EthProtocol.get();
-
-    final EthContext ethContext = ethProtocolManager.ethContext();
-
-    final SyncState syncState =
-        new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
-    final Synchronizer synchronizer =
-        new DefaultSynchronizer<>(
-            syncConfig,
-            protocolSchedule,
-            protocolContext,
-            protocolContext.getWorldStateArchive().getStorage(),
-            ethProtocolManager.ethContext(),
-            syncState,
-            dataDirectory,
-            clock,
-            metricsSystem);
-
-    final TransactionPool transactionPool =
-        TransactionPoolFactory.createTransactionPool(
-            protocolSchedule,
-            protocolContext,
-            ethContext,
-            clock,
-            maxPendingTransactions,
-            metricsSystem,
-            syncState);
-
-    final IbftEventQueue ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
 
     final IbftBlockCreatorFactory blockCreatorFactory =
         new IbftBlockCreatorFactory(
@@ -221,16 +148,17 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             transactionPool.getPendingTransactions(),
             protocolContext,
             protocolSchedule,
-            miningParams,
+            miningParameters,
             Util.publicKeyToAddress(nodeKeys.getPublicKey()));
 
+    final BlockInterface blockInterface = new IbftBlockInterface();
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, blockInterface, true);
 
     // NOTE: peers should not be used for accessing the network as it does not enforce the
     // "only send once" filter applied by the UniqueMessageMulticaster.
     final VoteTallyCache voteTallyCache = protocolContext.getConsensusState().getVoteTallyCache();
-    final ValidatorPeers peers = new ValidatorPeers(voteTallyCache);
+    peers = new ValidatorPeers(voteTallyCache);
 
     final UniqueMessageMulticaster uniqueMessageMulticaster =
         new UniqueMessageMulticaster(peers, ibftConfig.getGossipedHistoryLimit());
@@ -284,7 +212,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             gossiper,
             duplicateMessageTracker,
             futureMessageBuffer,
-            new EthSynchronizerUpdater(ethContext.getEthPeers()));
+            new EthSynchronizerUpdater(ethProtocolManager.ethContext().getEthPeers()));
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, eventMultiplexer);
@@ -294,8 +222,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final MiningCoordinator ibftMiningCoordinator =
         new IbftMiningCoordinator(ibftProcessor, blockCreatorFactory, blockchain, ibftEventQueue);
     ibftMiningCoordinator.enable();
-
-    final Runnable closer =
+    addShutdownAction(
         () -> {
           ibftProcessor.stop();
           ibftMiningCoordinator.disable();
@@ -311,86 +238,26 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
           } catch (final InterruptedException e) {
             LOG.error("Failed to shutdown timer executor");
           }
-          try {
-            storageProvider.close();
-            if (privacyParameters.isEnabled()) {
-              privacyParameters.getPrivateStorageProvider().close();
-            }
-          } catch (final IOException e) {
-            LOG.error("Failed to close storage provider", e);
-          }
-        };
-
-    return new IbftPantheonController(
-        protocolSchedule,
-        protocolContext,
-        genesisConfig.getConfigOptions(),
-        ethSubProtocol,
-        ethProtocolManager,
-        new IbftProtocolManager(ibftEventQueue, peers),
-        synchronizer,
-        nodeKeys,
-        transactionPool,
-        ibftMiningCoordinator,
-        privacyParameters,
-        closer);
-  }
-
-  @Override
-  public ProtocolContext<IbftContext> getProtocolContext() {
-    return context;
-  }
-
-  @Override
-  public ProtocolSchedule<IbftContext> getProtocolSchedule() {
-    return protocolSchedule;
-  }
-
-  @Override
-  public GenesisConfigOptions getGenesisConfigOptions() {
-    return genesisConfigOptions;
-  }
-
-  @Override
-  public Synchronizer getSynchronizer() {
-    return synchronizer;
-  }
-
-  @Override
-  public SubProtocolConfiguration subProtocolConfiguration() {
-    return new SubProtocolConfiguration()
-        .withSubProtocol(ethSubProtocol, ethProtocolManager)
-        .withSubProtocol(IbftSubProtocol.get(), ibftProtocolManager);
-  }
-
-  @Override
-  public KeyPair getLocalNodeKeyPair() {
-    return keyPair;
-  }
-
-  @Override
-  public TransactionPool getTransactionPool() {
-    return transactionPool;
-  }
-
-  @Override
-  public MiningCoordinator getMiningCoordinator() {
+        });
     return ibftMiningCoordinator;
   }
 
   @Override
-  public PrivacyParameters getPrivacyParameters() {
-    return privacyParameters;
+  protected ProtocolSchedule<IbftContext> createProtocolSchedule() {
+    return IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), privacyParameters);
   }
 
   @Override
-  public Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
-      final Collection<RpcApi> enabledRpcApis) {
-    return new IbftJsonRpcMethodsFactory().methods(context, enabledRpcApis);
-  }
-
-  @Override
-  public void close() {
-    closer.run();
+  protected IbftContext createConsensusContext(
+      final Blockchain blockchain, final WorldStateArchive worldStateArchive) {
+    final IbftConfigOptions ibftConfig = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
+    final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
+    return new IbftContext(
+        new VoteTallyCache(
+            blockchain,
+            new VoteTallyUpdater(epochManager, new IbftBlockInterface()),
+            epochManager,
+            new IbftBlockInterface()),
+        new VoteProposer());
   }
 }
