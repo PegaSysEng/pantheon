@@ -280,6 +280,8 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
         transactions.createPrivateRawTransaction(
             storeValueFromNode1_wrong)); // no need to verify as it fails
 
+    privateTransactionVerifier.noValidOutputReturned().verify(node1, transactionHash);
+
     final Address CONTRACT_ADDRESS_second =
         Address.fromHexString("0xf209cdbb484d982f71050076cde0b145904a6f52");
 
