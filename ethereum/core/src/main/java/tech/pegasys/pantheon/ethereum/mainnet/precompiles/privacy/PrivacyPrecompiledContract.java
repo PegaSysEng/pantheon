@@ -153,6 +153,19 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
       privateUpdater.putTransactionResult(txHash, result.getOutput());
       privateUpdater.commit();
     }
+
+    privateTransaction.getTo().ifPresent(a -> LOG.error(a.toString()));
+
+    LOG.error(
+        "\n key = {} \n lastRootHash = {} \n thisRootHash = {} \n privacyGoupId = {} \n persisting = {} \n logsCount = {} \n output = {}",
+        key,
+        lastRootHash,
+        disposablePrivateState.rootHash(),
+        privacyGroupId,
+        messageFrame.isPersistingState(),
+        result.getLogs().size(),
+        result.getOutput().toString());
+
     return result.getOutput();
   }
 }
