@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.time.Duration;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +29,6 @@ public class SynchronizerConfiguration {
   private static final int DEFAULT_PIVOT_DISTANCE_FROM_HEAD = 50;
   private static final float DEFAULT_FULL_VALIDATION_RATE = .1f;
   private static final int DEFAULT_FAST_SYNC_MINIMUM_PEERS = 5;
-  private static final Duration DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME = Duration.ofSeconds(0);
   private static final int DEFAULT_WORLD_STATE_HASH_COUNT_PER_REQUEST = 384;
   private static final int DEFAULT_WORLD_STATE_REQUEST_PARALLELISM = 10;
   private static final int DEFAULT_WORLD_STATE_MAX_REQUESTS_WITHOUT_PROGRESS = 1000;
@@ -41,7 +39,6 @@ public class SynchronizerConfiguration {
   private final int fastSyncPivotDistance;
   private final float fastSyncFullValidationRate;
   private final int fastSyncMinimumPeerCount;
-  private final Duration fastSyncMaximumPeerWaitTime;
   private final int worldStateHashCountPerRequest;
   private final int worldStateRequestParallelism;
   private final int worldStateMaxRequestsWithoutProgress;
@@ -63,13 +60,13 @@ public class SynchronizerConfiguration {
   private final int transactionsParallelism;
   private final int computationParallelism;
   private final int maxTrailingPeers;
+  private final boolean piplineDownloaderForFullSyncEnabled;
   private final long worldStateMinMillisBeforeStalling;
 
   private SynchronizerConfiguration(
       final int fastSyncPivotDistance,
       final float fastSyncFullValidationRate,
       final int fastSyncMinimumPeerCount,
-      final Duration fastSyncMaximumPeerWaitTime,
       final int worldStateHashCountPerRequest,
       final int worldStateRequestParallelism,
       final int worldStateMaxRequestsWithoutProgress,
@@ -85,11 +82,11 @@ public class SynchronizerConfiguration {
       final int downloaderParallelism,
       final int transactionsParallelism,
       final int computationParallelism,
-      final int maxTrailingPeers) {
+      final int maxTrailingPeers,
+      final boolean piplineDownloaderForFullSyncEnabled) {
     this.fastSyncPivotDistance = fastSyncPivotDistance;
     this.fastSyncFullValidationRate = fastSyncFullValidationRate;
     this.fastSyncMinimumPeerCount = fastSyncMinimumPeerCount;
-    this.fastSyncMaximumPeerWaitTime = fastSyncMaximumPeerWaitTime;
     this.worldStateHashCountPerRequest = worldStateHashCountPerRequest;
     this.worldStateRequestParallelism = worldStateRequestParallelism;
     this.worldStateMaxRequestsWithoutProgress = worldStateMaxRequestsWithoutProgress;
@@ -106,6 +103,7 @@ public class SynchronizerConfiguration {
     this.transactionsParallelism = transactionsParallelism;
     this.computationParallelism = computationParallelism;
     this.maxTrailingPeers = maxTrailingPeers;
+    this.piplineDownloaderForFullSyncEnabled = piplineDownloaderForFullSyncEnabled;
   }
 
   public static Builder builder() {
@@ -192,10 +190,6 @@ public class SynchronizerConfiguration {
     return fastSyncMinimumPeerCount;
   }
 
-  public Duration getFastSyncMaximumPeerWaitTime() {
-    return fastSyncMaximumPeerWaitTime;
-  }
-
   public int getWorldStateHashCountPerRequest() {
     return worldStateHashCountPerRequest;
   }
@@ -216,10 +210,13 @@ public class SynchronizerConfiguration {
     return maxTrailingPeers;
   }
 
+  public boolean isPiplineDownloaderForFullSyncEnabled() {
+    return piplineDownloaderForFullSyncEnabled;
+  }
+
   public static class Builder {
     private SyncMode syncMode = SyncMode.FULL;
     private int fastSyncMinimumPeerCount = DEFAULT_FAST_SYNC_MINIMUM_PEERS;
-    private Duration fastSyncMaximumPeerWaitTime = DEFAULT_FAST_SYNC_MAXIMUM_PEER_WAIT_TIME;
     private int maxTrailingPeers = Integer.MAX_VALUE;
 
     @CommandLine.Option(
@@ -244,20 +241,20 @@ public class SynchronizerConfiguration {
     @CommandLine.Option(
         names = "--Xsynchronizer-downloader-change-target-threshold-by-height",
         hidden = true,
-        defaultValue = "20",
+        defaultValue = "200",
         paramLabel = "<LONG>",
         description =
             "Minimum height difference before switching fast sync download peers (default: ${DEFAULT-VALUE})")
-    private long downloaderChangeTargetThresholdByHeight = 20L;
+    private long downloaderChangeTargetThresholdByHeight = 200L;
 
     @CommandLine.Option(
         names = "--Xsynchronizer-downloader-change-target-threshold-by-td",
         hidden = true,
-        defaultValue = "1000000000",
+        defaultValue = "1000000000000000000",
         paramLabel = "<UINT256>",
         description =
             "Minimum total difficulty difference before switching fast sync download peers (default: ${DEFAULT-VALUE})")
-    private UInt256 downloaderChangeTargetThresholdByTd = UInt256.of(1_000_000_000L);
+    private UInt256 downloaderChangeTargetThresholdByTd = UInt256.of(1_000_000_000_000_000_000L);
 
     @CommandLine.Option(
         names = "--Xsynchronizer-downloader-header-request-size",
@@ -374,6 +371,14 @@ public class SynchronizerConfiguration {
             "Minimum time in ms without progress before considering a world state download as stalled (default: ${DEFAULT-VALUE})")
     private long worldStateMinMillisBeforeStalling = DEFAULT_WORLD_STATE_MIN_MILLIS_BEFORE_STALLING;
 
+    @CommandLine.Option(
+        names = "--Xsynchronizer-pipeline-full-sync-enabled",
+        hidden = true,
+        defaultValue = "false",
+        paramLabel = "<BOOLEAN>",
+        description = "Enable the pipeline based chain downloader during full synchronization")
+    private Boolean piplineDownloaderForFullSyncEnabled = false;
+
     public Builder fastSyncPivotDistance(final int distance) {
       fastSyncPivotDistance = distance;
       return this;
@@ -465,11 +470,6 @@ public class SynchronizerConfiguration {
       return this;
     }
 
-    public Builder fastSyncMaximumPeerWaitTime(final Duration fastSyncMaximumPeerWaitTime) {
-      this.fastSyncMaximumPeerWaitTime = fastSyncMaximumPeerWaitTime;
-      return this;
-    }
-
     public Builder worldStateMinMillisBeforeStalling(final long worldStateMinMillisBeforeStalling) {
       this.worldStateMinMillisBeforeStalling = worldStateMinMillisBeforeStalling;
       return this;
@@ -480,12 +480,17 @@ public class SynchronizerConfiguration {
       return this;
     }
 
+    public Builder piplineDownloaderForFullSyncEnabled(
+        final Boolean piplineDownloaderForFullSyncEnabled) {
+      this.piplineDownloaderForFullSyncEnabled = piplineDownloaderForFullSyncEnabled;
+      return this;
+    }
+
     public SynchronizerConfiguration build() {
       return new SynchronizerConfiguration(
           fastSyncPivotDistance,
           fastSyncFullValidationRate,
           fastSyncMinimumPeerCount,
-          fastSyncMaximumPeerWaitTime,
           worldStateHashCountPerRequest,
           worldStateRequestParallelism,
           worldStateMaxRequestsWithoutProgress,
@@ -501,7 +506,8 @@ public class SynchronizerConfiguration {
           downloaderParallelism,
           transactionsParallelism,
           computationParallelism,
-          maxTrailingPeers);
+          maxTrailingPeers,
+          piplineDownloaderForFullSyncEnabled);
     }
   }
 }

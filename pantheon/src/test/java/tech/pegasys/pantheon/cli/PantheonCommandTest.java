@@ -37,10 +37,10 @@ import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
+import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
@@ -59,7 +59,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -146,8 +145,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
                 EthNetworkConfig.jsonConfig(MAINNET),
                 EthNetworkConfig.MAINNET_NETWORK_ID,
                 MAINNET_BOOTSTRAP_NODES));
-    verify(mockRunnerBuilder).discoveryHost(eq("127.0.0.1"));
-    verify(mockRunnerBuilder).discoveryPort(eq(30303));
+    verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
+    verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(defaultJsonRpcConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(defaultWebSocketConfiguration));
@@ -281,8 +280,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockRunnerBuilder).discovery(eq(false));
     verify(mockRunnerBuilder).ethNetworkConfig(ethNetworkConfigArgumentCaptor.capture());
-    verify(mockRunnerBuilder).discoveryHost(eq("1.2.3.4"));
-    verify(mockRunnerBuilder).discoveryPort(eq(1234));
+    verify(mockRunnerBuilder).p2pAdvertisedHost(eq("1.2.3.4"));
+    verify(mockRunnerBuilder).p2pListenPort(eq(1234));
     verify(mockRunnerBuilder).maxPeers(eq(42));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
@@ -307,7 +306,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FAST));
     verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(eq(13));
-    verify(mockSyncConfBuilder).fastSyncMaximumPeerWaitTime(eq(Duration.ofSeconds(57)));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -599,8 +597,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
                 EthNetworkConfig.jsonConfig(MAINNET),
                 EthNetworkConfig.MAINNET_NETWORK_ID,
                 MAINNET_BOOTSTRAP_NODES));
-    verify(mockRunnerBuilder).discoveryHost(eq("127.0.0.1"));
-    verify(mockRunnerBuilder).discoveryPort(eq(30303));
+    verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
+    verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
@@ -614,7 +612,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));
     verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(eq(5));
-    verify(mockSyncConfBuilder).fastSyncMaximumPeerWaitTime(eq(Duration.ofSeconds(0)));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
 
@@ -984,8 +981,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final int port = 1234;
     parseCommand("--p2p-host", host, "--p2p-port", String.valueOf(port));
 
-    verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
-    verify(mockRunnerBuilder).discoveryPort(intArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pAdvertisedHost(stringArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pListenPort(intArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(stringArgumentCaptor.getValue()).isEqualTo(host);
@@ -1001,7 +998,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final String host = "localhost";
     parseCommand("--p2p-host", host);
 
-    verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pAdvertisedHost(stringArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(stringArgumentCaptor.getValue()).isEqualTo(host);
@@ -1016,7 +1013,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final String host = "2600:DB8::8545";
     parseCommand("--p2p-host", host);
 
-    verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pAdvertisedHost(stringArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(stringArgumentCaptor.getValue()).isEqualTo(host);
@@ -1061,27 +1058,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).contains("--fast-sync-min-peers");
     assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void parsesValidFastSyncTimeoutOption() {
-
-    parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "17");
-    verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FAST));
-    verify(mockSyncConfBuilder).fastSyncMaximumPeerWaitTime(eq(Duration.ofSeconds(17)));
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void parsesInvalidFastSyncTimeoutOptionShouldFail() {
-    parseCommand("--sync-mode", "FAST", "--fast-sync-max-wait-time", "-1");
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains("--fast-sync-max-wait-time must be greater than or equal to 0");
   }
 
   @Test
@@ -1268,10 +1244,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void fastSyncOptionsRequiresFastSyncModeToBeSet() {
-    parseCommand("--fast-sync-min-peers", "5", "--fast-sync-max-wait-time", "30");
+    parseCommand("--fast-sync-min-peers", "5");
 
-    verifyOptionsConstraintLoggerCall(
-        "--sync-mode", "--fast-sync-min-peers", "--fast-sync-max-wait-time");
+    verifyOptionsConstraintLoggerCall("--sync-mode", "--fast-sync-min-peers");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -2339,16 +2314,19 @@ public class PantheonCommandTest extends CommandTestAbstract {
     permissioningConfig.deleteOnExit();
 
     final EnodeURL staticNodeURI =
-        new EnodeURL(
-            "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa",
-            "127.0.0.1",
-            30303);
+        EnodeURL.builder()
+            .nodeId(
+                "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa")
+            .ipAddress("127.0.0.1")
+            .build();
 
     final EnodeURL whiteListedNode =
-        new EnodeURL(
-            "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa",
-            "127.0.0.1",
-            30304);
+        EnodeURL.builder()
+            .nodeId(
+                "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa")
+            .ipAddress("127.0.0.1")
+            .listeningPort(30304)
+            .build();
 
     Files.write(
         staticNodesFile.toPath(), ("[\"" + staticNodeURI.toString() + "\"]").getBytes(UTF_8));

@@ -45,9 +45,9 @@ import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
@@ -145,6 +145,7 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   private final PeerDiscoveryAgent peerDiscoveryAgent;
   private final PeerBlacklist peerBlacklist;
+  private final NetworkingConfiguration config;
   private OptionalLong peerBondedObserverId = OptionalLong.empty();
   private OptionalLong peerDroppedObserverId = OptionalLong.empty();
 
@@ -174,7 +175,7 @@ public class NettyP2PNetwork implements P2PNetwork {
 
   private final String advertisedHost;
 
-  private EnodeURL ourEnodeURL;
+  private volatile EnodeURL ourEnodeURL;
 
   private final Optional<NodePermissioningController> nodePermissioningController;
   private final Optional<Blockchain> blockchain;
@@ -229,6 +230,7 @@ public class NettyP2PNetwork implements P2PNetwork {
       final Optional<NodePermissioningController> nodePermissioningController,
       final Blockchain blockchain) {
 
+    this.config = config;
     maxPeers = config.getRlpx().getMaxPeers();
     connections = new PeerConnectionRegistry(metricsSystem);
     this.peerBlacklist = peerBlacklist;
@@ -364,7 +366,7 @@ public class NettyP2PNetwork implements P2PNetwork {
                 LOG.debug(
                     "Disconnecting incoming connection because connection limit of {} has been reached: {}",
                     maxPeers,
-                    connection.getPeer().getNodeId());
+                    connection.getPeerInfo().getNodeId());
                 connection.disconnect(DisconnectReason.TOO_MANY_PEERS);
                 return;
               }
@@ -376,7 +378,7 @@ public class NettyP2PNetwork implements P2PNetwork {
 
               onConnectionEstablished(connection);
               LOG.debug(
-                  "Successfully accepted connection from {}", connection.getPeer().getNodeId());
+                  "Successfully accepted connection from {}", connection.getPeerInfo().getNodeId());
               logConnections();
             });
       }
@@ -590,7 +592,7 @@ public class NettyP2PNetwork implements P2PNetwork {
     return event -> {
       final Peer peer = event.getPeer();
       getPeers().stream()
-          .filter(p -> p.getPeer().getNodeId().equals(peer.getId()))
+          .filter(p -> p.getPeerInfo().getNodeId().equals(peer.getId()))
           .findFirst()
           .ifPresent(p -> p.disconnect(DisconnectReason.REQUESTED));
     };
@@ -625,18 +627,14 @@ public class NettyP2PNetwork implements P2PNetwork {
     }
 
     LOG.trace(
-        "Checking if connection with peer {} is permitted", peerConnection.getPeer().getNodeId());
+        "Checking if connection with peer {} is permitted",
+        peerConnection.getPeerInfo().getNodeId());
 
     return nodePermissioningController
         .map(
             c -> {
-              final EnodeURL localPeerEnodeURL =
-                  peerInfoToEnodeURL(
-                      ourPeerInfo, (InetSocketAddress) peerConnection.getLocalAddress());
-              final EnodeURL remotePeerEnodeURL =
-                  peerInfoToEnodeURL(
-                      peerConnection.getPeer(),
-                      (InetSocketAddress) peerConnection.getRemoteAddress());
+              final EnodeURL localPeerEnodeURL = getLocalEnode().orElse(buildSelfEnodeURL());
+              final EnodeURL remotePeerEnodeURL = peerConnection.getRemoteEnode();
               return c.isPermitted(localPeerEnodeURL, remotePeerEnodeURL);
             })
         .orElse(true);
@@ -650,13 +648,6 @@ public class NettyP2PNetwork implements P2PNetwork {
     return nodePermissioningController
         .map(c -> c.isPermitted(ourEnodeURL, peer.getEnodeURL()))
         .orElse(true);
-  }
-
-  private EnodeURL peerInfoToEnodeURL(final PeerInfo ourPeerInfo, final InetSocketAddress address) {
-    final String localNodeId = ourPeerInfo.getNodeId().toString().substring(2);
-    final InetAddress localHostAddress = address.getAddress();
-    final int localPort = ourPeerInfo.getPort();
-    return new EnodeURL(localNodeId, localHostAddress, localPort);
   }
 
   @VisibleForTesting
@@ -709,16 +700,6 @@ public class NettyP2PNetwork implements P2PNetwork {
   }
 
   @Override
-  public Optional<? extends Peer> getAdvertisedPeer() {
-    return peerDiscoveryAgent.getAdvertisedPeer();
-  }
-
-  @Override
-  public PeerInfo getLocalPeerInfo() {
-    return ourPeerInfo;
-  }
-
-  @Override
   public boolean isListening() {
     return peerDiscoveryAgent.isActive();
   }
@@ -729,12 +710,17 @@ public class NettyP2PNetwork implements P2PNetwork {
   }
 
   @Override
-  public Optional<EnodeURL> getSelfEnodeURL() {
+  public boolean isDiscoveryEnabled() {
+    return config.getDiscovery().isActive();
+  }
+
+  @Override
+  public Optional<EnodeURL> getLocalEnode() {
     return Optional.ofNullable(ourEnodeURL);
   }
 
   private EnodeURL buildSelfEnodeURL() {
-    final String nodeId = ourPeerInfo.getNodeId().toUnprefixedString();
+    final BytesValue nodeId = ourPeerInfo.getNodeId();
     final int listeningPort = ourPeerInfo.getPort();
     final OptionalInt discoveryPort =
         peerDiscoveryAgent
@@ -743,7 +729,12 @@ public class NettyP2PNetwork implements P2PNetwork {
             .filter(port -> port.getAsInt() != listeningPort)
             .orElse(OptionalInt.empty());
 
-    return new EnodeURL(nodeId, advertisedHost, listeningPort, discoveryPort);
+    return EnodeURL.builder()
+        .nodeId(nodeId)
+        .ipAddress(advertisedHost)
+        .listeningPort(listeningPort)
+        .discoveryPort(discoveryPort)
+        .build();
   }
 
   private void onConnectionEstablished(final PeerConnection connection) {

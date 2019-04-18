@@ -10,10 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.core;
+package tech.pegasys.pantheon.ethereum.eth.transactions;
 
 import static java.util.Comparator.comparing;
 
+import tech.pegasys.pantheon.ethereum.core.AccountTransactionOrder;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -86,6 +90,18 @@ public class PendingTransactions {
             "Count of transactions removed from the transaction pool",
             "source",
             "operation");
+  }
+
+  List<Transaction> getLocalTransactions() {
+    synchronized (pendingTransactions) {
+      List<Transaction> localTransactions = new ArrayList<>();
+      for (Map.Entry<Hash, TransactionInfo> transaction : pendingTransactions.entrySet()) {
+        if (transaction.getValue().isReceivedFromLocalSource()) {
+          localTransactions.add(transaction.getValue().getTransaction());
+        }
+      }
+      return localTransactions;
+    }
   }
 
   public boolean addRemoteTransaction(final Transaction transaction) {
@@ -232,6 +248,10 @@ public class PendingTransactions {
     transactionDroppedListeners.forEach(listener -> listener.onTransactionDropped(transaction));
   }
 
+  public long maxSize() {
+    return maxPendingTransactions;
+  }
+
   public int size() {
     synchronized (pendingTransactions) {
       return pendingTransactions.size();
@@ -282,7 +302,7 @@ public class PendingTransactions {
     private final Instant addedToPoolAt;
     private final long sequence; // Allows prioritization based on order transactions are added
 
-    private TransactionInfo(
+    TransactionInfo(
         final Transaction transaction,
         final boolean receivedFromLocalSource,
         final Instant addedToPoolAt) {

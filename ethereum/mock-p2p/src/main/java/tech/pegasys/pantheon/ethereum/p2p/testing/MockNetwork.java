@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
@@ -26,7 +25,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -100,7 +99,7 @@ public final class MockNetwork {
     }
   }
 
-  private final class MockP2PNetwork implements P2PNetwork {
+  private static final class MockP2PNetwork implements P2PNetwork {
 
     private final MockNetwork network;
 
@@ -179,21 +178,10 @@ public final class MockNetwork {
     public void awaitStop() {}
 
     @Override
-    public Optional<Peer> getAdvertisedPeer() {
-      return Optional.of(new DefaultPeer(self.getId(), "127.0.0.1", 0, 0));
-    }
-
-    @Override
     public void start() {}
 
     @Override
     public void close() {}
-
-    @Override
-    public PeerInfo getLocalPeerInfo() {
-      return new PeerInfo(
-          5, self.getId().toString(), new ArrayList<>(capabilities), 0, self.getId());
-    }
 
     @Override
     public boolean isListening() {
@@ -206,7 +194,12 @@ public final class MockNetwork {
     }
 
     @Override
-    public Optional<EnodeURL> getSelfEnodeURL() {
+    public boolean isDiscoveryEnabled() {
+      return true;
+    }
+
+    @Override
+    public Optional<EnodeURL> getLocalEnode() {
       return Optional.empty();
     }
   }
@@ -260,7 +253,7 @@ public final class MockNetwork {
     }
 
     @Override
-    public PeerInfo getPeer() {
+    public PeerInfo getPeerInfo() {
       return new PeerInfo(
           5,
           "mock-network-client",
@@ -287,12 +280,12 @@ public final class MockNetwork {
     }
 
     @Override
-    public SocketAddress getLocalAddress() {
+    public InetSocketAddress getLocalAddress() {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public SocketAddress getRemoteAddress() {
+    public InetSocketAddress getRemoteAddress() {
       throw new UnsupportedOperationException();
     }
   }

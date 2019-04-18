@@ -12,16 +12,17 @@
  */
 package tech.pegasys.pantheon.cli;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -105,6 +106,16 @@ public class PantheonControllerBuilder {
   }
 
   public PantheonController<?> build() throws IOException {
+    checkNotNull(nodePrivateKeyFile, "Missing node private key file");
+    checkNotNull(synchronizerConfiguration, "Missing synchronizer configuration");
+    checkNotNull(rocksDbConfiguration, "Missing rocksdb configuration");
+    checkNotNull(homePath, "Missing home path");
+    checkNotNull(ethNetworkConfig, "Missing Ethereum network config");
+    checkNotNull(miningParameters, "Missing mining parameters");
+    checkNotNull(metricsSystem, "Missing metrics system");
+    checkNotNull(privacyParameters, "Missing privacy parameters");
+    checkNotNull(ethereumWireProtocolConfiguration, "Missing Ethereum wire protocol config");
+
     // instantiate a controller with mainnet config if no genesis file is defined
     // otherwise use the indicated genesis file
     final KeyPair nodeKeys = loadKeyPair(nodePrivateKeyFile);
@@ -120,7 +131,7 @@ public class PantheonControllerBuilder {
       final String genesisConfig = ethNetworkConfig.getGenesisConfig();
       genesisConfigFile = GenesisConfigFile.fromConfig(genesisConfig);
     }
-    Clock clock = Clock.systemUTC();
+    final Clock clock = Clock.systemUTC();
     return PantheonController.fromConfig(
         genesisConfigFile,
         synchronizerConfiguration,

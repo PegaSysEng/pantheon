@@ -728,17 +728,17 @@ Returns the value of a storage position at a specified address.
 
 ### eth_getTransactionCount
 
-Returns the number of transactions sent from a specified address.
+Returns the number of transactions sent from a specified address. Use the `pending` tag to get the account nonce.
 
 **Parameters**
 
-`DATA` - 20-byte account address.
+`data` - 20-byte account address.
 
-`QUANTITY|TAG` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
+`quantity|tag` - Integer representing a block number or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../JSON-RPC-API/Using-JSON-RPC-API.md#block-parameter).
 
 **Returns**
 
-`result` : *QUANTITY* - Integer representing the number of transactions sent from the specified address.
+`result` : *quantity* - Integer representing the number of transactions sent from the specified address.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -2586,10 +2586,6 @@ None
             
 ## EEA Methods
 
-!!!note
-    EEA methods are for [privacy](../Privacy/Privacy-Overview.md) features. Privacy features are under 
-    development and will be available in v1.1.  
-
 !!! note
     The `EEA` API methods are not enabled by default. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `EEA` API methods.
@@ -2648,19 +2644,17 @@ are not available.
 
 `data` - 32-byte hash of a transaction.
 
-`data` - Orion node public key
-
 **Returns**
 
 `Object` - [Private Transaction receipt object](JSON-RPC-API-Objects.md#private-transaction-receipt-object), or `null` if no receipt found.
 
 !!! example 
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_getTransactionReceipt","params":["0xf3ab9693ad92e277bf785e1772f29fb1864904bbbe87b0470455ddb082caab9d", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="],"id":1}' http://127.0.0.1:8545
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_getTransactionReceipt","params":["0xf3ab9693ad92e277bf785e1772f29fb1864904bbbe87b0470455ddb082caab9d"],"id":1}' http://127.0.0.1:8545
     ```
             
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eea_getTransactionReceipt","params":["0xf3ab9693ad92e277bf785e1772f29fb1864904bbbe87b0470455ddb082caab9d", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="],"id":1}
+    {"jsonrpc":"2.0","method":"eea_getTransactionReceipt","params":["0xf3ab9693ad92e277bf785e1772f29fb1864904bbbe87b0470455ddb082caab9d"],"id":1}
     ```
             
     ```json tab="JSON result"

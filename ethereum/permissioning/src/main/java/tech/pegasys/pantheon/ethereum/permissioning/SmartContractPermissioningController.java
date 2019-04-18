@@ -48,13 +48,12 @@ public class SmartContractPermissioningController implements NodePermissioningPr
   }
 
   // True from a contract is 1 filled to 32 bytes
-  private static final BytesValue TRUE_RESPONSE;
-
-  static {
-    final byte[] trueValue = new byte[32];
-    trueValue[31] = (byte) (0xFF & 1L);
-    TRUE_RESPONSE = BytesValue.wrap(trueValue);
-  }
+  private static final BytesValue TRUE_RESPONSE =
+      BytesValue.fromHexString(
+          "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+  private static final BytesValue FALSE_RESPONSE =
+      BytesValue.fromHexString(
+          "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 
   /**
    * Creates a permissioning controller attached to a blockchain
@@ -81,8 +80,26 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     final CallParameter callParams =
         new CallParameter(null, contractAddress, -1, null, null, payload);
 
+    final Optional<Boolean> contractExists =
+        transactionSimulator.doesAddressExistAtHead(contractAddress);
+
+    if (contractExists.isPresent() && !contractExists.get()) {
+      throw new IllegalStateException("Permissioning contract does not exist");
+    }
+
     final Optional<TransactionSimulatorResult> result =
         transactionSimulator.processAtHead(callParams);
+
+    if (result.isPresent()) {
+      switch (result.get().getResult().getStatus()) {
+        case INVALID:
+          throw new IllegalStateException("Permissioning transaction found to be Invalid");
+        case FAILED:
+          throw new IllegalStateException("Permissioning transaction failed when processing");
+        default:
+          break;
+      }
+    }
 
     return result.map(r -> checkTransactionResult(r.getOutput())).orElse(false);
   }
@@ -96,7 +113,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     }
 
     // 0 is false
-    if (result.isZero()) {
+    if (result.compareTo(FALSE_RESPONSE) == 0) {
       return false;
       // 1 filled to 32 bytes is true
     } else if (result.compareTo(TRUE_RESPONSE) == 0) {
@@ -125,9 +142,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
 
   private static BytesValue encodeEnodeUrl(final EnodeURL enode) {
     return BytesValues.concatenate(
-        encodeEnodeId(enode.getNodeId()),
-        encodeIp(enode.getInetAddress()),
-        encodePort(enode.getListeningPort()));
+        enode.getNodeId(), encodeIp(enode.getInetAddress()), encodePort(enode.getListeningPort()));
   }
 
   // As a function parameter an ip needs to be the appropriate number of bytes, big endian, and
@@ -155,11 +170,5 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     res[31] = (byte) ((port) & 0xFF);
     res[30] = (byte) ((port >> 8) & 0xFF);
     return BytesValue.wrap(res);
-  }
-
-  // The enode high and low need to be 32 bytes each. They then get concatenated as they are
-  // adjacent parameters
-  private static BytesValue encodeEnodeId(final String id) {
-    return BytesValue.fromHexString(id);
   }
 }

@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.ethereum.core.TransactionPool;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -97,8 +97,8 @@ public class RunnerBuilder {
   private boolean p2pEnabled = true;
   private boolean discovery;
   private EthNetworkConfig ethNetworkConfig;
-  private String discoveryHost;
-  private int listenPort;
+  private String p2pAdvertisedHost;
+  private int p2pListenPort;
   private int maxPeers;
   private JsonRpcConfiguration jsonRpcConfiguration;
   private WebSocketConfiguration webSocketConfiguration;
@@ -110,8 +110,12 @@ public class RunnerBuilder {
   private Collection<EnodeURL> staticNodes = Collections.emptyList();
 
   private EnodeURL getSelfEnode() {
-    String nodeId = pantheonController.getLocalNodeKeyPair().getPublicKey().toString();
-    return new EnodeURL(nodeId, discoveryHost, listenPort);
+    BytesValue nodeId = pantheonController.getLocalNodeKeyPair().getPublicKey().getEncodedBytes();
+    return EnodeURL.builder()
+        .nodeId(nodeId)
+        .ipAddress(p2pAdvertisedHost)
+        .listeningPort(p2pListenPort)
+        .build();
   }
 
   public RunnerBuilder vertx(final Vertx vertx) {
@@ -139,13 +143,13 @@ public class RunnerBuilder {
     return this;
   }
 
-  public RunnerBuilder discoveryHost(final String discoveryHost) {
-    this.discoveryHost = discoveryHost;
+  public RunnerBuilder p2pAdvertisedHost(final String p2pAdvertisedHost) {
+    this.p2pAdvertisedHost = p2pAdvertisedHost;
     return this;
   }
 
-  public RunnerBuilder discoveryPort(final int listenPort) {
-    this.listenPort = listenPort;
+  public RunnerBuilder p2pListenPort(final int p2pListenPort) {
+    this.p2pListenPort = p2pListenPort;
     return this;
   }
 
@@ -209,8 +213,8 @@ public class RunnerBuilder {
       }
       discoveryConfiguration =
           DiscoveryConfiguration.create()
-              .setBindPort(listenPort)
-              .setAdvertisedHost(discoveryHost)
+              .setBindPort(p2pListenPort)
+              .setAdvertisedHost(p2pAdvertisedHost)
               .setBootstrapPeers(bootstrap);
     } else {
       discoveryConfiguration = DiscoveryConfiguration.create().setActive(false);
@@ -233,7 +237,7 @@ public class RunnerBuilder {
 
     final NetworkingConfiguration networkConfig =
         new NetworkingConfiguration()
-            .setRlpx(RlpxConfiguration.create().setBindPort(listenPort).setMaxPeers(maxPeers))
+            .setRlpx(RlpxConfiguration.create().setBindPort(p2pListenPort).setMaxPeers(maxPeers))
             .setDiscovery(discoveryConfiguration)
             .setClientId(PantheonInfo.version())
             .setSupportedProtocols(subProtocols);
@@ -342,7 +346,10 @@ public class RunnerBuilder {
               filterManager,
               accountWhitelistController,
               nodeWhitelistController,
-              privacyParameters);
+              privacyParameters,
+              jsonRpcConfiguration,
+              webSocketConfiguration,
+              metricsConfiguration);
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
@@ -373,7 +380,10 @@ public class RunnerBuilder {
               filterManager,
               accountWhitelistController,
               nodeWhitelistController,
-              privacyParameters);
+              privacyParameters,
+              jsonRpcConfiguration,
+              webSocketConfiguration,
+              metricsConfiguration);
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(vertx, transactionPool);
@@ -448,7 +458,10 @@ public class RunnerBuilder {
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
-      final PrivacyParameters privacyParameters) {
+      final PrivacyParameters privacyParameters,
+      final JsonRpcConfiguration jsonRpcConfiguration,
+      final WebSocketConfiguration webSocketConfiguration,
+      final MetricsConfiguration metricsConfiguration) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -468,7 +481,10 @@ public class RunnerBuilder {
                 filterManager,
                 accountWhitelistController,
                 nodeWhitelistController,
-                privacyParameters);
+                privacyParameters,
+                jsonRpcConfiguration,
+                webSocketConfiguration,
+                metricsConfiguration);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
   }
