@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
@@ -63,7 +62,6 @@ public interface PantheonController<C> extends Closeable {
       return MainnetPantheonController.init(
           storageProvider,
           genesisConfigFile,
-          MainnetProtocolSchedule.fromConfig(configOptions, privacyParameters),
           syncConfig,
           ethereumWireProtocolConfiguration,
           miningParameters,

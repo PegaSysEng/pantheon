@@ -38,6 +38,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderValidator;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
@@ -97,7 +98,6 @@ public class MainnetPantheonController implements PantheonController<Void> {
   public static PantheonController<Void> init(
       final StorageProvider storageProvider,
       final GenesisConfigFile genesisConfig,
-      final ProtocolSchedule<Void> protocolSchedule,
       final SynchronizerConfiguration syncConfig,
       final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
       final MiningParameters miningParams,
@@ -108,6 +108,8 @@ public class MainnetPantheonController implements PantheonController<Void> {
       final MetricsSystem metricsSystem,
       final Clock clock,
       final int maxPendingTransactions) {
+    final ProtocolSchedule<Void> protocolSchedule =
+        MainnetProtocolSchedule.fromConfig(genesisConfig.getConfigOptions(), privacyParameters);
 
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final ProtocolContext<Void> protocolContext =

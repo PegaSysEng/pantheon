@@ -37,7 +37,6 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
@@ -104,7 +103,6 @@ public final class RunnerTest {
         MainnetPantheonController.init(
             createKeyValueStorageProvider(dbAhead),
             GenesisConfigFile.mainnet(),
-            MainnetProtocolSchedule.create(),
             syncConfigAhead,
             EthereumWireProtocolConfiguration.defaultConfig(),
             new MiningParametersTestBuilder().enabled(false).build(),
@@ -123,7 +121,6 @@ public final class RunnerTest {
         MainnetPantheonController.init(
             createKeyValueStorageProvider(dbAhead),
             GenesisConfigFile.mainnet(),
-            MainnetProtocolSchedule.create(),
             syncConfigAhead,
             EthereumWireProtocolConfiguration.defaultConfig(),
             new MiningParametersTestBuilder().enabled(false).build(),
@@ -179,7 +176,6 @@ public final class RunnerTest {
           MainnetPantheonController.init(
               new InMemoryStorageProvider(),
               GenesisConfigFile.mainnet(),
-              MainnetProtocolSchedule.create(),
               syncConfigBehind,
               EthereumWireProtocolConfiguration.defaultConfig(),
               new MiningParametersTestBuilder().enabled(false).build(),
