@@ -100,39 +100,39 @@ public final class RunnerTest {
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
-        new EthashPantheonControllerBuilder(
-                GenesisConfigFile.mainnet(),
-                syncConfigAhead,
-                EthereumWireProtocolConfiguration.defaultConfig(),
-                createKeyValueStorageProvider(dbAhead),
-                networkId,
-                new MiningParametersTestBuilder().enabled(false).build(),
-                aheadDbNodeKeys,
-                noOpMetricsSystem,
-                PrivacyParameters.DEFAULT,
-                dataDirAhead,
-                TestClock.fixed(),
-                PendingTransactions.MAX_PENDING_TRANSACTIONS)
-            .createPantheonController()) {
+        new EthashPantheonControllerBuilder()
+            .genesisConfigFile(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(syncConfigAhead)
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .dataDirectory(dataDirAhead)
+            .networkId(networkId)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(aheadDbNodeKeys)
+            .metricsSystem(noOpMetricsSystem)
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .build()) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
     // Setup Runner with blocks
     final PantheonController<Void> controllerAhead =
-        new EthashPantheonControllerBuilder(
-                GenesisConfigFile.mainnet(),
-                syncConfigAhead,
-                EthereumWireProtocolConfiguration.defaultConfig(),
-                createKeyValueStorageProvider(dbAhead),
-                networkId,
-                new MiningParametersTestBuilder().enabled(false).build(),
-                aheadDbNodeKeys,
-                noOpMetricsSystem,
-                PrivacyParameters.DEFAULT,
-                dataDirAhead,
-                TestClock.fixed(),
-                PendingTransactions.MAX_PENDING_TRANSACTIONS)
-            .createPantheonController();
+        new EthashPantheonControllerBuilder()
+            .genesisConfigFile(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(syncConfigAhead)
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .dataDirectory(dataDirAhead)
+            .networkId(networkId)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(aheadDbNodeKeys)
+            .metricsSystem(noOpMetricsSystem)
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .build();
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
@@ -175,20 +175,20 @@ public final class RunnerTest {
 
       // Setup runner with no block data
       final PantheonController<Void> controllerBehind =
-          new EthashPantheonControllerBuilder(
-                  GenesisConfigFile.mainnet(),
-                  syncConfigBehind,
-                  EthereumWireProtocolConfiguration.defaultConfig(),
-                  new InMemoryStorageProvider(),
-                  networkId,
-                  new MiningParametersTestBuilder().enabled(false).build(),
-                  KeyPair.generate(),
-                  noOpMetricsSystem,
-                  PrivacyParameters.DEFAULT,
-                  dataDirBehind,
-                  TestClock.fixed(),
-                  PendingTransactions.MAX_PENDING_TRANSACTIONS)
-              .createPantheonController();
+          new EthashPantheonControllerBuilder()
+              .genesisConfigFile(GenesisConfigFile.mainnet())
+              .synchronizerConfiguration(syncConfigBehind)
+              .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+              .dataDirectory(dataDirBehind)
+              .networkId(networkId)
+              .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+              .nodeKeys(KeyPair.generate())
+              .storageProvider(new InMemoryStorageProvider())
+              .metricsSystem(noOpMetricsSystem)
+              .privacyParameters(PrivacyParameters.DEFAULT)
+              .clock(TestClock.fixed())
+              .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+              .build();
       final EnodeURL enode = runnerAhead.getLocalEnode().get();
       final EthNetworkConfig behindEthNetworkConfiguration =
           new EthNetworkConfig(
@@ -250,7 +250,6 @@ public final class RunnerTest {
                       UInt256.fromHexString(
                               new JsonObject(resp.body().string()).getString("result"))
                           .toInt();
-                  System.out.println("******current block  " + currentBlock);
                   if (currentBlock < blockCount) {
                     // if not yet at blockCount, we should get a sync result from eth_syncing
                     final int syncResultCurrentBlock =

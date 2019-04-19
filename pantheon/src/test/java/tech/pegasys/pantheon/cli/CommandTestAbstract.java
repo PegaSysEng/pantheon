@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -39,6 +40,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,7 +71,10 @@ public abstract class CommandTestAbstract {
 
   @Mock RunnerBuilder mockRunnerBuilder;
   @Mock Runner mockRunner;
-  @Mock PantheonControllerBuilder mockControllerBuilder;
+
+  @Mock Function<EthNetworkConfig, PantheonControllerBuilder<Void>> mockControllerBuilderProvider;
+
+  @Mock PantheonControllerBuilder<Void> mockControllerBuilder;
   @Mock SynchronizerConfiguration.Builder mockSyncConfBuilder;
   @Mock EthereumWireProtocolConfiguration.Builder mockEthereumWireProtocolConfigurationBuilder;
   @Mock SynchronizerConfiguration mockSyncConf;
@@ -101,19 +106,20 @@ public abstract class CommandTestAbstract {
 
   @Before
   public void initMocks() throws Exception {
+    when(mockControllerBuilderProvider.apply(any())).thenReturn(mockControllerBuilder);
     // doReturn used because of generic PantheonController
     Mockito.doReturn(mockController).when(mockControllerBuilder).build();
     when(mockControllerBuilder.synchronizerConfiguration(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.ethereumWireProtocolConfiguration(any()))
         .thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.rocksDbConfiguration(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.homePath(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.ethNetworkConfig(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.rocksdDbConfiguration(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.dataDirectory(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.miningParameters(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.maxPendingTransactions(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.maxPendingTransactions(anyInt())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.nodePrivateKeyFile(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
 
     when(mockSyncConfBuilder.syncMode(any())).thenReturn(mockSyncConfBuilder);
     when(mockSyncConfBuilder.maxTrailingPeers(anyInt())).thenReturn(mockSyncConfBuilder);
@@ -180,7 +186,7 @@ public abstract class CommandTestAbstract {
             mockLogger,
             mockBlockImporter,
             mockRunnerBuilder,
-            mockControllerBuilder,
+            mockControllerBuilderProvider,
             mockSyncConfBuilder,
             mockEthereumWireProtocolConfigurationBuilder,
             mockRocksDbConfBuilder,
@@ -209,7 +215,8 @@ public abstract class CommandTestAbstract {
         final Logger mockLogger,
         final BlockImporter mockBlockImporter,
         final RunnerBuilder mockRunnerBuilder,
-        final PantheonControllerBuilder mockControllerBuilder,
+        final Function<EthNetworkConfig, ? extends PantheonControllerBuilder<?>>
+            controllerBuilderProvider,
         final SynchronizerConfiguration.Builder mockSyncConfBuilder,
         final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
         final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
@@ -218,7 +225,7 @@ public abstract class CommandTestAbstract {
           mockLogger,
           mockBlockImporter,
           mockRunnerBuilder,
-          mockControllerBuilder,
+          controllerBuilderProvider,
           mockSyncConfBuilder,
           mockEthereumConfigurationMockBuilder,
           mockRocksDbConfBuilder);

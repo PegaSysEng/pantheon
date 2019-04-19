@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.controller;
 
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 
-import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.IbftConfigOptions;
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
@@ -47,31 +46,23 @@ import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftRoundFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
-import java.nio.file.Path;
-import java.time.Clock;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -80,40 +71,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class IbftPantheonControllerBuilder
-    extends ConsensusAwarePantheonControllerBuilder<IbftContext> {
+public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<IbftContext> {
   private static final Logger LOG = LogManager.getLogger();
-  private final IbftEventQueue ibftEventQueue;
-  private final IbftConfigOptions ibftConfig;
+  private IbftEventQueue ibftEventQueue;
+  private IbftConfigOptions ibftConfig;
   private ValidatorPeers peers;
 
-  protected IbftPantheonControllerBuilder(
-      final GenesisConfigFile genesisConfig,
-      final SynchronizerConfiguration syncConfig,
-      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
-      final StorageProvider storageProvider,
-      final int networkId,
-      final MiningParameters miningParameters,
-      final KeyPair nodeKeys,
-      final MetricsSystem metricsSystem,
-      final PrivacyParameters privacyParameters,
-      final Path dataDirectory,
-      final Clock clock,
-      final int maxPendingTransactions) {
-    super(
-        genesisConfig,
-        syncConfig,
-        ethereumWireProtocolConfiguration,
-        storageProvider,
-        networkId,
-        miningParameters,
-        nodeKeys,
-        metricsSystem,
-        privacyParameters,
-        dataDirectory,
-        clock,
-        maxPendingTransactions);
-
+  @Override
+  protected void prepForBuild() {
     ibftConfig = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
     ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
   }

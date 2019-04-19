@@ -40,6 +40,7 @@ import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
@@ -80,11 +81,13 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -127,11 +130,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private final BlockImporter blockImporter;
 
-  private final PantheonControllerBuilder controllerBuilder;
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder;
   private final RocksDbConfiguration.Builder rocksDbConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
+  private final Function<EthNetworkConfig, ? extends PantheonControllerBuilder<?>>
+      controllerBuilderProvider;
 
   protected KeyLoader getKeyLoader() {
     return KeyPairUtil::loadKeyPair;
@@ -521,14 +525,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final Logger logger,
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
-      final PantheonControllerBuilder controllerBuilder,
+      final Function<EthNetworkConfig, ? extends PantheonControllerBuilder<?>>
+          controllerBuilderProvider,
       final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder,
       final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder,
       final RocksDbConfiguration.Builder rocksDbConfigurationBuilder) {
     this.logger = logger;
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
-    this.controllerBuilder = controllerBuilder;
+    this.controllerBuilderProvider = controllerBuilderProvider;
     this.synchronizerConfigurationBuilder = synchronizerConfigurationBuilder;
     this.ethereumWireConfigurationBuilder = ethereumWireConfigurationBuilder;
     this.rocksDbConfigurationBuilder = rocksDbConfigurationBuilder;
@@ -691,18 +696,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   PantheonController<?> buildController() {
     try {
-      return controllerBuilder
+      return controllerBuilderProvider
+          .apply(updateNetworkConfig(getNetwork()))
           .synchronizerConfiguration(buildSyncConfig())
           .ethereumWireProtocolConfiguration(ethereumWireConfigurationBuilder.build())
-          .rocksDbConfiguration(buildRocksDbConfiguration())
-          .homePath(dataDir())
-          .ethNetworkConfig(updateNetworkConfig(getNetwork()))
+          .rocksdDbConfiguration(buildRocksDbConfiguration())
+          .dataDirectory(dataDir())
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .maxPendingTransactions(txPoolMaxSize)
           .nodePrivateKeyFile(nodePrivateKeyFile())
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
+          .clock(Clock.systemUTC())
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(this.commandLine, e.getMessage());

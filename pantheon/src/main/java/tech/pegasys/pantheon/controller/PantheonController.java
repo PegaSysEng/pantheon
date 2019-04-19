@@ -12,27 +12,19 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-import java.nio.file.Path;
-import java.time.Clock;
 import java.util.Collection;
 import java.util.Map;
 
@@ -75,89 +67,6 @@ public class PantheonController<C> implements java.io.Closeable {
     this.miningCoordinator = miningCoordinator;
     this.privacyParameters = privacyParameters;
     this.close = close;
-  }
-
-  public static PantheonController<?> fromConfig(
-      final GenesisConfigFile genesisConfigFile,
-      final SynchronizerConfiguration syncConfig,
-      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
-      final StorageProvider storageProvider,
-      final int networkId,
-      final MiningParameters miningParameters,
-      final KeyPair nodeKeys,
-      final MetricsSystem metricsSystem,
-      final PrivacyParameters privacyParameters,
-      final Path dataDirectory,
-      final Clock clock,
-      final int maxPendingTransactions) {
-
-    final GenesisConfigOptions configOptions = genesisConfigFile.getConfigOptions();
-    final ConsensusAwarePantheonControllerBuilder<?> builder;
-
-    if (configOptions.isEthHash()) {
-      builder =
-          new EthashPantheonControllerBuilder(
-              genesisConfigFile,
-              syncConfig,
-              ethereumWireProtocolConfiguration,
-              storageProvider,
-              networkId,
-              miningParameters,
-              nodeKeys,
-              metricsSystem,
-              privacyParameters,
-              dataDirectory,
-              clock,
-              maxPendingTransactions);
-    } else if (configOptions.isIbft2()) {
-      builder =
-          new IbftPantheonControllerBuilder(
-              genesisConfigFile,
-              syncConfig,
-              ethereumWireProtocolConfiguration,
-              storageProvider,
-              networkId,
-              miningParameters,
-              nodeKeys,
-              metricsSystem,
-              privacyParameters,
-              dataDirectory,
-              clock,
-              maxPendingTransactions);
-    } else if (configOptions.isIbftLegacy()) {
-      builder =
-          new IbftLegacyPantheonControllerBuilder(
-              genesisConfigFile,
-              syncConfig,
-              ethereumWireProtocolConfiguration,
-              storageProvider,
-              networkId,
-              miningParameters,
-              nodeKeys,
-              metricsSystem,
-              privacyParameters,
-              dataDirectory,
-              clock,
-              maxPendingTransactions);
-    } else if (configOptions.isClique()) {
-      builder =
-          new CliquePantheonControllerBuilder(
-              genesisConfigFile,
-              syncConfig,
-              ethereumWireProtocolConfiguration,
-              storageProvider,
-              networkId,
-              miningParameters,
-              nodeKeys,
-              metricsSystem,
-              privacyParameters,
-              dataDirectory,
-              clock,
-              maxPendingTransactions);
-    } else {
-      throw new IllegalArgumentException("Unknown consensus mechanism defined");
-    }
-    return builder.createPantheonController();
   }
 
   public ProtocolContext<C> getProtocolContext() {

@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.controller;
 
 import tech.pegasys.pantheon.config.CliqueConfigOptions;
-import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.consensus.clique.CliqueMiningTracker;
@@ -26,27 +25,19 @@ import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-import java.nio.file.Path;
-import java.time.Clock;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -54,41 +45,15 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CliquePantheonControllerBuilder
-    extends ConsensusAwarePantheonControllerBuilder<CliqueContext> {
+public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<CliqueContext> {
   private static final Logger LOG = LogManager.getLogger();
 
-  private final Address localAddress;
-  private final EpochManager epochManager;
-  private final long secondsBetweenBlocks;
+  private Address localAddress;
+  private EpochManager epochManager;
+  private long secondsBetweenBlocks;
 
-  protected CliquePantheonControllerBuilder(
-      final GenesisConfigFile genesisConfig,
-      final SynchronizerConfiguration syncConfig,
-      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
-      final StorageProvider storageProvider,
-      final int networkId,
-      final MiningParameters miningParameters,
-      final KeyPair nodeKeys,
-      final MetricsSystem metricsSystem,
-      final PrivacyParameters privacyParameters,
-      final Path dataDirectory,
-      final Clock clock,
-      final int maxPendingTransactions) {
-    super(
-        genesisConfig,
-        syncConfig,
-        ethereumWireProtocolConfiguration,
-        storageProvider,
-        networkId,
-        miningParameters,
-        nodeKeys,
-        metricsSystem,
-        privacyParameters,
-        dataDirectory,
-        clock,
-        maxPendingTransactions);
-
+  @Override
+  protected void prepForBuild() {
     localAddress = Util.publicKeyToAddress(nodeKeys.getPublicKey());
     final CliqueConfigOptions cliqueConfig =
         genesisConfig.getConfigOptions().getCliqueConfigOptions();

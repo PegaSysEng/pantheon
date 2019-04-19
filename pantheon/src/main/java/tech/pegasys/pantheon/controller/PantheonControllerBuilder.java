@@ -12,7 +12,13 @@
  */
 package tech.pegasys.pantheon.controller;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
+
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
@@ -38,9 +44,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFact
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Clock;
@@ -52,51 +61,149 @@ import java.util.OptionalLong;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class ConsensusAwarePantheonControllerBuilder<C> {
+public abstract class PantheonControllerBuilder<C> {
   private static final Logger LOG = LogManager.getLogger();
 
-  protected final GenesisConfigFile genesisConfig;
-  protected final SynchronizerConfiguration syncConfig;
-  protected final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
-  protected final StorageProvider storageProvider;
-  protected final int networkId;
-  protected final MiningParameters miningParameters;
-  protected final KeyPair nodeKeys;
-  protected final MetricsSystem metricsSystem;
-  protected final PrivacyParameters privacyParameters;
-  protected final Path dataDirectory;
-  protected final Clock clock;
-  protected final int maxPendingTransactions;
+  protected GenesisConfigFile genesisConfig;
+  protected SynchronizerConfiguration syncConfig;
+  protected EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
+  protected Integer networkId;
+  protected MiningParameters miningParameters;
+  protected MetricsSystem metricsSystem;
+  protected PrivacyParameters privacyParameters;
+  protected Path dataDirectory;
+  protected Clock clock;
+  protected Integer maxPendingTransactions;
+  protected KeyPair nodeKeys;
+  private StorageProvider storageProvider;
   private final List<Runnable> shutdownActions = new ArrayList<>();
+  private RocksDbConfiguration rocksdDbConfiguration;
 
-  protected ConsensusAwarePantheonControllerBuilder(
-      final GenesisConfigFile genesisConfig,
-      final SynchronizerConfiguration syncConfig,
-      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
-      final StorageProvider storageProvider,
-      final int networkId,
-      final MiningParameters miningParameters,
-      final KeyPair nodeKeys,
-      final MetricsSystem metricsSystem,
-      final PrivacyParameters privacyParameters,
-      final Path dataDirectory,
-      final Clock clock,
-      final int maxPendingTransactions) {
-    this.genesisConfig = genesisConfig;
-    this.syncConfig = syncConfig;
-    this.ethereumWireProtocolConfiguration = ethereumWireProtocolConfiguration;
-    this.storageProvider = storageProvider;
-    this.networkId = networkId;
-    this.miningParameters = miningParameters;
-    this.nodeKeys = nodeKeys;
-    this.metricsSystem = metricsSystem;
-    this.privacyParameters = privacyParameters;
-    this.dataDirectory = dataDirectory;
-    this.clock = clock;
-    this.maxPendingTransactions = maxPendingTransactions;
+  public static PantheonControllerBuilder<?> fromGenesisConfig(
+      final EthNetworkConfig ethNetworkConfig) {
+    return fromGenesisConfig(GenesisConfigFile.fromConfig(ethNetworkConfig.getGenesisConfig()))
+        .networkId(ethNetworkConfig.getNetworkId());
   }
 
-  public PantheonController<C> createPantheonController() {
+  public static PantheonControllerBuilder<?> fromGenesisConfig(
+      final GenesisConfigFile genesisConfig) {
+    final GenesisConfigOptions configOptions = genesisConfig.getConfigOptions();
+    final PantheonControllerBuilder<?> builder;
+
+    if (configOptions.isEthHash()) {
+      builder = new EthashPantheonControllerBuilder();
+    } else if (configOptions.isIbft2()) {
+      builder = new IbftPantheonControllerBuilder();
+    } else if (configOptions.isIbftLegacy()) {
+      builder = new IbftLegacyPantheonControllerBuilder();
+    } else if (configOptions.isClique()) {
+      builder = new CliquePantheonControllerBuilder();
+    } else {
+      throw new IllegalArgumentException("Unknown consensus mechanism defined");
+    }
+    return builder.genesisConfigFile(genesisConfig);
+  }
+
+  public PantheonControllerBuilder<C> rocksdDbConfiguration(
+      final RocksDbConfiguration rocksDbConfiguration) {
+    this.rocksdDbConfiguration = rocksDbConfiguration;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> storageProvider(final StorageProvider storageProvider) {
+    this.storageProvider = storageProvider;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> genesisConfigFile(final GenesisConfigFile genesisConfig) {
+    this.genesisConfig = genesisConfig;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> synchronizerConfiguration(
+      final SynchronizerConfiguration synchronizerConfig) {
+    this.syncConfig = synchronizerConfig;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> ethereumWireProtocolConfiguration(
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
+    this.ethereumWireProtocolConfiguration = ethereumWireProtocolConfiguration;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> networkId(final int networkId) {
+    this.networkId = networkId;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> miningParameters(final MiningParameters miningParameters) {
+    this.miningParameters = miningParameters;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> nodePrivateKeyFile(final File nodePrivateKeyFile)
+      throws IOException {
+    this.nodeKeys = loadKeyPair(nodePrivateKeyFile);
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> nodeKeys(final KeyPair nodeKeys) {
+    this.nodeKeys = nodeKeys;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> metricsSystem(final MetricsSystem metricsSystem) {
+    this.metricsSystem = metricsSystem;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> privacyParameters(final PrivacyParameters privacyParameters) {
+    this.privacyParameters = privacyParameters;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> dataDirectory(final Path dataDirectory) {
+    this.dataDirectory = dataDirectory;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> clock(final Clock clock) {
+    this.clock = clock;
+    return this;
+  }
+
+  public PantheonControllerBuilder<C> maxPendingTransactions(final int maxPendingTransactions) {
+    this.maxPendingTransactions = maxPendingTransactions;
+    return this;
+  }
+
+  public PantheonController<C> build() throws IOException {
+    checkNotNull(genesisConfig, "Missing genesis config");
+    checkNotNull(syncConfig, "Missing sync config");
+    checkNotNull(ethereumWireProtocolConfiguration, "Missing ethereum protocol configuration");
+    checkNotNull(networkId, "Missing network ID");
+    checkNotNull(miningParameters, "Missing mining parameters");
+    checkNotNull(metricsSystem, "Missing metrics system");
+    checkNotNull(privacyParameters, "Missing privacy parameters");
+    checkNotNull(dataDirectory, "Missing data directory"); // Why do we need this?
+    checkNotNull(clock, "Mising clock");
+    checkNotNull(maxPendingTransactions, "Missing max pending transactions");
+    checkNotNull(nodeKeys, "Missing node keys");
+    checkArgument(
+        storageProvider != null || rocksdDbConfiguration != null,
+        "Must supply either a storage provider or RocksDB configuration");
+    checkArgument(
+        storageProvider == null || rocksdDbConfiguration == null,
+        "Must supply either storage provider or RocksDB confguration, but not both");
+    privacyParameters.setSigningKeyPair(nodeKeys);
+
+    if (storageProvider == null && rocksdDbConfiguration != null) {
+      storageProvider = RocksDbStorageProvider.create(rocksdDbConfiguration, metricsSystem);
+    }
+
+    prepForBuild();
+
     final ProtocolSchedule<C> protocolSchedule = createProtocolSchedule();
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final ProtocolContext<C> protocolContext =
@@ -182,6 +289,8 @@ public abstract class ConsensusAwarePantheonControllerBuilder<C> {
           }
         });
   }
+
+  protected void prepForBuild() {}
 
   protected JsonRpcMethodFactory createAdditionalJsonRpcMethodFactory(
       final ProtocolContext<C> protocolContext) {

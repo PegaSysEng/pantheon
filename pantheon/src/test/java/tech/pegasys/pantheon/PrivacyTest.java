@@ -16,7 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
@@ -51,19 +52,19 @@ public class PrivacyTest {
             .build();
 
     final PantheonController<?> pantheonController =
-        PantheonController.fromConfig(
-            GenesisConfigFile.mainnet(),
-            SynchronizerConfiguration.builder().build(),
-            EthereumWireProtocolConfiguration.defaultConfig(),
-            new InMemoryStorageProvider(),
-            1,
-            new MiningParametersTestBuilder().enabled(false).build(),
-            SECP256K1.KeyPair.generate(),
-            new NoOpMetricsSystem(),
-            privacyParameters,
-            dataDir,
-            TestClock.fixed(),
-            PendingTransactions.MAX_PENDING_TRANSACTIONS);
+        PantheonControllerBuilder.fromGenesisConfig(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .storageProvider(new InMemoryStorageProvider())
+            .networkId(1)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(KeyPair.generate())
+            .metricsSystem(new NoOpMetricsSystem())
+            .dataDirectory(dataDir)
+            .clock(TestClock.fixed())
+            .privacyParameters(privacyParameters)
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .build();
 
     final Address privacyContractAddress = Address.privacyPrecompiled(ADDRESS);
     final PrecompiledContract precompiledContract =

@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
@@ -52,19 +53,19 @@ public final class BlockImporterTest {
     final Path source = dataDir.resolve("1000.blocks");
     BlockTestUtil.write1000Blocks(source);
     final PantheonController<?> targetController =
-        PantheonController.fromConfig(
-            GenesisConfigFile.mainnet(),
-            SynchronizerConfiguration.builder().build(),
-            EthereumWireProtocolConfiguration.defaultConfig(),
-            new InMemoryStorageProvider(),
-            1,
-            new MiningParametersTestBuilder().enabled(false).build(),
-            KeyPair.generate(),
-            new NoOpMetricsSystem(),
-            PrivacyParameters.DEFAULT,
-            dataDir,
-            TestClock.fixed(),
-            PendingTransactions.MAX_PENDING_TRANSACTIONS);
+        PantheonControllerBuilder.fromGenesisConfig(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .storageProvider(new InMemoryStorageProvider())
+            .networkId(1)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(KeyPair.generate())
+            .metricsSystem(new NoOpMetricsSystem())
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .dataDirectory(dataDir)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .build();
     final BlockImporter.ImportResult result =
         blockImporter.importBlockchain(source, targetController);
     // Don't count the Genesis block
@@ -90,19 +91,19 @@ public final class BlockImporterTest {
     }
 
     final PantheonController<?> controller =
-        PantheonController.fromConfig(
-            GenesisConfigFile.fromConfig(config),
-            SynchronizerConfiguration.builder().build(),
-            EthereumWireProtocolConfiguration.defaultConfig(),
-            new InMemoryStorageProvider(),
-            10,
-            new MiningParametersTestBuilder().enabled(false).build(),
-            KeyPair.generate(),
-            new NoOpMetricsSystem(),
-            PrivacyParameters.DEFAULT,
-            dataDir,
-            TestClock.fixed(),
-            PendingTransactions.MAX_PENDING_TRANSACTIONS);
+        PantheonControllerBuilder.fromGenesisConfig(GenesisConfigFile.fromConfig(config))
+            .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .storageProvider(new InMemoryStorageProvider())
+            .networkId(10)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(KeyPair.generate())
+            .metricsSystem(new NoOpMetricsSystem())
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .dataDirectory(dataDir)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .build();
     final BlockImporter.ImportResult result = blockImporter.importBlockchain(source, controller);
 
     // Don't count the Genesis block
