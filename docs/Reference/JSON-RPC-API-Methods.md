@@ -2078,6 +2078,132 @@ Reruns the transaction with the same state as when the transaction was executed.
     }
     ```
 
+### debug_traceBlock
+
+Returns full stack trace of all invoked opcodes of all transactions included in the block.
+
+**Parameters**
+
+`transactionHash` : `data` - Transaction hash.
+
+`Object` - request options (all optional and default to `false`):
+* `disableStorage` : `boolean` - `true` disables storage capture. 
+* `disableMemory` : `boolean` - `true` disables memory capture. 
+* `disableStack` : `boolean` - `true` disables stack capture. 
+
+**Returns**
+
+`result`:`object` - [Trace object](JSON-RPC-API-Objects.md#trace-object). 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceTransaction","params":["0x2cc6c94c21685b7e0f8ddabf277a5ccf98db157c62619cde8baea696a74ed18e",{"disableStorage":true}],"id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"debug_traceTransaction","params":["0x2cc6c94c21685b7e0f8ddabf277a5ccf98db157c62619cde8baea696a74ed18e",{"disableStorage":true}],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    ....
+    ```    
+
+### debug_traceBlockByHash
+
+Returns full stack trace of all invoked opcodes of all transactions included in the block.
+
+**Parameters**
+
+`block hash` : `data` - Block hash
+
+**Returns**
+
+`result`:`array of objects` - [Trace objects](JSON-RPC-API-Objects.md#trace-object). 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceBlockByHash","params":["0xaceb3b2c9b25b0589230873921eb894b28722011b8df63977145517d754875a5"], "id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"debug_traceBlockByHash","params":["0xaceb3b2c9b25b0589230873921eb894b28722011b8df63977145517d754875a5"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            {
+                "gas": 21000,
+                "failed": false,
+                "returnValue": "",
+                "structLogs": [
+                    {
+                        "pc": 0,
+                        "op": "STOP",
+                        "gas": 0,
+                        "gasCost": 0,
+                        "depth": 1,
+                        "stack": [],
+                        "memory": [],
+                        "storage": {},
+                        "reason": null
+                    }
+                ]
+            }
+        ]
+    }
+    ```
+    
+### debug_traceBlockByNumber
+
+Returns full stack trace of all invoked opcodes of all transactions included in the block.
+
+**Parameters**
+
+`block hash` : `data` - Block hash
+
+**Returns**
+
+`result`:`array of objects` - [Trace objects](JSON-RPC-API-Objects.md#trace-object). 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceBlockByHash","params":["0xaceb3b2c9b25b0589230873921eb894b28722011b8df63977145517d754875a5"], "id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"debug_traceBlockByHash","params":["0xaceb3b2c9b25b0589230873921eb894b28722011b8df63977145517d754875a5"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": [
+            {
+                "gas": 21000,
+                "failed": false,
+                "returnValue": "",
+                "structLogs": [
+                    {
+                        "pc": 0,
+                        "op": "STOP",
+                        "gas": 0,
+                        "gasCost": 0,
+                        "depth": 1,
+                        "stack": [],
+                        "memory": [],
+                        "storage": {},
+                        "reason": null
+                    }
+                ]
+            }
+        ]
+    }
+    ```
+
 ## Miner Methods
 
 !!! note
