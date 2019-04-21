@@ -35,6 +35,7 @@ dependencies {
   implementation project(':ethereum:blockcreation')
   implementation project(':ethereum:core')
   implementation project(':ethereum:eth')
+  implementation project(':ethereum:graphql')
   implementation project(':ethereum:jsonrpc')
   implementation project(':ethereum:permissioning')
   implementation project(':ethereum:p2p')

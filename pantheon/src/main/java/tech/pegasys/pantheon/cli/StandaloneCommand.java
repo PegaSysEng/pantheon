@@ -56,6 +56,14 @@ class StandaloneCommand implements DefaultCommandValues {
   final File nodePrivateKeyFile = null;
 
   @CommandLine.Option(
+      names = {"--graphql-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for GraphQL HTTP authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  String graphQlAuthenticationCredentialsFile = null;
+
+  @CommandLine.Option(
       names = {"--rpc-http-authentication-credentials-file"},
       paramLabel = MANDATORY_FILE_FORMAT_HELP,
       description =

@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon;
 
 import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketService;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
@@ -42,6 +43,7 @@ public class Runner implements AutoCloseable {
   private final Vertx vertx;
 
   private final NetworkRunner networkRunner;
+  private final Optional<GraphQLHttpService> graphQl;
   private final Optional<JsonRpcHttpService> jsonRpc;
   private final Optional<WebSocketService> websocketRpc;
   private final Optional<MetricsService> metrics;
@@ -52,6 +54,7 @@ public class Runner implements AutoCloseable {
   Runner(
       final Vertx vertx,
       final NetworkRunner networkRunner,
+      final Optional<GraphQLHttpService> graphQl,
       final Optional<JsonRpcHttpService> jsonRpc,
       final Optional<WebSocketService> websocketRpc,
       final Optional<MetricsService> metrics,
@@ -59,6 +62,7 @@ public class Runner implements AutoCloseable {
       final Path dataDir) {
     this.vertx = vertx;
     this.networkRunner = networkRunner;
+    this.graphQl = graphQl;
     this.jsonRpc = jsonRpc;
     this.websocketRpc = websocketRpc;
     this.metrics = metrics;
@@ -80,7 +84,8 @@ public class Runner implements AutoCloseable {
                   .getTransactionPool()
                   .getPendingTransactions()
                   .evictOldTransactions());
-      jsonRpc.ifPresent(service -> waitForServiceToStart("jsonRpc", service.start()));
+        graphQl.ifPresent(service -> waitForServiceToStart("graphQl", service.start()));
+        jsonRpc.ifPresent(service -> waitForServiceToStart("jsonRpc", service.start()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.start()));
       metrics.ifPresent(service -> waitForServiceToStart("metrics", service.start()));
       LOG.info("Ethereum main loop is up.");
@@ -110,6 +115,7 @@ public class Runner implements AutoCloseable {
       networkRunner.stop();
       networkRunner.awaitStop();
 
+      graphQl.ifPresent(service -> waitForServiceToStop("graphQl", service.stop()));
       jsonRpc.ifPresent(service -> waitForServiceToStop("jsonRpc", service.stop()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.stop()));
       metrics.ifPresent(service -> waitForServiceToStop("metrics", service.stop()));

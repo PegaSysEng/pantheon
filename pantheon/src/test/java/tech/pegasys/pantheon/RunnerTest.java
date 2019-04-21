@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
@@ -156,6 +157,7 @@ public final class RunnerTest {
             .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_HOURS)
             .build();
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
+    final GraphQLConfiguration aheadGraphQlConfiguration = graphQlConfiguration();
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
@@ -175,6 +177,7 @@ public final class RunnerTest {
         runnerBuilder
             .pantheonController(controllerAhead)
             .ethNetworkConfig(EthNetworkConfig.getNetworkConfig(DEV))
+            .graphQLConfiguration(aheadGraphQlConfiguration)
             .jsonRpcConfiguration(aheadJsonRpcConfiguration)
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .metricsConfiguration(aheadMetricsConfiguration)
@@ -191,6 +194,7 @@ public final class RunnerTest {
               .fastSyncMinimumPeerCount(1)
               .build();
       final Path dataDirBehind = temp.newFolder().toPath();
+      final GraphQLConfiguration behindGraphQlConfiguration = graphQlConfiguration();
       final JsonRpcConfiguration behindJsonRpcConfiguration = jsonRpcConfiguration();
       final WebSocketConfiguration behindWebSocketConfiguration = wsRpcConfiguration();
       final MetricsConfiguration behindMetricsConfiguration = metricsConfiguration();
@@ -222,6 +226,7 @@ public final class RunnerTest {
           runnerBuilder
               .pantheonController(controllerBehind)
               .ethNetworkConfig(behindEthNetworkConfiguration)
+              .graphQLConfiguration(behindGraphQlConfiguration)
               .jsonRpcConfiguration(behindJsonRpcConfiguration)
               .webSocketConfiguration(behindWebSocketConfiguration)
               .metricsConfiguration(behindMetricsConfiguration)
@@ -332,6 +337,14 @@ public final class RunnerTest {
   private StorageProvider createKeyValueStorageProvider(final Path dbAhead) throws IOException {
     return RocksDbStorageProvider.create(
         new RocksDbConfiguration.Builder().databaseDir(dbAhead).build(), new NoOpMetricsSystem());
+  }
+
+  private GraphQLConfiguration graphQlConfiguration() {
+    final GraphQLConfiguration configuration = GraphQLConfiguration.createDefault();
+    configuration.setPort(0);
+    configuration.setEnabled(true);
+    configuration.setHostsWhitelist(Collections.singletonList("*"));
+    return configuration;
   }
 
   private JsonRpcConfiguration jsonRpcConfiguration() {

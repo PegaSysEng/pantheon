@@ -35,6 +35,14 @@ sync-mode="fast"
 fast-sync-min-peers=5
 network-id=303
 
+# GraphQL
+graphql-enabled=false
+graphql-host="5.6.7.8"
+graphql-port=5678
+graphql-cors-origins=["none"]
+graphql-authentication-enabled=false
+graphql-authentication-credentials-file="none"
+
 # JSON-RPC
 rpc-http-enabled=false
 rpc-http-host="5.6.7.8"

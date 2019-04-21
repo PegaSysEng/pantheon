@@ -21,6 +21,11 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.EthGetBlockByHash;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -77,6 +82,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,6 +103,7 @@ public class RunnerBuilder {
   private String p2pAdvertisedHost;
   private int p2pListenPort;
   private int maxPeers;
+  private GraphQLConfiguration graphQLConfiguration;
   private JsonRpcConfiguration jsonRpcConfiguration;
   private WebSocketConfiguration webSocketConfiguration;
   private Path dataDir;
@@ -152,6 +159,11 @@ public class RunnerBuilder {
 
   public RunnerBuilder maxPeers(final int maxPeers) {
     this.maxPeers = maxPeers;
+    return this;
+  }
+
+  public RunnerBuilder graphQLConfiguration(final GraphQLConfiguration graphQLConfiguration) {
+    this.graphQLConfiguration = graphQLConfiguration;
     return this;
   }
 
@@ -325,6 +337,22 @@ public class RunnerBuilder {
           }
         });
 
+    Optional<GraphQLHttpService> graphQlHttpService = Optional.empty();
+    if (graphQLConfiguration.isEnabled()) {
+      final Map<String, GraphQLMethod> graphQLMethods = new HashMap<>();
+      graphQLMethods.put(
+          "eth_getBlockByNumber",
+          new EthGetBlockByHash(
+              new tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries(
+                  context.getBlockchain(), context.getWorldStateArchive()),
+              new BlockResultFactory()));
+
+      graphQlHttpService =
+          Optional.of(
+              new GraphQLHttpService(
+                  vertx, dataDir, graphQLConfiguration, metricsSystem, graphQLMethods));
+    }
+
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
       final Map<String, JsonRpcMethod> jsonRpcMethods =
@@ -399,6 +427,7 @@ public class RunnerBuilder {
     return new Runner(
         vertx,
         networkRunner,
+        graphQlHttpService,
         jsonRpcHttpService,
         webSocketService,
         metricsService,

@@ -41,6 +41,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
@@ -87,6 +88,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
   static final String PERMISSIONING_CONFIG_TOML = "/permissioning_config.toml";
 
+  private static final GraphQLConfiguration defaultGraphQlConfiguration;
   private static final JsonRpcConfiguration defaultJsonRpcConfiguration;
   private static final WebSocketConfiguration defaultWebSocketConfiguration;
   private static final MetricsConfiguration defaultMetricsConfiguration;
@@ -104,6 +106,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   };
 
   static {
+    defaultGraphQlConfiguration = GraphQLConfiguration.createDefault();
+
     defaultJsonRpcConfiguration = JsonRpcConfiguration.createDefault();
 
     defaultWebSocketConfiguration = WebSocketConfiguration.createDefault();
@@ -150,6 +154,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
+    verify(mockRunnerBuilder).graphQLConfiguration(eq(defaultGraphQlConfiguration));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(defaultJsonRpcConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(defaultWebSocketConfiguration));
     verify(mockRunnerBuilder).metricsConfiguration(eq(defaultMetricsConfiguration));
@@ -1162,6 +1167,19 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString())
         .contains(
             "Invalid value for option '--Xewp-max-get-node-data': cannot convert '-16' to PositiveNumber");
+  }
+
+  @Test
+  public void graphQlEnabledPropertyDefaultIsFalse() {
+    parseCommand();
+
+    verify(mockRunnerBuilder).graphQLConfiguration(graphQLConfigArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(graphQLConfigArgumentCaptor.getValue().isEnabled()).isFalse();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
