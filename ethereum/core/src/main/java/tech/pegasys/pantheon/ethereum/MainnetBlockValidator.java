@@ -109,7 +109,7 @@ public class MainnetBlockValidator<C> implements BlockValidator<C> {
     }
 
     if (!blockBodyValidator.validateBodyLight(
-        context, block, receipts, HeaderValidationMode.FULL)) {
+        context, block, receipts, headerValidationMode)) {
       return false;
     }
     return true;
