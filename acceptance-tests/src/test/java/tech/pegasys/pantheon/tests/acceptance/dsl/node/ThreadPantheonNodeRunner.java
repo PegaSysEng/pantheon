@@ -24,8 +24,6 @@ import tech.pegasys.pantheon.controller.PantheonControllerBuilderFactory;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
-import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
@@ -70,9 +68,6 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     final PantheonController<?> pantheonController;
     try {
-      final StorageProvider storageProvider =
-          RocksDbStorageProvider.create(
-              new RocksDbConfiguration.Builder().databaseDir(tempDir).build(), noOpMetricsSystem);
       pantheonController =
           builder
               .synchronizerConfiguration(new SynchronizerConfiguration.Builder().build())
@@ -82,7 +77,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
               .metricsSystem(noOpMetricsSystem)
               .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
-              .storageProvider(storageProvider)
+              .rocksdDbConfiguration(
+                  new RocksDbConfiguration.Builder().databaseDir(tempDir).build())
               .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
               .clock(Clock.systemUTC())
               .build();
