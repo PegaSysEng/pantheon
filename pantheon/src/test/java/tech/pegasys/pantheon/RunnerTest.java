@@ -20,7 +20,7 @@ import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.controller.EthashPantheonControllerBuilder;
+import tech.pegasys.pantheon.controller.MainnetPantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -100,7 +100,7 @@ public final class RunnerTest {
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
-        new EthashPantheonControllerBuilder()
+        new MainnetPantheonControllerBuilder()
             .genesisConfigFile(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(syncConfigAhead)
             .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
@@ -119,7 +119,7 @@ public final class RunnerTest {
 
     // Setup Runner with blocks
     final PantheonController<Void> controllerAhead =
-        new EthashPantheonControllerBuilder()
+        new MainnetPantheonControllerBuilder()
             .genesisConfigFile(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(syncConfigAhead)
             .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
@@ -175,7 +175,7 @@ public final class RunnerTest {
 
       // Setup runner with no block data
       final PantheonController<Void> controllerBehind =
-          new EthashPantheonControllerBuilder()
+          new MainnetPantheonControllerBuilder()
               .genesisConfigFile(GenesisConfigFile.mainnet())
               .synchronizerConfiguration(syncConfigBehind)
               .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())

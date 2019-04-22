@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class EthashPantheonControllerBuilder extends PantheonControllerBuilder<Void> {
+public class MainnetPantheonControllerBuilder extends PantheonControllerBuilder<Void> {
   private static final Logger LOG = LogManager.getLogger();
 
   @Override

@@ -29,7 +29,7 @@ public class PantheonControllerBuilderFactory {
     final PantheonControllerBuilder<?> builder;
 
     if (configOptions.isEthHash()) {
-      builder = new EthashPantheonControllerBuilder();
+      builder = new MainnetPantheonControllerBuilder();
     } else if (configOptions.isIbft2()) {
       builder = new IbftPantheonControllerBuilder();
     } else if (configOptions.isIbftLegacy()) {
