@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilderFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
@@ -52,7 +52,8 @@ public class PrivacyTest {
             .build();
 
     final PantheonController<?> pantheonController =
-        PantheonControllerBuilder.fromGenesisConfig(GenesisConfigFile.mainnet())
+        new PantheonControllerBuilderFactory()
+            .fromGenesisConfig(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
             .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
             .storageProvider(new InMemoryStorageProvider())

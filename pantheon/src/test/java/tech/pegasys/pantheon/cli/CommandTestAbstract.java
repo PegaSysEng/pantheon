@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.Runner;
@@ -23,6 +24,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilderFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -40,7 +42,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,7 +73,7 @@ public abstract class CommandTestAbstract {
   @Mock RunnerBuilder mockRunnerBuilder;
   @Mock Runner mockRunner;
 
-  @Mock Function<EthNetworkConfig, PantheonControllerBuilder<Void>> mockControllerBuilderProvider;
+  @Mock PantheonControllerBuilderFactory mockControllerBuilderFactory;
 
   @Mock PantheonControllerBuilder<Void> mockControllerBuilder;
   @Mock SynchronizerConfiguration.Builder mockSyncConfBuilder;
@@ -106,7 +107,7 @@ public abstract class CommandTestAbstract {
 
   @Before
   public void initMocks() throws Exception {
-    when(mockControllerBuilderProvider.apply(any())).thenReturn(mockControllerBuilder);
+    doReturn(mockControllerBuilder).when(mockControllerBuilderFactory).fromEthNetworkConfig(any());
     // doReturn used because of generic PantheonController
     Mockito.doReturn(mockController).when(mockControllerBuilder).build();
     when(mockControllerBuilder.synchronizerConfiguration(any())).thenReturn(mockControllerBuilder);
@@ -186,7 +187,7 @@ public abstract class CommandTestAbstract {
             mockLogger,
             mockBlockImporter,
             mockRunnerBuilder,
-            mockControllerBuilderProvider,
+            mockControllerBuilderFactory,
             mockSyncConfBuilder,
             mockEthereumWireProtocolConfigurationBuilder,
             mockRocksDbConfBuilder,
@@ -215,8 +216,7 @@ public abstract class CommandTestAbstract {
         final Logger mockLogger,
         final BlockImporter mockBlockImporter,
         final RunnerBuilder mockRunnerBuilder,
-        final Function<EthNetworkConfig, ? extends PantheonControllerBuilder<?>>
-            controllerBuilderProvider,
+        final PantheonControllerBuilderFactory controllerBuilderFactory,
         final SynchronizerConfiguration.Builder mockSyncConfBuilder,
         final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
         final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
@@ -225,7 +225,7 @@ public abstract class CommandTestAbstract {
           mockLogger,
           mockBlockImporter,
           mockRunnerBuilder,
-          controllerBuilderProvider,
+          controllerBuilderFactory,
           mockSyncConfBuilder,
           mockEthereumConfigurationMockBuilder,
           mockRocksDbConfBuilder);

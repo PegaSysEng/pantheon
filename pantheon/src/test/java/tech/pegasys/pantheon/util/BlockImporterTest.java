@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilderFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
@@ -53,7 +53,8 @@ public final class BlockImporterTest {
     final Path source = dataDir.resolve("1000.blocks");
     BlockTestUtil.write1000Blocks(source);
     final PantheonController<?> targetController =
-        PantheonControllerBuilder.fromGenesisConfig(GenesisConfigFile.mainnet())
+        new PantheonControllerBuilderFactory()
+            .fromGenesisConfig(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
             .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
             .storageProvider(new InMemoryStorageProvider())
@@ -91,7 +92,8 @@ public final class BlockImporterTest {
     }
 
     final PantheonController<?> controller =
-        PantheonControllerBuilder.fromGenesisConfig(GenesisConfigFile.fromConfig(config))
+        new PantheonControllerBuilderFactory()
+            .fromGenesisConfig(GenesisConfigFile.fromConfig(config))
             .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
             .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
             .storageProvider(new InMemoryStorageProvider())

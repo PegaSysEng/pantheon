@@ -16,9 +16,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
@@ -78,31 +76,6 @@ public abstract class PantheonControllerBuilder<C> {
   private StorageProvider storageProvider;
   private final List<Runnable> shutdownActions = new ArrayList<>();
   private RocksDbConfiguration rocksdDbConfiguration;
-
-  public static PantheonControllerBuilder<?> fromGenesisConfig(
-      final EthNetworkConfig ethNetworkConfig) {
-    return fromGenesisConfig(GenesisConfigFile.fromConfig(ethNetworkConfig.getGenesisConfig()))
-        .networkId(ethNetworkConfig.getNetworkId());
-  }
-
-  public static PantheonControllerBuilder<?> fromGenesisConfig(
-      final GenesisConfigFile genesisConfig) {
-    final GenesisConfigOptions configOptions = genesisConfig.getConfigOptions();
-    final PantheonControllerBuilder<?> builder;
-
-    if (configOptions.isEthHash()) {
-      builder = new EthashPantheonControllerBuilder();
-    } else if (configOptions.isIbft2()) {
-      builder = new IbftPantheonControllerBuilder();
-    } else if (configOptions.isIbftLegacy()) {
-      builder = new IbftLegacyPantheonControllerBuilder();
-    } else if (configOptions.isClique()) {
-      builder = new CliquePantheonControllerBuilder();
-    } else {
-      throw new IllegalArgumentException("Unknown consensus mechanism defined");
-    }
-    return builder.genesisConfigFile(genesisConfig);
-  }
 
   public PantheonControllerBuilder<C> rocksdDbConfiguration(
       final RocksDbConfiguration rocksDbConfiguration) {
