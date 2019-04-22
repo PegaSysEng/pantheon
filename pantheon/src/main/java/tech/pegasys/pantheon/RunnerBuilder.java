@@ -23,9 +23,8 @@ import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.EthGetBlockByHash;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLMethodsFactory;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
-import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -82,7 +81,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -339,18 +337,26 @@ public class RunnerBuilder {
 
     Optional<GraphQLHttpService> graphQlHttpService = Optional.empty();
     if (graphQLConfiguration.isEnabled()) {
-      final Map<String, GraphQLMethod> graphQLMethods = new HashMap<>();
-      graphQLMethods.put(
-          "eth_getBlockByNumber",
-          new EthGetBlockByHash(
-              new tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries(
-                  context.getBlockchain(), context.getWorldStateArchive()),
-              new BlockResultFactory()));
+      final Map<String, GraphQLMethod> graphQlMethods =
+          graphQlMethods(
+              context,
+              protocolSchedule,
+              pantheonController,
+              peerNetwork,
+              synchronizer,
+              transactionPool,
+              miningCoordinator,
+              metricsSystem,
+              supportedCapabilities,
+              accountWhitelistController,
+              nodeWhitelistController,
+              privacyParameters,
+              metricsConfiguration);
 
       graphQlHttpService =
           Optional.of(
               new GraphQLHttpService(
-                  vertx, dataDir, graphQLConfiguration, metricsSystem, graphQLMethods));
+                  vertx, dataDir, graphQLConfiguration, metricsSystem, graphQlMethods));
     }
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
@@ -464,6 +470,42 @@ public class RunnerBuilder {
             new FilterRepository());
     vertx.deployVerticle(filterManager);
     return filterManager;
+  }
+
+  private Map<String, GraphQLMethod> graphQlMethods(
+      final ProtocolContext<?> context,
+      final ProtocolSchedule<?> protocolSchedule,
+      final PantheonController<?> pantheonController,
+      final P2PNetwork network,
+      final Synchronizer synchronizer,
+      final TransactionPool transactionPool,
+      final MiningCoordinator miningCoordinator,
+      final MetricsSystem metricsSystem,
+      final Set<Capability> supportedCapabilities,
+      final Optional<AccountWhitelistController> accountWhitelistController,
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
+      final PrivacyParameters privacyParameters,
+      final MetricsConfiguration metricsConfiguration) {
+    final Map<String, GraphQLMethod> methods =
+        new GraphQLMethodsFactory()
+            .methods(
+                PantheonInfo.version(),
+                ethNetworkConfig.getNetworkId(),
+                pantheonController.getGenesisConfigOptions(),
+                network,
+                context.getBlockchain(),
+                context.getWorldStateArchive(),
+                synchronizer,
+                transactionPool,
+                protocolSchedule,
+                miningCoordinator,
+                metricsSystem,
+                supportedCapabilities,
+                accountWhitelistController,
+                nodeWhitelistController,
+                privacyParameters,
+                metricsConfiguration);
+    return methods;
   }
 
   private Map<String, JsonRpcMethod> jsonRpcMethods(

@@ -12,4 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.response;
 
-public interface GraphQLResponse {}
+public interface GraphQLResponse {
+
+  ResponseType getType();
+}

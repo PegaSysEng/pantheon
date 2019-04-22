@@ -43,8 +43,7 @@ dependencies {
   implementation 'net.consensys.cava:cava-toml'
   implementation 'org.springframework.security:spring-security-crypto'
   implementation 'io.vertx:vertx-auth-jwt:3.6.2'
-  implementation 'io.leangen.graphql:spqr:0.9.9'
-
+  implementation 'com.graphql-java:graphql-java:11.0'
 
   testImplementation project(':config')
   testImplementation project(path: ':config', configuration: 'testSupportArtifacts')

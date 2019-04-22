@@ -17,9 +17,11 @@ import java.util.List;
 
 public interface GraphQLMethod {
   /**
-   * Standardised GraphQl query types.
+   * GraphQl query types.
    *
-   * @return identification of the GraphQL query type.
+   * <p>These correspond to the `type Query{}` in the schema
+   *
+   * @return the GraphQL query type.
    */
   String getType();
 

@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal;
 
+import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLParameters;
+
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -35,8 +37,7 @@ public class GraphQLRequest {
     this.query = query;
     this.variables = variables;
     if (query == null) {
-      System.out.println("SHIT HAPPENED");
-      // throw new InvalidJsonRpcRequestException("Query is required");
+      throw new InvalidGraphQLParameters("Must provide query string.");
     }
   }
 

@@ -13,22 +13,36 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.response;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import graphql.GraphQLError;
 
 @JsonPropertyOrder({"errors"})
 public class GraphQLErrorResponse implements GraphQLResponse {
 
-  private final GraphQLError[] errors;
+  private final List<GraphQLError> errors;
 
-  public GraphQLErrorResponse(final GraphQLError... errors) {
+  public GraphQLErrorResponse(final List<GraphQLError> errors) {
     this.errors = errors;
   }
 
+  public GraphQLErrorResponse(final GraphQLError... errors) {
+    this(Arrays.asList(errors));
+  }
+
   @JsonGetter("errors")
-  public GraphQLError[] getErrors() {
+  public List<GraphQLError> getErrors() {
     return errors;
+  }
+
+  @Override
+  @JsonIgnore
+  public ResponseType getType() {
+    return ResponseType.ERROR;
   }
 
   @Override
@@ -36,11 +50,11 @@ public class GraphQLErrorResponse implements GraphQLResponse {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     GraphQLErrorResponse that = (GraphQLErrorResponse) o;
-    return Arrays.equals(errors, that.errors);
+    return Objects.equals(errors, that.errors);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(errors);
+    return Objects.hash(errors);
   }
 }
