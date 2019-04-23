@@ -101,7 +101,7 @@ public class RocksDbConfiguration {
     int maxBackgroundCompactions;
 
     @CommandLine.Option(
-        names = {"--Xrocksdb-max-background-compactions"},
+        names = {"--Xrocksdb-background-thread-count"},
         hidden = true,
         defaultValue = "1",
         paramLabel = "<INTEGER>",
