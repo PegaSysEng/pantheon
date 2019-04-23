@@ -12,24 +12,26 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResult;
 
 import java.math.BigInteger;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 public class Block implements GraphQLResult {
 
-  private final Long number;
+  private final BigInteger number;
   private final String hash;
-  private final String parentHash;
   private final String nonce;
   private final String transactionsRoot;
   private final Integer transactionCount;
   private final String stateRoot;
   private final String receiptsRoot;
   private final String extraData;
-  private final Long gasLimit;
-  private final Long gasUsed;
+  private final BigInteger gasLimit;
+  private final BigInteger gasUsed;
   private final BigInteger timestamp;
   private final String logsBloom;
   //    private final String mixHash;
@@ -37,7 +39,7 @@ public class Block implements GraphQLResult {
   private final BigInteger totalDifficulty;
   private final Integer ommerCount;
   //    private final List<Block> ommers;
-      private final String ommerHash;
+  private final String ommerHash;
   //    private final List<Transaction> transactions;
 
   //    public Account miner(Long block) {
@@ -46,73 +48,65 @@ public class Block implements GraphQLResult {
 
   public static Block createFromBlockResult(final BlockResult blockResult) {
     return new Block(
-            blockResult.getNumber(),
-            blockResult.getHash(),
-            blockResult.getParentHash(),
-            blockResult.getNonce(),
-            blockResult.getTransactionsRoot(),
-            blockResult.getTransactions() == null? null : String.valueOf(blockResult.getTransactions().size()),
-            blockResult.getStateRoot(),
-            blockResult.getReceiptsRoot(),
-            blockResult.getExtraData(),
-            blockResult.getGasLimit(),
-            blockResult.getGasUsed(),
-            blockResult.getTimestamp(),
-            blockResult.getLogsBloom(),
-            blockResult.getDifficulty(),
-            blockResult.getTotalDifficulty(),
-            blockResult.getOmmers() == null? null : String.valueOf(blockResult.getOmmers().size()),
-            blockResult.getSha3Uncles());
+            convertToBigInt(blockResult.getNumber()),
+        blockResult.getHash(),
+        blockResult.getNonce(),
+        blockResult.getTransactionsRoot(),
+        blockResult.getTransactions() == null
+            ? null
+            : blockResult.getTransactions().size(),
+        blockResult.getStateRoot(),
+        blockResult.getReceiptsRoot(),
+        blockResult.getExtraData(),
+            convertToBigInt(blockResult.getGasLimit()),
+            convertToBigInt(blockResult.getGasUsed()),
+            convertToBigInt(blockResult.getTimestamp()),
+        blockResult.getLogsBloom(),
+            convertToBigInt(blockResult.getDifficulty()),
+            convertToBigInt(blockResult.getTotalDifficulty()),
+        blockResult.getOmmers() == null
+                ? null
+                : blockResult.getOmmers().size(),
+        blockResult.getSha3Uncles());
   }
 
-  private Block(
-          final String number,
-          final String hash,
-          final String parentHash,
-          final String nonce,
-          final String transactionsRoot,
-          final String transactionCount,
-          final String stateRoot,
-          final String receiptsRoot,
-          final String extraData,
-          final String gasLimit,
-          final String gasUsed,
-          final String timestamp,
-          final String logsBloom,
-          final String difficulty,
-          final String totalDifficulty,
-          final String ommerCount,
-          final String ommerHash) {
-    this.number = convertToLong(number);
+  @JsonCreator
+  public Block(
+      @JsonProperty("number") final BigInteger number,
+      @JsonProperty("hash") final String hash,
+      @JsonProperty("nonce") final String nonce,
+      @JsonProperty("transactionsRoot") final String transactionsRoot,
+      @JsonProperty("transactionCount") final Integer transactionCount,
+      @JsonProperty("stateRoot") final String stateRoot,
+      @JsonProperty("receiptsRoot") final String receiptsRoot,
+      @JsonProperty("extraData") final String extraData,
+      @JsonProperty("gasLimit") final BigInteger gasLimit,
+      @JsonProperty("gasUsed") final BigInteger gasUsed,
+      @JsonProperty("timestamp") final BigInteger timestamp,
+      @JsonProperty("logsBloom") final String logsBloom,
+      @JsonProperty("difficulty") final BigInteger difficulty,
+      @JsonProperty("totalDifficulty") final BigInteger totalDifficulty,
+      @JsonProperty("ommerCount") final Integer ommerCount,
+      @JsonProperty("ommerHash") final String ommerHash) {
+    this.number = number;
     this.hash = hash;
-    this.parentHash = parentHash;
     this.nonce = nonce;
     this.transactionsRoot = transactionsRoot;
-    this.transactionCount = convertToInteger(transactionCount);
+    this.transactionCount = transactionCount;
     this.stateRoot = stateRoot;
     this.receiptsRoot = receiptsRoot;
     this.extraData = extraData;
-    this.gasLimit = convertToLong(gasLimit);
-    this.gasUsed = convertToLong(gasUsed);
-    this.timestamp = convertToBigInt(timestamp);
+    this.gasLimit = gasLimit;
+    this.gasUsed = gasUsed;
+    this.timestamp = timestamp;
     this.logsBloom = logsBloom;
-    this.difficulty = convertToBigInt(difficulty);
-    this.totalDifficulty = convertToBigInt(totalDifficulty);
-    this.ommerCount = convertToInteger(ommerCount);
+    this.difficulty = difficulty;
+    this.totalDifficulty = totalDifficulty;
+    this.ommerCount = ommerCount;
     this.ommerHash = ommerHash;
   }
 
-  private Integer convertToInteger(final String i) {
-    if (i == null || i.isEmpty()) {
-      return null;
-    }
-    if (i.length() > 2 && i.substring(0, 2).equals("0x")) {
-      return new BigInteger(i.substring(2), 16).intValue();
-    }
-    return Integer.parseInt(i);
-  }
-
-  private BigInteger convertToBigInt(final String s) {
+  private static BigInteger convertToBigInt(final String s) {
     if (s == null || s.isEmpty()) {
       return null;
     }
@@ -122,18 +116,8 @@ public class Block implements GraphQLResult {
     return null;
   }
 
-  private Long convertToLong(final String n) {
-    if (n == null || n.isEmpty()) {
-      return null;
-    }
-    if (n.substring(0, 2).equals("0x")) {
-      return new BigInteger(n.substring(2), 16).longValue();
-    }
-    return null;
-  }
-
   @JsonGetter(value = "number")
-  public Long getNumber() {
+  public BigInteger getNumber() {
     return number;
   }
 
@@ -142,17 +126,12 @@ public class Block implements GraphQLResult {
     return hash;
   }
 
-  @JsonGetter(value = "parentHash")
-  public String getParentHash() {
-    return parentHash;
-  }
-
   @JsonGetter(value = "nonce")
   public String getNonce() {
     return nonce;
   }
 
-  @JsonGetter(value = "transactionRoot")
+  @JsonGetter(value = "transactionsRoot")
   public String getTransactionsRoot() {
     return transactionsRoot;
   }
@@ -166,22 +145,24 @@ public class Block implements GraphQLResult {
   public String getStateRoot() {
     return stateRoot;
   }
-  @JsonGetter(value = "receiptRoot")
+
+  @JsonGetter(value = "receiptsRoot")
   public String getReceiptsRoot() {
     return receiptsRoot;
   }
+
   @JsonGetter(value = "extraData")
   public String getExtraData() {
     return extraData;
   }
 
   @JsonGetter(value = "gasLimit")
-  public Long getGasLimit() {
+  public BigInteger getGasLimit() {
     return gasLimit;
   }
 
   @JsonGetter(value = "gasUsed")
-  public Long getGasUsed() {
+  public BigInteger getGasUsed() {
     return gasUsed;
   }
 
@@ -215,4 +196,3 @@ public class Block implements GraphQLResult {
     return ommerHash;
   }
 }
-

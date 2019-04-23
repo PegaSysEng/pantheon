@@ -112,11 +112,15 @@ public class CoercingFactory {
     };
   }
 
-  public static Coercing<BigInteger, String> getBigInt() {
-    return new Coercing<BigInteger, String>() {
+  public static Coercing<BigInteger, BigInteger> getBigInt() {
+    return new Coercing<BigInteger, BigInteger>() {
       @Override
-      public String serialize(final Object dataFetcherResult) throws CoercingSerializeException {
-        return dataFetcherResult.toString();
+      public BigInteger serialize(final Object dataFetcherResult) throws CoercingSerializeException {
+        if (dataFetcherResult instanceof BigInteger) {
+          return (BigInteger) dataFetcherResult;
+        }
+        throw new CoercingParseValueException(
+                "Unable to parse variable value " + dataFetcherResult + " as BigInt");
       }
 
       @Override
@@ -139,33 +143,30 @@ public class CoercingFactory {
     };
   }
 
-  public static Coercing<Long, String> getLong() {
-    return new Coercing<Long, String>() {
+  public static Coercing<BigInteger, BigInteger> getLong() {
+    return new Coercing<BigInteger, BigInteger>() {
       @Override
-      public String serialize(final Object dataFetcherResult) throws CoercingSerializeException {
-        if (dataFetcherResult instanceof String) {
-          if (((String) dataFetcherResult).substring(0, 2).equals("0x")) {
-            return new BigInteger(((String) dataFetcherResult).substring(2), 16).toString();
-          }
-          return (String) dataFetcherResult;
+      public BigInteger serialize(final Object dataFetcherResult) throws CoercingSerializeException {
+        if (dataFetcherResult instanceof BigInteger) {
+          return ((BigInteger) dataFetcherResult);
         }
-        return dataFetcherResult.toString();
+        throw new CoercingParseValueException(
+                "Unable to parse response value " + dataFetcherResult + " as Long");
       }
 
       @Override
-      public Long parseValue(final Object input) throws CoercingParseValueException {
+      public BigInteger parseValue(final Object input) throws CoercingParseValueException {
         if (input instanceof String) {
-          return Long.valueOf((String) input);
+          return new BigInteger((String) input, 10);
         }
         throw new CoercingParseValueException(
             "Unable to parse variable value " + input + " as Long");
       }
 
       @Override
-      public Long parseLiteral(final Object input) throws CoercingParseLiteralException {
+      public BigInteger parseLiteral(final Object input) throws CoercingParseLiteralException {
         if (input instanceof IntValue) {
-          BigInteger value = ((IntValue) input).getValue();
-          return value.longValue();
+          return ((IntValue) input).getValue();
         }
         throw new CoercingParseLiteralException("Value is not Long : '" + input + "'");
       }

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.vertx.core.json.Json;
 
 @JsonPropertyOrder({"data"})
 public class GraphQLSuccessResponse implements GraphQLResponse {
@@ -30,13 +31,13 @@ public class GraphQLSuccessResponse implements GraphQLResponse {
     this.data = data;
   }
 
-  public GraphQLSuccessResponse() {
-    this.data = "Success";
-  }
-
   @JsonGetter("data")
   public Object getData() {
-    return data;
+    if (data instanceof String) {
+      return data;
+    } else {
+      return Json.encodePrettily(data);
+    }
   }
 
   @Override

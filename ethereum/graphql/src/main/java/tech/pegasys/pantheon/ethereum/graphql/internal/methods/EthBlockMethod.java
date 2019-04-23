@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
+import java.math.BigInteger;
 import java.util.Optional;
 
 import graphql.schema.DataFetcher;
@@ -42,14 +43,14 @@ public class EthBlockMethod implements DataFetcher<Block>, GraphQLMethod {
   }
 
   @Override
-  public Block get(final DataFetchingEnvironment environment){
+  public Block get(final DataFetchingEnvironment environment) {
 
     if (environment.containsArgument("hash")) {
       Bytes32 hash = getHash(environment);
       return getBlockByHash(hash);
     } else if (environment.containsArgument("number")) {
-      Long number = getNumber(environment);
-      return getBlockByNumber(number);
+      BigInteger number = getNumber(environment);
+      return getBlockByNumber(number.longValue());
     } else {
       return getLatestBlock();
     }
@@ -60,21 +61,21 @@ public class EthBlockMethod implements DataFetcher<Block>, GraphQLMethod {
     return (Bytes32) Optional.of(environment.getArgument("hash")).orElse(null);
   }
 
-  private Long getNumber(final DataFetchingEnvironment environment) {
-    return (Long) Optional.of(environment.getArgument("number")).orElse(null);
+  private BigInteger getNumber(final DataFetchingEnvironment environment) {
+    return (BigInteger) Optional.of(environment.getArgument("number")).orElse(null);
   }
 
   private Block getBlockByHash(final Bytes32 hash) {
     try {
       BlockResult result =
-              blockchain.blockByHash(Hash.wrap(hash)).map(blockResult::transactionComplete).orElse(null);
+          blockchain
+              .blockByHash(Hash.wrap(hash))
+              .map(blockResult::transactionComplete)
+              .orElse(null);
       return result == null ? null : Block.createFromBlockResult(result);
     } catch (NullPointerException e) {
       return null;
     }
-
-
-
   }
 
   private Block getBlockByNumber(final Long number) {

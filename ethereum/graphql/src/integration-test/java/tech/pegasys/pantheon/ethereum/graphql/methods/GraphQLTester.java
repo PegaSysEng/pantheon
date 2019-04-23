@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessRe
 import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import graphql.ExecutionInput;
@@ -37,14 +38,15 @@ public class GraphQLTester {
   final BlockResultFactory blockResult = new BlockResultFactory();
 
   private GraphQL graphQL;
+  private Map<String, GraphQLMethod> map = new HashMap<>();
 
   public GraphQLTester() {
-    Map<String, GraphQLMethod> map = new HashMap<>();
     map.put("block", new EthBlockMethod(blockchainQueries, blockResult));
     this.graphQL = GraphQLFactory.buildGraphQL(map);
   }
 
   void setMethods(final Map<String, GraphQLMethod> map) {
+    this.map = map;
     this.graphQL = GraphQLFactory.buildGraphQL(map);
   }
 
@@ -57,7 +59,8 @@ public class GraphQLTester {
                 .variables(request.getVariables())
                 .build());
 
-    System.out.println("error = [" + executionResult.getErrors() + "]");
+    System.out.println("error = " + executionResult.getErrors());
+    System.out.println("result = " + executionResult.toSpecification());
 
     if (executionResult.getErrors().size() == 0) {
       return Json.mapper.convertValue(

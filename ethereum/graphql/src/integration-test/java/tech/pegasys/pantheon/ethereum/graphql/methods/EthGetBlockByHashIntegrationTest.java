@@ -102,7 +102,7 @@ public class EthGetBlockByHashIntegrationTest extends GraphQLTester {
   @Test
   public void returnFullTransactionIfBlockFound() throws IOException {
     final Map<GraphQLResponseKey, String> expectedResult = new EnumMap<>(GraphQLResponseKey.class);
-    expectedResult.put(NUMBER, "1");
+    expectedResult.put(NUMBER, "0x1");
     expectedResult.put(
         MIX_HASH, "0x552dd5ae3ccb7a278c6cedda27e48963101be56526a8ee8d70e8227f2c08edf0");
     expectedResult.put(
@@ -120,13 +120,13 @@ public class EthGetBlockByHashIntegrationTest extends GraphQLTester {
     expectedResult.put(
         RECEIPTS_ROOT, "0xa2bd925fcbb8b1ec39612553b17c9265ab198f5af25cc564655114bf5a28c75d");
     expectedResult.put(COINBASE, "0x8888f1f195afa192cfee860698584c030f4c9db1");
-    expectedResult.put(DIFFICULTY, "131072");
-    expectedResult.put(TOTAL_DIFFICULTY, "262144");
+    expectedResult.put(DIFFICULTY, "0x20000");
+    expectedResult.put(TOTAL_DIFFICULTY, "0x40000");
     expectedResult.put(EXTRA_DATA, "0x");
     expectedResult.put(SIZE, "0x96a");
-    expectedResult.put(GAS_LIMIT, "3141592");
-    expectedResult.put(GAS_USED, "493172");
-    expectedResult.put(TIMESTAMP, "1444659936");
+    expectedResult.put(GAS_LIMIT, "0x2fefd8");
+    expectedResult.put(GAS_USED, "0x78674");
+    expectedResult.put(TIMESTAMP, "0x561bc2e0");
     final List<TransactionResult> transactions =
         responseUtils.transactions(
             responseUtils.transaction(
@@ -149,9 +149,8 @@ public class EthGetBlockByHashIntegrationTest extends GraphQLTester {
     final GraphQLResponse actual =
         executeRequest(
             requestWithQuery(
-                "{ block(hash: \""
-                    + "0x10aaf14a53caf27552325374429d3558398a36d3682ede6603c2c6511896e9f9"
-                    + "\") { difficulty extraData gasLimit gasUsed hash logsBloom nonce number ommerCount ommerHash receiptsRoot stateRoot timestamp totalDifficulty transactionsRoot } }"));
+                "{ block(number: 1)" +
+                        " { number hash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
 
     assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
   }
