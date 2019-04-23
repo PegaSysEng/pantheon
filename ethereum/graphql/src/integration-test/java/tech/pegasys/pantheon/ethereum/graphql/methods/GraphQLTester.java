@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessRe
 import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import graphql.ExecutionInput;
@@ -58,9 +57,6 @@ public class GraphQLTester {
                 .operationName(request.getOperationName())
                 .variables(request.getVariables())
                 .build());
-
-    System.out.println("error = " + executionResult.getErrors());
-    System.out.println("result = " + executionResult.toSpecification());
 
     if (executionResult.getErrors().size() == 0) {
       return Json.mapper.convertValue(

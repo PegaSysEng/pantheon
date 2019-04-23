@@ -81,7 +81,7 @@ public class EthBlockMethod implements DataFetcher<Block>, GraphQLMethod {
   private Block getBlockByNumber(final Long number) {
     try {
       BlockResult result =
-              blockchain.blockByNumber(number).map(blockResult::transactionComplete).orElse(null);
+          blockchain.blockByNumber(number).map(blockResult::transactionComplete).orElse(null);
 
       return result == null ? null : Block.createFromBlockResult(result);
     } catch (NullPointerException e) {

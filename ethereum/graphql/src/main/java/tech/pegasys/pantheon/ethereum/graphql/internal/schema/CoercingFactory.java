@@ -115,12 +115,13 @@ public class CoercingFactory {
   public static Coercing<BigInteger, BigInteger> getBigInt() {
     return new Coercing<BigInteger, BigInteger>() {
       @Override
-      public BigInteger serialize(final Object dataFetcherResult) throws CoercingSerializeException {
+      public BigInteger serialize(final Object dataFetcherResult)
+          throws CoercingSerializeException {
         if (dataFetcherResult instanceof BigInteger) {
           return (BigInteger) dataFetcherResult;
         }
         throw new CoercingParseValueException(
-                "Unable to parse variable value " + dataFetcherResult + " as BigInt");
+            "Unable to parse variable value " + dataFetcherResult + " as BigInt");
       }
 
       @Override
@@ -146,12 +147,13 @@ public class CoercingFactory {
   public static Coercing<BigInteger, BigInteger> getLong() {
     return new Coercing<BigInteger, BigInteger>() {
       @Override
-      public BigInteger serialize(final Object dataFetcherResult) throws CoercingSerializeException {
+      public BigInteger serialize(final Object dataFetcherResult)
+          throws CoercingSerializeException {
         if (dataFetcherResult instanceof BigInteger) {
           return ((BigInteger) dataFetcherResult);
         }
         throw new CoercingParseValueException(
-                "Unable to parse response value " + dataFetcherResult + " as Long");
+            "Unable to parse response value " + dataFetcherResult + " as Long");
       }
 
       @Override

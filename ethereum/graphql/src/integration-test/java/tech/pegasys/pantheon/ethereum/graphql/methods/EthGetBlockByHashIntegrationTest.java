@@ -100,7 +100,7 @@ public class EthGetBlockByHashIntegrationTest extends GraphQLTester {
   }
 
   @Test
-  public void returnFullTransactionIfBlockFound() throws IOException {
+  public void returnIfBlockFound() throws IOException {
     final Map<GraphQLResponseKey, String> expectedResult = new EnumMap<>(GraphQLResponseKey.class);
     expectedResult.put(NUMBER, "0x1");
     expectedResult.put(
@@ -146,13 +146,20 @@ public class EthGetBlockByHashIntegrationTest extends GraphQLTester {
                 "0x58d025af99b538b778a47da8115c43d5cee564c3cc8d58eb972aaf80ea2c406e"));
 
     final GraphQLResponse expected = responseUtils.response(expectedResult, transactions);
-    final GraphQLResponse actual =
+    final GraphQLResponse actualByNumber =
         executeRequest(
             requestWithQuery(
-                "{ block(number: 1)" +
-                        " { number hash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
+                "{ block(number: 1)"
+                    + " { number hash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
 
-    assertThat(actual).isEqualToComparingFieldByFieldRecursively(expected);
+    final GraphQLResponse actualByHash =
+        executeRequest(
+            requestWithQuery(
+                "{ block(hash: \"0x10aaf14a53caf27552325374429d3558398a36d3682ede6603c2c6511896e9f9\")"
+                    + " { number hash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
+
+    assertThat(actualByNumber).isEqualToComparingFieldByFieldRecursively(expected);
+    assertThat(actualByHash).isEqualToComparingFieldByFieldRecursively(expected);
   }
   //
   //  @Test

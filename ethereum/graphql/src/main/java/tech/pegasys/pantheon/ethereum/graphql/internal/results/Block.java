@@ -12,13 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResult;
 
 import java.math.BigInteger;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Block implements GraphQLResult {
 
@@ -48,25 +48,21 @@ public class Block implements GraphQLResult {
 
   public static Block createFromBlockResult(final BlockResult blockResult) {
     return new Block(
-            convertToBigInt(blockResult.getNumber()),
+        convertToBigInt(blockResult.getNumber()),
         blockResult.getHash(),
         blockResult.getNonce(),
         blockResult.getTransactionsRoot(),
-        blockResult.getTransactions() == null
-            ? null
-            : blockResult.getTransactions().size(),
+        blockResult.getTransactions() == null ? null : blockResult.getTransactions().size(),
         blockResult.getStateRoot(),
         blockResult.getReceiptsRoot(),
         blockResult.getExtraData(),
-            convertToBigInt(blockResult.getGasLimit()),
-            convertToBigInt(blockResult.getGasUsed()),
-            convertToBigInt(blockResult.getTimestamp()),
+        convertToBigInt(blockResult.getGasLimit()),
+        convertToBigInt(blockResult.getGasUsed()),
+        convertToBigInt(blockResult.getTimestamp()),
         blockResult.getLogsBloom(),
-            convertToBigInt(blockResult.getDifficulty()),
-            convertToBigInt(blockResult.getTotalDifficulty()),
-        blockResult.getOmmers() == null
-                ? null
-                : blockResult.getOmmers().size(),
+        convertToBigInt(blockResult.getDifficulty()),
+        convertToBigInt(blockResult.getTotalDifficulty()),
+        blockResult.getOmmers() == null ? null : blockResult.getOmmers().size(),
         blockResult.getSha3Uncles());
   }
 
