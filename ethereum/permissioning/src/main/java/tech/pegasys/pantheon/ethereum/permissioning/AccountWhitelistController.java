@@ -193,7 +193,7 @@ public class AccountWhitelistController {
     }
   }
 
-  private List<String> normalizeAccounts(List<String> accounts) {
+  private List<String> normalizeAccounts(final List<String> accounts) {
     if (accounts != null) {
       return accounts.parallelStream().map(String::toLowerCase).collect(Collectors.toList());
     } else {
