@@ -72,8 +72,7 @@ public abstract class CommandTestAbstract {
   @Mock RunnerBuilder mockRunnerBuilder;
   @Mock Runner mockRunner;
 
-  @Mock
-  PantheonController.Builder mockControllerBuilderFactory;
+  @Mock PantheonController.Builder mockControllerBuilderFactory;
 
   @Mock PantheonControllerBuilder<Void> mockControllerBuilder;
   @Mock SynchronizerConfiguration.Builder mockSyncConfBuilder;
