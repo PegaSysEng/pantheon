@@ -34,6 +34,7 @@ ext.acceptedLicenses = [
     'Eclipse Public License - v 2.0',
     'Eclipse Public License 1.0',
     'MIT License',
+    'MIT',
     'Apache License, Version 2.0',
     'Bouncy Castle Licence',
     'Public Domain',
@@ -41,6 +42,7 @@ ext.acceptedLicenses = [
     'Mozilla Public License Version 1.1',
     'Mozilla Public License Version 2.0',
     'CC0 1.0 Universal License',
+    'CC0',
     'Common Development and Distribution License 1.0',
     'Unicode/ICU License'
 ]*.toLowerCase()
