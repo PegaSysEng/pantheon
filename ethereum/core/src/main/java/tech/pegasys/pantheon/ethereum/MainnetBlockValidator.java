@@ -102,14 +102,15 @@ public class MainnetBlockValidator<C> implements BlockValidator<C> {
       final ProtocolContext<C> context,
       final Block block,
       final List<TransactionReceipt> receipts,
-      final HeaderValidationMode headerValidationMode) {
+      final HeaderValidationMode headerValidationMode,
+      final HeaderValidationMode ommerValidationMode) {
     final BlockHeader header = block.getHeader();
     if (!blockHeaderValidator.validateHeader(header, context, headerValidationMode)) {
       return false;
     }
 
     if (!blockBodyValidator.validateBodyLight(
-        context, block, receipts, headerValidationMode)) {
+        context, block, receipts, ommerValidationMode)) {
       return false;
     }
     return true;

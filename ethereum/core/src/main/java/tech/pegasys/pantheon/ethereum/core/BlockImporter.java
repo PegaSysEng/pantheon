@@ -73,5 +73,6 @@ public interface BlockImporter<C> {
       ProtocolContext<C> context,
       Block block,
       List<TransactionReceipt> receipts,
-      HeaderValidationMode headerValidationMode);
+      HeaderValidationMode headerValidationMode,
+      HeaderValidationMode ommerValidationMode);
 }
