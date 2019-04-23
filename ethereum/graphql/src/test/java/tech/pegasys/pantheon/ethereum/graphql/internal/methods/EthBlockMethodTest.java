@@ -17,10 +17,13 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
 import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLParameters;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
+import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.ResponseType;
 
+import java.io.IOException;
+
+import io.vertx.core.json.Json;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,12 +61,15 @@ public class EthBlockMethodTest extends GraphQLTester {
   }
 
   @Test
-  public void exceptionWhenHashParamInvalid() {
+  public void exceptionWhenHashParamInvalid() throws IOException {
     final GraphQLRequest request = requestWithQuery("{ block(hash: \"0x00\") { number } }");
 
-    GraphQLErrorResponse response = (GraphQLErrorResponse) executeRequest(request);
+    GraphQLSuccessResponse response = (GraphQLSuccessResponse) executeRequest(request);
 
-    assertThat(response.getErrors().size()).isEqualTo(1);
+    final GraphQLSuccessResponse expected =
+        Json.mapper.readValue("{ \"data\": {\"block\": null} }", GraphQLSuccessResponse.class);
+
+    assertThat(response).isEqualToComparingFieldByField(expected);
 
     verifyNoMoreInteractions(blockchainQueries);
   }
