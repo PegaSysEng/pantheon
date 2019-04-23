@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.controller;
 
+import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -113,5 +115,32 @@ public class PantheonController<C> implements java.io.Closeable {
   public Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(
       final Collection<RpcApi> enabledRpcApis) {
     return additionalJsonRpcMethodsFactory.createJsonRpcMethods(enabledRpcApis);
+  }
+
+  public static class Builder {
+
+    public PantheonControllerBuilder<?> fromEthNetworkConfig(
+        final EthNetworkConfig ethNetworkConfig) {
+      return fromGenesisConfig(GenesisConfigFile.fromConfig(ethNetworkConfig.getGenesisConfig()))
+          .networkId(ethNetworkConfig.getNetworkId());
+    }
+
+    public PantheonControllerBuilder<?> fromGenesisConfig(final GenesisConfigFile genesisConfig) {
+      final GenesisConfigOptions configOptions = genesisConfig.getConfigOptions();
+      final PantheonControllerBuilder<?> builder;
+
+      if (configOptions.isEthHash()) {
+        builder = new MainnetPantheonControllerBuilder();
+      } else if (configOptions.isIbft2()) {
+        builder = new IbftPantheonControllerBuilder();
+      } else if (configOptions.isIbftLegacy()) {
+        builder = new IbftLegacyPantheonControllerBuilder();
+      } else if (configOptions.isClique()) {
+        builder = new CliquePantheonControllerBuilder();
+      } else {
+        throw new IllegalArgumentException("Unknown consensus mechanism defined");
+      }
+      return builder.genesisConfigFile(genesisConfig);
+    }
   }
 }

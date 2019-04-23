@@ -40,7 +40,6 @@ import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.controller.PantheonControllerBuilderFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
@@ -133,7 +132,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder;
   private final RocksDbConfiguration.Builder rocksDbConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
-  private final PantheonControllerBuilderFactory controllerBuilderFactory;
+  private final PantheonController.Builder controllerBuilderFactory;
 
   protected KeyLoader getKeyLoader() {
     return KeyPairUtil::loadKeyPair;
@@ -523,7 +522,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final Logger logger,
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
-      final PantheonControllerBuilderFactory controllerBuilderFactory,
+      final PantheonController.Builder controllerBuilderFactory,
       final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder,
       final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder,
       final RocksDbConfiguration.Builder rocksDbConfigurationBuilder) {

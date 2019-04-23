@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
-import tech.pegasys.pantheon.controller.PantheonControllerBuilderFactory;
+import tech.pegasys.pantheon.controller.PantheonController.Builder;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
@@ -63,7 +63,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     node.getConfiguration().getGenesisConfig().ifPresent(networkConfigBuilder::setGenesisConfig);
     final EthNetworkConfig ethNetworkConfig = networkConfigBuilder.build();
     final PantheonControllerBuilder<?> builder =
-        new PantheonControllerBuilderFactory().fromEthNetworkConfig(ethNetworkConfig);
+        new PantheonController.Builder().fromEthNetworkConfig(ethNetworkConfig);
     final Path tempDir = Files.createTempDir().toPath();
 
     final PantheonController<?> pantheonController;
