@@ -69,6 +69,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,6 +78,7 @@ import org.junit.rules.TemporaryFolder;
 
 /** Tests for {@link Runner}. */
 public final class RunnerTest {
+  private static final Logger LOG = LogManager.getLogger();
 
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
@@ -214,6 +217,7 @@ public final class RunnerTest {
       Awaitility.await()
           .ignoreExceptions()
           .atMost(5L, TimeUnit.MINUTES)
+          .pollInterval(500, TimeUnit.MILLISECONDS)
           .untilAsserted(
               () -> {
                 final String baseUrl = String.format("http://%s:%s", listenHost, behindJsonRpcPort);
@@ -251,7 +255,7 @@ public final class RunnerTest {
                       UInt256.fromHexString(
                               new JsonObject(resp.body().string()).getString("result"))
                           .toInt();
-                  System.out.println("******current block  " + currentBlock);
+                  LOG.info("Current block {}", currentBlock);
                   if (currentBlock < blockCount) {
                     // if not yet at blockCount, we should get a sync result from eth_syncing
                     final int syncResultCurrentBlock =
