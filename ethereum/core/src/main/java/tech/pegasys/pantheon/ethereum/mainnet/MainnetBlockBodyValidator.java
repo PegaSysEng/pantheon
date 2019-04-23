@@ -224,9 +224,7 @@ public class MainnetBlockBodyValidator<C> implements BlockBodyValidator<C> {
       return false;
     }
 
-    if (ommerValidationMode != HeaderValidationMode.LIGHT
-        && ommerValidationMode != HeaderValidationMode.LIGHT_SKIP_DETACHED
-        && ommerValidationMode != HeaderValidationMode.LIGHT_DETACHED_ONLY) {
+    if (!ommerValidationMode.isFormOfLightValidation()) {
       return isOmmerSiblingOfAncestor(context, current, ommer);
     } else {
       return true;
