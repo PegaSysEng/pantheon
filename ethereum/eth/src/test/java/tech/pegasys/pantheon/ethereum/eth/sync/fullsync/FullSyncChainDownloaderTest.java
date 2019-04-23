@@ -56,7 +56,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -568,8 +567,7 @@ public class FullSyncChainDownloaderTest {
       // Check that any requests for checkpoint headers are only sent to the best peer
       final long checkpointRequestsToOtherPeers =
           otherPeers.stream()
-              .map(RespondingEthPeer::pendingOutgoingRequests)
-              .flatMap(Function.identity())
+              .flatMap(RespondingEthPeer::pendingOutgoingRequests)
               .filter(m -> m.getCode() == EthPV62.GET_BLOCK_HEADERS)
               .map(GetBlockHeadersMessage::readFrom)
               .filter(m -> m.skip() > 0)
