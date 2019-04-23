@@ -52,8 +52,9 @@ public class PendingTransactions {
   private final Map<Hash, TransactionInfo> pendingTransactions = new HashMap<>();
   private final SortedSet<TransactionInfo> prioritizedTransactions =
       new TreeSet<>(
-          comparing(TransactionInfo::isReceivedFromLocalSource)
+          comparing(PendingTransactions.TransactionInfo::isReceivedFromLocalSource)
               .thenComparing(TransactionInfo::getSequence)
+              .thenComparing(txInfo -> txInfo.getTransaction().getGasPrice())
               .reversed());
   private final Map<Address, SortedMap<Long, TransactionInfo>> transactionsBySender =
       new HashMap<>();
@@ -204,14 +205,27 @@ public class PendingTransactions {
       if (!addTransactionForSenderAndNonce(transactionInfo)) {
         return false;
       }
+
+      // Check if transaction pool is full
+      if (pendingTransactions.size() >= maxPendingTransactions) {
+        final TransactionInfo leastPriorityTxInfo = prioritizedTransactions.last();
+        if (leastPriorityTxInfo
+                .getTransaction()
+                .getGasPrice()
+                .compareTo(transactionInfo.getTransaction().getGasPrice())
+            < 0) {
+          // New transaction is better than our worse ones, make room for it
+          removeTransaction(leastPriorityTxInfo.getTransaction());
+        } else {
+          // If the new transaction is underpriced, don't accept it
+          return false;
+        }
+      }
+
       prioritizedTransactions.add(transactionInfo);
       pendingTransactions.put(transactionInfo.getHash(), transactionInfo);
 
       notifyTransactionAdded(transactionInfo.getTransaction());
-      if (pendingTransactions.size() > maxPendingTransactions) {
-        final TransactionInfo toRemove = prioritizedTransactions.last();
-        removeTransaction(toRemove.getTransaction());
-      }
       return true;
     }
   }
@@ -295,8 +309,8 @@ public class PendingTransactions {
    * and deciding which transactions to drop when the transaction pool reaches its size limit.
    */
   public static class TransactionInfo {
-
     private static final AtomicLong TRANSACTIONS_ADDED = new AtomicLong();
+
     private final Transaction transaction;
     private final boolean receivedFromLocalSource;
     private final Instant addedToPoolAt;
@@ -312,12 +326,12 @@ public class PendingTransactions {
       this.sequence = TRANSACTIONS_ADDED.getAndIncrement();
     }
 
-    public Transaction getTransaction() {
-      return transaction;
-    }
-
     public long getSequence() {
       return sequence;
+    }
+
+    public Transaction getTransaction() {
+      return transaction;
     }
 
     public long getNonce() {

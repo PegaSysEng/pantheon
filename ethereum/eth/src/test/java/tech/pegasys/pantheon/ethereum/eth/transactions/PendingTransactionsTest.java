@@ -13,6 +13,8 @@
 package tech.pegasys.pantheon.ethereum.eth.transactions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -91,20 +93,6 @@ public class PendingTransactionsTest {
   }
 
   @Test
-  public void shouldDropOldestTransactionWhenLimitExceeded() {
-    final Transaction oldestTransaction = createTransaction(0);
-    transactions.addRemoteTransaction(oldestTransaction);
-    for (int i = 1; i < MAX_TRANSACTIONS; i++) {
-      transactions.addRemoteTransaction(createTransaction(i));
-    }
-    assertThat(transactions.size()).isEqualTo(MAX_TRANSACTIONS);
-
-    transactions.addRemoteTransaction(createTransaction(MAX_TRANSACTIONS + 1));
-    assertThat(transactions.size()).isEqualTo(MAX_TRANSACTIONS);
-    assertTransactionNotPending(oldestTransaction);
-  }
-
-  @Test
   public void shouldHandleMaximumTransactionLimitCorrectlyWhenSameTransactionAddedMultipleTimes() {
     transactions.addRemoteTransaction(createTransaction(0));
     transactions.addRemoteTransaction(createTransaction(0));
@@ -132,15 +120,29 @@ public class PendingTransactionsTest {
   }
 
   @Test
-  public void shouldStartDroppingLocalTransactionsWhenPoolIsFullOfLocalTransactions() {
-    final Transaction firstLocalTransaction = createTransaction(0);
-    transactions.addLocalTransaction(firstLocalTransaction);
-
-    for (int i = 1; i <= MAX_TRANSACTIONS; i++) {
-      transactions.addLocalTransaction(createTransaction(i));
+  public void shouldAcceptLocalTransactionIfFullAndTxBetterPriced() {
+    final int startGasPrice = 1;
+    int gasPrice = startGasPrice;
+    for (int i = 1; i <= MAX_TRANSACTIONS; i++, gasPrice++) {
+      transactions.addLocalTransaction(createTransaction(i, Wei.of(gasPrice)));
     }
     assertThat(transactions.size()).isEqualTo(MAX_TRANSACTIONS);
-    assertTransactionNotPending(firstLocalTransaction);
+    assertTrue(
+        transactions.addLocalTransaction(
+            createTransaction(MAX_TRANSACTIONS + 1, Wei.of(startGasPrice + 1))));
+  }
+
+  @Test
+  public void shouldNotAcceptLocalTransactionIfFullAndUnderpriced() {
+    final int startGasPrice = 1;
+    int gasPrice = startGasPrice;
+    for (int i = 1; i <= MAX_TRANSACTIONS; i++, gasPrice++) {
+      transactions.addLocalTransaction(createTransaction(i, Wei.of(gasPrice)));
+    }
+    assertThat(transactions.size()).isEqualTo(MAX_TRANSACTIONS);
+    assertFalse(
+        transactions.addLocalTransaction(
+            createTransaction(MAX_TRANSACTIONS + 1, Wei.of(startGasPrice - 1))));
   }
 
   @Test
@@ -319,9 +321,9 @@ public class PendingTransactionsTest {
 
   @Test
   public void shouldIterateTransactionsFromSameSenderInNonceOrder() {
-    final Transaction transaction1 = transactionWithNonceAndSender(0, KEYS1);
-    final Transaction transaction2 = transactionWithNonceAndSender(1, KEYS1);
-    final Transaction transaction3 = transactionWithNonceAndSender(2, KEYS1);
+    final Transaction transaction1 = transactionWithNonceSenderAndGasPrice(0, KEYS1, 0);
+    final Transaction transaction2 = transactionWithNonceSenderAndGasPrice(1, KEYS1, 1);
+    final Transaction transaction3 = transactionWithNonceSenderAndGasPrice(2, KEYS1, 2);
 
     transactions.addLocalTransaction(transaction1);
     transactions.addLocalTransaction(transaction2);
@@ -404,9 +406,14 @@ public class PendingTransactionsTest {
   }
 
   private Transaction createTransaction(final int transactionNumber) {
+    return createTransaction(transactionNumber, Wei.ZERO);
+  }
+
+  private Transaction createTransaction(final int transactionNumber, Wei gasPrice) {
     return new TransactionTestFixture()
         .value(Wei.of(transactionNumber))
         .nonce(transactionNumber)
+        .gasPrice(gasPrice)
         .createTransaction(KEYS1);
   }
 }
