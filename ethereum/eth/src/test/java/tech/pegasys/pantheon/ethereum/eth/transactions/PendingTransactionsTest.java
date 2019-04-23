@@ -409,7 +409,7 @@ public class PendingTransactionsTest {
     return createTransaction(transactionNumber, Wei.ZERO);
   }
 
-  private Transaction createTransaction(final int transactionNumber, Wei gasPrice) {
+  private Transaction createTransaction(final int transactionNumber, final Wei gasPrice) {
     return new TransactionTestFixture()
         .value(Wei.of(transactionNumber))
         .nonce(transactionNumber)
