@@ -75,6 +75,7 @@ import org.junit.rules.TemporaryFolder;
 
 /** Tests for {@link Runner}. */
 public final class RunnerTest {
+
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   @Test
