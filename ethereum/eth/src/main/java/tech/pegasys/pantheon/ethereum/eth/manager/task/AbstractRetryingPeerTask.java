@@ -79,8 +79,6 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
       result.get().completeExceptionally(new MaxRetriesReachedException());
       return;
     }
-
-    retryCount += 1;
     executePeerTask(assignedPeer)
         .whenComplete(
             (peerResult, error) -> {
@@ -90,6 +88,8 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
                 // If we get a partial success reset the retry counter.
                 if (!isEmptyResponse.test(peerResult)) {
                   retryCount = 0;
+                } else {
+                  retryCount++;
                 }
                 executeTaskTimed();
               }
@@ -118,7 +118,7 @@ public abstract class AbstractRetryingPeerTask<T> extends AbstractEthTask<T> {
                   .whenComplete((r, t) -> executeTaskTimed()));
       return;
     }
-
+    retryCount++;
     LOG.debug(
         "Retrying after recoverable failure from peer task {}: {}",
         this.getClass().getSimpleName(),

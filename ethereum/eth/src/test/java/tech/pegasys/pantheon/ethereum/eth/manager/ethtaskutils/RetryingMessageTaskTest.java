@@ -126,6 +126,19 @@ public abstract class RetryingMessageTaskTest<T> extends AbstractMessageTaskTest
   }
 
   @Test
+  public void doesConsiderNoPeersAvailableAsARetry() {
+    peerCountToTimeout.set(10);
+    // Setup data to be requested
+    final T requestedData = generateDataToBeRequested();
+
+    final EthTask<T> task = createTask(requestedData);
+    final CompletableFuture<T> future = task.run();
+
+    // Even though we failed to find peers 10 times and our max retries is 3, we're still waiting
+    assertThat(future.isDone()).isFalse();
+  }
+
+  @Test
   public void completesWhenPeersAreTemporarilyUnavailable()
       throws ExecutionException, InterruptedException {
     // Setup data to be requested
