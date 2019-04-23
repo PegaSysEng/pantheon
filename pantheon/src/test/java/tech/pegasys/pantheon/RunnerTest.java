@@ -20,7 +20,7 @@ import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.controller.MainnetPantheonController;
+import tech.pegasys.pantheon.controller.MainnetPantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -37,7 +37,6 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
@@ -104,39 +103,39 @@ public final class RunnerTest {
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
-        MainnetPantheonController.init(
-            createKeyValueStorageProvider(dbAhead),
-            GenesisConfigFile.mainnet(),
-            MainnetProtocolSchedule.create(),
-            syncConfigAhead,
-            EthereumWireProtocolConfiguration.defaultConfig(),
-            new MiningParametersTestBuilder().enabled(false).build(),
-            networkId,
-            aheadDbNodeKeys,
-            PrivacyParameters.DEFAULT,
-            dataDirAhead,
-            noOpMetricsSystem,
-            TestClock.fixed(),
-            PendingTransactions.MAX_PENDING_TRANSACTIONS)) {
+        new MainnetPantheonControllerBuilder()
+            .genesisConfigFile(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(syncConfigAhead)
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .dataDirectory(dataDirAhead)
+            .networkId(networkId)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(aheadDbNodeKeys)
+            .metricsSystem(noOpMetricsSystem)
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .build()) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
     // Setup Runner with blocks
     final PantheonController<Void> controllerAhead =
-        MainnetPantheonController.init(
-            createKeyValueStorageProvider(dbAhead),
-            GenesisConfigFile.mainnet(),
-            MainnetProtocolSchedule.create(),
-            syncConfigAhead,
-            EthereumWireProtocolConfiguration.defaultConfig(),
-            new MiningParametersTestBuilder().enabled(false).build(),
-            networkId,
-            aheadDbNodeKeys,
-            PrivacyParameters.DEFAULT,
-            dataDirAhead,
-            noOpMetricsSystem,
-            TestClock.fixed(),
-            PendingTransactions.MAX_PENDING_TRANSACTIONS);
+        new MainnetPantheonControllerBuilder()
+            .genesisConfigFile(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(syncConfigAhead)
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .dataDirectory(dataDirAhead)
+            .networkId(networkId)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(aheadDbNodeKeys)
+            .metricsSystem(noOpMetricsSystem)
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .build();
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
@@ -179,20 +178,20 @@ public final class RunnerTest {
 
       // Setup runner with no block data
       final PantheonController<Void> controllerBehind =
-          MainnetPantheonController.init(
-              new InMemoryStorageProvider(),
-              GenesisConfigFile.mainnet(),
-              MainnetProtocolSchedule.create(),
-              syncConfigBehind,
-              EthereumWireProtocolConfiguration.defaultConfig(),
-              new MiningParametersTestBuilder().enabled(false).build(),
-              networkId,
-              KeyPair.generate(),
-              PrivacyParameters.DEFAULT,
-              dataDirBehind,
-              noOpMetricsSystem,
-              TestClock.fixed(),
-              PendingTransactions.MAX_PENDING_TRANSACTIONS);
+          new MainnetPantheonControllerBuilder()
+              .genesisConfigFile(GenesisConfigFile.mainnet())
+              .synchronizerConfiguration(syncConfigBehind)
+              .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+              .dataDirectory(dataDirBehind)
+              .networkId(networkId)
+              .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+              .nodeKeys(KeyPair.generate())
+              .storageProvider(new InMemoryStorageProvider())
+              .metricsSystem(noOpMetricsSystem)
+              .privacyParameters(PrivacyParameters.DEFAULT)
+              .clock(TestClock.fixed())
+              .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+              .build();
       final EnodeURL enode = runnerAhead.getLocalEnode().get();
       final EthNetworkConfig behindEthNetworkConfiguration =
           new EthNetworkConfig(
