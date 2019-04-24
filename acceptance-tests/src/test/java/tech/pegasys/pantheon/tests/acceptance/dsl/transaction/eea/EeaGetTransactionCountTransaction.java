@@ -27,7 +27,8 @@ public class EeaGetTransactionCountTransaction implements Transaction<BigInteger
   private final String accountAddress;
   private String privacyGroupId;
 
-  public EeaGetTransactionCountTransaction(final String accountAddress, String privacyGroupId) {
+  public EeaGetTransactionCountTransaction(
+      final String accountAddress, final String privacyGroupId) {
     this.accountAddress = accountAddress;
     this.privacyGroupId = privacyGroupId;
   }

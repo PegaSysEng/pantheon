@@ -12,17 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.privacy;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaGetTransactionCountTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaSendRawTransactionTransaction;
 
 public class PrivateTransactions {
 
-  private final Accounts accounts;
-
-  public PrivateTransactions(final Accounts accounts) {
-    this.accounts = accounts;
-  }
+  public PrivateTransactions() {}
 
   public EeaSendRawTransactionTransaction deployPrivateSmartContract(
       final String signedRawPrivateTransaction) {

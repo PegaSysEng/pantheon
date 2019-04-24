@@ -340,7 +340,7 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
     privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
   }
 
-  private long getNonce(PantheonNode node1, String privacyGroupId) {
+  private long getNonce(final PantheonNode node1, final String privacyGroupId) {
     return node1
         .execute(
             privateTransactions.getTransactionCount(node1.getAddress().toString(), privacyGroupId))

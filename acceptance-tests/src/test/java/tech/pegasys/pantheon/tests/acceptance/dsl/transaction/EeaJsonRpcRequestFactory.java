@@ -48,7 +48,7 @@ public class EeaJsonRpcRequestFactory {
   }
 
   public Request<?, EthGetTransactionCount> eeaGetTransactionCount(
-      String accountAddress, String privacyGroupId) {
+      final String accountAddress, final String privacyGroupId) {
     return new Request<>(
         "eea_getTransactionCount",
         Lists.newArrayList(accountAddress, privacyGroupId),

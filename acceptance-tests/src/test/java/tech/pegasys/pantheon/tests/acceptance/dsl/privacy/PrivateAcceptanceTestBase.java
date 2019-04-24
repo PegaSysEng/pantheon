@@ -36,9 +36,9 @@ public class PrivateAcceptanceTestBase extends AcceptanceTestBase {
   public PrivateAcceptanceTestBase() {
     final EeaTransactions eeaTransactions = new EeaTransactions();
 
-    privateTransactions = new PrivateTransactions(accounts);
+    privateTransactions = new PrivateTransactions();
     eea = new Eea(eeaTransactions);
-    privateTransactionBuilder = new PrivateTransactionBuilder().builder();
+    privateTransactionBuilder = PrivateTransactionBuilder.builder();
     privateTransactionVerifier = new PrivateTransactionVerifier(eea, transactions);
   }
 
