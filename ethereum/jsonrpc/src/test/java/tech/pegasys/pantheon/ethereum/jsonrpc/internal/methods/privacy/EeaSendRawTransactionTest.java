@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+@SuppressWarnings("unchecked")
 @RunWith(MockitoJUnitRunner.class)
 public class EeaSendRawTransactionTest {
 
@@ -179,7 +180,6 @@ public class EeaSendRawTransactionTest {
   public void validTransactionIsSentToTransactionPool() throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
-    // unchecked
     when(privateTxHandler.handle(any(PrivateTransaction.class), any(Supplier.class)))
         .thenReturn(PUBLIC_TRANSACTION);
     when(transactionPool.addLocalTransaction(any(Transaction.class)))
@@ -196,7 +196,6 @@ public class EeaSendRawTransactionTest {
     final JsonRpcResponse actualResponse = method.response(request);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
-    // unchecked
     verify(privateTxHandler).handle(any(PrivateTransaction.class), any(Supplier.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
   }
@@ -205,7 +204,6 @@ public class EeaSendRawTransactionTest {
   public void invalidTransactionIsSentToTransactionPool() throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
-    // unchecked
     when(privateTxHandler.handle(any(PrivateTransaction.class), any(Supplier.class)))
         .thenThrow(new IOException("enclave failed to execute"));
 
@@ -270,7 +268,6 @@ public class EeaSendRawTransactionTest {
       throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
-    // unchecked
     when(privateTxHandler.handle(any(PrivateTransaction.class), any(Supplier.class)))
         .thenReturn(PUBLIC_TRANSACTION);
     when(transactionPool.addLocalTransaction(any(Transaction.class)))
@@ -286,7 +283,6 @@ public class EeaSendRawTransactionTest {
     final JsonRpcResponse actualResponse = method.response(request);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
-    // unchecked
     verify(privateTxHandler).handle(any(PrivateTransaction.class), any(Supplier.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
   }
