@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -57,8 +58,8 @@ public class DebugTraceBlockByNumberTest {
 
   @Test
   public void shouldReturnCorrectResponse() {
-    Long blockNumber = 1L;
-    final Object[] params = new Object[] {blockNumber};
+    final long blockNumber = 1L;
+    final Object[] params = new Object[] {Long.toHexString(blockNumber)};
     final JsonRpcRequest request = new JsonRpcRequest("2.0", "debug_traceBlockByNumber", params);
 
     final TraceFrame traceFrame =
@@ -79,10 +80,11 @@ public class DebugTraceBlockByNumberTest {
     final TransactionTrace transaction1Trace = mock(TransactionTrace.class);
     final TransactionTrace transaction2Trace = mock(TransactionTrace.class);
 
-    BlockTrace blockTrace = new BlockTrace(Arrays.asList(transaction1Trace, transaction2Trace));
+    final BlockTrace blockTrace =
+        new BlockTrace(Arrays.asList(transaction1Trace, transaction2Trace));
 
-    when(transaction1Trace.getTraceFrames()).thenReturn(Arrays.asList(traceFrame));
-    when(transaction2Trace.getTraceFrames()).thenReturn(Arrays.asList(traceFrame));
+    when(transaction1Trace.getTraceFrames()).thenReturn(singletonList(traceFrame));
+    when(transaction2Trace.getTraceFrames()).thenReturn(singletonList(traceFrame));
     when(transaction1Trace.getResult()).thenReturn(transaction1Result);
     when(transaction2Trace.getResult()).thenReturn(transaction2Result);
     when(transaction1Result.getOutput()).thenReturn(BytesValue.fromHexString("1234"));
