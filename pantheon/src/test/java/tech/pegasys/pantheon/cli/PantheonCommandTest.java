@@ -249,7 +249,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void overrideDefaultValuesIfKeyIsPresentInConfigFile() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    final URL configFile = Resources.getResource("complete_config.toml");
+    final URL configFile = this.getClass().getResource("/complete_config.toml");
     final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     final String updatedConfig =
         Resources.toString(configFile, UTF_8)
@@ -538,7 +538,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeTrue(isFullInstantiation());
 
     // Load a TOML that configures literally everything (except permissioning TOML config)
-    final URL configFile = Resources.getResource("everything_config.toml");
+    final URL configFile = this.getClass().getResource("/everything_config.toml");
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
     // Parse it.
@@ -581,7 +581,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void noOverrideDefaultValuesIfKeyIsNotPresentInConfigFile() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    final String configFile = Resources.getResource("partial_config.toml").getFile();
+    final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
 
     parseCommand("--config-file", configFile);
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
@@ -2129,7 +2129,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void mustUseEnclaveUriAndOptions() throws IOException {
-    final URL configFile = Resources.getResource("orion_publickey.pub");
+    final URL configFile = this.getClass().getResource("/orion_publickey.pub");
 
     parseCommand(
         "--privacy-enabled",
