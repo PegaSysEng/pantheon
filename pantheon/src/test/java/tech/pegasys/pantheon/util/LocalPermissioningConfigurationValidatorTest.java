@@ -39,7 +39,7 @@ public class LocalPermissioningConfigurationValidatorTest {
 
     EthNetworkConfig ethNetworkConfig = EthNetworkConfig.getNetworkConfig(NetworkName.ROPSTEN);
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_ROPSTEN_BOOTNODES);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG_ROPSTEN_BOOTNODES);
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
 
@@ -56,7 +56,7 @@ public class LocalPermissioningConfigurationValidatorTest {
 
     EthNetworkConfig ethNetworkConfig = EthNetworkConfig.getNetworkConfig(NetworkName.ROPSTEN);
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG);
     final Path toml = Files.createTempFile("toml", "");
     toml.toFile().deleteOnExit();
     Files.write(toml, Resources.toByteArray(configFile));

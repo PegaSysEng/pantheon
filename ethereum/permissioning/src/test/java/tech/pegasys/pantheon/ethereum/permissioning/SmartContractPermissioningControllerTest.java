@@ -39,7 +39,8 @@ public class SmartContractPermissioningControllerTest {
       final String resourceName, final String contractAddressString) throws IOException {
     final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
 
-    final String emptyContractFile = Resources.toString(Resources.getResource(resourceName), UTF_8);
+    final String emptyContractFile =
+        Resources.toString(this.getClass().getResource(resourceName), UTF_8);
     final GenesisState genesisState =
         GenesisState.fromConfig(GenesisConfigFile.fromConfig(emptyContractFile), protocolSchedule);
 

@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.cli.custom;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.google.common.io.Resources;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -85,6 +84,6 @@ public class RpcAuthFileValidatorTest {
   }
 
   private String getFilePath(final String resourceName) {
-    return Resources.getResource(resourceName).getPath();
+    return this.getClass().getResource(resourceName).getPath();
   }
 }
