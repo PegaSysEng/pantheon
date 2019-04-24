@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class IncrementerTest {
@@ -50,32 +52,42 @@ public class IncrementerTest {
   private SyncState syncState;
   private MutableBlockchain localBlockchain;
   private MetricsSystem metricsSystem;
+  private EthProtocolManager ethProtocolManager;
+  private Blockchain otherBlockchain;
+  private long targetBlock;
 
-  @Test
-  public void parallelDownloadPipelineCounterShouldIncrement() {
+  @Before
+  public void setUp() {
     metricsConfiguration.setEnabled(true);
     metricsSystem = PrometheusMetricsSystem.init(metricsConfiguration);
 
     final BlockchainSetupUtil<Void> localBlockchainSetup = BlockchainSetupUtil.forTesting();
     localBlockchain = spy(localBlockchainSetup.getBlockchain());
     final BlockchainSetupUtil<Void> otherBlockchainSetup = BlockchainSetupUtil.forTesting();
-    final Blockchain otherBlockchain = otherBlockchainSetup.getBlockchain();
+    otherBlockchain = otherBlockchainSetup.getBlockchain();
 
     protocolSchedule = localBlockchainSetup.getProtocolSchedule();
     protocolContext = localBlockchainSetup.getProtocolContext();
-    final EthProtocolManager ethProtocolManager =
-        EthProtocolManagerTestUtil.create(
-            localBlockchain,
-            localBlockchainSetup.getWorldArchive(),
-            new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
+    ethProtocolManager = EthProtocolManagerTestUtil.create(
+        localBlockchain,
+        localBlockchainSetup.getWorldArchive(),
+        new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
 
     otherBlockchainSetup.importFirstBlocks(15);
-    final long targetBlock = otherBlockchain.getChainHeadBlockNumber();
+    targetBlock = otherBlockchain.getChainHeadBlockNumber();
     // Sanity check
     assertThat(targetBlock).isGreaterThan(localBlockchain.getChainHeadBlockNumber());
+  }
 
+  @After
+  public void tearDown() {
+    ethProtocolManager.stop();
+  }
+
+  @Test
+  public void parallelDownloadPipelineCounterShouldIncrement() {
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
     final RespondingEthPeer.Responder responder =
