@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 
