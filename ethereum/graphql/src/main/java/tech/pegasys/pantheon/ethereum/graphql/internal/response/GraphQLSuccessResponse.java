@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import io.vertx.core.json.Json;
 
 @JsonPropertyOrder({"data"})
 public class GraphQLSuccessResponse implements GraphQLResponse {
