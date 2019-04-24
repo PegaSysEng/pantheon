@@ -62,13 +62,12 @@ public class DebugTraceBlockByNumber extends AbstractBlockParameterMethod {
             .orElse(TraceOptions.DEFAULT);
 
     return blockHash
-        .map(
+        .flatMap(
             hash ->
                 blockTracer
                     .trace(hash, new DebugOperationTracer(traceOptions))
                     .map(BlockTrace::getTransactionTraces)
                     .map(DebugTraceTransactionResult::of))
-        .orElse(null)
-        .get();
+        .orElse(null);
   }
 }

@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockTracer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTrace;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -93,7 +95,14 @@ public class DebugTraceBlockByNumberTest {
 
     final JsonRpcSuccessResponse response =
         (JsonRpcSuccessResponse) debugTraceBlockByNumber.response(request);
-    final Collection<?> result = (Collection<?>) response.getResult();
-    assertEquals(2, result.size());
+    final Collection<DebugTraceTransactionResult> result = getResult(response);
+    assertThat(result)
+        .usingFieldByFieldElementComparator()
+        .isEqualTo(DebugTraceTransactionResult.of(blockTrace.getTransactionTraces()));
+  }
+
+  @SuppressWarnings("unchecked")
+  private Collection<DebugTraceTransactionResult> getResult(final JsonRpcSuccessResponse response) {
+    return (Collection<DebugTraceTransactionResult>) response.getResult();
   }
 }
