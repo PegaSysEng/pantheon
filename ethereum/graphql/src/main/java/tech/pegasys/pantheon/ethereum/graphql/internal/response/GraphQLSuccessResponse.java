@@ -33,11 +33,7 @@ public class GraphQLSuccessResponse implements GraphQLResponse {
 
   @JsonGetter("data")
   public Object getData() {
-    if (data instanceof String) {
-      return data;
-    } else {
-      return Json.encodePrettily(data);
-    }
+    return data;
   }
 
   @Override
