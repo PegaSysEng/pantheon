@@ -176,7 +176,7 @@ public class PrivateTransactionProcessor {
 
       LOG.debug(
           "Calculated contract address {} from sender {} with nonce {} and privacy group {}",
-          contractCreationAddress.toString(),
+          privateContractAddress.toString(),
           senderAddress,
           sender.getNonce() - 1L,
           privacyGroupId.toString());
