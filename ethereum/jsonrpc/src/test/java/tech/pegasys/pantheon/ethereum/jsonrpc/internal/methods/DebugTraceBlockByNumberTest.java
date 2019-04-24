@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +34,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -80,8 +80,7 @@ public class DebugTraceBlockByNumberTest {
     final TransactionTrace transaction1Trace = mock(TransactionTrace.class);
     final TransactionTrace transaction2Trace = mock(TransactionTrace.class);
 
-    final BlockTrace blockTrace =
-        new BlockTrace(Arrays.asList(transaction1Trace, transaction2Trace));
+    final BlockTrace blockTrace = new BlockTrace(asList(transaction1Trace, transaction2Trace));
 
     when(transaction1Trace.getTraceFrames()).thenReturn(singletonList(traceFrame));
     when(transaction2Trace.getTraceFrames()).thenReturn(singletonList(traceFrame));
