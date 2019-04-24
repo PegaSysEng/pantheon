@@ -174,6 +174,13 @@ public class PrivateTransactionProcessor {
       final Address privateContractAddress =
           Address.privateContractAddress(senderAddress, sender.getNonce() - 1L, privacyGroupId);
 
+      LOG.debug(
+          "Calculated contract address {} from sender {} with nonce {} and privacy group {}",
+          contractCreationAddress.toString(),
+          senderAddress,
+          sender.getNonce() - 1L,
+          privacyGroupId.toString());
+
       initialFrame =
           MessageFrame.builder()
               .type(MessageFrame.Type.CONTRACT_CREATION)
