@@ -32,7 +32,6 @@ import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.TIMESTAM
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.TOTAL_DIFFICULTY;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.TRANSACTION_ROOT;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -59,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.vertx.core.json.Json;
 
@@ -121,9 +121,11 @@ public class GraphQLResponseUtils {
 
     Block block = Block.createFromBlockResult(result);
 
-    return Json.mapper.enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS).readValue(
-        "{ \"data\": {\"block\": " + Json.encodePrettily(block) + " } }",
-        GraphQLSuccessResponse.class);
+    return Json.mapper
+        .enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)
+        .readValue(
+            "{ \"data\": {\"block\": " + Json.encodePrettily(block) + " } }",
+            GraphQLSuccessResponse.class);
   }
 
   public List<TransactionResult> transactions(final String... values) {
