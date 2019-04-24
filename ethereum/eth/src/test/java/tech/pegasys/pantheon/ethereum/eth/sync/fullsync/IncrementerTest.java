@@ -68,10 +68,11 @@ public class IncrementerTest {
 
     protocolSchedule = localBlockchainSetup.getProtocolSchedule();
     protocolContext = localBlockchainSetup.getProtocolContext();
-    ethProtocolManager = EthProtocolManagerTestUtil.create(
-        localBlockchain,
-        localBlockchainSetup.getWorldArchive(),
-        new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
+    ethProtocolManager =
+        EthProtocolManagerTestUtil.create(
+            localBlockchain,
+            localBlockchainSetup.getWorldArchive(),
+            new EthScheduler(1, 1, 1, new NoOpMetricsSystem()));
     ethContext = ethProtocolManager.ethContext();
     syncState = new SyncState(protocolContext.getBlockchain(), ethContext.getEthPeers());
 
