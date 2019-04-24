@@ -25,11 +25,11 @@ import picocli.CommandLine.ParameterException;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RpcAuthFileValidatorTest {
 
-  private static final String CORRECT_TOML = "auth_correct.toml";
-  private static final String DUPLICATE_USER_TOML = "auth_duplicate_user.toml";
-  private static final String INVALID_TOML = "auth_invalid.toml";
-  private static final String INVALID_VALUE_TOML = "auth_invalid_value.toml";
-  private static final String NO_PASSWORD_TOML = "auth_no_password.toml";
+  private static final String CORRECT_TOML = "/auth_correct.toml";
+  private static final String DUPLICATE_USER_TOML = "/auth_duplicate_user.toml";
+  private static final String INVALID_TOML = "/auth_invalid.toml";
+  private static final String INVALID_VALUE_TOML = "/auth_invalid_value.toml";
+  private static final String NO_PASSWORD_TOML = "/auth_no_password.toml";
   @Mock CommandLine commandLine;
 
   @Test
