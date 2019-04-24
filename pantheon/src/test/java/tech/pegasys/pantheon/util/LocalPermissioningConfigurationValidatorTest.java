@@ -30,8 +30,8 @@ import org.junit.Test;
 public class LocalPermissioningConfigurationValidatorTest {
 
   static final String PERMISSIONING_CONFIG_ROPSTEN_BOOTNODES =
-      "permissioning_config_ropsten_bootnodes.toml";
-  static final String PERMISSIONING_CONFIG = "permissioning_config.toml";
+      "/permissioning_config_ropsten_bootnodes.toml";
+  static final String PERMISSIONING_CONFIG = "/permissioning_config.toml";
 
   @Test
   public void ropstenWithNodesWhitelistOptionWhichDoesIncludeRopstenBootnodesMustNotError()
