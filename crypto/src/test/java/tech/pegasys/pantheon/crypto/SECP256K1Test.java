@@ -248,7 +248,7 @@ public class SECP256K1Test {
     final File file =
         new File(
             this.getClass()
-                .getResource("tech/pegasys/pantheon/crypto/validPrivateKey.txt")
+                .getResource("/tech/pegasys/pantheon/crypto/validPrivateKey.txt")
                 .toURI());
     final SECP256K1.PrivateKey privateKey = SECP256K1.PrivateKey.load(file);
     assertEquals(
