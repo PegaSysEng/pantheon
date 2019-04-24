@@ -36,8 +36,7 @@ public class GenesisConfigFile {
 
   public static GenesisConfigFile mainnet() {
     try {
-      return fromConfig(
-          Resources.toString(GenesisConfigFile.class.getResource("/mainnet.json"), UTF_8));
+      return fromConfig(Resources.toString(Resources.getResource("mainnet.json"), UTF_8));
     } catch (final IOException e) {
       throw new IllegalStateException(e);
     }
@@ -45,8 +44,7 @@ public class GenesisConfigFile {
 
   public static GenesisConfigFile development() {
     try {
-      return fromConfig(
-          Resources.toString(GenesisConfigFile.class.getResource("/dev.json"), UTF_8));
+      return fromConfig(Resources.toString(Resources.getResource("dev.json"), UTF_8));
     } catch (final IOException e) {
       throw new IllegalStateException(e);
     }
