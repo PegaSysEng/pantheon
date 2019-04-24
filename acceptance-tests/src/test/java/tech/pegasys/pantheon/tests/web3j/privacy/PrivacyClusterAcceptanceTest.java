@@ -21,6 +21,9 @@ import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivateAcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder.TransactionType;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
@@ -105,7 +108,7 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
     waitFor(() -> orion3.send(sendRequest3));
 
     deployContractFromNode1 =
-        PrivateAcceptanceTestBase.builder()
+        PrivateTransactionBuilder.builder()
             .nonce(0)
             .from(node1.getAddress())
             .to(null)
@@ -115,7 +118,7 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.CREATE_CONTRACT);
 
     storeValueFromNode2 =
-        PrivateAcceptanceTestBase.builder()
+        PrivateTransactionBuilder.builder()
             .nonce(0)
             .from(node2.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -125,7 +128,7 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.STORE);
 
     getValueFromNode2 =
-        PrivateAcceptanceTestBase.builder()
+        PrivateTransactionBuilder.builder()
             .nonce(1)
             .from(node2.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -135,7 +138,7 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.GET);
 
     getValueFromNode3 =
-        PrivateAcceptanceTestBase.builder()
+        PrivateTransactionBuilder.builder()
             .nonce(0)
             .from(node3.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -149,7 +152,7 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
   public void node2CanSeeContract() {
 
     String transactionHash =
-        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFromNode1));
 
     privateTransactionVerifier
         .validPrivateContractDeployed(CONTRACT_ADDRESS.toString())
@@ -159,13 +162,14 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
   @Test
   public void node2CanExecuteContract() {
     String transactionHash =
-        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFromNode1));
 
     privateTransactionVerifier
         .validPrivateContractDeployed(CONTRACT_ADDRESS.toString())
         .verify(node2, transactionHash);
 
-    transactionHash = node2.execute(transactions.createPrivateRawTransaction(storeValueFromNode2));
+    transactionHash =
+        node2.execute(privateTransactions.createPrivateRawTransaction(storeValueFromNode2));
 
     privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
   }
@@ -173,17 +177,19 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
   @Test
   public void node2CanSeePrivateTransactionReceipt() {
     String transactionHash =
-        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFromNode1));
 
     privateTransactionVerifier
         .validPrivateContractDeployed(CONTRACT_ADDRESS.toString())
         .verify(node2, transactionHash);
 
-    transactionHash = node2.execute(transactions.createPrivateRawTransaction(storeValueFromNode2));
+    transactionHash =
+        node2.execute(privateTransactions.createPrivateRawTransaction(storeValueFromNode2));
 
     privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
 
-    transactionHash = node2.execute(transactions.createPrivateRawTransaction(getValueFromNode2));
+    transactionHash =
+        node2.execute(privateTransactions.createPrivateRawTransaction(getValueFromNode2));
 
     privateTransactionVerifier.validOutputReturned("1000").verify(node2, transactionHash);
 
@@ -193,27 +199,27 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
   @Test
   public void node3CannotSeeContract() {
     final String transactionHash =
-        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFromNode1));
 
     privateTransactionVerifier.noPrivateContractDeployed().verify(node3, transactionHash);
   }
 
   @Test
   public void node3CannotExecuteContract() {
-    node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1));
+    node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFromNode1));
 
     final String transactionHash =
-        node3.execute(transactions.createPrivateRawTransaction(getValueFromNode3));
+        node3.execute(privateTransactions.createPrivateRawTransaction(getValueFromNode3));
 
     privateTransactionVerifier.noValidOutputReturned().verify(node3, transactionHash);
   }
 
   @Test(expected = RuntimeException.class)
   public void node2ExpectError() {
-    node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1));
+    node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFromNode1));
 
     String invalidStoreValueFromNode2 =
-        PrivateAcceptanceTestBase.builder()
+        PrivateTransactionBuilder.builder()
             .nonce(0)
             .from(node2.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -222,15 +228,22 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .keyPair(keypair2)
             .build(TransactionType.STORE);
 
-    node2.execute(transactions.createPrivateRawTransaction(invalidStoreValueFromNode2));
+    node2.execute(privateTransactions.createPrivateRawTransaction(invalidStoreValueFromNode2));
   }
 
   @Test
-  public void breakingTest() {
-    String contract_address = "0x1efee0ab2c1ec40c4b48410e5832d254c2eda0b0";
-    String deployContractFromNode1_first =
-        PrivateAcceptanceTestBase.builder()
-            .nonce(0)
+  public void node1CanInteractWithMultiplePrivacyGroups() {
+    final String ABC =
+        "0x393579496e2f4f59545a31784e3753694258314d64424a763942716b364f713766792b37585361496e79593d";
+    final String AB =
+        "0x4479414f69462f796e70632b4a586132594147423062436974536c4f4d4e6d2b53686d422f374d364334773d";
+    final String contractForABC = "0x1efee0ab2c1ec40c4b48410e5832d254c2eda0b0";
+
+    long nextNonce = getNonce(node1, ABC);
+
+    final String deployContractForABC =
+        PrivateTransactionBuilder.builder()
+            .nonce(nextNonce)
             .from(node1.getAddress())
             .to(null)
             .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
@@ -242,17 +255,19 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.CREATE_CONTRACT);
 
     String transactionHash =
-        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1_first));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractForABC));
 
     privateTransactionVerifier
-        .validPrivateContractDeployed(contract_address)
+        .validPrivateContractDeployed(contractForABC)
         .verify(node1, transactionHash);
 
-    String storeValueFromNode1_first =
-        PrivateAcceptanceTestBase.builder()
-            .nonce(1)
+    nextNonce = getNonce(node1, ABC);
+
+    final String storeValueForABC_first =
+        PrivateTransactionBuilder.builder()
+            .nonce(nextNonce)
             .from(node1.getAddress())
-            .to(Address.fromHexString(contract_address))
+            .to(Address.fromHexString(contractForABC))
             .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
             .privateFor(
                 Lists.newArrayList(
@@ -262,32 +277,37 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.STORE);
 
     transactionHash =
-        node1.execute(transactions.createPrivateRawTransaction(storeValueFromNode1_first));
+        node1.execute(privateTransactions.createPrivateRawTransaction(storeValueForABC_first));
 
     privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
 
-    String storeValueFromNode1_wrong =
-        PrivateAcceptanceTestBase.builder()
-            .nonce(2)
+    nextNonce = getNonce(node1, AB);
+
+    final String storeValueForABBeforeDeployingContract =
+        PrivateTransactionBuilder.builder()
+            .nonce(nextNonce)
             .from(node1.getAddress())
-            .to(Address.fromHexString(contract_address))
+            .to(Address.fromHexString(contractForABC))
             .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
             .privateFor(Lists.newArrayList(BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8))))
             .keyPair(keypair1)
             .build(TransactionType.STORE);
 
-    node1.execute(
-        transactions.createPrivateRawTransaction(
-            storeValueFromNode1_wrong)); // no need to verify as it fails
+    transactionHash =
+        node1.execute(
+            privateTransactions.createPrivateRawTransaction(
+                storeValueForABBeforeDeployingContract));
 
     privateTransactionVerifier.noValidOutputReturned().verify(node1, transactionHash);
 
-    final Address CONTRACT_ADDRESS_second =
-        Address.fromHexString("0xf209cdbb484d982f71050076cde0b145904a6f52");
+    nextNonce = getNonce(node1, AB);
 
-    String deployContractFromNode1_second =
-        PrivateAcceptanceTestBase.builder()
-            .nonce(3)
+    final Address contractForAB =
+        Address.privateContractAddress(node1.getAddress(), nextNonce, BytesValue.fromHexString(AB));
+
+    final String deployContractForAB =
+        PrivateTransactionBuilder.builder()
+            .nonce(nextNonce)
             .from(node1.getAddress())
             .to(null)
             .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
@@ -296,26 +316,35 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.CREATE_CONTRACT);
 
     transactionHash =
-        node1.execute(transactions.deployPrivateSmartContract(deployContractFromNode1_second));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractForAB));
 
     privateTransactionVerifier
-        .validPrivateContractDeployed(CONTRACT_ADDRESS_second.toString())
+        .validPrivateContractDeployed(contractForAB.toString())
         .verify(node1, transactionHash);
 
-    String storeValueFromNode1_second =
-        PrivateAcceptanceTestBase.builder()
-            .nonce(4)
+    nextNonce = getNonce(node1, AB);
+
+    final String storeValueForAB =
+        PrivateTransactionBuilder.builder()
+            .nonce(nextNonce)
             .from(node1.getAddress())
-            .to(CONTRACT_ADDRESS_second)
+            .to(contractForAB)
             .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
             .privateFor(Lists.newArrayList(BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8))))
             .keyPair(keypair1)
             .build(TransactionType.STORE);
 
     transactionHash =
-        node1.execute(transactions.createPrivateRawTransaction(storeValueFromNode1_second));
+        node1.execute(privateTransactions.createPrivateRawTransaction(storeValueForAB));
 
     privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
+  }
+
+  private long getNonce(PantheonNode node1, String privacyGroupId) {
+    return node1
+        .execute(
+            privateTransactions.getTransactionCount(node1.getAddress().toString(), privacyGroupId))
+        .longValue();
   }
 
   @After

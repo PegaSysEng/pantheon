@@ -45,7 +45,7 @@ public class EeaGetTransactionCountTest {
   private final WorldUpdater worldUpdater = mock(WorldUpdater.class);
   private final MutableAccount mutableAccount = mock(MutableAccount.class);
   private final Hash lastRootHash = mock(Hash.class);
-  private final BytesValue privacyGroupId = BytesValue.wrap("test".getBytes(UTF_8));
+  private final BytesValue privacyGroupId = BytesValue.wrap("0x123".getBytes(UTF_8));
 
   private final Address senderAddress =
       Address.fromHexString("0x627306090abab3a6e1400e9345bc60c78a8bef57");
@@ -71,7 +71,7 @@ public class EeaGetTransactionCountTest {
     final EeaGetTransactionCount eeaGetTransactionCount =
         new EeaGetTransactionCount(parameters, privacyParameters);
 
-    final Object[] params = new Object[] {senderAddress, "test"};
+    final Object[] params = new Object[] {senderAddress, privacyGroupId.toString()};
     final JsonRpcRequest request = new JsonRpcRequest("1", "eea_getTransactionCount", params);
 
     final JsonRpcSuccessResponse response =

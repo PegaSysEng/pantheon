@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
@@ -38,6 +39,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -94,9 +96,12 @@ public class EeaSendRawTransactionTest {
 
   @Mock private PrivateTransactionHandler privateTxHandler;
 
+  @Mock private BlockchainQueries blockchainQueries;
+
   @Before
   public void before() {
-    method = new EeaSendRawTransaction(privateTxHandler, transactionPool, parameter);
+    method =
+        new EeaSendRawTransaction(blockchainQueries, privateTxHandler, transactionPool, parameter);
   }
 
   @Test
@@ -174,7 +179,8 @@ public class EeaSendRawTransactionTest {
   public void validTransactionIsSentToTransactionPool() throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
-    when(privateTxHandler.handle(any(PrivateTransaction.class))).thenReturn(PUBLIC_TRANSACTION);
+    when(privateTxHandler.handle(any(PrivateTransaction.class), any(Supplier.class)))
+        .thenReturn(PUBLIC_TRANSACTION);
     when(transactionPool.addLocalTransaction(any(Transaction.class)))
         .thenReturn(ValidationResult.valid());
 
@@ -189,7 +195,7 @@ public class EeaSendRawTransactionTest {
     final JsonRpcResponse actualResponse = method.response(request);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
-    verify(privateTxHandler).handle(any(PrivateTransaction.class));
+    verify(privateTxHandler).handle(any(PrivateTransaction.class), any(Supplier.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
   }
 
@@ -197,7 +203,7 @@ public class EeaSendRawTransactionTest {
   public void invalidTransactionIsSentToTransactionPool() throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
-    when(privateTxHandler.handle(any(PrivateTransaction.class)))
+    when(privateTxHandler.handle(any(PrivateTransaction.class), any(Supplier.class)))
         .thenThrow(new IOException("enclave failed to execute"));
 
     final JsonRpcRequest request =
@@ -261,7 +267,8 @@ public class EeaSendRawTransactionTest {
       throws IOException {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
-    when(privateTxHandler.handle(any(PrivateTransaction.class))).thenReturn(PUBLIC_TRANSACTION);
+    when(privateTxHandler.handle(any(PrivateTransaction.class), any(Supplier.class)))
+        .thenReturn(PUBLIC_TRANSACTION);
     when(transactionPool.addLocalTransaction(any(Transaction.class)))
         .thenReturn(ValidationResult.invalid(transactionInvalidReason));
 
@@ -275,7 +282,7 @@ public class EeaSendRawTransactionTest {
     final JsonRpcResponse actualResponse = method.response(request);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
-    verify(privateTxHandler).handle(any(PrivateTransaction.class));
+    verify(privateTxHandler).handle(any(PrivateTransaction.class), any(Supplier.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
   }
 

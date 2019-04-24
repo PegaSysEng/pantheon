@@ -18,6 +18,8 @@ import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivateAcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder.TransactionType;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
@@ -54,7 +56,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
     cluster.start(minerNode);
 
     deployContract =
-        PrivateAcceptanceTestBase.builder()
+        privateTransactionBuilder
             .nonce(0)
             .from(minerNode.getAddress())
             .to(null)
@@ -64,7 +66,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
             .build(TransactionType.CREATE_CONTRACT);
 
     storeValue =
-        PrivateAcceptanceTestBase.builder()
+        privateTransactionBuilder
             .nonce(1)
             .from(minerNode.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -74,7 +76,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
             .build(TransactionType.STORE);
 
     getValue =
-        PrivateAcceptanceTestBase.builder()
+        privateTransactionBuilder
             .nonce(2)
             .from(minerNode.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -87,7 +89,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
   @Test
   public void deployingMustGiveValidReceipt() {
     final String transactionHash =
-        minerNode.execute(transactions.deployPrivateSmartContract(deployContract));
+        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
     privateTransactionVerifier
         .validPrivateContractDeployed(CONTRACT_ADDRESS.toString())
@@ -96,10 +98,10 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
 
   @Test
   public void privateSmartContractMustEmitEvents() {
-    minerNode.execute(transactions.deployPrivateSmartContract(deployContract));
+    minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
     final String transactionHash =
-        minerNode.execute(transactions.createPrivateRawTransaction(storeValue));
+        minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
 
     privateTransactionVerifier.validEventReturned("1000").verify(minerNode, transactionHash);
   }
@@ -107,12 +109,12 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
   @Test
   public void privateSmartContractMustReturnValues() {
 
-    minerNode.execute(transactions.deployPrivateSmartContract(deployContract));
+    minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
-    minerNode.execute(transactions.createPrivateRawTransaction(storeValue));
+    minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
 
     final String transactionHash =
-        minerNode.execute(transactions.createPrivateRawTransaction(getValue));
+        minerNode.execute(privateTransactions.createPrivateRawTransaction(getValue));
 
     privateTransactionVerifier.validOutputReturned("1000").verify(minerNode, transactionHash);
   }

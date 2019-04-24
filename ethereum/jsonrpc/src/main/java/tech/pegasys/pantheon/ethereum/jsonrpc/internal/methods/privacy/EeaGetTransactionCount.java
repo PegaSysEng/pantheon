@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
@@ -25,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.Quantity;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -58,7 +57,7 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
     final String privacyGroupId = parameters.required(request.getParams(), 1, String.class);
 
     return privateStateStorage
-        .getPrivateAccountState(BytesValue.of(privacyGroupId.getBytes(UTF_8)))
+        .getPrivateAccountState(BytesValue.fromHexString(privacyGroupId))
         .map(
             lastRootHash -> {
               final MutableWorldState privateWorldState =
@@ -66,8 +65,9 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
 
               final Account maybePrivateSender = privateWorldState.get(address);
 
-              return new JsonRpcSuccessResponse(request.getId(), maybePrivateSender.getNonce());
+              return new JsonRpcSuccessResponse(
+                  request.getId(), Quantity.create(maybePrivateSender.getNonce()));
             })
-        .orElse(new JsonRpcSuccessResponse(request.getId(), null));
+        .orElse(new JsonRpcSuccessResponse(request.getId(), Quantity.create(0)));
   }
 }

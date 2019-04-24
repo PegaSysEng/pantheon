@@ -321,7 +321,10 @@ public class JsonRpcMethodsFactory {
               parameter,
               privacyParameters),
           new EeaSendRawTransaction(
-              new PrivateTransactionHandler(privacyParameters), transactionPool, parameter),
+              blockchainQueries,
+              new PrivateTransactionHandler(privacyParameters),
+              transactionPool,
+              parameter),
           new EeaGetTransactionCount(parameter, privacyParameters));
     }
     return enabledMethods;

@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
+import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
+
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -160,6 +162,15 @@ public class PrivateTransactionProcessor {
         maybePrivateSender != null
             ? maybePrivateSender
             : privateWorldState.createAccount(senderAddress, 0, Wei.ZERO);
+
+    if (transaction.getNonce() < sender.getNonce()) {
+      return Result.invalid(
+          ValidationResult.invalid(
+              NONCE_TOO_LOW,
+              String.format(
+                  "transaction nonce %s below sender account nonce %s",
+                  transaction.getNonce(), sender.getNonce())));
+    }
 
     final long previousNonce = sender.incrementNonce();
     LOG.trace(

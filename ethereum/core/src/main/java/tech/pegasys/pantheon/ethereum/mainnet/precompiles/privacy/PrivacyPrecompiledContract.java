@@ -156,10 +156,9 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
       if (!logs.isEmpty()) {
         privateUpdater.putTransactionLogs(txHash, result.getLogs());
       }
+      privateUpdater.putTransactionResult(txHash, result.getOutput());
       privateUpdater.commit();
     }
-
-    privateTransaction.getTo().ifPresent(a -> LOG.error(a.toString()));
 
     LOG.debug(
         "Private Transaction Execution: "
