@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.web3j.privacy;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -98,9 +99,12 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
 
   @Test
   public void privateSmartContractMustEmitEvents() {
-    minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
+    String transactionHash =
+        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
-    final String transactionHash =
+    waitForTransactionToBeMined(transactionHash);
+
+    transactionHash =
         minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
 
     privateTransactionVerifier.validEventReturned("1000").verify(minerNode, transactionHash);
@@ -109,12 +113,17 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
   @Test
   public void privateSmartContractMustReturnValues() {
 
-    minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
+    String transactionHash =
+        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
-    minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
+    waitForTransactionToBeMined(transactionHash);
 
-    final String transactionHash =
-        minerNode.execute(privateTransactions.createPrivateRawTransaction(getValue));
+    transactionHash =
+        minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
+
+    waitForTransactionToBeMined(transactionHash);
+
+    transactionHash = minerNode.execute(privateTransactions.createPrivateRawTransaction(getValue));
 
     privateTransactionVerifier.validOutputReturned("1000").verify(minerNode, transactionHash);
   }
@@ -122,5 +131,9 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
   @After
   public void tearDown() {
     enclave.getOrion().stop();
+  }
+
+  public void waitForTransactionToBeMined(final String transactionHash) {
+    waitFor(() -> minerNode.verify(eea.expectSuccessfulTransactionReceipt(transactionHash)));
   }
 }
