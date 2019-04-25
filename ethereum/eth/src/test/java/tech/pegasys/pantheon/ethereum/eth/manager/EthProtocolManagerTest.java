@@ -1045,7 +1045,8 @@ public final class EthProtocolManagerTest {
             1,
             true,
             ethScheduler,
-            EthereumWireProtocolConfiguration.defaultConfig())) {
+            EthereumWireProtocolConfiguration.defaultConfig(),
+            metricsSystem)) {
 
       // Create a transaction pool.  This has a side effect of registring a listener for the
       // transactions message.

@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
 import tech.pegasys.pantheon.ethereum.eth.messages.NodeDataMessage;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,9 +62,13 @@ public class GetNodeDataFromPeerTask extends AbstractPeerRequestTask<Map<Hash, B
   }
 
   @Override
-  protected ResponseStream sendRequest(final EthPeer peer) throws PeerNotConnected {
-    LOG.debug("Requesting {} node data entries from peer {}.", hashes.size(), peer);
-    return peer.getNodeData(hashes);
+  protected CompletableFuture<ResponseStream> sendRequest() {
+    return sendRequestToPeer(
+        peer -> {
+          LOG.debug("Requesting {} node data entries from peer {}.", hashes.size(), peer);
+          return peer.getNodeData(hashes);
+        },
+        pivotBlockNumber);
   }
 
   @Override
@@ -86,7 +90,7 @@ public class GetNodeDataFromPeerTask extends AbstractPeerRequestTask<Map<Hash, B
 
   private Optional<Map<Hash, BytesValue>> mapNodeDataByHash(final List<BytesValue> nodeData) {
     final Map<Hash, BytesValue> nodeDataByHash = new HashMap<>();
-    for (BytesValue data : nodeData) {
+    for (final BytesValue data : nodeData) {
       final Hash hash = Hash.hash(data);
       if (!hashes.contains(hash)) {
         return Optional.empty();
@@ -94,10 +98,5 @@ public class GetNodeDataFromPeerTask extends AbstractPeerRequestTask<Map<Hash, B
       nodeDataByHash.put(hash, data);
     }
     return Optional.of(nodeDataByHash);
-  }
-
-  @Override
-  protected Optional<EthPeer> findSuitablePeer() {
-    return ethContext.getEthPeers().idlePeer(pivotBlockNumber);
   }
 }

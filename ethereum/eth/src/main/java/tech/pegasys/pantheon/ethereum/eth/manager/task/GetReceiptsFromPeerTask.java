@@ -25,7 +25,6 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
 import tech.pegasys.pantheon.ethereum.eth.messages.ReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,15 +67,25 @@ public class GetReceiptsFromPeerTask
   }
 
   @Override
-  protected ResponseStream sendRequest(final EthPeer peer) throws PeerNotConnected {
-    LOG.debug("Requesting {} receipts from peer {}.", blockHeaders.size(), peer);
+  protected CompletableFuture<ResponseStream> sendRequest() {
+    final long maximumRequiredBlockNumber =
+        blockHeaders.stream()
+            .mapToLong(BlockHeader::getNumber)
+            .max()
+            .orElse(BlockHeader.GENESIS_BLOCK_NUMBER);
+
     // Since we have to match up the data by receipt root, we only need to request receipts
     // for one of the headers with each unique receipt root.
     final List<Hash> blockHashes =
         headersByReceiptsRoot.values().stream()
             .map(headers -> headers.get(0).getHash())
             .collect(toList());
-    return peer.getReceipts(blockHashes);
+    return sendRequestToPeer(
+        peer -> {
+          LOG.debug("Requesting {} receipts from peer {}.", blockHeaders.size(), peer);
+          return peer.getReceipts(blockHashes);
+        },
+        maximumRequiredBlockNumber);
   }
 
   @Override
@@ -107,15 +117,5 @@ public class GetReceiptsFromPeerTask
       blockHeaders.forEach(header -> receiptsByHeader.put(header, receiptsInBlock));
     }
     return Optional.of(receiptsByHeader);
-  }
-
-  @Override
-  protected Optional<EthPeer> findSuitablePeer() {
-    final long maximumRequiredBlockNumber =
-        blockHeaders.stream()
-            .mapToLong(BlockHeader::getNumber)
-            .max()
-            .orElse(BlockHeader.GENESIS_BLOCK_NUMBER);
-    return this.ethContext.getEthPeers().idlePeer(maximumRequiredBlockNumber);
   }
 }

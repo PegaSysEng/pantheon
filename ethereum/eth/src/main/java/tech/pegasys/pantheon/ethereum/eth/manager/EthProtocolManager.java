@@ -71,7 +71,8 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int networkId,
       final boolean fastSyncEnabled,
       final EthScheduler scheduler,
-      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
+      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
+      final MetricsSystem metricsSystem) {
     this.networkId = networkId;
     this.scheduler = scheduler;
     this.blockchain = blockchain;
@@ -80,7 +81,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     this.shutdown = new CountDownLatch(1);
     genesisHash = blockchain.getBlockHashByNumber(0L).get();
 
-    ethPeers = new EthPeers(getSupportedProtocol());
+    ethPeers = new EthPeers(getSupportedProtocol(), metricsSystem);
     ethMessages = new EthMessages();
     ethContext = new EthContext(getSupportedProtocol(), ethPeers, ethMessages, scheduler);
 
@@ -105,7 +106,8 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         networkId,
         fastSyncEnabled,
         new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
-        EthereumWireProtocolConfiguration.defaultConfig());
+        EthereumWireProtocolConfiguration.defaultConfig(),
+        metricsSystem);
   }
 
   public EthProtocolManager(
@@ -124,7 +126,8 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         networkId,
         fastSyncEnabled,
         new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
-        ethereumWireProtocolConfiguration);
+        ethereumWireProtocolConfiguration,
+        metricsSystem);
   }
 
   public EthContext ethContext() {
@@ -192,7 +195,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       peer.disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
       return;
     }
-    peer.dispatch(ethMessage);
+    ethPeers.dispatchMessage(peer, ethMessage);
     ethMessages.dispatch(ethMessage);
   }
 

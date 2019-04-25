@@ -544,7 +544,7 @@ public class BlockPropagationManagerTest {
     when(ethScheduler.scheduleSyncWorkerTask(any(Supplier.class)))
         .thenReturn(new CompletableFuture<>());
     final EthContext ethContext =
-        new EthContext("eth", new EthPeers("eth"), new EthMessages(), ethScheduler);
+        new EthContext("eth", new EthPeers("eth", metricsSystem), new EthMessages(), ethScheduler);
     final BlockPropagationManager<Void> blockPropagationManager =
         new BlockPropagationManager<>(
             syncConfig,

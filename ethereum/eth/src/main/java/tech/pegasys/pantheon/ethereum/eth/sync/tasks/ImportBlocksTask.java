@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.sync.tasks;
 
+import static java.util.Collections.emptyList;
+
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -22,12 +24,9 @@ import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByHashTask;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -50,7 +49,6 @@ public class ImportBlocksTask<C> extends AbstractPeerTask<List<Hash>> {
   private final BlockHeader referenceHeader;
   private final int maxBlocks;
   private final MetricsSystem metricsSystem;
-  private EthPeer peer;
 
   protected ImportBlocksTask(
       final ProtocolSchedule<C> protocolSchedule,
@@ -81,8 +79,7 @@ public class ImportBlocksTask<C> extends AbstractPeerTask<List<Hash>> {
   }
 
   @Override
-  protected void executeTaskWithPeer(final EthPeer peer) throws PeerNotConnected {
-    this.peer = peer;
+  protected void executeTask() {
     LOG.debug("Importing blocks from {}", startNumber);
     downloadHeaders()
         .thenCompose(this::completeBlocks)
@@ -98,52 +95,56 @@ public class ImportBlocksTask<C> extends AbstractPeerTask<List<Hash>> {
                     .get()
                     .complete(
                         new PeerTaskResult<>(
-                            peer, r.stream().map(Block::getHash).collect(Collectors.toList())));
+                            r.getPeer(),
+                            r.getResult().stream()
+                                .map(Block::getHash)
+                                .collect(Collectors.toList())));
               }
             });
-  }
-
-  @Override
-  protected Optional<EthPeer> findSuitablePeer() {
-    return ethContext.getEthPeers().idlePeer(referenceHeader.getNumber());
   }
 
   private CompletableFuture<PeerTaskResult<List<BlockHeader>>> downloadHeaders() {
     final AbstractPeerTask<List<BlockHeader>> task =
         GetHeadersFromPeerByHashTask.startingAtHash(
-                protocolSchedule,
-                ethContext,
-                referenceHeader.getHash(),
-                referenceHeader.getNumber(),
-                maxBlocks,
-                metricsSystem)
-            .assignPeer(peer);
+            protocolSchedule,
+            ethContext,
+            referenceHeader.getHash(),
+            referenceHeader.getNumber(),
+            maxBlocks,
+            metricsSystem);
+    assignedPeer.ifPresent(task::assignPeer);
     return executeSubTask(task::run);
   }
 
-  private CompletableFuture<List<Block>> completeBlocks(
+  private CompletableFuture<PeerTaskResult<List<Block>>> completeBlocks(
       final PeerTaskResult<List<BlockHeader>> headers) {
     if (headers.getResult().isEmpty()) {
-      return CompletableFuture.completedFuture(Collections.emptyList());
+      return CompletableFuture.completedFuture(
+          new PeerTaskResult<>(headers.getPeer(), emptyList()));
     }
     final CompleteBlocksTask<C> task =
         CompleteBlocksTask.forHeaders(
             protocolSchedule, ethContext, headers.getResult(), metricsSystem);
-    task.assignPeer(peer);
-    return executeSubTask(() -> ethContext.getScheduler().timeout(task));
+    task.assignPeer(headers.getPeer());
+    return executeSubTask(() -> ethContext.getScheduler().timeout(task))
+        .thenApply(blocks -> new PeerTaskResult<>(headers.getPeer(), blocks));
   }
 
-  private CompletableFuture<List<Block>> importBlocks(final List<Block> blocks) {
+  private CompletableFuture<PeerTaskResult<List<Block>>> importBlocks(
+      final PeerTaskResult<List<Block>> blocksResult) {
+    final List<Block> blocks = blocksResult.getResult();
+    final EthPeer peer = blocksResult.getPeer();
     // Don't import reference block if we already know about it
     if (protocolContext.getBlockchain().contains(referenceHeader.getHash())) {
       blocks.removeIf(b -> b.getHash().equals(referenceHeader.getHash()));
     }
     if (blocks.isEmpty()) {
-      return CompletableFuture.completedFuture(Collections.emptyList());
+      return CompletableFuture.completedFuture(new PeerTaskResult<>(peer, emptyList()));
     }
     final Supplier<CompletableFuture<List<Block>>> task =
         PersistBlockTask.forSequentialBlocks(
             protocolSchedule, protocolContext, blocks, HeaderValidationMode.FULL, metricsSystem);
-    return executeWorkerSubTask(ethContext.getScheduler(), task);
+    return executeWorkerSubTask(ethContext.getScheduler(), task)
+        .thenApply(result -> new PeerTaskResult<>(peer, result));
   }
 }

@@ -13,14 +13,21 @@
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer.DisconnectCallback;
+import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
+import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
+import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerDisconnectedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
+import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,9 +50,14 @@ public class EthPeers {
   private final String protocolName;
   private final Subscribers<ConnectCallback> connectCallbacks = new Subscribers<>();
   private final Subscribers<DisconnectCallback> disconnectCallbacks = new Subscribers<>();
+  private final Collection<QueuedTask> pendingRequests = new ArrayList<>();
 
-  public EthPeers(final String protocolName) {
+  public EthPeers(final String protocolName, final MetricsSystem metricsSystem) {
     this.protocolName = protocolName;
+    metricsSystem.createIntegerGauge(MetricCategory.PEERS,
+        "pending_peer_requests_current",
+        "Number of peer requests currently pending because peers are busy",
+        pendingRequests::size);
   }
 
   void registerConnection(final PeerConnection peerConnection) {
@@ -65,6 +77,26 @@ public class EthPeers {
     return connections.get(peerConnection);
   }
 
+  public CompletableFuture<ResponseStream> executePeerRequest(
+      final PeerRequest request, final long minimumBlockNumber) {
+    final QueuedTask queuedTask = new QueuedTask(request, minimumBlockNumber);
+    synchronized (this) {
+      if (!queuedTask.attemptExecution()) {
+        pendingRequests.add(queuedTask);
+      }
+    }
+    return queuedTask.result;
+  }
+
+  public void dispatchMessage(final EthPeer peer, final EthMessage ethMessage) {
+    peer.dispatch(ethMessage);
+    if (peer.outstandingRequests() < maxOutstandingRequests) {
+      synchronized (this) {
+        pendingRequests.removeIf(QueuedTask::attemptExecution);
+      }
+    }
+  }
+
   public long subscribeConnect(final ConnectCallback callback) {
     return connectCallbacks.subscribe(callback);
   }
@@ -81,33 +113,12 @@ public class EthPeers {
     return connections.size();
   }
 
-  public int availablePeerCount() {
-    return (int) availablePeers().count();
-  }
-
   public Stream<EthPeer> availablePeers() {
     return connections.values().stream().filter(EthPeer::readyForRequests);
   }
 
   public Optional<EthPeer> bestPeer() {
     return availablePeers().max(BEST_CHAIN);
-  }
-
-  public Optional<EthPeer> idlePeer() {
-    return idlePeers().min(LEAST_TO_MOST_BUSY);
-  }
-
-  private Stream<EthPeer> idlePeers() {
-    final List<EthPeer> peers =
-        availablePeers()
-            .filter(p -> p.outstandingRequests() < maxOutstandingRequests)
-            .collect(Collectors.toList());
-    Collections.shuffle(peers);
-    return peers.stream();
-  }
-
-  public Optional<EthPeer> idlePeer(final long withBlocksUpTo) {
-    return idlePeers().filter(p -> p.chainState().getEstimatedHeight() >= withBlocksUpTo).findAny();
   }
 
   @FunctionalInterface
@@ -124,5 +135,49 @@ public class EthPeers {
 
   private void invokeConnectionCallbacks(final EthPeer peer) {
     connectCallbacks.forEach(cb -> cb.onPeerConnected(peer));
+  }
+
+  private class QueuedTask {
+    private final PeerRequest request;
+    private final CompletableFuture<ResponseStream> result = new CompletableFuture<>();
+    private final long minimumBlockNumber;
+
+    private QueuedTask(final PeerRequest request, final long minimumBlockNumber) {
+      this.request = request;
+      this.minimumBlockNumber = minimumBlockNumber;
+    }
+
+    public boolean attemptExecution() {
+      if (!result.isDone()) {
+        final Optional<EthPeer> leastBusySuitablePeer =
+            availablePeers()
+                .filter(peer -> peer.chainState().getEstimatedHeight() >= minimumBlockNumber)
+                .min(LEAST_TO_MOST_BUSY);
+        if (!leastBusySuitablePeer.isPresent()) {
+          // No peers have the required height.
+          result.completeExceptionally(new NoAvailablePeersException());
+        } else {
+          // At least one peer has the required height, but we not be able to use it if it's busy
+          final Optional<EthPeer> selectedPeer =
+              leastBusySuitablePeer.filter(
+                  peer -> peer.outstandingRequests() < maxOutstandingRequests);
+          selectedPeer.ifPresent(
+              peer -> {
+                try {
+                  final ResponseStream responseStream = request.sendRequest(peer);
+                  result.complete(responseStream);
+                } catch (final PeerNotConnected e) {
+                  result.completeExceptionally(new PeerDisconnectedException(peer));
+                }
+              });
+          return selectedPeer.isPresent();
+        }
+      }
+      return false;
+    }
+  }
+
+  public interface PeerRequest {
+    ResponseStream sendRequest(EthPeer peer) throws PeerNotConnected;
   }
 }

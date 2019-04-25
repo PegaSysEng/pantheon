@@ -76,13 +76,13 @@ public class FastSyncBlockHandlerTest {
   private final WorldStateArchive worldStateArchive = mock(WorldStateArchive.class);
   private final ProtocolContext<Void> protocolContext =
       new ProtocolContext<>(blockchain, worldStateArchive, null);
+  private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final EthContext ethContext =
       new EthContext(
           PROTOCOL_NAME,
-          new EthPeers(PROTOCOL_NAME),
+          new EthPeers(PROTOCOL_NAME, metricsSystem),
           new EthMessages(),
           new DeterministicEthScheduler());
-  private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final ValidationPolicy validationPolicy = mock(ValidationPolicy.class);
   private final ValidationPolicy ommerValidationPolicy = mock(ValidationPolicy.class);
 

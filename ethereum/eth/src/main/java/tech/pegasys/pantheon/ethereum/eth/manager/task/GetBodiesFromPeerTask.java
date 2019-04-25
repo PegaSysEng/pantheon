@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.mainnet.BodyValidation;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
@@ -38,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -82,11 +82,17 @@ public class GetBodiesFromPeerTask<C> extends AbstractPeerRequestTask<List<Block
   }
 
   @Override
-  protected ResponseStream sendRequest(final EthPeer peer) throws PeerNotConnected {
+  protected CompletableFuture<ResponseStream> sendRequest() {
     final List<Hash> blockHashes =
         headers.stream().map(BlockHeader::getHash).collect(Collectors.toList());
-    LOG.debug("Requesting {} bodies from peer {}.", blockHashes.size(), peer);
-    return peer.getBodies(blockHashes);
+    final long minimumRequiredBlockNumber = headers.get(headers.size() - 1).getNumber();
+
+    return sendRequestToPeer(
+        peer -> {
+          LOG.debug("Requesting {} bodies from peer {}.", blockHashes.size(), peer);
+          return peer.getBodies(blockHashes);
+        },
+        minimumRequiredBlockNumber);
   }
 
   @Override
@@ -121,11 +127,6 @@ public class GetBodiesFromPeerTask<C> extends AbstractPeerRequestTask<List<Block
       headers.clear();
     }
     return Optional.of(blocks);
-  }
-
-  @Override
-  protected Optional<EthPeer> findSuitablePeer() {
-    return this.ethContext.getEthPeers().idlePeer(headers.get(headers.size() - 1).getNumber());
   }
 
   private static class BodyIdentifier {
