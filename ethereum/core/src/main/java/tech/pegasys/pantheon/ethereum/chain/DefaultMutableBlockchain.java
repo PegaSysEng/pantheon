@@ -377,6 +377,12 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
   }
 
   protected boolean blockIsAlreadyTracked(final Block block) {
+    if (block.getHeader().getParentHash().equals(chainHeader.getHash())) {
+      // If this block builds on our chain head it would have a higher TD and be the chain head
+      // but since it isn't we mustn't have imported it yet.
+      // Saves a db read for the most common case
+      return false;
+    }
     return blockchainStorage.getBlockHeader(block.getHash()).isPresent();
   }
 
