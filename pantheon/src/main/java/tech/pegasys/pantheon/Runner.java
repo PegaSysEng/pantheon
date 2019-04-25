@@ -73,6 +73,13 @@ public class Runner implements AutoCloseable {
       if (networkRunner.getNetwork().isP2pEnabled()) {
         pantheonController.getSynchronizer().start();
       }
+      vertx.setPeriodic(
+          TimeUnit.MINUTES.toMillis(1),
+          time ->
+              pantheonController
+                  .getTransactionPool()
+                  .getPendingTransactions()
+                  .evictOldTransactions());
       jsonRpc.ifPresent(service -> waitForServiceToStart("jsonRpc", service.start()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.start()));
       metrics.ifPresent(service -> waitForServiceToStart("metrics", service.start()));
@@ -95,10 +102,14 @@ public class Runner implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    networkRunner.stop();
-    networkRunner.awaitStop();
-
     try {
+      if (networkRunner.getNetwork().isP2pEnabled()) {
+        pantheonController.getSynchronizer().stop();
+      }
+
+      networkRunner.stop();
+      networkRunner.awaitStop();
+
       jsonRpc.ifPresent(service -> waitForServiceToStop("jsonRpc", service.stop()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.stop()));
       metrics.ifPresent(service -> waitForServiceToStop("metrics", service.stop()));

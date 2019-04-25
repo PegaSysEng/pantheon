@@ -20,8 +20,11 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
 import java.time.Clock;
+import java.util.concurrent.TimeUnit;
 
 public class TransactionPoolFactory {
+
+  private static final long TRANSACTION_EVICTION_INTERVAL_MS = TimeUnit.HOURS.toMillis(12);
 
   public static TransactionPool createTransactionPool(
       final ProtocolSchedule<?> protocolSchedule,
@@ -31,8 +34,10 @@ public class TransactionPoolFactory {
       final int maxPendingTransactions,
       final MetricsSystem metricsSystem,
       final SyncState syncState) {
+
     final PendingTransactions pendingTransactions =
-        new PendingTransactions(maxPendingTransactions, clock, metricsSystem);
+        new PendingTransactions(
+            TRANSACTION_EVICTION_INTERVAL_MS, maxPendingTransactions, clock, metricsSystem);
 
     final PeerTransactionTracker transactionTracker = new PeerTransactionTracker();
     final TransactionsMessageSender transactionsMessageSender =
@@ -44,7 +49,9 @@ public class TransactionPoolFactory {
             protocolSchedule,
             protocolContext,
             new TransactionSender(transactionTracker, transactionsMessageSender, ethContext),
-            syncState);
+            syncState,
+            ethContext,
+            transactionTracker);
 
     final TransactionsMessageHandler transactionsMessageHandler =
         new TransactionsMessageHandler(
