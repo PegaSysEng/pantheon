@@ -55,6 +55,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 
+import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -570,6 +571,13 @@ public class FullSyncChainDownloaderTest {
                 + " Chain head: "
                 + bestPeerChainHead);
       }
+      Awaitility.await()
+          .atMost(10, TimeUnit.SECONDS)
+          .until(
+              () ->
+                  bestPeer.hasOutstandingRequests()
+                      || otherPeers.stream().anyMatch(RespondingEthPeer::hasOutstandingRequests)
+                      || localBlockchain.getChainHeadBlockNumber() >= bestPeerChainHead);
       count++;
       // Check that any requests for checkpoint headers are only sent to the best peer
       final long checkpointRequestsToOtherPeers =
@@ -586,8 +594,6 @@ public class FullSyncChainDownloaderTest {
       for (final RespondingEthPeer otherPeer : otherPeers) {
         otherPeer.respond(otherResponder);
       }
-      // Give other threads a go
-      LockSupport.parkNanos(200);
     }
   }
 
