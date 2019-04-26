@@ -12,18 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.LongStream;
 
+import com.google.common.collect.Lists;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
