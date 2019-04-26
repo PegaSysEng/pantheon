@@ -85,6 +85,7 @@ public class CheckpointHeaderManagerTest {
 
   @Before
   public void setUp() {
+    when(syncTargetPeer.hasAvailableRequestCapacity()).thenReturn(true);
     when(syncTargetPeer.chainState()).thenReturn(new ChainState());
     syncTarget = syncState.setSyncTarget(syncTargetPeer, GENESIS);
   }
@@ -123,6 +124,7 @@ public class CheckpointHeaderManagerTest {
 
     // Receive response
     reset(syncTargetPeer);
+    when(syncTargetPeer.hasAvailableRequestCapacity()).thenReturn(true);
     respondToHeaderRequests(GENESIS, block(5));
     timeout.set(false);
     assertThat(checkpointHeaderManager.pullCheckpointHeaders(syncTarget))
@@ -131,6 +133,7 @@ public class CheckpointHeaderManagerTest {
 
     // Timeout again but shouldn't have reached threshold
     reset(syncTargetPeer);
+    when(syncTargetPeer.hasAvailableRequestCapacity()).thenReturn(true);
     timeout.set(true);
     when(anyHeadersRequested()).thenReturn(createResponseStream());
     assertThat(checkpointHeaderManager.pullCheckpointHeaders(syncTarget))
