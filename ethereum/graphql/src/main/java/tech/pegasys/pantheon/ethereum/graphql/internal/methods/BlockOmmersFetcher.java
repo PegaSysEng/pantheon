@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Ommer;
