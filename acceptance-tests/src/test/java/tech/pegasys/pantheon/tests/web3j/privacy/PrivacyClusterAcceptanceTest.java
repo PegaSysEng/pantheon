@@ -77,12 +77,13 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
     enclave3 = createEnclave("orion_key_2.pub", "orion_key_2.key", enclave2.nodeUrl());
     node1 =
         pantheon.createPrivateTransactionEnabledMinerNode(
-            "node1", getPrivacyParams(enclave1), "key");
+            "node1", getPrivacyParameters(enclave1), "key");
     node2 =
         pantheon.createPrivateTransactionEnabledMinerNode(
-            "node2", getPrivacyParams(enclave2), "key1");
+            "node2", getPrivacyParameters(enclave2), "key1");
     node3 =
-        pantheon.createPrivateTransactionEnabledNode("node3", getPrivacyParams(enclave3), "key2");
+        pantheon.createPrivateTransactionEnabledNode(
+            "node3", getPrivacyParameters(enclave3), "key2");
 
     cluster.start(node1, node2, node3);
 
@@ -233,15 +234,15 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
 
   @Test
   public void node1CanInteractWithMultiplePrivacyGroups() {
-    final String ABC =
+    final String privacyGroup123 =
         "0x393579496e2f4f59545a31784e3753694258314d64424a763942716b364f713766792b37585361496e79593d";
-    final String AB =
+    final String privacyGroup12 =
         "0x4479414f69462f796e70632b4a586132594147423062436974536c4f4d4e6d2b53686d422f374d364334773d";
     final String contractForABC = "0x1efee0ab2c1ec40c4b48410e5832d254c2eda0b0";
 
-    long nextNonce = getNonce(node1, ABC);
+    long nextNonce = getNonce(node1, privacyGroup123);
 
-    final String deployContractForABC =
+    final String deployContractFor123 =
         PrivateTransactionBuilder.builder()
             .nonce(nextNonce)
             .from(node1.getAddress())
@@ -255,15 +256,15 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.CREATE_CONTRACT);
 
     String transactionHash =
-        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractForABC));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFor123));
 
     privateTransactionVerifier
         .validPrivateContractDeployed(contractForABC)
         .verify(node1, transactionHash);
 
-    nextNonce = getNonce(node1, ABC);
+    nextNonce = getNonce(node1, privacyGroup123);
 
-    final String storeValueForABC_first =
+    final String storeValueFor123 =
         PrivateTransactionBuilder.builder()
             .nonce(nextNonce)
             .from(node1.getAddress())
@@ -277,13 +278,13 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.STORE);
 
     transactionHash =
-        node1.execute(privateTransactions.createPrivateRawTransaction(storeValueForABC_first));
+        node1.execute(privateTransactions.createPrivateRawTransaction(storeValueFor123));
 
     privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
 
-    nextNonce = getNonce(node1, AB);
+    nextNonce = getNonce(node1, privacyGroup12);
 
-    final String storeValueForABBeforeDeployingContract =
+    final String storeValueFor12BeforeDeployingContract =
         PrivateTransactionBuilder.builder()
             .nonce(nextNonce)
             .from(node1.getAddress())
@@ -296,16 +297,17 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
     transactionHash =
         node1.execute(
             privateTransactions.createPrivateRawTransaction(
-                storeValueForABBeforeDeployingContract));
+                storeValueFor12BeforeDeployingContract));
 
     privateTransactionVerifier.noValidOutputReturned().verify(node1, transactionHash);
 
-    nextNonce = getNonce(node1, AB);
+    nextNonce = getNonce(node1, privacyGroup12);
 
-    final Address contractForAB =
-        Address.privateContractAddress(node1.getAddress(), nextNonce, BytesValue.fromHexString(AB));
+    final Address contractFor12 =
+        Address.privateContractAddress(
+            node1.getAddress(), nextNonce, BytesValue.fromHexString(privacyGroup12));
 
-    final String deployContractForAB =
+    final String deployContractFor12 =
         PrivateTransactionBuilder.builder()
             .nonce(nextNonce)
             .from(node1.getAddress())
@@ -316,34 +318,33 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
             .build(TransactionType.CREATE_CONTRACT);
 
     transactionHash =
-        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractForAB));
+        node1.execute(privateTransactions.deployPrivateSmartContract(deployContractFor12));
 
     privateTransactionVerifier
-        .validPrivateContractDeployed(contractForAB.toString())
+        .validPrivateContractDeployed(contractFor12.toString())
         .verify(node1, transactionHash);
 
-    nextNonce = getNonce(node1, AB);
+    nextNonce = getNonce(node1, privacyGroup12);
 
-    final String storeValueForAB =
+    final String storeValueFor12 =
         PrivateTransactionBuilder.builder()
             .nonce(nextNonce)
             .from(node1.getAddress())
-            .to(contractForAB)
+            .to(contractFor12)
             .privateFrom(BytesValue.wrap(PUBLIC_KEY_1.getBytes(UTF_8)))
             .privateFor(Lists.newArrayList(BytesValue.wrap(PUBLIC_KEY_2.getBytes(UTF_8))))
             .keyPair(keypair1)
             .build(TransactionType.STORE);
 
     transactionHash =
-        node1.execute(privateTransactions.createPrivateRawTransaction(storeValueForAB));
+        node1.execute(privateTransactions.createPrivateRawTransaction(storeValueFor12));
 
     privateTransactionVerifier.validEventReturned("1000").verify(node1, transactionHash);
   }
 
-  private long getNonce(final PantheonNode node1, final String privacyGroupId) {
-    return node1
-        .execute(
-            privateTransactions.getTransactionCount(node1.getAddress().toString(), privacyGroupId))
+  private long getNonce(final PantheonNode node, final String privacyGroupId) {
+    return node.execute(
+            privateTransactions.getTransactionCount(node.getAddress().toString(), privacyGroupId))
         .longValue();
   }
 

@@ -31,7 +31,6 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -50,15 +49,14 @@ public class EeaGetTransactionCountTest {
 
   private final Address senderAddress =
       Address.fromHexString("0x627306090abab3a6e1400e9345bc60c78a8bef57");
-  private final BigInteger NONCE = BigInteger.valueOf(5);
+  private final long NONCE = 5;
 
   @Test
   public void verifyTransactionCount() {
     when(mutableWorldState.updater()).thenReturn(worldUpdater);
-    when(mutableAccount.getNonce()).thenReturn(NONCE.longValue());
+    when(mutableAccount.getNonce()).thenReturn(NONCE);
     // Create account in storage with given nonce
-    when(worldUpdater.createAccount(senderAddress, NONCE.longValue(), Wei.ZERO))
-        .thenReturn(mutableAccount);
+    when(worldUpdater.createAccount(senderAddress, NONCE, Wei.ZERO)).thenReturn(mutableAccount);
     when(privateWorldStateArchive.getMutable()).thenReturn(mutableWorldState);
 
     when(privacyParameters.getPrivateStateStorage()).thenReturn(privacyStateStorage);
@@ -79,8 +77,6 @@ public class EeaGetTransactionCountTest {
     final JsonRpcSuccessResponse response =
         (JsonRpcSuccessResponse) eeaGetTransactionCount.response(request);
 
-    final BigInteger result = new BigInteger(((String) response.getResult()).substring(2), 16);
-
-    assertEquals(NONCE, result);
+    assertEquals("0x5", response.getResult());
   }
 }

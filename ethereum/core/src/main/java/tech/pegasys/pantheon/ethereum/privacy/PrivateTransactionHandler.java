@@ -60,7 +60,7 @@ public class PrivateTransactionHandler {
   public Transaction handle(
       final PrivateTransaction privateTransaction, final Supplier<Long> nonceSupplier)
       throws IOException {
-    LOG.trace("Handling private transaction");
+    LOG.trace("Handling private transaction {}", privateTransaction.toString());
     final SendRequest sendRequest = createSendRequest(privateTransaction);
     final SendResponse sendResponse;
     try {

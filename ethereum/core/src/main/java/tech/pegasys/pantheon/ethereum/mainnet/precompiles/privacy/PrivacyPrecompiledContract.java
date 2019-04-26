@@ -103,7 +103,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
     try {
       receiveResponse = enclave.receive(receiveRequest);
     } catch (IOException e) {
-      LOG.debug("Enclave probably does not have private transaction with key {}.", key);
+      LOG.debug("Enclave probably does not have private transaction with key {}.", key, e);
       return BytesValue.EMPTY;
     }
 

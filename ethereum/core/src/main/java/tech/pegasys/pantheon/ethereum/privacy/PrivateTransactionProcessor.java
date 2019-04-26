@@ -183,13 +183,13 @@ public class PrivateTransactionProcessor {
     final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
     if (transaction.isContractCreation()) {
       final Address privateContractAddress =
-          Address.privateContractAddress(senderAddress, sender.getNonce() - 1L, privacyGroupId);
+          Address.privateContractAddress(senderAddress, previousNonce, privacyGroupId);
 
       LOG.debug(
           "Calculated contract address {} from sender {} with nonce {} and privacy group {}",
           privateContractAddress.toString(),
           senderAddress,
-          sender.getNonce() - 1L,
+          previousNonce,
           privacyGroupId.toString());
 
       initialFrame =

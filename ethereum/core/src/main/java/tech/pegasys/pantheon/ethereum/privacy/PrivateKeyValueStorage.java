@@ -38,26 +38,26 @@ public class PrivateKeyValueStorage implements PrivateTransactionStorage {
 
   @Override
   public Optional<List<Log>> getEvents(final Bytes32 transactionHash) {
-    return get(EVENTS_KEY_SUFFIX, transactionHash).map(this::rlpDecodeLog);
+    return get(transactionHash, EVENTS_KEY_SUFFIX).map(this::rlpDecodeLog);
   }
 
   @Override
   public Optional<BytesValue> getOutput(final Bytes32 transactionHash) {
-    return get(OUTPUT_KEY_SUFFIX, transactionHash);
+    return get(transactionHash, OUTPUT_KEY_SUFFIX);
   }
 
   @Override
   public boolean isPrivateStateAvailable(final Bytes32 transactionHash) {
-    return get(EVENTS_KEY_SUFFIX, transactionHash).isPresent()
-        || get(OUTPUT_KEY_SUFFIX, transactionHash).isPresent();
+    return get(transactionHash, EVENTS_KEY_SUFFIX).isPresent()
+        || get(transactionHash, OUTPUT_KEY_SUFFIX).isPresent();
   }
 
   private List<Log> rlpDecodeLog(final BytesValue bytes) {
     return RLP.input(bytes).readList(Log::readFrom);
   }
 
-  private Optional<BytesValue> get(final BytesValue suffix, final BytesValue key) {
-    return keyValueStorage.get(BytesValues.concatenate(key, suffix));
+  private Optional<BytesValue> get(final BytesValue key, final BytesValue keySuffix) {
+    return keyValueStorage.get(BytesValues.concatenate(key, keySuffix));
   }
 
   @Override
@@ -76,19 +76,19 @@ public class PrivateKeyValueStorage implements PrivateTransactionStorage {
     @Override
     public PrivateTransactionStorage.Updater putTransactionLogs(
         final Bytes32 transactionHash, final LogSeries logs) {
-      set(EVENTS_KEY_SUFFIX, transactionHash, RLP.encode(logs::writeTo));
+      set(transactionHash, EVENTS_KEY_SUFFIX, RLP.encode(logs::writeTo));
       return this;
     }
 
     @Override
     public PrivateTransactionStorage.Updater putTransactionResult(
         final Bytes32 transactionHash, final BytesValue events) {
-      set(OUTPUT_KEY_SUFFIX, transactionHash, events);
+      set(transactionHash, OUTPUT_KEY_SUFFIX, events);
       return this;
     }
 
-    private void set(final BytesValue suffix, final BytesValue key, final BytesValue value) {
-      transaction.put(BytesValues.concatenate(key, suffix), value);
+    private void set(final BytesValue key, final BytesValue keySuffix, final BytesValue value) {
+      transaction.put(BytesValues.concatenate(key, keySuffix), value);
     }
 
     @Override

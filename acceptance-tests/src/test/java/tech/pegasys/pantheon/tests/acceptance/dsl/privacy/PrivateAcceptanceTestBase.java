@@ -47,7 +47,7 @@ public class PrivateAcceptanceTestBase extends AcceptanceTestBase {
     return OrionTestHarnessFactory.create(privacy.newFolder().toPath(), pubKey, privKey, othernode);
   }
 
-  protected static PrivacyParameters getPrivacyParams(final OrionTestHarness testHarness)
+  protected static PrivacyParameters getPrivacyParameters(final OrionTestHarness testHarness)
       throws IOException {
     return new PrivacyParameters.Builder()
         .setEnabled(true)

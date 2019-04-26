@@ -53,7 +53,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
     enclave = createEnclave("orion_key_0.pub", "orion_key_0.key");
     minerNode =
         pantheon.createPrivateTransactionEnabledMinerNode(
-            "miner-node", getPrivacyParams(enclave), "key");
+            "miner-node", getPrivacyParameters(enclave), "key");
     cluster.start(minerNode);
 
     deployContract =
