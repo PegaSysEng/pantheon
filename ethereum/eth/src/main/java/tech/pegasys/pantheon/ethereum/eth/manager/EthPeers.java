@@ -54,7 +54,8 @@ public class EthPeers {
 
   public EthPeers(final String protocolName, final MetricsSystem metricsSystem) {
     this.protocolName = protocolName;
-    metricsSystem.createIntegerGauge(MetricCategory.PEERS,
+    metricsSystem.createIntegerGauge(
+        MetricCategory.PEERS,
         "pending_peer_requests_current",
         "Number of peer requests currently pending because peers are busy",
         pendingRequests::size);

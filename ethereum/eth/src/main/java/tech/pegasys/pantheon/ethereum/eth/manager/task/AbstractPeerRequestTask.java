@@ -59,10 +59,14 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
     responseStream = sendRequest();
     responseStream
         .thenAccept(
-            stream ->
-                stream.then(
-                    (streamClosed, message, peer1) ->
-                        handleMessage(promise, streamClosed, message, peer1)))
+            stream -> {
+              // Start the timeout now that the request has actually been sent
+              ethContext.getScheduler().failAfterTimeout(promise, timeout);
+
+              stream.then(
+                  (streamClosed, message, peer1) ->
+                      handleMessage(promise, streamClosed, message, peer1));
+            })
         .exceptionally(
             error -> {
               promise.completeExceptionally(error);
@@ -83,8 +87,6 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
             result.get().complete(new PeerTaskResult<>(responseStream.get().getPeer(), r));
           }
         });
-
-    ethContext.getScheduler().failAfterTimeout(promise, timeout);
   }
 
   public CompletableFuture<ResponseStream> sendRequestToPeer(
