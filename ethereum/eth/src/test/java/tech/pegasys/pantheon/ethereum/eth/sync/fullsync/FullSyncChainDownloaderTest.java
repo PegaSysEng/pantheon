@@ -566,7 +566,7 @@ public class FullSyncChainDownloaderTest {
       if (count > 10_000) {
         fail(
             "Did not reach chain head soon enough. At: "
-                + localBlockchain.getChainHeadBlockNumber());
+                + localBlockchain.getChainHeadBlockNumber() + " Chain head: " + bestPeerChainHead);
       }
       count++;
       // Check that any requests for checkpoint headers are only sent to the best peer
@@ -585,7 +585,7 @@ public class FullSyncChainDownloaderTest {
         otherPeer.respond(otherResponder);
       }
       // Give other threads a go
-      LockSupport.parkNanos(2000);
+      LockSupport.parkNanos(200);
     }
   }
 
