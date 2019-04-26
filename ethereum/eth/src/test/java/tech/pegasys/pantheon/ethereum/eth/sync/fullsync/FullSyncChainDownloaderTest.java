@@ -16,10 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assumptions.assumeThatObject;
 import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -56,6 +52,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 
 import org.junit.After;
@@ -96,7 +93,7 @@ public class FullSyncChainDownloaderTest {
   public void setupTest() {
     gen = new BlockDataGenerator();
     localBlockchainSetup = BlockchainSetupUtil.forTesting();
-    localBlockchain = spy(localBlockchainSetup.getBlockchain());
+    localBlockchain = localBlockchainSetup.getBlockchain();
     otherBlockchainSetup = BlockchainSetupUtil.forTesting();
     otherBlockchain = otherBlockchainSetup.getBlockchain();
 
@@ -229,7 +226,6 @@ public class FullSyncChainDownloaderTest {
     peer.respondWhileOtherThreadsWork(responder, peer::hasOutstandingRequests);
 
     assertThat(syncState.syncTarget()).isNotPresent();
-    verify(localBlockchain, times(0)).appendBlock(any(), any());
   }
 
   @Test
@@ -568,7 +564,9 @@ public class FullSyncChainDownloaderTest {
     int count = 0;
     while (localBlockchain.getChainHeadBlockNumber() < bestPeerChainHead) {
       if (count > 10_000) {
-        fail("Did not reach chain head soon enough");
+        fail(
+            "Did not reach chain head soon enough. At: "
+                + localBlockchain.getChainHeadBlockNumber());
       }
       count++;
       // Check that any requests for checkpoint headers are only sent to the best peer
@@ -586,6 +584,8 @@ public class FullSyncChainDownloaderTest {
       for (final RespondingEthPeer otherPeer : otherPeers) {
         otherPeer.respond(otherResponder);
       }
+      // Give other threads a go
+      LockSupport.parkNanos(2000);
     }
   }
 
