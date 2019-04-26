@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.Quantity;
 
 import java.math.BigInteger;
 

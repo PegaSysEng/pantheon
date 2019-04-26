@@ -15,14 +15,10 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.Quantity;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public class Block implements GraphQLResult {
 

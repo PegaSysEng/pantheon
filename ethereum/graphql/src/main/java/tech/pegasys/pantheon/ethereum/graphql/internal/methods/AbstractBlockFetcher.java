@@ -13,20 +13,10 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionCompleteResult;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 abstract class AbstractBlockFetcher implements GraphQLMethod {
 

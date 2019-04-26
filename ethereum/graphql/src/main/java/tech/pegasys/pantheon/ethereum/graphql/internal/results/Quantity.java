@@ -10,15 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.graphql.internal.dao;
+package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import com.google.common.base.Strings;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
 import java.math.BigInteger;
 import java.util.Objects;
-
-import com.google.common.base.Strings;
 
 /**
  * Utility for formatting "quantity" fields and results to be returned. Quantity fields are
