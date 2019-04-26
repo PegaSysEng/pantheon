@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fullsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assumptions.assumeThatObject;
 import static org.awaitility.Awaitility.await;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
@@ -52,7 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 
 import org.awaitility.Awaitility;
@@ -562,23 +560,18 @@ public class FullSyncChainDownloaderTest {
     assertThat(syncState.syncTarget()).isPresent();
     assertThat(syncState.syncTarget().get().peer()).isEqualTo(bestPeer.getEthPeer());
 
-    int count = 0;
     while (localBlockchain.getChainHeadBlockNumber() < bestPeerChainHead) {
-      if (count > 10_000) {
-        fail(
-            "Did not reach chain head soon enough. At: "
-                + localBlockchain.getChainHeadBlockNumber()
-                + " Chain head: "
-                + bestPeerChainHead);
-      }
+      // Wait until there is a request to respond to (or we reached chain head).
+      // If we don't get a new request within 30 seconds the test will fail because we've probably
+      // stalled.
       Awaitility.await()
-          .atMost(10, TimeUnit.SECONDS)
+          .atMost(30, TimeUnit.SECONDS)
           .until(
               () ->
                   bestPeer.hasOutstandingRequests()
                       || otherPeers.stream().anyMatch(RespondingEthPeer::hasOutstandingRequests)
                       || localBlockchain.getChainHeadBlockNumber() >= bestPeerChainHead);
-      count++;
+
       // Check that any requests for checkpoint headers are only sent to the best peer
       final long checkpointRequestsToOtherPeers =
           otherPeers.stream()
