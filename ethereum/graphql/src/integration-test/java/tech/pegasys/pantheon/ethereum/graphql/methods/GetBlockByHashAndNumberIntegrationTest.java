@@ -149,7 +149,7 @@ public class GetBlockByHashAndNumberIntegrationTest extends GraphQLTester {
             GRAPHQL,
             requestWithQuery(
                 "{ block(number: 1)"
-                    + " { number hash mixHash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
+                    + " { parent { number } number hash mixHash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
 
     final GraphQLResponse actualByHash =
         executeRequest(

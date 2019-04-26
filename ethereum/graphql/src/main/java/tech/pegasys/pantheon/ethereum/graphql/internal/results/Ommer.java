@@ -25,7 +25,6 @@ public class Ommer implements GraphQLResult {
 
   private final BigInteger number;
   private final String hash;
-  //  private Ommer parent;
   private final String nonce;
   private final String transactionsRoot;
   private final String stateRoot;
@@ -37,12 +36,6 @@ public class Ommer implements GraphQLResult {
   private final String logsBloom;
   private final String mixHash;
   private final BigInteger difficulty;
-  //  private final BigInteger totalDifficulty;
-  //  private final String ommerHash;
-  //  private final List<Log> logs;
-  //  private final Account account;
-  //  private final CallResult call;
-  //  private final Long estimateGas;
 
   public Ommer(final BlockHeader header) {
     this(

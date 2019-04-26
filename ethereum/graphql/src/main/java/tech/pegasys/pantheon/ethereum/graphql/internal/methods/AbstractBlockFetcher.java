@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +38,7 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
 
   Block getBlockByHash(final Bytes32 hash) {
     try {
-      return blockchain.blockByHash(Hash.wrap(hash)).map(this::transactionComplete).orElse(null);
+      return blockchain.blockByHashWithTxHashes(Hash.wrap(hash)).map(this::transactionComplete).orElse(null);
     } catch (NullPointerException e) {
       return null;
     }
@@ -45,32 +46,22 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
 
   Block getBlockByNumber(final Long number) {
     try {
-      return blockchain.blockByNumber(number).map(this::transactionComplete).orElse(null);
+      return blockchain.blockByNumberWithTxHashes(number).map(this::transactionComplete).orElse(null);
     } catch (NullPointerException e) {
       return null;
     }
   }
 
   Block getLatestBlock() {
-    return blockchain.latestBlock().map(this::transactionComplete).orElse(null);
+    return blockchain.latestBlockWithTxHashes().map(this::transactionComplete).orElse(null);
   }
 
   Block transactionComplete(
-      final BlockWithMetadata<TransactionWithMetadata, Hash> blockWithMetadata) {
-    final List<TransactionResult> txs =
-        blockWithMetadata.getTransactions().stream()
-            .map(TransactionCompleteResult::new)
-            .collect(Collectors.toList());
-    final List<JsonNode> ommers =
-        blockWithMetadata.getOmmers().stream()
-            .map(Hash::toString)
-            .map(TextNode::new)
-            .collect(Collectors.toList());
+      final BlockWithMetadata<Hash, Hash> blockWithMetadata) {
     return new Block(
         blockWithMetadata.getHeader(),
-        txs,
-        ommers,
-        blockWithMetadata.getTotalDifficulty(),
-        blockWithMetadata.getSize());
+        blockWithMetadata.getTransactions().size(),
+        blockWithMetadata.getOmmers().size(),
+        blockWithMetadata.getTotalDifficulty());
   }
 }

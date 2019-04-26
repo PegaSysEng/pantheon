@@ -12,6 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.Quantity;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;
@@ -20,16 +24,10 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import java.math.BigInteger;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-
 public class Block implements GraphQLResult {
 
   private final BigInteger number;
   private final String hash;
-  private Block parent;
   private final String nonce;
   private final String transactionsRoot;
   private final Integer transactionCount;
@@ -44,28 +42,19 @@ public class Block implements GraphQLResult {
   private final BigInteger difficulty;
   private final BigInteger totalDifficulty;
   private final Integer ommerCount;
-  private List<Ommer> ommers;
-  //      private final Ommer ommerAt;
   private final String ommerHash;
-  //    private final List<Transaction> transactions;
-  //  private final Transaction transactionAt;
-  //  private final List<Log> logs;
-  //  private final Account account;
-  //  private final CallResult call;
-  //  private final Long estimateGas;
 
   public Block(
       final BlockHeader header,
-      final List<TransactionResult> transactions,
-      final List<JsonNode> ommers,
-      final UInt256 totalDifficulty,
-      final int size) {
+      final int transactionCount,
+      final int ommersCount,
+      final UInt256 totalDifficulty) {
     this(
         BigInteger.valueOf(header.getNumber()),
         header.getHash().toString(),
         Quantity.longToPaddedHex(header.getNonce(), 8),
         header.getTransactionsRoot().toString(),
-        transactions.size(),
+            transactionCount,
         header.getStateRoot().toString(),
         header.getReceiptsRoot().toString(),
         header.getExtraData().toString(),
@@ -76,7 +65,7 @@ public class Block implements GraphQLResult {
         header.getMixHash().toString(),
         BigInteger.valueOf(header.getDifficulty().toLong()),
         BigInteger.valueOf(totalDifficulty.toLong()),
-        ommers.size(),
+            ommersCount,
         header.getOmmersHash().toString());
   }
 
@@ -101,7 +90,6 @@ public class Block implements GraphQLResult {
       @JsonProperty("ommerHash") final String ommerHash) {
     this.number = number;
     this.hash = hash;
-    this.parent = null;
     this.nonce = nonce;
     this.transactionsRoot = transactionsRoot;
     this.transactionCount = transactionCount;
@@ -116,7 +104,6 @@ public class Block implements GraphQLResult {
     this.difficulty = difficulty;
     this.totalDifficulty = totalDifficulty;
     this.ommerCount = ommerCount;
-    this.ommers = null;
     this.ommerHash = ommerHash;
   }
 
@@ -128,11 +115,6 @@ public class Block implements GraphQLResult {
   @JsonGetter(value = "hash")
   public String getHash() {
     return hash;
-  }
-
-  @JsonGetter(value = "parent")
-  public Block getParent() {
-    return parent;
   }
 
   @JsonGetter(value = "nonce")
@@ -203,11 +185,6 @@ public class Block implements GraphQLResult {
   @JsonGetter(value = "ommerCount")
   public Integer getOmmerCount() {
     return ommerCount;
-  }
-
-  @JsonGetter(value = "ommers")
-  public List<Ommer> getOmmers() {
-    return ommers;
   }
 
   @JsonGetter(value = "ommerHash")

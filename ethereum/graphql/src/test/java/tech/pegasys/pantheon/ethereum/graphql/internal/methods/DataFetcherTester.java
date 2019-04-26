@@ -36,7 +36,7 @@ public class DataFetcherTester {
 
   public DataFetcherTester() {}
 
-  void setGraphql(List<GraphQLMethod> methods) {
+  void setGraphql(final List<GraphQLMethod> methods) {
     graphQL = GraphQLFactory.buildGraphQL(methods);
   }
 

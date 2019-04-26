@@ -25,10 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Log implements GraphQLResult {
 
   private final Integer index;
-  private Account account;
   private final List<String> topics;
   private final String data;
-  private Transaction transaction;
 
   public Log(final LogWithMetadata logWithMetadata) {
     this(
@@ -45,20 +43,13 @@ public class Log implements GraphQLResult {
       @JsonProperty("topics") final List<String> topics,
       @JsonProperty("data") final String data) {
     this.index = index;
-    this.account = null;
     this.topics = topics;
     this.data = data;
-    this.transaction = null;
   }
 
   @JsonGetter(value = "index")
   public Integer getIndex() {
     return index;
-  }
-
-  @JsonGetter(value = "account")
-  public Account getAccount() {
-    return account;
   }
 
   @JsonGetter(value = "topics")
@@ -69,10 +60,5 @@ public class Log implements GraphQLResult {
   @JsonGetter(value = "data")
   public String getData() {
     return data;
-  }
-
-  @JsonGetter(value = "transaction")
-  public Transaction getTransaction() {
-    return transaction;
   }
 }

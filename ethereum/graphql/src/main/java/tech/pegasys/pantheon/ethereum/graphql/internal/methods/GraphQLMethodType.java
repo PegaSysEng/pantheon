@@ -16,7 +16,7 @@ public enum GraphQLMethodType {
   BLOCK("Query", "block"),
   BLOCKS("Query", "blocks"),
   PARENT("Block", "parent"),
-  OMMER("Block", "parent");
+  OMMER("Block", "ommers");
 
   private final String type;
   private final String field;
