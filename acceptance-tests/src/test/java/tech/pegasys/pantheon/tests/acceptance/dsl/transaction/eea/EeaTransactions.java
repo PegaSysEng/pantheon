@@ -17,4 +17,9 @@ public class EeaTransactions {
   public EeaGetTransactionReceiptTransaction getTransactionReceipt(final String transactionHash) {
     return new EeaGetTransactionReceiptTransaction(transactionHash);
   }
+
+  public EeaGetTransactionCountTransaction getTransactionCount(
+      final String address, final String privacyGroupId) {
+    return new EeaGetTransactionCountTransaction(address, privacyGroupId);
+  }
 }
