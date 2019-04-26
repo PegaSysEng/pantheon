@@ -117,9 +117,7 @@ public class GraphQLResponseUtils {
             nonce,
             hashFunction);
 
-    BlockResult result = new BlockResult(header, transactions, ommers, totalDifficulty, size);
-
-    Block block = Block.createFromBlockResult(result);
+    Block block = new Block(header, transactions, ommers, totalDifficulty, size);
 
     return Json.mapper
         .enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)

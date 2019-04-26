@@ -62,14 +62,23 @@ public class GraphQLFactory {
                     .build())
             .wiringFactory(new EchoingWiringFactory());
 
-    methods
-        .keySet()
-        .forEach(
-            k -> {
-              GraphQLMethod method = methods.get(k);
-              runtimeWiringBuilder.type(
-                  "Query", builder -> builder.dataFetcher(k, (DataFetcher) method));
-            });
+    //    methods
+    //        .keySet()
+    //        .forEach(
+    //            k -> {
+    //              GraphQLMethod method = methods.get(k);
+    //              runtimeWiringBuilder.type(
+    //                  "Query", builder -> builder.dataFetcher(k, (DataFetcher) method));
+    //            });
+
+    if (methods.containsKey("block")) {
+      runtimeWiringBuilder.type(
+          "Query", builder -> builder.dataFetcher("block", (DataFetcher) methods.get("block")));
+    }
+    if (methods.containsKey("parent")) {
+      runtimeWiringBuilder.type(
+          "Block", builder -> builder.dataFetcher("parent", (DataFetcher) methods.get("parent")));
+    }
 
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema =

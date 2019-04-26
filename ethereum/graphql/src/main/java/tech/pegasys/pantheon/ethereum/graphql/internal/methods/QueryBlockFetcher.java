@@ -13,28 +13,32 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResult;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResultFactory;
+import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionCompleteResult;
+import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
-public class EthBlockMethod implements DataFetcher<Block>, GraphQLMethod {
+public class QueryBlockFetcher implements DataFetcher<Block>, GraphQLMethod {
 
   //    private static final Logger LOG = LogManager.getLogger();
 
-  private final BlockResultFactory blockResult;
   private final BlockchainQueries blockchain;
 
-  public EthBlockMethod(final BlockchainQueries blockchain, final BlockResultFactory blockResult) {
+  public QueryBlockFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
-    this.blockResult = blockResult;
   }
 
   @Override
@@ -67,12 +71,7 @@ public class EthBlockMethod implements DataFetcher<Block>, GraphQLMethod {
 
   private Block getBlockByHash(final Bytes32 hash) {
     try {
-      BlockResult result =
-          blockchain
-              .blockByHash(Hash.wrap(hash))
-              .map(blockResult::transactionComplete)
-              .orElse(null);
-      return result == null ? null : Block.createFromBlockResult(result);
+      return blockchain.blockByHash(Hash.wrap(hash)).map(this::transactionComplete).orElse(null);
     } catch (NullPointerException e) {
       return null;
     }
@@ -80,18 +79,32 @@ public class EthBlockMethod implements DataFetcher<Block>, GraphQLMethod {
 
   private Block getBlockByNumber(final Long number) {
     try {
-      BlockResult result =
-          blockchain.blockByNumber(number).map(blockResult::transactionComplete).orElse(null);
-
-      return result == null ? null : Block.createFromBlockResult(result);
+      return blockchain.blockByNumber(number).map(this::transactionComplete).orElse(null);
     } catch (NullPointerException e) {
       return null;
     }
   }
 
   private Block getLatestBlock() {
-    BlockResult result =
-        blockchain.latestBlock().map(blockResult::transactionComplete).orElse(null);
-    return result == null ? null : Block.createFromBlockResult(result);
+    return blockchain.latestBlock().map(this::transactionComplete).orElse(null);
+  }
+
+  public Block transactionComplete(
+      final BlockWithMetadata<TransactionWithMetadata, Hash> blockWithMetadata) {
+    final List<TransactionResult> txs =
+        blockWithMetadata.getTransactions().stream()
+            .map(TransactionCompleteResult::new)
+            .collect(Collectors.toList());
+    final List<JsonNode> ommers =
+        blockWithMetadata.getOmmers().stream()
+            .map(Hash::toString)
+            .map(TextNode::new)
+            .collect(Collectors.toList());
+    return new Block(
+        blockWithMetadata.getHeader(),
+        txs,
+        ommers,
+        blockWithMetadata.getTotalDifficulty(),
+        blockWithMetadata.getSize());
   }
 }

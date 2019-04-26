@@ -13,9 +13,8 @@
 package tech.pegasys.pantheon.ethereum.graphql.methods;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResultFactory;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.EthBlockMethod;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
@@ -34,13 +33,12 @@ import org.mockito.Mock;
 public class GraphQLTester {
 
   @Mock BlockchainQueries blockchainQueries;
-  final BlockResultFactory blockResult = new BlockResultFactory();
 
   private GraphQL graphQL;
   private Map<String, GraphQLMethod> map = new HashMap<>();
 
   public GraphQLTester() {
-    map.put("block", new EthBlockMethod(blockchainQueries, blockResult));
+    map.put("block", new QueryBlockFetcher(blockchainQueries));
     this.graphQL = GraphQLFactory.buildGraphQL(map);
   }
 

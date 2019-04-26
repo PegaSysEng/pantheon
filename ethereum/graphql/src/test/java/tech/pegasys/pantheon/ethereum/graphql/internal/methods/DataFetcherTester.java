@@ -13,14 +13,12 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResultFactory;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import graphql.ExecutionInput;
@@ -29,18 +27,16 @@ import graphql.GraphQL;
 import io.vertx.core.json.Json;
 import org.mockito.Mock;
 
-public class GraphQLTester {
+public class DataFetcherTester {
 
-  @Mock BlockchainQueries blockchainQueries;
-  final BlockResultFactory blockResult = new BlockResultFactory();
+  @Mock static BlockchainQueries blockchainQueries;
 
-  private final GraphQL graphQL;
+  private static GraphQL graphQL;
 
-  public GraphQLTester() {
-    Map<String, GraphQLMethod> map = new HashMap<>();
-    map.put("block", new EthBlockMethod(blockchainQueries, blockResult));
+  public DataFetcherTester() {}
 
-    this.graphQL = GraphQLFactory.buildGraphQL(map);
+  static void setGraphql(Map<String, GraphQLMethod> methods) {
+    graphQL = GraphQLFactory.buildGraphQL(methods);
   }
 
   GraphQLResponse executeRequest(final GraphQLRequest request) {
@@ -63,16 +59,16 @@ public class GraphQLTester {
     }
   }
 
-  GraphQLRequest requestNoQuery() {
-    return requestWithQuery(null);
+  GraphQLResponse executeNoQuery() {
+    return executeWithQuery(null);
   }
 
-  GraphQLRequest requestWithQuery(final String query) {
-    return requestWithQueryAndVariables(query, null);
+  GraphQLResponse executeWithQuery(final String query) {
+    return executeWithQueryAndVariables(query, null);
   }
 
-  GraphQLRequest requestWithQueryAndVariables(
+  GraphQLResponse executeWithQueryAndVariables(
       final String query, final Map<String, Object> variables) {
-    return new GraphQLRequest(null, query, variables);
+    return executeRequest(new GraphQLRequest(null, query, variables));
   }
 }

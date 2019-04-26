@@ -15,30 +15,36 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
 import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLParameters;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.ResponseType;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import io.vertx.core.json.Json;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EthBlockMethodTest extends GraphQLTester {
+public class QueryBlockFetcherTest extends DataFetcherTester {
 
-  private EthBlockMethod method;
+  private QueryBlockFetcher method;
   private final String ETH_METHOD = "block";
   //  private final String ZERO_HASH = String.valueOf(Hash.ZERO);
 
+  @BeforeClass
+  public static void setUpOnce() {
+    setGraphql(Collections.singletonMap("block", new QueryBlockFetcher(blockchainQueries)));
+  }
+
   @Before
   public void setUp() {
-    method = new EthBlockMethod(blockchainQueries, blockResult);
+    method = new QueryBlockFetcher(blockchainQueries);
   }
 
   @Test
@@ -46,25 +52,17 @@ public class EthBlockMethodTest extends GraphQLTester {
     assertThat(method.getType()).isEqualTo(ETH_METHOD);
   }
 
-  @Test
-  public void returnsCorrectMethodName1() {
-    Long.valueOf("0");
-  }
-
   @Test(expected = InvalidGraphQLParameters.class)
   public void exceptionWhenNoParamsSupplied() {
-    final GraphQLRequest request = requestNoQuery();
-
-    executeRequest(request);
+    executeNoQuery();
 
     verifyNoMoreInteractions(blockchainQueries);
   }
 
   @Test
   public void exceptionWhenHashParamInvalid() throws IOException {
-    final GraphQLRequest request = requestWithQuery("{ block(hash: \"0x00\") { number } }");
-
-    GraphQLSuccessResponse response = (GraphQLSuccessResponse) executeRequest(request);
+    final GraphQLSuccessResponse response =
+        (GraphQLSuccessResponse) executeWithQuery("{ block(hash: \"0x00\") { number } }");
 
     final GraphQLSuccessResponse expected =
         Json.mapper.readValue("{ \"data\": {\"block\": null} }", GraphQLSuccessResponse.class);
@@ -76,11 +74,9 @@ public class EthBlockMethodTest extends GraphQLTester {
 
   @Test
   public void returnsWhenHashParamValid() {
-    final GraphQLRequest request =
-        requestWithQuery(
+    final GraphQLResponse response =
+        executeWithQuery(
             "{ block(hash: \"0x00000000000000000000000000000000000000000000000000000000000000\") { number } }");
-
-    GraphQLResponse response = executeRequest(request);
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
 
@@ -89,9 +85,7 @@ public class EthBlockMethodTest extends GraphQLTester {
 
   @Test
   public void returnsWhenNumberParamValid() {
-    final GraphQLRequest request = requestWithQuery("{ block(number: 0) { number } }");
-
-    GraphQLResponse response = executeRequest(request);
+    final GraphQLResponse response = executeWithQuery("{ block(number: 0) { number } }");
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
 

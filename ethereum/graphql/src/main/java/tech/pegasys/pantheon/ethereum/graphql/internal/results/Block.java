@@ -12,18 +12,25 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResult;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.graphql.internal.dao.Quantity;
+import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;
+import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class Block implements GraphQLResult {
 
   private final BigInteger number;
   private final String hash;
+  private Block parent;
   private final String nonce;
   private final String transactionsRoot;
   private final Integer transactionCount;
@@ -34,36 +41,43 @@ public class Block implements GraphQLResult {
   private final BigInteger gasUsed;
   private final BigInteger timestamp;
   private final String logsBloom;
-  //    private final String mixHash;
+  private final String mixHash;
   private final BigInteger difficulty;
   private final BigInteger totalDifficulty;
   private final Integer ommerCount;
   //    private final List<Block> ommers;
   private final String ommerHash;
   //    private final List<Transaction> transactions;
+  //  private final Transaction transactionAt;
+  //  private final List<Log> logs;
+  //  private final Account account;
+  //  private final CallResult call;
+  //  private final Long estimateGas;
 
-  //    public Account miner(Long block) {
-  //
-  //    }
-
-  public static Block createFromBlockResult(final BlockResult blockResult) {
-    return new Block(
-        convertToBigInt(blockResult.getNumber()),
-        blockResult.getHash(),
-        blockResult.getNonce(),
-        blockResult.getTransactionsRoot(),
-        blockResult.getTransactions() == null ? null : blockResult.getTransactions().size(),
-        blockResult.getStateRoot(),
-        blockResult.getReceiptsRoot(),
-        blockResult.getExtraData(),
-        convertToBigInt(blockResult.getGasLimit()),
-        convertToBigInt(blockResult.getGasUsed()),
-        convertToBigInt(blockResult.getTimestamp()),
-        blockResult.getLogsBloom(),
-        convertToBigInt(blockResult.getDifficulty()),
-        convertToBigInt(blockResult.getTotalDifficulty()),
-        blockResult.getOmmers() == null ? null : blockResult.getOmmers().size(),
-        blockResult.getSha3Uncles());
+  public Block(
+      final BlockHeader header,
+      final List<TransactionResult> transactions,
+      final List<JsonNode> ommers,
+      final UInt256 totalDifficulty,
+      final int size) {
+    this(
+        BigInteger.valueOf(header.getNumber()),
+        header.getHash().toString(),
+        Quantity.longToPaddedHex(header.getNonce(), 8),
+        header.getTransactionsRoot().toString(),
+        transactions.size(),
+        header.getStateRoot().toString(),
+        header.getReceiptsRoot().toString(),
+        header.getExtraData().toString(),
+        BigInteger.valueOf(header.getGasLimit()),
+        BigInteger.valueOf(header.getGasUsed()),
+        BigInteger.valueOf(header.getTimestamp()),
+        header.getLogsBloom().toString(),
+        header.getMixHash().toString(),
+        BigInteger.valueOf(header.getDifficulty().toLong()),
+        BigInteger.valueOf(totalDifficulty.toLong()),
+        ommers.size(),
+        header.getOmmersHash().toString());
   }
 
   @JsonCreator
@@ -80,12 +94,14 @@ public class Block implements GraphQLResult {
       @JsonProperty("gasUsed") final BigInteger gasUsed,
       @JsonProperty("timestamp") final BigInteger timestamp,
       @JsonProperty("logsBloom") final String logsBloom,
+      @JsonProperty("mixHash") final String mixHash,
       @JsonProperty("difficulty") final BigInteger difficulty,
       @JsonProperty("totalDifficulty") final BigInteger totalDifficulty,
       @JsonProperty("ommerCount") final Integer ommerCount,
       @JsonProperty("ommerHash") final String ommerHash) {
     this.number = number;
     this.hash = hash;
+    this.parent = null;
     this.nonce = nonce;
     this.transactionsRoot = transactionsRoot;
     this.transactionCount = transactionCount;
@@ -96,20 +112,11 @@ public class Block implements GraphQLResult {
     this.gasUsed = gasUsed;
     this.timestamp = timestamp;
     this.logsBloom = logsBloom;
+    this.mixHash = mixHash;
     this.difficulty = difficulty;
     this.totalDifficulty = totalDifficulty;
     this.ommerCount = ommerCount;
     this.ommerHash = ommerHash;
-  }
-
-  private static BigInteger convertToBigInt(final String s) {
-    if (s == null || s.isEmpty()) {
-      return null;
-    }
-    if (s.substring(0, 2).equals("0x")) {
-      return new BigInteger(s.substring(2), 16);
-    }
-    return null;
   }
 
   @JsonGetter(value = "number")
@@ -120,6 +127,16 @@ public class Block implements GraphQLResult {
   @JsonGetter(value = "hash")
   public String getHash() {
     return hash;
+  }
+
+  @JsonGetter(value = "parent")
+  public Block getParent() {
+    return parent;
+  }
+
+  @JsonSetter(value = "parent")
+  public void setParent(final Block parent) {
+    this.parent = parent;
   }
 
   @JsonGetter(value = "nonce")
@@ -170,6 +187,11 @@ public class Block implements GraphQLResult {
   @JsonGetter(value = "logsBloom")
   public String getLogsBloom() {
     return logsBloom;
+  }
+
+  @JsonGetter(value = "mixHash")
+  public String getMixHash() {
+    return mixHash;
   }
 
   @JsonGetter(value = "difficulty")

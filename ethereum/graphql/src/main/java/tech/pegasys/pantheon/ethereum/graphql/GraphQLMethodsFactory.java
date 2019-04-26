@@ -18,9 +18,9 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResultFactory;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.EthBlockMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -37,9 +37,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public class GraphQLMethodsFactory {
-
-  private final BlockResultFactory blockResult = new BlockResultFactory();
-  //  private final GraphQLParameters parameter = new JsonRpcParameter();
 
   public Map<String, GraphQLMethod> methods(
       final String clientVersion,
@@ -97,7 +94,10 @@ public class GraphQLMethodsFactory {
       final PrivacyParameters privacyParameters,
       final MetricsConfiguration metricsConfiguration) {
     final Map<String, GraphQLMethod> enabledMethods = new HashMap<>();
-    addMethods(enabledMethods, new EthBlockMethod(blockchainQueries, blockResult));
+    addMethods(
+        enabledMethods,
+        new QueryBlockFetcher(blockchainQueries),
+        new BlockParentFetcher(blockchainQueries));
     //    if (rpcApis.contains(RpcApis.ETH)) {
     //      addMethods(
     //          enabledMethods,

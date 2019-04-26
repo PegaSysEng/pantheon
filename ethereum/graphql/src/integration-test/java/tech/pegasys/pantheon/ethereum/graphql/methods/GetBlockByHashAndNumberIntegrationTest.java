@@ -54,7 +54,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class EthGetBlockByHashIntegrationTest extends GraphQLTester {
+public class GetBlockByHashAndNumberIntegrationTest extends GraphQLTester {
 
   private Map<String, GraphQLMethod> methods = BLOCKCHAIN.methods();
   private static GraphQLTestMethodsFactory BLOCKCHAIN;
@@ -65,12 +65,12 @@ public class EthGetBlockByHashIntegrationTest extends GraphQLTester {
   @BeforeClass
   public static void setUpOnce() throws Exception {
     final URL blocksUrl =
-        EthGetBlockByHashIntegrationTest.class
+        GetBlockByHashAndNumberIntegrationTest.class
             .getClassLoader()
             .getResource("tech/pegasys/pantheon/ethereum/graphql/jsonRpcTestBlockchain.blocks");
 
     final URL genesisJsonUrl =
-        EthGetBlockByHashIntegrationTest.class
+        GetBlockByHashAndNumberIntegrationTest.class
             .getClassLoader()
             .getResource("tech/pegasys/pantheon/ethereum/graphql/jsonRpcTestGenesis.json");
 
