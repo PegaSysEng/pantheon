@@ -408,15 +408,12 @@ public class RunnerBuilder {
       final List<EnodeURL> bootnodesAsEnodeURLs,
       final Synchronizer synchronizer,
       final TransactionSimulator transactionSimulator) {
+    Collection<EnodeURL> fixedNodes = bootnodesAsEnodeURLs;
+    fixedNodes.addAll(staticNodes);
     return permissioningConfiguration.map(
         config ->
             new NodePermissioningControllerFactory()
-                .create(
-                    config,
-                    synchronizer,
-                    bootnodesAsEnodeURLs,
-                    getSelfEnode(),
-                    transactionSimulator));
+                .create(config, synchronizer, fixedNodes, getSelfEnode(), transactionSimulator));
   }
 
   private FilterManager createFilterManager(
