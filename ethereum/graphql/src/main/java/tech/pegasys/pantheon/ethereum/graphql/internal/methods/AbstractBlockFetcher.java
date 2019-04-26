@@ -55,7 +55,7 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
     return blockchain.latestBlock().map(this::transactionComplete).orElse(null);
   }
 
-  private Block transactionComplete(
+  Block transactionComplete(
       final BlockWithMetadata<TransactionWithMetadata, Hash> blockWithMetadata) {
     final List<TransactionResult> txs =
         blockWithMetadata.getTransactions().stream()

@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockOmmersFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
@@ -99,7 +100,8 @@ public class GraphQLMethodsFactory {
         enabledMethods,
         new QueryBlockFetcher(blockchainQueries),
         new QueryBlocksFetcher(blockchainQueries),
-        new BlockParentFetcher(blockchainQueries));
+        new BlockParentFetcher(blockchainQueries),
+        new BlockOmmersFetcher(blockchainQueries));
     //    if (rpcApis.contains(RpcApis.ETH)) {
     //      addMethods(
     //          enabledMethods,

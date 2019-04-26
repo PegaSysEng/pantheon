@@ -15,7 +15,8 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 public enum GraphQLMethodType {
   BLOCK("Query", "block"),
   BLOCKS("Query", "blocks"),
-  PARENT("Block", "parent");
+  PARENT("Block", "parent"),
+  OMMER("Block", "parent");
 
   private final String type;
   private final String field;

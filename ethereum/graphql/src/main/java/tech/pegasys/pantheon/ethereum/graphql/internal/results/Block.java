@@ -23,7 +23,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class Block implements GraphQLResult {
@@ -45,7 +44,8 @@ public class Block implements GraphQLResult {
   private final BigInteger difficulty;
   private final BigInteger totalDifficulty;
   private final Integer ommerCount;
-  //    private final List<Block> ommers;
+  private List<Ommer> ommers;
+  //      private final Ommer ommerAt;
   private final String ommerHash;
   //    private final List<Transaction> transactions;
   //  private final Transaction transactionAt;
@@ -116,6 +116,7 @@ public class Block implements GraphQLResult {
     this.difficulty = difficulty;
     this.totalDifficulty = totalDifficulty;
     this.ommerCount = ommerCount;
+    this.ommers = null;
     this.ommerHash = ommerHash;
   }
 
@@ -132,11 +133,6 @@ public class Block implements GraphQLResult {
   @JsonGetter(value = "parent")
   public Block getParent() {
     return parent;
-  }
-
-  @JsonSetter(value = "parent")
-  public void setParent(final Block parent) {
-    this.parent = parent;
   }
 
   @JsonGetter(value = "nonce")
@@ -207,6 +203,11 @@ public class Block implements GraphQLResult {
   @JsonGetter(value = "ommerCount")
   public Integer getOmmerCount() {
     return ommerCount;
+  }
+
+  @JsonGetter(value = "ommers")
+  public List<Ommer> getOmmers() {
+    return ommers;
   }
 
   @JsonGetter(value = "ommerHash")
