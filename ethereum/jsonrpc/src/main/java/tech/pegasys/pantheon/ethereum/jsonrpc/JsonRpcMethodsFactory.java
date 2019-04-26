@@ -73,6 +73,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetPeerCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetServices;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.RpcModules;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.TxPoolPantheonStatistics;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.TxPoolPantheonTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3Sha3;
@@ -87,6 +88,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.Per
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermReloadPermissionsFromFile;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveAccountsFromWhitelist;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveNodesFromWhitelist;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaGetTransactionCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaGetTransactionReceipt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaSendRawTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -286,7 +288,9 @@ public class JsonRpcMethodsFactory {
     }
     if (rpcApis.contains(RpcApis.TX_POOL)) {
       addMethods(
-          enabledMethods, new TxPoolPantheonTransactions(transactionPool.getPendingTransactions()));
+          enabledMethods,
+          new TxPoolPantheonTransactions(transactionPool.getPendingTransactions()),
+          new TxPoolPantheonStatistics(transactionPool.getPendingTransactions()));
     }
     if (rpcApis.contains(RpcApis.PERM)) {
       addMethods(
@@ -311,15 +315,17 @@ public class JsonRpcMethodsFactory {
     if (rpcApis.contains(RpcApis.EEA)) {
       addMethods(
           enabledMethods,
-          new EeaSendRawTransaction(
-              new PrivateTransactionHandler(privacyParameters), transactionPool, parameter));
-      addMethods(
-          enabledMethods,
           new EeaGetTransactionReceipt(
               blockchainQueries,
               new Enclave(privacyParameters.getEnclaveUri()),
               parameter,
-              privacyParameters));
+              privacyParameters),
+          new EeaSendRawTransaction(
+              blockchainQueries,
+              new PrivateTransactionHandler(privacyParameters),
+              transactionPool,
+              parameter),
+          new EeaGetTransactionCount(parameter, privacyParameters));
     }
     return enabledMethods;
   }
