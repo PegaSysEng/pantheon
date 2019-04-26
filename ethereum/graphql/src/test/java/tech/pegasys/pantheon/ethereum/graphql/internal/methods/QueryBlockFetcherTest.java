@@ -25,7 +25,6 @@ import java.util.Collections;
 
 import io.vertx.core.json.Json;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -34,22 +33,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class QueryBlockFetcherTest extends DataFetcherTester {
 
   private QueryBlockFetcher method;
-  private final String ETH_METHOD = "block";
+  private final GraphQLMethodType GRAPHQL_METHOD = GraphQLMethodType.BLOCK;
   //  private final String ZERO_HASH = String.valueOf(Hash.ZERO);
-
-  @BeforeClass
-  public static void setUpOnce() {
-    setGraphql(Collections.singletonMap("block", new QueryBlockFetcher(blockchainQueries)));
-  }
 
   @Before
   public void setUp() {
     method = new QueryBlockFetcher(blockchainQueries);
+    setGraphql(Collections.singletonList(method));
   }
 
   @Test
-  public void returnsCorrectMethodName() {
-    assertThat(method.getType()).isEqualTo(ETH_METHOD);
+  public void returnsCorrectMethodType() {
+    assertThat(method.getType()).isEqualTo(GRAPHQL_METHOD);
   }
 
   @Test(expected = InvalidGraphQLParameters.class)

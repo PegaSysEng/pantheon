@@ -37,31 +37,30 @@ import tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseUtils;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLTestMethodsFactory;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
+import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import graphql.GraphQL;
 import io.vertx.core.json.Json;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class GetBlockByHashAndNumberIntegrationTest extends GraphQLTester {
 
-  private Map<String, GraphQLMethod> methods = BLOCKCHAIN.methods();
-  private static GraphQLTestMethodsFactory BLOCKCHAIN;
+  private static GraphQL GRAPHQL;
   private final GraphQLResponseUtils responseUtils = new GraphQLResponseUtils();
-  //  private final String ETH_METHOD = "blocks";
   private final String ZERO_HASH = String.valueOf(Hash.ZERO);
-  //
+
   @BeforeClass
   public static void setUpOnce() throws Exception {
     final URL blocksUrl =
@@ -79,12 +78,10 @@ public class GetBlockByHashAndNumberIntegrationTest extends GraphQLTester {
 
     final String genesisJson = Resources.toString(genesisJsonUrl, Charsets.UTF_8);
 
-    BLOCKCHAIN = new GraphQLTestMethodsFactory(new BlockchainImporter(blocksUrl, genesisJson));
-  }
+    final GraphQLTestMethodsFactory blockchain =
+        new GraphQLTestMethodsFactory(new BlockchainImporter(blocksUrl, genesisJson));
 
-  @Before
-  public void setUp() {
-    this.setMethods(methods);
+    GRAPHQL = GraphQLFactory.buildGraphQL(new ArrayList<>(blockchain.methods().values()));
   }
 
   @Test
@@ -94,7 +91,8 @@ public class GetBlockByHashAndNumberIntegrationTest extends GraphQLTester {
 
     final GraphQLSuccessResponse actual =
         (GraphQLSuccessResponse)
-            executeRequest(requestWithQuery("{ block(hash: \"" + ZERO_HASH + "\") { number } }"));
+            executeRequest(
+                GRAPHQL, requestWithQuery("{ block(hash: \"" + ZERO_HASH + "\") { number } }"));
 
     assertThat(actual).isEqualToComparingFieldByField(expected);
   }
@@ -148,15 +146,17 @@ public class GetBlockByHashAndNumberIntegrationTest extends GraphQLTester {
     final GraphQLResponse expected = responseUtils.response(expectedResult, transactions);
     final GraphQLResponse actualByNumber =
         executeRequest(
+            GRAPHQL,
             requestWithQuery(
                 "{ block(number: 1)"
-                    + " { number hash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
+                    + " { number hash mixHash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
 
     final GraphQLResponse actualByHash =
         executeRequest(
+            GRAPHQL,
             requestWithQuery(
                 "{ block(hash: \"0x10aaf14a53caf27552325374429d3558398a36d3682ede6603c2c6511896e9f9\")"
-                    + " { number hash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
+                    + " { number hash mixHash nonce transactionsRoot transactionCount stateRoot receiptsRoot extraData gasLimit gasUsed timestamp logsBloom difficulty totalDifficulty ommerCount ommerHash } }"));
 
     assertThat(actualByNumber).isEqualToComparingFieldByFieldRecursively(expected);
     assertThat(actualByHash).isEqualToComparingFieldByFieldRecursively(expected);

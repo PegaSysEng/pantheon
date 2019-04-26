@@ -39,6 +39,7 @@ import tech.pegasys.pantheon.util.NetworkUtility;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -134,7 +135,7 @@ public class GraphQLHttpService {
     this.vertx = vertx;
     this.authenticationService = authenticationService;
     this.methods = methods;
-    this.graphQL = GraphQLFactory.buildGraphQL(methods);
+    this.graphQL = GraphQLFactory.buildGraphQL(new ArrayList<>(methods.values()));
   }
 
   private void validateConfig(final GraphQLConfiguration config) {

@@ -16,7 +16,7 @@ import static tech.pegasys.pantheon.ethereum.graphql.internal.schema.Schema.SCHE
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 
-import java.util.Map;
+import java.util.List;
 
 import graphql.GraphQL;
 import graphql.schema.DataFetcher;
@@ -29,7 +29,7 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
 public class GraphQLFactory {
-  public static GraphQL buildGraphQL(final Map<String, GraphQLMethod> methods) {
+  public static GraphQL buildGraphQL(final List<GraphQLMethod> methods) {
     SchemaParser schemaParser = new SchemaParser();
     TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(SCHEMA);
 
@@ -62,23 +62,11 @@ public class GraphQLFactory {
                     .build())
             .wiringFactory(new EchoingWiringFactory());
 
-    //    methods
-    //        .keySet()
-    //        .forEach(
-    //            k -> {
-    //              GraphQLMethod method = methods.get(k);
-    //              runtimeWiringBuilder.type(
-    //                  "Query", builder -> builder.dataFetcher(k, (DataFetcher) method));
-    //            });
-
-    if (methods.containsKey("block")) {
-      runtimeWiringBuilder.type(
-          "Query", builder -> builder.dataFetcher("block", (DataFetcher) methods.get("block")));
-    }
-    if (methods.containsKey("parent")) {
-      runtimeWiringBuilder.type(
-          "Block", builder -> builder.dataFetcher("parent", (DataFetcher) methods.get("parent")));
-    }
+    methods.forEach(
+        method ->
+            runtimeWiringBuilder.type(
+                method.getType().getType(),
+                builder -> builder.dataFetcher(method.getType().getField(), (DataFetcher) method)));
 
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema =

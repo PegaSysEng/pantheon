@@ -13,15 +13,11 @@
 package tech.pegasys.pantheon.ethereum.graphql.methods;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import graphql.ExecutionInput;
@@ -34,22 +30,9 @@ public class GraphQLTester {
 
   @Mock BlockchainQueries blockchainQueries;
 
-  private GraphQL graphQL;
-  private Map<String, GraphQLMethod> map = new HashMap<>();
-
-  public GraphQLTester() {
-    map.put("block", new QueryBlockFetcher(blockchainQueries));
-    this.graphQL = GraphQLFactory.buildGraphQL(map);
-  }
-
-  void setMethods(final Map<String, GraphQLMethod> map) {
-    this.map = map;
-    this.graphQL = GraphQLFactory.buildGraphQL(map);
-  }
-
-  GraphQLResponse executeRequest(final GraphQLRequest request) {
+  GraphQLResponse executeRequest(final GraphQL graphQl, final GraphQLRequest request) {
     ExecutionResult executionResult =
-        graphQL.execute(
+        graphQl.execute(
             ExecutionInput.newExecutionInput()
                 .query(request.getQuery())
                 .operationName(request.getOperationName())

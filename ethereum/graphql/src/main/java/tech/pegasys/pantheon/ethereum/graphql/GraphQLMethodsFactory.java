@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlocksFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -97,6 +98,7 @@ public class GraphQLMethodsFactory {
     addMethods(
         enabledMethods,
         new QueryBlockFetcher(blockchainQueries),
+        new QueryBlocksFetcher(blockchainQueries),
         new BlockParentFetcher(blockchainQueries));
     //    if (rpcApis.contains(RpcApis.ETH)) {
     //      addMethods(
@@ -242,7 +244,7 @@ public class GraphQLMethodsFactory {
   private void addMethods(
       final Map<String, GraphQLMethod> methods, final GraphQLMethod... graphQLMethods) {
     for (final GraphQLMethod graphQLMethod : graphQLMethods) {
-      methods.put(graphQLMethod.getType(), graphQLMethod);
+      methods.put(graphQLMethod.getType().getField(), graphQLMethod);
     }
   }
 }

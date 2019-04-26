@@ -39,7 +39,6 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.BlockResult;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionCompleteResult;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionHashResult;
 import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;

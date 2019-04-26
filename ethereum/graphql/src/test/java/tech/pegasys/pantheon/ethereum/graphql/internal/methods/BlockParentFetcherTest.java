@@ -15,13 +15,13 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLParameters;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.ResponseType;
 
-import java.util.HashMap;
-
-import org.junit.BeforeClass;
+import org.assertj.core.util.Lists;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -29,26 +29,20 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BlockParentFetcherTest extends DataFetcherTester {
 
-  private static BlockParentFetcher method;
-  private final String ETH_METHOD = "parent";
-  //  private final String ZERO_HASH = String.valueOf(Hash.ZERO);
+  private BlockParentFetcher method;
+  private final GraphQLMethodType GRAPHQL_METHOD = GraphQLMethodType.PARENT;
+  private final String ZERO_HASH = String.valueOf(Hash.ZERO);
 
-  @BeforeClass
-  public static void setUpOnce() {
+  @Before
+  public void setUp() {
     method = new BlockParentFetcher(blockchainQueries);
 
-    setGraphql(
-        new HashMap<String, GraphQLMethod>() {
-          {
-            put("block", new QueryBlockFetcher(blockchainQueries));
-            put("parent", method);
-          }
-        });
+    setGraphql(Lists.list(new QueryBlockFetcher(blockchainQueries), method));
   }
 
   @Test
-  public void returnsCorrectMethodName() {
-    assertThat(method.getType()).isEqualTo(ETH_METHOD);
+  public void returnsCorrectMethodType() {
+    assertThat(method.getType()).isEqualTo(GRAPHQL_METHOD);
   }
 
   @Test(expected = InvalidGraphQLParameters.class)
@@ -61,8 +55,7 @@ public class BlockParentFetcherTest extends DataFetcherTester {
   @Test
   public void returnsWhenParamValid() {
     final GraphQLResponse response =
-        executeWithQuery(
-            "{ block(hash: \"0x00000000000000000000000000000000000000000000000000000000000000\") { number parent { hash } } }");
+        executeWithQuery("{ block(hash: \"" + ZERO_HASH + "\") { number parent { hash } } }");
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
 

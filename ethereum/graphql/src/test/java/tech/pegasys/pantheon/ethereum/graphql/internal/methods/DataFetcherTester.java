@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
+import java.util.List;
 import java.util.Map;
 
 import graphql.ExecutionInput;
@@ -31,11 +32,11 @@ public class DataFetcherTester {
 
   @Mock static BlockchainQueries blockchainQueries;
 
-  private static GraphQL graphQL;
+  private GraphQL graphQL;
 
   public DataFetcherTester() {}
 
-  static void setGraphql(Map<String, GraphQLMethod> methods) {
+  void setGraphql(List<GraphQLMethod> methods) {
     graphQL = GraphQLFactory.buildGraphQL(methods);
   }
 

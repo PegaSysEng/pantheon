@@ -17,21 +17,13 @@ import java.util.List;
 
 public interface GraphQLMethod {
   /**
-   * GraphQl query types.
+   * GraphQl method type.
    *
-   * <p>These correspond to the `type Query{}` in the schema
+   * <p>These provide a mapping of the method to a type and field in the schema
    *
-   * @return the GraphQL query type.
+   * @return the GraphQL method type.
    */
-  String getType();
-
-  //        /**
-  //         * Applies the method to given request.
-  //         *
-  //         * @param request input data for the GraphQL method.
-  //         * @return output from applying the JSON-RPC method to the input.
-  //         */
-  //        GraphQLResponse response(GraphQLRequest request);
+  GraphQLMethodType getType();
 
   /**
    * The list of Permissions that correspond to this JSON-RPC method. e.g. [net/*, net/listening]
@@ -41,7 +33,7 @@ public interface GraphQLMethod {
   default List<String> getPermissions() {
     List<String> permissions = new ArrayList<>();
     permissions.add("*:*");
-    permissions.add(this.getType());
+    permissions.add(this.getType().getType());
     return permissions;
   };
 }
