@@ -13,11 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer.DisconnectCallback;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerDisconnectedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
@@ -27,11 +23,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +40,6 @@ public class EthPeers {
   public static final Comparator<EthPeer> LEAST_TO_MOST_BUSY =
       Comparator.comparing(EthPeer::outstandingRequests);
 
-  private final int maxOutstandingRequests = 5;
   private final Map<PeerConnection, EthPeer> connections = new ConcurrentHashMap<>();
   private final String protocolName;
   private final Subscribers<ConnectCallback> connectCallbacks = new Subscribers<>();
@@ -84,7 +75,7 @@ public class EthPeers {
   public PendingPeerRequest executePeerRequest(
       final PeerRequest request, final long minimumBlockNumber, final Optional<EthPeer> peer) {
     final PendingPeerRequest pendingPeerRequest =
-        new PendingPeerRequest(request, minimumBlockNumber, peer);
+        new PendingPeerRequest(this, request, minimumBlockNumber, peer);
     synchronized (this) {
       if (!pendingPeerRequest.attemptExecution()) {
         pendingRequests.add(pendingPeerRequest);
@@ -95,7 +86,7 @@ public class EthPeers {
 
   public void dispatchMessage(final EthPeer peer, final EthMessage ethMessage) {
     peer.dispatch(ethMessage);
-    if (peer.outstandingRequests() < maxOutstandingRequests) {
+    if (peer.hasAvailableRequestCapacity()) {
       synchronized (this) {
         pendingRequests.removeIf(PendingPeerRequest::attemptExecution);
       }
@@ -140,101 +131,5 @@ public class EthPeers {
 
   private void invokeConnectionCallbacks(final EthPeer peer) {
     connectCallbacks.forEach(cb -> cb.onPeerConnected(peer));
-  }
-
-  public class PendingPeerRequest {
-    private final PeerRequest request;
-    private final CompletableFuture<ResponseStream> result = new CompletableFuture<>();
-    private final long minimumBlockNumber;
-    private final Optional<EthPeer> peer;
-
-    private PendingPeerRequest(
-        final PeerRequest request, final long minimumBlockNumber, final Optional<EthPeer> peer) {
-      this.request = request;
-      this.minimumBlockNumber = minimumBlockNumber;
-      this.peer = peer;
-    }
-
-    /**
-     * Attempts to find an available peer and execute the peer request.
-     *
-     * @return true if the request should be removed from the pending list, otherwise false.
-     */
-    public boolean attemptExecution() {
-      if (result.isDone()) {
-        return true;
-      }
-      final Optional<EthPeer> leastBusySuitablePeer = getLeastBusySuitablePeer();
-      if (!leastBusySuitablePeer.isPresent()) {
-        // No peers have the required height.
-        result.completeExceptionally(new NoAvailablePeersException());
-        return true;
-      } else {
-        // At least one peer has the required height, but we not be able to use it if it's busy
-        final Optional<EthPeer> selectedPeer =
-            leastBusySuitablePeer.filter(
-                peer -> peer.outstandingRequests() < maxOutstandingRequests);
-
-        selectedPeer.ifPresent(this::sendRequest);
-        return selectedPeer.isPresent();
-      }
-    }
-
-    private synchronized void sendRequest(final EthPeer peer) {
-      // Recheck if we should send the request now we're inside the synchronized block
-      if (!result.isDone()) {
-        try {
-          final ResponseStream responseStream = request.sendRequest(peer);
-          result.complete(responseStream);
-        } catch (final PeerNotConnected e) {
-          result.completeExceptionally(new PeerDisconnectedException(peer));
-        }
-      }
-    }
-
-    private Optional<EthPeer> getLeastBusySuitablePeer() {
-      return peer.isPresent()
-          ? peer
-          : availablePeers()
-              .filter(peer -> peer.chainState().getEstimatedHeight() >= minimumBlockNumber)
-              .min(LEAST_TO_MOST_BUSY);
-    }
-
-    /**
-     * Register callbacks for when the request is made or
-     *
-     * @param onSuccess handler for when a peer becomes available and the request is sent
-     * @param onError handler for when there is no peer with sufficient height or the request fails
-     *     to send
-     */
-    public void thenEither(
-        final Consumer<ResponseStream> onSuccess, final Consumer<Throwable> onError) {
-      result.whenComplete(
-          (result, error) -> {
-            if (error != null) {
-              onError.accept(error);
-            } else {
-              onSuccess.accept(result);
-            }
-          });
-    }
-
-    /**
-     * Abort this request.
-     *
-     * @return the response stream if the request has already been sent, otherwise empty.
-     */
-    public synchronized Optional<ResponseStream> abort() {
-      try {
-        result.cancel(false);
-        return Optional.ofNullable(result.getNow(null));
-      } catch (final CancellationException | CompletionException e) {
-        return Optional.empty();
-      }
-    }
-  }
-
-  public interface PeerRequest {
-    ResponseStream sendRequest(EthPeer peer) throws PeerNotConnected;
   }
 }

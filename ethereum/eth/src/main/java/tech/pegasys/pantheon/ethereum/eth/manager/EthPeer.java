@@ -46,6 +46,9 @@ import org.apache.logging.log4j.Logger;
 
 public class EthPeer {
   private static final Logger LOG = LogManager.getLogger();
+
+  private static final int MAX_OUTSTANDING_REQUESTS = 5;
+
   private final PeerConnection connection;
 
   private final int maxTrackedSeenBlocks = 300;
@@ -326,6 +329,10 @@ public class EthPeer {
         + bodiesRequestManager.outstandingRequests()
         + receiptsRequestManager.outstandingRequests()
         + nodeDataRequestManager.outstandingRequests();
+  }
+
+  public boolean hasAvailableRequestCapacity() {
+    return outstandingRequests() < MAX_OUTSTANDING_REQUESTS;
   }
 
   public BytesValue nodeId() {
