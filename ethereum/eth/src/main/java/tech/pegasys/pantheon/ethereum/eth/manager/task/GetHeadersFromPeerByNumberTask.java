@@ -14,11 +14,9 @@ package tech.pegasys.pantheon.ethereum.eth.manager.task;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers.PendingPeerRequest;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-
-import java.util.concurrent.CompletableFuture;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
@@ -84,7 +82,7 @@ public class GetHeadersFromPeerByNumberTask extends AbstractGetHeadersFromPeerTa
   }
 
   @Override
-  protected CompletableFuture<ResponseStream> sendRequest() {
+  protected PendingPeerRequest sendRequest() {
     return sendRequestToPeer(
         peer -> {
           LOG.debug("Requesting {} headers from peer {}.", count, peer);

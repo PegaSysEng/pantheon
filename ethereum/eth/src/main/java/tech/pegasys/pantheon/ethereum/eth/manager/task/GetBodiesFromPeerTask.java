@@ -21,7 +21,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers.PendingPeerRequest;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockBodiesMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.mainnet.BodyValidation;
@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -82,7 +81,7 @@ public class GetBodiesFromPeerTask<C> extends AbstractPeerRequestTask<List<Block
   }
 
   @Override
-  protected CompletableFuture<ResponseStream> sendRequest() {
+  protected PendingPeerRequest sendRequest() {
     final List<Hash> blockHashes =
         headers.stream().map(BlockHeader::getHash).collect(Collectors.toList());
     final long minimumRequiredBlockNumber = headers.get(headers.size() - 1).getNumber();

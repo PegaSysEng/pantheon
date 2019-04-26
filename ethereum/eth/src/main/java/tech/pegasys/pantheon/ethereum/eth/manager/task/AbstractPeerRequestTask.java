@@ -12,17 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager.task;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
-
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers.PeerRequest;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers.PendingPeerRequest;
 import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerBreachedProtocolException;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerDisconnectedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -30,9 +26,7 @@ import tech.pegasys.pantheon.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeoutException;
 
 public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
@@ -40,7 +34,7 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
 
   private Duration timeout = DEFAULT_TIMEOUT;
   private final int requestCode;
-  private volatile CompletableFuture<ResponseStream> responseStream;
+  private volatile PendingPeerRequest responseStream;
 
   protected AbstractPeerRequestTask(
       final EthContext ethContext, final int requestCode, final MetricsSystem metricsSystem) {
@@ -57,25 +51,20 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
   protected final void executeTask() {
     final CompletableFuture<R> promise = new CompletableFuture<>();
     responseStream = sendRequest();
-    responseStream
-        .thenAccept(
-            stream -> {
-              // Start the timeout now that the request has actually been sent
-              ethContext.getScheduler().failAfterTimeout(promise, timeout);
+    responseStream.thenEither(
+        stream -> {
+          // Start the timeout now that the request has actually been sent
+          ethContext.getScheduler().failAfterTimeout(promise, timeout);
 
-              stream.then(
-                  (streamClosed, message, peer1) ->
-                      handleMessage(promise, streamClosed, message, peer1));
-            })
-        .exceptionally(
-            error -> {
-              promise.completeExceptionally(error);
-              return null;
-            });
+          stream.then(
+              (streamClosed, message, peer1) ->
+                  handleMessage(promise, streamClosed, message, peer1));
+        },
+        promise::completeExceptionally);
 
     promise.whenComplete(
         (r, t) -> {
-          final Optional<ResponseStream> responseStream = cancelAndGetResponseStreamIfCreated();
+          final Optional<ResponseStream> responseStream = this.responseStream.abort();
           if (t != null) {
             t = ExceptionUtils.rootCause(t);
             if (t instanceof TimeoutException && responseStream.isPresent()) {
@@ -89,18 +78,9 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
         });
   }
 
-  public CompletableFuture<ResponseStream> sendRequestToPeer(
+  public PendingPeerRequest sendRequestToPeer(
       final PeerRequest request, final long minimumBlockNumber) {
-    if (assignedPeer.isPresent()) {
-      try {
-        return completedFuture(request.sendRequest(assignedPeer.get()));
-      } catch (final PeerNotConnected e) {
-        result.get().completeExceptionally(new PeerDisconnectedException(assignedPeer.get()));
-        return completedExceptionally(e);
-      }
-    } else {
-      return ethContext.getEthPeers().executePeerRequest(request, minimumBlockNumber);
-    }
+    return ethContext.getEthPeers().executePeerRequest(request, minimumBlockNumber, assignedPeer);
   }
 
   private void handleMessage(
@@ -122,25 +102,13 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
     }
   }
 
-  private Optional<ResponseStream> cancelAndGetResponseStreamIfCreated() {
-    try {
-      responseStream.cancel(false);
-      return Optional.ofNullable(responseStream.getNow(null));
-    } catch (final CancellationException | CompletionException e) {
-      return Optional.empty();
-    }
-  }
-
   @Override
   protected void cleanup() {
     super.cleanup();
-    final ResponseStream stream = responseStream.getNow(null);
-    if (stream != null) {
-      stream.close();
-    }
+    responseStream.abort().ifPresent(ResponseStream::close);
   }
 
-  protected abstract CompletableFuture<ResponseStream> sendRequest();
+  protected abstract PendingPeerRequest sendRequest();
 
   protected abstract Optional<R> processResponse(
       boolean streamClosed, MessageData message, EthPeer peer);

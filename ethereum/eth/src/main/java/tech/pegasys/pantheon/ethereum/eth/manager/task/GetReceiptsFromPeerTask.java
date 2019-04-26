@@ -21,7 +21,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers.PendingPeerRequest;
 import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
 import tech.pegasys.pantheon.ethereum.eth.messages.ReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,7 +66,7 @@ public class GetReceiptsFromPeerTask
   }
 
   @Override
-  protected CompletableFuture<ResponseStream> sendRequest() {
+  protected PendingPeerRequest sendRequest() {
     final long maximumRequiredBlockNumber =
         blockHeaders.stream()
             .mapToLong(BlockHeader::getNumber)

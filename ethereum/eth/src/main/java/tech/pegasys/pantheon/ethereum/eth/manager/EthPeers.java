@@ -27,8 +27,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,7 +53,7 @@ public class EthPeers {
   private final String protocolName;
   private final Subscribers<ConnectCallback> connectCallbacks = new Subscribers<>();
   private final Subscribers<DisconnectCallback> disconnectCallbacks = new Subscribers<>();
-  private final Collection<QueuedTask> pendingRequests = new ArrayList<>();
+  private final Collection<PendingPeerRequest> pendingRequests = new ArrayList<>();
 
   public EthPeers(final String protocolName, final MetricsSystem metricsSystem) {
     this.protocolName = protocolName;
@@ -78,22 +81,23 @@ public class EthPeers {
     return connections.get(peerConnection);
   }
 
-  public CompletableFuture<ResponseStream> executePeerRequest(
-      final PeerRequest request, final long minimumBlockNumber) {
-    final QueuedTask queuedTask = new QueuedTask(request, minimumBlockNumber);
+  public PendingPeerRequest executePeerRequest(
+      final PeerRequest request, final long minimumBlockNumber, final Optional<EthPeer> peer) {
+    final PendingPeerRequest pendingPeerRequest =
+        new PendingPeerRequest(request, minimumBlockNumber, peer);
     synchronized (this) {
-      if (!queuedTask.attemptExecution()) {
-        pendingRequests.add(queuedTask);
+      if (!pendingPeerRequest.attemptExecution()) {
+        pendingRequests.add(pendingPeerRequest);
       }
     }
-    return queuedTask.result;
+    return pendingPeerRequest;
   }
 
   public void dispatchMessage(final EthPeer peer, final EthMessage ethMessage) {
     peer.dispatch(ethMessage);
     if (peer.outstandingRequests() < maxOutstandingRequests) {
       synchronized (this) {
-        pendingRequests.removeIf(QueuedTask::attemptExecution);
+        pendingRequests.removeIf(PendingPeerRequest::attemptExecution);
       }
     }
   }
@@ -138,43 +142,95 @@ public class EthPeers {
     connectCallbacks.forEach(cb -> cb.onPeerConnected(peer));
   }
 
-  private class QueuedTask {
+  public class PendingPeerRequest {
     private final PeerRequest request;
     private final CompletableFuture<ResponseStream> result = new CompletableFuture<>();
     private final long minimumBlockNumber;
+    private final Optional<EthPeer> peer;
 
-    private QueuedTask(final PeerRequest request, final long minimumBlockNumber) {
+    private PendingPeerRequest(
+        final PeerRequest request, final long minimumBlockNumber, final Optional<EthPeer> peer) {
       this.request = request;
       this.minimumBlockNumber = minimumBlockNumber;
+      this.peer = peer;
     }
 
+    /**
+     * Attempts to find an available peer and execute the peer request.
+     *
+     * @return true if the request should be removed from the pending list, otherwise false.
+     */
     public boolean attemptExecution() {
+      if (result.isDone()) {
+        return true;
+      }
+      final Optional<EthPeer> leastBusySuitablePeer = getLeastBusySuitablePeer();
+      if (!leastBusySuitablePeer.isPresent()) {
+        // No peers have the required height.
+        result.completeExceptionally(new NoAvailablePeersException());
+        return true;
+      } else {
+        // At least one peer has the required height, but we not be able to use it if it's busy
+        final Optional<EthPeer> selectedPeer =
+            leastBusySuitablePeer.filter(
+                peer -> peer.outstandingRequests() < maxOutstandingRequests);
+
+        selectedPeer.ifPresent(this::sendRequest);
+        return selectedPeer.isPresent();
+      }
+    }
+
+    private synchronized void sendRequest(final EthPeer peer) {
+      // Recheck if we should send the request now we're inside the synchronized block
       if (!result.isDone()) {
-        final Optional<EthPeer> leastBusySuitablePeer =
-            availablePeers()
-                .filter(peer -> peer.chainState().getEstimatedHeight() >= minimumBlockNumber)
-                .min(LEAST_TO_MOST_BUSY);
-        if (!leastBusySuitablePeer.isPresent()) {
-          // No peers have the required height.
-          result.completeExceptionally(new NoAvailablePeersException());
-        } else {
-          // At least one peer has the required height, but we not be able to use it if it's busy
-          final Optional<EthPeer> selectedPeer =
-              leastBusySuitablePeer.filter(
-                  peer -> peer.outstandingRequests() < maxOutstandingRequests);
-          selectedPeer.ifPresent(
-              peer -> {
-                try {
-                  final ResponseStream responseStream = request.sendRequest(peer);
-                  result.complete(responseStream);
-                } catch (final PeerNotConnected e) {
-                  result.completeExceptionally(new PeerDisconnectedException(peer));
-                }
-              });
-          return selectedPeer.isPresent();
+        try {
+          final ResponseStream responseStream = request.sendRequest(peer);
+          result.complete(responseStream);
+        } catch (final PeerNotConnected e) {
+          result.completeExceptionally(new PeerDisconnectedException(peer));
         }
       }
-      return false;
+    }
+
+    private Optional<EthPeer> getLeastBusySuitablePeer() {
+      return peer.isPresent()
+          ? peer
+          : availablePeers()
+              .filter(peer -> peer.chainState().getEstimatedHeight() >= minimumBlockNumber)
+              .min(LEAST_TO_MOST_BUSY);
+    }
+
+    /**
+     * Register callbacks for when the request is made or
+     *
+     * @param onSuccess handler for when a peer becomes available and the request is sent
+     * @param onError handler for when there is no peer with sufficient height or the request fails
+     *     to send
+     */
+    public void thenEither(
+        final Consumer<ResponseStream> onSuccess, final Consumer<Throwable> onError) {
+      result.whenComplete(
+          (result, error) -> {
+            if (error != null) {
+              onError.accept(error);
+            } else {
+              onSuccess.accept(result);
+            }
+          });
+    }
+
+    /**
+     * Abort this request.
+     *
+     * @return the response stream if the request has already been sent, otherwise empty.
+     */
+    public synchronized Optional<ResponseStream> abort() {
+      try {
+        result.cancel(false);
+        return Optional.ofNullable(result.getNow(null));
+      } catch (final CancellationException | CompletionException e) {
+        return Optional.empty();
+      }
     }
   }
 
