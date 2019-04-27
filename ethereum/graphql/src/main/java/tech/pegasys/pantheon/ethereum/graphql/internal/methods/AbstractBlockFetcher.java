@@ -28,7 +28,10 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
 
   Block getBlockByHash(final Bytes32 hash) {
     try {
-      return blockchain.blockByHashWithTxHashes(Hash.wrap(hash)).map(this::transactionComplete).orElse(null);
+      return blockchain
+          .blockByHashWithTxHashes(Hash.wrap(hash))
+          .map(this::blockWithMetadataToBlock)
+          .orElse(null);
     } catch (NullPointerException e) {
       return null;
     }
@@ -36,18 +39,20 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
 
   Block getBlockByNumber(final Long number) {
     try {
-      return blockchain.blockByNumberWithTxHashes(number).map(this::transactionComplete).orElse(null);
+      return blockchain
+          .blockByNumberWithTxHashes(number)
+          .map(this::blockWithMetadataToBlock)
+          .orElse(null);
     } catch (NullPointerException e) {
       return null;
     }
   }
 
   Block getLatestBlock() {
-    return blockchain.latestBlockWithTxHashes().map(this::transactionComplete).orElse(null);
+    return blockchain.latestBlockWithTxHashes().map(this::blockWithMetadataToBlock).orElse(null);
   }
 
-  Block transactionComplete(
-      final BlockWithMetadata<Hash, Hash> blockWithMetadata) {
+  Block blockWithMetadataToBlock(final BlockWithMetadata<Hash, Hash> blockWithMetadata) {
     return new Block(
         blockWithMetadata.getHeader(),
         blockWithMetadata.getTransactions().size(),

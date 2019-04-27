@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
+
 import java.math.BigInteger;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -31,22 +33,32 @@ public class Transaction implements GraphQLResult {
   private final BigInteger gasUsed;
   private final BigInteger cumulativeGasUsed;
 
+  public Transaction(final TransactionWithMetadata tx) {
+    this(
+        tx.getTransaction().hash().toString(),
+        BigInteger.valueOf(tx.getTransaction().getNonce()),
+        tx.getTransactionIndex(),
+        BigInteger.valueOf(tx.getTransaction().getValue().toLong()),
+        BigInteger.valueOf(tx.getTransaction().getGasPrice().toLong()),
+        BigInteger.valueOf(tx.getTransaction().getGasLimit()),
+        tx.getTransaction().getPayload().toString(),
+        BigInteger.ZERO,
+        BigInteger.ZERO,
+        BigInteger.ZERO);
+  }
+
   @JsonCreator
   public Transaction(
       @JsonProperty("hash") final String hash,
       @JsonProperty("nonce") final BigInteger nonce,
       @JsonProperty("index") final Integer index,
-      @JsonProperty("from") final Account from,
-      @JsonProperty("to;") final Account to,
       @JsonProperty("value") final BigInteger value,
       @JsonProperty("gasPrice") final BigInteger gasPrice,
       @JsonProperty("gas") final BigInteger gas,
       @JsonProperty("inputData") final String inputData,
-      @JsonProperty("block") final Block block,
       @JsonProperty("status") final BigInteger status,
       @JsonProperty("gasUsed") final BigInteger gasUsed,
-      @JsonProperty("cumulativeGasUsed") final BigInteger cumulativeGasUsed,
-      @JsonProperty("createdContract") final Account createdContract) {
+      @JsonProperty("cumulativeGasUsed") final BigInteger cumulativeGasUsed) {
     this.hash = hash;
     this.nonce = nonce;
     this.index = index;

@@ -84,8 +84,8 @@ public class Runner implements AutoCloseable {
                   .getTransactionPool()
                   .getPendingTransactions()
                   .evictOldTransactions());
-        graphQl.ifPresent(service -> waitForServiceToStart("graphQl", service.start()));
-        jsonRpc.ifPresent(service -> waitForServiceToStart("jsonRpc", service.start()));
+      graphQl.ifPresent(service -> waitForServiceToStart("graphQl", service.start()));
+      jsonRpc.ifPresent(service -> waitForServiceToStart("jsonRpc", service.start()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.start()));
       metrics.ifPresent(service -> waitForServiceToStart("metrics", service.start()));
       LOG.info("Ethereum main loop is up.");

@@ -12,15 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import java.math.BigInteger;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class CallResult implements GraphQLResult {
 

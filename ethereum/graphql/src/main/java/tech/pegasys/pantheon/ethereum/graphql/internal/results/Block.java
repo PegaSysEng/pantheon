@@ -12,13 +12,14 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.math.BigInteger;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Block implements GraphQLResult {
 
@@ -50,7 +51,7 @@ public class Block implements GraphQLResult {
         header.getHash().toString(),
         Quantity.longToPaddedHex(header.getNonce(), 8),
         header.getTransactionsRoot().toString(),
-            transactionCount,
+        transactionCount,
         header.getStateRoot().toString(),
         header.getReceiptsRoot().toString(),
         header.getExtraData().toString(),
@@ -61,7 +62,7 @@ public class Block implements GraphQLResult {
         header.getMixHash().toString(),
         BigInteger.valueOf(header.getDifficulty().toLong()),
         BigInteger.valueOf(totalDifficulty.toLong()),
-            ommersCount,
+        ommersCount,
         header.getOmmersHash().toString());
   }
 

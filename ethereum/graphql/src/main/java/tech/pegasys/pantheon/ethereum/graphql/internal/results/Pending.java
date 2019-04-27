@@ -12,12 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import java.math.BigInteger;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.math.BigInteger;
-import java.util.List;
 
 public class Pending implements GraphQLResult {
 
