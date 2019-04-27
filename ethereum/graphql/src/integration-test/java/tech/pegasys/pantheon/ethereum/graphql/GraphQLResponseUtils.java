@@ -38,11 +38,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionCompleteResult;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionHashResult;
-import tech.pegasys.pantheon.ethereum.graphql.internal.dao.TransactionResult;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
@@ -55,7 +50,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -73,7 +67,7 @@ public class GraphQLResponseUtils {
 
   /** @param values hex encoded values. */
   public GraphQLResponse response(
-      final Map<GraphQLResponseKey, String> values, final List<TransactionResult> transactions)
+      final Map<GraphQLResponseKey, String> values, final List<Transaction> transactions)
       throws IOException {
 
     final Hash mixHash = hash(values.get(MIX_HASH));
@@ -116,7 +110,7 @@ public class GraphQLResponseUtils {
             nonce,
             hashFunction);
 
-    Block block = new Block(header, transactions, ommers, totalDifficulty, size);
+    Block block = new Block(header, 1, ommers.size(), totalDifficulty);
 
     return Json.mapper
         .enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)
@@ -125,62 +119,62 @@ public class GraphQLResponseUtils {
             GraphQLSuccessResponse.class);
   }
 
-  public List<TransactionResult> transactions(final String... values) {
-    final List<TransactionResult> nodes = new ArrayList<>(values.length);
-
-    for (int i = 0; i < values.length; i++) {
-      nodes.add(new TransactionHashResult(values[i]));
-    }
-
-    return nodes;
-  }
-
-  public List<TransactionResult> transactions(final TransactionResult... transactions) {
-    final List<TransactionResult> list = new ArrayList<>(transactions.length);
-
-    for (final TransactionResult transaction : transactions) {
-      list.add(transaction);
-    }
-
-    return list;
-  }
-
-  public TransactionResult transaction(
-      final String blockHash,
-      final String blockNumber,
-      final String fromAddress,
-      final String gas,
-      final String gasPrice,
-      final String hash,
-      final String input,
-      final String nonce,
-      final String toAddress,
-      final String transactionIndex,
-      final String value,
-      final String v,
-      final String r,
-      final String s) {
-
-    final Transaction transaction = mock(Transaction.class);
-    when(transaction.getGasPrice()).thenReturn(Wei.fromHexString(gasPrice));
-    when(transaction.getNonce()).thenReturn(unsignedLong(nonce));
-    when(transaction.getV()).thenReturn(bigInteger(v).intValue());
-    when(transaction.getR()).thenReturn(bigInteger(r));
-    when(transaction.getS()).thenReturn(bigInteger(s));
-    when(transaction.hash()).thenReturn(hash(hash));
-    when(transaction.getTo()).thenReturn(Optional.ofNullable(address(toAddress)));
-    when(transaction.getSender()).thenReturn(address(fromAddress));
-    when(transaction.getPayload()).thenReturn(bytes(input));
-    when(transaction.getValue()).thenReturn(wei(value));
-    when(transaction.getGasLimit()).thenReturn(unsignedLong(gas));
-
-    return new TransactionCompleteResult(
-        new TransactionWithMetadata(
-            transaction,
-            unsignedLong(blockNumber),
-            Hash.fromHexString(blockHash),
-            unsignedInt(transactionIndex)));
-  }
+//  public List<Transaction> transactions(final String... values) {
+//    final List<Transaction> nodes = new ArrayList<>(values.length);
+//
+//    for (int i = 0; i < values.length; i++) {
+//      nodes.add(new Transaction(values[i]));
+//    }
+//
+//    return nodes;
+//  }
+//
+//  public List<Transaction> transactions(final Transaction... transactions) {
+//    final List<Transaction> list = new ArrayList<>(transactions.length);
+//
+//    for (final Transaction transaction : transactions) {
+//      list.add(transaction);
+//    }
+//
+//    return list;
+//  }
+//
+//  public Transaction transaction(
+//      final String blockHash,
+//      final String blockNumber,
+//      final String fromAddress,
+//      final String gas,
+//      final String gasPrice,
+//      final String hash,
+//      final String input,
+//      final String nonce,
+//      final String toAddress,
+//      final String transactionIndex,
+//      final String value,
+//      final String v,
+//      final String r,
+//      final String s) {
+//
+//    final Transaction transaction = mock(Transaction.class);
+//    when(transaction.getGasPrice()).thenReturn(Wei.fromHexString(gasPrice));
+//    when(transaction.getNonce()).thenReturn(unsignedLong(nonce));
+//    when(transaction.getV()).thenReturn(bigInteger(v).intValue());
+//    when(transaction.getR()).thenReturn(bigInteger(r));
+//    when(transaction.getS()).thenReturn(bigInteger(s));
+//    when(transaction.hash()).thenReturn(hash(hash));
+//    when(transaction.getTo()).thenReturn(Optional.ofNullable(address(toAddress)));
+//    when(transaction.getSender()).thenReturn(address(fromAddress));
+//    when(transaction.getPayload()).thenReturn(bytes(input));
+//    when(transaction.getValue()).thenReturn(wei(value));
+//    when(transaction.getGasLimit()).thenReturn(unsignedLong(gas));
+//
+//    return new Transaction(
+//        new TransactionWithMetadata(
+//            transaction,
+//            unsignedLong(blockNumber),
+//            Hash.fromHexString(blockHash),
+//            unsignedInt(transactionIndex)));
+//  }
 
   private int unsignedInt(final String value) {
     final String hex = removeHexPrefix(value);
@@ -200,13 +194,13 @@ public class GraphQLResponseUtils {
     return prefixedHex.startsWith("0x") ? prefixedHex.substring(2) : prefixedHex;
   }
 
-  private BigInteger bigInteger(final String hex) {
-    return new BigInteger(removeHexPrefix(hex), HEX_RADIX);
-  }
-
-  private Wei wei(final String hex) {
-    return Wei.fromHexString(hex);
-  }
+//  private BigInteger bigInteger(final String hex) {
+//    return new BigInteger(removeHexPrefix(hex), HEX_RADIX);
+//  }
+//
+//  private Wei wei(final String hex) {
+//    return Wei.fromHexString(hex);
+//  }
 
   private Address address(final String hex) {
     return Address.fromHexString(hex);
