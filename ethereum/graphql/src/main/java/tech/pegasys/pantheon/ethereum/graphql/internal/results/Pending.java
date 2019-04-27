@@ -39,7 +39,7 @@ public class Pending implements GraphQLResult {
   public Pending(final Set<PendingTransactions.TransactionInfo> transactionInfo) {
     this(
         transactionInfo.size(),
-        transactionInfo.stream().map(item -> new Transaction(item)).collect(Collectors.toList()));
+        transactionInfo.stream().map(Transaction::new).collect(Collectors.toList()));
   }
 
   @JsonGetter(value = "transactionCount")
