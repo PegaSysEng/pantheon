@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import tech.pegasys.pantheon.ethereum.core.SyncStatus;
+
 import java.math.BigInteger;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,22 +25,31 @@ public class SyncState implements GraphQLResult {
   private final BigInteger startingBlock;
   private final BigInteger currentBlock;
   private final BigInteger highestBlock;
-  private final BigInteger pulledStates;
-  private final BigInteger knownStates;
+
+  //  These are defined in eip 1767 but not supported by Pantheon...
+  //  private final BigInteger pulledStates;
+  //  private final BigInteger knownStates;
+
+  public SyncState(SyncStatus status) {
+    this(
+        BigInteger.valueOf(status.getStartingBlock()),
+        BigInteger.valueOf(status.getCurrentBlock()),
+        BigInteger.valueOf(status.getHighestBlock()));
+  }
+
+  public SyncState(BigInteger headBlockNumber) {
+    this(headBlockNumber, headBlockNumber, headBlockNumber);
+  }
 
   @JsonCreator
   public SyncState(
       @JsonProperty("startingBlock") final BigInteger startingBlock,
       @JsonProperty("currentBlock") final BigInteger currentBlock,
-      @JsonProperty("highestBlock") final BigInteger highestBlock,
-      @JsonProperty("pulledStates") final BigInteger pulledStates,
-      @JsonProperty("knownStates") final BigInteger knownStates) {
+      @JsonProperty("highestBlock") final BigInteger highestBlock) {
 
     this.startingBlock = startingBlock;
     this.currentBlock = currentBlock;
     this.highestBlock = highestBlock;
-    this.pulledStates = pulledStates;
-    this.knownStates = knownStates;
   }
 
   @JsonGetter(value = "startingBlock")
@@ -54,15 +65,5 @@ public class SyncState implements GraphQLResult {
   @JsonGetter(value = "highestBlock")
   public BigInteger getHighestBlock() {
     return highestBlock;
-  }
-
-  @JsonGetter(value = "pulledStates")
-  public BigInteger getPulledStates() {
-    return pulledStates;
-  }
-
-  @JsonGetter(value = "knownStates")
-  public BigInteger getKnownStates() {
-    return knownStates;
   }
 }

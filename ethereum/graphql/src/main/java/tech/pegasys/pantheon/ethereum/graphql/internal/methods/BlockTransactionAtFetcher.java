@@ -13,9 +13,7 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Transaction;
 
@@ -47,18 +45,17 @@ public class BlockTransactionAtFetcher implements DataFetcher<Transaction>, Grap
   }
 
   private Transaction getTransactionAt(final long blockNumber, final Integer transactionAt) {
-    return blockchain
-        .blockByNumber(blockNumber)
-        .map(result -> this.extractTransaction(result, transactionAt))
-        .orElse(null);
-  }
-
-  private Transaction extractTransaction(
-      final BlockWithMetadata<TransactionWithMetadata, Hash> result, final Integer transactionAt) {
-    if (result.getTransactions().size() < transactionAt) {
+    Hash transactionHash =
+        blockchain
+            .transactionByBlockNumberAndIndex(blockNumber, transactionAt)
+            .map(transaction -> transaction.getTransaction().hash())
+            .orElse(null);
+    if (transactionHash == null) {
       return null;
     }
-
-    return new Transaction(result.getTransactions().get(transactionAt));
+    return blockchain
+        .transactionReceiptByTransactionHash(transactionHash)
+        .map(Transaction::new)
+        .orElse(null);
   }
 }

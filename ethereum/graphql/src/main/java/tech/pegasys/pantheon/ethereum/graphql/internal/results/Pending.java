@@ -36,7 +36,7 @@ public class Pending implements GraphQLResult {
     this.transactions = transactions;
   }
 
-  public Pending(Set<PendingTransactions.TransactionInfo> transactionInfo) {
+  public Pending(final Set<PendingTransactions.TransactionInfo> transactionInfo) {
     this(
         transactionInfo.size(),
         transactionInfo.stream().map(item -> new Transaction(item)).collect(Collectors.toList()));

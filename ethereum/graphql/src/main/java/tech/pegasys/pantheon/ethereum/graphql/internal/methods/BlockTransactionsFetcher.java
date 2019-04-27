@@ -60,7 +60,9 @@ public class BlockTransactionsFetcher
           transactionWithMetadataHashBlockWithMetadata) {
     return Lists.newArrayList(
         transactionWithMetadataHashBlockWithMetadata.getTransactions().stream()
-            .map(Transaction::new)
+            .map(transaction -> transaction.getTransaction().hash())
+            .map(hash -> blockchain.transactionReceiptByTransactionHash(hash))
+            .map(receipt -> receipt.map(Transaction::new).orElse(null))
             .collect(Collectors.toList()));
   }
 }

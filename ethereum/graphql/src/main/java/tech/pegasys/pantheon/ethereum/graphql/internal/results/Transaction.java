@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionReceiptWithMetadata;
 
 import java.math.BigInteger;
 
@@ -34,18 +34,18 @@ public class Transaction implements GraphQLResult {
   private final BigInteger gasUsed;
   private final BigInteger cumulativeGasUsed;
 
-  public Transaction(final TransactionWithMetadata tx) {
+  public Transaction(TransactionReceiptWithMetadata receipt) {
     this(
-        tx.getTransaction().hash().toString(),
-        BigInteger.valueOf(tx.getTransaction().getNonce()),
-        tx.getTransactionIndex(),
-        BigInteger.valueOf(tx.getTransaction().getValue().toLong()),
-        BigInteger.valueOf(tx.getTransaction().getGasPrice().toLong()),
-        BigInteger.valueOf(tx.getTransaction().getGasLimit()),
-        tx.getTransaction().getPayload().toString(),
-        BigInteger.ZERO,
-        BigInteger.ZERO,
-        BigInteger.ZERO);
+        receipt.getTransactionHash().toString(),
+        BigInteger.valueOf(receipt.getTransaction().getNonce()),
+        receipt.getTransactionIndex(),
+        BigInteger.valueOf(receipt.getTransaction().getValue().toLong()),
+        BigInteger.valueOf(receipt.getTransaction().getGasPrice().toLong()),
+        BigInteger.valueOf(receipt.getTransaction().getGasLimit()),
+        receipt.getTransaction().getPayload().toString(),
+        BigInteger.valueOf(receipt.getReceipt().getStatus()),
+        BigInteger.valueOf(receipt.getGasUsed()),
+        BigInteger.valueOf(receipt.getReceipt().getCumulativeGasUsed()));
   }
 
   public Transaction(final PendingTransactions.TransactionInfo item) {

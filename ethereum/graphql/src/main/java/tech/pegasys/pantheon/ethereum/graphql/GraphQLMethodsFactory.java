@@ -30,7 +30,11 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactions
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlocksFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryLogsFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryPendingFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryProtocolVersionFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QuerySyncingFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryTransactionFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -110,6 +114,10 @@ public class GraphQLMethodsFactory {
         new QueryBlockFetcher(blockchainQueries),
         new QueryBlocksFetcher(blockchainQueries),
         new QueryPendingFetcher(transactionPool),
+        new QueryTransactionFetcher(blockchainQueries),
+        new QueryLogsFetcher(blockchainQueries),
+        new QueryProtocolVersionFetcher(supportedCapabilities),
+        new QuerySyncingFetcher(blockchainQueries, synchronizer),
         new BlockParentFetcher(blockchainQueries),
         new BlockOmmersFetcher(blockchainQueries),
         new BlockOmmerAtFetcher(blockchainQueries),
