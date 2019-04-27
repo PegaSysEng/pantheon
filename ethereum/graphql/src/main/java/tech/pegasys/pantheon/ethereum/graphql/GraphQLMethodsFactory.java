@@ -18,6 +18,9 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockAccountFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockCallFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockEstimateGasFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockOmmerAtFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockOmmersFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetcher;
@@ -32,6 +35,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -107,9 +111,18 @@ public class GraphQLMethodsFactory {
         new BlockOmmersFetcher(blockchainQueries),
         new BlockOmmerAtFetcher(blockchainQueries),
         new BlockTransactionsFetcher(blockchainQueries),
-        new BlockTransactionAtFetcher(blockchainQueries)
-        //            new BlockAccountFetcher(worldStateArchive),
-        );
+        new BlockTransactionAtFetcher(blockchainQueries),
+        new BlockAccountFetcher(blockchainQueries),
+        new BlockCallFetcher(
+            new TransactionSimulator(
+                blockchainQueries.getBlockchain(),
+                blockchainQueries.getWorldStateArchive(),
+                protocolSchedule)),
+        new BlockEstimateGasFetcher(
+            new TransactionSimulator(
+                blockchainQueries.getBlockchain(),
+                blockchainQueries.getWorldStateArchive(),
+                protocolSchedule)));
     return enabledMethods;
   }
 

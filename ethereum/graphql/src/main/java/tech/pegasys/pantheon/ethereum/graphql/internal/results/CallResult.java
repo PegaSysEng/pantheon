@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
+
 import java.math.BigInteger;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -32,6 +34,15 @@ public class CallResult implements GraphQLResult {
     this.data = data;
     this.gasUsed = gasUsed;
     this.status = status;
+  }
+
+  public CallResult(final TransactionSimulatorResult result) {
+    this(
+        result.getOutput().toString(), BigInteger.valueOf(result.getGasEstimate()), BigInteger.ONE);
+  }
+
+  public CallResult() {
+    this("", BigInteger.ZERO, BigInteger.ZERO);
   }
 
   @JsonGetter(value = "data")

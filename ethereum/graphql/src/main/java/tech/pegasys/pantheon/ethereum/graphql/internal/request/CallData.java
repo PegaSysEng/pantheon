@@ -13,6 +13,9 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.request;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
 
@@ -26,7 +29,7 @@ public class CallData {
   private final BigInteger gas;
   private final BigInteger gasPrice;
   private final BigInteger value;
-  private final String data;
+  private final BytesValue data;
 
   @JsonCreator
   public CallData(
@@ -35,7 +38,7 @@ public class CallData {
       @JsonProperty("gas") final BigInteger gas,
       @JsonProperty("gasPrice") final BigInteger gasPrice,
       @JsonProperty("value") final BigInteger value,
-      @JsonProperty("data") final String data) {
+      @JsonProperty("data") final BytesValue data) {
     this.from = from;
     this.to = to;
     this.gas = gas;
@@ -64,7 +67,11 @@ public class CallData {
     return value;
   }
 
-  public String getData() {
+  public BytesValue getData() {
     return data;
+  }
+
+  public CallParameter asCallParams() {
+    return new CallParameter(from, to, gas.longValue(), Wei.of(gasPrice), Wei.of(value), data);
   }
 }

@@ -32,7 +32,7 @@ public class Account implements GraphQLResult {
     this(address, BigInteger.ZERO, BigInteger.ZERO, BytesValue.EMPTY);
   }
 
-  public Account(tech.pegasys.pantheon.ethereum.core.Account account) {
+  public Account(final tech.pegasys.pantheon.ethereum.core.Account account) {
     this(
         account.getAddress(),
         BigInteger.valueOf(account.getBalance().toLong()),

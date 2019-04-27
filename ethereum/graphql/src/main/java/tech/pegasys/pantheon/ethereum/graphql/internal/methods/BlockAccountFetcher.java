@@ -14,19 +14,19 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class BlockAccountFetcher implements DataFetcher<Account>, GraphQLMethod {
-  private WorldStateArchive blockchain;
+  private BlockchainQueries blockchain;
 
   //    private static final Logger LOG = LogManager.getLogger();
 
-  public BlockAccountFetcher(final WorldStateArchive blockchain) {
+  public BlockAccountFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
   }
 
@@ -47,6 +47,7 @@ public class BlockAccountFetcher implements DataFetcher<Account>, GraphQLMethod 
 
   private Account getAccount(final String stateRoot, final Address address) {
     return blockchain
+        .getWorldStateArchive()
         .get(Hash.fromHexString(stateRoot))
         .map(worldState -> new Account(worldState.get(address)))
         .orElse(new Account(address));
