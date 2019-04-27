@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -58,7 +58,5 @@ public class BlockParentFetcherTest extends DataFetcherTester {
         executeWithQuery("{ block(hash: \"" + ZERO_HASH + "\") { number parent { hash } } }");
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
-
-    verifyNoMoreInteractions(blockchainQueries);
   }
 }

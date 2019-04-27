@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -63,8 +63,6 @@ public class QueryBlockFetcherTest extends DataFetcherTester {
         Json.mapper.readValue("{ \"data\": {\"block\": null} }", GraphQLSuccessResponse.class);
 
     assertThat(response).isEqualToComparingFieldByField(expected);
-
-    verifyNoMoreInteractions(blockchainQueries);
   }
 
   @Test
@@ -74,8 +72,6 @@ public class QueryBlockFetcherTest extends DataFetcherTester {
             "{ block(hash: \"0x00000000000000000000000000000000000000000000000000000000000000\") { number } }");
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
-
-    verifyNoMoreInteractions(blockchainQueries);
   }
 
   @Test
@@ -83,7 +79,5 @@ public class QueryBlockFetcherTest extends DataFetcherTester {
     final GraphQLResponse response = executeWithQuery("{ block(number: 0) { number } }");
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
-
-    verifyNoMoreInteractions(blockchainQueries);
   }
 }

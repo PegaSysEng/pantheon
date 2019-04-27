@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockAccountFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockOmmerAtFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockOmmersFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetcher;
@@ -108,9 +107,9 @@ public class GraphQLMethodsFactory {
         new BlockOmmersFetcher(blockchainQueries),
         new BlockOmmerAtFetcher(blockchainQueries),
         new BlockTransactionsFetcher(blockchainQueries),
-            new BlockTransactionAtFetcher(blockchainQueries)
-//            new BlockAccountFetcher(worldStateArchive),
-    );
+        new BlockTransactionAtFetcher(blockchainQueries)
+        //            new BlockAccountFetcher(worldStateArchive),
+        );
     return enabledMethods;
   }
 
