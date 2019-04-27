@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.graphql;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.toList;
-import static tech.pegasys.pantheon.ethereum.graphql.internal.schema.Schema.SCHEMA;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
 import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationService;
@@ -311,9 +310,7 @@ public class GraphQLHttpService {
             user -> {
               final HttpServerResponse response = routingContext.response();
               vertx.executeBlocking(
-                  future -> {
-                    future.complete(SCHEMA);
-                  },
+                  future -> future.complete(GraphQLFactory.SCHEMA),
                   false,
                   (res) -> {
                     if (res.failed()) {

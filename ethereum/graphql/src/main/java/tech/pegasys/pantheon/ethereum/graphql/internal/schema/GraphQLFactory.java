@@ -32,9 +32,11 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 
 public class GraphQLFactory {
 
+  public static String SCHEMA = getSchemaFromResources();
+
   public static GraphQL buildGraphQL(final List<GraphQLMethod> methods) {
     SchemaParser schemaParser = new SchemaParser();
-    TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(getSchemaFromResources());
+    TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(SCHEMA);
 
     RuntimeWiring.Builder runtimeWiringBuilder =
         RuntimeWiring.newRuntimeWiring()
