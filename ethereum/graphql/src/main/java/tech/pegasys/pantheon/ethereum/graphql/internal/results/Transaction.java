@@ -48,7 +48,7 @@ public class Transaction implements GraphQLResult {
         BigInteger.ZERO);
   }
 
-  public Transaction(PendingTransactions.TransactionInfo item) {
+  public Transaction(final PendingTransactions.TransactionInfo item) {
     this(
         item.getHash().toString(),
         BigInteger.valueOf(item.getNonce()),
