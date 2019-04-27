@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.schema;
 
-import static tech.pegasys.pantheon.ethereum.graphql.internal.schema.Schema.SCHEMA;
-
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import graphql.GraphQL;
 import graphql.schema.DataFetcher;
@@ -29,9 +31,10 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
 public class GraphQLFactory {
+
   public static GraphQL buildGraphQL(final List<GraphQLMethod> methods) {
     SchemaParser schemaParser = new SchemaParser();
-    TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(SCHEMA);
+    TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(getSchemaFromResources());
 
     RuntimeWiring.Builder runtimeWiringBuilder =
         RuntimeWiring.newRuntimeWiring()
@@ -72,5 +75,15 @@ public class GraphQLFactory {
     GraphQLSchema graphQLSchema =
         schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiringBuilder.build());
     return GraphQL.newGraphQL(graphQLSchema).build();
+  }
+
+  private static String getSchemaFromResources() {
+    ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+    InputStream is = classLoader.getResourceAsStream("schema.graphql");
+    if (is != null) {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+    }
+    return null;
   }
 }
