@@ -34,7 +34,7 @@ public class Transaction implements GraphQLResult {
   private final BigInteger gasUsed;
   private final BigInteger cumulativeGasUsed;
 
-  public Transaction(TransactionReceiptWithMetadata receipt) {
+  public Transaction(final TransactionReceiptWithMetadata receipt) {
     this(
         receipt.getTransactionHash().toString(),
         BigInteger.valueOf(receipt.getTransaction().getNonce()),
