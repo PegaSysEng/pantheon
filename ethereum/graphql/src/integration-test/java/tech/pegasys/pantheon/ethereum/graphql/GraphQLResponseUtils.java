@@ -24,7 +24,6 @@ import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.NUMBER;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.OMMERS_HASH;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.PARENT_HASH;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.RECEIPTS_ROOT;
-import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.SIZE;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.STATE_ROOT;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.TIMESTAMP;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey.TOTAL_DIFFICULTY;
@@ -85,7 +84,7 @@ public class GraphQLResponseUtils {
     final long timestamp = unsignedLong(values.get(TIMESTAMP));
     final long nonce = unsignedLong(values.get(NONCE));
     final UInt256 totalDifficulty = unsignedInt256(values.get(TOTAL_DIFFICULTY));
-    final int size = unsignedInt(values.get(SIZE));
+    //    final int size = unsignedInt(values.get(SIZE));
 
     final List<JsonNode> ommers = new ArrayList<>();
 

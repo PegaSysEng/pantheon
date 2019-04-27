@@ -19,7 +19,8 @@ public enum GraphQLMethodType {
   OMMER("Block", "ommers"),
   OMMERAT("Block", "ommerAt"),
   TRANSACTIONS("Block", "transactions"),
-  TRANSACTIONAT("Block", "transactionAt");
+  TRANSACTIONAT("Block", "transactionAt"),
+  ACCOUNT("Block", "account");
 
   private final String type;
   private final String field;
