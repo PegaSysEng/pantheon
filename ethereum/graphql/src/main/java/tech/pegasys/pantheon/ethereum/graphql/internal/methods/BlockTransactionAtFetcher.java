@@ -46,7 +46,7 @@ public class BlockTransactionAtFetcher implements DataFetcher<Transaction>, Grap
     return null;
   }
 
-  private Transaction getTransactionAt(long blockNumber, Integer transactionAt) {
+  private Transaction getTransactionAt(long blockNumber, final Integer transactionAt) {
     return blockchain
         .blockByNumber(blockNumber)
         .map(result -> this.extractTransaction(result, transactionAt))
@@ -54,7 +54,7 @@ public class BlockTransactionAtFetcher implements DataFetcher<Transaction>, Grap
   }
 
   private Transaction extractTransaction(
-      BlockWithMetadata<TransactionWithMetadata, Hash> result, Integer transactionAt) {
+      final BlockWithMetadata<TransactionWithMetadata, Hash> result, final Integer transactionAt) {
     if (result.getTransactions().size() < transactionAt) {
       return null;
     }

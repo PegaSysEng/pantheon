@@ -56,7 +56,7 @@ public class BlockTransactionsFetcher
   }
 
   private ArrayList<Transaction> extractTransactions(
-      BlockWithMetadata<TransactionWithMetadata, Hash>
+      final BlockWithMetadata<TransactionWithMetadata, Hash>
           transactionWithMetadataHashBlockWithMetadata) {
     return Lists.newArrayList(
         transactionWithMetadataHashBlockWithMetadata.getTransactions().stream()
