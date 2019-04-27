@@ -85,7 +85,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   private final String ENCLAVE_PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
-  static final String PERMISSIONING_CONFIG_TOML = "permissioning_config.toml";
+  static final String PERMISSIONING_CONFIG_TOML = "/permissioning_config.toml";
 
   private static final JsonRpcConfiguration defaultJsonRpcConfiguration;
   private static final WebSocketConfiguration defaultWebSocketConfiguration;
@@ -138,6 +138,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void callingPantheonCommandWithoutOptionsMustSyncWithDefaultValues() throws Exception {
     parseCommand();
 
+    final ArgumentCaptor<EthNetworkConfig> ethNetworkArg =
+        ArgumentCaptor.forClass(EthNetworkConfig.class);
     verify(mockRunnerBuilder).discovery(eq(true));
     verify(mockRunnerBuilder)
         .ethNetworkConfig(
@@ -145,23 +147,21 @@ public class PantheonCommandTest extends CommandTestAbstract {
                 EthNetworkConfig.jsonConfig(MAINNET),
                 EthNetworkConfig.MAINNET_NETWORK_ID,
                 MAINNET_BOOTSTRAP_NODES));
-    verify(mockRunnerBuilder).discoveryHost(eq("127.0.0.1"));
-    verify(mockRunnerBuilder).discoveryPort(eq(30303));
+    verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
+    verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(defaultJsonRpcConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(defaultWebSocketConfiguration));
     verify(mockRunnerBuilder).metricsConfiguration(eq(defaultMetricsConfiguration));
+    verify(mockRunnerBuilder).ethNetworkConfig(ethNetworkArg.capture());
     verify(mockRunnerBuilder).build();
 
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(ethNetworkArg.capture());
     final ArgumentCaptor<MiningParameters> miningArg =
         ArgumentCaptor.forClass(MiningParameters.class);
-    final ArgumentCaptor<EthNetworkConfig> networkArg =
-        ArgumentCaptor.forClass(EthNetworkConfig.class);
     verify(mockControllerBuilder).synchronizerConfiguration(isNotNull());
-    verify(mockControllerBuilder).homePath(isNotNull());
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilder).dataDirectory(isNotNull());
     verify(mockControllerBuilder).miningParameters(miningArg.capture());
-    verify(mockControllerBuilder).devMode(eq(false));
     verify(mockControllerBuilder).nodePrivateKeyFile(isNotNull());
     verify(mockControllerBuilder).build();
 
@@ -171,8 +171,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(miningArg.getValue().getCoinbase()).isEqualTo(Optional.empty());
     assertThat(miningArg.getValue().getMinTransactionGasPrice()).isEqualTo(Wei.of(1000));
     assertThat(miningArg.getValue().getExtraData()).isEqualTo(BytesValue.EMPTY);
-    assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1);
-    assertThat(networkArg.getValue().getBootNodes()).isEqualTo(MAINNET_BOOTSTRAP_NODES);
+    assertThat(ethNetworkArg.getValue().getNetworkId()).isEqualTo(1);
+    assertThat(ethNetworkArg.getValue().getBootNodes()).isEqualTo(MAINNET_BOOTSTRAP_NODES);
   }
 
   // Testing each option
@@ -249,7 +249,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void overrideDefaultValuesIfKeyIsPresentInConfigFile() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    final URL configFile = Resources.getResource("complete_config.toml");
+    final URL configFile = this.getClass().getResource("/complete_config.toml");
     final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     final String updatedConfig =
         Resources.toString(configFile, UTF_8)
@@ -280,8 +280,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockRunnerBuilder).discovery(eq(false));
     verify(mockRunnerBuilder).ethNetworkConfig(ethNetworkConfigArgumentCaptor.capture());
-    verify(mockRunnerBuilder).discoveryHost(eq("1.2.3.4"));
-    verify(mockRunnerBuilder).discoveryPort(eq(1234));
+    verify(mockRunnerBuilder).p2pAdvertisedHost(eq("1.2.3.4"));
+    verify(mockRunnerBuilder).p2pListenPort(eq(1234));
     verify(mockRunnerBuilder).maxPeers(eq(42));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
@@ -301,8 +301,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
             .setGenesisConfig(encodeJsonGenesis(GENESIS_VALID_JSON))
             .setBootNodes(nodes)
             .build();
-    verify(mockControllerBuilder).homePath(eq(Paths.get("~/pantheondata").toAbsolutePath()));
-    verify(mockControllerBuilder).ethNetworkConfig(eq(networkConfig));
+    verify(mockControllerBuilder).dataDirectory(eq(Paths.get("~/pantheondata").toAbsolutePath()));
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(eq(networkConfig));
 
     verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FAST));
     verify(mockSyncConfBuilder).fastSyncMinimumPeerCount(eq(13));
@@ -434,7 +434,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void nodePermissioningTomlFileWithNoPermissionsEnabledMustNotError() throws IOException {
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
     parseCommand("--permissions-nodes-config-file", permToml.toString());
 
@@ -448,7 +448,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void accountPermissioningTomlFileWithNoPermissionsEnabledMustNotError()
       throws IOException {
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
     parseCommand("--permissions-accounts-config-file", permToml.toString());
 
@@ -477,7 +477,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             URI.create(
                 "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.169.0.9:4568"));
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
 
     final String whitelistedNodesString =
@@ -508,7 +508,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void accountPermissioningTomlPathMustUseOption() throws IOException {
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_TOML);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG_TOML);
     final Path permToml = createTempFile("toml", Resources.toByteArray(configFile));
 
     parseCommand(
@@ -538,7 +538,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeTrue(isFullInstantiation());
 
     // Load a TOML that configures literally everything (except permissioning TOML config)
-    final URL configFile = Resources.getResource("everything_config.toml");
+    final URL configFile = this.getClass().getResource("/everything_config.toml");
     final Path toml = createTempFile("toml", Resources.toByteArray(configFile));
 
     // Parse it.
@@ -581,7 +581,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void noOverrideDefaultValuesIfKeyIsNotPresentInConfigFile() throws IOException {
     assumeTrue(isFullInstantiation());
 
-    final String configFile = Resources.getResource("partial_config.toml").getFile();
+    final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
 
     parseCommand("--config-file", configFile);
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
@@ -597,15 +597,14 @@ public class PantheonCommandTest extends CommandTestAbstract {
                 EthNetworkConfig.jsonConfig(MAINNET),
                 EthNetworkConfig.MAINNET_NETWORK_ID,
                 MAINNET_BOOTSTRAP_NODES));
-    verify(mockRunnerBuilder).discoveryHost(eq("127.0.0.1"));
-    verify(mockRunnerBuilder).discoveryPort(eq(30303));
+    verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
+    verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
     verify(mockRunnerBuilder).metricsConfiguration(eq(metricsConfiguration));
     verify(mockRunnerBuilder).build();
 
-    verify(mockControllerBuilder).devMode(eq(false));
     verify(mockControllerBuilder)
         .maxPendingTransactions(eq(PendingTransactions.MAX_PENDING_TRANSACTIONS));
     verify(mockControllerBuilder).build();
@@ -638,7 +637,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand("--node-private-key-file", file.getPath());
 
-    verify(mockControllerBuilder).homePath(isNotNull());
+    verify(mockControllerBuilder).dataDirectory(isNotNull());
     verify(mockControllerBuilder).nodePrivateKeyFile(fileArgumentCaptor.capture());
     verify(mockControllerBuilder).build();
 
@@ -665,7 +664,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void nodekeyDefaultedUnderDocker() {
+  public void nodekeyDefaultedUnderDocker() throws Exception {
     System.setProperty("pantheon.docker", "true");
 
     assumeFalse(isFullInstantiation());
@@ -684,7 +683,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand("--data-path", path.toString());
 
-    verify(mockControllerBuilder).homePath(pathArgumentCaptor.capture());
+    verify(mockControllerBuilder).dataDirectory(pathArgumentCaptor.capture());
     verify(mockControllerBuilder)
         .nodePrivateKeyFile(eq(path.resolve("key").toAbsolutePath().toFile()));
     verify(mockControllerBuilder).build();
@@ -716,7 +715,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand();
 
-    verify(mockControllerBuilder).homePath(pathArgumentCaptor.capture());
+    verify(mockControllerBuilder).dataDirectory(pathArgumentCaptor.capture());
     assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(Paths.get("/var/lib/pantheon"));
   }
 
@@ -730,7 +729,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     parseCommand("--genesis-file", genesisFile.toString());
 
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue().getGenesisConfig())
@@ -766,7 +765,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue().getGenesisConfig())
@@ -789,7 +788,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue().getGenesisConfig())
@@ -812,7 +811,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final GenesisConfigFile genesisConfigFile =
         GenesisConfigFile.fromConfig(EthNetworkConfig.getNetworkConfig(MAINNET).getGenesisConfig());
     assertThat(genesisConfigFile.getConfigOptions().getChainId().isPresent()).isTrue();
-    assertThat(genesisConfigFile.getConfigOptions().getChainId().getAsInt())
+    assertThat(genesisConfigFile.getConfigOptions().getChainId().get().intValueExact())
         .isEqualTo(EthNetworkConfig.getNetworkConfig(MAINNET).getNetworkId());
   }
 
@@ -981,8 +980,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final int port = 1234;
     parseCommand("--p2p-host", host, "--p2p-port", String.valueOf(port));
 
-    verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
-    verify(mockRunnerBuilder).discoveryPort(intArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pAdvertisedHost(stringArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pListenPort(intArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(stringArgumentCaptor.getValue()).isEqualTo(host);
@@ -998,7 +997,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final String host = "localhost";
     parseCommand("--p2p-host", host);
 
-    verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pAdvertisedHost(stringArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(stringArgumentCaptor.getValue()).isEqualTo(host);
@@ -1013,7 +1012,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final String host = "2600:DB8::8545";
     parseCommand("--p2p-host", host);
 
-    verify(mockRunnerBuilder).discoveryHost(stringArgumentCaptor.capture());
+    verify(mockRunnerBuilder).p2pAdvertisedHost(stringArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(stringArgumentCaptor.getValue()).isEqualTo(host);
@@ -2002,8 +2001,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    verify(mockControllerBuilder).devMode(eq(true));
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(DEV));
@@ -2019,7 +2017,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(RINKEBY));
@@ -2035,7 +2033,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(ROPSTEN));
@@ -2051,7 +2049,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(GOERLI));
@@ -2092,7 +2090,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final ArgumentCaptor<EthNetworkConfig> networkArg =
         ArgumentCaptor.forClass(EthNetworkConfig.class);
 
-    verify(mockControllerBuilder).ethNetworkConfig(networkArg.capture());
+    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture());
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue().getBootNodes())
@@ -2131,7 +2129,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void mustUseEnclaveUriAndOptions() throws IOException {
-    final URL configFile = Resources.getResource("orion_publickey.pub");
+    final URL configFile = this.getClass().getResource("/orion_publickey.pub");
 
     parseCommand(
         "--privacy-enabled",

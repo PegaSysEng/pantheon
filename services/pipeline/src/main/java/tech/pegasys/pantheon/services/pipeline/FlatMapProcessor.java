@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.services.pipeline;
 
-import java.util.Iterator;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -28,10 +27,7 @@ class FlatMapProcessor<I, O> implements Processor<I, O> {
   public void processNextInput(final ReadPipe<I> inputPipe, final WritePipe<O> outputPipe) {
     final I value = inputPipe.get();
     if (value != null) {
-      final Iterator<O> outputs = mapper.apply(value).iterator();
-      while (outputs.hasNext()) {
-        outputPipe.put(outputs.next());
-      }
+      mapper.apply(value).forEach(outputPipe::put);
     }
   }
 }
