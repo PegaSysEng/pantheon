@@ -32,7 +32,7 @@ public class BlockEstimateGasFetcher implements DataFetcher<BigInteger>, GraphQL
 
   @Override
   public GraphQLMethodType getType() {
-    return GraphQLMethodType.ACCOUNT;
+    return GraphQLMethodType.ESTIMATE_GAS;
   }
 
   @Override

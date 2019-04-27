@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.AccountStorageFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockAccountFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockCallFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockEstimateGasFetcher;
@@ -29,6 +30,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactions
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlocksFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryPendingFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -107,6 +109,7 @@ public class GraphQLMethodsFactory {
         enabledMethods,
         new QueryBlockFetcher(blockchainQueries),
         new QueryBlocksFetcher(blockchainQueries),
+        new QueryPendingFetcher(transactionPool),
         new BlockParentFetcher(blockchainQueries),
         new BlockOmmersFetcher(blockchainQueries),
         new BlockOmmerAtFetcher(blockchainQueries),
@@ -122,7 +125,8 @@ public class GraphQLMethodsFactory {
             new TransactionSimulator(
                 blockchainQueries.getBlockchain(),
                 blockchainQueries.getWorldStateArchive(),
-                protocolSchedule)));
+                protocolSchedule)),
+        new AccountStorageFetcher(blockchainQueries));
     return enabledMethods;
   }
 

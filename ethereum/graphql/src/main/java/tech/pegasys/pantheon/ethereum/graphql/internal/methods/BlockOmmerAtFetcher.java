@@ -29,7 +29,7 @@ public class BlockOmmerAtFetcher implements DataFetcher<Ommer>, GraphQLMethod {
 
   @Override
   public GraphQLMethodType getType() {
-    return GraphQLMethodType.OMMERAT;
+    return GraphQLMethodType.OMMER_AT;
   }
 
   @Override

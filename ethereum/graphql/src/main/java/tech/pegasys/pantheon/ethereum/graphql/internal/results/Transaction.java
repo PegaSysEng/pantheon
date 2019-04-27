@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
+import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
 
 import java.math.BigInteger;
@@ -45,6 +46,20 @@ public class Transaction implements GraphQLResult {
         BigInteger.ZERO,
         BigInteger.ZERO,
         BigInteger.ZERO);
+  }
+
+  public Transaction(PendingTransactions.TransactionInfo item) {
+    this(
+        item.getHash().toString(),
+        BigInteger.valueOf(item.getNonce()),
+        null,
+        BigInteger.valueOf(item.getTransaction().getValue().toLong()),
+        BigInteger.valueOf(item.getTransaction().getGasPrice().toLong()),
+        BigInteger.valueOf(item.getTransaction().getGasLimit()),
+        item.getTransaction().getPayload().toString(),
+        null,
+        null,
+        null);
   }
 
   @JsonCreator

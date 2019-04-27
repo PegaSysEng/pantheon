@@ -28,7 +28,7 @@ public class Account implements GraphQLResult {
   private final BigInteger transactionCount;
   private final BytesValue code;
 
-  public Account(Address address) {
+  public Account(final Address address) {
     this(address, BigInteger.ZERO, BigInteger.ZERO, BytesValue.EMPTY);
   }
 

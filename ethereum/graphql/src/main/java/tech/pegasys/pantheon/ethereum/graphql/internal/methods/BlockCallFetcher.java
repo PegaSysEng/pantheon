@@ -31,7 +31,7 @@ public class BlockCallFetcher implements DataFetcher<CallResult>, GraphQLMethod 
 
   @Override
   public GraphQLMethodType getType() {
-    return GraphQLMethodType.ACCOUNT;
+    return GraphQLMethodType.CALL;
   }
 
   @Override

@@ -33,7 +33,7 @@ public class BlockTransactionAtFetcher implements DataFetcher<Transaction>, Grap
 
   @Override
   public GraphQLMethodType getType() {
-    return GraphQLMethodType.TRANSACTIONAT;
+    return GraphQLMethodType.TRANSACTION_AT;
   }
 
   @Override

@@ -15,12 +15,16 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 public enum GraphQLMethodType {
   BLOCK("Query", "block"),
   BLOCKS("Query", "blocks"),
+  PENDING("Query", "pending"),
   PARENT("Block", "parent"),
-  OMMER("Block", "ommers"),
-  OMMERAT("Block", "ommerAt"),
+  OMMERS("Block", "ommers"),
+  OMMER_AT("Block", "ommerAt"),
   TRANSACTIONS("Block", "transactions"),
-  TRANSACTIONAT("Block", "transactionAt"),
-  ACCOUNT("Block", "account");
+  TRANSACTION_AT("Block", "transactionAt"),
+  ACCOUNT("Block", "account"),
+  CALL("Block", "call"),
+  ESTIMATE_GAS("Block", "estimateGas"),
+  STORAGE("Account", "storage");
 
   private final String type;
   private final String field;

@@ -34,7 +34,7 @@ public class BlockOmmersFetcher implements DataFetcher<ArrayList<Ommer>>, GraphQ
 
   @Override
   public GraphQLMethodType getType() {
-    return GraphQLMethodType.OMMER;
+    return GraphQLMethodType.OMMERS;
   }
 
   @Override

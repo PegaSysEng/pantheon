@@ -12,7 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
-import java.math.BigInteger;
+import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -21,17 +25,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Pending implements GraphQLResult {
 
   private final Integer transactionCount;
-
-  private final BigInteger estimateGas;
+  private List<Transaction> transactions;
 
   @JsonCreator
   public Pending(
       @JsonProperty("transactionCount") final Integer transactionCount,
-      @JsonProperty("estimateGas") final BigInteger estimateGas) {
+      @JsonProperty("transactions") final List<Transaction> transactions) {
 
     this.transactionCount = transactionCount;
+    this.transactions = transactions;
+  }
 
-    this.estimateGas = estimateGas;
+  public Pending(Set<PendingTransactions.TransactionInfo> transactionInfo) {
+    this(
+        transactionInfo.size(),
+        transactionInfo.stream().map(item -> new Transaction(item)).collect(Collectors.toList()));
   }
 
   @JsonGetter(value = "transactionCount")
@@ -39,8 +47,8 @@ public class Pending implements GraphQLResult {
     return transactionCount;
   }
 
-  @JsonGetter(value = "estimateGas")
-  public BigInteger getEstimateGas() {
-    return estimateGas;
+  @JsonGetter(value = "transactions")
+  public List<Transaction> getTransactions() {
+    return transactions;
   }
 }
