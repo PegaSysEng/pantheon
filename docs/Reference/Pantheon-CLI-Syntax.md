@@ -660,7 +660,7 @@ Specifies the contract address for [onchain node permissioning](../Permissions/O
 permissions-nodes-contract-enabled=true
 ```
 
-Enables contract-based for [onchain node permissioning](../Permissions/Onchain-Permissioning.md). Default is `false`.
+Enables contract-based [onchain node permissioning](../Permissions/Onchain-Permissioning.md). Default is `false`.
 
 ### privacy-enabled
 
