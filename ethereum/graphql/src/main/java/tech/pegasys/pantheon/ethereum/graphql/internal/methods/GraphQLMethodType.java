@@ -16,12 +16,15 @@ public enum GraphQLMethodType {
   BLOCK("Query", "block"),
   BLOCKS("Query", "blocks"),
   PARENT("Block", "parent"),
-  OMMER("Block", "ommers");
+  OMMER("Block", "ommers"),
+  OMMERAT("Block", "ommerAt"),
+  TRANSACTIONS("Block", "transactions"),
+  TRANSACTIONAT("Block", "transactionAt");
 
   private final String type;
   private final String field;
 
-  GraphQLMethodType(String type, String field) {
+  GraphQLMethodType(final String type, final String field) {
     this.type = type;
     this.field = field;
   }
