@@ -34,7 +34,8 @@ public enum GraphQLMethodType {
   TRANSACTION_FROM("Transaction", "from"),
   TRANSACTION_TO("Transaction", "to"),
   TRANSACTION_CREATED_CONTRACT("Transaction", "createdContract"),
-  TRANSACTION_BLOCK("Transaction", "block");
+  TRANSACTION_BLOCK("Transaction", "block"),
+  LOG_ACCOUNT("Log", "account");
 
   private final String type;
   private final String field;

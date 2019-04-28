@@ -34,31 +34,31 @@ abstract class AbstractAccountFetcher implements DataFetcher<Account>, GraphQLMe
   }
 
   Account resolve(DataFetchingEnvironment environment) {
-    final Hash stateRoot = resolveStateRoot(environment);
-    final Address address = resolveAddress(environment);
+    final Hash stateRoot = resolveStateRootFromBlockInEnvironment(environment);
+    final Address address = resolveAddressFromTransactionSource(environment);
     return getAccount(stateRoot, address);
   }
 
   Account resolveOrNull(DataFetchingEnvironment environment) {
-    final Hash stateRoot = resolveStateRoot(environment);
-    final Address address = resolveAddress(environment);
+    final Hash stateRoot = resolveStateRootFromBlockInEnvironment(environment);
+    final Address address = resolveAddressFromTransactionSource(environment);
     return getAccountOrNull(stateRoot, address);
   }
 
-  Address resolveAddress(DataFetchingEnvironment environment) {
+  Address resolveAddressFromTransactionSource(DataFetchingEnvironment environment) {
     final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
     final Optional<TransactionWithMetadata> transaction = blockchain.transactionByHash(hash);
-    return transaction.map(t -> t.getTransaction().getSender()).orElseThrow(RuntimeException::new);
+    return transaction.map(t -> t.getTransaction().getSender()).orElse(null);
   }
 
-  Hash resolveStateRoot(DataFetchingEnvironment environment) {
+  Hash resolveStateRootFromBlockInEnvironment(DataFetchingEnvironment environment) {
     final Optional<BlockWithMetadata<Hash, Hash>> block;
     if (environment.containsArgument("block")) {
       block = blockchain.blockByNumberWithTxHashes(environment.getArgument("block"));
     } else {
       block = blockchain.blockByNumberWithTxHashes(blockchain.headBlockNumber());
     }
-    return block.map(b -> b.getHeader().getStateRoot()).orElseThrow(RuntimeException::new);
+    return block.map(b -> b.getHeader().getStateRoot()).orElse(null);
   }
 
   Account getAccount(final Hash stateRoot, final Address address) {

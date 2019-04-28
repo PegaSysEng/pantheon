@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.LogWithMetadata;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionReceiptWithMetadata;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 
 import java.util.List;
@@ -27,24 +28,28 @@ public class Log implements GraphQLResult {
   private final Integer index;
   private final List<String> topics;
   private final String data;
+  private final Transaction transaction;
 
-  public Log(final LogWithMetadata logWithMetadata) {
+  public Log(LogWithMetadata logWithMetadata, TransactionReceiptWithMetadata receipt) {
     this(
         logWithMetadata.getLogIndex(),
         logWithMetadata.getTopics().stream()
             .map(topic -> RLP.encode(topic::writeTo).toString())
             .collect(Collectors.toList()),
-        logWithMetadata.getData().toString());
+        logWithMetadata.getData().toString(),
+        new Transaction(receipt));
   }
 
   @JsonCreator
   public Log(
       @JsonProperty("index") final Integer index,
       @JsonProperty("topics") final List<String> topics,
-      @JsonProperty("data") final String data) {
+      @JsonProperty("data") final String data,
+      @JsonProperty("transaction") final Transaction transaction) {
     this.index = index;
     this.topics = topics;
     this.data = data;
+    this.transaction = transaction;
   }
 
   @JsonGetter(value = "index")
@@ -60,5 +65,10 @@ public class Log implements GraphQLResult {
   @JsonGetter(value = "data")
   public String getData() {
     return data;
+  }
+
+  @JsonGetter(value = "transaction")
+  public Transaction getTransaction() {
+    return transaction;
   }
 }

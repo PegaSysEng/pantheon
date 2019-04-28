@@ -56,7 +56,13 @@ public class QueryLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMet
     return blockchain
         .matchingLogs(filter.getFromBlock().longValue(), filter.getToBlock().longValue(), query)
         .stream()
-        .map(Log::new)
+        .map(
+            log ->
+                new Log(
+                    log,
+                    blockchain
+                        .transactionReceiptByTransactionHash(log.getTransactionHash())
+                        .orElse(null)))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 }

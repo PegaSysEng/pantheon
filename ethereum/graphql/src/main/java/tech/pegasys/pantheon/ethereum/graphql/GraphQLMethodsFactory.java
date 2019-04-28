@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetche
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactionAtFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactionsFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.LogAccountFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.MutationTransactionFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlocksFetcher;
@@ -146,7 +147,8 @@ public class GraphQLMethodsFactory {
         new TransactionCreatedContractFetcher(blockchainQueries),
         new TransactionFromFetcher(blockchainQueries),
         new TransactionToFetcher(blockchainQueries),
-        new MutationTransactionFetcher(transactionPool));
+        new MutationTransactionFetcher(transactionPool),
+        new LogAccountFetcher(blockchainQueries));
     return enabledMethods;
   }
 
