@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class GraphQLFactory {
     ClassLoader classLoader = ClassLoader.getSystemClassLoader();
     InputStream is = classLoader.getResourceAsStream("schema.graphql");
     if (is != null) {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.defaultCharset()));
       return reader.lines().collect(Collectors.joining(System.lineSeparator()));
     }
     return null;

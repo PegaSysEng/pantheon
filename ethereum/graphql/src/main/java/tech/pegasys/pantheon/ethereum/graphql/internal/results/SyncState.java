@@ -30,14 +30,14 @@ public class SyncState implements GraphQLResult {
   //  private final BigInteger pulledStates;
   //  private final BigInteger knownStates;
 
-  public SyncState(SyncStatus status) {
+  public SyncState(final SyncStatus status) {
     this(
         BigInteger.valueOf(status.getStartingBlock()),
         BigInteger.valueOf(status.getCurrentBlock()),
         BigInteger.valueOf(status.getHighestBlock()));
   }
 
-  public SyncState(BigInteger headBlockNumber) {
+  public SyncState(final BigInteger headBlockNumber) {
     this(headBlockNumber, headBlockNumber, headBlockNumber);
   }
 
