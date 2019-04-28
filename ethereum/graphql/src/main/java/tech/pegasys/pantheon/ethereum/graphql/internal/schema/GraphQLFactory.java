@@ -84,7 +84,8 @@ public class GraphQLFactory {
     ClassLoader classLoader = ClassLoader.getSystemClassLoader();
     InputStream is = classLoader.getResourceAsStream("schema.graphql");
     if (is != null) {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.defaultCharset()));
+      BufferedReader reader =
+          new BufferedReader(new InputStreamReader(is, Charset.defaultCharset()));
       return reader.lines().collect(Collectors.joining(System.lineSeparator()));
     }
     return null;
