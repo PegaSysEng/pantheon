@@ -66,6 +66,7 @@ public class EthPeers {
       disconnectCallbacks.forEach(callback -> callback.onDisconnect(peer));
       peer.handleDisconnect();
     }
+    checkPendingConnections();
   }
 
   public EthPeer peer(final PeerConnection peerConnection) {
@@ -87,9 +88,13 @@ public class EthPeers {
   public void dispatchMessage(final EthPeer peer, final EthMessage ethMessage) {
     peer.dispatch(ethMessage);
     if (peer.hasAvailableRequestCapacity()) {
-      synchronized (this) {
-        pendingRequests.removeIf(PendingPeerRequest::attemptExecution);
-      }
+      checkPendingConnections();
+    }
+  }
+
+  private void checkPendingConnections() {
+    synchronized (this) {
+      pendingRequests.removeIf(PendingPeerRequest::attemptExecution);
     }
   }
 
