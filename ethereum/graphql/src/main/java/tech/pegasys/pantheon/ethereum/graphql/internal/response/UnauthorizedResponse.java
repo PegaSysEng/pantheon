@@ -23,14 +23,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({"errors"})
 public class UnauthorizedResponse implements GraphQLResponse {
 
-  private final RequestError errors;
+  private final GraphQLError errors;
 
-  public UnauthorizedResponse(final RequestError errors) {
+  public UnauthorizedResponse(final GraphQLError errors) {
     this.errors = errors;
   }
 
   @JsonGetter("errors")
-  public List<RequestError> getErrors() {
+  public List<GraphQLError> getErrors() {
     return Collections.singletonList(errors);
   }
 

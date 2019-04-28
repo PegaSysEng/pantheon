@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
+import graphql.schema.DataFetcher;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;

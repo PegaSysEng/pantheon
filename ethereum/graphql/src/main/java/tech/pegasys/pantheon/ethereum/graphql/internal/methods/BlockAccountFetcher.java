@@ -21,13 +21,12 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
-public class BlockAccountFetcher implements DataFetcher<Account>, GraphQLMethod {
-  private BlockchainQueries blockchain;
+public class BlockAccountFetcher extends AbstractAccountFetcher {
 
   //    private static final Logger LOG = LogManager.getLogger();
 
   public BlockAccountFetcher(final BlockchainQueries blockchain) {
-    this.blockchain = blockchain;
+    super(blockchain);
   }
 
   @Override
@@ -37,19 +36,11 @@ public class BlockAccountFetcher implements DataFetcher<Account>, GraphQLMethod 
 
   @Override
   public Account get(final DataFetchingEnvironment environment) {
-    final String stateRoot = ((Block) environment.getSource()).getStateRoot();
+    final Hash stateRoot = Hash.fromHexString(((Block) environment.getSource()).getStateRoot());
     if (environment.containsArgument("address")) {
       Address address = environment.getArgument("address");
       return getAccount(stateRoot, address);
     }
     return null;
-  }
-
-  private Account getAccount(final String stateRoot, final Address address) {
-    return blockchain
-        .getWorldStateArchive()
-        .get(Hash.fromHexString(stateRoot))
-        .map(worldState -> new Account(worldState.get(address)))
-        .orElse(new Account(address));
   }
 }

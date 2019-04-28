@@ -22,11 +22,10 @@ import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationUtils
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLServiceException;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLError;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.RequestError;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.RequestErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.UnauthorizedResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -300,7 +299,7 @@ public class GraphQLHttpService {
     String token = getAuthToken(routingContext);
     if (authenticationService.isPresent() && token == null) {
       // no auth token when auth required
-      handleGraphQLUnauthorizedError(routingContext, RequestError.UNAUTHORIZED);
+      handleGraphQLUnauthorizedError(routingContext, GraphQLError.UNAUTHORIZED);
     } else {
       // Parse json
       try {
@@ -325,7 +324,7 @@ public class GraphQLHttpService {
                   });
             });
       } catch (final DecodeException ex) {
-        handleRequestError(routingContext, RequestError.PARSE_ERROR);
+        handleRequestError(routingContext, GraphQLError.PARSE_ERROR);
       }
     }
   }
@@ -335,7 +334,7 @@ public class GraphQLHttpService {
     String token = getAuthToken(routingContext);
     if (authenticationService.isPresent() && token == null) {
       // no auth token when auth required
-      handleGraphQLUnauthorizedError(routingContext, RequestError.UNAUTHORIZED);
+      handleGraphQLUnauthorizedError(routingContext, GraphQLError.UNAUTHORIZED);
     } else {
       // Parse json
       try {
@@ -348,12 +347,12 @@ public class GraphQLHttpService {
                 handleGraphQLSingleRequest(routingContext, new JsonObject(json), user);
               });
         } else if (json.length() == 0) {
-          handleRequestError(routingContext, RequestError.EMPTY_QUERY_ERROR);
+          handleRequestError(routingContext, GraphQLError.EMPTY_QUERY_ERROR);
 
         } else {
           final JsonArray array = new JsonArray(json);
           if (array.size() < 1) {
-            handleRequestError(routingContext, RequestError.INVALID_REQUEST);
+            handleRequestError(routingContext, GraphQLError.INVALID_REQUEST);
             return;
           }
           AuthenticationUtils.getUser(
@@ -365,7 +364,7 @@ public class GraphQLHttpService {
         }
 
       } catch (final DecodeException ex) {
-        handleRequestError(routingContext, RequestError.PARSE_ERROR);
+        handleRequestError(routingContext, GraphQLError.PARSE_ERROR);
       }
     }
   }
@@ -423,7 +422,7 @@ public class GraphQLHttpService {
             .map(
                 obj -> {
                   if (!(obj instanceof JsonObject)) {
-                    return Future.succeededFuture(errorResponse(RequestError.INVALID_REQUEST));
+                    return Future.succeededFuture(errorResponse(GraphQLError.INVALID_REQUEST));
                   }
 
                   final JsonObject req = (JsonObject) obj;
@@ -467,7 +466,7 @@ public class GraphQLHttpService {
       LOG.debug(query);
       request = query.mapTo(GraphQLRequest.class);
     } catch (final IllegalArgumentException exception) {
-      return errorResponse(RequestError.INVALID_REQUEST);
+      return errorResponse(GraphQLError.INVALID_REQUEST);
     }
 
     LOG.debug("GraphQL query -> \n {}", request.getQuery());
@@ -496,33 +495,33 @@ public class GraphQLHttpService {
         }
       } catch (final RuntimeException e) {
         LOG.error("Error processing GraphQL request", e);
-        return errorResponse(RequestError.INTERNAL_ERROR);
+        return errorResponse(GraphQLError.INTERNAL_ERROR);
       }
     } else {
-      return unauthorizedResponse(RequestError.UNAUTHORIZED);
+      return unauthorizedResponse(GraphQLError.UNAUTHORIZED);
     }
   }
 
-  private void handleRequestError(final RoutingContext routingContext, final RequestError error) {
+  private void handleRequestError(final RoutingContext routingContext, final GraphQLError error) {
     routingContext
         .response()
         .setStatusCode(HttpResponseStatus.BAD_REQUEST.code())
-        .end(Json.encode(new RequestErrorResponse(error)));
+        .end(Json.encode(new GraphQLErrorResponse(error)));
   }
 
   private void handleGraphQLUnauthorizedError(
-      final RoutingContext routingContext, final RequestError error) {
+      final RoutingContext routingContext, final GraphQLError error) {
     routingContext
         .response()
         .setStatusCode(HttpResponseStatus.UNAUTHORIZED.code())
         .end(Json.encode(new UnauthorizedResponse(error)));
   }
 
-  private GraphQLResponse errorResponse(final RequestError error) {
-    return new RequestErrorResponse(error);
+  private GraphQLResponse errorResponse(final GraphQLError error) {
+    return new GraphQLErrorResponse(error);
   }
 
-  private GraphQLResponse unauthorizedResponse(final RequestError error) {
+  private GraphQLResponse unauthorizedResponse(final GraphQLError error) {
     return new UnauthorizedResponse(error);
   }
 

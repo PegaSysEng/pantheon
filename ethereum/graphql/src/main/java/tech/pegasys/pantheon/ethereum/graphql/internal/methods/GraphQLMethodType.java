@@ -29,7 +29,12 @@ public enum GraphQLMethodType {
   ACCOUNT("Block", "account"),
   CALL("Block", "call"),
   ESTIMATE_GAS("Block", "estimateGas"),
-  STORAGE("Account", "storage");
+  STORAGE("Account", "storage"),
+  SEND_RAW_TRANSACTION("Mutation", "sendRawTransaction"),
+  TRANSACTION_FROM("Transaction", "from"),
+  TRANSACTION_TO("Transaction", "to"),
+  TRANSACTION_CREATED_CONTRACT("Transaction", "createdContract"),
+  TRANSACTION_BLOCK("Transaction", "block");
 
   private final String type;
   private final String field;
