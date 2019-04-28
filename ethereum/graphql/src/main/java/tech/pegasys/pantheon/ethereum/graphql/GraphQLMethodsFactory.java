@@ -28,13 +28,19 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetche
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactionAtFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactionsFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.MutationTransactionFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlocksFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryGasPriceFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryLogsFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryPendingFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryProtocolVersionFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QuerySyncingFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryTransactionFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionBlockFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionCreatedContractFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionFromFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionToFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
@@ -117,6 +123,7 @@ public class GraphQLMethodsFactory {
         new QueryTransactionFetcher(blockchainQueries),
         new QueryLogsFetcher(blockchainQueries),
         new QueryProtocolVersionFetcher(supportedCapabilities),
+        new QueryGasPriceFetcher(miningCoordinator),
         new QuerySyncingFetcher(blockchainQueries, synchronizer),
         new BlockParentFetcher(blockchainQueries),
         new BlockOmmersFetcher(blockchainQueries),
@@ -134,7 +141,12 @@ public class GraphQLMethodsFactory {
                 blockchainQueries.getBlockchain(),
                 blockchainQueries.getWorldStateArchive(),
                 protocolSchedule)),
-        new AccountStorageFetcher(blockchainQueries));
+        new AccountStorageFetcher(blockchainQueries),
+            new TransactionBlockFetcher(blockchainQueries),
+            new TransactionCreatedContractFetcher(blockchainQueries),
+            new TransactionFromFetcher(blockchainQueries),
+            new TransactionToFetcher(blockchainQueries),
+            new MutationTransactionFetcher(transactionPool));
     return enabledMethods;
   }
 
