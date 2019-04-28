@@ -127,7 +127,7 @@ public class GraphQLHttpService {
         metricsSystem.createLabelledTimer(
             MetricCategory.RPC,
             "request_time",
-            "Time taken to process a JSON-RPC request",
+            "Time taken to process a GraphQL request",
             "methodName");
     validateConfig(config);
     this.config = config;
@@ -145,7 +145,7 @@ public class GraphQLHttpService {
   }
 
   public CompletableFuture<?> start() {
-    LOG.info("Starting JsonRPC service on {}:{}", config.getHost(), config.getPort());
+    LOG.info("Starting GraphQL service on {}:{}", config.getHost(), config.getPort());
     // Create the HTTP server and a router object.
     httpServer =
         vertx.createHttpServer(
@@ -214,7 +214,7 @@ public class GraphQLHttpService {
                 resultFuture.completeExceptionally(
                     new GraphQLServiceException(
                         String.format(
-                            "Failed to bind Ethereum JSON RPC listener to %s:%s: %s",
+                            "Failed to bind Ethereum GraphQL listener to %s:%s: %s",
                             config.getHost(), config.getPort(), cause.getMessage())));
                 return;
               }
