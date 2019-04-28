@@ -173,10 +173,10 @@ public class GraphQLResponseUtils {
   //            unsignedInt(transactionIndex)));
   //  }
 
-//  private int unsignedInt(final String value) {
-//    final String hex = removeHexPrefix(value);
-//    return new BigInteger(hex, HEX_RADIX).intValue();
-//  }
+  //  private int unsignedInt(final String value) {
+  //    final String hex = removeHexPrefix(value);
+  //    return new BigInteger(hex, HEX_RADIX).intValue();
+  //  }
 
   private long unsignedLong(final String value) {
     final String hex = removeHexPrefix(value);
