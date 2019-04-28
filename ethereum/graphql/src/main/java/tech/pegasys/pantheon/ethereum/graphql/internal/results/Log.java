@@ -47,7 +47,7 @@ public class Log implements GraphQLResult {
     this.data = data;
   }
 
-    @JsonGetter(value = "index")
+  @JsonGetter(value = "index")
   public Integer getIndex() {
     return index;
   }

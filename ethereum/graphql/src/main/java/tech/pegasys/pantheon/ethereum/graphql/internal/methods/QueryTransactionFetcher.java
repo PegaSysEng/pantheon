@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.graphql.internal.filter.LogsQuery;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Transaction;
 import tech.pegasys.pantheon.util.bytes.Bytes32;

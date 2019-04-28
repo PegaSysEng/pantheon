@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class BlockAccountFetcher extends AbstractAccountFetcher {

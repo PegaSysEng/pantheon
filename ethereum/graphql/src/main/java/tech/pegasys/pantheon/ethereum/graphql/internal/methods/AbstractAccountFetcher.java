@@ -12,19 +12,18 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
-import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Transaction;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
 
 import java.util.Optional;
+
+import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
 
 abstract class AbstractAccountFetcher implements DataFetcher<Account>, GraphQLMethod {
 
@@ -63,19 +62,17 @@ abstract class AbstractAccountFetcher implements DataFetcher<Account>, GraphQLMe
   }
 
   Account getAccount(final Hash stateRoot, final Address address) {
-    return maybeAccount(stateRoot, address)
-            .orElse(new Account(address));
+    return maybeAccount(stateRoot, address).orElse(new Account(address));
   }
 
   Account getAccountOrNull(final Hash stateRoot, final Address address) {
-    return maybeAccount(stateRoot, address)
-            .orElse(new Account(address));
+    return maybeAccount(stateRoot, address).orElse(new Account(address));
   }
 
   Optional<Account> maybeAccount(final Hash stateRoot, final Address address) {
     return blockchain
-            .getWorldStateArchive()
-            .get(stateRoot)
-            .map(worldState -> new Account(worldState.get(address)));
+        .getWorldStateArchive()
+        .get(stateRoot)
+        .map(worldState -> new Account(worldState.get(address)));
   }
 }

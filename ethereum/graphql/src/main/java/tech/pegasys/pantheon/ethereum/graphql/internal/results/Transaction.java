@@ -16,9 +16,6 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionReceiptWithMetadata;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -36,7 +33,7 @@ public class Transaction implements GraphQLResult {
   private final BigInteger status;
   private final BigInteger gasUsed;
   private final BigInteger cumulativeGasUsed;
-//  private final List<Log> logs;
+  //  private final List<Log> logs;
 
   public Transaction(final TransactionReceiptWithMetadata receipt) {
     this(

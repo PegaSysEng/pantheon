@@ -12,14 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Transaction;
 
-public class TransactionBlockFetcher extends AbstractBlockFetcher implements DataFetcher<Block>, GraphQLMethod {
+import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
+
+public class TransactionBlockFetcher extends AbstractBlockFetcher
+    implements DataFetcher<Block>, GraphQLMethod {
   private BlockchainQueries blockchain;
 
   //    private static final Logger LOG = LogManager.getLogger();
@@ -36,6 +38,9 @@ public class TransactionBlockFetcher extends AbstractBlockFetcher implements Dat
   @Override
   public Block get(final DataFetchingEnvironment environment) {
     final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
-    return blockchain.transactionByHash(hash).map(transaction -> getBlockByHash(transaction.getBlockHash())).orElse(null);
+    return blockchain
+        .transactionByHash(hash)
+        .map(transaction -> getBlockByHash(transaction.getBlockHash()))
+        .orElse(null);
   }
 }

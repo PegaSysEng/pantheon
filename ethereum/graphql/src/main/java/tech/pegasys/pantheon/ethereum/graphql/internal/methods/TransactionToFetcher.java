@@ -12,17 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
-import tech.pegasys.pantheon.ethereum.graphql.internal.results.Transaction;
 
-import java.util.Optional;
+import graphql.schema.DataFetchingEnvironment;
 
 public class TransactionToFetcher extends AbstractAccountFetcher {
   private BlockchainQueries blockchain;
@@ -40,6 +33,4 @@ public class TransactionToFetcher extends AbstractAccountFetcher {
   public Account get(final DataFetchingEnvironment environment) {
     return resolve(environment);
   }
-
-
 }

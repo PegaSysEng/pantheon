@@ -142,11 +142,11 @@ public class GraphQLMethodsFactory {
                 blockchainQueries.getWorldStateArchive(),
                 protocolSchedule)),
         new AccountStorageFetcher(blockchainQueries),
-            new TransactionBlockFetcher(blockchainQueries),
-            new TransactionCreatedContractFetcher(blockchainQueries),
-            new TransactionFromFetcher(blockchainQueries),
-            new TransactionToFetcher(blockchainQueries),
-            new MutationTransactionFetcher(transactionPool));
+        new TransactionBlockFetcher(blockchainQueries),
+        new TransactionCreatedContractFetcher(blockchainQueries),
+        new TransactionFromFetcher(blockchainQueries),
+        new TransactionToFetcher(blockchainQueries),
+        new MutationTransactionFetcher(transactionPool));
     return enabledMethods;
   }
 
