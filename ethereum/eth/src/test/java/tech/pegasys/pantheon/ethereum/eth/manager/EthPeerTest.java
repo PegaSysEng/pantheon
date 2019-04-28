@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,6 +80,38 @@ public class EthPeerTest {
     final MessageData otherMessage = BlockHeadersMessage.create(asList(gen.header(), gen.header()));
 
     messageStream(getStream, targetMessage, otherMessage);
+  }
+
+  @Test
+  public void shouldHaveAvailableCapacityUntilOutstandingRequestLimitIsReached()
+      throws PeerNotConnected {
+    final EthPeer peer = createPeer();
+    assertThat(peer.hasAvailableRequestCapacity()).isTrue();
+    assertThat(peer.outstandingRequests()).isEqualTo(0);
+
+    peer.getBodies(asList(gen.hash(), gen.hash()));
+    assertThat(peer.hasAvailableRequestCapacity()).isTrue();
+    assertThat(peer.outstandingRequests()).isEqualTo(1);
+
+    peer.getReceipts(asList(gen.hash(), gen.hash()));
+    assertThat(peer.hasAvailableRequestCapacity()).isTrue();
+    assertThat(peer.outstandingRequests()).isEqualTo(2);
+
+    peer.getNodeData(asList(gen.hash(), gen.hash()));
+    assertThat(peer.hasAvailableRequestCapacity()).isTrue();
+    assertThat(peer.outstandingRequests()).isEqualTo(3);
+
+    peer.getHeadersByHash(gen.hash(), 4, 1, false);
+    assertThat(peer.hasAvailableRequestCapacity()).isTrue();
+    assertThat(peer.outstandingRequests()).isEqualTo(4);
+
+    peer.getHeadersByNumber(1, 1, 1, false);
+    assertThat(peer.hasAvailableRequestCapacity()).isFalse();
+    assertThat(peer.outstandingRequests()).isEqualTo(5);
+
+    peer.dispatch(new EthMessage(peer, BlockBodiesMessage.create(emptyList())));
+    assertThat(peer.hasAvailableRequestCapacity()).isTrue();
+    assertThat(peer.outstandingRequests()).isEqualTo(4);
   }
 
   @Test
