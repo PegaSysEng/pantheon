@@ -117,9 +117,9 @@ public class DownloadHeadersStepTest {
 
   @Test
   public void shouldGetRemainingHeadersWhenRangeHasNoEnd() {
-    final CheckpointRange checkpointRange =
-        new CheckpointRange(syncTarget, blockchain.getBlockHeader(3).get());
     final RespondingEthPeer peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
+    final CheckpointRange checkpointRange =
+        new CheckpointRange(peer.getEthPeer(), blockchain.getBlockHeader(3).get());
 
     final CompletableFuture<CheckpointRangeHeaders> result = this.downloader.apply(checkpointRange);
 
