@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler.TimeoutPolicy;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.testutil.TestClock;
 
 public class EthContextTestUtil {
 
@@ -22,7 +23,7 @@ public class EthContextTestUtil {
   public static EthContext createTestEthContext(final TimeoutPolicy timeoutPolicy) {
     return new EthContext(
         PROTOCOL_NAME,
-        new EthPeers(PROTOCOL_NAME, new NoOpMetricsSystem()),
+        new EthPeers(PROTOCOL_NAME, TestClock.fixed(), new NoOpMetricsSystem()),
         new EthMessages(),
         new DeterministicEthScheduler(timeoutPolicy));
   }

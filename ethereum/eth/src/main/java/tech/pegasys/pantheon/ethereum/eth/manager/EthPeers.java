@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -38,16 +39,19 @@ public class EthPeers {
   public static final Comparator<EthPeer> BEST_CHAIN = TOTAL_DIFFICULTY.thenComparing(CHAIN_HEIGHT);
 
   public static final Comparator<EthPeer> LEAST_TO_MOST_BUSY =
-      Comparator.comparing(EthPeer::outstandingRequests);
+      Comparator.comparing(EthPeer::outstandingRequests)
+          .thenComparing(EthPeer::getLastRequestTimestamp);
 
   private final Map<PeerConnection, EthPeer> connections = new ConcurrentHashMap<>();
   private final String protocolName;
+  private final Clock clock;
   private final Subscribers<ConnectCallback> connectCallbacks = new Subscribers<>();
   private final Subscribers<DisconnectCallback> disconnectCallbacks = new Subscribers<>();
   private final Collection<PendingPeerRequest> pendingRequests = new ArrayList<>();
 
-  public EthPeers(final String protocolName, final MetricsSystem metricsSystem) {
+  public EthPeers(final String protocolName, final Clock clock, final MetricsSystem metricsSystem) {
     this.protocolName = protocolName;
+    this.clock = clock;
     metricsSystem.createIntegerGauge(
         MetricCategory.PEERS,
         "pending_peer_requests_current",
@@ -56,7 +60,8 @@ public class EthPeers {
   }
 
   void registerConnection(final PeerConnection peerConnection) {
-    final EthPeer peer = new EthPeer(peerConnection, protocolName, this::invokeConnectionCallbacks);
+    final EthPeer peer =
+        new EthPeer(peerConnection, protocolName, this::invokeConnectionCallbacks, clock);
     connections.putIfAbsent(peerConnection, peer);
   }
 

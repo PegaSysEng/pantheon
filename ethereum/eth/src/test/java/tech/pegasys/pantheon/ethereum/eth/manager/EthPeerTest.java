@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.testutil.TestClock;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.junit.Test;
 
 public class EthPeerTest {
   private static final BlockDataGenerator gen = new BlockDataGenerator();
+  private final TestClock clock = new TestClock();
 
   @Test
   public void getHeadersStream() throws PeerNotConnected {
@@ -112,6 +114,31 @@ public class EthPeerTest {
     peer.dispatch(new EthMessage(peer, BlockBodiesMessage.create(emptyList())));
     assertThat(peer.hasAvailableRequestCapacity()).isTrue();
     assertThat(peer.outstandingRequests()).isEqualTo(4);
+  }
+
+  @Test
+  public void shouldTrackLastRequestTime() throws PeerNotConnected {
+    final EthPeer peer = createPeer();
+
+    clock.stepMillis(10_000);
+    peer.getBodies(asList(gen.hash(), gen.hash()));
+    assertThat(peer.getLastRequestTimestamp()).isEqualTo(clock.millis());
+
+    clock.stepMillis(10_000);
+    peer.getReceipts(asList(gen.hash(), gen.hash()));
+    assertThat(peer.getLastRequestTimestamp()).isEqualTo(clock.millis());
+
+    clock.stepMillis(10_000);
+    peer.getNodeData(asList(gen.hash(), gen.hash()));
+    assertThat(peer.getLastRequestTimestamp()).isEqualTo(clock.millis());
+
+    clock.stepMillis(10_000);
+    peer.getHeadersByHash(gen.hash(), 4, 1, false);
+    assertThat(peer.getLastRequestTimestamp()).isEqualTo(clock.millis());
+
+    clock.stepMillis(10_000);
+    peer.getHeadersByNumber(1, 1, 1, false);
+    assertThat(peer.getLastRequestTimestamp()).isEqualTo(clock.millis());
   }
 
   @Test
@@ -316,7 +343,7 @@ public class EthPeerTest {
     final Set<Capability> caps = new HashSet<>(singletonList(EthProtocol.ETH63));
     final PeerConnection peerConnection = new MockPeerConnection(caps);
     final Consumer<EthPeer> onPeerReady = (peer) -> {};
-    return new EthPeer(peerConnection, EthProtocol.NAME, onPeerReady);
+    return new EthPeer(peerConnection, EthProtocol.NAME, onPeerReady, clock);
   }
 
   @FunctionalInterface

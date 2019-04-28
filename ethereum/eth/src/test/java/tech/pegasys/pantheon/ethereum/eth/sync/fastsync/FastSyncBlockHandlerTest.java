@@ -43,6 +43,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.testutil.TestClock;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -80,7 +81,7 @@ public class FastSyncBlockHandlerTest {
   private final EthContext ethContext =
       new EthContext(
           PROTOCOL_NAME,
-          new EthPeers(PROTOCOL_NAME, metricsSystem),
+          new EthPeers(PROTOCOL_NAME, TestClock.fixed(), metricsSystem),
           new EthMessages(),
           new DeterministicEthScheduler());
   private final ValidationPolicy validationPolicy = mock(ValidationPolicy.class);

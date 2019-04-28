@@ -103,12 +103,32 @@ public class EthPeersTest {
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
     final RespondingEthPeer workingPeer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
-    workingPeer.getEthPeer().getNodeData(emptyList());
+    useRequestSlot(workingPeer.getEthPeer());
 
     final PendingPeerRequest pendingRequest =
         ethPeers.executePeerRequest(peerRequest, 10, Optional.empty());
 
     verify(peerRequest).sendRequest(idlePeer.getEthPeer());
+    assertRequestSuccessful(pendingRequest);
+  }
+
+  @Test
+  public void shouldUseLeastRecentlyUsedPeerWhenBothHaveSameNumberOfOutstandingRequests()
+      throws Exception {
+    final RespondingEthPeer mostRecentlyUsedPeer =
+        EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
+    final RespondingEthPeer leastRecentlyUsedPeer =
+        EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 1000);
+    useRequestSlot(mostRecentlyUsedPeer.getEthPeer());
+    freeUpCapacity(mostRecentlyUsedPeer.getEthPeer());
+
+    assertThat(leastRecentlyUsedPeer.getEthPeer().outstandingRequests())
+        .isEqualTo(mostRecentlyUsedPeer.getEthPeer().outstandingRequests());
+
+    final PendingPeerRequest pendingRequest =
+        ethPeers.executePeerRequest(peerRequest, 10, Optional.empty());
+
+    verify(peerRequest).sendRequest(leastRecentlyUsedPeer.getEthPeer());
     assertRequestSuccessful(pendingRequest);
   }
 
@@ -214,9 +234,13 @@ public class EthPeersTest {
 
   private void useAllAvailableCapacity(final EthPeer peer) throws PeerNotConnected {
     while (peer.hasAvailableRequestCapacity()) {
-      peer.getNodeData(emptyList());
+      useRequestSlot(peer);
     }
     assertThat(peer.hasAvailableRequestCapacity()).isFalse();
+  }
+
+  private void useRequestSlot(final EthPeer peer) throws PeerNotConnected {
+    peer.getNodeData(emptyList());
   }
 
   @SuppressWarnings("unchecked")

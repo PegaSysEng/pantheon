@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 public class EthProtocolManagerTestUtil {
@@ -52,6 +53,7 @@ public class EthProtocolManagerTestUtil {
         false,
         ethScheduler,
         EthereumWireProtocolConfiguration.defaultConfig(),
+        TestClock.fixed(),
         new NoOpMetricsSystem());
   }
 

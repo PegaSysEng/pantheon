@@ -35,6 +35,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +73,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final boolean fastSyncEnabled,
       final EthScheduler scheduler,
       final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration,
+      final Clock clock,
       final MetricsSystem metricsSystem) {
     this.networkId = networkId;
     this.scheduler = scheduler;
@@ -81,7 +83,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
     this.shutdown = new CountDownLatch(1);
     genesisHash = blockchain.getBlockHashByNumber(0L).get();
 
-    ethPeers = new EthPeers(getSupportedProtocol(), metricsSystem);
+    ethPeers = new EthPeers(getSupportedProtocol(), clock, metricsSystem);
     ethMessages = new EthMessages();
     ethContext = new EthContext(getSupportedProtocol(), ethPeers, ethMessages, scheduler);
 
@@ -99,6 +101,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int syncWorkers,
       final int txWorkers,
       final int computationWorkers,
+      final Clock clock,
       final MetricsSystem metricsSystem) {
     this(
         blockchain,
@@ -107,6 +110,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         fastSyncEnabled,
         new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
         EthereumWireProtocolConfiguration.defaultConfig(),
+        clock,
         metricsSystem);
   }
 
@@ -118,6 +122,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
       final int syncWorkers,
       final int txWorkers,
       final int computationWorkers,
+      final Clock clock,
       final MetricsSystem metricsSystem,
       final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
     this(
@@ -127,6 +132,7 @@ public class EthProtocolManager implements ProtocolManager, MinedBlockObserver {
         fastSyncEnabled,
         new EthScheduler(syncWorkers, txWorkers, computationWorkers, metricsSystem),
         ethereumWireProtocolConfiguration,
+        clock,
         metricsSystem);
   }
 
