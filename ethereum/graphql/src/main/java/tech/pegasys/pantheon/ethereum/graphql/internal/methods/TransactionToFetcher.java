@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
 import graphql.schema.DataFetchingEnvironment;
 
 public class TransactionToFetcher extends AbstractAccountFetcher {
-  private BlockchainQueries blockchain;
 
   public TransactionToFetcher(final BlockchainQueries blockchain) {
     super(blockchain);
