@@ -44,7 +44,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   //  private final Logger PROCESS_LOG =
   // LogManager.getLogger("tech.pegasys.pantheon.SubProcessLog");
 
-  private final Map<String, Process> pantheonProcesses = new HashMap<>();
+  private final Map<String, ProcessInfo> pantheonProcesses = new HashMap<>();
   private final ExecutorService outputProcessorExecutor = Executors.newCachedThreadPool();
 
   ProcessPantheonNodeRunner() {
@@ -192,7 +192,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
       processBuilder.redirectOutput(logFile);
       final Process process = processBuilder.start();
       //      outputProcessorExecutor.submit(() -> printOutput(node, process));
-      pantheonProcesses.put(node.getName(), process);
+      pantheonProcesses.put(node.getName(), new ProcessInfo(process, logFile));
     } catch (final IOException e) {
       LOG.error("Error starting PantheonNode process", e);
     }
@@ -233,14 +233,14 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   public void stopNode(final PantheonNode node) {
     node.stop();
     if (pantheonProcesses.containsKey(node.getName())) {
-      final Process process = pantheonProcesses.get(node.getName());
+      final ProcessInfo process = pantheonProcesses.get(node.getName());
       killPantheonProcess(node.getName(), process);
     }
   }
 
   @Override
   public synchronized void shutdown() {
-    final HashMap<String, Process> localMap = new HashMap<>(pantheonProcesses);
+    final HashMap<String, ProcessInfo> localMap = new HashMap<>(pantheonProcesses);
     localMap.forEach(this::killPantheonProcess);
     outputProcessorExecutor.shutdown();
     try {
@@ -255,14 +255,16 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public boolean isActive(final String nodeName) {
-    final Process process = pantheonProcesses.get(nodeName);
-    return process != null && process.isAlive();
+    final ProcessInfo processInfo = pantheonProcesses.get(nodeName);
+    return processInfo != null && processInfo.process.isAlive();
   }
 
-  private void killPantheonProcess(final String name, final Process process) {
+  private void killPantheonProcess(final String name, final ProcessInfo processInfo) {
     LOG.info("Killing " + name + " process");
 
+    final Process process = processInfo.process;
     Awaitility.waitAtMost(30, TimeUnit.SECONDS)
+        .alias("Waiting for node " + name + " to shutdown (logs: " + processInfo.logFile + ")")
         .until(
             () -> {
               if (process.isAlive()) {
@@ -274,5 +276,15 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
                 return true;
               }
             });
+  }
+
+  private static class ProcessInfo {
+    private final Process process;
+    private final File logFile;
+
+    private ProcessInfo(final Process process, final File logFile) {
+      this.process = process;
+      this.logFile = logFile;
+    }
   }
 }
