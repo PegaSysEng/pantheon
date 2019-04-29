@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationUtils
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLServiceException;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethodType;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLError;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
@@ -82,7 +83,7 @@ public class GraphQLHttpService {
   private final Vertx vertx;
   private final GraphQLConfiguration config;
   private final GraphQL graphQL;
-  private final Map<String, GraphQLMethod> methods;
+  private final Map<GraphQLMethodType, GraphQLMethod> methods;
   private final Path dataDir;
   private final LabelledMetric<OperationTimer> requestTimer;
 
@@ -104,7 +105,7 @@ public class GraphQLHttpService {
       final Path dataDir,
       final GraphQLConfiguration config,
       final MetricsSystem metricsSystem,
-      final Map<String, GraphQLMethod> methods) {
+      final Map<GraphQLMethodType, GraphQLMethod> methods) {
     this(
         vertx,
         dataDir,
@@ -119,7 +120,7 @@ public class GraphQLHttpService {
       final Path dataDir,
       final GraphQLConfiguration config,
       final MetricsSystem metricsSystem,
-      final Map<String, GraphQLMethod> methods,
+      final Map<GraphQLMethodType, GraphQLMethod> methods,
       final Optional<AuthenticationService> authenticationService) {
     this.dataDir = dataDir;
     requestTimer =

@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLMethodsFactory;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethodType;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -337,7 +338,7 @@ public class RunnerBuilder {
 
     Optional<GraphQLHttpService> graphQlHttpService = Optional.empty();
     if (graphQLConfiguration.isEnabled()) {
-      final Map<String, GraphQLMethod> graphQlMethods =
+      final Map<GraphQLMethodType, GraphQLMethod> graphQlMethods =
           graphQlMethods(
               context,
               protocolSchedule,
@@ -472,7 +473,7 @@ public class RunnerBuilder {
     return filterManager;
   }
 
-  private Map<String, GraphQLMethod> graphQlMethods(
+  private Map<GraphQLMethodType, GraphQLMethod> graphQlMethods(
       final ProtocolContext<?> context,
       final ProtocolSchedule<?> protocolSchedule,
       final PantheonController<?> pantheonController,
@@ -486,7 +487,7 @@ public class RunnerBuilder {
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters,
       final MetricsConfiguration metricsConfiguration) {
-    final Map<String, GraphQLMethod> methods =
+    final Map<GraphQLMethodType, GraphQLMethod> methods =
         new GraphQLMethodsFactory()
             .methods(
                 PantheonInfo.version(),
