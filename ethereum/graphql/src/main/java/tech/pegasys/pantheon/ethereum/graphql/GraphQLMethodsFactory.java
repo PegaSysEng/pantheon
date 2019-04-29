@@ -158,7 +158,7 @@ public class GraphQLMethodsFactory {
   }
 
   private void addMethods(
-          final Map<GraphQLMethodType, GraphQLMethod> methods, final GraphQLMethod... graphQLMethods) {
+      final Map<GraphQLMethodType, GraphQLMethod> methods, final GraphQLMethod... graphQLMethods) {
     for (final GraphQLMethod graphQLMethod : graphQLMethods) {
       methods.put(graphQLMethod.getType(), graphQLMethod);
     }

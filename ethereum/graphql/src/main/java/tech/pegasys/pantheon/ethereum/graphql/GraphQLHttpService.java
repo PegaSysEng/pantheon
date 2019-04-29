@@ -473,7 +473,9 @@ public class GraphQLHttpService {
     LOG.debug("GraphQL query -> \n {}", request.getQuery());
 
     if (AuthenticationUtils.isPermitted(
-        authenticationService, user, methods.get(GraphQLMethodType.valueOf(request.getOperationName())))) {
+        authenticationService,
+        user,
+        methods.get(GraphQLMethodType.valueOf(request.getOperationName())))) {
       // Generate response
       try (final OperationTimer.TimingContext ignored =
           requestTimer.labels(request.getOperationName()).startTimer()) {
