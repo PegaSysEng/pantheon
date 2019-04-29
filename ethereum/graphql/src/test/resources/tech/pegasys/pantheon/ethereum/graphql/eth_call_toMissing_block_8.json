@@ -1,0 +1,17 @@
+{
+  "request": {
+    "query": "{ block(number: 8) { number call ( data: { from: \"a94f5374fce5edbc8e2a8697c15331677e6ebf0b\", gasPrice: 4503599627370496 } ) { data status } } }"
+  },
+  "response": {
+    "data": {
+      "block": {
+        "number": 8,
+        "call": {
+          "data": "",
+          "status": 0
+        }
+      }
+    }
+  },
+  "statusCode": 200
+}

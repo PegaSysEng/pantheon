@@ -1,0 +1,13 @@
+{
+  "request":     
+    "{ \"query\": \"{ gasPrice }\" }",
+
+
+
+  "response": {
+    "data" : {
+      "gasPrice" : "16"
+    }
+  },
+  "statusCode": 200
+}

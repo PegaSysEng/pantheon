@@ -12,11 +12,14 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
+import graphql.GraphQLException;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
+
+import java.util.Optional;
 
 abstract class AbstractBlockFetcher implements GraphQLMethod {
 
@@ -28,23 +31,19 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
 
   Block getBlockByHash(final Bytes32 hash) {
     try {
-      return blockchain
-          .blockByHashWithTxHashes(Hash.wrap(hash))
-          .map(this::blockWithMetadataToBlock)
-          .orElse(null);
+      return getBlock(blockchain
+              .blockByHashWithTxHashes(Hash.wrap(hash)));
     } catch (NullPointerException e) {
-      return null;
+      throw new GraphQLException("Hash is null", e);
     }
   }
 
   Block getBlockByNumber(final Long number) {
     try {
-      return blockchain
-          .blockByNumberWithTxHashes(number)
-          .map(this::blockWithMetadataToBlock)
-          .orElse(null);
+      return getBlock(blockchain
+              .blockByNumberWithTxHashes(number));
     } catch (NullPointerException e) {
-      return null;
+      throw new GraphQLException("Number is null", e);
     }
   }
 
@@ -58,5 +57,11 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
         blockWithMetadata.getTransactions().size(),
         blockWithMetadata.getOmmers().size(),
         blockWithMetadata.getTotalDifficulty());
+  }
+
+  private Block getBlock(Optional<BlockWithMetadata<Hash, Hash>> blockByHashWithTxHashes) {
+    return blockByHashWithTxHashes.map(this::blockWithMetadataToBlock)
+            .orElseThrow(() -> new GraphQLException("Block not found"));
+
   }
 }

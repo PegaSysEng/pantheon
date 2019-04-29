@@ -105,7 +105,12 @@ public class CoercingFactory {
       public Address parseLiteral(final Object input) throws CoercingParseLiteralException {
         if (input instanceof StringValue) {
           String value = ((StringValue) input).getValue();
-          return Address.fromHexString(value);
+          try {
+            return Address.fromHexString(value);
+          } catch (IllegalArgumentException e) {
+            throw new CoercingParseLiteralException("Illegal character cound in Address : '" + input + "'");
+          }
+
         }
         throw new CoercingParseLiteralException("Value is not Address : '" + input + "'");
       }
@@ -138,6 +143,9 @@ public class CoercingFactory {
         if (input instanceof StringValue) {
           String value = ((StringValue) input).getValue();
           return new BigInteger(value, 16);
+        }
+        if (input instanceof IntValue) {
+          return ((IntValue) input).getValue();
         }
         throw new CoercingParseLiteralException("Value is not BigInt : '" + input + "'");
       }

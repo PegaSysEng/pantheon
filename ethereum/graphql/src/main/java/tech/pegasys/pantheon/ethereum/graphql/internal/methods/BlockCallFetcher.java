@@ -38,7 +38,7 @@ public class BlockCallFetcher implements DataFetcher<CallResult>, GraphQLMethod 
   public CallResult get(final DataFetchingEnvironment environment) {
     final long blockNumber = ((Block) environment.getSource()).getNumber().longValue();
     if (environment.containsArgument("data")) {
-      CallData callData = environment.getArgument("data");
+      CallData callData = new CallData(environment.getArgument("data"));
       return runCall(callData, blockNumber);
     }
     return null;
@@ -47,7 +47,7 @@ public class BlockCallFetcher implements DataFetcher<CallResult>, GraphQLMethod 
   protected CallResult runCall(final CallData callData, final long blockNumber) {
 
     return transactionSimulator
-        .process(callData.asCallParams(), blockNumber)
+        .process(callData, blockNumber)
         .map(
             result ->
                 result

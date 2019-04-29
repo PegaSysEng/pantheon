@@ -38,17 +38,17 @@ public class BlockEstimateGasFetcher implements DataFetcher<BigInteger>, GraphQL
   @Override
   public BigInteger get(final DataFetchingEnvironment environment) {
     final long blockNumber = ((Block) environment.getSource()).getNumber().longValue();
+    final BigInteger gasLimit = ((Block) environment.getSource()).getGasLimit();
     if (environment.containsArgument("data")) {
-      CallData callData = environment.getArgument("data");
-      return runCall(callData, blockNumber);
+      CallData callData = new CallData(environment.getArgument("data"));
+      return runCall(overrideGasLimitAndPrice(callData, gasLimit), blockNumber);
     }
     return null;
   }
 
   protected BigInteger runCall(final CallData callData, final long blockNumber) {
-
     return transactionSimulator
-        .process(callData.asCallParams(), blockNumber)
+        .process(callData, blockNumber)
         .map(
             result ->
                 result
@@ -57,5 +57,15 @@ public class BlockEstimateGasFetcher implements DataFetcher<BigInteger>, GraphQL
                         (() -> BigInteger.valueOf(result.getGasEstimate())),
                         reason -> BigInteger.ZERO))
         .orElse(BigInteger.ZERO);
+  }
+
+  private CallData overrideGasLimitAndPrice(CallData callData, BigInteger gasLimit) {
+    return new CallData(
+            callData.getFrom(),
+            callData.getTo(),
+            gasLimit,
+            BigInteger.ZERO,
+            callData.getValue(),
+            callData.getPayload());
   }
 }

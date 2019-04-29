@@ -1,0 +1,24 @@
+{
+  "request": 
+    
+    "{ transaction(hash: \"0x9cc6c7e602c56aa30c554bb691377f8703d778cec8845f4b88c0f72516b304f4\") { block { hash } gas gasPrice hash inputData nonce index value } }",
+
+
+  "response":  {
+    "data" : {
+      "transaction" : {
+        "gas" : "0x4cb2f",
+        "gasPrice" : "1",
+        "hash" : "0x9cc6c7e602c56aa30c554bb691377f8703d778cec8845f4b88c0f72516b304f4",
+        "inputData" : "0xe8beef5b",
+        "nonce" : "0x1d",
+        "index" : 0,
+        "value" : "10",
+        "block" : {
+          "hash" : "0xc8df1f061abb4d0c107b2b1a794ade8780b3120e681f723fe55a7be586d95ba6"
+        }
+      }
+    }
+  },
+  "statusCode": 200
+}

@@ -97,6 +97,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .p2pAdvertisedHost(node.hostName())
             .p2pListenPort(0)
             .maxPeers(25)
+                .graphQLConfiguration(node.graphQlConfiguration())
             .jsonRpcConfiguration(node.jsonRpcConfiguration())
             .webSocketConfiguration(node.webSocketConfiguration())
             .dataDir(node.homeDirectory())

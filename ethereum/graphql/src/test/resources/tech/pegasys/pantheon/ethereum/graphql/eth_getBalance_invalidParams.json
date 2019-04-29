@@ -1,0 +1,29 @@
+{
+  "request": {
+    "query": "{ block(number: 33) { account(address: \"0xi_am_not_an_address\") { balance } } }"
+  },
+  "response": {
+    "errors": [
+      {
+        "message": "Validation error of type WrongType: argument 'address' with value 'StringValue{value='0xi_am_not_an_address'}' is not a valid 'Address' @ 'block/account'",
+        "locations": [
+          {
+            "line": 1,
+            "column": 31,
+            "sourceName": null
+          }
+        ],
+        "description": "argument 'address' with value 'StringValue{value='0xi_am_not_an_address'}' is not a valid 'Address'",
+        "validationErrorType": "WrongType",
+        "queryPath": [
+          "block",
+          "account"
+        ],
+        "errorType": "ValidationError",
+        "path": null,
+        "extensions": null
+      }
+    ]
+  },
+  "statusCode": 400
+}

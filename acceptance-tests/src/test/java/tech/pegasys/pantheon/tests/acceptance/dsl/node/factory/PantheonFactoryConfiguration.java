@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node.factory;
 
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
@@ -27,6 +28,7 @@ class PantheonFactoryConfiguration {
   private final String name;
   private final MiningParameters miningParameters;
   private final PrivacyParameters privacyParameters;
+  private final GraphQLConfiguration graphQlConfiguration;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
   private final MetricsConfiguration metricsConfiguration;
@@ -42,6 +44,7 @@ class PantheonFactoryConfiguration {
       final String name,
       final MiningParameters miningParameters,
       final PrivacyParameters privacyParameters,
+      final GraphQLConfiguration graphQlConfiguration,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
@@ -55,6 +58,7 @@ class PantheonFactoryConfiguration {
     this.name = name;
     this.miningParameters = miningParameters;
     this.privacyParameters = privacyParameters;
+    this.graphQlConfiguration = graphQlConfiguration;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
     this.metricsConfiguration = metricsConfiguration;
@@ -77,6 +81,10 @@ class PantheonFactoryConfiguration {
 
   public PrivacyParameters getPrivacyParameters() {
     return privacyParameters;
+  }
+
+  public GraphQLConfiguration getGraphQLConfiguration() {
+    return graphQlConfiguration;
   }
 
   public JsonRpcConfiguration getJsonRpcConfiguration() {

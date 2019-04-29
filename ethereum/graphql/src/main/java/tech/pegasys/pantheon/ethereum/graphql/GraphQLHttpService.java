@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.graphql;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
-import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
 import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationService;
@@ -39,7 +38,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -52,8 +51,6 @@ import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
@@ -339,29 +336,26 @@ public class GraphQLHttpService {
     } else {
       // Parse json
       try {
-        final String json = routingContext.getBodyAsString().trim();
-        if (!json.isEmpty() && json.charAt(0) == '{') {
+        final String request = routingContext.getBodyAsString().trim();
+        if (!request.isEmpty() && request.charAt(0) == '{') {
           AuthenticationUtils.getUser(
               authenticationService,
               token,
-              user -> {
-                handleGraphQLSingleRequest(routingContext, new JsonObject(json), user);
-              });
-        } else if (json.length() == 0) {
+              user -> handleGraphQLSingleRequest(routingContext, request, user));
+        } else if (request.length() == 0) {
           handleRequestError(routingContext, GraphQLError.EMPTY_QUERY_ERROR);
 
-        } else {
-          final JsonArray array = new JsonArray(json);
+        } else if (request.charAt(0) == '[') {
+          final JsonArray array = new JsonArray(request);
           if (array.size() < 1) {
-            handleRequestError(routingContext, GraphQLError.INVALID_REQUEST);
+            handleRequestError(routingContext, GraphQLError.EMPTY_QUERY_ERROR);
             return;
           }
-          AuthenticationUtils.getUser(
-              authenticationService,
-              token,
-              user -> {
-                handleGraphQLBatchRequest(routingContext, array, user);
-              });
+          handleRequestError(routingContext, GraphQLError.BATCH_REQUEST_UNIMPLEMENTED_ERROR);
+          //          AuthenticationUtils.getUser(
+          //              authenticationService,
+          //              token,
+          //              user -> handleGraphQLBatchRequest(routingContext, array, user));
         }
 
       } catch (final DecodeException ex) {
@@ -376,7 +370,7 @@ public class GraphQLHttpService {
   }
 
   private void handleGraphQLSingleRequest(
-      final RoutingContext routingContext, final JsonObject json, final Optional<User> user) {
+      final RoutingContext routingContext, final String json, final Optional<User> user) {
     final HttpServerResponse response = routingContext.response();
     vertx.executeBlocking(
         future -> {
@@ -415,93 +409,98 @@ public class GraphQLHttpService {
   }
 
   @SuppressWarnings("rawtypes")
-  private void handleGraphQLBatchRequest(
-      final RoutingContext routingContext, final JsonArray queryArray, final Optional<User> user) {
-    // Interpret json as rpc request
-    final List<Future> responses =
-        queryArray.stream()
-            .map(
-                obj -> {
-                  if (!(obj instanceof JsonObject)) {
-                    return Future.succeededFuture(errorResponse(GraphQLError.INVALID_REQUEST));
-                  }
+  //  private void handleGraphQLBatchRequest(
+  //      final RoutingContext routingContext, final JsonArray queryArray, final Optional<User>
+  // user) {
+  //    // Interpret json as rpc request
+  //    final List<Future> responses =
+  //        queryArray.stream()
+  //            .map(
+  //                obj -> {
+  //                  if (!(obj instanceof JsonObject)) {
+  //                    return Future.succeededFuture(errorResponse(GraphQLError.INVALID_REQUEST));
+  //                  }
+  //
+  //                  final JsonObject req = (JsonObject) obj;
+  //                  final Future<GraphQLResponse> fut = Future.future();
+  //                  vertx.executeBlocking(
+  //                      future -> future.complete(process(req, user)),
+  //                      false,
+  //                      ar -> {
+  //                        if (ar.failed()) {
+  //                          fut.fail(ar.cause());
+  //                        } else {
+  //                          fut.complete((GraphQLResponse) ar.result());
+  //                        }
+  //                      });
+  //                  return fut;
+  //                })
+  //            .collect(toList());
+  //
+  //    CompositeFuture.all(responses)
+  //        .setHandler(
+  //            (res) -> {
+  //              if (res.failed()) {
+  //                routingContext
+  //                    .response()
+  //                    .setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
+  //                    .end();
+  //                return;
+  //              }
+  //              final GraphQLResponse[] completed =
+  //                  res.result().list().stream()
+  //                      .map(GraphQLResponse.class::cast)
+  //                      .toArray(GraphQLResponse[]::new);
+  //
+  //              routingContext.response().end(Json.encode(completed));
+  //            });
+  //  }
 
-                  final JsonObject req = (JsonObject) obj;
-                  final Future<GraphQLResponse> fut = Future.future();
-                  vertx.executeBlocking(
-                      future -> future.complete(process(req, user)),
-                      false,
-                      ar -> {
-                        if (ar.failed()) {
-                          fut.fail(ar.cause());
-                        } else {
-                          fut.complete((GraphQLResponse) ar.result());
-                        }
-                      });
-                  return fut;
-                })
-            .collect(toList());
-
-    CompositeFuture.all(responses)
-        .setHandler(
-            (res) -> {
-              if (res.failed()) {
-                routingContext
-                    .response()
-                    .setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
-                    .end();
-                return;
-              }
-              final GraphQLResponse[] completed =
-                  res.result().list().stream()
-                      .map(GraphQLResponse.class::cast)
-                      .toArray(GraphQLResponse[]::new);
-
-              routingContext.response().end(Json.encode(completed));
-            });
-  }
-
-  private GraphQLResponse process(final JsonObject query, final Optional<User> user) {
+  private GraphQLResponse process(final String query, final Optional<User> user) {
     final GraphQLRequest request;
-    try {
-      LOG.debug(query);
-      request = query.mapTo(GraphQLRequest.class);
-    } catch (final IllegalArgumentException exception) {
-      return errorResponse(GraphQLError.INVALID_REQUEST);
+    if (query.contains("query")) {
+      try {
+        request = new JsonObject(query).mapTo(GraphQLRequest.class);
+      } catch (final IllegalArgumentException exception) {
+        return errorResponse(GraphQLError.INVALID_REQUEST);
+      }
+    } else {
+      request = new GraphQLRequest("", query, Collections.emptyMap());
     }
 
     LOG.debug("GraphQL query -> \n {}", request.getQuery());
 
-    if (AuthenticationUtils.isPermitted(
-        authenticationService,
-        user,
-        methods.get(GraphQLMethodType.valueOf(request.getOperationName())))) {
-      // Generate response
-      try (final OperationTimer.TimingContext ignored =
-          requestTimer.labels(request.getOperationName()).startTimer()) {
-        ExecutionResult executionResult =
-            graphQL.execute(
-                ExecutionInput.newExecutionInput()
-                    .query(request.getQuery())
-                    .operationName(request.getOperationName())
-                    .variables(request.getVariables())
-                    .build());
-
-        LOG.debug("Errors {}", executionResult.getErrors());
-
-        LOG.debug("Spec result {}", executionResult.toSpecification());
-        if (executionResult.getErrors().size() == 0) {
-          return Json.mapper.convertValue(
-              executionResult.toSpecification(), GraphQLSuccessResponse.class);
-        } else {
-          return new GraphQLErrorResponse(executionResult.getErrors());
-        }
-      } catch (final RuntimeException e) {
-        LOG.error("Error processing GraphQL request", e);
-        return errorResponse(GraphQLError.INTERNAL_ERROR);
+    if (authenticationService.isPresent()) {
+      if (!AuthenticationUtils.isPermitted(
+          authenticationService,
+          user,
+          methods.get(GraphQLMethodType.valueOf(request.getOperationName())))) {
+        return unauthorizedResponse(GraphQLError.UNAUTHORIZED);
       }
-    } else {
-      return unauthorizedResponse(GraphQLError.UNAUTHORIZED);
+    }
+
+    // Generate response
+    try (final OperationTimer.TimingContext ignored =
+        requestTimer.labels(request.getOperationName()).startTimer()) {
+      ExecutionResult executionResult =
+          graphQL.execute(
+              ExecutionInput.newExecutionInput()
+                  .query(request.getQuery())
+                  .variables(request.getVariables())
+                  .build());
+
+      LOG.debug("Errors {}", executionResult.getErrors());
+
+      LOG.debug("Spec result {}", executionResult.toSpecification());
+      if (executionResult.getErrors().size() == 0) {
+        return Json.mapper.convertValue(
+            executionResult.toSpecification(), GraphQLSuccessResponse.class);
+      } else {
+        return new GraphQLErrorResponse(executionResult.getErrors());
+      }
+    } catch (final RuntimeException e) {
+      LOG.error("Error processing GraphQL request", e);
+      return errorResponse(GraphQLError.INTERNAL_ERROR);
     }
   }
 

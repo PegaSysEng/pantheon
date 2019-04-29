@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
@@ -81,6 +82,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final String name;
   private final MiningParameters miningParameters;
   private final PrivacyParameters privacyParameters;
+  private final GraphQLConfiguration graphQlConfiguration;
   private final JsonRpcConfiguration jsonRpcConfiguration;
   private final WebSocketConfiguration webSocketConfiguration;
   private final MetricsConfiguration metricsConfiguration;
@@ -101,6 +103,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final String name,
       final MiningParameters miningParameters,
       final PrivacyParameters privacyParameters,
+      final GraphQLConfiguration graphQLConfiguration,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
@@ -127,6 +130,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     this.miningParameters = miningParameters;
     this.privacyParameters = privacyParameters;
     this.privacyParameters.setSigningKeyPair(keyPair);
+    this.graphQlConfiguration = graphQLConfiguration;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
     this.metricsConfiguration = metricsConfiguration;
@@ -397,6 +401,10 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   @Override
   public boolean jsonRpcEnabled() {
     return isJsonRpcEnabled();
+  }
+
+  public GraphQLConfiguration graphQlConfiguration() {
+    return graphQlConfiguration;
   }
 
   JsonRpcConfiguration jsonRpcConfiguration() {

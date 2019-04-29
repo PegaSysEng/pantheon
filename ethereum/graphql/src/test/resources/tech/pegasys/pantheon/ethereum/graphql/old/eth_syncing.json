@@ -1,0 +1,17 @@
+{
+  "request":     
+    "{ syncing {startingBlock currentBlock highestBlock pulledStates knownStates } }",
+
+  "response": {
+    "data" : {
+      "syncing" : {
+        "startingBlock" : "0x1",
+        "currentBlock" : "0x2",
+        "highestBlock" : "0x3",
+        "pulledStates" : null,
+        "knownStates" : null
+      }
+    }
+  },
+  "statusCode": 200
+}

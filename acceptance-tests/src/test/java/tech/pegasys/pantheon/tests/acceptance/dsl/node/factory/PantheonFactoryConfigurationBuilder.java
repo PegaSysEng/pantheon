@@ -17,6 +17,7 @@ import static java.util.Collections.singletonList;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
@@ -35,6 +36,7 @@ public class PantheonFactoryConfigurationBuilder {
   private MiningParameters miningParameters =
       new MiningParametersTestBuilder().enabled(false).build();
   private PrivacyParameters privacyParameters = PrivacyParameters.DEFAULT;
+  private GraphQLConfiguration graphQlConfiguration = GraphQLConfiguration.createDefault();
   private JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
   private WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
   private MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
@@ -65,6 +67,14 @@ public class PantheonFactoryConfigurationBuilder {
   public PantheonFactoryConfigurationBuilder setJsonRpcConfiguration(
       final JsonRpcConfiguration jsonRpcConfiguration) {
     this.jsonRpcConfiguration = jsonRpcConfiguration;
+    return this;
+  }
+
+  public PantheonFactoryConfigurationBuilder graphQlEnabled() {
+    this.graphQlConfiguration.setEnabled(true);
+    this.graphQlConfiguration.setPort(0);
+    this.graphQlConfiguration.setHostsWhitelist(singletonList("*"));
+
     return this;
   }
 
@@ -174,6 +184,7 @@ public class PantheonFactoryConfigurationBuilder {
         name,
         miningParameters,
         privacyParameters,
+        graphQlConfiguration,
         jsonRpcConfiguration,
         webSocketConfiguration,
         metricsConfiguration,

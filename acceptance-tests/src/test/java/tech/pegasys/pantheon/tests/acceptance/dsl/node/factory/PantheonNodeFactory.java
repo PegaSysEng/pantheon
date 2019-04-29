@@ -51,6 +51,7 @@ public class PantheonNodeFactory {
         config.getName(),
         config.getMiningParameters(),
         config.getPrivacyParameters(),
+        config.getGraphQLConfiguration(),
         config.getJsonRpcConfiguration(),
         config.getWebSocketConfiguration(),
         config.getMetricsConfiguration(),
