@@ -146,7 +146,7 @@ The path to the genesis file.
 ### host-whitelist
 
 ```bash tab="Syntax"
---host-whitelist=<hostname>[,<hostname>...]... or * or all
+--host-whitelist=<hostname>[,<hostname>...]... or *
 ```
 
 ```bash tab="Example Command Line"
@@ -161,7 +161,7 @@ Comma-separated list of hostnames to allow [access to the JSON-RPC API](../JSON-
 By default, access from `localhost` and `127.0.0.1` is accepted. 
 
 !!!tip
-    To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
+    To allow all hostnames, use `*`. We don't recommend allowing all hostnames for production code.
 
 ### max-peers
 
@@ -1058,10 +1058,6 @@ Default is `INFO`.
 Print version information and exit.
 
 ## Fast Sync Options 
-
-!!! important 
-    Support for fast sync is currently experimental. Fast sync is in active development. The fast sync options are available
-    but hidden on the command line. 
 
 ### sync-mode
 

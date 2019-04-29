@@ -80,6 +80,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -127,11 +128,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private final BlockImporter blockImporter;
 
-  private final PantheonControllerBuilder controllerBuilder;
   private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
   private final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder;
   private final RocksDbConfiguration.Builder rocksDbConfigurationBuilder;
   private final RunnerBuilder runnerBuilder;
+  private final PantheonController.Builder controllerBuilderFactory;
 
   protected KeyLoader getKeyLoader() {
     return KeyPairUtil::loadKeyPair;
@@ -521,14 +522,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final Logger logger,
       final BlockImporter blockImporter,
       final RunnerBuilder runnerBuilder,
-      final PantheonControllerBuilder controllerBuilder,
+      final PantheonController.Builder controllerBuilderFactory,
       final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder,
       final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder,
       final RocksDbConfiguration.Builder rocksDbConfigurationBuilder) {
     this.logger = logger;
     this.blockImporter = blockImporter;
     this.runnerBuilder = runnerBuilder;
-    this.controllerBuilder = controllerBuilder;
+    this.controllerBuilderFactory = controllerBuilderFactory;
     this.synchronizerConfigurationBuilder = synchronizerConfigurationBuilder;
     this.ethereumWireConfigurationBuilder = ethereumWireConfigurationBuilder;
     this.rocksDbConfigurationBuilder = rocksDbConfigurationBuilder;
@@ -691,19 +692,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   PantheonController<?> buildController() {
     try {
-      return controllerBuilder
+      return controllerBuilderFactory
+          .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
           .synchronizerConfiguration(buildSyncConfig())
           .ethereumWireProtocolConfiguration(ethereumWireConfigurationBuilder.build())
-          .rocksDbConfiguration(buildRocksDbConfiguration())
-          .homePath(dataDir())
-          .ethNetworkConfig(updateNetworkConfig(getNetwork()))
+          .rocksdDbConfiguration(buildRocksDbConfiguration())
+          .dataDirectory(dataDir())
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
-          .devMode(NetworkName.DEV.equals(getNetwork()))
           .maxPendingTransactions(txPoolMaxSize)
           .nodePrivateKeyFile(nodePrivateKeyFile())
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
+          .clock(Clock.systemUTC())
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(this.commandLine, e.getMessage());
@@ -1053,10 +1054,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
               genesisConfigFile
                   .getConfigOptions()
                   .getChainId()
+                  .map(BigInteger::intValueExact)
                   .orElse(EthNetworkConfig.getNetworkConfig(MAINNET).getNetworkId()));
         } catch (final DecodeException e) {
           throw new ParameterException(
               this.commandLine, String.format("Unable to parse genesis file %s.", genesisFile), e);
+        } catch (final ArithmeticException e) {
+          throw new ParameterException(
+              this.commandLine,
+              "No networkId specified and chainId in "
+                  + "genesis file is too large to be used as a networkId");
         }
       }
 
@@ -1212,8 +1219,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private Set<EnodeURL> loadStaticNodes() throws IOException {
-    final String staticNodesFilname = "static-nodes.json";
-    final Path staticNodesPath = dataDir().resolve(staticNodesFilname);
+    final String staticNodesFilename = "static-nodes.json";
+    final Path staticNodesPath = dataDir().resolve(staticNodesFilename);
 
     return StaticNodesParser.fromPath(staticNodesPath);
   }

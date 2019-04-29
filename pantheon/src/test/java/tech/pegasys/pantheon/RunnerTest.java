@@ -20,7 +20,7 @@ import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.controller.MainnetPantheonController;
+import tech.pegasys.pantheon.controller.MainnetPantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -37,7 +37,6 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
@@ -53,6 +52,8 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +81,24 @@ public final class RunnerTest {
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   @Test
+  public void getFixedNodes() {
+    EnodeURL staticNode =
+        EnodeURL.fromString(
+            "enode://8f4b88336cc40ef2516d8b27df812e007fb2384a61e93635f1899051311344f3dcdbb49a4fe49a79f66d2f589a9f282e8cc4f1d7381e8ef7e4fcc6b0db578c77@127.0.0.1:30301");
+    EnodeURL bootnode =
+        EnodeURL.fromString(
+            "enode://8f4b88336cc40ef2516d8b27df812e007fb2384a61e93635f1899051311344f3dcdbb49a4fe49a79f66d2f589a9f282e8cc4f1d7381e8ef7e4fcc6b0db578c77@127.0.0.1:30302");
+    final List<EnodeURL> bootnodes = new ArrayList<EnodeURL>();
+    bootnodes.add(bootnode);
+    Collection<EnodeURL> staticNodes = new ArrayList<EnodeURL>();
+    staticNodes.add(staticNode);
+    Collection<EnodeURL> fixedNodes = RunnerBuilder.getFixedNodes(bootnodes, staticNodes);
+    assertThat(fixedNodes).containsExactlyInAnyOrder(staticNode, bootnode);
+    // bootnodes should be unchanged
+    assertThat(bootnodes).containsExactly(bootnode);
+  }
+
+  @Test
   public void fullSyncFromGenesis() throws Exception {
     syncFromGenesis(SyncMode.FULL);
   }
@@ -101,39 +120,39 @@ public final class RunnerTest {
 
     // Setup state with block data
     try (final PantheonController<Void> controller =
-        MainnetPantheonController.init(
-            createKeyValueStorageProvider(dbAhead),
-            GenesisConfigFile.mainnet(),
-            MainnetProtocolSchedule.create(),
-            syncConfigAhead,
-            EthereumWireProtocolConfiguration.defaultConfig(),
-            new MiningParametersTestBuilder().enabled(false).build(),
-            networkId,
-            aheadDbNodeKeys,
-            PrivacyParameters.DEFAULT,
-            dataDirAhead,
-            noOpMetricsSystem,
-            TestClock.fixed(),
-            PendingTransactions.MAX_PENDING_TRANSACTIONS)) {
+        new MainnetPantheonControllerBuilder()
+            .genesisConfigFile(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(syncConfigAhead)
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .dataDirectory(dataDirAhead)
+            .networkId(networkId)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(aheadDbNodeKeys)
+            .metricsSystem(noOpMetricsSystem)
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .build()) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
 
     // Setup Runner with blocks
     final PantheonController<Void> controllerAhead =
-        MainnetPantheonController.init(
-            createKeyValueStorageProvider(dbAhead),
-            GenesisConfigFile.mainnet(),
-            MainnetProtocolSchedule.create(),
-            syncConfigAhead,
-            EthereumWireProtocolConfiguration.defaultConfig(),
-            new MiningParametersTestBuilder().enabled(false).build(),
-            networkId,
-            aheadDbNodeKeys,
-            PrivacyParameters.DEFAULT,
-            dataDirAhead,
-            noOpMetricsSystem,
-            TestClock.fixed(),
-            PendingTransactions.MAX_PENDING_TRANSACTIONS);
+        new MainnetPantheonControllerBuilder()
+            .genesisConfigFile(GenesisConfigFile.mainnet())
+            .synchronizerConfiguration(syncConfigAhead)
+            .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+            .dataDirectory(dataDirAhead)
+            .networkId(networkId)
+            .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+            .nodeKeys(aheadDbNodeKeys)
+            .metricsSystem(noOpMetricsSystem)
+            .privacyParameters(PrivacyParameters.DEFAULT)
+            .clock(TestClock.fixed())
+            .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+            .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .build();
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
     final WebSocketConfiguration aheadWebSocketConfiguration = wsRpcConfiguration();
@@ -176,20 +195,20 @@ public final class RunnerTest {
 
       // Setup runner with no block data
       final PantheonController<Void> controllerBehind =
-          MainnetPantheonController.init(
-              new InMemoryStorageProvider(),
-              GenesisConfigFile.mainnet(),
-              MainnetProtocolSchedule.create(),
-              syncConfigBehind,
-              EthereumWireProtocolConfiguration.defaultConfig(),
-              new MiningParametersTestBuilder().enabled(false).build(),
-              networkId,
-              KeyPair.generate(),
-              PrivacyParameters.DEFAULT,
-              dataDirBehind,
-              noOpMetricsSystem,
-              TestClock.fixed(),
-              PendingTransactions.MAX_PENDING_TRANSACTIONS);
+          new MainnetPantheonControllerBuilder()
+              .genesisConfigFile(GenesisConfigFile.mainnet())
+              .synchronizerConfiguration(syncConfigBehind)
+              .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+              .dataDirectory(dataDirBehind)
+              .networkId(networkId)
+              .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
+              .nodeKeys(KeyPair.generate())
+              .storageProvider(new InMemoryStorageProvider())
+              .metricsSystem(noOpMetricsSystem)
+              .privacyParameters(PrivacyParameters.DEFAULT)
+              .clock(TestClock.fixed())
+              .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
+              .build();
       final EnodeURL enode = runnerAhead.getLocalEnode().get();
       final EthNetworkConfig behindEthNetworkConfiguration =
           new EthNetworkConfig(
@@ -251,7 +270,6 @@ public final class RunnerTest {
                       UInt256.fromHexString(
                               new JsonObject(resp.body().string()).getString("result"))
                           .toInt();
-                  System.out.println("******current block  " + currentBlock);
                   if (currentBlock < blockCount) {
                     // if not yet at blockCount, we should get a sync result from eth_syncing
                     final int syncResultCurrentBlock =
