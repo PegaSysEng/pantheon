@@ -41,7 +41,8 @@ import org.awaitility.Awaitility;
 public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
   private final Logger LOG = LogManager.getLogger();
-  private final Logger PROCESS_LOG = LogManager.getLogger("tech.pegasys.pantheon.SubProcessLog");
+  //  private final Logger PROCESS_LOG =
+  // LogManager.getLogger("tech.pegasys.pantheon.SubProcessLog");
 
   private final Map<String, Process> pantheonProcesses = new HashMap<>();
   private final ExecutorService outputProcessorExecutor = Executors.newCachedThreadPool();
