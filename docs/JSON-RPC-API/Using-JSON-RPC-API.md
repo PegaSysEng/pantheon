@@ -71,10 +71,10 @@ If your application publishes RPC ports, specify the hostnames when starting Pan
     pantheon --host-whitelist=example.com
     ```
     
-Specify * or all for `--host-whitelist` to effectively disable host protection.
+Specify * for `--host-whitelist` to effectively disable host protection.
 
 !!! caution 
-    Specifying * or all for `--host-whitelist` is not recommended for production code.
+    Specifying * for `--host-whitelist` is not recommended for production code.
 
 ## JSON-RPC Authentication 
 
@@ -117,9 +117,6 @@ The `ETH`, `NET`, and `WEB3` API methods are enabled by default.
 
 Use the [`--rpc-http-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) or [`--rpc-ws-api`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-api) 
 options to enable the `ADMIN`, `CLIQUE`, `DEBUG`, `EEA`, `IBFT`, `MINER`, `PERM`, and `TXPOOL` API methods.
-
-!!!note
-    EEA methods are for privacy features. Privacy features are under development and will be available in v1.1.  
 
 ## Block Parameter
 

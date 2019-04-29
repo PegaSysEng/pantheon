@@ -13,6 +13,8 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.DETACHED_ONLY;
+import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.FULL;
+import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT;
 import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT_DETACHED_ONLY;
 import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT_SKIP_DETACHED;
 import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.SKIP_DETACHED;
@@ -37,7 +39,6 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
 import tech.pegasys.pantheon.services.pipeline.PipelineBuilder;
 
-import java.time.Duration;
 import java.util.Optional;
 
 public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFactory {
@@ -49,6 +50,7 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
   private final MetricsSystem metricsSystem;
   private final FastSyncValidationPolicy attachedValidationPolicy;
   private final FastSyncValidationPolicy detachedValidationPolicy;
+  private final FastSyncValidationPolicy ommerValidationPolicy;
 
   public FastSyncDownloadPipelineFactory(
       final SynchronizerConfiguration syncConfig,
@@ -75,6 +77,9 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             LIGHT_SKIP_DETACHED,
             SKIP_DETACHED,
             fastSyncValidationCounter);
+    ommerValidationPolicy =
+        new FastSyncValidationPolicy(
+            this.syncConfig.fastSyncFullValidationRate(), LIGHT, FULL, fastSyncValidationCounter);
     detachedValidationPolicy =
         new FastSyncValidationPolicy(
             this.syncConfig.fastSyncFullValidationRate(),
@@ -100,11 +105,15 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             ethContext.getScheduler(),
             target.peer(),
             target.commonAncestor(),
-            syncConfig.downloaderCheckpointTimeoutsPermitted(),
-            Duration.ofSeconds(5));
+            syncConfig.downloaderCheckpointTimeoutsPermitted());
     final DownloadHeadersStep<C> downloadHeadersStep =
         new DownloadHeadersStep<>(
-            protocolSchedule, protocolContext, ethContext, detachedValidationPolicy, metricsSystem);
+            protocolSchedule,
+            protocolContext,
+            ethContext,
+            detachedValidationPolicy,
+            headerRequestSize,
+            metricsSystem);
     final CheckpointHeaderValidationStep<C> validateHeadersJoinUpStep =
         new CheckpointHeaderValidationStep<>(
             protocolSchedule, protocolContext, detachedValidationPolicy);
@@ -113,7 +122,8 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
     final DownloadReceiptsStep downloadReceiptsStep =
         new DownloadReceiptsStep(ethContext, metricsSystem);
     final FastImportBlocksStep<C> importBlockStep =
-        new FastImportBlocksStep<>(protocolSchedule, protocolContext, attachedValidationPolicy);
+        new FastImportBlocksStep<>(
+            protocolSchedule, protocolContext, attachedValidationPolicy, ommerValidationPolicy);
 
     return PipelineBuilder.createPipelineFrom(
             "fetchCheckpoints",

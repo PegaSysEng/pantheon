@@ -77,7 +77,6 @@ public class EeaGetTransactionReceipt implements JsonRpcMethod {
   public JsonRpcResponse response(final JsonRpcRequest request) {
     LOG.trace("Executing eea_getTransactionReceipt");
     final Hash transactionHash = parameters.required(request.getParams(), 0, Hash.class);
-    final String publicKey = parameters.required(request.getParams(), 1, String.class);
     final Optional<TransactionLocation> maybeLocation =
         blockchain.getBlockchain().getTransactionLocation(transactionHash);
     if (!maybeLocation.isPresent()) {
@@ -91,11 +90,19 @@ public class EeaGetTransactionReceipt implements JsonRpcMethod {
     final Hash blockhash = location.getBlockHash();
     final long blockNumber = blockchain.getBlockchain().getBlockHeader(blockhash).get().getNumber();
 
+    final String publicKey = privacyParameters.getEnclavePublicKey();
     PrivateTransaction privateTransaction;
     String privacyGroupId;
     try {
-      privateTransaction = getTransactionFromEnclave(transaction, publicKey);
-      privacyGroupId = getPrivacyGroupIdFromEnclave(transaction, publicKey);
+      ReceiveResponse receiveResponse = getReceiveResponseFromEnclave(transaction, publicKey);
+      LOG.trace("Received transaction information from Enclave");
+
+      final BytesValueRLPInput bytesValueRLPInput =
+          new BytesValueRLPInput(
+              BytesValue.wrap(Base64.getDecoder().decode(receiveResponse.getPayload())), false);
+
+      privateTransaction = PrivateTransaction.readFrom(bytesValueRLPInput);
+      privacyGroupId = receiveResponse.getPrivacyGroupId();
     } catch (Exception e) {
       LOG.error("Failed to fetch transaction from Enclave with error " + e.getMessage());
       return new JsonRpcSuccessResponse(
@@ -151,26 +158,13 @@ public class EeaGetTransactionReceipt implements JsonRpcMethod {
     return new JsonRpcSuccessResponse(request.getId(), result);
   }
 
-  private String getPrivacyGroupIdFromEnclave(final Transaction transaction, final String publicKey)
-      throws IOException {
-    LOG.trace("Fetching transaction information from Enclave");
-    final ReceiveRequest enclaveRequest =
-        new ReceiveRequest(new String(transaction.getPayload().extractArray(), UTF_8), publicKey);
-    ReceiveResponse enclaveResponse = enclave.receive(enclaveRequest);
-    LOG.trace("Received transaction information from Enclave");
-    return enclaveResponse.getPrivacyGroupId();
-  }
-
-  private PrivateTransaction getTransactionFromEnclave(
+  private ReceiveResponse getReceiveResponseFromEnclave(
       final Transaction transaction, final String publicKey) throws IOException {
     LOG.trace("Fetching transaction information from Enclave");
     final ReceiveRequest enclaveRequest =
         new ReceiveRequest(new String(transaction.getPayload().extractArray(), UTF_8), publicKey);
     ReceiveResponse enclaveResponse = enclave.receive(enclaveRequest);
-    final BytesValueRLPInput bytesValueRLPInput =
-        new BytesValueRLPInput(
-            BytesValue.wrap(Base64.getDecoder().decode(enclaveResponse.getPayload())), false);
     LOG.trace("Received transaction information from Enclave");
-    return PrivateTransaction.readFrom(bytesValueRLPInput);
+    return enclaveResponse;
   }
 }

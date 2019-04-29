@@ -13,11 +13,14 @@
 package tech.pegasys.pantheon.tests.web3j.privacy;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivateAcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder.TransactionType;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
@@ -31,7 +34,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
 
   // Contract address is generated from sender address and transaction nonce and privacy group id
   protected static final Address CONTRACT_ADDRESS =
-      Address.fromHexString("0x99a3e1c0368cb56aeea8fc8cf5068175d0de7ac1");
+      Address.fromHexString("0x06088ead8384df709132151403e08c2b978beb85");
   protected static final String PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
   private SECP256K1.KeyPair keypair =
       SECP256K1.KeyPair.create(
@@ -50,11 +53,11 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
     enclave = createEnclave("orion_key_0.pub", "orion_key_0.key");
     minerNode =
         pantheon.createPrivateTransactionEnabledMinerNode(
-            "miner-node", getPrivacyParams(enclave), "key");
+            "miner-node", getPrivacyParameters(enclave), "key");
     cluster.start(minerNode);
 
     deployContract =
-        PrivateAcceptanceTestBase.builder()
+        privateTransactionBuilder
             .nonce(0)
             .from(minerNode.getAddress())
             .to(null)
@@ -64,7 +67,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
             .build(TransactionType.CREATE_CONTRACT);
 
     storeValue =
-        PrivateAcceptanceTestBase.builder()
+        privateTransactionBuilder
             .nonce(1)
             .from(minerNode.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -74,7 +77,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
             .build(TransactionType.STORE);
 
     getValue =
-        PrivateAcceptanceTestBase.builder()
+        privateTransactionBuilder
             .nonce(2)
             .from(minerNode.getAddress())
             .to(CONTRACT_ADDRESS)
@@ -87,42 +90,50 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivateAcceptanceT
   @Test
   public void deployingMustGiveValidReceipt() {
     final String transactionHash =
-        minerNode.execute(transactions.deployPrivateSmartContract(deployContract));
+        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
     privateTransactionVerifier
         .validPrivateContractDeployed(CONTRACT_ADDRESS.toString())
-        .verify(minerNode, transactionHash, PUBLIC_KEY);
+        .verify(minerNode, transactionHash);
   }
 
   @Test
   public void privateSmartContractMustEmitEvents() {
-    minerNode.execute(transactions.deployPrivateSmartContract(deployContract));
+    String transactionHash =
+        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
-    final String transactionHash =
-        minerNode.execute(transactions.createPrivateRawTransaction(storeValue));
+    waitForTransactionToBeMined(transactionHash);
 
-    privateTransactionVerifier
-        .validEventReturned("1000")
-        .verify(minerNode, transactionHash, PUBLIC_KEY);
+    transactionHash =
+        minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
+
+    privateTransactionVerifier.validEventReturned("1000").verify(minerNode, transactionHash);
   }
 
   @Test
   public void privateSmartContractMustReturnValues() {
 
-    minerNode.execute(transactions.deployPrivateSmartContract(deployContract));
+    String transactionHash =
+        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
 
-    minerNode.execute(transactions.createPrivateRawTransaction(storeValue));
+    waitForTransactionToBeMined(transactionHash);
 
-    final String transactionHash =
-        minerNode.execute(transactions.createPrivateRawTransaction(getValue));
+    transactionHash =
+        minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
 
-    privateTransactionVerifier
-        .validOutputReturned("1000")
-        .verify(minerNode, transactionHash, PUBLIC_KEY);
+    waitForTransactionToBeMined(transactionHash);
+
+    transactionHash = minerNode.execute(privateTransactions.createPrivateRawTransaction(getValue));
+
+    privateTransactionVerifier.validOutputReturned("1000").verify(minerNode, transactionHash);
   }
 
   @After
   public void tearDown() {
     enclave.getOrion().stop();
+  }
+
+  public void waitForTransactionToBeMined(final String transactionHash) {
+    waitFor(() -> minerNode.verify(eea.expectSuccessfulTransactionReceipt(transactionHash)));
   }
 }

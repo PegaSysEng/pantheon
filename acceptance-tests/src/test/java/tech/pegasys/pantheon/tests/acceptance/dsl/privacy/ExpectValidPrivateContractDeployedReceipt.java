@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.privacy;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eea;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -29,11 +30,11 @@ public class ExpectValidPrivateContractDeployedReceipt extends GetValidPrivateTr
     this.contractAddress = contractAddress;
   }
 
-  public void verify(
-      final PantheonNode node, final String transactionHash, final String publicKey) {
+  public void verify(final PantheonNode node, final String transactionHash) {
     ResponseTypes.PrivateTransactionReceipt privateTxReceipt =
-        getPrivateTransactionReceipt(node, transactionHash, publicKey);
+        getPrivateTransactionReceipt(node, transactionHash);
 
     assertEquals(contractAddress, privateTxReceipt.getContractAddress());
+    assertNotEquals("0x", privateTxReceipt.getOutput());
   }
 }

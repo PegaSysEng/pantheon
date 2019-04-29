@@ -20,8 +20,8 @@ import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.ethereum.core.TransactionPool;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthAccounts;
@@ -31,14 +31,17 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.NetVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.Web3Sha3;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -112,7 +115,7 @@ public class JsonRpcHttpServiceLoginTest {
     supportedCapabilities.add(EthProtocol.ETH63);
 
     final StubGenesisConfigOptions genesisConfigOptions =
-        new StubGenesisConfigOptions().constantinopleBlock(0).chainId(CHAIN_ID);
+        new StubGenesisConfigOptions().constantinopleBlock(0).chainId(BigInteger.valueOf(CHAIN_ID));
     rpcMethods =
         spy(
             new JsonRpcMethodsFactory()
@@ -132,7 +135,10 @@ public class JsonRpcHttpServiceLoginTest {
                     Optional.empty(),
                     Optional.empty(),
                     JSON_RPC_APIS,
-                    mock(PrivacyParameters.class)));
+                    mock(PrivacyParameters.class),
+                    mock(JsonRpcConfiguration.class),
+                    mock(WebSocketConfiguration.class),
+                    mock(MetricsConfiguration.class)));
     service = createJsonRpcHttpService();
     jwtAuth = service.authenticationService.get().getJwtAuthProvider();
     service.start().join();
@@ -383,7 +389,7 @@ public class JsonRpcHttpServiceLoginTest {
       assertThat(token).isNotNull();
 
       JsonRpcMethod ethAccounts = new EthAccounts();
-      JsonRpcMethod netVersion = new NetVersion(123);
+      JsonRpcMethod netVersion = new NetVersion(Optional.of(BigInteger.valueOf(123)));
       JsonRpcMethod ethBlockNumber = new EthBlockNumber(blockchainQueries);
       JsonRpcMethod web3Sha3 = new Web3Sha3();
       JsonRpcMethod web3ClientVersion = new Web3ClientVersion("777");

@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
@@ -38,7 +39,8 @@ public class SmartContractPermissioningControllerTest {
       final String resourceName, final String contractAddressString) throws IOException {
     final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
 
-    final String emptyContractFile = Resources.toString(Resources.getResource(resourceName), UTF_8);
+    final String emptyContractFile =
+        Resources.toString(this.getClass().getResource(resourceName), UTF_8);
     final GenesisState genesisState =
         GenesisState.fromConfig(GenesisConfigFile.fromConfig(emptyContractFile), protocolSchedule);
 
@@ -58,7 +60,7 @@ public class SmartContractPermissioningControllerTest {
   public void testIpv4Included() throws IOException {
     final SmartContractPermissioningController controller =
         setupController(
-            "SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -74,7 +76,7 @@ public class SmartContractPermissioningControllerTest {
   public void testIpv4DestinationMissing() throws IOException {
     final SmartContractPermissioningController controller =
         setupController(
-            "SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -90,7 +92,7 @@ public class SmartContractPermissioningControllerTest {
   public void testIpv4SourceMissing() throws IOException {
     final SmartContractPermissioningController controller =
         setupController(
-            "SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -106,7 +108,7 @@ public class SmartContractPermissioningControllerTest {
   public void testIpv6Included() throws IOException {
     final SmartContractPermissioningController controller =
         setupController(
-            "SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -122,7 +124,7 @@ public class SmartContractPermissioningControllerTest {
   public void testIpv6SourceMissing() throws IOException {
     final SmartContractPermissioningController controller =
         setupController(
-            "SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -138,7 +140,7 @@ public class SmartContractPermissioningControllerTest {
   public void testIpv6DestinationMissing() throws IOException {
     final SmartContractPermissioningController controller =
         setupController(
-            "SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -148,5 +150,41 @@ public class SmartContractPermissioningControllerTest {
                 EnodeURL.fromString(
                     "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab63@[1:2:3:4:5:6:7:8]:30304")))
         .isFalse();
+  }
+
+  @Test
+  public void testPermissioningContractMissing() throws IOException {
+    final SmartContractPermissioningController controller =
+        setupController(
+            "/SmartContractPermissioningControllerTest/noSmartPermissioning.json",
+            "0x0000000000000000000000000000000000001234");
+
+    assertThatThrownBy(
+            () ->
+                controller.isPermitted(
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab61@[1:2:3:4:5:6:7:8]:30303"),
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab63@[1:2:3:4:5:6:7:8]:30304")))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Permissioning contract does not exist");
+  }
+
+  @Test
+  public void testPermissioningContractCorrupt() throws IOException {
+    final SmartContractPermissioningController controller =
+        setupController(
+            "/SmartContractPermissioningControllerTest/corruptSmartPermissioning.json",
+            "0x0000000000000000000000000000000000001234");
+
+    assertThatThrownBy(
+            () ->
+                controller.isPermitted(
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab61@[1:2:3:4:5:6:7:8]:30303"),
+                    EnodeURL.fromString(
+                        "enode://1234000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ab63@[1:2:3:4:5:6:7:8]:30304")))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Permissioning transaction failed when processing");
   }
 }

@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.core;
+package tech.pegasys.pantheon.ethereum.eth.transactions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -18,7 +18,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.core.PendingTransactions.TransactionSelectionResult;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.TransactionTestFixture;
+import tech.pegasys.pantheon.ethereum.core.Util;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions.TransactionSelectionResult;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
@@ -26,19 +32,23 @@ import tech.pegasys.pantheon.testutil.TestClock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
 public class PendingTransactionsTest {
 
+  private static final long TRANSACTION_EVICTION_INTERVAL_MS = TimeUnit.MINUTES.toMillis(1);
   private static final int MAX_TRANSACTIONS = 5;
   private static final KeyPair KEYS1 = KeyPair.generate();
   private static final KeyPair KEYS2 = KeyPair.generate();
 
+  private final TestClock clock = new TestClock();
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final PendingTransactions transactions =
-      new PendingTransactions(MAX_TRANSACTIONS, TestClock.fixed(), metricsSystem);
+      new PendingTransactions(
+          TRANSACTION_EVICTION_INTERVAL_MS, MAX_TRANSACTIONS, TestClock.fixed(), metricsSystem);
   private final Transaction transaction1 = createTransaction(2);
   private final Transaction transaction2 = createTransaction(1);
 
@@ -47,6 +57,22 @@ public class PendingTransactionsTest {
       mock(PendingTransactionDroppedListener.class);
   private static final Address SENDER1 = Util.publicKeyToAddress(KEYS1.getPublicKey());
   private static final Address SENDER2 = Util.publicKeyToAddress(KEYS2.getPublicKey());
+
+  @Test
+  public void shouldReturnExclusivelyLocalTransactionsWhenAppropriate() {
+    final Transaction localTransaction0 = createTransaction(0);
+    transactions.addLocalTransaction(localTransaction0);
+    assertThat(transactions.size()).isEqualTo(1);
+
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(2);
+
+    transactions.addRemoteTransaction(transaction2);
+    assertThat(transactions.size()).isEqualTo(3);
+
+    List<Transaction> localTransactions = transactions.getLocalTransactions();
+    assertThat(localTransactions.size()).isEqualTo(1);
+  }
 
   @Test
   public void shouldAddATransaction() {
@@ -386,5 +412,50 @@ public class PendingTransactionsTest {
         .value(Wei.of(transactionNumber))
         .nonce(transactionNumber)
         .createTransaction(KEYS1);
+  }
+
+  @Test
+  public void shouldEvictMultipleOldTransactions() {
+    final long transactionEvictionIntervalMs = 1000L;
+    final PendingTransactions transactions =
+        new PendingTransactions(
+            transactionEvictionIntervalMs, MAX_TRANSACTIONS, clock, metricsSystem);
+
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(1);
+    transactions.addRemoteTransaction(transaction2);
+    assertThat(transactions.size()).isEqualTo(2);
+
+    clock.stepMillis(2000);
+    transactions.evictOldTransactions();
+    assertThat(transactions.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldEvictSingleOldTransaction() {
+    final long transactionEvictionIntervalMs = 1000L;
+    final PendingTransactions transactions =
+        new PendingTransactions(
+            transactionEvictionIntervalMs, MAX_TRANSACTIONS, clock, metricsSystem);
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(1);
+    clock.stepMillis(2000);
+    transactions.evictOldTransactions();
+    assertThat(transactions.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldEvictExclusivelyOldTransactions() {
+    final long transactionEvictionIntervalMs = 2L;
+    final PendingTransactions transactions =
+        new PendingTransactions(
+            transactionEvictionIntervalMs, MAX_TRANSACTIONS, clock, metricsSystem);
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(1);
+    clock.stepMillis(2001);
+    transactions.addRemoteTransaction(transaction2);
+    assertThat(transactions.size()).isEqualTo(2);
+    transactions.evictOldTransactions();
+    assertThat(transactions.size()).isEqualTo(1);
   }
 }
