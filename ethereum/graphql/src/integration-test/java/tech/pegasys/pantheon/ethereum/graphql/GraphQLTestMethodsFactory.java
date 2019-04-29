@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethodType;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
@@ -55,7 +56,7 @@ public class GraphQLTestMethodsFactory {
     this.importer = importer;
   }
 
-  public Map<String, GraphQLMethod> methods() {
+  public Map<GraphQLMethodType, GraphQLMethod> methods() {
     final WorldStateArchive stateArchive = createInMemoryWorldStateArchive();
 
     importer.getGenesisState().writeStateTo(stateArchive.getMutable());

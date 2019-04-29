@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockParentFetche
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactionAtFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockTransactionsFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLMethodType;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.LogAccountFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.MutationTransactionFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher;
@@ -62,7 +63,7 @@ import java.util.Set;
 
 public class GraphQLMethodsFactory {
 
-  public Map<String, GraphQLMethod> methods(
+  public Map<GraphQLMethodType, GraphQLMethod> methods(
       final String clientVersion,
       final int networkId,
       final GenesisConfigOptions genesisConfigOptions,
@@ -101,7 +102,7 @@ public class GraphQLMethodsFactory {
         metricsConfiguration);
   }
 
-  public Map<String, GraphQLMethod> methods(
+  public Map<GraphQLMethodType, GraphQLMethod> methods(
       final String clientVersion,
       final int networkId,
       final GenesisConfigOptions genesisConfigOptions,
@@ -117,7 +118,7 @@ public class GraphQLMethodsFactory {
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters,
       final MetricsConfiguration metricsConfiguration) {
-    final Map<String, GraphQLMethod> enabledMethods = new HashMap<>();
+    final Map<GraphQLMethodType, GraphQLMethod> enabledMethods = new HashMap<>();
     addMethods(
         enabledMethods,
         new QueryBlockFetcher(blockchainQueries),
@@ -157,9 +158,9 @@ public class GraphQLMethodsFactory {
   }
 
   private void addMethods(
-      final Map<String, GraphQLMethod> methods, final GraphQLMethod... graphQLMethods) {
+          final Map<GraphQLMethodType, GraphQLMethod> methods, final GraphQLMethod... graphQLMethods) {
     for (final GraphQLMethod graphQLMethod : graphQLMethods) {
-      methods.put(graphQLMethod.getType().getField(), graphQLMethod);
+      methods.put(graphQLMethod.getType(), graphQLMethod);
     }
   }
 }
