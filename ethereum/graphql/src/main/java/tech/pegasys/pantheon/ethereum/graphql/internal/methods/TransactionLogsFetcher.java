@@ -43,7 +43,7 @@ public class TransactionLogsFetcher implements DataFetcher<ArrayList<Log>>, Grap
     final TransactionReceiptWithMetadata receipt =
         blockchain.transactionReceiptByTransactionHash(hash).orElse(null);
     return blockchain.matchingLogs(receipt.getBlockHash(), new LogsQuery.Builder().build()).stream()
-        .filter(item -> item.getTransactionHash() == hash)
+        .filter(item -> item.getTransactionHash().equals(hash))
         .map(log -> new Log(log, receipt))
         .collect(Collectors.toCollection(ArrayList::new));
   }
