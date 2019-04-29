@@ -42,6 +42,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryTransactionF
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionBlockFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionCreatedContractFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionFromFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionLogsFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.TransactionToFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -149,6 +150,7 @@ public class GraphQLMethodsFactory {
         new TransactionCreatedContractFetcher(blockchainQueries),
         new TransactionFromFetcher(blockchainQueries),
         new TransactionToFetcher(blockchainQueries),
+        new TransactionLogsFetcher(blockchainQueries),
         new MutationTransactionFetcher(transactionPool),
         new LogAccountFetcher(blockchainQueries));
     return enabledMethods;

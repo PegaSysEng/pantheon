@@ -12,10 +12,15 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
+import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.graphql.internal.filter.LogsQuery;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionReceiptWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Log;
+import tech.pegasys.pantheon.ethereum.graphql.internal.results.Transaction;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -34,13 +39,12 @@ public class TransactionLogsFetcher implements DataFetcher<ArrayList<Log>>, Grap
 
   @Override
   public ArrayList<Log> get(final DataFetchingEnvironment environment) {
-    //      final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
-    //      final Hash blockHash =
-    //   blockchain.transactionByHash(hash).map(TransactionWithMetadata::getBlockHash).orElse(null);
-    //      blockchain.matchingLogs(blockHash, new LogsQuery.Builder().build()).stream().filter(item
-    // ->
-    //   item.getTransactionHash() == hash).collect(Collectors.toList())
-
-    return null;
+    final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
+    final TransactionReceiptWithMetadata receipt =
+        blockchain.transactionReceiptByTransactionHash(hash).orElse(null);
+    return blockchain.matchingLogs(receipt.getBlockHash(), new LogsQuery.Builder().build()).stream()
+        .filter(item -> item.getTransactionHash() == hash)
+        .map(log -> new Log(log, receipt))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 }
