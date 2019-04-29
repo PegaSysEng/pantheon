@@ -19,17 +19,20 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.Quantity;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 
 public class EthChainIdTest {
 
   private EthChainId method;
-  private final int CHAIN_ID = 1;
+  private final BigInteger CHAIN_ID = BigInteger.ONE;
 
   @Before
   public void setUp() {
-    method = new EthChainId(CHAIN_ID);
+    method = new EthChainId(Optional.of(CHAIN_ID));
   }
 
   @Test
@@ -39,9 +42,20 @@ public class EthChainIdTest {
 
   @Test
   public void shouldReturnChainId() {
-    JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, Quantity.create(CHAIN_ID));
+    final JsonRpcResponse expectedResponse =
+        new JsonRpcSuccessResponse(null, Quantity.create(CHAIN_ID));
 
-    JsonRpcResponse response = method.response(request());
+    final JsonRpcResponse response = method.response(request());
+
+    assertThat(response).isEqualToComparingFieldByField(expectedResponse);
+  }
+
+  @Test
+  public void shouldReturnNullWhenNoChainId() {
+    method = new EthChainId(Optional.empty());
+    final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, null);
+
+    final JsonRpcResponse response = method.response(request());
 
     assertThat(response).isEqualToComparingFieldByField(expectedResponse);
   }
