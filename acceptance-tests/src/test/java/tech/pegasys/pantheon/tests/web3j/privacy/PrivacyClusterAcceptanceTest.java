@@ -391,7 +391,7 @@ public class PrivacyClusterAcceptanceTest extends PrivateAcceptanceTestBase {
     nextNonce = getNonce(node1, privacyGroup12);
 
     final Address contractFor12 =
-        generateContractAddress(node1.getAddress(), nextNonce, privacyGroup123);
+        generateContractAddress(node1.getAddress(), nextNonce, privacyGroup12);
 
     final String deployContractFor12 =
         PrivateTransactionBuilder.builder()
