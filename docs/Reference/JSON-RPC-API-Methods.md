@@ -2558,7 +2558,7 @@ None
 
 * `maxSize` - Maximum number of transactions kept in the transaction pool. Use the [`--tx-pool-max-size`](Pantheon-CLI-Syntax.md#tx-pool-max-size)
  option to configure the maximum size. 
-* `localCount` - Number of transactions submitted from the local node 
+* `localCount` - Number of transactions submitted directly to this node 
 * `remoteCount` - Number of transactions received from remote nodes. 
 
 !!! example
