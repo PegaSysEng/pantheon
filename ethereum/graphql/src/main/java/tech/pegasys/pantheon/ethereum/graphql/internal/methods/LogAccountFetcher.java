@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.results.Log;
 import graphql.schema.DataFetchingEnvironment;
 
 public class LogAccountFetcher extends AbstractAccountFetcher {
-  private BlockchainQueries blockchain;
 
   public LogAccountFetcher(final BlockchainQueries blockchain) {
     super(blockchain);
