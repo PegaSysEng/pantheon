@@ -80,11 +80,6 @@ public class EthereumWireProtocolConfiguration {
   }
 
   @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  @Override
   public String toString() {
     return String.format(
         "maxGetBlockHeaders=%s\tmaxGetBlockBodies=%s\tmaxGetReceipts=%s\tmaxGetReceipts=%s",
