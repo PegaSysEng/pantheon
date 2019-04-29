@@ -16,6 +16,8 @@
 
 ### Technical Improvements 
 
+- Updating Orion to 0.9.0 [\#1360](https://github.com/PegaSysEng/pantheon/pull/1360)
+- Allow use of large chain IDs [\#1357](https://github.com/PegaSysEng/pantheon/pull/1357)
 - Allow private contract invocations in multiple privacy groups [\#1340](https://github.com/PegaSysEng/pantheon/pull/1340)
 - Missing p2p info when queried live [\#1338](https://github.com/PegaSysEng/pantheon/pull/1338)
 - Fix expose transaction statistics [\#1337](https://github.com/PegaSysEng/pantheon/pull/1337)
