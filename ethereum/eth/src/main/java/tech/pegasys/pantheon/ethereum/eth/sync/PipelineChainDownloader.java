@@ -17,8 +17,10 @@ import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
 import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
+import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -101,34 +103,39 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
 
   private CompletionStage<Void> repeatUnlessDownloadComplete(
       @SuppressWarnings("unused") final Void result) {
+    syncState.clearSyncTarget();
     if (syncTargetManager.shouldContinueDownloading()) {
       return performDownload();
     } else {
       LOG.info("Chain download complete");
-      syncState.clearSyncTarget();
       return completedFuture(null);
     }
   }
 
   private CompletionStage<Void> handleFailedDownload(final Throwable error) {
     pipelineErrorCounter.inc();
-    final Throwable rootCause = ExceptionUtils.rootCause(error);
-    if (!cancelled.get() && rootCause instanceof CancellationException) {
-      // Weird but when Pantheon shuts down we get an unexpected CancellationException
-      // when the scheduler shuts down and to prevent the fast sync state from being deleted have
-      // to ensure we stop doing anything, but never complete.
-      return new CompletableFuture<>();
-    }
     if (!cancelled.get()
         && syncTargetManager.shouldContinueDownloading()
-        && !(rootCause instanceof CancellationException)) {
-      LOG.debug("Chain download failed. Restarting after short delay.", error);
+        && !(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+      logDownloadFailure("Chain download failed. Restarting after short delay.", error);
       // Allowing the normal looping logic to retry after a brief delay.
       return scheduler.scheduleFutureTask(() -> completedFuture(null), PAUSE_AFTER_ERROR_DURATION);
     }
-    LOG.debug("Chain download failed.", error);
+    logDownloadFailure("Chain download failed.", error);
     // Propagate the error out, terminating this chain download.
     return completedExceptionally(error);
+  }
+
+  private void logDownloadFailure(final String message, final Throwable error) {
+    final Throwable rootCause = ExceptionUtils.rootCause(error);
+    if (rootCause instanceof CancellationException || rootCause instanceof InterruptedException) {
+      LOG.trace(message, error);
+    } else if (rootCause instanceof EthTaskException
+        || rootCause instanceof InvalidBlockException) {
+      LOG.debug(message, error);
+    } else {
+      LOG.error(message, error);
+    }
   }
 
   private synchronized CompletionStage<Void> startDownloadForSyncTarget(final SyncTarget target) {

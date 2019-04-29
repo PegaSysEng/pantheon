@@ -79,7 +79,7 @@ public class PrivateTransactionHandlerTest {
           .value(Wei.ZERO)
           .payload(BytesValue.wrap(TRANSACTION_KEY.getBytes(Charsets.UTF_8)))
           .sender(Address.fromHexString("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"))
-          .chainId(2018)
+          .chainId(BigInteger.valueOf(2018))
           .signAndBuild(KEY_PAIR);
 
   Enclave mockEnclave() throws IOException {
@@ -106,7 +106,7 @@ public class PrivateTransactionHandlerTest {
   @Test
   public void validTransactionThroughHandler() throws IOException {
     final Transaction transactionResponse =
-        privateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION);
+        privateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION, () -> 0L);
 
     assertThat(transactionResponse.contractAddress())
         .isEqualTo(PUBLIC_TRANSACTION.contractAddress());
@@ -118,6 +118,6 @@ public class PrivateTransactionHandlerTest {
 
   @Test(expected = IOException.class)
   public void enclaveIsDownWhileHandling() throws IOException {
-    brokenPrivateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION);
+    brokenPrivateTransactionHandler.handle(VALID_PRIVATE_TRANSACTION, () -> 0L);
   }
 }

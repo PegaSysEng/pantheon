@@ -17,17 +17,19 @@ import static tech.pegasys.pantheon.cli.NetworkName.DEV;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
-import tech.pegasys.pantheon.cli.PantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.ethereum.core.PendingTransactions;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
+import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,12 +56,13 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
 
     final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
-    final PantheonControllerBuilder builder = new PantheonControllerBuilder();
     final EthNetworkConfig.Builder networkConfigBuilder =
         new EthNetworkConfig.Builder(EthNetworkConfig.getNetworkConfig(DEV))
             .setBootNodes(node.getConfiguration().bootnodes());
     node.getConfiguration().getGenesisConfig().ifPresent(networkConfigBuilder::setGenesisConfig);
     final EthNetworkConfig ethNetworkConfig = networkConfigBuilder.build();
+    final PantheonControllerBuilder<?> builder =
+        new PantheonController.Builder().fromEthNetworkConfig(ethNetworkConfig);
     final Path tempDir = Files.createTempDir().toPath();
 
     final PantheonController<?> pantheonController;
@@ -67,15 +70,16 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       pantheonController =
           builder
               .synchronizerConfiguration(new SynchronizerConfiguration.Builder().build())
-              .homePath(node.homeDirectory())
-              .ethNetworkConfig(ethNetworkConfig)
+              .dataDirectory(node.homeDirectory())
               .miningParameters(node.getMiningParameters())
               .privacyParameters(node.getPrivacyParameters())
-              .devMode(node.isDevMode())
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
               .metricsSystem(noOpMetricsSystem)
               .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
-              .rocksDbConfiguration(new RocksDbConfiguration.Builder().databaseDir(tempDir).build())
+              .rocksdDbConfiguration(
+                  new RocksDbConfiguration.Builder().databaseDir(tempDir).build())
+              .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+              .clock(Clock.systemUTC())
               .build();
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
@@ -90,8 +94,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .pantheonController(pantheonController)
             .ethNetworkConfig(ethNetworkConfig)
             .discovery(node.isDiscoveryEnabled())
-            .discoveryHost(node.hostName())
-            .discoveryPort(0)
+            .p2pAdvertisedHost(node.hostName())
+            .p2pListenPort(0)
             .maxPeers(25)
             .jsonRpcConfiguration(node.jsonRpcConfiguration())
             .webSocketConfiguration(node.webSocketConfiguration())

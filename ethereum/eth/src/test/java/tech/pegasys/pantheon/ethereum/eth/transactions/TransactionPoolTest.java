@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.core;
+package tech.pegasys.pantheon.ethereum.eth.transactions;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -37,7 +37,24 @@ import static tech.pegasys.pantheon.ethereum.mainnet.ValidationResult.valid;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.TransactionPool.TransactionBatchAddedListener;
+import tech.pegasys.pantheon.ethereum.core.Account;
+import tech.pegasys.pantheon.ethereum.core.AccountFilter;
+import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockBody;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.core.TransactionTestFixture;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
+import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool.TransactionBatchAddedListener;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
@@ -47,13 +64,17 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class TransactionPoolTest {
 
+  private static final long TRANSACTION_EVICTION_INTERVAL_MS = TimeUnit.MINUTES.toMillis(1);
   private static final int MAX_TRANSACTIONS = 5;
   private static final KeyPair KEY_PAIR1 = KeyPair.generate();
 
@@ -70,26 +91,59 @@ public class TransactionPoolTest {
 
   private final TransactionValidator transactionValidator = mock(TransactionValidator.class);
   private MutableBlockchain blockchain;
+
   private final PendingTransactions transactions =
-      new PendingTransactions(MAX_TRANSACTIONS, TestClock.fixed(), metricsSystem);
+      new PendingTransactions(
+          TRANSACTION_EVICTION_INTERVAL_MS, MAX_TRANSACTIONS, TestClock.fixed(), metricsSystem);
   private final Transaction transaction1 = createTransaction(1);
   private final Transaction transaction2 = createTransaction(2);
+  private final ExecutionContextTestFixture executionContext = ExecutionContextTestFixture.create();
+  private final ProtocolContext<Void> protocolContext = executionContext.getProtocolContext();
   private TransactionPool transactionPool;
   private long genesisBlockGasLimit;
   private final AccountFilter accountFilter = mock(AccountFilter.class);
+  private SyncState syncState;
+  private EthContext ethContext;
+  private PeerTransactionTracker peerTransactionTracker;
 
   @Before
   public void setUp() {
-    final ExecutionContextTestFixture executionContext = ExecutionContextTestFixture.create();
     blockchain = executionContext.getBlockchain();
-    final ProtocolContext<Void> protocolContext = executionContext.getProtocolContext();
     when(protocolSchedule.getByBlockNumber(anyLong())).thenReturn(protocolSpec);
     when(protocolSpec.getTransactionValidator()).thenReturn(transactionValidator);
     genesisBlockGasLimit = executionContext.getGenesis().getHeader().getGasLimit();
-
+    syncState = mock(SyncState.class);
+    when(syncState.isInSync(anyLong())).thenReturn(true);
+    ethContext = mock(EthContext.class);
+    EthPeers ethPeers = mock(EthPeers.class);
+    when(ethContext.getEthPeers()).thenReturn(ethPeers);
+    peerTransactionTracker = mock(PeerTransactionTracker.class);
     transactionPool =
-        new TransactionPool(transactions, protocolSchedule, protocolContext, batchAddedListener);
+        new TransactionPool(
+            transactions,
+            protocolSchedule,
+            protocolContext,
+            batchAddedListener,
+            syncState,
+            ethContext,
+            peerTransactionTracker);
     blockchain.observeBlockAdded(transactionPool);
+  }
+
+  @Test
+  public void shouldReturnExclusivelyLocalTransactionsWhenAppropriate() {
+    final Transaction localTransaction0 = createTransaction(0);
+    transactions.addLocalTransaction(localTransaction0);
+    assertThat(transactions.size()).isEqualTo(1);
+
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(2);
+
+    transactions.addRemoteTransaction(transaction2);
+    assertThat(transactions.size()).isEqualTo(3);
+
+    List<Transaction> localTransactions = transactions.getLocalTransactions();
+    assertThat(localTransactions.size()).isEqualTo(1);
   }
 
   @Test
@@ -152,7 +206,7 @@ public class TransactionPoolTest {
   }
 
   @Test
-  public void shouldReaddTransactionsFromThePreviousCanonicalHeadWhenAReorgOccurs() {
+  public void shouldReadTransactionsFromThePreviousCanonicalHeadWhenAReorgOccurs() {
     givenTransactionIsValid(transaction1);
     givenTransactionIsValid(transaction2);
     transactions.addRemoteTransaction(transaction1);
@@ -178,7 +232,7 @@ public class TransactionPoolTest {
   }
 
   @Test
-  public void shouldNotReaddTransactionsThatAreInBothForksWhenReorgHappens() {
+  public void shouldNotReadTransactionsThatAreInBothForksWhenReorgHappens() {
     givenTransactionIsValid(transaction1);
     givenTransactionIsValid(transaction2);
     transactions.addRemoteTransaction(transaction1);
@@ -395,6 +449,103 @@ public class TransactionPoolTest {
     assertThat(transactionPool.addLocalTransaction(transaction1)).isEqualTo(valid());
 
     assertTransactionPending(transaction1);
+  }
+
+  @Test
+  public void shouldRejectRemoteTransactionsWhenNotInSync() {
+    SyncState syncState = mock(SyncState.class);
+    when(syncState.isInSync(anyLong())).thenReturn(false);
+    TransactionPool transactionPool =
+        new TransactionPool(
+            transactions,
+            protocolSchedule,
+            protocolContext,
+            batchAddedListener,
+            syncState,
+            ethContext,
+            peerTransactionTracker);
+
+    final TransactionTestFixture builder = new TransactionTestFixture();
+    final Transaction transaction1 = builder.nonce(1).createTransaction(KEY_PAIR1);
+    final Transaction transaction2 = builder.nonce(2).createTransaction(KEY_PAIR1);
+    final Transaction transaction3 = builder.nonce(3).createTransaction(KEY_PAIR1);
+
+    when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
+    when(transactionValidator.validateForSender(
+            eq(transaction1), nullable(Account.class), eq(true)))
+        .thenReturn(valid());
+    when(transactionValidator.validateForSender(
+            eq(transaction2), nullable(Account.class), eq(true)))
+        .thenReturn(valid());
+    when(transactionValidator.validateForSender(
+            eq(transaction3), nullable(Account.class), eq(true)))
+        .thenReturn(valid());
+
+    transactionPool.addRemoteTransactions(asList(transaction3, transaction1, transaction2));
+
+    assertTransactionNotPending(transaction1);
+    assertTransactionNotPending(transaction2);
+    assertTransactionNotPending(transaction3);
+    verifyZeroInteractions(batchAddedListener);
+  }
+
+  @Test
+  public void shouldAllowRemoteTransactionsWhenInSync() {
+    final TransactionTestFixture builder = new TransactionTestFixture();
+    final Transaction transaction1 = builder.nonce(1).createTransaction(KEY_PAIR1);
+    final Transaction transaction2 = builder.nonce(2).createTransaction(KEY_PAIR1);
+    final Transaction transaction3 = builder.nonce(3).createTransaction(KEY_PAIR1);
+
+    when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
+    when(transactionValidator.validateForSender(
+            eq(transaction1), nullable(Account.class), eq(true)))
+        .thenReturn(valid());
+    when(transactionValidator.validateForSender(
+            eq(transaction2), nullable(Account.class), eq(true)))
+        .thenReturn(valid());
+    when(transactionValidator.validateForSender(
+            eq(transaction3), nullable(Account.class), eq(true)))
+        .thenReturn(valid());
+
+    transactionPool.addRemoteTransactions(asList(transaction3, transaction1, transaction2));
+
+    assertTransactionPending(transaction1);
+    assertTransactionPending(transaction2);
+    assertTransactionPending(transaction3);
+  }
+
+  @Test
+  public void shouldSendOnlyLocalTransactionToNewlyConnectedPeer() {
+    EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create();
+    EthContext ethContext = ethProtocolManager.ethContext();
+    PeerTransactionTracker peerTransactionTracker = new PeerTransactionTracker();
+    TransactionPool transactionPool =
+        new TransactionPool(
+            transactions,
+            protocolSchedule,
+            protocolContext,
+            batchAddedListener,
+            syncState,
+            ethContext,
+            peerTransactionTracker);
+
+    final TransactionTestFixture builder = new TransactionTestFixture();
+    final Transaction transactionLocal = builder.nonce(1).createTransaction(KEY_PAIR1);
+    final Transaction transactionRemote = builder.nonce(2).createTransaction(KEY_PAIR1);
+    when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
+    when(transactionValidator.validateForSender(
+            any(Transaction.class), nullable(Account.class), eq(true)))
+        .thenReturn(valid());
+
+    transactionPool.addLocalTransaction(transactionLocal);
+    transactionPool.addRemoteTransactions(Collections.singletonList(transactionRemote));
+
+    RespondingEthPeer peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager);
+
+    Set<Transaction> transactionsToSendToPeer =
+        peerTransactionTracker.claimTransactionsToSendToPeer(peer.getEthPeer());
+
+    assertThat(transactionsToSendToPeer).containsExactly(transactionLocal);
   }
 
   private void assertTransactionPending(final Transaction t) {

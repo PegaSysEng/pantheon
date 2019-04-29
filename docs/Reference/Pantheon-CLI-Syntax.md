@@ -146,7 +146,7 @@ The path to the genesis file.
 ### host-whitelist
 
 ```bash tab="Syntax"
---host-whitelist=<hostname>[,<hostname>...]... or * or all
+--host-whitelist=<hostname>[,<hostname>...]... or *
 ```
 
 ```bash tab="Example Command Line"
@@ -161,7 +161,7 @@ Comma-separated list of hostnames to allow [access to the JSON-RPC API](../JSON-
 By default, access from `localhost` and `127.0.0.1` is accepted. 
 
 !!!tip
-    To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
+    To allow all hostnames, use `*`. We don't recommend allowing all hostnames for production code.
 
 ### max-peers
 
@@ -676,11 +676,8 @@ Enables contract-based [onchain node permissioning](../Permissions/Onchain-Permi
 privacy-enabled=false
 ```
 
-Set to enable private transactions. 
-The default is false.
-
-!!!note
-    Privacy is under development and will be available in v1.1.  
+Set to enable [private transactions](../Privacy/Privacy-Overview.md). 
+The default is false.  
 
 ### privacy-precompiled-address
 
@@ -688,11 +685,8 @@ The default is false.
 --privacy-precompiled-address=<privacyPrecompiledAddress>
 ```
 
-Address to which the privacy pre-compiled contract is mapped.
-The default is 126. 
-
-!!!note
-    Privacy is under development and will be available in v1.1.    
+Address to which the [privacy pre-compiled contract](../Privacy/Private-Transaction-Processing.md) is mapped.
+The default is 126.     
     
 ### privacy-public-key-file
 
@@ -700,10 +694,15 @@ The default is 126.
 --privacy-public-key-file=<privacyPublicKeyFile>
 ```
 
-Path to the public key for the enclave.     
+```bash tab="Example Command Line"
+--privacy-public-key-file=Orion/nodeKey.pub
+```
 
-!!!note
-    Privacy is under development and will be available in v1.1.
+```bash tab="Example Configuration File"
+privacy-public-key-file="Orion/nodeKey.pub"
+```
+
+Path to the [public key of the Orion node](../Privacy/Privacy-Overview.md#pantheon-and-orion-keys).     
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#privacy-public-key-file).
@@ -714,10 +713,15 @@ Path to the public key for the enclave.
 --privacy-url=<privacyUrl>
 ```
 
-URL on which enclave is running.    
+```bash tab="Example Command Line"
+--privacy-url=http://127.0.0.1:8888
+```
 
-!!!note
-    Privacy is under development and will be available in v1.1.
+```bash tab="Example Configuration File"
+privacy-url="http://127.0.0.1:8888"
+```
+
+URL on which the [Orion node](../Privacy/Configuring-Privacy.md#4-create-orion-configuration-files) is running.    
 
 ### rpc-http-api
 
@@ -737,9 +741,6 @@ Comma-separated APIs to enable on the HTTP JSON-RPC channel.
 When you use this option, the `--rpc-http-enabled` option must also be specified.
 The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `PERM`, `DEBUG`, `MINER`, `EEA`, and `TXPOOL`.
 The default is: `ETH`, `NET`, `WEB3`.
-
-!!!note
-    EEA methods are for privacy features. Privacy features are under development and will be available in v1.1.  
 
 !!!tip
     The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are two
@@ -900,9 +901,6 @@ When you use this option, the `--rpc-ws-enabled` option must also be specified.
 The available API options are: `ADMIN`,`ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `PERM', DEBUG`, `MINER`, `EEA`, and `TXPOOL`.
 The default is: `ETH`, `NET`, `WEB3`.
 
-!!!note
-    EEA methods are for privacy features. Privacy features are under development and will be available in v1.1.  
-
 !!!tip
     The singular `--rpc-ws-api` and plural `--rpc-ws-apis` are available and are just two
     names for the same option.
@@ -1054,10 +1052,6 @@ Default is `INFO`.
 Print version information and exit.
 
 ## Fast Sync Options 
-
-!!! important 
-    Support for fast sync is currently experimental. Fast sync is in active development. The fast sync options are available
-    but hidden on the command line. 
 
 ### sync-mode
 

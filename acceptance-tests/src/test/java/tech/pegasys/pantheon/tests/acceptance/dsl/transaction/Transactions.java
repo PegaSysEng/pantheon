@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTr
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransactionBuilder;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransactionSet;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaGetTransactionReceiptTransaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaSendRawTransactionTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionCountTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermAddAccountsToWhitelistTransaction;
@@ -91,16 +90,6 @@ public class Transactions {
         .build();
   }
 
-  public EeaSendRawTransactionTransaction deployPrivateSmartContract(
-      final String signedRawPrivateTransaction) {
-    return new EeaSendRawTransactionTransaction(signedRawPrivateTransaction);
-  }
-
-  public EeaSendRawTransactionTransaction createPrivateRawTransaction(
-      final String signedRawPrivateTransaction) {
-    return new EeaSendRawTransactionTransaction(signedRawPrivateTransaction);
-  }
-
   public TransferTransactionSet createIncrementalTransfers(
       final Account sender, final Account recipient, final int etherAmount) {
     final List<TransferTransaction> transfers = new ArrayList<>();
@@ -144,8 +133,8 @@ public class Transactions {
   }
 
   public EeaGetTransactionReceiptTransaction getPrivateTransactionReceipt(
-      final String transactionHash, final String publicKey) {
-    return new EeaGetTransactionReceiptTransaction(transactionHash, publicKey);
+      final String transactionHash) {
+    return new EeaGetTransactionReceiptTransaction(transactionHash);
   }
 
   public PermAddNodeTransaction addNodesToWhitelist(final List<URI> enodeList) {
