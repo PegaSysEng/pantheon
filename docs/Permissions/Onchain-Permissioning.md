@@ -21,9 +21,9 @@ The following smart contracts are provided in the [PegaSysEng/permissioning-smar
 * Ingress - a simple contract functioning as a gateway to the Admin and Rules contracts. The Ingress contract is deployed 
 to a static address. 
 
-* Rules - stores the node whitelist. 
+* Rules - stores the node whitelist and node whitelist operations (for example, add and remove). 
 
-* Admin - stores the list of admin accounts.
+* Admin - stores the list of admin accounts and admin list operations (for example, add and remove).
 
 ## Pre-requisites 
 
