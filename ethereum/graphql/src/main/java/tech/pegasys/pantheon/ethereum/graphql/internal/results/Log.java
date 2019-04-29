@@ -30,7 +30,7 @@ public class Log implements GraphQLResult {
   private final String data;
   private final Transaction transaction;
 
-  public Log(LogWithMetadata logWithMetadata, TransactionReceiptWithMetadata receipt) {
+  public Log(final LogWithMetadata logWithMetadata, final TransactionReceiptWithMetadata receipt) {
     this(
         logWithMetadata.getLogIndex(),
         logWithMetadata.getTopics().stream()

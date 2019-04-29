@@ -33,25 +33,25 @@ abstract class AbstractAccountFetcher implements DataFetcher<Account>, GraphQLMe
     this.blockchain = blockchain;
   }
 
-  Account resolve(DataFetchingEnvironment environment) {
+  Account resolve(final DataFetchingEnvironment environment) {
     final Hash stateRoot = resolveStateRootFromBlockInEnvironment(environment);
     final Address address = resolveAddressFromTransactionSource(environment);
     return getAccount(stateRoot, address);
   }
 
-  Account resolveOrNull(DataFetchingEnvironment environment) {
+  Account resolveOrNull(final DataFetchingEnvironment environment) {
     final Hash stateRoot = resolveStateRootFromBlockInEnvironment(environment);
     final Address address = resolveAddressFromTransactionSource(environment);
     return getAccountOrNull(stateRoot, address);
   }
 
-  Address resolveAddressFromTransactionSource(DataFetchingEnvironment environment) {
+  Address resolveAddressFromTransactionSource(final DataFetchingEnvironment environment) {
     final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
     final Optional<TransactionWithMetadata> transaction = blockchain.transactionByHash(hash);
     return transaction.map(t -> t.getTransaction().getSender()).orElse(null);
   }
 
-  Hash resolveStateRootFromBlockInEnvironment(DataFetchingEnvironment environment) {
+  Hash resolveStateRootFromBlockInEnvironment(final DataFetchingEnvironment environment) {
     final Optional<BlockWithMetadata<Hash, Hash>> block;
     if (environment.containsArgument("block")) {
       block = blockchain.blockByNumberWithTxHashes(environment.getArgument("block"));

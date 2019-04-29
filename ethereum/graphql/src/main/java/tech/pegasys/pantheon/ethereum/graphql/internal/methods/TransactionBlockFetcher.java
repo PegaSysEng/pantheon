@@ -22,7 +22,6 @@ import graphql.schema.DataFetchingEnvironment;
 
 public class TransactionBlockFetcher extends AbstractBlockFetcher
     implements DataFetcher<Block>, GraphQLMethod {
-  private BlockchainQueries blockchain;
 
   //    private static final Logger LOG = LogManager.getLogger();
 

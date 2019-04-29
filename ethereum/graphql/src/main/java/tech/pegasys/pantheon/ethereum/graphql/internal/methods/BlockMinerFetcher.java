@@ -22,7 +22,6 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import graphql.schema.DataFetchingEnvironment;
 
 public class BlockMinerFetcher extends AbstractAccountFetcher {
-  private BlockchainQueries blockchain;
 
   public BlockMinerFetcher(final BlockchainQueries blockchain) {
     super(blockchain);
