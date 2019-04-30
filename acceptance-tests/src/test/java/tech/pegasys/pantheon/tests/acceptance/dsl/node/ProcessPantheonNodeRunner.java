@@ -186,13 +186,8 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
             .redirectInput(Redirect.INHERIT);
 
     try {
-      final File logsDir = new File("build/reports/nodeLogs");
-      logsDir.mkdirs();
-      final File logFile = File.createTempFile("pantheon-" + node.getName(), ".log", logsDir);
-      LOG.info("Logging {} output to {}", node.getName(), logFile);
-      processBuilder.redirectOutput(logFile);
       final Process process = processBuilder.start();
-//      outputProcessorExecutor.submit(() -> printOutput(node, process));
+      outputProcessorExecutor.submit(() -> printOutput(node, process));
       pantheonProcesses.put(node.getName(), process);
     } catch (final IOException e) {
       LOG.error("Error starting PantheonNode process", e);
@@ -263,7 +258,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   private void killPantheonProcess(final String name, final Process process) {
     LOG.info("Killing " + name + " process");
 
-    Awaitility.waitAtMost(30, TimeUnit.SECONDS)
+    Awaitility.waitAtMost(60, TimeUnit.SECONDS)
         .until(
             () -> {
               if (process.isAlive()) {
