@@ -258,7 +258,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   private void killPantheonProcess(final String name, final Process process) {
     LOG.info("Killing " + name + " process");
 
-    Awaitility.waitAtMost(60, TimeUnit.SECONDS)
+    Awaitility.waitAtMost(30, TimeUnit.SECONDS)
         .until(
             () -> {
               if (process.isAlive()) {
