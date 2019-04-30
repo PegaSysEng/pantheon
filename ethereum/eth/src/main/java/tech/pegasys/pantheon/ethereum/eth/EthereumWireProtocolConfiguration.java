@@ -14,6 +14,8 @@ package tech.pegasys.pantheon.ethereum.eth;
 
 import tech.pegasys.pantheon.util.number.PositiveNumber;
 
+import java.util.Objects;
+
 import picocli.CommandLine;
 
 public class EthereumWireProtocolConfiguration {
@@ -68,15 +70,23 @@ public class EthereumWireProtocolConfiguration {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if (!(obj instanceof EthereumWireProtocolConfiguration)) {
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    EthereumWireProtocolConfiguration other = ((EthereumWireProtocolConfiguration) obj);
-    return maxGetBlockHeaders == other.maxGetBlockHeaders
-        && maxGetBlockBodies == other.maxGetBlockBodies
-        && maxGetReceipts == other.maxGetReceipts
-        && maxGetNodeData == other.maxGetNodeData;
+    final EthereumWireProtocolConfiguration that = (EthereumWireProtocolConfiguration) o;
+    return maxGetBlockHeaders == that.maxGetBlockHeaders &&
+        maxGetBlockBodies == that.maxGetBlockBodies &&
+        maxGetReceipts == that.maxGetReceipts &&
+        maxGetNodeData == that.maxGetNodeData;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(maxGetBlockHeaders, maxGetBlockBodies, maxGetReceipts, maxGetNodeData);
   }
 
   @Override
