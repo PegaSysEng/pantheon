@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.util.number.PositiveNumber;
 
 import java.util.Objects;
 
+import com.google.common.base.MoreObjects;
 import picocli.CommandLine;
 
 public class EthereumWireProtocolConfiguration {
@@ -91,9 +92,12 @@ public class EthereumWireProtocolConfiguration {
 
   @Override
   public String toString() {
-    return String.format(
-        "maxGetBlockHeaders=%s\tmaxGetBlockBodies=%s\tmaxGetReceipts=%s\tmaxGetReceipts=%s",
-        maxGetBlockHeaders, maxGetBlockBodies, maxGetReceipts, maxGetNodeData);
+    return MoreObjects.toStringHelper(this)
+        .add("maxGetBlockHeaders", maxGetBlockHeaders)
+        .add("maxGetBlockBodies", maxGetBlockBodies)
+        .add("maxGetReceipts", maxGetReceipts)
+        .add("maxGetNodeData", maxGetNodeData)
+        .toString();
   }
 
   public static class Builder {
