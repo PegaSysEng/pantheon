@@ -79,10 +79,10 @@ public class EthereumWireProtocolConfiguration {
       return false;
     }
     final EthereumWireProtocolConfiguration that = (EthereumWireProtocolConfiguration) o;
-    return maxGetBlockHeaders == that.maxGetBlockHeaders &&
-        maxGetBlockBodies == that.maxGetBlockBodies &&
-        maxGetReceipts == that.maxGetReceipts &&
-        maxGetNodeData == that.maxGetNodeData;
+    return maxGetBlockHeaders == that.maxGetBlockHeaders
+        && maxGetBlockBodies == that.maxGetBlockBodies
+        && maxGetReceipts == that.maxGetReceipts
+        && maxGetNodeData == that.maxGetNodeData;
   }
 
   @Override
