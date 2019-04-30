@@ -30,6 +30,7 @@ public class FilterCriteria {
   private final List<Address> addresses;
   private final List<List<Bytes32>> topics;
 
+  @SuppressWarnings("unchecked")
   public FilterCriteria(Map<String, Object> filterMap) {
     this.fromBlock =
         filterMap.get("fromBlock") != null ? (BigInteger) filterMap.get("fromBlock") : null;

@@ -27,6 +27,7 @@ public class BlockFilterCriteria {
   private final List<Address> addresses;
   private final List<List<Bytes32>> topics;
 
+  @SuppressWarnings("unchecked")
   public BlockFilterCriteria(Map<String, Object> filterMap) {
 
     this.addresses =
