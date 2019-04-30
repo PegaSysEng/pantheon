@@ -1,18 +1,24 @@
 {
   "request": {
-    "id": 1,
-    "jsonrpc": "2.0",
-    "method": "eth_sendRawTransaction",
-    "params": [
-      "0x00"
-    ]
+    "query": "mutation { sendRawTransaction(data: \"0x00\") }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 1,
-    "error" : {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "data": null,
+      "errors": [
+        {
+          "message": "Exception while fetching data (/sendRawTransaction) : Expected current item to be a list, but it is: BYTE_ELEMENT (at bytes 0-1: [00])",
+          "locations": [
+            {
+              "line": 1,
+              "column": 12
+            }
+          ],
+          "path": [
+            "sendRawTransaction"
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

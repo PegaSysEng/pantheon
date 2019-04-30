@@ -1,18 +1,24 @@
 {
   "request": {
-    "id": 1,
-    "jsonrpc": "2.0",
-    "method": "eth_sendRawTransaction",
-    "params": [
-      "0xed0a85174876e800830222e0945aae326516b4f8fe08074b7e972e40a713048d62880de0b6b3a7640000801c8080"
-    ]
+    "query": "mutation { sendRawTransaction(data: \"0xed0a85174876e800830222e0945aae326516b4f8fe08074b7e972e40a713048d62880de0b6b3a7640000801c8080\") }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 1,
-    "error" : {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "data": null,
+      "errors": [
+        {
+          "message": "Exception while fetching data (/sendRawTransaction) : Invalid 'r' value, should be >= 1 but got 0",
+          "locations": [
+            {
+              "line": 1,
+              "column": 12
+            }
+          ],
+          "path": [
+            "sendRawTransaction"
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

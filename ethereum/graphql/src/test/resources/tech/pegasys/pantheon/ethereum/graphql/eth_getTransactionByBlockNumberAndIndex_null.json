@@ -1,17 +1,13 @@
 {
   "request": {
-    "id": 485,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByBlockNumberAndIndex",
-    "params": [
-      "0x2",
-      "0xb"
-    ]
+    "query": "{ block(number: 2) { transactionAt(index: 11) { block{ hash }  hash from { address } to { address } } } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 485,
-    "result": null
+    "data": {
+      "block": {
+        "transactionAt": null
+      }
+    }
   },
   "statusCode": 200
 }

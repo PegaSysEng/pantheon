@@ -1,17 +1,15 @@
 {
   "request": {
-    "id": 253,
-    "jsonrpc": "2.0",
-    "method": "eth_getCode",
-    "params": [
-      "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b",
-      "0x0"
-    ]
+    "query": "{ block(number: 0) { account(address: \"0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b\") { code } } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 253,
-    "result": "0x"
+    "data": {
+      "block": {
+        "account": {
+          "code": "0x"
+        }
+      }
+    }
   },
   "statusCode": 200
 }

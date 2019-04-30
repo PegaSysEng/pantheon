@@ -35,7 +35,7 @@ public class Account implements GraphQLResult {
   public Account(final tech.pegasys.pantheon.ethereum.core.Account account) {
     this(
         account.getAddress(),
-        BigInteger.valueOf(account.getBalance().toLong()),
+        new BigInteger(account.getBalance().toUnprefixedHexString(), 16),
         BigInteger.valueOf(account.getNonce()),
         account.getCode());
   }

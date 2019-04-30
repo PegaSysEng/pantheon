@@ -1,18 +1,20 @@
 {
   "request": {
-    "id": 1,
-    "jsonrpc": "2.0",
-    "method": "eth_sendRawTransaction",
-    "params": [
-      "0x0"
-    ]
+    "query": "mutation { sendRawTransaction(data: \"0x0\") }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 1,
-    "error" : {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'data' with value 'StringValue{value='0x0'}' is not a valid 'Bytes' @ 'sendRawTransaction'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 31
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

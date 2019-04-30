@@ -496,7 +496,7 @@ public class GraphQLHttpService {
         return Json.mapper.convertValue(
             executionResult.toSpecification(), GraphQLSuccessResponse.class);
       } else {
-        return new GraphQLErrorResponse(executionResult.getErrors());
+        return new GraphQLErrorResponse(executionResult.toSpecification());
       }
     } catch (final RuntimeException e) {
       LOG.error("Error processing GraphQL request", e);

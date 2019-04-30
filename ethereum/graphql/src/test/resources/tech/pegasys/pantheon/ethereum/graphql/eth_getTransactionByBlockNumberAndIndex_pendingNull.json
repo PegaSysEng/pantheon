@@ -1,17 +1,13 @@
 {
   "request": {
-    "id": 484,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByBlockNumberAndIndex",
-    "params": [
-      "pending",
-      "0x0"
-    ]
+    "query": "{ pending { transactions { block{ hash }  hash from { address } to { address } } } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 484,
-    "result": null
+    "data": {
+      "pending": {
+        "transactions": []
+      }
+    }
   },
   "statusCode": 200
 }

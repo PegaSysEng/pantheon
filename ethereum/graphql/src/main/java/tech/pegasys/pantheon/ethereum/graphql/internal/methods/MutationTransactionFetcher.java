@@ -45,7 +45,7 @@ public class MutationTransactionFetcher implements DataFetcher<Bytes32>, GraphQL
 
   @Override
   public Bytes32 get(final DataFetchingEnvironment environment) {
-    final String rawTransaction = environment.getArgument("data");
+    final BytesValue rawTransaction = environment.getArgument("data");
 
     final Transaction transaction;
     try {
@@ -64,12 +64,12 @@ public class MutationTransactionFetcher implements DataFetcher<Bytes32>, GraphQL
         });
   }
 
-  private Transaction decodeRawTransaction(final String hash) throws InvalidGraphQLParameters {
+  private Transaction decodeRawTransaction(final BytesValue hash) throws InvalidGraphQLParameters {
     try {
-      return Transaction.readFrom(RLP.input(BytesValue.fromHexString(hash)));
+      return Transaction.readFrom(RLP.input(hash));
     } catch (final IllegalArgumentException | RLPException e) {
       LOG.debug(e);
-      throw new InvalidGraphQLParameters("Invalid raw transaction hex", e);
+      throw new InvalidGraphQLParameters(e.getMessage(), e);
     }
   }
 }

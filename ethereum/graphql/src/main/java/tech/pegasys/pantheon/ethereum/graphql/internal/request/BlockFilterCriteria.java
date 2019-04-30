@@ -15,7 +15,9 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.request;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,21 +25,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class BlockFilterCriteria {
 
   private final List<Address> addresses;
-  private final List<List<Bytes32>> topcis;
+  private final List<List<Bytes32>> topics;
+
+  public BlockFilterCriteria(Map<String, Object> filterMap) {
+
+    this.addresses =
+        filterMap.get("addresses") != null
+            ? (List<Address>) filterMap.get("addresses")
+            : Collections.emptyList();
+    this.topics =
+        filterMap.get("topcis") != null
+            ? (List<List<Bytes32>>) filterMap.get("topcis")
+            : Collections.emptyList();
+  }
 
   @JsonCreator
   public BlockFilterCriteria(
       @JsonProperty("addresses") final List<Address> addresses,
       @JsonProperty("topics") final List<List<Bytes32>> topics) {
     this.addresses = addresses;
-    this.topcis = topics;
+    this.topics = topics;
   }
 
   public List<Address> getAddresses() {
     return addresses;
   }
 
-  public List<List<Bytes32>> getTopcis() {
-    return topcis;
+  public List<List<Bytes32>> getTopics() {
+    return topics;
   }
 }

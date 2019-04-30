@@ -30,6 +30,7 @@ public enum GraphQLMethodType {
   CALL("Block", "call"),
   ESTIMATE_GAS("Block", "estimateGas"),
   MINER("Block", "miner"),
+  BLOCK_LOG("Block", "logs"),
   STORAGE("Account", "storage"),
   SEND_RAW_TRANSACTION("Mutation", "sendRawTransaction"),
   TRANSACTION_FROM("Transaction", "from"),

@@ -1,16 +1,11 @@
 {
   "request": {
-    "id": 396,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByHash",
-    "params": [
-      "0x1044c2ba6827a73c1994a2213d1d76fb147bf6dc2e3aaea6b8423c462f4be897"
-    ]
+    "query": "{ transaction(hash: \"0x1044c2ba6827a73c1994a2213d1d76fb147bf6dc2e3aaea6b8423c462f4be897\") { block { hash } from { address } to { address } createdContract { address } gas gasPrice hash inputData nonce index value } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 396,
-    "result": null
+    "data": {
+      "transaction": null
+    }
   },
   "statusCode": 200
 }

@@ -1,16 +1,20 @@
 {
   "request": {
-    "id": 248,
-    "jsonrpc": "2.0",
-    "method": "eth_getBlockTransactionCountByNumber",
-    "params": []
+    "query": "{ block(number: \"i_am_not_a_number\") { transactionCount } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 248,
-    "error": {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'number' with value 'StringValue{value='i_am_not_a_number'}' is not a valid 'Long' @ 'block'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 9
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

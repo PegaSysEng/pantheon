@@ -1,19 +1,20 @@
 {
   "request": {
-    "id": 406,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByHash",
-    "params": [
-      "0x71d59849ddd98543bdfbe8548f5eed559b07b8aaf196369f39134500eab68e53",
-      "0x0"
-    ]
+    "query": "{ transaction(hash: \"0x812742182a79a8e67733edc58cfa3767aa2d7ad06439d156ddbbb33e3403b4ed\", index: 0) { block { hash } from { address } to { address } createdContract { address } gas gasPrice hash inputData nonce index value } }"
   },
   "response": {
-    "jsonrpc" : "2.0",
-    "id" : 406,
-    "error" : {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type UnknownArgument: Unknown field argument index @ 'transaction'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 91
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

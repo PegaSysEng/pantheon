@@ -1,19 +1,20 @@
 {
   "request": {
-    "id": 448,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByBlockHashAndIndex",
-    "params": [
-      "0x71d59849ddd98543bdfbe8548f5eed559b07b8aaf196369f39134500eab68e53",
-      "0x9999999999999999999999999999999999999999999999999999999999999999"
-    ]
+    "query": "{ block(hash: \"0x71d59849ddd98543bdfbe8548f5eed559b07b8aaf196369f39134500eab68e53\") { transactionAt(index: 69475253542389717254142591005212744711961990799384338423674550404747877783961) { block{ hash }  hash from { address } to { address } } } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 448,
-    "error": {
-      "code": -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'index' with value 'IntValue{value=69475253542389717254142591005212744711961990799384338423674550404747877783961}' is not a valid 'Int' @ 'block/transactionAt'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 101
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

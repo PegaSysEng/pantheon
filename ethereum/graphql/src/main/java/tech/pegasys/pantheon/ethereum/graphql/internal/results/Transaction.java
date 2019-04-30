@@ -33,7 +33,6 @@ public class Transaction implements GraphQLResult {
   private final BigInteger status;
   private final BigInteger gasUsed;
   private final BigInteger cumulativeGasUsed;
-  //  private final List<Log> logs;
 
   public Transaction(final TransactionReceiptWithMetadata receipt) {
     this(

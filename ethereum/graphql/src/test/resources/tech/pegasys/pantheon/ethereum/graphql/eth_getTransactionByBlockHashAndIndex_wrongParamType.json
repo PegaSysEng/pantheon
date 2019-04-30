@@ -1,19 +1,20 @@
 {
   "request": {
-    "id": 448,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByBlockHashAndIndex",
-    "params": [
-      "0x71d59849ddd98543bdfbe8548f5eed559b07b8aaf196369f39134500eab68e53",
-      "0x0L"
-    ]
+    "query": "{ block(hash: \"0x10aaf14a53caf27552325374429d3558398a36d3682ede6603c2c6511896e9f9\") { transactionAt(index: \"0\") { block{ hash }  hash from { address } to { address } } } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 448,
-    "error": {
-      "code": -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'index' with value 'StringValue{value='0'}' is not a valid 'Int' @ 'block/transactionAt'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 101
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

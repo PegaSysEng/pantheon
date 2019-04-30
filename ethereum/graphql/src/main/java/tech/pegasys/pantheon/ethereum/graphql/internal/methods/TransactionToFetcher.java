@@ -12,8 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
+
+import java.util.Optional;
 
 import graphql.schema.DataFetchingEnvironment;
 
@@ -30,6 +34,13 @@ public class TransactionToFetcher extends AbstractAccountFetcher {
 
   @Override
   public Account get(final DataFetchingEnvironment environment) {
-    return resolve(environment);
+    Optional<Address> maybeToAddress = resolveTo(environment);
+    return maybeToAddress
+        .map(
+            toAddress -> {
+              Hash stateRoot = resolveStateRootFromBlockInEnvironment(environment);
+              return getAccount(stateRoot, toAddress);
+            })
+        .orElse(null);
   }
 }

@@ -3,21 +3,19 @@
     "query": "{ block(number: 8) { number call ( ) { data status } } }"
   },
   "response": {
-    "errors": [
-      {
-        "message": "Invalid Syntax",
-        "locations": [
-          {
-            "line": 1,
-            "column": 35,
-            "sourceName": null
-          }
-        ],
-        "errorType": "InvalidSyntax",
-        "path": null,
-        "extensions": null
-      }
-    ]
+    "errors": {
+      "errors": [
+        {
+          "message": "Invalid Syntax",
+          "locations": [
+            {
+              "line": 1,
+              "column": 35
+            }
+          ]
+        }
+      ]
+    }
   },
   "statusCode": 400
 }

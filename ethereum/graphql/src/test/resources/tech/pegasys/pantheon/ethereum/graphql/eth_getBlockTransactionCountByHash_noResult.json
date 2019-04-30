@@ -1,16 +1,27 @@
 {
   "request": {
-    "id": 208,
-    "jsonrpc": "2.0",
-    "method": "eth_getBlockTransactionCountByHash",
-    "params": [
-      "0x878a132155f53adb7c993ded4cfb687977397d63d873fcdbeb06c18cac907a5c"
-    ]
+    "query": "{ block(hash: \"0x878a132155f53adb7c993ded4cfb687977397d63d873fcdbeb06c18cac907a5c\") { transactionCount } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 208,
-    "result": null
+    "errors": {
+      "data": {
+        "block": null
+      },
+      "errors": [
+        {
+          "message": "Exception while fetching data (/block) : Block with hash 0x878a132155f53adb7c993ded4cfb687977397d63d873fcdbeb06c18cac907a5c not found",
+          "locations": [
+            {
+              "line": 1,
+              "column": 3
+            }
+          ],
+          "path": [
+            "block"
+          ]
+        }
+      ]
+    }
   },
-  "statusCode": 200
+  "statusCode": 400
 }

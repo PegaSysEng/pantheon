@@ -36,7 +36,12 @@ public class CoercingFactory {
       @Override
       public Bytes32 parseValue(final Object input) throws CoercingParseValueException {
         if (input instanceof String) {
-          return Bytes32.fromHexString((String) input);
+          try {
+            return Bytes32.fromHexString((String) input);
+          } catch (IllegalArgumentException e) {
+            throw new CoercingParseLiteralException(
+                "Invalid hex binary representation: '" + input + "'");
+          }
         }
         throw new CoercingParseValueException(
             "Unable to parse variable value " + input + " as Bytes32");
@@ -50,7 +55,7 @@ public class CoercingFactory {
             return Bytes32.fromHexString(value);
           } catch (IllegalArgumentException e) {
             throw new CoercingParseLiteralException(
-                "Invalid odd-length hex binary representation 0x0 : '" + input + "'");
+                "Invalid hex binary representation: '" + input + "'");
           }
         }
         throw new CoercingParseLiteralException("Value is not Bytes32 : '" + input + "'");
@@ -68,7 +73,12 @@ public class CoercingFactory {
       @Override
       public BytesValue parseValue(final Object input) throws CoercingParseValueException {
         if (input instanceof String) {
-          return BytesValue.fromHexString((String) input);
+          try {
+            return BytesValue.fromHexString((String) input);
+          } catch (IllegalArgumentException e) {
+            throw new CoercingParseLiteralException(
+                "Invalid hex binary representation: '" + input + "'");
+          }
         }
         throw new CoercingParseValueException(
             "Unable to parse variable value " + input + " as Bytes");
@@ -78,7 +88,12 @@ public class CoercingFactory {
       public BytesValue parseLiteral(final Object input) throws CoercingParseLiteralException {
         if (input instanceof StringValue) {
           String value = ((StringValue) input).getValue();
-          return BytesValue.fromHexString(value);
+          try {
+            return BytesValue.fromHexString(value);
+          } catch (IllegalArgumentException e) {
+            throw new CoercingParseLiteralException(
+                "Invalid hex binary representation: '" + input + "'");
+          }
         }
         throw new CoercingParseLiteralException("Value is not Bytes : '" + input + "'");
       }
@@ -95,7 +110,12 @@ public class CoercingFactory {
       @Override
       public Address parseValue(final Object input) throws CoercingParseValueException {
         if (input instanceof String) {
-          return Address.fromHexString((String) input);
+          try {
+            return Address.fromHexString((String) input);
+          } catch (IllegalArgumentException e) {
+            throw new CoercingParseLiteralException(
+                "Illegal character found in Address : '" + input + "'");
+          }
         }
         throw new CoercingParseValueException(
             "Unable to parse variable value " + input + " as an Address");
@@ -108,9 +128,9 @@ public class CoercingFactory {
           try {
             return Address.fromHexString(value);
           } catch (IllegalArgumentException e) {
-            throw new CoercingParseLiteralException("Illegal character cound in Address : '" + input + "'");
+            throw new CoercingParseLiteralException(
+                "Illegal character found in Address : '" + input + "'");
           }
-
         }
         throw new CoercingParseLiteralException("Value is not Address : '" + input + "'");
       }

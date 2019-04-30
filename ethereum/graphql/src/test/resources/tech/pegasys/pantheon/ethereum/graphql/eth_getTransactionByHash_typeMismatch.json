@@ -1,18 +1,20 @@
 {
   "request": {
-    "id": 406,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByHash",
-    "params": [
-      "0x0"
-    ]
+    "query": "{ transaction(hash: 5) { block { hash } from { address } to { address } createdContract { address } gas gasPrice hash inputData nonce index value } }"
   },
   "response": {
-    "jsonrpc" : "2.0",
-    "id" : 406,
-    "error" : {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'hash' with value 'IntValue{value=5}' is not a valid 'Bytes32' @ 'transaction'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 15
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

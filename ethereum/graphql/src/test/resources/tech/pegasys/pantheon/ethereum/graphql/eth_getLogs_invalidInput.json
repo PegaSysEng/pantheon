@@ -1,22 +1,20 @@
 {
   "request": {
-    "id": 406,
-    "jsonrpc": "2.0",
-    "method": "eth_getLogs",
-    "params": [{
-      "fromBlock": "0x17",
-      "toBlock": "0x17",
-      "address": [],
-      "topics": [["0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b", "0x65c9ac8011e286e89d02a269890f41d67ca2cc597b2c76c7c69321ff492be580"]],
-      "blockhash": "0x3c419f39b340a4c35cc27b8f7880b779dc1abb9814ad13a2a5a55b885cc8ec2d"
-    }]
+    "query": "{ logs(filter: { blockHash: \"0x3c419f39b340a4c35cc27b8f7880b779dc1abb9814ad13a2a5a55b885cc8ec2d\", fromBlock: 23, toBlock: 23, topics: [[\"0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b\", \"0x65c9ac8011e286e89d02a269890f41d67ca2cc597b2c76c7c69321ff492be580\"]] }) { index  topics  data transaction { hash } } }"
   },
   "response": {
-    "jsonrpc" : "2.0",
-    "id" : 406,
-    "error" : {
-      "code": -32602,
-      "message": "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'filter' with value 'ObjectValue{objectFields=[ObjectField{name='blockHash', value=StringValue{value='0x3c419f39b340a4c35cc27b8f7880b779dc1abb9814ad13a2a5a55b885cc8ec2d'}}, ObjectField{name='fromBlock', value=IntValue{value=23}}, ObjectField{name='toBlock', value=IntValue{value=23}}, ObjectField{name='topics', value=ArrayValue{values=[ArrayValue{values=[StringValue{value='0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b'}, StringValue{value='0x65c9ac8011e286e89d02a269890f41d67ca2cc597b2c76c7c69321ff492be580'}]}]}}]}' contains a field not in 'FilterCriteria': 'blockHash' @ 'logs'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 8
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

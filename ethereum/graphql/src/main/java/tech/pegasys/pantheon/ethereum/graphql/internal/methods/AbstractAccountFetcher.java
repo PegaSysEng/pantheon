@@ -33,22 +33,22 @@ abstract class AbstractAccountFetcher implements DataFetcher<Account>, GraphQLMe
     this.blockchain = blockchain;
   }
 
-  Account resolve(final DataFetchingEnvironment environment) {
-    final Hash stateRoot = resolveStateRootFromBlockInEnvironment(environment);
-    final Address address = resolveAddressFromTransactionSource(environment);
-    return getAccount(stateRoot, address);
-  }
-
-  Account resolveOrNull(final DataFetchingEnvironment environment) {
-    final Hash stateRoot = resolveStateRootFromBlockInEnvironment(environment);
-    final Address address = resolveAddressFromTransactionSource(environment);
-    return getAccountOrNull(stateRoot, address);
-  }
-
-  Address resolveAddressFromTransactionSource(final DataFetchingEnvironment environment) {
+  Address resolveFrom(DataFetchingEnvironment environment) {
     final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
     final Optional<TransactionWithMetadata> transaction = blockchain.transactionByHash(hash);
     return transaction.map(t -> t.getTransaction().getSender()).orElse(null);
+  }
+
+  Optional<Address> resolveTo(DataFetchingEnvironment environment) {
+    final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
+    final Optional<TransactionWithMetadata> transaction = blockchain.transactionByHash(hash);
+    return transaction.map(t -> t.getTransaction().getTo()).orElse(null);
+  }
+
+  Optional<Address> resolveContractAddress(DataFetchingEnvironment environment) {
+    final Hash hash = Hash.fromHexString(((Transaction) environment.getSource()).getHash());
+    final Optional<TransactionWithMetadata> transaction = blockchain.transactionByHash(hash);
+    return transaction.map(t -> t.getTransaction().contractAddress()).orElse(null);
   }
 
   Hash resolveStateRootFromBlockInEnvironment(final DataFetchingEnvironment environment) {

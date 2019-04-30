@@ -3,199 +3,25 @@
     "query": "{ block(number: -1) { account(address: \"0x8888f1f195afa192cfee860698584c030f4c9db1\") { balance } } }"
   },
   "response": {
-    "errors": [
-      {
-        "message": "Exception while fetching data (/block) : Argument must be positive, got -1",
-        "path": [
-          "block"
-        ],
-        "exception": {
-          "cause": null,
-          "stackTrace": [
+    "errors": {
+      "data": {
+        "block": null
+      },
+      "errors": [
+        {
+          "message": "Exception while fetching data (/block) : Argument must be positive, got -1",
+          "locations": [
             {
-              "methodName": "checkArgument",
-              "fileName": "Preconditions.java",
-              "lineNumber": 203,
-              "className": "com.google.common.base.Preconditions",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "of",
-              "fileName": "UInt256Bytes.java",
-              "lineNumber": 365,
-              "className": "tech.pegasys.pantheon.util.uint.UInt256Bytes",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "getBlockHash",
-              "fileName": "KeyValueStoragePrefixedKeyBlockchainStorage.java",
-              "lineNumber": 92,
-              "className": "tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "getBlockHashByNumber",
-              "fileName": "DefaultMutableBlockchain.java",
-              "lineNumber": 122,
-              "className": "tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "blockByNumberWithTxHashes",
-              "fileName": "BlockchainQueries.java",
-              "lineNumber": 341,
-              "className": "tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "getBlockByNumber",
-              "fileName": "AbstractBlockFetcher.java",
-              "lineNumber": 44,
-              "className": "tech.pegasys.pantheon.ethereum.graphql.internal.methods.AbstractBlockFetcher",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "get",
-              "fileName": "QueryBlockFetcher.java",
-              "lineNumber": 46,
-              "className": "tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "get",
-              "fileName": "QueryBlockFetcher.java",
-              "lineNumber": 25,
-              "className": "tech.pegasys.pantheon.ethereum.graphql.internal.methods.QueryBlockFetcher",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "fetchField",
-              "fileName": "ExecutionStrategy.java",
-              "lineNumber": 261,
-              "className": "graphql.execution.ExecutionStrategy",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "resolveFieldWithInfo",
-              "fileName": "ExecutionStrategy.java",
-              "lineNumber": 202,
-              "className": "graphql.execution.ExecutionStrategy",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "execute",
-              "fileName": "AsyncExecutionStrategy.java",
-              "lineNumber": 70,
-              "className": "graphql.execution.AsyncExecutionStrategy",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "executeOperation",
-              "fileName": "Execution.java",
-              "lineNumber": 159,
-              "className": "graphql.execution.Execution",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "execute",
-              "fileName": "Execution.java",
-              "lineNumber": 101,
-              "className": "graphql.execution.Execution",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "execute",
-              "fileName": "GraphQL.java",
-              "lineNumber": 573,
-              "className": "graphql.GraphQL",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "parseValidateAndExecute",
-              "fileName": "GraphQL.java",
-              "lineNumber": 515,
-              "className": "graphql.GraphQL",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "executeAsync",
-              "fileName": "GraphQL.java",
-              "lineNumber": 489,
-              "className": "graphql.GraphQL",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "execute",
-              "fileName": "GraphQL.java",
-              "lineNumber": 420,
-              "className": "graphql.GraphQL",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "process",
-              "fileName": "GraphQLHttpService.java",
-              "lineNumber": 486,
-              "className": "tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "lambda$handleGraphQLSingleRequest$8",
-              "fileName": "GraphQLHttpService.java",
-              "lineNumber": 377,
-              "className": "tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "lambda$executeBlocking$2",
-              "fileName": "ContextImpl.java",
-              "lineNumber": 272,
-              "className": "io.vertx.core.impl.ContextImpl",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "runWorker",
-              "fileName": "ThreadPoolExecutor.java",
-              "lineNumber": 1149,
-              "className": "java.util.concurrent.ThreadPoolExecutor",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "run",
-              "fileName": "ThreadPoolExecutor.java",
-              "lineNumber": 624,
-              "className": "java.util.concurrent.ThreadPoolExecutor$Worker",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "run",
-              "fileName": "FastThreadLocalRunnable.java",
-              "lineNumber": 30,
-              "className": "io.netty.util.concurrent.FastThreadLocalRunnable",
-              "nativeMethod": false
-            },
-            {
-              "methodName": "run",
-              "fileName": "Thread.java",
-              "lineNumber": 748,
-              "className": "java.lang.Thread",
-              "nativeMethod": false
+              "line": 1,
+              "column": 3
             }
           ],
-          "message": "Argument must be positive, got -1",
-          "localizedMessage": "Argument must be positive, got -1",
-          "suppressed": []
-        },
-        "locations": [
-          {
-            "line": 1,
-            "column": 3,
-            "sourceName": null
-          }
-        ],
-        "extensions": null,
-        "errorType": "DataFetchingException"
-      }
-    ]
+          "path": [
+            "block"
+          ]
+        }
+      ]
+    }
   },
   "statusCode": 400
 }

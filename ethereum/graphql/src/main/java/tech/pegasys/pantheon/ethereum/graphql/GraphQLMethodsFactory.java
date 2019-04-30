@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.methods.AccountStorageFet
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockAccountFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockCallFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockEstimateGasFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockLogsFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockMinerFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockOmmerAtFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockOmmersFetcher;
@@ -146,6 +147,7 @@ public class GraphQLMethodsFactory {
                 blockchainQueries.getBlockchain(),
                 blockchainQueries.getWorldStateArchive(),
                 protocolSchedule)),
+        new BlockLogsFetcher(blockchainQueries),
         new AccountStorageFetcher(blockchainQueries),
         new TransactionBlockFetcher(blockchainQueries),
         new TransactionCreatedContractFetcher(blockchainQueries),

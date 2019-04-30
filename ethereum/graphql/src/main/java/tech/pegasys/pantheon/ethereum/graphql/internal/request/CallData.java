@@ -34,7 +34,8 @@ public class CallData extends CallParameter {
         callDataMap.get("data") != null ? (BytesValue) callDataMap.get("data") : null);
   }
 
-  public CallData(Address from, Address to, BigInteger gas, BigInteger gasPrice, Wei value, BytesValue data) {
+  public CallData(
+      Address from, Address to, BigInteger gas, BigInteger gasPrice, Wei value, BytesValue data) {
     super(from, to, gas.longValue(), Wei.of(gasPrice), value, data);
   }
 }

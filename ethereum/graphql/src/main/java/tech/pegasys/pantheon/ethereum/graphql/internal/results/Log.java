@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.LogWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionReceiptWithMetadata;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,9 +32,7 @@ public class Log implements GraphQLResult {
   public Log(final LogWithMetadata logWithMetadata, final TransactionReceiptWithMetadata receipt) {
     this(
         logWithMetadata.getLogIndex(),
-        logWithMetadata.getTopics().stream()
-            .map(topic -> RLP.encode(topic::writeTo).toString())
-            .collect(Collectors.toList()),
+        logWithMetadata.getTopics().stream().map(Object::toString).collect(Collectors.toList()),
         logWithMetadata.getData().toString(),
         new Transaction(receipt));
   }

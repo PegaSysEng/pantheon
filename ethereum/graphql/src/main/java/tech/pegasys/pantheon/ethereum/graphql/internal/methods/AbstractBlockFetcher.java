@@ -12,14 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import graphql.GraphQLException;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
-import java.util.Optional;
+import graphql.GraphQLException;
 
 abstract class AbstractBlockFetcher implements GraphQLMethod {
 
@@ -31,8 +30,11 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
 
   Block getBlockByHash(final Bytes32 hash) {
     try {
-      return getBlock(blockchain
-              .blockByHashWithTxHashes(Hash.wrap(hash)));
+      return blockchain
+          .blockByHashWithTxHashes(Hash.wrap(hash))
+          .map(this::blockWithMetadataToBlock)
+          .orElseThrow(
+              () -> new GraphQLException("Block with hash " + hash.toString() + " not found"));
     } catch (NullPointerException e) {
       throw new GraphQLException("Hash is null", e);
     }
@@ -40,8 +42,10 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
 
   Block getBlockByNumber(final Long number) {
     try {
-      return getBlock(blockchain
-              .blockByNumberWithTxHashes(number));
+      return blockchain
+          .blockByNumberWithTxHashes(number)
+          .map(this::blockWithMetadataToBlock)
+          .orElseThrow(() -> new GraphQLException("Block with number " + number + " not found"));
     } catch (NullPointerException e) {
       throw new GraphQLException("Number is null", e);
     }
@@ -57,11 +61,5 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
         blockWithMetadata.getTransactions().size(),
         blockWithMetadata.getOmmers().size(),
         blockWithMetadata.getTotalDifficulty());
-  }
-
-  private Block getBlock(Optional<BlockWithMetadata<Hash, Hash>> blockByHashWithTxHashes) {
-    return blockByHashWithTxHashes.map(this::blockWithMetadataToBlock)
-            .orElseThrow(() -> new GraphQLException("Block not found"));
-
   }
 }

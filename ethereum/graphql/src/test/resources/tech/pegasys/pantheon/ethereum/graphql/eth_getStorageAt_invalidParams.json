@@ -1,16 +1,20 @@
 {
   "request": {
-    "id": 342,
-    "jsonrpc": "2.0",
-    "method": "eth_getStorageAt",
-    "params": []
+    "query": "{ block { account(address: \"0x6295ee1b4f6dd65047762f924ecd367c17eabf8f\") { storage(slot: \"0xi_am_not_bytes32\") } } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 342,
-    "error" : {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'slot' with value 'StringValue{value='0xi_am_not_bytes32'}' is not a valid 'Bytes32' @ 'block/account/storage'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 84
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

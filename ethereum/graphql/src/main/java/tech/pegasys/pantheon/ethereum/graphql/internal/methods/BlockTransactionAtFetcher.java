@@ -37,8 +37,8 @@ public class BlockTransactionAtFetcher implements DataFetcher<Transaction>, Grap
   @Override
   public Transaction get(final DataFetchingEnvironment environment) {
     final long blockNumber = ((Block) environment.getSource()).getNumber().longValue();
-    if (environment.containsArgument("transactionAt")) {
-      Integer transactionAt = environment.getArgument("transactionAt");
+    if (environment.containsArgument("index")) {
+      Integer transactionAt = environment.getArgument("index");
       return getTransactionAt(blockNumber, transactionAt);
     }
     return null;

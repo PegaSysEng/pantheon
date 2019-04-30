@@ -1,16 +1,20 @@
 {
   "request": {
-    "id": 209,
-    "jsonrpc": "2.0",
-    "method": "eth_getBlockTransactionCountByHash",
-    "params": []
+    "query": "{ block(hash: \"0xabc\") { transactionCount } }"
   },
   "response": {
-    "jsonrpc": "2.0",
-    "id": 209,
-    "error": {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type WrongType: argument 'hash' with value 'StringValue{value='0xabc'}' is not a valid 'Bytes32' @ 'block'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 9
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400

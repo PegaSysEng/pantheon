@@ -1,16 +1,20 @@
 {
   "request": {
-    "id": 412,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByHash",
-    "params": []
+    "query": "{ transaction { block { hash } from { address } to { address } createdContract { address } gas gasPrice hash inputData nonce index value } }"
   },
   "response": {
-    "jsonrpc" : "2.0",
-    "id" : 412,
-    "error" : {
-      "code" : -32602,
-      "message" : "Invalid params"
+    "errors": {
+      "errors": [
+        {
+          "message": "Validation error of type MissingFieldArgument: Missing field argument hash @ 'transaction'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   },
   "statusCode": 400
