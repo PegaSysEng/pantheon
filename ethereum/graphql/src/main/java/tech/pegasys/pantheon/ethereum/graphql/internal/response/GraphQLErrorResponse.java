@@ -14,8 +14,10 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.response;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"errors"})
@@ -23,7 +25,8 @@ public class GraphQLErrorResponse implements GraphQLResponse {
 
   private final Object errors;
 
-  public GraphQLErrorResponse(final Object errors) {
+  @JsonCreator
+  public GraphQLErrorResponse(@JsonProperty("errors") final Object errors) {
     this.errors = errors;
   }
 

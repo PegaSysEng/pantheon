@@ -36,8 +36,8 @@ import tech.pegasys.pantheon.ethereum.graphql.BlockchainImporter;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseKey;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLResponseUtils;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLTestMethodsFactory;
+import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
 import java.io.IOException;
@@ -49,7 +49,6 @@ import java.util.Map;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import graphql.GraphQL;
-import io.vertx.core.json.Json;
 import org.assertj.core.util.Lists;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,16 +83,12 @@ public class GetBlockByHashAndNumberIntegrationTest extends GraphQLTester {
   }
 
   @Test
-  public void returnEmptyResponseIfBlockNotFound() throws IOException {
-    final GraphQLSuccessResponse expected =
-        Json.mapper.readValue("{ \"data\": {\"block\": null} }", GraphQLSuccessResponse.class);
+  public void returnErrorResponseIfBlockNotFound() {
+    final GraphQLResponse response =
+        executeRequest(
+            GRAPHQL, requestWithQuery("{ block(hash: \"" + ZERO_HASH + "\") { number } }"));
 
-    final GraphQLSuccessResponse actual =
-        (GraphQLSuccessResponse)
-            executeRequest(
-                GRAPHQL, requestWithQuery("{ block(hash: \"" + ZERO_HASH + "\") { number } }"));
-
-    assertThat(actual).isEqualToComparingFieldByField(expected);
+    assertThat(response).isInstanceOf(GraphQLErrorResponse.class);
   }
 
   @Test
