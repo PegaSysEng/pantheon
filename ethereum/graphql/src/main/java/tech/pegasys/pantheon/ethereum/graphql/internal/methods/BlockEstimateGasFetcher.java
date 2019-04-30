@@ -59,7 +59,7 @@ public class BlockEstimateGasFetcher implements DataFetcher<BigInteger>, GraphQL
         .orElse(BigInteger.ZERO);
   }
 
-  private CallData overrideGasLimitAndPrice(CallData callData, BigInteger gasLimit) {
+  private CallData overrideGasLimitAndPrice(final CallData callData, final BigInteger gasLimit) {
     return new CallData(
         callData.getFrom(),
         callData.getTo(),

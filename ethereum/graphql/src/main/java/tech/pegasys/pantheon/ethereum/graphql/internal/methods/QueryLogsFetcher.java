@@ -54,7 +54,7 @@ public class QueryLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMet
                     .collect(Collectors.toList()))
             .build();
 
-    if (filter.getFromBlock().compareTo(filter.getToBlock()) == 1) {
+    if (filter.getFromBlock().compareTo(filter.getToBlock()) > 0) {
       throw new GraphQLException(
           "fromBlock ("
               + filter.getFromBlock()

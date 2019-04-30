@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class CallData extends CallParameter {
 
-  public CallData(Map<String, Object> callDataMap) {
+  public CallData(final Map<String, Object> callDataMap) {
     super(
         callDataMap.get("from") != null ? (Address) callDataMap.get("from") : null,
         callDataMap.get("to") != null ? (Address) callDataMap.get("to") : null,
@@ -35,7 +35,12 @@ public class CallData extends CallParameter {
   }
 
   public CallData(
-      Address from, Address to, BigInteger gas, BigInteger gasPrice, Wei value, BytesValue data) {
+      final Address from,
+      final Address to,
+      final BigInteger gas,
+      final BigInteger gasPrice,
+      final Wei value,
+      final BytesValue data) {
     super(from, to, gas.longValue(), Wei.of(gasPrice), value, data);
   }
 }

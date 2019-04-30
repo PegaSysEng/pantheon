@@ -103,7 +103,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final String name,
       final MiningParameters miningParameters,
       final PrivacyParameters privacyParameters,
-      final GraphQLConfiguration graphQLConfiguration,
+      final GraphQLConfiguration graphQlConfiguration,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
@@ -130,7 +130,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     this.miningParameters = miningParameters;
     this.privacyParameters = privacyParameters;
     this.privacyParameters.setSigningKeyPair(keyPair);
-    this.graphQlConfiguration = graphQLConfiguration;
+    this.graphQlConfiguration = graphQlConfiguration;
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     this.webSocketConfiguration = webSocketConfiguration;
     this.metricsConfiguration = metricsConfiguration;

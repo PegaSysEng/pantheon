@@ -19,16 +19,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class BlockFilterCriteria {
 
   private final List<Address> addresses;
   private final List<List<Bytes32>> topics;
 
   @SuppressWarnings("unchecked")
-  public BlockFilterCriteria(Map<String, Object> filterMap) {
+  public BlockFilterCriteria(final Map<String, Object> filterMap) {
 
     this.addresses =
         filterMap.get("addresses") != null
@@ -38,14 +35,6 @@ public class BlockFilterCriteria {
         filterMap.get("topcis") != null
             ? (List<List<Bytes32>>) filterMap.get("topcis")
             : Collections.emptyList();
-  }
-
-  @JsonCreator
-  public BlockFilterCriteria(
-      @JsonProperty("addresses") final List<Address> addresses,
-      @JsonProperty("topics") final List<List<Bytes32>> topics) {
-    this.addresses = addresses;
-    this.topics = topics;
   }
 
   public List<Address> getAddresses() {

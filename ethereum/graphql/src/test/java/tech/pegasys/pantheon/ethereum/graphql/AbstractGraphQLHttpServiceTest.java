@@ -51,7 +51,12 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -146,14 +151,6 @@ public abstract class AbstractGraphQLHttpServiceTest {
     context = new ProtocolContext<>(blockchain, stateArchive, null);
 
     final BlockchainQueries blockchainQueries = new BlockchainQueries(blockchain, stateArchive);
-    //    final FilterIdGenerator filterIdGenerator = mock(FilterIdGenerator.class);
-    //    final FilterRepository filterRepository = new FilterRepository();
-    //    when(filterIdGenerator.nextId()).thenReturn("0x1");
-    //    filterManager =
-    //            new FilterManager(
-    //                    blockchainQueries, transactionPoolMock, filterIdGenerator,
-    // filterRepository);
-
     final Set<Capability> supportedCapabilities = new HashSet<>();
     supportedCapabilities.add(EthProtocol.ETH62);
     supportedCapabilities.add(EthProtocol.ETH63);

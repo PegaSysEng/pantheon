@@ -13,33 +13,38 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLParameters;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.ResponseType;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import io.vertx.core.json.Json;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QueryBlockFetcherTest extends DataFetcherTester {
 
-  private QueryBlockFetcher method;
+  @Mock static BlockchainQueries blockchainQueries;
+
+  @Mock private QueryBlockFetcher method;
   private final GraphQLMethodType GRAPHQL_METHOD = GraphQLMethodType.BLOCK;
   //  private final String ZERO_HASH = String.valueOf(Hash.ZERO);
 
   @Before
   public void setUp() {
-    method = new QueryBlockFetcher(blockchainQueries);
-    setGraphql(Collections.singletonList(method));
+    method = mock(QueryBlockFetcher.class);
+    when(method.getType()).thenReturn(GRAPHQL_METHOD);
   }
 
   @Test
@@ -49,7 +54,7 @@ public class QueryBlockFetcherTest extends DataFetcherTester {
 
   @Test(expected = InvalidGraphQLParameters.class)
   public void exceptionWhenNoParamsSupplied() {
-    executeNoQuery();
+    executeNoQuery(method);
 
     verifyNoMoreInteractions(blockchainQueries);
   }
@@ -57,7 +62,7 @@ public class QueryBlockFetcherTest extends DataFetcherTester {
   @Test
   public void exceptionWhenHashParamInvalid() throws IOException {
     final GraphQLSuccessResponse response =
-        (GraphQLSuccessResponse) executeWithQuery("{ block(hash: \"0x00\") { number } }");
+        (GraphQLSuccessResponse) executeWithQuery("{ block(hash: \"0x00\") { number } }", method);
 
     final GraphQLSuccessResponse expected =
         Json.mapper.readValue("{ \"data\": {\"block\": null} }", GraphQLSuccessResponse.class);
@@ -69,14 +74,15 @@ public class QueryBlockFetcherTest extends DataFetcherTester {
   public void returnsWhenHashParamValid() {
     final GraphQLResponse response =
         executeWithQuery(
-            "{ block(hash: \"0x00000000000000000000000000000000000000000000000000000000000000\") { number } }");
+            "{ block(hash: \"0x00000000000000000000000000000000000000000000000000000000000000\") { number } }",
+            method);
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
   }
 
   @Test
   public void returnsWhenNumberParamValid() {
-    final GraphQLResponse response = executeWithQuery("{ block(number: 0) { number } }");
+    final GraphQLResponse response = executeWithQuery("{ block(number: 0) { number } }", method);
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
   }

@@ -13,41 +13,29 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.schema.GraphQLFactory;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
-import graphql.GraphQL;
 import io.vertx.core.json.Json;
-import org.mockito.Mock;
 
 public class DataFetcherTester {
 
-  @Mock static BlockchainQueries blockchainQueries;
-
-  private GraphQL graphQL;
-
-  public DataFetcherTester() {}
-
-  void setGraphql(final List<GraphQLMethod> methods) {
-    graphQL = GraphQLFactory.buildGraphQL(methods);
-  }
-
-  GraphQLResponse executeRequest(final GraphQLRequest request) {
+  GraphQLResponse executeRequest(final GraphQLRequest request, final GraphQLMethod... method) {
     ExecutionResult executionResult =
-        graphQL.execute(
-            ExecutionInput.newExecutionInput()
-                .query(request.getQuery())
-                .operationName(request.getOperationName())
-                .variables(request.getVariables())
-                .build());
+        GraphQLFactory.buildGraphQL(Arrays.asList(method))
+            .execute(
+                ExecutionInput.newExecutionInput()
+                    .query(request.getQuery())
+                    .operationName(request.getOperationName())
+                    .variables(request.getVariables())
+                    .build());
 
     System.out.println("error = [" + executionResult.getErrors() + "]");
     System.out.println("error = [" + executionResult.getData() + "]");
@@ -60,16 +48,16 @@ public class DataFetcherTester {
     }
   }
 
-  GraphQLResponse executeNoQuery() {
-    return executeWithQuery(null);
+  GraphQLResponse executeNoQuery(final GraphQLMethod... method) {
+    return executeWithQuery(null, method);
   }
 
-  GraphQLResponse executeWithQuery(final String query) {
-    return executeWithQueryAndVariables(query, null);
+  GraphQLResponse executeWithQuery(final String query, final GraphQLMethod... method) {
+    return executeWithQueryAndVariables(query, null, method);
   }
 
   GraphQLResponse executeWithQueryAndVariables(
-      final String query, final Map<String, Object> variables) {
-    return executeRequest(new GraphQLRequest(null, query, variables));
+      final String query, final Map<String, Object> variables, final GraphQLMethod... method) {
+    return executeRequest(new GraphQLRequest(null, query, variables), method);
   }
 }

@@ -13,41 +13,51 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLParameters;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.ResponseType;
 
-import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BlockParentFetcherTest extends DataFetcherTester {
 
-  private BlockParentFetcher method;
+  @Mock static BlockchainQueries blockchainQueries;
+
+  @Mock private QueryBlockFetcher method;
+  @Mock private BlockParentFetcher method1;
+  private GraphQLMethod[] methods = new GraphQLMethod[2];
   private final GraphQLMethodType GRAPHQL_METHOD = GraphQLMethodType.PARENT;
   private final String ZERO_HASH = String.valueOf(Hash.ZERO);
 
   @Before
   public void setUp() {
-    method = new BlockParentFetcher(blockchainQueries);
-
-    setGraphql(Lists.list(new QueryBlockFetcher(blockchainQueries), method));
+    method = mock(QueryBlockFetcher.class);
+    when(method.getType()).thenReturn(GraphQLMethodType.BLOCK);
+    method1 = mock(BlockParentFetcher.class);
+    when(method1.getType()).thenReturn(GRAPHQL_METHOD);
+    methods[0] = method;
+    methods[1] = method1;
   }
 
   @Test
   public void returnsCorrectMethodType() {
-    assertThat(method.getType()).isEqualTo(GRAPHQL_METHOD);
+    assertThat(method1.getType()).isEqualTo(GRAPHQL_METHOD);
   }
 
   @Test(expected = InvalidGraphQLParameters.class)
   public void exceptionWhenNoParamsSupplied() {
-    executeNoQuery();
+    executeNoQuery(method1);
 
     verifyNoMoreInteractions(blockchainQueries);
   }
@@ -55,7 +65,8 @@ public class BlockParentFetcherTest extends DataFetcherTester {
   @Test
   public void returnsWhenParamValid() {
     final GraphQLResponse response =
-        executeWithQuery("{ block(hash: \"" + ZERO_HASH + "\") { number parent { hash } } }");
+        executeWithQuery(
+            "{ block(hash: \"" + ZERO_HASH + "\") { number parent { hash } } }", methods);
 
     assertThat(response.getType()).isEqualTo(ResponseType.SUCCESS);
   }

@@ -20,9 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class FilterCriteria {
 
   private final BigInteger fromBlock;
@@ -31,7 +28,7 @@ public class FilterCriteria {
   private final List<List<Bytes32>> topics;
 
   @SuppressWarnings("unchecked")
-  public FilterCriteria(Map<String, Object> filterMap) {
+  public FilterCriteria(final Map<String, Object> filterMap) {
     this.fromBlock =
         filterMap.get("fromBlock") != null ? (BigInteger) filterMap.get("fromBlock") : null;
 
@@ -44,18 +41,6 @@ public class FilterCriteria {
         filterMap.get("topcis") != null
             ? (List<List<Bytes32>>) filterMap.get("topcis")
             : Collections.emptyList();
-  }
-
-  @JsonCreator
-  public FilterCriteria(
-      @JsonProperty("fromBlock") final BigInteger fromBlock,
-      @JsonProperty("toBlock") final BigInteger toBlock,
-      @JsonProperty("addresses") final List<Address> addresses,
-      @JsonProperty("topics") final List<List<Bytes32>> topics) {
-    this.fromBlock = fromBlock;
-    this.toBlock = toBlock;
-    this.addresses = addresses;
-    this.topics = topics;
   }
 
   public BigInteger getFromBlock() {
