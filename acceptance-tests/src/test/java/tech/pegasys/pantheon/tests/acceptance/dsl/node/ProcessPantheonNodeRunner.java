@@ -204,7 +204,6 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
         PROCESS_LOG.info("{}: {}", node.getName(), line);
         line = in.readLine();
       }
-      PROCESS_LOG.info("{}: Output complete", node.getName());
     } catch (final IOException e) {
       LOG.error("Failed to read output from process", e);
     }
