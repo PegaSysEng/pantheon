@@ -72,14 +72,15 @@ public abstract class PantheonControllerBuilder<C> {
   protected Path dataDirectory;
   protected Clock clock;
   protected Integer maxPendingTransactions;
+  protected Integer pendingTransactionRetentionPeriod;
   protected KeyPair nodeKeys;
   private StorageProvider storageProvider;
   private final List<Runnable> shutdownActions = new ArrayList<>();
-  private RocksDbConfiguration rocksdDbConfiguration;
+  private RocksDbConfiguration rocksDbConfiguration;
 
-  public PantheonControllerBuilder<C> rocksdDbConfiguration(
+  public PantheonControllerBuilder<C> rocksDbConfiguration(
       final RocksDbConfiguration rocksDbConfiguration) {
-    this.rocksdDbConfiguration = rocksDbConfiguration;
+    this.rocksDbConfiguration = rocksDbConfiguration;
     return this;
   }
 
@@ -151,6 +152,12 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
+  public PantheonControllerBuilder<C> pendingTransactionRetentionPeriod(
+      final int pendingTransactionRetentionPeriod) {
+    this.pendingTransactionRetentionPeriod = pendingTransactionRetentionPeriod;
+    return this;
+  }
+
   public PantheonController<C> build() throws IOException {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
@@ -164,15 +171,15 @@ public abstract class PantheonControllerBuilder<C> {
     checkNotNull(maxPendingTransactions, "Missing max pending transactions");
     checkNotNull(nodeKeys, "Missing node keys");
     checkArgument(
-        storageProvider != null || rocksdDbConfiguration != null,
+        storageProvider != null || rocksDbConfiguration != null,
         "Must supply either a storage provider or RocksDB configuration");
     checkArgument(
-        storageProvider == null || rocksdDbConfiguration == null,
+        storageProvider == null || rocksDbConfiguration == null,
         "Must supply either storage provider or RocksDB confguration, but not both");
     privacyParameters.setSigningKeyPair(nodeKeys);
 
-    if (storageProvider == null && rocksdDbConfiguration != null) {
-      storageProvider = RocksDbStorageProvider.create(rocksdDbConfiguration, metricsSystem);
+    if (storageProvider == null && rocksDbConfiguration != null) {
+      storageProvider = RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
     }
 
     prepForBuild();
@@ -223,7 +230,8 @@ public abstract class PantheonControllerBuilder<C> {
             clock,
             maxPendingTransactions,
             metricsSystem,
-            syncState);
+            syncState,
+            pendingTransactionRetentionPeriod);
 
     final MiningCoordinator miningCoordinator =
         createMiningCoordinator(
