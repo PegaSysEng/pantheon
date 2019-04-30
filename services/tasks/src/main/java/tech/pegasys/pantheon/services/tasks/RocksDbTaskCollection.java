@@ -30,7 +30,7 @@ import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
-public class RocksDbTaskQueue<T> implements TaskCollection<T> {
+public class RocksDbTaskCollection<T> implements TaskCollection<T> {
 
   private final Options options;
   private final RocksDB db;
@@ -49,7 +49,7 @@ public class RocksDbTaskQueue<T> implements TaskCollection<T> {
   private final OperationTimer enqueueLatency;
   private final OperationTimer dequeueLatency;
 
-  private RocksDbTaskQueue(
+  private RocksDbTaskCollection(
       final Path storageDirectory,
       final Function<T, BytesValue> serializer,
       final Function<BytesValue, T> deserializer,
@@ -79,12 +79,12 @@ public class RocksDbTaskQueue<T> implements TaskCollection<T> {
     }
   }
 
-  public static <T> RocksDbTaskQueue<T> create(
+  public static <T> RocksDbTaskCollection<T> create(
       final Path storageDirectory,
       final Function<T, BytesValue> serializer,
       final Function<BytesValue, T> deserializer,
       final MetricsSystem metricsSystem) {
-    return new RocksDbTaskQueue<>(storageDirectory, serializer, deserializer, metricsSystem);
+    return new RocksDbTaskCollection<>(storageDirectory, serializer, deserializer, metricsSystem);
   }
 
   @Override
@@ -206,11 +206,11 @@ public class RocksDbTaskQueue<T> implements TaskCollection<T> {
 
   private static class RocksDbTask<T> implements Task<T> {
     private final AtomicBoolean completed = new AtomicBoolean(false);
-    private final RocksDbTaskQueue<T> parentQueue;
+    private final RocksDbTaskCollection<T> parentQueue;
     private final T data;
     private final long key;
 
-    private RocksDbTask(final RocksDbTaskQueue<T> parentQueue, final T data, final long key) {
+    private RocksDbTask(final RocksDbTaskCollection<T> parentQueue, final T data, final long key) {
       this.parentQueue = parentQueue;
       this.data = data;
       this.key = key;

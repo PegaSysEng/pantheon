@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.services.tasks;
 
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -22,18 +21,18 @@ import java.util.function.Function;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
-public class RocksDbTaskQueueTest extends AbstractTaskQueueTest<RocksDbTaskQueue<BytesValue>> {
+public class FlatFileTaskCollectionTest
+    extends AbstractTaskQueueTest<FlatFileTaskCollection<BytesValue>> {
 
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Override
-  protected RocksDbTaskQueue<BytesValue> createQueue() throws IOException {
+  protected FlatFileTaskCollection<BytesValue> createQueue() throws IOException {
     final Path dataDir = folder.newFolder().toPath();
     return createQueue(dataDir);
   }
 
-  private RocksDbTaskQueue<BytesValue> createQueue(final Path dataDir) {
-    return RocksDbTaskQueue.create(
-        dataDir, Function.identity(), Function.identity(), new NoOpMetricsSystem());
+  private FlatFileTaskCollection<BytesValue> createQueue(final Path dataDir) {
+    return new FlatFileTaskCollection<>(dataDir, Function.identity(), Function.identity());
   }
 }

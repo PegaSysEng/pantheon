@@ -34,13 +34,13 @@ import org.openjdk.jmh.annotations.TearDown;
 public class RocksDbTaskQueueBenchmark {
 
   private File tempDir;
-  private RocksDbTaskQueue<BytesValue> queue;
+  private RocksDbTaskCollection<BytesValue> queue;
 
   @Setup(Level.Trial)
   public void prepare() {
     tempDir = Files.createTempDir();
     queue =
-        RocksDbTaskQueue.create(
+        RocksDbTaskCollection.create(
             tempDir.toPath(), Function.identity(), Function.identity(), new NoOpMetricsSystem());
     for (int i = 0; i < 1_000_000; i++) {
       queue.add(UInt256.of(i).getBytes());
