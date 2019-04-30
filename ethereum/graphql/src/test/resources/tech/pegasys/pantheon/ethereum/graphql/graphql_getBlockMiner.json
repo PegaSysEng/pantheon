@@ -1,0 +1,15 @@
+{
+  "request": {
+    "query": "{ block { miner { address } } }"
+  },
+  "response": {
+    "data": {
+      "block": {
+        "miner": {
+          "address": "0x8888f1f195afa192cfee860698584c030f4c9db1"
+        }
+      }
+    }
+  },
+  "statusCode": 200
+}

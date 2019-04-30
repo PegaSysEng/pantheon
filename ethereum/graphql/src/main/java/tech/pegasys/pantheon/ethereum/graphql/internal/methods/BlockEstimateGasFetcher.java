@@ -22,9 +22,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class BlockEstimateGasFetcher implements DataFetcher<BigInteger>, GraphQLMethod {
-  private TransactionSimulator transactionSimulator;
 
-  //    private static final Logger LOG = LogManager.getLogger();
+  private TransactionSimulator transactionSimulator;
 
   public BlockEstimateGasFetcher(final TransactionSimulator transactionSimulator) {
     this.transactionSimulator = transactionSimulator;

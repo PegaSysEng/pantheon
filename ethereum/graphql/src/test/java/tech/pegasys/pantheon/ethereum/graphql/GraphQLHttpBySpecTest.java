@@ -133,6 +133,15 @@ public class GraphQLHttpBySpecTest extends AbstractGraphQLHttpServiceTest {
     specs.add("eth_sendRawTransaction_messageCall");
     specs.add("eth_sendRawTransaction_transferEther");
     specs.add("eth_sendRawTransaction_unsignedTransaction");
+    specs.add("graphql_getBlockMiner");
+    specs.add("graphql_getBlockParent");
+    specs.add("graphql_getBlocks");
+    specs.add("graphql_getBlockTransactions");
+    specs.add("graphql_getGasPrice");
+    specs.add("graphql_getOmmerAt");
+    specs.add("graphql_getOmmers");
+    specs.add("graphql_protocolVersion");
+    specs.add("graphql_getSyncing");
 
     return specs;
   }

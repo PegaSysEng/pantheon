@@ -1,0 +1,15 @@
+{
+  "request": {
+    "query": "{ block { parent { hash } } }"
+  },
+  "response": {
+    "data": {
+      "block": {
+        "parent": {
+          "hash": "0x0f765087745aa259d9e5ac39c367c57432a16ed98e3b0d81c5b51d10f301dc49"
+        }
+      }
+    }
+  },
+  "statusCode": 200
+}

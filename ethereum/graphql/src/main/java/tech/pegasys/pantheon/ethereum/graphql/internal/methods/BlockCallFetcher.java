@@ -21,9 +21,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class BlockCallFetcher implements DataFetcher<CallResult>, GraphQLMethod {
-  private TransactionSimulator transactionSimulator;
 
-  //    private static final Logger LOG = LogManager.getLogger();
+  private TransactionSimulator transactionSimulator;
 
   public BlockCallFetcher(final TransactionSimulator transactionSimulator) {
     this.transactionSimulator = transactionSimulator;

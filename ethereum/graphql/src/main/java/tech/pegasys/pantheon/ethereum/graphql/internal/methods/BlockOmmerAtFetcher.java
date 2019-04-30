@@ -35,8 +35,8 @@ public class BlockOmmerAtFetcher implements DataFetcher<Ommer>, GraphQLMethod {
   @Override
   public Ommer get(final DataFetchingEnvironment environment) {
     final long blockNumber = ((Block) environment.getSource()).getNumber().longValue();
-    if (environment.containsArgument("ommerAt")) {
-      Integer ommerAt = environment.getArgument("ommerAt");
+    if (environment.containsArgument("index")) {
+      Integer ommerAt = environment.getArgument("index");
       return getOmmerAt(blockNumber, ommerAt);
     }
     return null;

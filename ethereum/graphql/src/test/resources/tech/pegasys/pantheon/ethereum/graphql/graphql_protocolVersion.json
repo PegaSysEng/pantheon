@@ -1,0 +1,11 @@
+{
+  "request": {
+    "query": "{ protocolVersion }"
+  },
+  "response": {
+    "data": {
+      "protocolVersion": 63
+    }
+  },
+  "statusCode": 200
+}

@@ -26,7 +26,7 @@ public interface GraphQLMethod {
   GraphQLMethodType getType();
 
   /**
-   * The list of Permissions that correspond to this JSON-RPC method. e.g. [net/*, net/listening]
+   * The list of Permissions that correspond to this GraphQL method. e.g. [BLOCKS/*, BLOCKS/PARENT]
    *
    * @return list of permissions that match this method.
    */

@@ -27,7 +27,6 @@ import graphql.schema.DataFetchingEnvironment;
 
 public class QueryBlocksFetcher extends AbstractBlockFetcher implements DataFetcher<List<Block>> {
 
-  //    private static final Logger LOG = LogManager.getLogger();
   public QueryBlocksFetcher(final BlockchainQueries blockchain) {
     super(blockchain);
   }

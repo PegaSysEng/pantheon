@@ -26,8 +26,6 @@ public class BlockOmmersFetcher implements DataFetcher<ArrayList<Ommer>>, GraphQ
 
   private BlockchainQueries blockchain;
 
-  //    private static final Logger LOG = LogManager.getLogger();
-
   public BlockOmmersFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
   }

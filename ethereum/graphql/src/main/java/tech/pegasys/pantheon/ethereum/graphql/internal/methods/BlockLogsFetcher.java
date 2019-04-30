@@ -13,8 +13,6 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.LogTopic;
-import tech.pegasys.pantheon.ethereum.graphql.internal.filter.LogsQuery;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.TransactionReceiptWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.request.BlockFilterCriteria;
@@ -29,9 +27,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class BlockLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMethod {
-  private BlockchainQueries blockchain;
 
-  //    private static final Logger LOG = LogManager.getLogger();
+  private BlockchainQueries blockchain;
 
   public BlockLogsFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
@@ -46,15 +43,8 @@ public class BlockLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMet
   public ArrayList<Log> get(final DataFetchingEnvironment environment) {
     final String blockHash = ((Block) environment.getSource()).getHash();
     final BlockFilterCriteria filter = new BlockFilterCriteria(environment.getArgument("filter"));
-    final LogsQuery query =
-        new LogsQuery.Builder()
-            .addresses(filter.getAddresses())
-            .topics(
-                filter.getTopics().stream()
-                    .map(item -> item.stream().map(LogTopic::wrap).collect(Collectors.toList()))
-                    .collect(Collectors.toList()))
-            .build();
-    return blockchain.matchingLogs(Hash.fromHexString(blockHash), query).stream()
+
+    return blockchain.matchingLogs(Hash.fromHexString(blockHash), filter).stream()
         .map(
             log -> {
               final TransactionReceiptWithMetadata receipt =
@@ -63,7 +53,7 @@ public class BlockLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMet
                       .orElseThrow(
                           () ->
                               new GraphQLException(
-                                  "Log found but no transaction associated to it"));
+                                  "Log found but no transaction associated with it"));
               return new Log(log, receipt);
             })
         .collect(Collectors.toCollection(ArrayList::new));

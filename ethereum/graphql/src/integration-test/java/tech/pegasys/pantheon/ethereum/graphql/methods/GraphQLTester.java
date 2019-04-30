@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.graphql.methods;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRequest;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
@@ -24,11 +23,8 @@ import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import io.vertx.core.json.Json;
-import org.mockito.Mock;
 
 public class GraphQLTester {
-
-  @Mock BlockchainQueries blockchainQueries;
 
   GraphQLResponse executeRequest(final GraphQL graphQl, final GraphQLRequest request) {
     ExecutionResult executionResult =

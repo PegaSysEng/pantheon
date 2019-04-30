@@ -22,8 +22,6 @@ import graphql.schema.DataFetchingEnvironment;
 
 public class BlockAccountFetcher extends AbstractAccountFetcher {
 
-  //    private static final Logger LOG = LogManager.getLogger();
-
   public BlockAccountFetcher(final BlockchainQueries blockchain) {
     super(blockchain);
   }

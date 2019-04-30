@@ -12,35 +12,21 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.request;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
-public class FilterCriteria {
+public class FilterCriteria extends BlockFilterCriteria {
 
   private final BigInteger fromBlock;
   private final BigInteger toBlock;
-  private final List<Address> addresses;
-  private final List<List<Bytes32>> topics;
 
-  @SuppressWarnings("unchecked")
   public FilterCriteria(final Map<String, Object> filterMap) {
+    super(filterMap);
+
     this.fromBlock =
         filterMap.get("fromBlock") != null ? (BigInteger) filterMap.get("fromBlock") : null;
 
     this.toBlock = filterMap.get("toBlock") != null ? (BigInteger) filterMap.get("toBlock") : null;
-    this.addresses =
-        filterMap.get("addresses") != null
-            ? (List<Address>) filterMap.get("addresses")
-            : Collections.emptyList();
-    this.topics =
-        filterMap.get("topcis") != null
-            ? (List<List<Bytes32>>) filterMap.get("topcis")
-            : Collections.emptyList();
   }
 
   public BigInteger getFromBlock() {
@@ -49,13 +35,5 @@ public class FilterCriteria {
 
   public BigInteger getToBlock() {
     return toBlock;
-  }
-
-  public List<Address> getAddresses() {
-    return addresses;
-  }
-
-  public List<List<Bytes32>> getTopics() {
-    return topics;
   }
 }

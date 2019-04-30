@@ -34,10 +34,10 @@ import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
+import tech.pegasys.pantheon.ethereum.graphql.internal.results.Transaction;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -47,6 +47,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -112,71 +113,45 @@ public class GraphQLResponseUtils {
     return Json.mapper
         .enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)
         .readValue(
-            "{ \"data\": {\"block\": " + Json.encodePrettily(block) + " } }",
+            "{ \"data\": {\"block\": " + embedTransactions(block, transactions) + " } }",
             GraphQLSuccessResponse.class);
   }
 
-  //  public List<Transaction> transactions(final String... values) {
-  //    final List<Transaction> nodes = new ArrayList<>(values.length);
-  //
-  //    for (int i = 0; i < values.length; i++) {
-  //      nodes.add(new Transaction(values[i]));
-  //    }
-  //
-  //    return nodes;
-  //  }
-  //
-  //  public List<Transaction> transactions(final Transaction... transactions) {
-  //    final List<Transaction> list = new ArrayList<>(transactions.length);
-  //
-  //    for (final Transaction transaction : transactions) {
-  //      list.add(transaction);
-  //    }
-  //
-  //    return list;
-  //  }
-  //
-  //  public Transaction transaction(
-  //      final String blockHash,
-  //      final String blockNumber,
-  //      final String fromAddress,
-  //      final String gas,
-  //      final String gasPrice,
-  //      final String hash,
-  //      final String input,
-  //      final String nonce,
-  //      final String toAddress,
-  //      final String transactionIndex,
-  //      final String value,
-  //      final String v,
-  //      final String r,
-  //      final String s) {
-  //
-  //    final Transaction transaction = mock(Transaction.class);
-  //    when(transaction.getGasPrice()).thenReturn(Wei.fromHexString(gasPrice));
-  //    when(transaction.getNonce()).thenReturn(unsignedLong(nonce));
-  //    when(transaction.getV()).thenReturn(bigInteger(v).intValue());
-  //    when(transaction.getR()).thenReturn(bigInteger(r));
-  //    when(transaction.getS()).thenReturn(bigInteger(s));
-  //    when(transaction.hash()).thenReturn(hash(hash));
-  //    when(transaction.getTo()).thenReturn(Optional.ofNullable(address(toAddress)));
-  //    when(transaction.getSender()).thenReturn(address(fromAddress));
-  //    when(transaction.getPayload()).thenReturn(bytes(input));
-  //    when(transaction.getValue()).thenReturn(wei(value));
-  //    when(transaction.getGasLimit()).thenReturn(unsignedLong(gas));
-  //
-  //    return new Transaction(
-  //        new TransactionWithMetadata(
-  //            transaction,
-  //            unsignedLong(blockNumber),
-  //            Hash.fromHexString(blockHash),
-  //            unsignedInt(transactionIndex)));
-  //  }
+  private String embedTransactions(Block block, List<Transaction> transactions) {
+    String blockString = Json.encodePrettily(block);
+    return Json.encodePrettily(block)
+        .substring(0, Json.encodePrettily(block).lastIndexOf("}") - 1)
+        .concat(
+            ", \"transactions\": ["
+                + transactions.stream().map(Json::encodePrettily).collect(Collectors.joining(","))
+                + "]}");
+  }
 
-  //  private int unsignedInt(final String value) {
-  //    final String hex = removeHexPrefix(value);
-  //    return new BigInteger(hex, HEX_RADIX).intValue();
-  //  }
+  public List<Transaction> transactions(final Transaction... transactions) {
+    final List<Transaction> list = new ArrayList<>(transactions.length);
+
+    for (final Transaction transaction : transactions) {
+      list.add(transaction);
+    }
+
+    return list;
+  }
+
+  public Transaction transaction(
+      final String hash,
+      final BigInteger nonce,
+      final Integer index,
+      final BigInteger value,
+      final BigInteger gasPrice,
+      final BigInteger gas,
+      final String inputData,
+      final BigInteger status,
+      final BigInteger gasUsed,
+      final BigInteger cumulativeGasUsed) {
+
+    return new Transaction(
+        hash, nonce, index, value, gasPrice, gas, inputData, status, gasUsed, cumulativeGasUsed);
+  }
 
   private long unsignedLong(final String value) {
     final String hex = removeHexPrefix(value);
@@ -190,14 +165,6 @@ public class GraphQLResponseUtils {
   private String removeHexPrefix(final String prefixedHex) {
     return prefixedHex.startsWith("0x") ? prefixedHex.substring(2) : prefixedHex;
   }
-
-  //  private BigInteger bigInteger(final String hex) {
-  //    return new BigInteger(removeHexPrefix(hex), HEX_RADIX);
-  //  }
-  //
-  //  private Wei wei(final String hex) {
-  //    return Wei.fromHexString(hex);
-  //  }
 
   private Address address(final String hex) {
     return Address.fromHexString(hex);

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "query": "{ block { ommers { hash } } }"
+  },
+  "response": {
+    "data": {
+      "block": {
+        "ommers": []
+      }
+    }
+  },
+  "statusCode": 200
+}

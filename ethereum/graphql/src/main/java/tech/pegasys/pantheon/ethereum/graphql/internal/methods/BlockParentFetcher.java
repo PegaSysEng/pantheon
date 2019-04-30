@@ -20,8 +20,6 @@ import graphql.schema.DataFetchingEnvironment;
 
 public class BlockParentFetcher extends AbstractBlockFetcher implements DataFetcher<Block> {
 
-  //    private static final Logger LOG = LogManager.getLogger();
-
   public BlockParentFetcher(final BlockchainQueries blockchain) {
     super(blockchain);
   }

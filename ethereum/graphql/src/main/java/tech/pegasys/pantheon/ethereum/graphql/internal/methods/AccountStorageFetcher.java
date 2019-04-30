@@ -27,8 +27,6 @@ import graphql.schema.DataFetchingEnvironment;
 public class AccountStorageFetcher implements DataFetcher<Bytes32>, GraphQLMethod {
   private BlockchainQueries blockchain;
 
-  //    private static final Logger LOG = LogManager.getLogger();
-
   public AccountStorageFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
   }

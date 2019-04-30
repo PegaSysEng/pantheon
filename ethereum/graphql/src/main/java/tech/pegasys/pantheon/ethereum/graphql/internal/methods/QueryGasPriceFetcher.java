@@ -21,6 +21,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class QueryGasPriceFetcher implements DataFetcher<BigInteger>, GraphQLMethod {
+
   private MiningCoordinator miningCoordinator;
 
   public QueryGasPriceFetcher(final MiningCoordinator miningCoordinator) {
@@ -36,6 +37,6 @@ public class QueryGasPriceFetcher implements DataFetcher<BigInteger>, GraphQLMet
   @Override
   public BigInteger get(final DataFetchingEnvironment environment) {
     Wei gasPrice = miningCoordinator.getMinTransactionGasPrice();
-    return gasPrice == null ? null : BigInteger.valueOf(gasPrice.toLong());
+    return gasPrice == null ? BigInteger.ONE : BigInteger.valueOf(gasPrice.toLong());
   }
 }

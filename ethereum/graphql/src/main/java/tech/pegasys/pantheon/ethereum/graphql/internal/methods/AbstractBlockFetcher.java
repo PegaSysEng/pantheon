@@ -29,26 +29,18 @@ abstract class AbstractBlockFetcher implements GraphQLMethod {
   }
 
   Block getBlockByHash(final Bytes32 hash) {
-    try {
-      return blockchain
-          .blockByHashWithTxHashes(Hash.wrap(hash))
-          .map(this::blockWithMetadataToBlock)
-          .orElseThrow(
-              () -> new GraphQLException("Block with hash " + hash.toString() + " not found"));
-    } catch (NullPointerException e) {
-      throw new GraphQLException("Hash is null", e);
-    }
+    return blockchain
+        .blockByHashWithTxHashes(Hash.wrap(hash))
+        .map(this::blockWithMetadataToBlock)
+        .orElseThrow(
+            () -> new GraphQLException("Block with hash " + hash.toString() + " not found"));
   }
 
   Block getBlockByNumber(final Long number) {
-    try {
-      return blockchain
-          .blockByNumberWithTxHashes(number)
-          .map(this::blockWithMetadataToBlock)
-          .orElseThrow(() -> new GraphQLException("Block with number " + number + " not found"));
-    } catch (NullPointerException e) {
-      throw new GraphQLException("Number is null", e);
-    }
+    return blockchain
+        .blockByNumberWithTxHashes(number)
+        .map(this::blockWithMetadataToBlock)
+        .orElseThrow(() -> new GraphQLException("Block with number " + number + " not found"));
   }
 
   Block getLatestBlock() {

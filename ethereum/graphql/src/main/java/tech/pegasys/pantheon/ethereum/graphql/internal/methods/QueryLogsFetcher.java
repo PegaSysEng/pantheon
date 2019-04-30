@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import tech.pegasys.pantheon.ethereum.core.LogTopic;
-import tech.pegasys.pantheon.ethereum.graphql.internal.filter.LogsQuery;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.request.FilterCriteria;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Log;
@@ -26,9 +24,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class QueryLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMethod {
-  private BlockchainQueries blockchain;
 
-  //    private static final Logger LOG = LogManager.getLogger();
+  private BlockchainQueries blockchain;
 
   public QueryLogsFetcher(final BlockchainQueries blockchain) {
 
@@ -43,16 +40,6 @@ public class QueryLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMet
   @Override
   public ArrayList<Log> get(final DataFetchingEnvironment environment) {
     FilterCriteria filter = new FilterCriteria(environment.getArgument("filter"));
-    final LogsQuery query =
-        new LogsQuery.Builder()
-            .addresses(filter.getAddresses())
-            .topics(
-                filter.getTopics().stream()
-                    .map(
-                        topicList ->
-                            topicList.stream().map(LogTopic::create).collect(Collectors.toList()))
-                    .collect(Collectors.toList()))
-            .build();
 
     if (filter.getFromBlock().compareTo(filter.getToBlock()) > 0) {
       throw new GraphQLException(
@@ -64,7 +51,7 @@ public class QueryLogsFetcher implements DataFetcher<ArrayList<Log>>, GraphQLMet
     }
 
     return blockchain
-        .matchingLogs(filter.getFromBlock().longValue(), filter.getToBlock().longValue(), query)
+        .matchingLogs(filter.getFromBlock().longValue(), filter.getToBlock().longValue(), filter)
         .stream()
         .map(
             log ->

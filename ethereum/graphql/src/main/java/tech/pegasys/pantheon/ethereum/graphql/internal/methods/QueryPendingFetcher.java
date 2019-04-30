@@ -19,9 +19,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class QueryPendingFetcher implements DataFetcher<Pending>, GraphQLMethod {
-  private TransactionPool transactionPool;
 
-  //    private static final Logger LOG = LogManager.getLogger();
+  private TransactionPool transactionPool;
 
   public QueryPendingFetcher(final TransactionPool transactionPool) {
     this.transactionPool = transactionPool;

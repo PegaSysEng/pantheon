@@ -21,9 +21,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class QueryTransactionFetcher implements DataFetcher<Transaction>, GraphQLMethod {
-  private BlockchainQueries blockchain;
 
-  //    private static final Logger LOG = LogManager.getLogger();
+  private BlockchainQueries blockchain;
 
   public QueryTransactionFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;

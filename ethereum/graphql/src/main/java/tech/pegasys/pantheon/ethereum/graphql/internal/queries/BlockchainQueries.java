@@ -27,7 +27,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldState;
-import tech.pegasys.pantheon.ethereum.graphql.internal.filter.LogsQuery;
+import tech.pegasys.pantheon.ethereum.graphql.internal.request.BlockFilterCriteria;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -480,8 +480,8 @@ public class BlockchainQueries {
    *     topics is non-empty, the topic at this index must match one of the values in the set.
    * @return The set of logs matching the given constraints.
    */
-  public List<LogWithMetadata> matchingLogs(
-      final long fromBlockNumber, final long toBlockNumber, final LogsQuery query) {
+  public <T extends BlockFilterCriteria> List<LogWithMetadata> matchingLogs(
+      final long fromBlockNumber, final long toBlockNumber, final T query) {
     if (fromBlockNumber > toBlockNumber || toBlockNumber > headBlockNumber()) {
       return Lists.newArrayList();
     }
@@ -505,7 +505,8 @@ public class BlockchainQueries {
     return matchingLogs;
   }
 
-  public List<LogWithMetadata> matchingLogs(final Hash blockhash, final LogsQuery query) {
+  public <T extends BlockFilterCriteria> List<LogWithMetadata> matchingLogs(
+      final Hash blockhash, final T query) {
     final List<LogWithMetadata> matchingLogs = Lists.newArrayList();
     Optional<BlockHeader> blockHeader = blockchain.getBlockHeader(blockhash);
     if (!blockHeader.isPresent()) {
@@ -520,10 +521,10 @@ public class BlockchainQueries {
         receipts, number, query, blockhash, matchingLogs, transaction, logHasBeenRemoved);
   }
 
-  private List<LogWithMetadata> generateLogWithMetadata(
+  private <T extends BlockFilterCriteria> List<LogWithMetadata> generateLogWithMetadata(
       final List<TransactionReceipt> receipts,
       final long number,
-      final LogsQuery query,
+      final T query,
       final Hash blockhash,
       final List<LogWithMetadata> matchingLogs,
       final List<Transaction> transaction,

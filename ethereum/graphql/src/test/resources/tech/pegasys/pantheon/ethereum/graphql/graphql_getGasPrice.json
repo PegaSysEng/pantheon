@@ -1,0 +1,11 @@
+{
+  "request": {
+    "query": "{ gasPrice }"
+  },
+  "response": {
+    "data": {
+      "gasPrice": 500
+    }
+  },
+  "statusCode": 200
+}

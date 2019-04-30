@@ -22,6 +22,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
 public class QueryProtocolVersionFetcher implements DataFetcher<Integer>, GraphQLMethod {
+
   private final Integer highestEthVersion;
 
   public QueryProtocolVersionFetcher(final Set<Capability> supportedCapabilities) {

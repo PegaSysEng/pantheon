@@ -13,16 +13,24 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.request;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Log;
+import tech.pegasys.pantheon.ethereum.core.LogTopic;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BlockFilterCriteria {
 
   private final List<Address> addresses;
   private final List<List<Bytes32>> topics;
+
+  public static BlockFilterCriteria matchingAll() {
+    return new BlockFilterCriteria();
+  }
 
   @SuppressWarnings("unchecked")
   public BlockFilterCriteria(final Map<String, Object> filterMap) {
@@ -35,6 +43,48 @@ public class BlockFilterCriteria {
         filterMap.get("topcis") != null
             ? (List<List<Bytes32>>) filterMap.get("topcis")
             : Collections.emptyList();
+  }
+
+  BlockFilterCriteria() {
+    this.addresses = new ArrayList<>();
+    this.topics = new ArrayList<>();
+  }
+
+  public boolean matches(final Log log) {
+    return matchesAddresses(log.getLogger()) && matchesTopics(log.getTopics());
+  }
+
+  private boolean matchesAddresses(final Address address) {
+    return addresses.isEmpty() || addresses.contains(address);
+  }
+
+  private boolean matchesTopics(final List<LogTopic> matchTopics) {
+    if (topics.isEmpty()) {
+      return true;
+    }
+    if (matchTopics.size() < topics.size()) {
+      return false;
+    }
+    for (int i = 0; i < topics.size(); ++i) {
+      if (!matchesTopic(
+          matchTopics.get(i),
+          topics.get(i).stream().map((LogTopic::create)).collect(Collectors.toList()))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean matchesTopic(final LogTopic topic, final List<LogTopic> matchCriteria) {
+    for (final LogTopic candidate : matchCriteria) {
+      if (candidate == null) {
+        return true;
+      }
+      if (candidate.equals(topic)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public List<Address> getAddresses() {

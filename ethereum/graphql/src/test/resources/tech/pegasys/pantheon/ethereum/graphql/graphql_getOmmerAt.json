@@ -1,0 +1,13 @@
+{
+  "request": {
+    "query": "{ block { ommerAt(index: 0) { hash } } }"
+  },
+  "response": {
+    "data": {
+      "block": {
+        "ommerAt": null
+      }
+    }
+  },
+  "statusCode": 200
+}
