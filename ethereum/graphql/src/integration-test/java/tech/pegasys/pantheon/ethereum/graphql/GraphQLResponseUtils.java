@@ -117,7 +117,7 @@ public class GraphQLResponseUtils {
             GraphQLSuccessResponse.class);
   }
 
-  private String embedTransactions(final Block block, List<Transaction> transactions) {
+  private String embedTransactions(final Block block, final List<Transaction> transactions) {
     String blockString = Json.encodePrettily(block);
     return blockString
         .substring(0, blockString.lastIndexOf("}") - 1)
