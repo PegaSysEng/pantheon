@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.services.tasks;
 
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -24,33 +25,59 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-public class FlatFileTaskCollection<T> implements TaskCollection<T> {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+public class FlatFileTaskCollection<T> implements TaskCollection<T> {
+  private static final Logger LOG = LogManager.getLogger();
+  private static final String FILENAME_PREFIX = "tasks";
   private final Set<FlatFileTask<T>> outstandingTasks = new HashSet<>();
 
+  private final Path storageDirectory;
   private final Function<T, BytesValue> serializer;
   private final Function<BytesValue, T> deserializer;
+  private final long rollWhenFileSizeExceedsBytes;
 
   private final ByteBuffer lengthBuffer = ByteBuffer.allocate(Integer.SIZE);
 
-  private final FileChannel fileChannel;
+  private FileChannel readFileChannel;
+  private FileChannel writeFileChannel;
 
   private long size = 0;
+  private int readFileNumber = 0;
+  private int writeFileNumber = 0;
 
   public FlatFileTaskCollection(
       final Path storageDirectory,
       final Function<T, BytesValue> serializer,
-      final Function<BytesValue, T> deserializer) {
+      final Function<BytesValue, T> deserializer,
+      final long rollWhenFileSizeExceedsBytes) {
+    this.storageDirectory = storageDirectory;
     this.serializer = serializer;
     this.deserializer = deserializer;
+    this.rollWhenFileSizeExceedsBytes = rollWhenFileSizeExceedsBytes;
+    writeFileChannel = openWriteFileChannel(writeFileNumber);
+    readFileChannel = openReadFileChannel(readFileNumber);
+  }
+
+  private FileChannel openReadFileChannel(final int fileNumber) {
     try {
-      fileChannel =
-          FileChannel.open(
-              storageDirectory.resolve("tasks"),
-              StandardOpenOption.TRUNCATE_EXISTING,
-              StandardOpenOption.READ,
-              StandardOpenOption.WRITE,
-              StandardOpenOption.CREATE);
+      return FileChannel.open(
+          storageDirectory.resolve(FILENAME_PREFIX + fileNumber),
+          StandardOpenOption.DELETE_ON_CLOSE,
+          StandardOpenOption.READ);
+    } catch (final IOException e) {
+      throw new StorageException(e);
+    }
+  }
+
+  private FileChannel openWriteFileChannel(final int fileNumber) {
+    try {
+      return FileChannel.open(
+          storageDirectory.resolve(FILENAME_PREFIX + fileNumber),
+          StandardOpenOption.TRUNCATE_EXISTING,
+          StandardOpenOption.WRITE,
+          StandardOpenOption.CREATE);
     } catch (final IOException e) {
       throw new StorageException(e);
     }
@@ -60,13 +87,19 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   public synchronized void add(final T taskData) {
     final BytesValue data = serializer.apply(taskData);
     try {
-      final long offset = fileChannel.size();
+      final long offset = writeFileChannel.size();
       lengthBuffer.position(0);
       lengthBuffer.putInt(data.size());
       lengthBuffer.flip();
-      fileChannel.write(lengthBuffer, offset);
-      fileChannel.write(ByteBuffer.wrap(data.getArrayUnsafe()), offset + Integer.SIZE);
+      writeFileChannel.write(lengthBuffer, offset);
+      writeFileChannel.write(ByteBuffer.wrap(data.getArrayUnsafe()), offset + Integer.SIZE);
       size++;
+      if (writeFileChannel.size() > rollWhenFileSizeExceedsBytes) {
+        LOG.debug("Writing reached end of file {}", writeFileNumber);
+        writeFileChannel.close();
+        writeFileNumber++;
+        writeFileChannel = openWriteFileChannel(writeFileNumber);
+      }
     } catch (final IOException e) {
       throw new StorageException(e);
     }
@@ -97,7 +130,16 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
 
   private void readAndCheckLength(final ByteBuffer buffer, final int expectedLength)
       throws IOException {
-    final int readBytes = fileChannel.read(buffer);
+    int readBytes = readFileChannel.read(buffer);
+
+    if (readBytes == -1 && writeFileNumber > readFileNumber) {
+      LOG.debug("Reading reached end of file {}", readFileNumber);
+      readFileChannel.close();
+      readFileNumber++;
+      readFileChannel = openReadFileChannel(readFileNumber);
+
+      readBytes = readFileChannel.read(buffer);
+    }
     if (readBytes != expectedLength) {
       throw new IllegalStateException(
           "Task queue corrupted. Expected to read "
@@ -105,9 +147,9 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
               + " bytes but only got "
               + readBytes
               + " starting at position "
-              + fileChannel.position()
+              + readFileChannel.position()
               + " with size "
-              + fileChannel.size());
+              + readFileChannel.size());
     }
   }
 
@@ -125,8 +167,18 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   public synchronized void clear() {
     outstandingTasks.clear();
     try {
-      fileChannel.position(0);
-      fileChannel.truncate(0);
+      readFileChannel.close();
+      writeFileChannel.close();
+      for (int i = readFileNumber; i <= writeFileNumber; i++) {
+        final File file = storageDirectory.resolve(FILENAME_PREFIX + i).toFile();
+        if (!file.delete() && file.exists()) {
+          LOG.error("Failed to delete tasks file {}", file.getAbsolutePath());
+        }
+      }
+      readFileNumber = 0;
+      writeFileNumber = 0;
+      writeFileChannel = openWriteFileChannel(writeFileNumber);
+      readFileChannel = openReadFileChannel(readFileNumber);
       size = 0;
     } catch (final IOException e) {
       throw new StorageException(e);
@@ -141,7 +193,8 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   @Override
   public synchronized void close() {
     try {
-      fileChannel.close();
+      readFileChannel.close();
+      writeFileChannel.close();
     } catch (final IOException e) {
       throw new StorageException(e);
     }

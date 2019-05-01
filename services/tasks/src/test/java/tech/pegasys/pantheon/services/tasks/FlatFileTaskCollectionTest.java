@@ -12,12 +12,15 @@
  */
 package tech.pegasys.pantheon.services.tasks;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Function;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -33,6 +36,12 @@ public class FlatFileTaskCollectionTest
   }
 
   private FlatFileTaskCollection<BytesValue> createQueue(final Path dataDir) {
-    return new FlatFileTaskCollection<>(dataDir, Function.identity(), Function.identity());
+    return new FlatFileTaskCollection<>(dataDir, Function.identity(), Function.identity(), 10);
+  }
+
+  @After
+  public void checkFilesCleanedUp() {
+    final String[] files = folder.getRoot().list((dir, name) -> name.startsWith("tasks"));
+    assertThat(files.length).isEqualTo(0);
   }
 }

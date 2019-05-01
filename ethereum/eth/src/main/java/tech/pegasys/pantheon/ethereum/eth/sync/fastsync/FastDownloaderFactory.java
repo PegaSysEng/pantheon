@@ -119,10 +119,14 @@ public class FastDownloaderFactory {
 
   private static CachingTaskCollection<NodeDataRequest> createWorldStateDownloaderTaskCollection(
       final Path dataDirectory, final MetricsSystem metricsSystem) {
+    final int tenMegabytes = 1024 * 1024 * 10;
     final TaskCollection<NodeDataRequest> diskBasedCollection =
         true
             ? new FlatFileTaskCollection<>(
-                dataDirectory, NodeDataRequest::serialize, NodeDataRequest::deserialize)
+                dataDirectory,
+                NodeDataRequest::serialize,
+                NodeDataRequest::deserialize,
+                tenMegabytes)
             : RocksDbTaskCollection.create(
                 dataDirectory,
                 NodeDataRequest::serialize,
