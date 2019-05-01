@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class ExtractTxSignaturesTask implements Function<List<Block>, Stream<Block>> {
+public class ExtractTxSignaturesStep implements Function<List<Block>, Stream<Block>> {
 
   @Override
   public Stream<Block> apply(final List<Block> blocks) {
