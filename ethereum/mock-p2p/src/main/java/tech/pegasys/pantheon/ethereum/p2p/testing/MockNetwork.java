@@ -260,13 +260,14 @@ public final class MockNetwork {
     }
 
     @Override
+    public Peer getPeer() {
+      return to;
+    }
+
+    @Override
     public PeerInfo getPeerInfo() {
       return new PeerInfo(
-          5,
-          "mock-network-client",
-          capabilities,
-          to.getEndpoint().getTcpPort().getAsInt(),
-          to.getId());
+          5, "mock-network-client", capabilities, to.getEnodeURL().getListeningPort(), to.getId());
     }
 
     @Override

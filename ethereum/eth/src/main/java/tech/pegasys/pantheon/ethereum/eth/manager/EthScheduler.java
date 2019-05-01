@@ -104,11 +104,11 @@ public class EthScheduler {
   }
 
   public void scheduleSyncWorkerTask(final Runnable command) {
-    syncWorkerExecutor.submit(command);
+    syncWorkerExecutor.execute(command);
   }
 
   public void scheduleTxWorkerTask(final Runnable command) {
-    txWorkerExecutor.submit(command);
+    txWorkerExecutor.execute(command);
   }
 
   public <T> CompletableFuture<T> scheduleServiceTask(final EthTask<T> task) {
@@ -240,10 +240,6 @@ public class EthScheduler {
     final CompletableFuture<T> promise = new CompletableFuture<>();
     failAfterTimeout(promise, timeout);
     return promise;
-  }
-
-  public <T> void failAfterTimeout(final CompletableFuture<T> promise) {
-    failAfterTimeout(promise, defaultTimeout);
   }
 
   public <T> void failAfterTimeout(final CompletableFuture<T> promise, final Duration timeout) {

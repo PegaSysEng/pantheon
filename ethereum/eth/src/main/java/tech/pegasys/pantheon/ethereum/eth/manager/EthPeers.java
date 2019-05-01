@@ -111,8 +111,8 @@ public class EthPeers {
     connectCallbacks.unsubscribe(id);
   }
 
-  public long subscribeDisconnect(final DisconnectCallback callback) {
-    return disconnectCallbacks.subscribe(callback);
+  public void subscribeDisconnect(final DisconnectCallback callback) {
+    disconnectCallbacks.subscribe(callback);
   }
 
   public int peerCount() {

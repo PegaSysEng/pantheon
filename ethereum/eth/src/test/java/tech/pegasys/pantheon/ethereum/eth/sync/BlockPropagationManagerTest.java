@@ -582,10 +582,7 @@ public class BlockPropagationManagerTest {
         .thenReturn(new CompletableFuture<>());
     final EthContext ethContext =
         new EthContext(
-            "eth",
-            new EthPeers("eth", TestClock.fixed(), metricsSystem),
-            new EthMessages(),
-            ethScheduler);
+            new EthPeers("eth", TestClock.fixed(), metricsSystem), new EthMessages(), ethScheduler);
     final BlockPropagationManager<Void> blockPropagationManager =
         new BlockPropagationManager<>(
             syncConfig,
