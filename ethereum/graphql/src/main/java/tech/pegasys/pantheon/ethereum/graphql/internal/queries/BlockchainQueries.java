@@ -478,6 +478,7 @@ public class BlockchainQueries {
    * @param toBlockNumber The block number defining the last block in the search range (inclusive).
    * @param query Constraints on required topics by topic index. For a given index if the set of
    *     topics is non-empty, the topic at this index must match one of the values in the set.
+   * @param <T> The query type
    * @return The set of logs matching the given constraints.
    */
   public <T extends BlockFilterCriteria> List<LogWithMetadata> matchingLogs(
