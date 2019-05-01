@@ -1056,7 +1056,8 @@ public final class EthProtocolManagerTest {
           TestClock.fixed(),
           PendingTransactions.MAX_PENDING_TRANSACTIONS,
           metricsSystem,
-          mock(SyncState.class));
+          mock(SyncState.class),
+          PendingTransactions.DEFAULT_TX_RETENTION_HOURS);
 
       // Send just a transaction message.
       final PeerConnection peer = setupPeer(ethManager, (cap, msg, connection) -> {});
@@ -1065,7 +1066,7 @@ public final class EthProtocolManagerTest {
       // Verify the regular message executor and scheduled executor got nothing to execute.
       verifyZeroInteractions(worker, scheduled);
       // Verify our transactions executor got something to execute.
-      verify(transactions).submit((Runnable) any());
+      verify(transactions).execute(any());
     }
   }
 }

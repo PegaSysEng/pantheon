@@ -76,8 +76,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
               .metricsSystem(noOpMetricsSystem)
               .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
-              .rocksdDbConfiguration(
-                  new RocksDbConfiguration.Builder().databaseDir(tempDir).build())
+              .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_HOURS)
+              .rocksDbConfiguration(new RocksDbConfiguration.Builder().databaseDir(tempDir).build())
               .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
               .clock(Clock.systemUTC())
               .build();
