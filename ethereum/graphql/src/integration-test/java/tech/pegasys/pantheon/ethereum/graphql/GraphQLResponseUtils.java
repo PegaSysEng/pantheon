@@ -117,10 +117,10 @@ public class GraphQLResponseUtils {
             GraphQLSuccessResponse.class);
   }
 
-  private String embedTransactions(Block block, List<Transaction> transactions) {
+  private String embedTransactions(final Block block, List<Transaction> transactions) {
     String blockString = Json.encodePrettily(block);
-    return Json.encodePrettily(block)
-        .substring(0, Json.encodePrettily(block).lastIndexOf("}") - 1)
+    return blockString
+        .substring(0, blockString.lastIndexOf("}") - 1)
         .concat(
             ", \"transactions\": ["
                 + transactions.stream().map(Json::encodePrettily).collect(Collectors.joining(","))
