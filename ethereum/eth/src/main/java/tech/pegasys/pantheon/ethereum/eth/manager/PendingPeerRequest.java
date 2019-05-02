@@ -93,8 +93,7 @@ public class PendingPeerRequest {
    * @param onError handler for when there is no peer with sufficient height or the request fails to
    *     send
    */
-  public void then(
-      final Consumer<ResponseStream> onSuccess, final Consumer<Throwable> onError) {
+  public void then(final Consumer<ResponseStream> onSuccess, final Consumer<Throwable> onError) {
     result.whenComplete(
         (result, error) -> {
           if (error != null) {

@@ -256,8 +256,7 @@ public class EthPeersTest {
   private void assertRequestFailure(
       final PendingPeerRequest pendingRequest, final Class<? extends Throwable> reason) {
     final Consumer<Throwable> errorHandler = mock(Consumer.class);
-    pendingRequest.then(
-        responseStream -> fail("Should not have performed request"), errorHandler);
+    pendingRequest.then(responseStream -> fail("Should not have performed request"), errorHandler);
 
     verify(errorHandler).accept(any(reason));
   }
