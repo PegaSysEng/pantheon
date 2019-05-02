@@ -32,11 +32,10 @@ public class FlatFileTaskCollectionTest
 
   private static final int ROLL_SIZE = 10;
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
-  private Path dataDir;
 
   @Override
   protected FlatFileTaskCollection<BytesValue> createQueue() throws IOException {
-    dataDir = folder.newFolder().toPath();
+    final Path dataDir = folder.newFolder().toPath();
     return createQueue(dataDir);
   }
 
@@ -47,21 +46,22 @@ public class FlatFileTaskCollectionTest
 
   @Test
   public void shouldRollFilesWhenSizeExceeded() throws Exception {
-    try (final FlatFileTaskCollection<BytesValue> queue = createQueue()) {
+    final Path dataDir = folder.newFolder().toPath();
+    try (final FlatFileTaskCollection<BytesValue> queue = createQueue(dataDir)) {
       final List<BytesValue> tasks = new ArrayList<>();
 
       addItem(queue, tasks, 0);
-      final File[] currentFiles = getCurrentFiles();
+      final File[] currentFiles = getCurrentFiles(dataDir);
       assertThat(currentFiles).hasSize(1);
       final File firstFile = currentFiles[0];
       int tasksInFirstFile = 1;
-      while (getCurrentFiles().length == 1) {
+      while (getCurrentFiles(dataDir).length == 1) {
         addItem(queue, tasks, tasksInFirstFile);
         tasksInFirstFile++;
       }
 
-      assertThat(getCurrentFiles()).hasSizeGreaterThan(1);
-      assertThat(getCurrentFiles()).contains(firstFile);
+      assertThat(getCurrentFiles(dataDir)).hasSizeGreaterThan(1);
+      assertThat(getCurrentFiles(dataDir)).contains(firstFile);
 
       // Add an extra item to be sure we have at least one in a later file
       addItem(queue, tasks, 123);
@@ -73,7 +73,7 @@ public class FlatFileTaskCollectionTest
       }
 
       // Fully read files should have been removed.
-      assertThat(getCurrentFiles()).doesNotContain(firstFile);
+      assertThat(getCurrentFiles(dataDir)).doesNotContain(firstFile);
 
       // Check that all tasks were read correctly.
       removedTasks.add(queue.remove().getData());
@@ -90,7 +90,7 @@ public class FlatFileTaskCollectionTest
     queue.add(BytesValue.of(value));
   }
 
-  private File[] getCurrentFiles() {
+  private File[] getCurrentFiles(final Path dataDir) {
     return dataDir
         .toFile()
         .listFiles((dir, name) -> name.startsWith(FlatFileTaskCollection.FILENAME_PREFIX));
