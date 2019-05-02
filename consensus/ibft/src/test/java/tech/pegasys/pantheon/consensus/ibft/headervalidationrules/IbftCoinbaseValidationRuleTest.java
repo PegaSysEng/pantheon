@@ -54,7 +54,7 @@ public class IbftCoinbaseValidationRuleTest {
             validators,
             committerKeyPairs);
 
-    builder.extraData(ibftExtraData.encode());
+    builder.extraData(ibftExtraData);
     return builder.buildHeader();
   }
 

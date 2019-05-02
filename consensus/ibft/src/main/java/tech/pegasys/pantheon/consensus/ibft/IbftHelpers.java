@@ -53,7 +53,7 @@ public class IbftHelpers {
 
     final BlockHeader sealedHeader =
         BlockHeaderBuilder.fromHeader(initialHeader)
-            .extraData(sealedExtraData.encode())
+            .extraData(sealedExtraData)
             .blockHashFunction(IbftBlockHashing::calculateHashOfIbftBlockOnChain)
             .buildBlockHeader();
 

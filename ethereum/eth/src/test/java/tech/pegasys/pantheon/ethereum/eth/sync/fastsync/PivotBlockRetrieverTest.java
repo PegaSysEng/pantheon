@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
@@ -166,7 +167,7 @@ public class PivotBlockRetrieverTest {
             Optional.of(
                 new BlockHeaderTestFixture()
                     .number(PIVOT_BLOCK_NUMBER)
-                    .extraData(BytesValue.of(1))
+                    .extraData(new UnparsedExtraData(BytesValue.of(1)))
                     .buildHeader()));
     return RespondingEthPeer.blockchainResponder(mockBlockchain);
   }

@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.time.Instant;
@@ -49,7 +48,7 @@ public class BlockHeaderBuilder {
 
   private long timestamp = -1L;
 
-  private BytesValue extraData;
+  private ExtraData extraData;
 
   private Hash mixHash;
 
@@ -280,7 +279,7 @@ public class BlockHeaderBuilder {
     return this;
   }
 
-  public BlockHeaderBuilder extraData(final BytesValue data) {
+  public BlockHeaderBuilder extraData(final ExtraData data) {
     checkNotNull(data);
 
     this.extraData = data;

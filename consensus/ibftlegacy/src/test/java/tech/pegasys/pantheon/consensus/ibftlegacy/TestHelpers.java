@@ -33,7 +33,7 @@ public class TestHelpers {
 
     final IbftExtraData unsignedExtraData =
         new IbftExtraData(BytesValue.wrap(new byte[32]), Collections.emptyList(), null, validators);
-    blockHeaderBuilder.extraData(unsignedExtraData.encode());
+    blockHeaderBuilder.extraData(unsignedExtraData);
 
     final Hash signingHash =
         IbftBlockHashing.calculateDataHashForProposerSeal(
@@ -48,7 +48,7 @@ public class TestHelpers {
             proposerSignature,
             unsignedExtraData.getValidators());
 
-    blockHeaderBuilder.extraData(signedExtraData.encode());
+    blockHeaderBuilder.extraData(signedExtraData);
 
     return blockHeaderBuilder.buildHeader();
   }

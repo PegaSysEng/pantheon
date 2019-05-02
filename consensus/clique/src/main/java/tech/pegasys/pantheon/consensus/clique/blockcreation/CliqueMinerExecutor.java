@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMinerExecutor;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
@@ -41,7 +42,7 @@ public class CliqueMinerExecutor extends AbstractMinerExecutor<CliqueContext, Cl
   private final Address localAddress;
   private final KeyPair nodeKeys;
   private final EpochManager epochManager;
-  private volatile BytesValue vanityData;
+  private final BytesValue vanityData;
 
   public CliqueMinerExecutor(
       final ProtocolContext<CliqueContext> protocolContext,
@@ -94,7 +95,7 @@ public class CliqueMinerExecutor extends AbstractMinerExecutor<CliqueContext, Cl
     return currentRunningMiner;
   }
 
-  public BytesValue calculateExtraData(final BlockHeader parentHeader) {
+  public ExtraData calculateExtraData(final BlockHeader parentHeader) {
     final List<Address> validators = Lists.newArrayList();
 
     final BytesValue vanityDataToInsert =
@@ -109,8 +110,6 @@ public class CliqueMinerExecutor extends AbstractMinerExecutor<CliqueContext, Cl
       validators.addAll(voteTally.getValidators());
     }
 
-    final CliqueExtraData extraData = new CliqueExtraData(vanityDataToInsert, null, validators);
-
-    return extraData.encode();
+    return new CliqueExtraData(vanityDataToInsert, null, validators);
   }
 }

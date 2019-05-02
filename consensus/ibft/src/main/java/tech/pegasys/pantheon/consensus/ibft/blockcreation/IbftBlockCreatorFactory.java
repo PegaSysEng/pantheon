@@ -84,7 +84,7 @@ public class IbftBlockCreatorFactory {
     return minTransactionGasPrice;
   }
 
-  public BytesValue createExtraData(final int round, final BlockHeader parentHeader) {
+  public IbftExtraData createExtraData(final int round, final BlockHeader parentHeader) {
     final VoteTally voteTally =
         protocolContext
             .getConsensusState()
@@ -96,20 +96,15 @@ public class IbftBlockCreatorFactory {
 
     final List<Address> validators = new ArrayList<>(voteTally.getValidators());
 
-    final IbftExtraData extraData =
-        new IbftExtraData(
-            ConsensusHelpers.zeroLeftPad(vanityData, IbftExtraData.EXTRA_VANITY_LENGTH),
-            Collections.emptyList(),
-            toVote(proposal),
-            round,
-            validators);
-
-    return extraData.encode();
+    return new IbftExtraData(
+        ConsensusHelpers.zeroLeftPad(vanityData, IbftExtraData.EXTRA_VANITY_LENGTH),
+        Collections.emptyList(),
+        toVote(proposal),
+        round,
+        validators);
   }
 
   private static Optional<Vote> toVote(final Optional<ValidatorVote> input) {
-    return input
-        .map(v -> Optional.of(new Vote(v.getRecipient(), v.getVotePolarity())))
-        .orElse(Optional.empty());
+    return input.map(v -> new Vote(v.getRecipient(), v.getVotePolarity()));
   }
 }

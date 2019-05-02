@@ -67,7 +67,7 @@ public class CliqueExtraDataValidationRuleTest {
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     final BlockHeader parent = headerBuilder.number(1).buildHeader();
-    final BlockHeader child = headerBuilder.number(2).extraData(extraData.encode()).buildHeader();
+    final BlockHeader child = headerBuilder.number(2).extraData(extraData).buildHeader();
 
     final CliqueExtraDataValidationRule rule =
         new CliqueExtraDataValidationRule(new EpochManager(10));

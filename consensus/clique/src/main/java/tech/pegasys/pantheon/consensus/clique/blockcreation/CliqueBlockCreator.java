@@ -94,7 +94,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
         constructSignedExtraData(builderIncludingProposedVotes.buildBlockHeader());
 
     // Replace the extraData in the BlockHeaderBuilder, and return header.
-    return builderIncludingProposedVotes.extraData(sealedExtraData.encode()).buildBlockHeader();
+    return builderIncludingProposedVotes.extraData(sealedExtraData).buildBlockHeader();
   }
 
   private Optional<ValidatorVote> determineCliqueVote(

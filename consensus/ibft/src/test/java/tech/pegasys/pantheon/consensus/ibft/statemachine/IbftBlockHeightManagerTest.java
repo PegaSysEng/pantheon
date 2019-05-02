@@ -108,7 +108,7 @@ public class IbftBlockHeightManagerTest {
         new IbftExtraData(
             BytesValue.wrap(new byte[32]), emptyList(), Optional.empty(), 0, validators);
 
-    headerTestFixture.extraData(extraData.encode());
+    headerTestFixture.extraData(extraData);
     final BlockHeader header = headerTestFixture.buildHeader();
     createdBlock = new Block(header, new BlockBody(emptyList(), emptyList()));
   }

@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
@@ -164,7 +165,7 @@ public class BlockchainReferenceTestCaseSpec {
           Long.decode(gasLimit), // gasLimit
           Long.decode(gasUsed), // gasUsed
           Long.decode(timestamp), // timestamp
-          BytesValue.fromHexString(extraData), // extraData
+          new UnparsedExtraData(BytesValue.fromHexString(extraData)), // extraData
           Hash.fromHexString(mixHash), // mixHash
           BytesValue.fromHexString(nonce).getLong(0),
           header -> Hash.fromHexString(hash)); // nonce

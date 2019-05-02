@@ -101,7 +101,7 @@ public class IbftRoundTest {
     proposedExtraData =
         new IbftExtraData(BytesValue.wrap(new byte[32]), emptyList(), empty(), 0, emptyList());
     final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
-    headerTestFixture.extraData(proposedExtraData.encode());
+    headerTestFixture.extraData(proposedExtraData);
     headerTestFixture.number(1);
 
     final BlockHeader header = headerTestFixture.buildHeader();

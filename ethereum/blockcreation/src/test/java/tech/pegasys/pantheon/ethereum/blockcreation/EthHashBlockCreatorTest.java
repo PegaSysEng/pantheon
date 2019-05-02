@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolver;
@@ -71,7 +72,7 @@ public class EthHashBlockCreatorTest {
     final EthHashBlockCreator blockCreator =
         new EthHashBlockCreator(
             BLOCK_1_COINBASE,
-            parent -> BLOCK_1_EXTRA_DATA,
+            parent -> new UnparsedExtraData(BLOCK_1_EXTRA_DATA),
             pendingTransactions,
             executionContextTestFixture.getProtocolContext(),
             executionContextTestFixture.getProtocolSchedule(),

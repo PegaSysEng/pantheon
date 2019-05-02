@@ -15,13 +15,13 @@ package tech.pegasys.pantheon.consensus.ibft;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
+import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class IbftBlockHashing {
@@ -77,7 +77,7 @@ public class IbftBlockHashing {
   }
 
   private static BytesValue serializeHeader(
-      final BlockHeader header, final Supplier<BytesValue> extraDataSerializer) {
+      final BlockHeader header, final ExtraData extraDataSerializer) {
 
     // create a block header which is a copy of the header supplied as parameter except of the
     // extraData field
@@ -88,7 +88,7 @@ public class IbftBlockHashing {
     if (header.getNumber() == 0) {
       builder.extraData(header.getExtraData());
     } else {
-      builder.extraData(extraDataSerializer.get());
+      builder.extraData(extraDataSerializer);
     }
 
     final BytesValueRLPOutput out = new BytesValueRLPOutput();

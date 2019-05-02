@@ -92,7 +92,7 @@ public final class ProofOfWorkValidationRule implements DetachedBlockHeaderValid
     out.writeLongScalar(header.getGasLimit());
     out.writeLongScalar(header.getGasUsed());
     out.writeLongScalar(header.getTimestamp());
-    out.writeBytesValue(header.getExtraData());
+    out.writeBytesValue(header.getExtraData().toBytesValue());
     out.endList();
 
     return Hash.hash(out.encoded());

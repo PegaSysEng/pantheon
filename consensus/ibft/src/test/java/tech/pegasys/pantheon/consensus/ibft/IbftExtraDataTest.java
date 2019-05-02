@@ -89,7 +89,7 @@ public class IbftExtraDataTest {
 
     final BytesValue bufferToInject = encoder.encoded();
 
-    final IbftExtraData extraData = IbftExtraData.decode(bufferToInject);
+    final IbftExtraData extraData = IbftExtraData.decodeRaw(bufferToInject);
 
     assertThat(extraData.getVanityData()).isEqualTo(vanity_data);
     assertThat(extraData.getRound()).isEqualTo(round);
@@ -98,7 +98,8 @@ public class IbftExtraDataTest {
   }
 
   /**
-   * This test specifically verifies that {@link IbftExtraData#decode(BytesValue)} uses {@link
+   * This test specifically verifies that {@link
+   * IbftExtraData#decode(tech.pegasys.pantheon.ethereum.core.ExtraData)} uses {@link
    * RLPInput#readInt()} rather than {@link RLPInput#readIntScalar()} to decode the round number
    */
   @Test
@@ -129,7 +130,8 @@ public class IbftExtraDataTest {
 
     final BytesValue bufferToInject = encoder.encoded();
 
-    assertThatThrownBy(() -> IbftExtraData.decode(bufferToInject)).isInstanceOf(RLPException.class);
+    assertThatThrownBy(() -> IbftExtraData.decodeRaw(bufferToInject))
+        .isInstanceOf(RLPException.class);
   }
 
   @Test
@@ -157,7 +159,7 @@ public class IbftExtraDataTest {
 
     final BytesValue bufferToInject = encoder.encoded();
 
-    final IbftExtraData extraData = IbftExtraData.decode(bufferToInject);
+    final IbftExtraData extraData = IbftExtraData.decodeRaw(bufferToInject);
 
     assertThat(extraData.getVanityData()).isEqualTo(vanity_data);
     assertThat(extraData.getVote().isPresent()).isEqualTo(false);
@@ -180,7 +182,7 @@ public class IbftExtraDataTest {
     IbftExtraData expectedExtraData =
         new IbftExtraData(vanity_data, committerSeals, vote, round, validators);
 
-    IbftExtraData actualExtraData = IbftExtraData.decode(expectedExtraData.encode());
+    IbftExtraData actualExtraData = IbftExtraData.decodeRaw(expectedExtraData.encode());
 
     assertThat(actualExtraData).isEqualToComparingFieldByField(expectedExtraData);
   }
@@ -211,7 +213,7 @@ public class IbftExtraDataTest {
 
     final BytesValue bufferToInject = encoder.encoded();
 
-    final IbftExtraData extraData = IbftExtraData.decode(bufferToInject);
+    final IbftExtraData extraData = IbftExtraData.decodeRaw(bufferToInject);
 
     assertThat(extraData.getVanityData()).isEqualTo(vanity_data);
     assertThat(extraData.getRound()).isEqualTo(round);
@@ -233,7 +235,7 @@ public class IbftExtraDataTest {
     IbftExtraData expectedExtraData =
         new IbftExtraData(vanity_data, committerSeals, vote, round, validators);
 
-    IbftExtraData actualExtraData = IbftExtraData.decode(expectedExtraData.encode());
+    IbftExtraData actualExtraData = IbftExtraData.decodeRaw(expectedExtraData.encode());
 
     assertThat(actualExtraData).isEqualToComparingFieldByField(expectedExtraData);
   }
@@ -271,7 +273,7 @@ public class IbftExtraDataTest {
 
     final BytesValue bufferToInject = encoder.encoded();
 
-    final IbftExtraData extraData = IbftExtraData.decode(bufferToInject);
+    final IbftExtraData extraData = IbftExtraData.decodeRaw(bufferToInject);
 
     assertThat(extraData.getVanityData()).isEqualTo(vanity_data);
     assertThat(extraData.getVote())
@@ -299,7 +301,7 @@ public class IbftExtraDataTest {
     IbftExtraData expectedExtraData =
         new IbftExtraData(vanity_data, committerSeals, vote, round, validators);
 
-    IbftExtraData actualExtraData = IbftExtraData.decode(expectedExtraData.encode());
+    IbftExtraData actualExtraData = IbftExtraData.decodeRaw(expectedExtraData.encode());
 
     assertThat(actualExtraData).isEqualToComparingFieldByField(expectedExtraData);
   }
@@ -317,7 +319,7 @@ public class IbftExtraDataTest {
     final IbftExtraData expectedExtraData = DECODED_EXTRA_DATA_FOR_RAW_HEX_ENCODING_STRING;
 
     BytesValue rawDecoding = BytesValue.fromHexString(RAW_HEX_ENCODING_STRING);
-    IbftExtraData actualExtraData = IbftExtraData.decode(rawDecoding);
+    IbftExtraData actualExtraData = IbftExtraData.decodeRaw(rawDecoding);
 
     assertThat(actualExtraData).isEqualToComparingFieldByField(expectedExtraData);
   }
@@ -418,7 +420,8 @@ public class IbftExtraDataTest {
 
     final BytesValue bufferToInject = encoder.encoded();
 
-    assertThatThrownBy(() -> IbftExtraData.decode(bufferToInject)).isInstanceOf(RLPException.class);
+    assertThatThrownBy(() -> IbftExtraData.decodeRaw(bufferToInject))
+        .isInstanceOf(RLPException.class);
   }
 
   @Test
@@ -455,7 +458,8 @@ public class IbftExtraDataTest {
 
     final BytesValue bufferToInject = encoder.encoded();
 
-    assertThatThrownBy(() -> IbftExtraData.decode(bufferToInject)).isInstanceOf(RLPException.class);
+    assertThatThrownBy(() -> IbftExtraData.decodeRaw(bufferToInject))
+        .isInstanceOf(RLPException.class);
   }
 
   private static byte[] createNonEmptyVanityData() {

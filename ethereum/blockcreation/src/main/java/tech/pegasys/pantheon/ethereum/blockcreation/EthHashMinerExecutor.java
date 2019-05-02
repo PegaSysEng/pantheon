@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
+import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolver;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHasher;
@@ -58,7 +59,7 @@ public class EthHashMinerExecutor extends AbstractMinerExecutor<Void, EthHashBlo
       final EthHashBlockCreator blockCreator =
           new EthHashBlockCreator(
               coinbase.get(),
-              parent -> extraData,
+              parent -> new UnparsedExtraData(extraData),
               pendingTransactions,
               protocolContext,
               protocolSchedule,

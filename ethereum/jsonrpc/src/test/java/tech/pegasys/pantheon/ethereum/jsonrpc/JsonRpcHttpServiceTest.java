@@ -1773,7 +1773,7 @@ public class JsonRpcHttpServiceTest {
     assertThat(UInt256.fromHexString(result.getString("difficulty")))
         .isEqualTo(header.getDifficulty());
     assertThat(BytesValue.fromHexString(result.getString("extraData")))
-        .isEqualTo(header.getExtraData());
+        .isEqualTo(header.getExtraData().toBytesValue());
     assertThat(hexStringToInt(result.getString("size"))).isEqualTo(block.calculateSize());
     assertThat(Long.decode(result.getString("gasLimit"))).isEqualTo(header.getGasLimit());
     assertThat(Long.decode(result.getString("gasUsed"))).isEqualTo(header.getGasUsed());

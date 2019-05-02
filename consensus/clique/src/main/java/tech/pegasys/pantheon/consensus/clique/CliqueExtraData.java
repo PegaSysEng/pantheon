@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
@@ -29,7 +30,7 @@ import com.google.common.collect.Lists;
  * Represents the data structure stored in the extraData field of the BlockHeader used when
  * operating under an Clique consensus mechanism.
  */
-public class CliqueExtraData {
+public class CliqueExtraData implements ExtraData {
 
   public static final int EXTRA_VANITY_LENGTH = 32;
 
@@ -49,7 +50,15 @@ public class CliqueExtraData {
     this.validators = validators;
   }
 
-  public static CliqueExtraData decode(final BytesValue input) {
+  public static CliqueExtraData decode(final ExtraData inputExtraData) {
+    if (inputExtraData instanceof CliqueExtraData) {
+      return (CliqueExtraData) inputExtraData;
+    }
+    final BytesValue input = inputExtraData.toBytesValue();
+    return decodeRaw(input);
+  }
+
+  public static CliqueExtraData decodeRaw(final BytesValue input) {
     if (input.size() < EXTRA_VANITY_LENGTH + Signature.BYTES_REQUIRED) {
       throw new IllegalArgumentException(
           "Invalid BytesValue supplied - too short to produce a valid Clique Extra Data object.");
@@ -85,7 +94,8 @@ public class CliqueExtraData {
     return result;
   }
 
-  public BytesValue encode() {
+  @Override
+  public BytesValue toBytesValue() {
     final BytesValue validatorData = BytesValues.concatenate(validators.toArray(new Address[0]));
     return BytesValues.concatenate(
         vanityData,
@@ -110,7 +120,7 @@ public class CliqueExtraData {
   public static String createGenesisExtraDataString(final List<Address> validators) {
     final CliqueExtraData cliqueExtraData =
         new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validators);
-    final BytesValue output = cliqueExtraData.encode();
+    final BytesValue output = cliqueExtraData.toBytesValue();
     return output.toString();
   }
 }

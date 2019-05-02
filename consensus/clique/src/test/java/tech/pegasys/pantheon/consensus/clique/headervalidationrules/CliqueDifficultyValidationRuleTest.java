@@ -68,7 +68,7 @@ public class CliqueDifficultyValidationRuleTest {
 
     final CliqueExtraData unsignedExtraData =
         new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validatorList);
-    blockHeaderBuilder.extraData(unsignedExtraData.encode());
+    blockHeaderBuilder.extraData(unsignedExtraData);
 
     final Hash signingHash =
         CliqueBlockHashing.calculateDataHashForProposerSeal(
@@ -82,7 +82,7 @@ public class CliqueDifficultyValidationRuleTest {
             proposerSignature,
             unsignedExtraData.getValidators());
 
-    blockHeaderBuilder.extraData(signedExtraData.encode());
+    blockHeaderBuilder.extraData(signedExtraData);
 
     return blockHeaderBuilder.buildHeader();
   }

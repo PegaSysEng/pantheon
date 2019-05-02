@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 /** A block header capable of being sealed. */
@@ -30,7 +29,7 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
 
   protected final long gasUsed;
 
-  protected final BytesValue extraData;
+  protected final ExtraData extraData;
 
   protected SealableBlockHeader(
       final Hash parentHash,
@@ -45,7 +44,7 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
       final long gasLimit,
       final long gasUsed,
       final long timestamp,
-      final BytesValue extraData) {
+      final ExtraData extraData) {
     super(parentHash, coinbase, difficulty, number, gasLimit, timestamp);
     this.ommersHash = ommersHash;
     this.stateRoot = stateRoot;
@@ -115,7 +114,7 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
    *
    * @return the block extra data field
    */
-  public BytesValue getExtraData() {
+  public ExtraData getExtraData() {
     return extraData;
   }
 }

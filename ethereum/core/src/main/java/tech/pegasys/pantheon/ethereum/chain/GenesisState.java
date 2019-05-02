@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
+import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -143,7 +144,7 @@ public final class GenesisState {
         .gasLimit(genesis.getGasLimit())
         .gasUsed(0L)
         .timestamp(genesis.getTimestamp())
-        .extraData(parseExtraData(genesis))
+        .extraData(new UnparsedExtraData(parseExtraData(genesis)))
         .mixHash(parseMixHash(genesis))
         .nonce(parseNonce(genesis))
         .blockHashFunction(ScheduleBasedBlockHashFunction.create(protocolSchedule))

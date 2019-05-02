@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Objects;
@@ -46,7 +45,7 @@ public class BlockHeader extends SealableBlockHeader {
       final long gasLimit,
       final long gasUsed,
       final long timestamp,
-      final BytesValue extraData,
+      final ExtraData extraData,
       final Hash mixHash,
       final long nonce,
       final BlockHashFunction hashFunction) {
@@ -119,7 +118,7 @@ public class BlockHeader extends SealableBlockHeader {
     out.writeLongScalar(gasLimit);
     out.writeLongScalar(gasUsed);
     out.writeLongScalar(timestamp);
-    out.writeBytesValue(extraData);
+    out.writeBytesValue(extraData.toBytesValue());
     out.writeBytesValue(mixHash);
     out.writeLong(nonce);
 
@@ -142,7 +141,7 @@ public class BlockHeader extends SealableBlockHeader {
             input.readLongScalar(),
             input.readLongScalar(),
             input.readLongScalar(),
-            input.readBytesValue(),
+            new UnparsedExtraData(input.readBytesValue()),
             Hash.wrap(input.readBytes32()),
             input.readLong(),
             hashFunction);

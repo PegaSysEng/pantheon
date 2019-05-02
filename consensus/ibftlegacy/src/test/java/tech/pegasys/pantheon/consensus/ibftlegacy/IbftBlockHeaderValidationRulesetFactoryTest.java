@@ -128,7 +128,7 @@ public class IbftBlockHeaderValidationRulesetFactoryTest {
             Signature.create(BigInteger.ONE, BigInteger.ONE, (byte) 0),
             validators);
 
-    builder.extraData(initialIbftExtraData.encode());
+    builder.extraData(initialIbftExtraData);
     final BlockHeader parentHeader = builder.buildHeader();
     final Hash proposerSealHash =
         IbftBlockHashing.calculateDataHashForProposerSeal(parentHeader, initialIbftExtraData);
@@ -154,7 +154,7 @@ public class IbftBlockHeaderValidationRulesetFactoryTest {
             proposerSignature,
             validators);
 
-    builder.extraData(sealedData.encode());
+    builder.extraData(sealedData);
     return builder.buildHeader();
   }
 }

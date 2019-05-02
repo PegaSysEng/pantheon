@@ -225,7 +225,7 @@ public class TestContextBuilder {
             Optional.empty(),
             0,
             validators);
-    headerTestFixture.extraData(extraData.encode());
+    headerTestFixture.extraData(extraData);
     headerTestFixture.mixHash(IbftHelpers.EXPECTED_MIX_HASH);
     headerTestFixture.difficulty(UInt256.ONE);
     headerTestFixture.ommersHash(Hash.EMPTY_LIST_HASH);

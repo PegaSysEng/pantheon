@@ -85,7 +85,7 @@ public class IbftBlockHashingTest {
     IbftExtraData extraDataWithCommitSeals =
         new IbftExtraData(VANITY_DATA, commitSeals, VOTE, ROUND, VALIDATORS);
 
-    builder.extraData(extraDataWithCommitSeals.encode());
+    builder.extraData(extraDataWithCommitSeals);
     BlockHeader actualHeader = builder.buildBlockHeader();
     assertThat(actualHeader).isEqualTo(HEADER_TO_BE_HASHED);
   }
@@ -143,7 +143,7 @@ public class IbftBlockHashingTest {
 
     builder.extraData(
         new IbftExtraData(VANITY_DATA, emptyList(), VOTE, ROUND, VALIDATORS)
-            .encodeWithoutCommitSeals());
+            ::encodeWithoutCommitSeals);
 
     BytesValueRLPOutput rlpForHeaderFroCommittersSigning = new BytesValueRLPOutput();
     builder.buildBlockHeader().writeTo(rlpForHeaderFroCommittersSigning);
@@ -158,7 +158,7 @@ public class IbftBlockHashingTest {
     IbftExtraData extraDataWithCommitSeals =
         new IbftExtraData(VANITY_DATA, commitSeals, VOTE, ROUND, VALIDATORS);
 
-    builder.extraData(extraDataWithCommitSeals.encode());
+    builder.extraData(extraDataWithCommitSeals);
     return builder.buildBlockHeader();
   }
 
@@ -167,7 +167,7 @@ public class IbftBlockHashingTest {
 
     builder.extraData(
         new IbftExtraData(VANITY_DATA, emptyList(), VOTE, 0, VALIDATORS)
-            .encodeWithoutCommitSealsAndRoundNumber());
+            ::encodeWithoutCommitSealsAndRoundNumber);
 
     BytesValueRLPOutput rlpOutput = new BytesValueRLPOutput();
     builder.buildBlockHeader().writeTo(rlpOutput);

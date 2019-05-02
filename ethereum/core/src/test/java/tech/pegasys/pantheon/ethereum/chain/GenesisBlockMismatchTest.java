@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
+import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -63,7 +64,7 @@ public class GenesisBlockMismatchTest {
             .gasLimit(1L)
             .gasUsed(1L)
             .timestamp(0L)
-            .extraData(Bytes32.wrap(bytes(Bytes32.SIZE)))
+            .extraData(new UnparsedExtraData(Bytes32.wrap(bytes(Bytes32.SIZE))))
             .mixHash(Hash.ZERO)
             .nonce(0L)
             .blockHashFunction(MainnetBlockHashFunction::createHash)
@@ -91,7 +92,7 @@ public class GenesisBlockMismatchTest {
             .gasLimit(1L)
             .gasUsed(1L)
             .timestamp(0L)
-            .extraData(Bytes32.wrap(bytes(Bytes32.SIZE)))
+            .extraData(new UnparsedExtraData(Bytes32.wrap(bytes(Bytes32.SIZE))))
             .mixHash(Hash.ZERO)
             .nonce(0L)
             .blockHashFunction(MainnetBlockHashFunction::createHash)

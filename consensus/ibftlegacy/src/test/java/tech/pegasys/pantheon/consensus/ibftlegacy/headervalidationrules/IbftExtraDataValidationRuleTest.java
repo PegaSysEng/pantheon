@@ -54,7 +54,7 @@ public class IbftExtraDataValidationRuleTest {
             emptyList(),
             null,
             validators);
-    builder.extraData(initialIbftExtraData.encode());
+    builder.extraData(initialIbftExtraData);
     final BlockHeader header = builder.buildHeader();
 
     // Hash the header (ignoring committer and proposer seals), and create signature
@@ -71,7 +71,7 @@ public class IbftExtraDataValidationRuleTest {
             validators);
 
     // insert the signed ExtraData into the block
-    builder.extraData(proposedData.encode());
+    builder.extraData(proposedData);
     return builder.buildHeader();
   }
 
@@ -114,7 +114,7 @@ public class IbftExtraDataValidationRuleTest {
     // Insert an extraData block with committer seals.
     final IbftExtraData commitedExtraData =
         createExtraDataWithCommitSeals(header, singletonList(proposerKeyPair));
-    builder.extraData(commitedExtraData.encode());
+    builder.extraData(commitedExtraData);
     header = builder.buildHeader();
 
     assertThat(extraDataValidationRule.validate(header, null, context)).isTrue();
@@ -167,7 +167,7 @@ public class IbftExtraDataValidationRuleTest {
     // Insert an extraData block with committer seals.
     final IbftExtraData commitedExtraData =
         createExtraDataWithCommitSeals(header, singletonList(proposerKeyPair));
-    builder.extraData(commitedExtraData.encode());
+    builder.extraData(commitedExtraData);
     header = builder.buildHeader();
 
     assertThat(extraDataValidationRule.validate(header, null, context)).isFalse();
@@ -196,7 +196,7 @@ public class IbftExtraDataValidationRuleTest {
     // Insert an extraData block with committer seals.
     final IbftExtraData commitedExtraData =
         createExtraDataWithCommitSeals(header, singletonList(proposerKeyPair));
-    builder.extraData(commitedExtraData.encode());
+    builder.extraData(commitedExtraData);
     header = builder.buildHeader();
 
     assertThat(extraDataValidationRule.validate(header, null, context)).isFalse();
@@ -227,7 +227,7 @@ public class IbftExtraDataValidationRuleTest {
     // Insert an extraData block with committer seals.
     final IbftExtraData commitedExtraData =
         createExtraDataWithCommitSeals(header, singletonList(proposerKeyPair));
-    builder.extraData(commitedExtraData.encode());
+    builder.extraData(commitedExtraData);
     header = builder.buildHeader();
 
     assertThat(extraDataValidationRule.validate(header, null, context)).isFalse();
@@ -249,7 +249,7 @@ public class IbftExtraDataValidationRuleTest {
     final KeyPair nonValidatorKeyPair = KeyPair.generate();
     final IbftExtraData commitedExtraData =
         createExtraDataWithCommitSeals(header, singletonList(nonValidatorKeyPair));
-    builder.extraData(commitedExtraData.encode());
+    builder.extraData(commitedExtraData);
     header = builder.buildHeader();
 
     final ProtocolContext<IbftContext> context =
@@ -314,7 +314,7 @@ public class IbftExtraDataValidationRuleTest {
     final IbftExtraData commitedExtraData =
         createExtraDataWithCommitSeals(header, committerKeys.subList(0, committerCount));
 
-    builder.extraData(commitedExtraData.encode());
+    builder.extraData(commitedExtraData);
     header = builder.buildHeader();
 
     final ProtocolContext<IbftContext> context =

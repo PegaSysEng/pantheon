@@ -43,12 +43,12 @@ public final class MainnetBlockHeaderValidator {
     return createValidator(difficultyCalculator)
         .addRule(
             new ConstantFieldValidationRule<>(
-                "extraData", BlockHeader::getExtraData, DAO_EXTRA_DATA))
+                "extraData", header -> header.getExtraData().toBytesValue(), DAO_EXTRA_DATA))
         .build();
   }
 
   public static boolean validateHeaderForDaoFork(final BlockHeader header) {
-    return header.getExtraData().equals(DAO_EXTRA_DATA);
+    return header.getExtraData().toBytesValue().equals(DAO_EXTRA_DATA);
   }
 
   static BlockHeaderValidator<Void> createOmmerValidator(

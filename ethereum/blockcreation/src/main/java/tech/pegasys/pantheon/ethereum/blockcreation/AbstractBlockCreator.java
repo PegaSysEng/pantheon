@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
+import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
@@ -31,7 +32,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.DifficultyCalculator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.math.BigInteger;
@@ -48,7 +48,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
 
   public interface ExtraDataCalculator {
 
-    BytesValue get(final BlockHeader parent);
+    ExtraData get(final BlockHeader parent);
   }
 
   private static final Logger LOG = LogManager.getLogger();
