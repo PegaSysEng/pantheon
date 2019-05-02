@@ -28,7 +28,7 @@ public class BlockHeader extends SealableBlockHeader {
   private final Hash mixHash;
 
   private final long nonce;
-  private final BlockHashFunction hashFunction;
+  private final BlockHeaderUtils blockHeaderUtils;
 
   private Hash hash;
 
@@ -48,7 +48,7 @@ public class BlockHeader extends SealableBlockHeader {
       final ExtraData extraData,
       final Hash mixHash,
       final long nonce,
-      final BlockHashFunction hashFunction) {
+      final BlockHeaderUtils blockHeaderUtils) {
     super(
         parentHash,
         ommersHash,
@@ -65,7 +65,7 @@ public class BlockHeader extends SealableBlockHeader {
         extraData);
     this.mixHash = mixHash;
     this.nonce = nonce;
-    this.hashFunction = hashFunction;
+    this.blockHeaderUtils = blockHeaderUtils;
   }
 
   /**
@@ -93,7 +93,7 @@ public class BlockHeader extends SealableBlockHeader {
    */
   public Hash getHash() {
     if (hash == null) {
-      hash = hashFunction.apply(this);
+      hash = blockHeaderUtils.hash(this);
     }
     return hash;
   }
@@ -125,28 +125,44 @@ public class BlockHeader extends SealableBlockHeader {
     out.endList();
   }
 
-  public static BlockHeader readFrom(final RLPInput input, final BlockHashFunction hashFunction) {
+  public static BlockHeader readFrom(
+      final RLPInput input, final BlockHeaderUtils blockHeaderUtils) {
     input.enterList();
-    final BlockHeader header =
-        new BlockHeader(
-            Hash.wrap(input.readBytes32()),
-            Hash.wrap(input.readBytes32()),
-            Address.readFrom(input),
-            Hash.wrap(input.readBytes32()),
-            Hash.wrap(input.readBytes32()),
-            Hash.wrap(input.readBytes32()),
-            LogsBloomFilter.readFrom(input),
-            input.readUInt256Scalar(),
-            input.readLongScalar(),
-            input.readLongScalar(),
-            input.readLongScalar(),
-            input.readLongScalar(),
-            new UnparsedExtraData(input.readBytesValue()),
-            Hash.wrap(input.readBytes32()),
-            input.readLong(),
-            hashFunction);
+    final Hash parentHash = Hash.wrap(input.readBytes32());
+    final Hash ommersHash = Hash.wrap(input.readBytes32());
+    final Address coinbase = Address.readFrom(input);
+    final Hash stateRoot = Hash.wrap(input.readBytes32());
+    final Hash transactionsRoot = Hash.wrap(input.readBytes32());
+    final Hash receiptsRoot = Hash.wrap(input.readBytes32());
+    final LogsBloomFilter logsBloom = LogsBloomFilter.readFrom(input);
+    final UInt256 difficulty = input.readUInt256Scalar();
+    final long blockNumber = input.readLongScalar();
+    final long gasLimit = input.readLongScalar();
+    final long gasUsed = input.readLongScalar();
+    final long timestamp = input.readLongScalar();
+    final ExtraData extraData =
+        blockHeaderUtils.parseExtraData(blockNumber, input.readBytesValue());
+    final Hash mixHash = Hash.wrap(input.readBytes32());
+    final long nonce = input.readLong();
     input.leaveList();
-    return header;
+
+    return new BlockHeader(
+        parentHash,
+        ommersHash,
+        coinbase,
+        stateRoot,
+        transactionsRoot,
+        receiptsRoot,
+        logsBloom,
+        difficulty,
+        blockNumber,
+        gasLimit,
+        gasUsed,
+        timestamp,
+        extraData,
+        mixHash,
+        nonce,
+        blockHeaderUtils);
   }
 
   @Override

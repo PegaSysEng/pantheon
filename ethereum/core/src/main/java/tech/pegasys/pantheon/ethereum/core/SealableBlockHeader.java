@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 
 /** A block header capable of being sealed. */
 public class SealableBlockHeader extends ProcessableBlockHeader {
-
   protected final Hash ommersHash;
 
   protected final Hash stateRoot;

@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public class ProtocolSpecBuilder<T> {
   private Supplier<GasCalculator> gasCalculatorBuilder;
   private Wei blockReward;
-  private BlockHashFunction blockHashFunction;
+  private BlockHeaderUtils blockHeaderUtils;
   private TransactionReceiptFactory transactionReceiptFactory;
   private DifficultyCalculator<T> difficultyCalculator;
   private Function<GasCalculator, EVM> evmBuilder;
@@ -66,8 +66,8 @@ public class ProtocolSpecBuilder<T> {
     return this;
   }
 
-  public ProtocolSpecBuilder<T> blockHashFunction(final BlockHashFunction blockHashFunction) {
-    this.blockHashFunction = blockHashFunction;
+  public ProtocolSpecBuilder<T> blockHeaderUtils(final BlockHeaderUtils blockHeaderUtils) {
+    this.blockHeaderUtils = blockHeaderUtils;
     return this;
   }
 
@@ -219,7 +219,7 @@ public class ProtocolSpecBuilder<T> {
         .blockProcessorBuilder(blockProcessorBuilder)
         .blockValidatorBuilder(blockValidatorBuilder)
         .blockImporterBuilder(blockImporterBuilder)
-        .blockHashFunction(blockHashFunction)
+        .blockHeaderUtils(blockHeaderUtils)
         .blockReward(blockReward)
         .difficultyCalculator(difficultyCalculator)
         .transactionReceiptFactory(transactionReceiptFactory)
@@ -242,7 +242,7 @@ public class ProtocolSpecBuilder<T> {
     checkNotNull(blockProcessorBuilder, "Missing block processor");
     checkNotNull(blockImporterBuilder, "Missing block importer");
     checkNotNull(blockValidatorBuilder, "Missing block validator");
-    checkNotNull(blockHashFunction, "Missing block hash function");
+    checkNotNull(blockHeaderUtils, "Missing block hash function");
     checkNotNull(blockReward, "Missing block reward");
     checkNotNull(difficultyCalculator, "Missing difficulty calculator");
     checkNotNull(transactionReceiptFactory, "Missing transaction receipt factory");
@@ -305,7 +305,7 @@ public class ProtocolSpecBuilder<T> {
         blockProcessor,
         blockImporter,
         blockValidator,
-        blockHashFunction,
+        blockHeaderUtils,
         transactionReceiptFactory,
         difficultyCalculator,
         blockReward,

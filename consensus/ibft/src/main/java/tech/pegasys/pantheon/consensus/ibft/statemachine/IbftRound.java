@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderUtils;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -108,7 +109,7 @@ public class IbftRound {
           IbftBlockInterface.replaceRoundInBlock(
               bestBlockFromRoundChange.get(),
               getRoundIdentifier().getRoundNumber(),
-              IbftBlockHashing::calculateDataHashForCommittedSeal);
+              IbftBlockHeaderUtils.forCommittedSeal());
     }
 
     updateStateWithProposalAndTransmit(blockToPublish, Optional.of(roundChangeCertificate));

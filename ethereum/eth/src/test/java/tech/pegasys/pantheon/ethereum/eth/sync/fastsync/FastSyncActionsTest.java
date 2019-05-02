@@ -22,9 +22,9 @@ import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState.EMP
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -107,7 +107,7 @@ public class FastSyncActionsTest {
   @Test
   public void selectPivotBlockShouldUseExistingPivotBlockIfAvailable() {
     final BlockHeader pivotHeader = new BlockHeaderTestFixture().number(1024).buildHeader();
-    when(fastSyncStateStorage.loadState(any(BlockHashFunction.class)))
+    when(fastSyncStateStorage.loadState(any(BlockHeaderUtils.class)))
         .thenReturn(new FastSyncState(pivotHeader));
     EthProtocolManagerTestUtil.createPeer(ethProtocolManager, 5000);
 

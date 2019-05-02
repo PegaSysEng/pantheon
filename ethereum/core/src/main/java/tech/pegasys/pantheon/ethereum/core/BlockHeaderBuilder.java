@@ -52,7 +52,7 @@ public class BlockHeaderBuilder {
 
   private Hash mixHash;
 
-  private BlockHashFunction blockHashFunction;
+  private BlockHeaderUtils blockHeaderUtils;
 
   // A nonce can be any value so we use the OptionalLong
   // instead of an invalid identifier such as -1.
@@ -98,7 +98,7 @@ public class BlockHeaderBuilder {
             .timestamp(fromBuilder.timestamp)
             .extraData(fromBuilder.extraData)
             .mixHash(fromBuilder.mixHash)
-            .blockHashFunction(fromBuilder.blockHashFunction);
+            .blockHeaderUtils(fromBuilder.blockHeaderUtils);
     toBuilder.nonce = fromBuilder.nonce;
     return toBuilder;
   }
@@ -122,7 +122,7 @@ public class BlockHeaderBuilder {
         extraData,
         mixHash,
         nonce.getAsLong(),
-        blockHashFunction);
+        blockHeaderUtils);
   }
 
   public ProcessableBlockHeader buildProcessableBlockHeader() {
@@ -155,7 +155,7 @@ public class BlockHeaderBuilder {
     validateSealableBlockHeader();
     checkState(this.mixHash != null, "Missing mixHash");
     checkState(this.nonce.isPresent(), "Missing nonce");
-    checkState(this.blockHashFunction != null, "Missing blockHashFunction");
+    checkState(this.blockHeaderUtils != null, "Missing blockHashFunction");
   }
 
   private void validateProcessableBlockHeader() {
@@ -297,8 +297,8 @@ public class BlockHeaderBuilder {
     return this;
   }
 
-  public BlockHeaderBuilder blockHashFunction(final BlockHashFunction blockHashFunction) {
-    this.blockHashFunction = blockHashFunction;
+  public BlockHeaderBuilder blockHeaderUtils(final BlockHeaderUtils blockHeaderUtils) {
+    this.blockHeaderUtils = blockHeaderUtils;
     return this;
   }
 }

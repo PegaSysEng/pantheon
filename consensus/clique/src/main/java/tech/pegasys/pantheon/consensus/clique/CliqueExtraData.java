@@ -31,7 +31,6 @@ import com.google.common.collect.Lists;
  * operating under an Clique consensus mechanism.
  */
 public class CliqueExtraData implements ExtraData {
-
   public static final int EXTRA_VANITY_LENGTH = 32;
 
   private final BytesValue vanityData;

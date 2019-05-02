@@ -12,14 +12,15 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
+import tech.pegasys.pantheon.util.bytes.BytesValue;
+
 /**
  * An interface for creating the block hash given a {@link BlockHeader}.
  *
  * <p>The algorithm to create the block hash may vary depending on the consensus mechanism used by
  * the chain.
  */
-@FunctionalInterface
-public interface BlockHashFunction {
+public interface BlockHeaderUtils {
 
   /**
    * Create the hash for a given BlockHeader.
@@ -27,5 +28,7 @@ public interface BlockHashFunction {
    * @param header the header to create the block hash from
    * @return a {@link Hash} containing the block hash.
    */
-  Hash apply(BlockHeader header);
+  Hash hash(BlockHeader header);
+
+  ExtraData parseExtraData(long blockNumber, BytesValue extraDataField);
 }

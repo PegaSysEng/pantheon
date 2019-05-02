@@ -15,9 +15,9 @@ package tech.pegasys.pantheon.ethereum.core;
 import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
 import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
@@ -33,15 +33,15 @@ import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 public class InMemoryStorageProvider implements StorageProvider {
 
   public static MutableBlockchain createInMemoryBlockchain(final Block genesisBlock) {
-    return createInMemoryBlockchain(genesisBlock, MainnetBlockHashFunction::createHash);
+    return createInMemoryBlockchain(genesisBlock, new MainnetBlockHeaderUtils());
   }
 
   public static MutableBlockchain createInMemoryBlockchain(
-      final Block genesisBlock, final BlockHashFunction blockHashFunction) {
+      final Block genesisBlock, final BlockHeaderUtils blockHeaderUtils) {
     final InMemoryKeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
     return new DefaultMutableBlockchain(
         genesisBlock,
-        new KeyValueStoragePrefixedKeyBlockchainStorage(keyValueStorage, blockHashFunction),
+        new KeyValueStoragePrefixedKeyBlockchainStorage(keyValueStorage, blockHeaderUtils),
         new NoOpMetricsSystem());
   }
 
@@ -53,7 +53,7 @@ public class InMemoryStorageProvider implements StorageProvider {
   @Override
   public BlockchainStorage createBlockchainStorage(final ProtocolSchedule<?> protocolSchedule) {
     return new KeyValueStoragePrefixedKeyBlockchainStorage(
-        new InMemoryKeyValueStorage(), ScheduleBasedBlockHashFunction.create(protocolSchedule));
+        new InMemoryKeyValueStorage(), ScheduleBasedBlockHeaderUtils.create(protocolSchedule));
   }
 
   @Override

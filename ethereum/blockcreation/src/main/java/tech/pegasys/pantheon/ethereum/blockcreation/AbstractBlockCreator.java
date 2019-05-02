@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
@@ -31,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.BodyValidation;
 import tech.pegasys.pantheon.ethereum.mainnet.DifficultyCalculator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -61,6 +63,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
   private final PendingTransactions pendingTransactions;
   protected final ProtocolContext<C> protocolContext;
   protected final ProtocolSchedule<C> protocolSchedule;
+  protected final BlockHeaderUtils blockHeaderUtils;
   private final Wei minTransactionGasPrice;
   private final Address miningBeneficiary;
   protected final BlockHeader parentHeader;
@@ -86,6 +89,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
     this.minTransactionGasPrice = minTransactionGasPrice;
     this.miningBeneficiary = miningBeneficiary;
     this.parentHeader = parentHeader;
+    blockHeaderUtils = ScheduleBasedBlockHeaderUtils.create(protocolSchedule);
   }
 
   /**

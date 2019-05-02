@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
 import tech.pegasys.pantheon.ethereum.chain.TransactionLocation;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
@@ -50,12 +50,12 @@ public class KeyValueStoragePrefixedKeyBlockchainStorage implements BlockchainSt
   private static final BytesValue TRANSACTION_LOCATION_PREFIX = BytesValue.of(7);
 
   private final KeyValueStorage storage;
-  private final BlockHashFunction blockHashFunction;
+  private final BlockHeaderUtils blockHeaderUtils;
 
   public KeyValueStoragePrefixedKeyBlockchainStorage(
-      final KeyValueStorage storage, final BlockHashFunction blockHashFunction) {
+      final KeyValueStorage storage, final BlockHeaderUtils blockHeaderUtils) {
     this.storage = storage;
-    this.blockHashFunction = blockHashFunction;
+    this.blockHeaderUtils = blockHeaderUtils;
   }
 
   @Override
@@ -73,13 +73,13 @@ public class KeyValueStoragePrefixedKeyBlockchainStorage implements BlockchainSt
   @Override
   public Optional<BlockHeader> getBlockHeader(final Hash blockHash) {
     return get(BLOCK_HEADER_PREFIX, blockHash)
-        .map(b -> BlockHeader.readFrom(RLP.input(b), blockHashFunction));
+        .map(b -> BlockHeader.readFrom(RLP.input(b), blockHeaderUtils));
   }
 
   @Override
   public Optional<BlockBody> getBlockBody(final Hash blockHash) {
     return get(BLOCK_BODY_PREFIX, blockHash)
-        .map(bytesValue -> BlockBody.readFrom(RLP.input(bytesValue), blockHashFunction));
+        .map(bytesValue -> BlockBody.readFrom(RLP.input(bytesValue), blockHeaderUtils));
   }
 
   @Override

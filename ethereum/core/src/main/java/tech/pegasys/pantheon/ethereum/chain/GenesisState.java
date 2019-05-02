@@ -19,15 +19,15 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
-import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutableWorldState;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
@@ -131,6 +131,9 @@ public final class GenesisState {
       final Hash genesisRootHash,
       final ProtocolSchedule<C> protocolSchedule) {
 
+    final long blockNumber = BlockHeader.GENESIS_BLOCK_NUMBER;
+    final BlockHeaderUtils blockHeaderUtils =
+        ScheduleBasedBlockHeaderUtils.create(protocolSchedule);
     return BlockHeaderBuilder.create()
         .parentHash(parseParentHash(genesis))
         .ommersHash(Hash.EMPTY_LIST_HASH)
@@ -140,14 +143,14 @@ public final class GenesisState {
         .receiptsRoot(Hash.EMPTY_TRIE_HASH)
         .logsBloom(LogsBloomFilter.empty())
         .difficulty(parseDifficulty(genesis))
-        .number(BlockHeader.GENESIS_BLOCK_NUMBER)
+        .number(blockNumber)
         .gasLimit(genesis.getGasLimit())
         .gasUsed(0L)
         .timestamp(genesis.getTimestamp())
-        .extraData(new UnparsedExtraData(parseExtraData(genesis)))
+        .extraData(blockHeaderUtils.parseExtraData(blockNumber, parseExtraData(genesis)))
         .mixHash(parseMixHash(genesis))
         .nonce(parseNonce(genesis))
-        .blockHashFunction(ScheduleBasedBlockHashFunction.create(protocolSchedule))
+        .blockHeaderUtils(blockHeaderUtils)
         .buildBlockHeader();
   }
 

@@ -22,13 +22,15 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -168,7 +170,18 @@ public class BlockchainReferenceTestCaseSpec {
           new UnparsedExtraData(BytesValue.fromHexString(extraData)), // extraData
           Hash.fromHexString(mixHash), // mixHash
           BytesValue.fromHexString(nonce).getLong(0),
-          header -> Hash.fromHexString(hash)); // nonce
+          new BlockHeaderUtils() {
+            @Override
+            public Hash hash(final BlockHeader header) {
+              return Hash.fromHexString(hash);
+            }
+
+            @Override
+            public ExtraData parseExtraData(
+                final long blockNumber, final BytesValue extraDataField) {
+              return new UnparsedExtraData(BytesValue.fromHexString(extraData));
+            }
+          });
     }
   }
 
@@ -224,12 +237,12 @@ public class BlockchainReferenceTestCaseSpec {
     public Block getBlock() {
       final RLPInput input = new BytesValueRLPInput(rlp, false);
       input.enterList();
-      final BlockHeader header = BlockHeader.readFrom(input, MainnetBlockHashFunction::createHash);
+      final MainnetBlockHeaderUtils blockHeaderUtils = new MainnetBlockHeaderUtils();
+      final BlockHeader header = BlockHeader.readFrom(input, blockHeaderUtils);
       final BlockBody body =
           new BlockBody(
               input.readList(Transaction::readFrom),
-              input.readList(
-                  rlp -> BlockHeader.readFrom(rlp, MainnetBlockHashFunction::createHash)));
+              input.readList(rlp -> BlockHeader.readFrom(rlp, blockHeaderUtils)));
       return new Block(header, body);
     }
   }

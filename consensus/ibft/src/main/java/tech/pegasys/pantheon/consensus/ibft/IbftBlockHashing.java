@@ -82,10 +82,10 @@ public class IbftBlockHashing {
     // create a block header which is a copy of the header supplied as parameter except of the
     // extraData field
     BlockHeaderBuilder builder = BlockHeaderBuilder.fromHeader(header);
-    builder.blockHashFunction(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
+    builder.blockHeaderUtils(IbftBlockHeaderUtils.forOnChainBlock());
 
     // set the extraData field using the supplied extraDataSerializer if the block height is not 0
-    if (header.getNumber() == 0) {
+    if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
       builder.extraData(header.getExtraData());
     } else {
       builder.extraData(extraDataSerializer);
