@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.FlatFileTaskCollection;
-import tech.pegasys.pantheon.services.tasks.TaskCollection;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -118,11 +117,10 @@ public class FastDownloaderFactory {
 
   private static CachingTaskCollection<NodeDataRequest> createWorldStateDownloaderTaskCollection(
       final Path dataDirectory, final MetricsSystem metricsSystem) {
-    final TaskCollection<NodeDataRequest> diskBasedCollection =
-        new FlatFileTaskCollection<>(
-            dataDirectory, NodeDataRequest::serialize, NodeDataRequest::deserialize);
     final CachingTaskCollection<NodeDataRequest> taskCollection =
-        new CachingTaskCollection<>(diskBasedCollection);
+        new CachingTaskCollection<>(
+            new FlatFileTaskCollection<>(
+                dataDirectory, NodeDataRequest::serialize, NodeDataRequest::deserialize));
 
     metricsSystem.createLongGauge(
         MetricCategory.SYNCHRONIZER,
