@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
@@ -36,6 +37,7 @@ public class CliqueExtraData implements ExtraData {
   private final BytesValue vanityData;
   private final List<Address> validators;
   private final Optional<Signature> proposerSeal;
+  private Address proposerAddress;
 
   public CliqueExtraData(
       final BytesValue vanityData, final Signature proposerSeal, final List<Address> validators) {
@@ -77,6 +79,13 @@ public class CliqueExtraData implements ExtraData {
     final Signature proposerSeal = parseProposerSeal(input.slice(proposerSealStartIndex));
 
     return new CliqueExtraData(vanityData, proposerSeal, validators);
+  }
+
+  public synchronized Address getProposerAddress(final BlockHeader fullHeader) {
+    if (proposerAddress == null) {
+      proposerAddress = CliqueBlockHashing.recoverProposerAddress(fullHeader, this);
+    }
+    return proposerAddress;
   }
 
   private static Signature parseProposerSeal(final BytesValue proposerSealRaw) {
