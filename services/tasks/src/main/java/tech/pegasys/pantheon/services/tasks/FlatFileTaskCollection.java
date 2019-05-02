@@ -30,7 +30,9 @@ import org.apache.logging.log4j.Logger;
 
 public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   private static final Logger LOG = LogManager.getLogger();
-  private static final String FILENAME_PREFIX = "tasks";
+  // Roll when files reach 10mb.
+  private static final long DEFAULT_FILE_ROLL_SIZE_BYTES = 1024 * 1024 * 10;
+  static final String FILENAME_PREFIX = "tasks";
   private final Set<FlatFileTask<T>> outstandingTasks = new HashSet<>();
 
   private final Path storageDirectory;
@@ -48,6 +50,13 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   private int writeFileNumber = 0;
 
   public FlatFileTaskCollection(
+      final Path storageDirectory,
+      final Function<T, BytesValue> serializer,
+      final Function<BytesValue, T> deserializer) {
+    this(storageDirectory, serializer, deserializer, DEFAULT_FILE_ROLL_SIZE_BYTES);
+  }
+
+  FlatFileTaskCollection(
       final Path storageDirectory,
       final Function<T, BytesValue> serializer,
       final Function<BytesValue, T> deserializer,

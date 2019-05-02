@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.FlatFileTaskCollection;
-import tech.pegasys.pantheon.services.tasks.RocksDbTaskCollection;
 import tech.pegasys.pantheon.services.tasks.TaskCollection;
 
 import java.io.File;
@@ -119,19 +118,9 @@ public class FastDownloaderFactory {
 
   private static CachingTaskCollection<NodeDataRequest> createWorldStateDownloaderTaskCollection(
       final Path dataDirectory, final MetricsSystem metricsSystem) {
-    final int tenMegabytes = 1024 * 1024 * 10;
     final TaskCollection<NodeDataRequest> diskBasedCollection =
-        true
-            ? new FlatFileTaskCollection<>(
-                dataDirectory,
-                NodeDataRequest::serialize,
-                NodeDataRequest::deserialize,
-                tenMegabytes)
-            : RocksDbTaskCollection.create(
-                dataDirectory,
-                NodeDataRequest::serialize,
-                NodeDataRequest::deserialize,
-                metricsSystem);
+        new FlatFileTaskCollection<>(
+            dataDirectory, NodeDataRequest::serialize, NodeDataRequest::deserialize);
     final CachingTaskCollection<NodeDataRequest> taskCollection =
         new CachingTaskCollection<>(diskBasedCollection);
 
