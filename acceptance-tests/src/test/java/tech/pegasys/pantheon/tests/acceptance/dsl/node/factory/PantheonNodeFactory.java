@@ -217,6 +217,22 @@ public class PantheonNodeFactory {
             .build());
   }
 
+  public PantheonNode createIbftNodePrivacyEnabled(
+      final String name, final PrivacyParameters privacyParameters, final String keyFilePath)
+      throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .miningEnabled()
+            .setJsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .setWebSocketConfiguration(createWebSocketEnabledConfig())
+            .setDevMode(false)
+            .setGenesisConfigProvider(this::createIbftGenesisConfig)
+            .setKeyFilePath(keyFilePath)
+            .enablePrivateTransactions(privacyParameters)
+            .build());
+  }
+
   public PantheonNode createCustomGenesisNode(
       final String name, final String genesisPath, final boolean canBeBootnode) throws IOException {
     final String genesisFile = readGenesisFile(genesisPath);
