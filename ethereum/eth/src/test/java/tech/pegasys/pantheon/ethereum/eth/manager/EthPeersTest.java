@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerDisconnectedException;
@@ -240,13 +242,13 @@ public class EthPeersTest {
   }
 
   private void useRequestSlot(final EthPeer peer) throws PeerNotConnected {
-    peer.getNodeData(emptyList());
+    peer.getNodeData(singletonList(Hash.ZERO));
   }
 
   @SuppressWarnings("unchecked")
   private void assertRequestSuccessful(final PendingPeerRequest pendingRequest) {
     final Consumer<ResponseStream> onSuccess = mock(Consumer.class);
-    pendingRequest.thenEither(onSuccess, error -> fail("Request should have executed", error));
+    pendingRequest.then(onSuccess, error -> fail("Request should have executed", error));
     verify(onSuccess).accept(any());
   }
 
@@ -254,7 +256,7 @@ public class EthPeersTest {
   private void assertRequestFailure(
       final PendingPeerRequest pendingRequest, final Class<? extends Throwable> reason) {
     final Consumer<Throwable> errorHandler = mock(Consumer.class);
-    pendingRequest.thenEither(
+    pendingRequest.then(
         responseStream -> fail("Should not have performed request"), errorHandler);
 
     verify(errorHandler).accept(any(reason));
@@ -264,7 +266,7 @@ public class EthPeersTest {
   private void assertNotDone(final PendingPeerRequest pendingRequest) {
     final Consumer<ResponseStream> onSuccess = mock(Consumer.class);
     final Consumer<Throwable> onError = mock(Consumer.class);
-    pendingRequest.thenEither(onSuccess, onError);
+    pendingRequest.then(onSuccess, onError);
 
     verifyZeroInteractions(onSuccess);
     verifyZeroInteractions(onError);
