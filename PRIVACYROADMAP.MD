@@ -9,12 +9,12 @@ Our now scale is about 3 months, next about 6 months, and then later is beyond.
 
 ## Now (up to v1.2)
 
-* Ability to add and remove members from privacy groups
 * Privacy group management added to JSON RPC-API
 * Support for external key management 
 
 ## Next 
 
+* Ability to add and remove members from privacy groups
 * Many to many relationship between Pantheon nodes and Orion nodes 
 * Privacy group consensus 
 * Cross privacy group communication 
