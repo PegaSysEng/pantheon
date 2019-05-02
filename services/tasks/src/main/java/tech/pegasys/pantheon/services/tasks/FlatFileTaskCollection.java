@@ -71,7 +71,7 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   private FileChannel openReadFileChannel(final int fileNumber) {
     try {
       return FileChannel.open(
-          storageDirectory.resolve(FILENAME_PREFIX + fileNumber),
+          pathForFileNumber(fileNumber),
           StandardOpenOption.DELETE_ON_CLOSE,
           StandardOpenOption.READ);
     } catch (final IOException e) {
@@ -82,7 +82,7 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   private FileChannel openWriteFileChannel(final int fileNumber) {
     try {
       return FileChannel.open(
-          storageDirectory.resolve(FILENAME_PREFIX + fileNumber),
+          pathForFileNumber(fileNumber),
           StandardOpenOption.TRUNCATE_EXISTING,
           StandardOpenOption.WRITE,
           StandardOpenOption.CREATE);
@@ -95,12 +95,7 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   public synchronized void add(final T taskData) {
     final BytesValue data = serializer.apply(taskData);
     try {
-      final long offset = writeFileChannel.size();
-      lengthBuffer.position(0);
-      lengthBuffer.putInt(data.size());
-      lengthBuffer.flip();
-      writeFileChannel.write(lengthBuffer, offset);
-      writeFileChannel.write(ByteBuffer.wrap(data.getArrayUnsafe()), offset + Integer.SIZE);
+      writeTaskData(data);
       size++;
       if (writeFileChannel.size() > rollWhenFileSizeExceedsBytes) {
         LOG.debug("Writing reached end of file {}", writeFileNumber);
@@ -119,13 +114,7 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
       return null;
     }
     try {
-      lengthBuffer.position(0);
-      lengthBuffer.limit(Integer.SIZE);
-      readAndCheckLength(lengthBuffer, Integer.SIZE);
-      final int dataLength = lengthBuffer.getInt(0);
-
-      final ByteBuffer dataBuffer = ByteBuffer.allocate(dataLength);
-      readAndCheckLength(dataBuffer, dataLength);
+      final ByteBuffer dataBuffer = readNextTaskData();
       final T data = deserializer.apply(BytesValue.wrapBuffer(dataBuffer));
       final FlatFileTask<T> task = new FlatFileTask<>(this, data);
       outstandingTasks.add(task);
@@ -136,8 +125,34 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
     }
   }
 
-  private void readAndCheckLength(final ByteBuffer buffer, final int expectedLength)
-      throws IOException {
+  private ByteBuffer readNextTaskData() throws IOException {
+    final int dataLength = readDataLength();
+    final ByteBuffer dataBuffer = ByteBuffer.allocate(dataLength);
+    readBytes(dataBuffer, dataLength);
+    return dataBuffer;
+  }
+
+  private void writeTaskData(final BytesValue data) throws IOException {
+    final long offset = writeFileChannel.size();
+    writeDataLength(data.size(), offset);
+    writeFileChannel.write(ByteBuffer.wrap(data.getArrayUnsafe()), offset + Integer.SIZE);
+  }
+
+  private int readDataLength() throws IOException {
+    lengthBuffer.position(0);
+    lengthBuffer.limit(Integer.SIZE);
+    readBytes(lengthBuffer, Integer.SIZE);
+    return lengthBuffer.getInt(0);
+  }
+
+  private void writeDataLength(final int size, final long offset) throws IOException {
+    lengthBuffer.position(0);
+    lengthBuffer.putInt(size);
+    lengthBuffer.flip();
+    writeFileChannel.write(lengthBuffer, offset);
+  }
+
+  private void readBytes(final ByteBuffer buffer, final int expectedLength) throws IOException {
     int readBytes = readFileChannel.read(buffer);
 
     if (readBytes == -1 && writeFileNumber > readFileNumber) {
@@ -153,11 +168,7 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
           "Task queue corrupted. Expected to read "
               + expectedLength
               + " bytes but only got "
-              + readBytes
-              + " starting at position "
-              + readFileChannel.position()
-              + " with size "
-              + readFileChannel.size());
+              + readBytes);
     }
   }
 
@@ -178,7 +189,7 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
       readFileChannel.close();
       writeFileChannel.close();
       for (int i = readFileNumber; i <= writeFileNumber; i++) {
-        final File file = storageDirectory.resolve(FILENAME_PREFIX + i).toFile();
+        final File file = pathForFileNumber(i).toFile();
         if (!file.delete() && file.exists()) {
           LOG.error("Failed to delete tasks file {}", file.getAbsolutePath());
         }
@@ -206,6 +217,10 @@ public class FlatFileTaskCollection<T> implements TaskCollection<T> {
     } catch (final IOException e) {
       throw new StorageException(e);
     }
+  }
+
+  private Path pathForFileNumber(final int fileNumber) {
+    return storageDirectory.resolve(FILENAME_PREFIX + fileNumber);
   }
 
   private synchronized boolean markTaskCompleted(final FlatFileTask<T> task) {
