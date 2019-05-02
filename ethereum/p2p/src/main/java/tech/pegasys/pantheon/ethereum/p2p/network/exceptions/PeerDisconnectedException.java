@@ -10,14 +10,13 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.p2p;
+package tech.pegasys.pantheon.ethereum.p2p.network.exceptions;
 
-public class ConnectingToLocalNodeException extends RuntimeException {
-  public ConnectingToLocalNodeException(final String message) {
-    super(message);
-  }
+import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 
-  public ConnectingToLocalNodeException() {
-    super("Cannot add the local node as a peer connection");
+public class PeerDisconnectedException extends RuntimeException {
+
+  public PeerDisconnectedException(final DisconnectReason reason) {
+    super("Peer disconnected for reason: " + reason.toString());
   }
 }
