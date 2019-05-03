@@ -105,7 +105,8 @@ nav:
         - Using Wallets for Account Management: Using-Pantheon/Account-Management.md
         - Mining: Using-Pantheon/Mining.md
         - RPC Pub/Sub: Using-Pantheon/RPC-PubSub.md
-        - Debugging Pantheon: Using-Pantheon/Debugging.md
+        - Monitoring Pantheon: Using-Pantheon/Monitoring.md
+        - Troubleshooting Pantheon: Using-Pantheon/Troubleshooting.md
     - Monitoring Pantheon:
         - EthStats:
           - Overview: EthStats/Overview.md
