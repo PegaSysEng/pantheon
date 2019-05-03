@@ -444,6 +444,9 @@ public class JsonRpcHttpService {
     // Find method handler
     final JsonRpcMethod method = jsonRpcMethods.get(request.getMethod());
     if (method == null) {
+      if (RpcMethod.rpcMethodExists(request.getMethod())) {
+        return errorResponse(id, JsonRpcError.METHOD_NOT_ENABLED);
+      }
       return errorResponse(id, JsonRpcError.METHOD_NOT_FOUND);
     }
 
