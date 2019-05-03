@@ -790,21 +790,6 @@ public class DefaultP2PNetwork implements P2PNetwork {
       return this;
     }
 
-    public Builder nodeLocalConfigPermissioningController(
-        final Optional<NodeLocalConfigPermissioningController>
-            nodeLocalConfigPermissioningController) {
-      checkNotNull(nodeLocalConfigPermissioningController);
-      this.nodeLocalConfigPermissioningController = nodeLocalConfigPermissioningController;
-      return this;
-    }
-
-    public Builder nodeLocalConfigPermissioningController(
-        final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController) {
-      this.nodeLocalConfigPermissioningController =
-          Optional.ofNullable(nodeLocalConfigPermissioningController);
-      return this;
-    }
-
     public Builder keyPair(final KeyPair keyPair) {
       checkNotNull(keyPair);
       this.keyPair = keyPair;
