@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.clique.blockcreation;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -53,7 +52,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Resources;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,12 +72,10 @@ public class CliqueBlockCreatorTest {
   private EpochManager epochManager;
 
   @Before
-  public void setup() throws Exception {
-    final GenesisConfigFile genesisConfigFile =
-        GenesisConfigFile.fromConfig(
-            Resources.toString(GenesisConfigFile.class.getResource("/goerli.json"), UTF_8));
+  public void setup() {
     protocolSchedule =
-        CliqueProtocolSchedule.create(genesisConfigFile.getConfigOptions(), proposerKeyPair);
+        CliqueProtocolSchedule.create(
+            GenesisConfigFile.DEFAULT.getConfigOptions(), proposerKeyPair);
 
     final Address otherAddress = Util.publicKeyToAddress(otherKeyPair.getPublicKey());
     validatorList.add(otherAddress);
@@ -89,7 +85,8 @@ public class CliqueBlockCreatorTest {
     voteProposer = new VoteProposer();
     final CliqueContext cliqueContext = new CliqueContext(voteTallyCache, voteProposer, null);
 
-    final Block genesis = GenesisState.fromConfig(genesisConfigFile, protocolSchedule).getBlock();
+    final Block genesis =
+        GenesisState.fromConfig(GenesisConfigFile.mainnet(), protocolSchedule).getBlock();
     blockchain = createInMemoryBlockchain(genesis);
     protocolContext = new ProtocolContext<>(blockchain, stateArchive, cliqueContext);
     epochManager = new EpochManager(10);
