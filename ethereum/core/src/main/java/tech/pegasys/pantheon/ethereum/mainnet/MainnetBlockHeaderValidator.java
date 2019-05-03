@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.AncestryValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.CalculatedDifficultyValidationRule;
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ConstantFieldValidationRule;
@@ -44,7 +43,7 @@ public final class MainnetBlockHeaderValidator {
     return createValidator(difficultyCalculator)
         .addRule(
             new ConstantFieldValidationRule<>(
-                "extraData", SealableBlockHeader::getExtraData, DAO_EXTRA_DATA))
+                "extraData", BlockHeader::getExtraData, DAO_EXTRA_DATA))
         .build();
   }
 
