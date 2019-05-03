@@ -96,16 +96,20 @@ public class IbftBlockCreatorFactory {
 
     final List<Address> validators = new ArrayList<>(voteTally.getValidators());
 
-    return new IbftExtraData(
+    final IbftExtraData extraData =
+        new IbftExtraData(
             ConsensusHelpers.zeroLeftPad(vanityData, IbftExtraData.EXTRA_VANITY_LENGTH),
             Collections.emptyList(),
             toVote(proposal),
             round,
-            validators)
-        .encode();
+            validators);
+
+    return extraData.encode();
   }
 
   private static Optional<Vote> toVote(final Optional<ValidatorVote> input) {
-    return input.map(v -> new Vote(v.getRecipient(), v.getVotePolarity()));
+    return input
+        .map(v -> Optional.of(new Vote(v.getRecipient(), v.getVotePolarity())))
+        .orElse(Optional.empty());
   }
 }
