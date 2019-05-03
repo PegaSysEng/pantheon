@@ -77,7 +77,7 @@ public class EthHashBlockCreator extends AbstractBlockCreator<Void> {
         .populateFrom(sealableBlockHeader)
         .mixHash(solution.getMixHash())
         .nonce(solution.getNonce())
-        .blockHeaderUtils(blockHeaderUtils)
+        .blockHeaderFunctions(blockHeaderFunctions)
         .buildBlockHeader();
   }
 

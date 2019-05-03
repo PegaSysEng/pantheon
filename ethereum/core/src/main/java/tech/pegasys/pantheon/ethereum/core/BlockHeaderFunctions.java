@@ -18,7 +18,7 @@ package tech.pegasys.pantheon.ethereum.core;
  * <p>The algorithm to create the block hash may vary depending on the consensus mechanism used by
  * the chain.
  */
-public interface BlockHeaderUtils {
+public interface BlockHeaderFunctions {
 
   /**
    * Create the hash for a given BlockHeader.

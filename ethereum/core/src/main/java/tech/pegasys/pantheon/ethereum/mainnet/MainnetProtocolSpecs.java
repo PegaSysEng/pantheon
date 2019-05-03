@@ -109,7 +109,7 @@ public abstract class MainnetProtocolSpecs {
         .blockValidatorBuilder(MainnetBlockValidator::new)
         .blockImporterBuilder(MainnetBlockImporter::new)
         .transactionReceiptType(TransactionReceiptType.ROOT)
-        .blockHeaderUtils(new MainnetBlockHeaderUtils())
+        .blockHeaderFunctions(new MainnetBlockHeaderFunctions())
         .miningBeneficiaryCalculator(BlockHeader::getCoinbase)
         .name("Frontier");
   }

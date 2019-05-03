@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.blockcreation;
 
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderUtils;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -59,7 +59,7 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
             .populateFrom(sealableBlockHeader)
             .mixHash(IbftHelpers.EXPECTED_MIX_HASH)
             .nonce(0L)
-            .blockHeaderUtils(IbftBlockHeaderUtils.forCommittedSeal());
+            .blockHeaderFunctions(IbftBlockHeaderFunctions.forCommittedSeal());
 
     return builder.buildBlockHeader();
   }

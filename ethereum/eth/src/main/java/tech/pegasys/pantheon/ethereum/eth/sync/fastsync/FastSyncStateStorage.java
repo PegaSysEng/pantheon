@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.fastsync;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -47,14 +47,14 @@ public class FastSyncStateStorage {
     return pivotBlockHeaderFile.isFile();
   }
 
-  public FastSyncState loadState(final BlockHeaderUtils blockHeaderUtils) {
+  public FastSyncState loadState(final BlockHeaderFunctions blockHeaderFunctions) {
     try {
       if (!isFastSyncInProgress()) {
         return FastSyncState.EMPTY_SYNC_STATE;
       }
       final BytesValue rlp = BytesValue.wrap(Files.toByteArray(pivotBlockHeaderFile));
       return new FastSyncState(
-          BlockHeader.readFrom(new BytesValueRLPInput(rlp, false), blockHeaderUtils));
+          BlockHeader.readFrom(new BytesValueRLPInput(rlp, false), blockHeaderFunctions));
     } catch (final IOException e) {
       throw new IllegalStateException(
           "Unable to read fast sync status file: " + pivotBlockHeaderFile.getAbsolutePath());

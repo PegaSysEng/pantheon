@@ -13,29 +13,29 @@
 package tech.pegasys.pantheon.consensus.ibft;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.function.Function;
 
-public class IbftBlockHeaderUtils implements BlockHeaderUtils {
+public class IbftBlockHeaderFunctions implements BlockHeaderFunctions {
 
-  private static final IbftBlockHeaderUtils COMMITTED_SEAL =
-      new IbftBlockHeaderUtils(IbftBlockHashing::calculateDataHashForCommittedSeal);
-  private static final IbftBlockHeaderUtils ON_CHAIN =
-      new IbftBlockHeaderUtils(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
+  private static final IbftBlockHeaderFunctions COMMITTED_SEAL =
+      new IbftBlockHeaderFunctions(IbftBlockHashing::calculateDataHashForCommittedSeal);
+  private static final IbftBlockHeaderFunctions ON_CHAIN =
+      new IbftBlockHeaderFunctions(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
 
   private final Function<BlockHeader, Hash> hashFunction;
 
-  private IbftBlockHeaderUtils(final Function<BlockHeader, Hash> hashFunction) {
+  private IbftBlockHeaderFunctions(final Function<BlockHeader, Hash> hashFunction) {
     this.hashFunction = hashFunction;
   }
 
-  public static BlockHeaderUtils forOnChainBlock() {
+  public static BlockHeaderFunctions forOnChainBlock() {
     return ON_CHAIN;
   }
 
-  public static BlockHeaderUtils forCommittedSeal() {
+  public static BlockHeaderFunctions forCommittedSeal() {
     return COMMITTED_SEAL;
   }
 

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.consensus.clique.CliqueBlockHeaderUtils;
+import tech.pegasys.pantheon.consensus.clique.CliqueBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
@@ -111,7 +111,7 @@ public class CliqueMinerExecutorTest {
             blockHeaderBuilder
                 .number(EPOCH_LENGTH)
                 .extraData(extraDataBytes)
-                .blockHeaderUtils(new CliqueBlockHeaderUtils())
+                .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
                 .buildHeader());
 
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
@@ -151,7 +151,7 @@ public class CliqueMinerExecutorTest {
             blockHeaderBuilder
                 .number(EPOCH_LENGTH)
                 .extraData(extraDataBytes)
-                .blockHeaderUtils(new CliqueBlockHeaderUtils())
+                .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
                 .buildHeader());
 
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);

@@ -13,13 +13,13 @@
 package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 /** Implements the block hashing algorithm for MainNet as per the yellow paper. */
-public class MainnetBlockHeaderUtils implements BlockHeaderUtils {
+public class MainnetBlockHeaderFunctions implements BlockHeaderFunctions {
 
   @Override
   public Hash hash(final BlockHeader header) {

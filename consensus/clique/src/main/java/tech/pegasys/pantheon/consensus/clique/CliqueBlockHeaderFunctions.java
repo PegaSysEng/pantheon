@@ -13,15 +13,15 @@
 package tech.pegasys.pantheon.consensus.clique;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 
-public class CliqueBlockHeaderUtils implements BlockHeaderUtils {
+public class CliqueBlockHeaderFunctions implements BlockHeaderFunctions {
 
   @Override
   public Hash hash(final BlockHeader header) {
-    return MainnetBlockHeaderUtils.createHash(header);
+    return MainnetBlockHeaderFunctions.createHash(header);
   }
 
   @Override

@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -54,7 +54,7 @@ public class IbftBlockInterface implements BlockInterface {
   }
 
   public static Block replaceRoundInBlock(
-      final Block block, final int round, final BlockHeaderUtils blockHeaderUtils) {
+      final Block block, final int round, final BlockHeaderFunctions blockHeaderFunctions) {
     final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader());
     final IbftExtraData substituteExtraData =
         new IbftExtraData(
@@ -65,7 +65,9 @@ public class IbftBlockInterface implements BlockInterface {
             prevExtraData.getValidators());
 
     final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
-    headerBuilder.extraData(substituteExtraData.encode()).blockHeaderUtils(blockHeaderUtils);
+    headerBuilder
+        .extraData(substituteExtraData.encode())
+        .blockHeaderFunctions(blockHeaderFunctions);
 
     final BlockHeader newHeader = headerBuilder.buildBlockHeader();
 

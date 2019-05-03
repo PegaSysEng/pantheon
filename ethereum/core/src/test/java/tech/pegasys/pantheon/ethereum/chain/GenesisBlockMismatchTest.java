@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
@@ -66,14 +66,15 @@ public class GenesisBlockMismatchTest {
             .extraData(Bytes32.wrap(bytes(Bytes32.SIZE)))
             .mixHash(Hash.ZERO)
             .nonce(0L)
-            .blockHeaderUtils(new MainnetBlockHeaderUtils())
+            .blockHeaderFunctions(new MainnetBlockHeaderFunctions())
             .buildBlockHeader();
     final BlockBody genesisBody00 = new BlockBody(Collections.emptyList(), Collections.emptyList());
     final Block genesisBlock00 = new Block(genesisHeader00, genesisBody00);
     final DefaultMutableBlockchain blockchain00 =
         new DefaultMutableBlockchain(
             genesisBlock00,
-            new KeyValueStoragePrefixedKeyBlockchainStorage(kvStore, new MainnetBlockHeaderUtils()),
+            new KeyValueStoragePrefixedKeyBlockchainStorage(
+                kvStore, new MainnetBlockHeaderFunctions()),
             new NoOpMetricsSystem());
 
     final BlockHeader genesisHeader01 =
@@ -93,7 +94,7 @@ public class GenesisBlockMismatchTest {
             .extraData(Bytes32.wrap(bytes(Bytes32.SIZE)))
             .mixHash(Hash.ZERO)
             .nonce(0L)
-            .blockHeaderUtils(new MainnetBlockHeaderUtils())
+            .blockHeaderFunctions(new MainnetBlockHeaderFunctions())
             .buildBlockHeader();
     final BlockBody genesisBody01 = new BlockBody(Collections.emptyList(), Collections.emptyList());
     final Block genesisBlock01 = new Block(genesisHeader01, genesisBody01);

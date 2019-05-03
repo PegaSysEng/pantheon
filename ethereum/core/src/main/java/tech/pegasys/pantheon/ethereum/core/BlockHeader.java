@@ -53,7 +53,7 @@ public class BlockHeader extends SealableBlockHeader {
       final BytesValue extraData,
       final Hash mixHash,
       final long nonce,
-      final BlockHeaderUtils blockHeaderUtils) {
+      final BlockHeaderFunctions blockHeaderFunctions) {
     super(
         parentHash,
         ommersHash,
@@ -70,8 +70,8 @@ public class BlockHeader extends SealableBlockHeader {
         extraData);
     this.mixHash = mixHash;
     this.nonce = nonce;
-    this.hash = Suppliers.memoize(() -> blockHeaderUtils.hash(this));
-    this.parsedExtraData = Suppliers.memoize(() -> blockHeaderUtils.parseExtraData(this));
+    this.hash = Suppliers.memoize(() -> blockHeaderFunctions.hash(this));
+    this.parsedExtraData = Suppliers.memoize(() -> blockHeaderFunctions.parseExtraData(this));
   }
 
   /**
@@ -92,7 +92,7 @@ public class BlockHeader extends SealableBlockHeader {
     return nonce;
   }
   /**
-   * Returns the block extra data field, as parsed by the {@link BlockHeaderUtils}.
+   * Returns the block extra data field, as parsed by the {@link BlockHeaderFunctions}.
    *
    * @return the block extra data field
    */
@@ -137,7 +137,7 @@ public class BlockHeader extends SealableBlockHeader {
   }
 
   public static BlockHeader readFrom(
-      final RLPInput input, final BlockHeaderUtils blockHeaderUtils) {
+      final RLPInput input, final BlockHeaderFunctions blockHeaderFunctions) {
     input.enterList();
     final Hash parentHash = Hash.wrap(input.readBytes32());
     final Hash ommersHash = Hash.wrap(input.readBytes32());
@@ -172,7 +172,7 @@ public class BlockHeader extends SealableBlockHeader {
         extraData,
         mixHash,
         nonce,
-        blockHeaderUtils);
+        blockHeaderFunctions);
   }
 
   @Override

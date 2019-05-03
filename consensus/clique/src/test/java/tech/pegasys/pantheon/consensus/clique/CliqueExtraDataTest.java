@@ -69,7 +69,7 @@ public class CliqueExtraDataTest {
         CliqueExtraData.decode(
             new BlockHeaderTestFixture()
                 .number(BlockHeader.GENESIS_BLOCK_NUMBER)
-                .blockHeaderUtils(new CliqueBlockHeaderUtils())
+                .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
                 .extraData(bufferToInject)
                 .buildHeader());
     assertThat(extraData.getProposerSeal()).isEmpty();
@@ -82,7 +82,7 @@ public class CliqueExtraDataTest {
         BytesValue.wrap(
             new byte[Signature.BYTES_REQUIRED + CliqueExtraData.EXTRA_VANITY_LENGTH - 1]);
 
-    assertThatThrownBy(() -> CliqueExtraData.decodeRaw(createHeaderWithExtraData(illegalData)))
+    assertThatThrownBy(() -> CliqueExtraData.decode(createHeaderWithExtraData(illegalData)))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage(
             "Invalid BytesValue supplied - too short to produce a valid Clique Extra Data object.");
@@ -126,7 +126,7 @@ public class CliqueExtraDataTest {
 
   private BlockHeader createHeaderWithExtraData(final BytesValue illegalData) {
     return new BlockHeaderTestFixture()
-        .blockHeaderUtils(new CliqueBlockHeaderUtils())
+        .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
         .extraData(illegalData)
         .buildHeader();
   }

@@ -26,14 +26,14 @@ import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -78,14 +78,14 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
    */
   @Override
   protected BlockHeader createFinalBlockHeader(final SealableBlockHeader sealableBlockHeader) {
-    final BlockHeaderUtils blockHeaderUtils =
-        ScheduleBasedBlockHeaderUtils.create(protocolSchedule);
+    final BlockHeaderFunctions blockHeaderFunctions =
+        ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
 
     final BlockHeaderBuilder builder =
         BlockHeaderBuilder.create()
             .populateFrom(sealableBlockHeader)
             .mixHash(Hash.ZERO)
-            .blockHeaderUtils(blockHeaderUtils);
+            .blockHeaderFunctions(blockHeaderFunctions);
 
     final Optional<ValidatorVote> vote = determineCliqueVote(sealableBlockHeader);
     final BlockHeaderBuilder builderIncludingProposedVotes =

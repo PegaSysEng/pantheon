@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.core.Address.fromHexString;
 
-import tech.pegasys.pantheon.consensus.clique.CliqueBlockHeaderUtils;
+import tech.pegasys.pantheon.consensus.clique.CliqueBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -74,7 +74,7 @@ public class CliqueGetSignersAtHashTest {
 
     blockHeader =
         new BlockHeaderTestFixture()
-            .blockHeaderUtils(new CliqueBlockHeaderUtils())
+            .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
             .extraData(BytesValue.wrap(genesisBlockExtraData))
             .buildHeader();
 

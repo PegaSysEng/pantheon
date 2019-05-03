@@ -13,23 +13,23 @@
 package tech.pegasys.pantheon.consensus.ibftlegacy;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.function.Function;
 
-public class LegacyIbftBlockHeaderUtils implements BlockHeaderUtils {
+public class LegacyIbftBlockHeaderFunctions implements BlockHeaderFunctions {
 
-  private static final BlockHeaderUtils ON_CHAIN =
-      new LegacyIbftBlockHeaderUtils(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
+  private static final BlockHeaderFunctions ON_CHAIN =
+      new LegacyIbftBlockHeaderFunctions(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
 
   private final Function<BlockHeader, Hash> hashFunction;
 
-  private LegacyIbftBlockHeaderUtils(final Function<BlockHeader, Hash> hashFunction) {
+  private LegacyIbftBlockHeaderFunctions(final Function<BlockHeader, Hash> hashFunction) {
     this.hashFunction = hashFunction;
   }
 
-  public static BlockHeaderUtils forOnChainBlock() {
+  public static BlockHeaderFunctions forOnChainBlock() {
     return ON_CHAIN;
   }
 

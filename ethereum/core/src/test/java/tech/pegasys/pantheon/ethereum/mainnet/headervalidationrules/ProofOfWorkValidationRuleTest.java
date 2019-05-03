@@ -16,11 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationTestUtils;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -70,7 +70,7 @@ public class ProofOfWorkValidationRuleTest {
     final BlockHeader header =
         BlockHeaderBuilder.fromHeader(blockHeader)
             .difficulty(UInt256.ZERO)
-            .blockHeaderUtils(mainnetBlockHashFunction())
+            .blockHeaderFunctions(mainnetBlockHashFunction())
             .buildBlockHeader();
     assertThat(validationRule.validate(header, parentHeader)).isFalse();
   }
@@ -81,7 +81,7 @@ public class ProofOfWorkValidationRuleTest {
     final BlockHeader header =
         BlockHeaderBuilder.fromHeader(blockHeader)
             .difficulty(largeDifficulty)
-            .blockHeaderUtils(mainnetBlockHashFunction())
+            .blockHeaderFunctions(mainnetBlockHashFunction())
             .buildBlockHeader();
     assertThat(validationRule.validate(header, parentHeader)).isFalse();
   }
@@ -92,7 +92,7 @@ public class ProofOfWorkValidationRuleTest {
     final BlockHeader header =
         BlockHeaderBuilder.fromHeader(blockHeader)
             .mixHash(updateMixHash)
-            .blockHeaderUtils(mainnetBlockHashFunction())
+            .blockHeaderFunctions(mainnetBlockHashFunction())
             .buildBlockHeader();
     assertThat(validationRule.validate(header, parentHeader)).isFalse();
   }
@@ -103,13 +103,13 @@ public class ProofOfWorkValidationRuleTest {
     final BlockHeader header =
         BlockHeaderBuilder.fromHeader(blockHeader)
             .nonce(updatedNonce)
-            .blockHeaderUtils(mainnetBlockHashFunction())
+            .blockHeaderFunctions(mainnetBlockHashFunction())
             .buildBlockHeader();
     assertThat(validationRule.validate(header, parentHeader)).isFalse();
   }
 
-  private BlockHeaderUtils mainnetBlockHashFunction() {
+  private BlockHeaderFunctions mainnetBlockHashFunction() {
     final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
-    return ScheduleBasedBlockHeaderUtils.create(protocolSchedule);
+    return ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
   }
 }

@@ -13,37 +13,37 @@
 package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 
 /**
- * Looks up the correct {@link BlockHeaderUtils} to use based on a {@link ProtocolSchedule} to
+ * Looks up the correct {@link BlockHeaderFunctions} to use based on a {@link ProtocolSchedule} to
  * ensure that the correct hash is created given the block number.
  */
-public class ScheduleBasedBlockHeaderUtils<C> implements BlockHeaderUtils {
+public class ScheduleBasedBlockHeaderFunctions<C> implements BlockHeaderFunctions {
 
   private final ProtocolSchedule<C> protocolSchedule;
 
-  private ScheduleBasedBlockHeaderUtils(final ProtocolSchedule<C> protocolSchedule) {
+  private ScheduleBasedBlockHeaderFunctions(final ProtocolSchedule<C> protocolSchedule) {
     this.protocolSchedule = protocolSchedule;
   }
 
-  public static <C> BlockHeaderUtils create(final ProtocolSchedule<C> protocolSchedule) {
-    return new ScheduleBasedBlockHeaderUtils<>(protocolSchedule);
+  public static <C> BlockHeaderFunctions create(final ProtocolSchedule<C> protocolSchedule) {
+    return new ScheduleBasedBlockHeaderFunctions<>(protocolSchedule);
   }
 
   @Override
   public Hash hash(final BlockHeader header) {
-    return getBlockHeaderUtils(header).hash(header);
+    return getBlockHeaderFunctions(header).hash(header);
   }
 
   @Override
   public Object parseExtraData(final BlockHeader header) {
-    return getBlockHeaderUtils(header).parseExtraData(header);
+    return getBlockHeaderFunctions(header).parseExtraData(header);
   }
 
-  private BlockHeaderUtils getBlockHeaderUtils(final SealableBlockHeader header) {
-    return protocolSchedule.getByBlockNumber(header.getNumber()).getBlockHeaderUtils();
+  private BlockHeaderFunctions getBlockHeaderFunctions(final SealableBlockHeader header) {
+    return protocolSchedule.getByBlockNumber(header.getNumber()).getBlockHeaderFunctions();
   }
 }

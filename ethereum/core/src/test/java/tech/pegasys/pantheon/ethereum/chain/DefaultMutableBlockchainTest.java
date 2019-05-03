@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
@@ -712,7 +712,7 @@ public class DefaultMutableBlockchainTest {
       final KeyValueStorage kvStore, final Block genesisBlock) {
     return new DefaultMutableBlockchain(
         genesisBlock,
-        new KeyValueStoragePrefixedKeyBlockchainStorage(kvStore, new MainnetBlockHeaderUtils()),
+        new KeyValueStoragePrefixedKeyBlockchainStorage(kvStore, new MainnetBlockHeaderFunctions()),
         new NoOpMetricsSystem());
   }
 }

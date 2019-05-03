@@ -44,7 +44,7 @@ public class IbftLegacyBlockInterfaceTest {
   private final IbftLegacyBlockInterface blockInterface = new IbftLegacyBlockInterface();
   private final BlockHeaderBuilder builder =
       BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-          .blockHeaderUtils(LegacyIbftBlockHeaderUtils.forOnChainBlock());
+          .blockHeaderFunctions(LegacyIbftBlockHeaderFunctions.forOnChainBlock());
 
   @Before
   public void setup() {

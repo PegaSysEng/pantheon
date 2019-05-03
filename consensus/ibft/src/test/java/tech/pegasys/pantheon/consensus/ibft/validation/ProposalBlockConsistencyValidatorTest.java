@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderUtils;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
@@ -57,7 +57,9 @@ public class ProposalBlockConsistencyValidatorTest {
 
     final Block misMatchedBlock =
         IbftBlockInterface.replaceRoundInBlock(
-            block, roundIdentifier.getRoundNumber() + 1, IbftBlockHeaderUtils.forCommittedSeal());
+            block,
+            roundIdentifier.getRoundNumber() + 1,
+            IbftBlockHeaderFunctions.forCommittedSeal());
 
     assertThat(
             consistencyChecker.validateProposalMatchesBlock(

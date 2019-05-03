@@ -48,7 +48,7 @@ public class CliqueBlockInterfaceTest {
 
   private final BlockHeaderBuilder builder =
       BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
-          .blockHeaderUtils(new CliqueBlockHeaderUtils());
+          .blockHeaderFunctions(new CliqueBlockHeaderFunctions());
 
   @Test
   public void headerWithZeroCoinbaseReturnsAnEmptyVote() {

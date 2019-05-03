@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
@@ -27,7 +27,7 @@ import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutableWorldState;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
@@ -132,8 +132,8 @@ public final class GenesisState {
       final ProtocolSchedule<C> protocolSchedule) {
 
     final long blockNumber = BlockHeader.GENESIS_BLOCK_NUMBER;
-    final BlockHeaderUtils blockHeaderUtils =
-        ScheduleBasedBlockHeaderUtils.create(protocolSchedule);
+    final BlockHeaderFunctions blockHeaderFunctions =
+        ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
     return BlockHeaderBuilder.create()
         .parentHash(parseParentHash(genesis))
         .ommersHash(Hash.EMPTY_LIST_HASH)
@@ -150,7 +150,7 @@ public final class GenesisState {
         .extraData(parseExtraData(genesis))
         .mixHash(parseMixHash(genesis))
         .nonce(parseNonce(genesis))
-        .blockHeaderUtils(blockHeaderUtils)
+        .blockHeaderFunctions(blockHeaderFunctions)
         .buildBlockHeader();
   }
 

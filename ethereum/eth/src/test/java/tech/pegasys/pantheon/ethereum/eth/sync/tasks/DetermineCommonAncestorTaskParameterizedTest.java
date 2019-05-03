@@ -28,7 +28,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -173,6 +173,6 @@ public class DetermineCommonAncestorTaskParameterizedTest {
 
     assertThat(actualResult.get()).isNotNull();
     assertThat(actualResult.get().getHash())
-        .isEqualTo(MainnetBlockHeaderUtils.createHash(commonHeader));
+        .isEqualTo(MainnetBlockHeaderFunctions.createHash(commonHeader));
   }
 }

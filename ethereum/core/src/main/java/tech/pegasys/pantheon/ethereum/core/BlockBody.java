@@ -58,13 +58,14 @@ public class BlockBody {
     output.endList();
   }
 
-  public static BlockBody readFrom(final RLPInput input, final BlockHeaderUtils blockHeaderUtils) {
+  public static BlockBody readFrom(
+      final RLPInput input, final BlockHeaderFunctions blockHeaderFunctions) {
     input.enterList();
     // TODO: Support multiple hard fork transaction formats.
     final BlockBody body =
         new BlockBody(
             input.readList(Transaction::readFrom),
-            input.readList(rlp -> BlockHeader.readFrom(rlp, blockHeaderUtils)));
+            input.readList(rlp -> BlockHeader.readFrom(rlp, blockHeaderFunctions)));
     input.leaveList();
     return body;
   }

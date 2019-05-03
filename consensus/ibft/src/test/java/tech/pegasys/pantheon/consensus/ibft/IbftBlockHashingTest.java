@@ -126,7 +126,7 @@ public class IbftBlockHashingTest {
     builder.mixHash(
         Hash.fromHexString("0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365"));
     builder.nonce(0);
-    builder.blockHeaderUtils(IbftBlockHeaderUtils.forOnChainBlock());
+    builder.blockHeaderFunctions(IbftBlockHeaderFunctions.forOnChainBlock());
     return builder;
   }
 

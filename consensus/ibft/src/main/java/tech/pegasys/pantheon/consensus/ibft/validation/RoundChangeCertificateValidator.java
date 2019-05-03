@@ -16,7 +16,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPrepare
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderUtils;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
@@ -126,7 +126,7 @@ public class RoundChangeCertificateValidator {
                 .getPayload()
                 .getRoundIdentifier()
                 .getRoundNumber(),
-            IbftBlockHeaderUtils.forCommittedSeal());
+            IbftBlockHeaderFunctions.forCommittedSeal());
 
     if (!currentBlockWithOldRound
         .getHash()

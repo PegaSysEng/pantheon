@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderUtils;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
@@ -70,7 +70,7 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
         SignedData.readSignedRoundChangePayloadFrom(rlpIn);
     Optional<Block> block = Optional.empty();
     if (!rlpIn.nextIsNull()) {
-      block = Optional.of(Block.readFrom(rlpIn, IbftBlockHeaderUtils.forCommittedSeal()));
+      block = Optional.of(Block.readFrom(rlpIn, IbftBlockHeaderFunctions.forCommittedSeal()));
     } else {
       rlpIn.skipNext();
     }
