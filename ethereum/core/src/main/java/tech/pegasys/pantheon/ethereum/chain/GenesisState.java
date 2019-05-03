@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
@@ -131,9 +130,6 @@ public final class GenesisState {
       final Hash genesisRootHash,
       final ProtocolSchedule<C> protocolSchedule) {
 
-    final long blockNumber = BlockHeader.GENESIS_BLOCK_NUMBER;
-    final BlockHeaderFunctions blockHeaderFunctions =
-        ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
     return BlockHeaderBuilder.create()
         .parentHash(parseParentHash(genesis))
         .ommersHash(Hash.EMPTY_LIST_HASH)
@@ -143,14 +139,14 @@ public final class GenesisState {
         .receiptsRoot(Hash.EMPTY_TRIE_HASH)
         .logsBloom(LogsBloomFilter.empty())
         .difficulty(parseDifficulty(genesis))
-        .number(blockNumber)
+        .number(BlockHeader.GENESIS_BLOCK_NUMBER)
         .gasLimit(genesis.getGasLimit())
         .gasUsed(0L)
         .timestamp(genesis.getTimestamp())
         .extraData(parseExtraData(genesis))
         .mixHash(parseMixHash(genesis))
         .nonce(parseNonce(genesis))
-        .blockHeaderFunctions(blockHeaderFunctions)
+        .blockHeaderFunctions(ScheduleBasedBlockHeaderFunctions.create(protocolSchedule))
         .buildBlockHeader();
   }
 
