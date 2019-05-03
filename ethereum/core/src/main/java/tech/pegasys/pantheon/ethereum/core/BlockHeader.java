@@ -139,40 +139,26 @@ public class BlockHeader extends SealableBlockHeader {
   public static BlockHeader readFrom(
       final RLPInput input, final BlockHeaderFunctions blockHeaderFunctions) {
     input.enterList();
-    final Hash parentHash = Hash.wrap(input.readBytes32());
-    final Hash ommersHash = Hash.wrap(input.readBytes32());
-    final Address coinbase = Address.readFrom(input);
-    final Hash stateRoot = Hash.wrap(input.readBytes32());
-    final Hash transactionsRoot = Hash.wrap(input.readBytes32());
-    final Hash receiptsRoot = Hash.wrap(input.readBytes32());
-    final LogsBloomFilter logsBloom = LogsBloomFilter.readFrom(input);
-    final UInt256 difficulty = input.readUInt256Scalar();
-    final long blockNumber = input.readLongScalar();
-    final long gasLimit = input.readLongScalar();
-    final long gasUsed = input.readLongScalar();
-    final long timestamp = input.readLongScalar();
-    final BytesValue extraData = input.readBytesValue();
-    final Hash mixHash = Hash.wrap(input.readBytes32());
-    final long nonce = input.readLong();
+    final BlockHeader blockHeader =
+        new BlockHeader(
+            Hash.wrap(input.readBytes32()),
+            Hash.wrap(input.readBytes32()),
+            Address.readFrom(input),
+            Hash.wrap(input.readBytes32()),
+            Hash.wrap(input.readBytes32()),
+            Hash.wrap(input.readBytes32()),
+            LogsBloomFilter.readFrom(input),
+            input.readUInt256Scalar(),
+            input.readLongScalar(),
+            input.readLongScalar(),
+            input.readLongScalar(),
+            input.readLongScalar(),
+            input.readBytesValue(),
+            Hash.wrap(input.readBytes32()),
+            input.readLong(),
+            blockHeaderFunctions);
     input.leaveList();
-
-    return new BlockHeader(
-        parentHash,
-        ommersHash,
-        coinbase,
-        stateRoot,
-        transactionsRoot,
-        receiptsRoot,
-        logsBloom,
-        difficulty,
-        blockNumber,
-        gasLimit,
-        gasUsed,
-        timestamp,
-        extraData,
-        mixHash,
-        nonce,
-        blockHeaderFunctions);
+    return blockHeader;
   }
 
   @Override
