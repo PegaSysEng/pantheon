@@ -61,6 +61,6 @@ public class IbftProtocolSchedule {
             MainnetBlockImporter::new,
             (time, parent, protocolContext) -> BigInteger.ONE)
         .blockReward(Wei.ZERO)
-        .blockHeaderFunctions(LegacyIbftBlockHeaderFunctions.forOnChainBlock());
+        .blockHeaderFunctions(new LegacyIbftBlockHeaderFunctions());
   }
 }

@@ -16,26 +16,11 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
-import java.util.function.Function;
-
 public class LegacyIbftBlockHeaderFunctions implements BlockHeaderFunctions {
-
-  private static final BlockHeaderFunctions ON_CHAIN =
-      new LegacyIbftBlockHeaderFunctions(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
-
-  private final Function<BlockHeader, Hash> hashFunction;
-
-  private LegacyIbftBlockHeaderFunctions(final Function<BlockHeader, Hash> hashFunction) {
-    this.hashFunction = hashFunction;
-  }
-
-  public static BlockHeaderFunctions forOnChainBlock() {
-    return ON_CHAIN;
-  }
 
   @Override
   public Hash hash(final BlockHeader header) {
-    return hashFunction.apply(header);
+    return IbftBlockHashing.calculateHashOfIbftBlockOnChain(header);
   }
 
   @Override
