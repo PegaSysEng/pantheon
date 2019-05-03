@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 
 import java.util.function.Function;
 
@@ -47,7 +46,7 @@ public class IbftBlockHeaderUtils implements BlockHeaderUtils {
   }
 
   @Override
-  public ExtraData parseExtraData(final SealableBlockHeader header) {
+  public ExtraData parseExtraData(final BlockHeader header) {
     return IbftExtraData.decodeRaw(header.getRawExtraData());
   }
 }

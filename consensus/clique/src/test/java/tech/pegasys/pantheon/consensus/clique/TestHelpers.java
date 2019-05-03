@@ -31,7 +31,7 @@ public class TestHelpers {
       final List<Address> validators) {
 
     final CliqueExtraData unsignedExtraData =
-        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validators);
+        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validators, null);
     blockHeaderBuilder.extraData(unsignedExtraData);
 
     final Hash signingHash =
@@ -40,11 +40,13 @@ public class TestHelpers {
 
     final Signature proposerSignature = SECP256K1.sign(signingHash, signer);
 
-    final CliqueExtraData signedExtraData =
+    final BytesValue signedExtraData =
         new CliqueExtraData(
-            unsignedExtraData.getVanityData(),
-            proposerSignature,
-            unsignedExtraData.getValidators());
+                unsignedExtraData.getVanityData(),
+                proposerSignature,
+                unsignedExtraData.getValidators(),
+                null)
+            .toBytesValue();
 
     blockHeaderBuilder.extraData(signedExtraData);
 

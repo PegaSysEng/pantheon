@@ -48,7 +48,7 @@ public class CliqueBlockHashingTest {
 
   @Test
   public void recoverProposerAddressFromSeal() {
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(expectedHeader.getExtraData());
+    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(expectedHeader);
     final Address proposerAddress =
         CliqueBlockHashing.recoverProposerAddress(expectedHeader, cliqueExtraData);
 
@@ -57,7 +57,7 @@ public class CliqueBlockHashingTest {
 
   @Test
   public void readValidatorListFromExtraData() {
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(expectedHeader.getExtraData());
+    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(expectedHeader);
     assertThat(cliqueExtraData.getValidators()).isEqualTo(VALIDATORS_IN_HEADER);
   }
 
@@ -72,10 +72,8 @@ public class CliqueBlockHashingTest {
     final BlockHeaderBuilder builder = new BlockHeaderBuilder();
     builder.difficulty(UInt256.of(2));
     builder.extraData(
-        CliqueExtraData.decodeRaw(
-                BytesValue.fromHexString(
-                    "0xd783010600846765746887676f312e372e33856c696e7578000000000000000042eb768f2244c8811c63729a21a3569731535f067ffc57839b00206d1ad20c69a1981b489f772031b279182d99e65703f0076e4812653aab85fca0f0c5bc40d0535af16266714ccb26fc49448c10bdf2969411514707d7442956b3397b09a980f4bea9347f70eea52183326247a0239b6d01fa0b07afc44e8a05463301"))
-            .toBytesValue());
+        BytesValue.fromHexString(
+            "0xd783010600846765746887676f312e372e33856c696e7578000000000000000042eb768f2244c8811c63729a21a3569731535f067ffc57839b00206d1ad20c69a1981b489f772031b279182d99e65703f0076e4812653aab85fca0f0c5bc40d0535af16266714ccb26fc49448c10bdf2969411514707d7442956b3397b09a980f4bea9347f70eea52183326247a0239b6d01fa0b07afc44e8a05463301"));
     builder.gasLimit(4712388);
     builder.gasUsed(0);
     // Do not do Hash.

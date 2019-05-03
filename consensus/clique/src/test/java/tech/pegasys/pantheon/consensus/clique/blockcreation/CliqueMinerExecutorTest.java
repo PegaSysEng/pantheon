@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import tech.pegasys.pantheon.consensus.clique.CliqueBlockHeaderUtils;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
 import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
@@ -105,7 +106,13 @@ public class CliqueMinerExecutorTest {
 
     final BytesValue extraDataBytes = executor.calculateExtraData(header);
 
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decodeRaw(extraDataBytes);
+    final CliqueExtraData cliqueExtraData =
+        CliqueExtraData.decode(
+            blockHeaderBuilder
+                .number(EPOCH_LENGTH)
+                .extraData(extraDataBytes)
+                .blockHeaderUtils(new CliqueBlockHeaderUtils())
+                .buildHeader());
 
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
     assertThat(cliqueExtraData.getValidators())
@@ -113,7 +120,7 @@ public class CliqueMinerExecutorTest {
   }
 
   @Test
-  public void extraDataForNonEpochBlocksDoesNotContainValidaors() {
+  public void extraDataForNonEpochBlocksDoesNotContainValidators() {
     final byte[] vanityData = new byte[32];
     new Random().nextBytes(vanityData);
     final BytesValue wrappedVanityData = BytesValue.wrap(vanityData);
@@ -139,7 +146,13 @@ public class CliqueMinerExecutorTest {
 
     final BytesValue extraDataBytes = executor.calculateExtraData(header);
 
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decodeRaw(extraDataBytes);
+    final CliqueExtraData cliqueExtraData =
+        CliqueExtraData.decode(
+            blockHeaderBuilder
+                .number(EPOCH_LENGTH)
+                .extraData(extraDataBytes)
+                .blockHeaderUtils(new CliqueBlockHeaderUtils())
+                .buildHeader());
 
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
     assertThat(cliqueExtraData.getValidators()).isEqualTo(Lists.newArrayList());

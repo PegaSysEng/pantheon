@@ -37,6 +37,7 @@ public class BlockHeaderTestFixture {
 
   private Hash mixHash = Hash.EMPTY;
   private long nonce = 0;
+  private BlockHeaderUtils blockHeaderUtils = new MainnetBlockHeaderUtils();
 
   public BlockHeader buildHeader() {
     final BlockHeaderBuilder builder = BlockHeaderBuilder.create();
@@ -55,7 +56,8 @@ public class BlockHeaderTestFixture {
     builder.extraData(extraData);
     builder.mixHash(mixHash);
     builder.nonce(nonce);
-    builder.blockHeaderUtils(new MainnetBlockHeaderUtils());
+    blockHeaderUtils = new MainnetBlockHeaderUtils();
+    builder.blockHeaderUtils(blockHeaderUtils);
 
     return builder.buildBlockHeader();
   }
@@ -137,6 +139,11 @@ public class BlockHeaderTestFixture {
 
   public BlockHeaderTestFixture nonce(final long nonce) {
     this.nonce = nonce;
+    return this;
+  }
+
+  public BlockHeaderTestFixture blockHeaderUtils(final BlockHeaderUtils blockHeaderUtils) {
+    this.blockHeaderUtils = blockHeaderUtils;
     return this;
   }
 }

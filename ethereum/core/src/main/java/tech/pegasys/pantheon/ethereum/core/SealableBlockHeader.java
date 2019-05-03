@@ -15,10 +15,6 @@ package tech.pegasys.pantheon.ethereum.core;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
-
 /** A block header capable of being sealed. */
 public class SealableBlockHeader extends ProcessableBlockHeader {
   protected final Hash ommersHash;
@@ -33,11 +29,7 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
 
   protected final long gasUsed;
 
-  protected final BlockHeaderUtils blockHeaderUtils;
-
   protected final BytesValue rawExtraData;
-
-  private final Supplier<ExtraData> extraData;
 
   protected SealableBlockHeader(
       final Hash parentHash,
@@ -52,8 +44,7 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
       final long gasLimit,
       final long gasUsed,
       final long timestamp,
-      final BytesValue rawExtraData,
-      final BlockHeaderUtils blockHeaderUtils) {
+      final BytesValue rawExtraData) {
     super(parentHash, coinbase, difficulty, number, gasLimit, timestamp);
     this.ommersHash = ommersHash;
     this.stateRoot = stateRoot;
@@ -62,8 +53,6 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
     this.logsBloom = logsBloom;
     this.gasUsed = gasUsed;
     this.rawExtraData = rawExtraData;
-    this.blockHeaderUtils = blockHeaderUtils;
-    extraData = Suppliers.memoize(() -> blockHeaderUtils.parseExtraData(this));
   }
 
   /**
@@ -118,15 +107,6 @@ public class SealableBlockHeader extends ProcessableBlockHeader {
    */
   public long getGasUsed() {
     return gasUsed;
-  }
-
-  /**
-   * Returns the block extra data field.
-   *
-   * @return the block extra data field
-   */
-  public ExtraData getExtraData() {
-    return extraData.get();
   }
 
   /**

@@ -122,10 +122,13 @@ public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
    *     proposerSeal will also be populated.
    */
   private CliqueExtraData constructSignedExtraData(final BlockHeader headerToSign) {
-    final CliqueExtraData extraData = CliqueExtraData.decode(headerToSign.getExtraData());
+    final CliqueExtraData extraData = CliqueExtraData.decode(headerToSign);
     final Hash hashToSign =
         CliqueBlockHashing.calculateDataHashForProposerSeal(headerToSign, extraData);
     return new CliqueExtraData(
-        extraData.getVanityData(), SECP256K1.sign(hashToSign, nodeKeys), extraData.getValidators());
+        extraData.getVanityData(),
+        SECP256K1.sign(hashToSign, nodeKeys),
+        extraData.getValidators(),
+        headerToSign);
   }
 }

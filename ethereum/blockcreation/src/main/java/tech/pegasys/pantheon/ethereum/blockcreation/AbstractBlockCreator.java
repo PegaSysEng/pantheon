@@ -150,7 +150,6 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
               .logsBloom(BodyValidation.logsBloom(transactionResults.getReceipts()))
               .gasUsed(transactionResults.getCumulativeGasUsed())
               .extraData(extraDataCalculator.get(parentHeader))
-              .blockHeaderUtils(blockHeaderUtils)
               .buildSealableBlockHeader();
 
       final BlockHeader blockHeader = createFinalBlockHeader(sealableBlockHeader);

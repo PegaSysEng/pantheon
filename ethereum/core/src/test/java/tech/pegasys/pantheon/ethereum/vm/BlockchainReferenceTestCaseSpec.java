@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
-import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
@@ -178,7 +177,7 @@ public class BlockchainReferenceTestCaseSpec {
             }
 
             @Override
-            public ExtraData parseExtraData(final SealableBlockHeader header) {
+            public ExtraData parseExtraData(final BlockHeader header) {
               return new UnparsedExtraData(BytesValue.fromHexString(extraData));
             }
           });

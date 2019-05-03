@@ -19,13 +19,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.core.Address.fromHexString;
 
-import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -40,7 +38,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.List;
 import java.util.Optional;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,11 +60,9 @@ public class CliqueGetSignersTest {
   public void setup() {
     method = new CliqueGetSigners(blockchainQueries, voteTallyCache, new JsonRpcParameter());
 
-    final byte[] genesisBlockExtraData =
-        Hex.decode(
-            "52657370656374206d7920617574686f7269746168207e452e436172746d616e42eb768f2244c8811c63729a21a3569731535f067ffc57839b00206d1ad20c69a1981b489f772031b279182d99e65703f0076e4812653aab85fca0f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-    final ExtraData bufferToInject =
-        CliqueExtraData.decodeRaw(BytesValue.wrap(genesisBlockExtraData));
+    final String genesisBlockExtraData =
+        "52657370656374206d7920617574686f7269746168207e452e436172746d616e42eb768f2244c8811c63729a21a3569731535f067ffc57839b00206d1ad20c69a1981b489f772031b279182d99e65703f0076e4812653aab85fca0f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+    final BytesValue bufferToInject = BytesValue.fromHexString(genesisBlockExtraData);
     final BlockHeaderTestFixture blockHeaderTestFixture = new BlockHeaderTestFixture();
     blockHeader = blockHeaderTestFixture.extraData(bufferToInject).buildHeader();
 

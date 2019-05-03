@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 
 import java.util.function.Function;
@@ -42,7 +41,7 @@ public class LegacyIbftBlockHeaderUtils implements BlockHeaderUtils {
   }
 
   @Override
-  public ExtraData parseExtraData(final SealableBlockHeader header) {
+  public ExtraData parseExtraData(final BlockHeader header) {
     // Legacy IBFT always has an invalid genesis block so don't try to parse it.
     if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
       return new UnparsedExtraData(header.getRawExtraData());

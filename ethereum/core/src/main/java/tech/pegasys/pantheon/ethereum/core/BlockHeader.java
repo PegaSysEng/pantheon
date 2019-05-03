@@ -18,6 +18,9 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Objects;
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
 
 /** A mined Ethereum block header. */
 public class BlockHeader extends SealableBlockHeader {
@@ -30,7 +33,9 @@ public class BlockHeader extends SealableBlockHeader {
 
   private final long nonce;
 
-  private volatile Hash hash;
+  private final Supplier<Hash> hash;
+
+  private final Supplier<ExtraData> extraData;
 
   public BlockHeader(
       final Hash parentHash,
@@ -62,10 +67,11 @@ public class BlockHeader extends SealableBlockHeader {
         gasLimit,
         gasUsed,
         timestamp,
-        extraData,
-        blockHeaderUtils);
+        extraData);
     this.mixHash = mixHash;
     this.nonce = nonce;
+    this.hash = Suppliers.memoize(() -> blockHeaderUtils.hash(this));
+    this.extraData = Suppliers.memoize(() -> blockHeaderUtils.parseExtraData(this));
   }
 
   /**
@@ -85,6 +91,14 @@ public class BlockHeader extends SealableBlockHeader {
   public long getNonce() {
     return nonce;
   }
+  /**
+   * Returns the block extra data field.
+   *
+   * @return the block extra data field
+   */
+  public ExtraData getExtraData() {
+    return extraData.get();
+  }
 
   /**
    * Returns the block header hash.
@@ -92,10 +106,7 @@ public class BlockHeader extends SealableBlockHeader {
    * @return the block header hash
    */
   public Hash getHash() {
-    if (hash == null) {
-      hash = blockHeaderUtils.hash(this);
-    }
-    return hash;
+    return hash.get();
   }
 
   /**

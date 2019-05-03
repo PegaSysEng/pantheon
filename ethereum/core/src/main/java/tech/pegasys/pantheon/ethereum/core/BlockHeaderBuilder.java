@@ -149,8 +149,7 @@ public class BlockHeaderBuilder {
         gasLimit,
         gasUsed,
         timestamp,
-        extraData,
-        blockHeaderUtils);
+        extraData);
   }
 
   private void validateBlockHeader() {
@@ -178,7 +177,6 @@ public class BlockHeaderBuilder {
     checkState(this.logsBloom != null, "Missing logs bloom filter");
     checkState(this.gasUsed > -1L, "Missing gas used");
     checkState(this.extraData != null, "Missing extra data field");
-    checkState(this.blockHeaderUtils != null, "Missing blockHeaderUtils");
   }
 
   public BlockHeaderBuilder populateFrom(final ProcessableBlockHeader processableBlockHeader) {

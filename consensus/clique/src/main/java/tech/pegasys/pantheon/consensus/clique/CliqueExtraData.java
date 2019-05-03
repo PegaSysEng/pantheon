@@ -24,23 +24,31 @@ import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Represents the data structure stored in the extraData field of the BlockHeader used when
  * operating under an Clique consensus mechanism.
  */
 public class CliqueExtraData implements ExtraData {
+  private static final Logger LOG = LogManager.getLogger();
   public static final int EXTRA_VANITY_LENGTH = 32;
 
   private final BytesValue vanityData;
   private final List<Address> validators;
   private final Optional<Signature> proposerSeal;
-  private Address proposerAddress;
+  private final Supplier<Address> proposerAddress;
 
   public CliqueExtraData(
-      final BytesValue vanityData, final Signature proposerSeal, final List<Address> validators) {
+      final BytesValue vanityData,
+      final Signature proposerSeal,
+      final List<Address> validators,
+      final BlockHeader header) {
 
     checkNotNull(vanityData);
     checkNotNull(validators);
@@ -49,17 +57,28 @@ public class CliqueExtraData implements ExtraData {
     this.vanityData = vanityData;
     this.proposerSeal = Optional.ofNullable(proposerSeal);
     this.validators = validators;
+    proposerAddress =
+        Suppliers.memoize(() -> CliqueBlockHashing.recoverProposerAddress(header, this));
   }
 
-  public static CliqueExtraData decode(final ExtraData inputExtraData) {
+  public static BytesValue createUnsignedData(
+      final BytesValue vanityData, final List<Address> validators) {
+    return new CliqueExtraData(vanityData, null, validators, null).toBytesValue();
+  }
+
+  public static CliqueExtraData decode(final BlockHeader header) {
+    final ExtraData inputExtraData = header.getExtraData();
     if (inputExtraData instanceof CliqueExtraData) {
       return (CliqueExtraData) inputExtraData;
     }
-    final BytesValue input = inputExtraData.toBytesValue();
-    return decodeRaw(input);
+    LOG.warn(
+        "Expected a CliqueExtraData instance but got {}. Reparsing required.",
+        inputExtraData.getClass().getSimpleName());
+    return decodeRaw(header);
   }
 
-  public static CliqueExtraData decodeRaw(final BytesValue input) {
+  static CliqueExtraData decodeRaw(final BlockHeader header) {
+    final BytesValue input = header.getRawExtraData();
     if (input.size() < EXTRA_VANITY_LENGTH + Signature.BYTES_REQUIRED) {
       throw new IllegalArgumentException(
           "Invalid BytesValue supplied - too short to produce a valid Clique Extra Data object.");
@@ -78,14 +97,11 @@ public class CliqueExtraData implements ExtraData {
     final int proposerSealStartIndex = input.size() - Signature.BYTES_REQUIRED;
     final Signature proposerSeal = parseProposerSeal(input.slice(proposerSealStartIndex));
 
-    return new CliqueExtraData(vanityData, proposerSeal, validators);
+    return new CliqueExtraData(vanityData, proposerSeal, validators, header);
   }
 
-  public synchronized Address calculateProposerAddress(final BlockHeader fullHeader) {
-    if (proposerAddress == null) {
-      proposerAddress = CliqueBlockHashing.recoverProposerAddress(fullHeader, this);
-    }
-    return proposerAddress;
+  public synchronized Address getProposerAddress() {
+    return proposerAddress.get();
   }
 
   private static Signature parseProposerSeal(final BytesValue proposerSealRaw) {
@@ -126,9 +142,6 @@ public class CliqueExtraData implements ExtraData {
   }
 
   public static String createGenesisExtraDataString(final List<Address> validators) {
-    final CliqueExtraData cliqueExtraData =
-        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validators);
-    final BytesValue output = cliqueExtraData.toBytesValue();
-    return output.toString();
+    return CliqueExtraData.createUnsignedData(BytesValue.wrap(new byte[32]), validators).toString();
   }
 }

@@ -40,7 +40,7 @@ public class ScheduleBasedBlockHeaderUtils<C> implements BlockHeaderUtils {
   }
 
   @Override
-  public ExtraData parseExtraData(final SealableBlockHeader header) {
+  public ExtraData parseExtraData(final BlockHeader header) {
     return getBlockHeaderUtils(header).parseExtraData(header);
   }
 
