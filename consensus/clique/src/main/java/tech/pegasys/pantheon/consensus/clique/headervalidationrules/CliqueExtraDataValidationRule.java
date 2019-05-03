@@ -76,7 +76,7 @@ public class CliqueExtraDataValidationRule
       final Collection<Address> expectedValidators, final BlockHeader header) {
 
     final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(header.getExtraData());
-    final Address proposer = cliqueExtraData.getProposerAddress(header);
+    final Address proposer = cliqueExtraData.calculateProposerAddress(header);
 
     if (!expectedValidators.contains(proposer)) {
       LOG.trace("Proposer sealing block is not a member of the signers.");

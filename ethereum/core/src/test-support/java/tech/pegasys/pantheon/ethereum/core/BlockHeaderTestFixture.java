@@ -33,7 +33,7 @@ public class BlockHeaderTestFixture {
   private long gasLimit = 0;
   private long gasUsed = 0;
   private long timestamp = 0;
-  private ExtraData extraData = new UnparsedExtraData(BytesValue.EMPTY);
+  private BytesValue extraData = BytesValue.EMPTY;
 
   private Hash mixHash = Hash.EMPTY;
   private long nonce = 0;
@@ -121,6 +121,11 @@ public class BlockHeaderTestFixture {
   }
 
   public BlockHeaderTestFixture extraData(final ExtraData extraData) {
+    this.extraData = extraData.toBytesValue();
+    return this;
+  }
+
+  public BlockHeaderTestFixture extraData(final BytesValue extraData) {
     this.extraData = extraData;
     return this;
   }

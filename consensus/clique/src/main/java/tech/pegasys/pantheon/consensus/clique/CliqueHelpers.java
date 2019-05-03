@@ -25,7 +25,7 @@ public class CliqueHelpers {
 
   public static Address getProposerOfBlock(final BlockHeader header) {
     final CliqueExtraData extraData = CliqueExtraData.decode(header.getExtraData());
-    return extraData.getProposerAddress(header);
+    return extraData.calculateProposerAddress(header);
   }
 
   public static Address getProposerForBlockAfter(

@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-
 /**
  * An interface for creating the block hash given a {@link BlockHeader}.
  *
@@ -30,5 +28,5 @@ public interface BlockHeaderUtils {
    */
   Hash hash(BlockHeader header);
 
-  ExtraData parseExtraData(long blockNumber, BytesValue extraDataField);
+  ExtraData parseExtraData(SealableBlockHeader header);
 }

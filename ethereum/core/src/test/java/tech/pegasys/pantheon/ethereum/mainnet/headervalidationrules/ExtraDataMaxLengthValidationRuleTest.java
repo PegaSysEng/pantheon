@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import org.junit.Test;
@@ -27,7 +26,7 @@ public class ExtraDataMaxLengthValidationRuleTest {
   public void sufficientlySmallExtraDataBlockValidateSuccessfully() {
     final ExtraDataMaxLengthValidationRule uut = new ExtraDataMaxLengthValidationRule(1);
     final BlockHeaderTestFixture builder = new BlockHeaderTestFixture();
-    builder.extraData(new UnparsedExtraData(BytesValue.wrap(new byte[1])));
+    builder.extraData(BytesValue.wrap(new byte[1]));
 
     final BlockHeader header = builder.buildHeader();
 
@@ -39,7 +38,7 @@ public class ExtraDataMaxLengthValidationRuleTest {
   public void tooLargeExtraDataCausesValidationFailure() {
     final ExtraDataMaxLengthValidationRule uut = new ExtraDataMaxLengthValidationRule(1);
     final BlockHeaderTestFixture builder = new BlockHeaderTestFixture();
-    builder.extraData(new UnparsedExtraData(BytesValue.wrap(new byte[2])));
+    builder.extraData(BytesValue.wrap(new byte[2]));
 
     final BlockHeader header = builder.buildHeader();
 

@@ -92,10 +92,11 @@ public class IbftBlockCreatorTest {
             Address.fromHexString(String.format("%020d", 0)),
             parent ->
                 new IbftExtraData(
-                    BytesValue.wrap(new byte[32]),
-                    Lists.newArrayList(),
-                    null,
-                    initialValidatorList),
+                        BytesValue.wrap(new byte[32]),
+                        Lists.newArrayList(),
+                        null,
+                        initialValidatorList)
+                    .encode(),
             new PendingTransactions(
                 PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
                 1,

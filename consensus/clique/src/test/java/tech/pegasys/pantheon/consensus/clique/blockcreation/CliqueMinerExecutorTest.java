@@ -32,7 +32,6 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.core.Wei;
@@ -104,9 +103,9 @@ public class CliqueMinerExecutorTest {
     // NOTE: Passing in the *parent* block, so must be 1 less than EPOCH
     final BlockHeader header = blockHeaderBuilder.number(EPOCH_LENGTH - 1).buildHeader();
 
-    final ExtraData extraDataBytes = executor.calculateExtraData(header);
+    final BytesValue extraDataBytes = executor.calculateExtraData(header);
 
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(extraDataBytes);
+    final CliqueExtraData cliqueExtraData = CliqueExtraData.decodeRaw(extraDataBytes);
 
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
     assertThat(cliqueExtraData.getValidators())
@@ -138,9 +137,9 @@ public class CliqueMinerExecutorTest {
     // Parent block was epoch, so the next block should contain no validators.
     final BlockHeader header = blockHeaderBuilder.number(EPOCH_LENGTH).buildHeader();
 
-    final ExtraData extraDataBytes = executor.calculateExtraData(header);
+    final BytesValue extraDataBytes = executor.calculateExtraData(header);
 
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(extraDataBytes);
+    final CliqueExtraData cliqueExtraData = CliqueExtraData.decodeRaw(extraDataBytes);
 
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
     assertThat(cliqueExtraData.getValidators()).isEqualTo(Lists.newArrayList());

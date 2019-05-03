@@ -41,7 +41,7 @@ public class CliqueBlockInterface implements BlockInterface {
   @Override
   public Address getProposerOfBlock(final BlockHeader header) {
     final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(header.getExtraData());
-    return cliqueExtraData.getProposerAddress(header);
+    return cliqueExtraData.calculateProposerAddress(header);
   }
 
   @Override

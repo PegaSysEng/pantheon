@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
@@ -34,6 +33,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionR
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.math.BigInteger;
@@ -50,7 +50,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
 
   public interface ExtraDataCalculator {
 
-    ExtraData get(final BlockHeader parent);
+    BytesValue get(final BlockHeader parent);
   }
 
   private static final Logger LOG = LogManager.getLogger();
@@ -150,6 +150,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
               .logsBloom(BodyValidation.logsBloom(transactionResults.getReceipts()))
               .gasUsed(transactionResults.getCumulativeGasUsed())
               .extraData(extraDataCalculator.get(parentHeader))
+              .blockHeaderUtils(blockHeaderUtils)
               .buildSealableBlockHeader();
 
       final BlockHeader blockHeader = createFinalBlockHeader(sealableBlockHeader);

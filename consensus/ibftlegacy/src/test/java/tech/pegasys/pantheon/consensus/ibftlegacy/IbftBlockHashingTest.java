@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
-import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -121,7 +120,7 @@ public class IbftBlockHashingTest {
     builder.gasLimit(4704588);
     builder.gasUsed(0);
     builder.timestamp(1530674616);
-    builder.extraData(new UnparsedExtraData(BytesValue.fromHexString(extraDataHexString)));
+    builder.extraData(BytesValue.fromHexString(extraDataHexString));
     builder.mixHash(
         Hash.fromHexString("0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365"));
     builder.nonce(0);

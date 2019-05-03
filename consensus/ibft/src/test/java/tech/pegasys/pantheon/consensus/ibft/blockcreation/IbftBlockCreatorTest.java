@@ -90,11 +90,12 @@ public class IbftBlockCreatorTest {
             initialValidatorList.get(0),
             parent ->
                 new IbftExtraData(
-                    BytesValue.wrap(new byte[32]),
-                    Collections.emptyList(),
-                    Optional.empty(),
-                    0,
-                    initialValidatorList),
+                        BytesValue.wrap(new byte[32]),
+                        Collections.emptyList(),
+                        Optional.empty(),
+                        0,
+                        initialValidatorList)
+                    .encode(),
             pendingTransactions,
             protContext,
             protocolSchedule,

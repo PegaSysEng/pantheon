@@ -16,8 +16,8 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class CliqueBlockHeaderUtils implements BlockHeaderUtils {
 
@@ -27,7 +27,7 @@ public class CliqueBlockHeaderUtils implements BlockHeaderUtils {
   }
 
   @Override
-  public ExtraData parseExtraData(final long blockNumber, final BytesValue extraDataField) {
-    return CliqueExtraData.decodeRaw(extraDataField);
+  public ExtraData parseExtraData(final SealableBlockHeader header) {
+    return CliqueExtraData.decodeRaw(header.getRawExtraData());
   }
 }

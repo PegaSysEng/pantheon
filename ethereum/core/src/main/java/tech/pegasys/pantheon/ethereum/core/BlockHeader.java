@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Objects;
@@ -28,9 +29,8 @@ public class BlockHeader extends SealableBlockHeader {
   private final Hash mixHash;
 
   private final long nonce;
-  private final BlockHeaderUtils blockHeaderUtils;
 
-  private Hash hash;
+  private volatile Hash hash;
 
   public BlockHeader(
       final Hash parentHash,
@@ -45,7 +45,7 @@ public class BlockHeader extends SealableBlockHeader {
       final long gasLimit,
       final long gasUsed,
       final long timestamp,
-      final ExtraData extraData,
+      final BytesValue extraData,
       final Hash mixHash,
       final long nonce,
       final BlockHeaderUtils blockHeaderUtils) {
@@ -62,10 +62,10 @@ public class BlockHeader extends SealableBlockHeader {
         gasLimit,
         gasUsed,
         timestamp,
-        extraData);
+        extraData,
+        blockHeaderUtils);
     this.mixHash = mixHash;
     this.nonce = nonce;
-    this.blockHeaderUtils = blockHeaderUtils;
   }
 
   /**
@@ -118,7 +118,7 @@ public class BlockHeader extends SealableBlockHeader {
     out.writeLongScalar(gasLimit);
     out.writeLongScalar(gasUsed);
     out.writeLongScalar(timestamp);
-    out.writeBytesValue(extraData.toBytesValue());
+    out.writeBytesValue(rawExtraData);
     out.writeBytesValue(mixHash);
     out.writeLong(nonce);
 
@@ -140,8 +140,7 @@ public class BlockHeader extends SealableBlockHeader {
     final long gasLimit = input.readLongScalar();
     final long gasUsed = input.readLongScalar();
     final long timestamp = input.readLongScalar();
-    final ExtraData extraData =
-        blockHeaderUtils.parseExtraData(blockNumber, input.readBytesValue());
+    final BytesValue extraData = input.readBytesValue();
     final Hash mixHash = Hash.wrap(input.readBytes32());
     final long nonce = input.readLong();
     input.leaveList();
@@ -199,7 +198,7 @@ public class BlockHeader extends SealableBlockHeader {
     sb.append("gasLimit=").append(gasLimit).append(", ");
     sb.append("gasUsed=").append(gasUsed).append(", ");
     sb.append("timestamp=").append(timestamp).append(", ");
-    sb.append("extraData=").append(extraData).append(", ");
+    sb.append("extraData=").append(rawExtraData).append(", ");
     sb.append("mixHash=").append(mixHash).append(", ");
     sb.append("nonce=").append(nonce);
     return sb.append("}").toString();

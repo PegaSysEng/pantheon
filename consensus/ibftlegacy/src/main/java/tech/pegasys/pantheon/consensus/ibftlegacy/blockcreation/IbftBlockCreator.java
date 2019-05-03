@@ -90,7 +90,7 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
     final IbftExtraData sealedExtraData = constructSignedExtraData(builder.buildBlockHeader());
 
     // Replace the extraData in the BlockHeaderBuilder, and return header.
-    return builder.extraData(sealedExtraData).buildBlockHeader();
+    return builder.extraData(sealedExtraData.encode()).buildBlockHeader();
   }
 
   /**

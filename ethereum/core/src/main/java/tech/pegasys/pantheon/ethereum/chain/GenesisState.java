@@ -147,7 +147,7 @@ public final class GenesisState {
         .gasLimit(genesis.getGasLimit())
         .gasUsed(0L)
         .timestamp(genesis.getTimestamp())
-        .extraData(blockHeaderUtils.parseExtraData(blockNumber, parseExtraData(genesis)))
+        .extraData(parseExtraData(genesis))
         .mixHash(parseMixHash(genesis))
         .nonce(parseNonce(genesis))
         .blockHeaderUtils(blockHeaderUtils)

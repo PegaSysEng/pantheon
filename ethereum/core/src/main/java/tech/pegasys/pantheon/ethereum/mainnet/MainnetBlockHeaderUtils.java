@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -34,7 +35,7 @@ public class MainnetBlockHeaderUtils implements BlockHeaderUtils {
   }
 
   @Override
-  public ExtraData parseExtraData(final long blockNumber, final BytesValue extraDataField) {
-    return new UnparsedExtraData(extraDataField);
+  public ExtraData parseExtraData(final SealableBlockHeader header) {
+    return new UnparsedExtraData(header.getRawExtraData());
   }
 }

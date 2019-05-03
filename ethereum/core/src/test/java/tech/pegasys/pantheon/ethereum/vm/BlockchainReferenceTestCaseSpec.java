@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
+import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
@@ -167,7 +168,7 @@ public class BlockchainReferenceTestCaseSpec {
           Long.decode(gasLimit), // gasLimit
           Long.decode(gasUsed), // gasUsed
           Long.decode(timestamp), // timestamp
-          new UnparsedExtraData(BytesValue.fromHexString(extraData)), // extraData
+          BytesValue.fromHexString(extraData), // extraData
           Hash.fromHexString(mixHash), // mixHash
           BytesValue.fromHexString(nonce).getLong(0),
           new BlockHeaderUtils() {
@@ -177,8 +178,7 @@ public class BlockchainReferenceTestCaseSpec {
             }
 
             @Override
-            public ExtraData parseExtraData(
-                final long blockNumber, final BytesValue extraDataField) {
+            public ExtraData parseExtraData(final SealableBlockHeader header) {
               return new UnparsedExtraData(BytesValue.fromHexString(extraData));
             }
           });

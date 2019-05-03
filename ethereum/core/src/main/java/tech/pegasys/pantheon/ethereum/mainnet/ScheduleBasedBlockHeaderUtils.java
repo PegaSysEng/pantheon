@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 
 /**
  * Looks up the correct {@link BlockHeaderUtils} to use based on a {@link ProtocolSchedule} to
@@ -36,15 +36,15 @@ public class ScheduleBasedBlockHeaderUtils<C> implements BlockHeaderUtils {
 
   @Override
   public Hash hash(final BlockHeader header) {
-    return getBlockHeaderUtils(header.getNumber()).hash(header);
+    return getBlockHeaderUtils(header).hash(header);
   }
 
   @Override
-  public ExtraData parseExtraData(final long blockNumber, final BytesValue extraDataField) {
-    return getBlockHeaderUtils(blockNumber).parseExtraData(blockNumber, extraDataField);
+  public ExtraData parseExtraData(final SealableBlockHeader header) {
+    return getBlockHeaderUtils(header).parseExtraData(header);
   }
 
-  private BlockHeaderUtils getBlockHeaderUtils(final long blockNumber) {
-    return protocolSchedule.getByBlockNumber(blockNumber).getBlockHeaderUtils();
+  private BlockHeaderUtils getBlockHeaderUtils(final SealableBlockHeader header) {
+    return protocolSchedule.getByBlockNumber(header.getNumber()).getBlockHeaderUtils();
   }
 }

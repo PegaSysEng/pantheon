@@ -15,13 +15,13 @@ package tech.pegasys.pantheon.consensus.ibft;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class IbftBlockHashing {
@@ -77,18 +77,18 @@ public class IbftBlockHashing {
   }
 
   private static BytesValue serializeHeader(
-      final BlockHeader header, final ExtraData extraDataSerializer) {
+      final BlockHeader header, final Supplier<BytesValue> extraDataSerializer) {
 
     // create a block header which is a copy of the header supplied as parameter except of the
     // extraData field
-    BlockHeaderBuilder builder = BlockHeaderBuilder.fromHeader(header);
+    final BlockHeaderBuilder builder = BlockHeaderBuilder.fromHeader(header);
     builder.blockHeaderUtils(IbftBlockHeaderUtils.forOnChainBlock());
 
     // set the extraData field using the supplied extraDataSerializer if the block height is not 0
     if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
-      builder.extraData(header.getExtraData());
+      builder.extraData(header.getRawExtraData());
     } else {
-      builder.extraData(extraDataSerializer);
+      builder.extraData(extraDataSerializer.get());
     }
 
     final BytesValueRLPOutput out = new BytesValueRLPOutput();

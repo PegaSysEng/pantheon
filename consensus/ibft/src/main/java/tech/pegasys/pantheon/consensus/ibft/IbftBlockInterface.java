@@ -65,7 +65,7 @@ public class IbftBlockInterface implements BlockInterface {
             prevExtraData.getValidators());
 
     final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
-    headerBuilder.extraData(substituteExtraData).blockHeaderUtils(blockHeaderUtils);
+    headerBuilder.extraData(substituteExtraData.encode()).blockHeaderUtils(blockHeaderUtils);
 
     final BlockHeader newHeader = headerBuilder.buildBlockHeader();
 

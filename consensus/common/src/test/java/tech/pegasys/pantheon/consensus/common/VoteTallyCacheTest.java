@@ -32,7 +32,6 @@ import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Arrays;
@@ -69,7 +68,7 @@ public class VoteTallyCacheTest {
     for (int i = 0; i < 3; i++) {
       validators.add(AddressHelpers.ofValue(i));
     }
-    headerBuilder.extraData(new UnparsedExtraData(BytesValue.wrap(new byte[32])));
+    headerBuilder.extraData(BytesValue.wrap(new byte[32]));
 
     genesisBlock = createEmptyBlock(0, Hash.ZERO);
 

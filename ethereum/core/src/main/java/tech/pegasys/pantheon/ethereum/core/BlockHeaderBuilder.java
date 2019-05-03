@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.time.Instant;
@@ -48,7 +49,7 @@ public class BlockHeaderBuilder {
 
   private long timestamp = -1L;
 
-  private ExtraData extraData;
+  private BytesValue extraData;
 
   private Hash mixHash;
 
@@ -76,7 +77,7 @@ public class BlockHeaderBuilder {
         .gasLimit(header.getGasLimit())
         .gasUsed(header.getGasUsed())
         .timestamp(header.getTimestamp())
-        .extraData(header.getExtraData())
+        .extraData(header.getRawExtraData())
         .mixHash(header.getMixHash())
         .nonce(header.getNonce());
   }
@@ -148,14 +149,15 @@ public class BlockHeaderBuilder {
         gasLimit,
         gasUsed,
         timestamp,
-        extraData);
+        extraData,
+        blockHeaderUtils);
   }
 
   private void validateBlockHeader() {
     validateSealableBlockHeader();
     checkState(this.mixHash != null, "Missing mixHash");
     checkState(this.nonce.isPresent(), "Missing nonce");
-    checkState(this.blockHeaderUtils != null, "Missing blockHashFunction");
+    checkState(this.blockHeaderUtils != null, "Missing blockHeaderUtils");
   }
 
   private void validateProcessableBlockHeader() {
@@ -176,6 +178,7 @@ public class BlockHeaderBuilder {
     checkState(this.logsBloom != null, "Missing logs bloom filter");
     checkState(this.gasUsed > -1L, "Missing gas used");
     checkState(this.extraData != null, "Missing extra data field");
+    checkState(this.blockHeaderUtils != null, "Missing blockHeaderUtils");
   }
 
   public BlockHeaderBuilder populateFrom(final ProcessableBlockHeader processableBlockHeader) {
@@ -203,7 +206,7 @@ public class BlockHeaderBuilder {
     gasLimit(sealableBlockHeader.getGasLimit());
     gasUsed(sealableBlockHeader.getGasUsed());
     timestamp(sealableBlockHeader.getTimestamp());
-    extraData(sealableBlockHeader.getExtraData());
+    extraData(sealableBlockHeader.getRawExtraData());
     return this;
   }
 
@@ -279,7 +282,7 @@ public class BlockHeaderBuilder {
     return this;
   }
 
-  public BlockHeaderBuilder extraData(final ExtraData data) {
+  public BlockHeaderBuilder extraData(final BytesValue data) {
     checkNotNull(data);
 
     this.extraData = data;

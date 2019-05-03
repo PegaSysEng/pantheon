@@ -81,7 +81,7 @@ public class CliqueExtraData implements ExtraData {
     return new CliqueExtraData(vanityData, proposerSeal, validators);
   }
 
-  public synchronized Address getProposerAddress(final BlockHeader fullHeader) {
+  public synchronized Address calculateProposerAddress(final BlockHeader fullHeader) {
     if (proposerAddress == null) {
       proposerAddress = CliqueBlockHashing.recoverProposerAddress(fullHeader, this);
     }

@@ -35,11 +35,9 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcResponseKey.TRANSACT
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
@@ -83,8 +81,8 @@ public class JsonRpcResponseUtils {
     final Hash receiptsRoot = hash(values.get(RECEIPTS_ROOT));
     final LogsBloomFilter logsBloom = logsBloom(values.get(LOGS_BLOOM));
     final UInt256 difficulty = unsignedInt256(values.get(DIFFICULTY));
-    final ExtraData extraData = new UnparsedExtraData(bytes(values.get(EXTRA_DATA)));
-    final BlockHeaderUtils hashFunction = new MainnetBlockHeaderUtils();
+    final BytesValue extraData = bytes(values.get(EXTRA_DATA));
+    final BlockHeaderUtils blockHeaderUtils = new MainnetBlockHeaderUtils();
     final long number = unsignedLong(values.get(NUMBER));
     final long gasLimit = unsignedLong(values.get(GAS_LIMIT));
     final long gasUsed = unsignedLong(values.get(GAS_USED));
@@ -112,7 +110,7 @@ public class JsonRpcResponseUtils {
             extraData,
             mixHash,
             nonce,
-            hashFunction);
+            blockHeaderUtils);
 
     return new JsonRpcSuccessResponse(
         null, new BlockResult(header, transactions, ommers, totalDifficulty, size));

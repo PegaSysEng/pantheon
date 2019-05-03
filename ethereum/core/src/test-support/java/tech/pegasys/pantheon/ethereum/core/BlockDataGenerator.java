@@ -221,7 +221,7 @@ public class BlockDataGenerator {
         .gasLimit(gasLimit)
         .gasUsed(gasUsed)
         .timestamp(Instant.now().truncatedTo(ChronoUnit.SECONDS).getEpochSecond())
-        .extraData(new UnparsedExtraData(options.getExtraData(bytes32())))
+        .extraData(options.getExtraData(bytes32()))
         .mixHash(hash())
         .nonce(blockNonce)
         .blockHeaderUtils(options.getBlockHeaderUtils(new MainnetBlockHeaderUtils()))

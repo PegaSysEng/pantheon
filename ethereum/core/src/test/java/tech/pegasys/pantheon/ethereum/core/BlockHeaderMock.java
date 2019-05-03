@@ -52,7 +52,7 @@ public class BlockHeaderMock extends BlockHeader {
         Long.decode(gasLimit),
         0L,
         Long.decode(timestamp),
-        new UnparsedExtraData(BytesValue.EMPTY),
+        BytesValue.EMPTY,
         Hash.ZERO,
         0L,
         new MainnetBlockHeaderUtils());
