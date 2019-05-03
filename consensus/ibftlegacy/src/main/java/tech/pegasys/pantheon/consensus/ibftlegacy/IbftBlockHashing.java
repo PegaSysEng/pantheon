@@ -71,7 +71,7 @@ public class IbftBlockHashing {
    * @return the hash of the header including the validator and proposer seal in the extra data
    */
   public static Hash calculateHashOfIbftBlockOnChain(final BlockHeader header) {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
     return Hash.hash(serializeHeaderWithoutCommittedSeals(header, ibftExtraData));
   }
 
@@ -153,7 +153,7 @@ public class IbftBlockHashing {
     out.writeLongScalar(header.getTimestamp());
     // Cannot decode an IbftExtraData on block 0 due to missing/illegal signatures
     if (header.getNumber() == 0) {
-      out.writeBytesValue(header.getExtraData().toBytesValue());
+      out.writeBytesValue(header.getExtraData());
     } else {
       out.writeBytesValue(extraDataSerializer.get());
     }

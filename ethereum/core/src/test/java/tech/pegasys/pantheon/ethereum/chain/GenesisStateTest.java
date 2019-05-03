@@ -58,7 +58,7 @@ public final class GenesisStateTest {
     assertThat(header.getTransactionsRoot()).isEqualTo(Hash.EMPTY_TRIE_HASH);
     assertThat(header.getReceiptsRoot()).isEqualTo(Hash.EMPTY_TRIE_HASH);
     assertThat(header.getOmmersHash()).isEqualTo(Hash.EMPTY_LIST_HASH);
-    assertThat(header.getExtraData().toBytesValue()).isEqualTo(BytesValue.EMPTY);
+    assertThat(header.getExtraData()).isEqualTo(BytesValue.EMPTY);
     assertThat(header.getParentHash()).isEqualTo(Hash.ZERO);
     final DefaultMutableWorldState worldState =
         new DefaultMutableWorldState(
@@ -85,7 +85,7 @@ public final class GenesisStateTest {
     assertThat(header.getTransactionsRoot()).isEqualTo(Hash.EMPTY_TRIE_HASH);
     assertThat(header.getReceiptsRoot()).isEqualTo(Hash.EMPTY_TRIE_HASH);
     assertThat(header.getOmmersHash()).isEqualTo(Hash.EMPTY_LIST_HASH);
-    assertThat(header.getExtraData().toBytesValue()).isEqualTo(BytesValue.EMPTY);
+    assertThat(header.getExtraData()).isEqualTo(BytesValue.EMPTY);
     assertThat(header.getParentHash()).isEqualTo(Hash.ZERO);
   }
 

@@ -63,7 +63,7 @@ public class CliqueBlockHashing {
 
   private static BytesValue encodeExtraDataWithoutProposerSeal(
       final CliqueExtraData cliqueExtraData) {
-    final BytesValue extraDataBytes = cliqueExtraData.toBytesValue();
+    final BytesValue extraDataBytes = cliqueExtraData.encode();
     // Always trim off final 65 bytes (which maybe zeros)
     return extraDataBytes.slice(0, extraDataBytes.size() - Signature.BYTES_REQUIRED);
   }

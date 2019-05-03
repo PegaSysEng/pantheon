@@ -33,7 +33,7 @@ public class IbftBlockInterface implements BlockInterface {
 
   @Override
   public Optional<ValidatorVote> extractVoteFromHeader(final BlockHeader header) {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
 
     if (ibftExtraData.getVote().isPresent()) {
       final Vote headerVote = ibftExtraData.getVote().get();
@@ -49,13 +49,13 @@ public class IbftBlockInterface implements BlockInterface {
 
   @Override
   public Collection<Address> validatorsInBlock(final BlockHeader header) {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
     return ibftExtraData.getValidators();
   }
 
   public static Block replaceRoundInBlock(
       final Block block, final int round, final BlockHeaderUtils blockHeaderUtils) {
-    final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
+    final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader());
     final IbftExtraData substituteExtraData =
         new IbftExtraData(
             prevExtraData.getVanityData(),

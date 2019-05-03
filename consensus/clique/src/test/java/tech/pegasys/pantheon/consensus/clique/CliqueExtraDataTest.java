@@ -46,7 +46,7 @@ public class CliqueExtraDataTest {
     final CliqueExtraData extraData =
         new CliqueExtraData(vanityData, proposerSeal, validators, null);
 
-    final BytesValue serialisedData = extraData.toBytesValue();
+    final BytesValue serialisedData = extraData.encode();
 
     final CliqueExtraData decodedExtraData =
         CliqueExtraData.decode(createHeaderWithExtraData(serialisedData));

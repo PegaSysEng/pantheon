@@ -50,7 +50,7 @@ public class IbftBlockHashingTest {
 
   @Test
   public void recoverProposerAddressFromSeal() {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
     final Address proposerAddress = IbftBlockHashing.recoverProposerAddress(header, ibftExtraData);
 
     assertThat(proposerAddress).isEqualTo(PROPOSER_IN_HEADER);
@@ -58,13 +58,13 @@ public class IbftBlockHashingTest {
 
   @Test
   public void readValidatorListFromExtraData() {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
     Assertions.assertThat(ibftExtraData.getValidators()).isEqualTo(VALIDATORS_IN_HEADER);
   }
 
   @Test
   public void recoverCommitterAddresses() {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
     final List<Address> committers =
         IbftBlockHashing.recoverCommitterAddresses(header, ibftExtraData);
 

@@ -102,7 +102,7 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
    *     proposerSeal will also be populated.
    */
   private IbftExtraData constructSignedExtraData(final BlockHeader headerToSign) {
-    final IbftExtraData extraData = IbftExtraData.decode(headerToSign.getExtraData());
+    final IbftExtraData extraData = IbftExtraData.decode(headerToSign);
     final Hash hashToSign =
         IbftBlockHashing.calculateDataHashForProposerSeal(headerToSign, extraData);
     return new IbftExtraData(

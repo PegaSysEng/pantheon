@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
@@ -32,7 +32,7 @@ import java.util.StringJoiner;
  * Represents the data structure stored in the extraData field of the BlockHeader used when
  * operating under an IBFT 2.0 consensus mechanism.
  */
-public class IbftExtraData implements ExtraData {
+public class IbftExtraData {
 
   public static final int EXTRA_VANITY_LENGTH = 32;
 
@@ -60,11 +60,12 @@ public class IbftExtraData implements ExtraData {
     this.vote = vote;
   }
 
-  public static IbftExtraData decode(final ExtraData inputExtraData) {
+  public static IbftExtraData decode(final BlockHeader blockHeader) {
+    final Object inputExtraData = blockHeader.getParsedExtraData();
     if (inputExtraData instanceof IbftExtraData) {
       return (IbftExtraData) inputExtraData;
     }
-    return decodeRaw(inputExtraData.toBytesValue());
+    return decodeRaw(blockHeader.getExtraData());
   }
 
   public static IbftExtraData decodeRaw(final BytesValue input) {
@@ -85,11 +86,6 @@ public class IbftExtraData implements ExtraData {
     rlpInput.leaveList();
 
     return new IbftExtraData(vanityData, seals, vote, round, validators);
-  }
-
-  @Override
-  public BytesValue toBytesValue() {
-    return encode();
   }
 
   public BytesValue encode() {

@@ -32,7 +32,7 @@ public class TestHelpers {
 
     final CliqueExtraData unsignedExtraData =
         new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validators, null);
-    blockHeaderBuilder.extraData(unsignedExtraData);
+    blockHeaderBuilder.extraData(unsignedExtraData.encode());
 
     final Hash signingHash =
         CliqueBlockHashing.calculateDataHashForProposerSeal(
@@ -46,7 +46,7 @@ public class TestHelpers {
                 proposerSignature,
                 unsignedExtraData.getValidators(),
                 null)
-            .toBytesValue();
+            .encode();
 
     blockHeaderBuilder.extraData(signedExtraData);
 

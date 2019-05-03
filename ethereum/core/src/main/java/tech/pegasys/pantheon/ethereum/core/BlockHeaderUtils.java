@@ -28,5 +28,5 @@ public interface BlockHeaderUtils {
    */
   Hash hash(BlockHeader header);
 
-  ExtraData parseExtraData(BlockHeader header);
+  Object parseExtraData(BlockHeader header);
 }

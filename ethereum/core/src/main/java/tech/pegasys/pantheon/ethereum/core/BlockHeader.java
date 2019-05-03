@@ -35,7 +35,7 @@ public class BlockHeader extends SealableBlockHeader {
 
   private final Supplier<Hash> hash;
 
-  private final Supplier<ExtraData> extraData;
+  private final Supplier<Object> parsedExtraData;
 
   public BlockHeader(
       final Hash parentHash,
@@ -71,7 +71,7 @@ public class BlockHeader extends SealableBlockHeader {
     this.mixHash = mixHash;
     this.nonce = nonce;
     this.hash = Suppliers.memoize(() -> blockHeaderUtils.hash(this));
-    this.extraData = Suppliers.memoize(() -> blockHeaderUtils.parseExtraData(this));
+    this.parsedExtraData = Suppliers.memoize(() -> blockHeaderUtils.parseExtraData(this));
   }
 
   /**
@@ -92,12 +92,12 @@ public class BlockHeader extends SealableBlockHeader {
     return nonce;
   }
   /**
-   * Returns the block extra data field.
+   * Returns the block extra data field, as parsed by the {@link BlockHeaderUtils}.
    *
    * @return the block extra data field
    */
-  public ExtraData getExtraData() {
-    return extraData.get();
+  public Object getParsedExtraData() {
+    return parsedExtraData.get();
   }
 
   /**
@@ -129,7 +129,7 @@ public class BlockHeader extends SealableBlockHeader {
     out.writeLongScalar(gasLimit);
     out.writeLongScalar(gasUsed);
     out.writeLongScalar(timestamp);
-    out.writeBytesValue(rawExtraData);
+    out.writeBytesValue(extraData);
     out.writeBytesValue(mixHash);
     out.writeLong(nonce);
 
@@ -209,7 +209,7 @@ public class BlockHeader extends SealableBlockHeader {
     sb.append("gasLimit=").append(gasLimit).append(", ");
     sb.append("gasUsed=").append(gasUsed).append(", ");
     sb.append("timestamp=").append(timestamp).append(", ");
-    sb.append("extraData=").append(rawExtraData).append(", ");
+    sb.append("extraData=").append(extraData).append(", ");
     sb.append("mixHash=").append(mixHash).append(", ");
     sb.append("nonce=").append(nonce);
     return sb.append("}").toString();

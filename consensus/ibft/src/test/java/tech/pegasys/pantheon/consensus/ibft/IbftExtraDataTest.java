@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
@@ -98,8 +99,7 @@ public class IbftExtraDataTest {
   }
 
   /**
-   * This test specifically verifies that {@link
-   * IbftExtraData#decode(tech.pegasys.pantheon.ethereum.core.ExtraData)} uses {@link
+   * This test specifically verifies that {@link IbftExtraData#decode(BlockHeader)} uses {@link
    * RLPInput#readInt()} rather than {@link RLPInput#readIntScalar()} to decode the round number
    */
   @Test

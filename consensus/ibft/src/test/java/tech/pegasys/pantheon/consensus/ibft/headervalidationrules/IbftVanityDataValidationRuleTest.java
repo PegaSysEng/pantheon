@@ -39,7 +39,8 @@ public class IbftVanityDataValidationRuleTest {
     final IbftExtraData extraData =
         new IbftExtraData(
             BytesValue.wrap(new byte[extraDataSize]), emptyList(), empty(), 0, emptyList());
-    final BlockHeader header = new BlockHeaderTestFixture().extraData(extraData).buildHeader();
+    final BlockHeader header =
+        new BlockHeaderTestFixture().extraData(extraData.encode()).buildHeader();
 
     return validationRule.validate(header, null, null);
   }

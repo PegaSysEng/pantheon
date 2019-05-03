@@ -18,7 +18,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
@@ -35,7 +34,7 @@ import org.apache.logging.log4j.Logger;
  * Represents the data structure stored in the extraData field of the BlockHeader used when
  * operating under an Clique consensus mechanism.
  */
-public class CliqueExtraData implements ExtraData {
+public class CliqueExtraData {
   private static final Logger LOG = LogManager.getLogger();
   public static final int EXTRA_VANITY_LENGTH = 32;
 
@@ -63,11 +62,11 @@ public class CliqueExtraData implements ExtraData {
 
   public static BytesValue createUnsignedData(
       final BytesValue vanityData, final List<Address> validators) {
-    return new CliqueExtraData(vanityData, null, validators, null).toBytesValue();
+    return new CliqueExtraData(vanityData, null, validators, null).encode();
   }
 
   public static CliqueExtraData decode(final BlockHeader header) {
-    final ExtraData inputExtraData = header.getExtraData();
+    final Object inputExtraData = header.getParsedExtraData();
     if (inputExtraData instanceof CliqueExtraData) {
       return (CliqueExtraData) inputExtraData;
     }
@@ -78,7 +77,7 @@ public class CliqueExtraData implements ExtraData {
   }
 
   static CliqueExtraData decodeRaw(final BlockHeader header) {
-    final BytesValue input = header.getRawExtraData();
+    final BytesValue input = header.getExtraData();
     if (input.size() < EXTRA_VANITY_LENGTH + Signature.BYTES_REQUIRED) {
       throw new IllegalArgumentException(
           "Invalid BytesValue supplied - too short to produce a valid Clique Extra Data object.");
@@ -118,8 +117,7 @@ public class CliqueExtraData implements ExtraData {
     return result;
   }
 
-  @Override
-  public BytesValue toBytesValue() {
+  public BytesValue encode() {
     final BytesValue validatorData = BytesValues.concatenate(validators.toArray(new Address[0]));
     return BytesValues.concatenate(
         vanityData,

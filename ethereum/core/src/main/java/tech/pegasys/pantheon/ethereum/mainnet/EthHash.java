@@ -175,7 +175,7 @@ public final class EthHash {
     out.writeLongScalar(header.getGasLimit());
     out.writeLongScalar(header.getGasUsed());
     out.writeLongScalar(header.getTimestamp());
-    out.writeBytesValue(header.getRawExtraData());
+    out.writeBytesValue(header.getExtraData());
     out.endList();
     return DirectAcyclicGraphSeed.KECCAK_256.get().digest(out.encoded().extractArray());
   }

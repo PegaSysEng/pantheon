@@ -42,7 +42,7 @@ public class IbftBlockHashing {
   }
 
   public static Hash calculateDataHashForCommittedSeal(final BlockHeader header) {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
     return Hash.hash(serializeHeader(header, ibftExtraData::encodeWithoutCommitSeals));
   }
 
@@ -54,7 +54,7 @@ public class IbftBlockHashing {
    * @return the hash of the header to be used when referencing the header on the blockchain
    */
   public static Hash calculateHashOfIbftBlockOnChain(final BlockHeader header) {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
     return Hash.hash(
         serializeHeader(header, ibftExtraData::encodeWithoutCommitSealsAndRoundNumber));
   }
@@ -86,7 +86,7 @@ public class IbftBlockHashing {
 
     // set the extraData field using the supplied extraDataSerializer if the block height is not 0
     if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
-      builder.extraData(header.getRawExtraData());
+      builder.extraData(header.getExtraData());
     } else {
       builder.extraData(extraDataSerializer.get());
     }

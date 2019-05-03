@@ -122,11 +122,6 @@ public class BlockHeaderTestFixture {
     return this;
   }
 
-  public BlockHeaderTestFixture extraData(final ExtraData extraData) {
-    this.extraData = extraData.toBytesValue();
-    return this;
-  }
-
   public BlockHeaderTestFixture extraData(final BytesValue extraData) {
     this.extraData = extraData;
     return this;

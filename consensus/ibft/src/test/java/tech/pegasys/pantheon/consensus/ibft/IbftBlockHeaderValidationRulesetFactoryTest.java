@@ -318,7 +318,7 @@ public class IbftBlockHeaderValidationRulesetFactoryTest {
             singletonList(proposerKeyPair),
             0xDEADBEEF);
 
-    builder.extraData(ibftExtraData);
+    builder.extraData(ibftExtraData.encode());
     return builder;
   }
 }

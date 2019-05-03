@@ -23,12 +23,10 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderUtils;
-import tech.pegasys.pantheon.ethereum.core.ExtraData;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.UnparsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderUtils;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
@@ -177,8 +175,8 @@ public class BlockchainReferenceTestCaseSpec {
             }
 
             @Override
-            public ExtraData parseExtraData(final BlockHeader header) {
-              return new UnparsedExtraData(BytesValue.fromHexString(extraData));
+            public BytesValue parseExtraData(final BlockHeader header) {
+              return BytesValue.fromHexString(extraData);
             }
           });
     }

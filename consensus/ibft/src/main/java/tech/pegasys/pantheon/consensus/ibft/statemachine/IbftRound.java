@@ -85,7 +85,7 @@ public class IbftRound {
 
   public void createAndSendProposalMessage(final long headerTimeStampSeconds) {
     final Block block = blockCreator.createBlock(headerTimeStampSeconds);
-    final IbftExtraData extraData = IbftExtraData.decode(block.getHeader().getExtraData());
+    final IbftExtraData extraData = IbftExtraData.decode(block.getHeader());
     LOG.debug("Creating proposed block. round={}", roundState.getRoundIdentifier());
     LOG.trace(
         "Creating proposed block with extraData={} blockHeader={}", extraData, block.getHeader());
@@ -203,7 +203,7 @@ public class IbftRound {
             roundState.getProposedBlock().get(), roundState.getCommitSeals());
 
     final long blockNumber = blockToImport.getHeader().getNumber();
-    final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader().getExtraData());
+    final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader());
     LOG.info(
         "Importing block to chain. round={}, hash={}",
         getRoundIdentifier(),
@@ -224,7 +224,7 @@ public class IbftRound {
 
   private Signature createCommitSeal(final Block block) {
     final BlockHeader proposedHeader = block.getHeader();
-    final IbftExtraData extraData = IbftExtraData.decode(proposedHeader.getExtraData());
+    final IbftExtraData extraData = IbftExtraData.decode(proposedHeader);
     final Hash commitHash =
         IbftBlockHashing.calculateDataHashForCommittedSeal(proposedHeader, extraData);
     return SECP256K1.sign(commitHash, nodeKeys);

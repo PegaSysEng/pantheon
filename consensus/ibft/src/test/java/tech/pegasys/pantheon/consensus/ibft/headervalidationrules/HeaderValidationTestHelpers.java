@@ -46,7 +46,7 @@ public class HeaderValidationTestHelpers {
             BASE_ROUND_NUMBER,
             useDifferentRoundNumbersForCommittedSeals);
 
-    builder.extraData(ibftExtraData);
+    builder.extraData(ibftExtraData.encode());
     return builder.buildHeader();
   }
 }
