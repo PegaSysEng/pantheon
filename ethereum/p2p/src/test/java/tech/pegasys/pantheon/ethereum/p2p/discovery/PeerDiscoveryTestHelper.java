@@ -204,12 +204,6 @@ public class PeerDiscoveryTestHelper {
           .collect(Collectors.toList());
     }
 
-    public AgentBuilder whiteList(
-        final Optional<NodeLocalConfigPermissioningController> whitelist) {
-      this.whitelist = whitelist;
-      return this;
-    }
-
     public AgentBuilder nodePermissioningController(final NodePermissioningController controller) {
       this.nodePermissioningController = Optional.ofNullable(controller);
       return this;
@@ -232,12 +226,7 @@ public class PeerDiscoveryTestHelper {
       config.setActive(active);
 
       return new MockPeerDiscoveryAgent(
-          SECP256K1.KeyPair.generate(),
-          config,
-          blacklist,
-          whitelist,
-          nodePermissioningController,
-          agents);
+          SECP256K1.KeyPair.generate(), config, blacklist, nodePermissioningController, agents);
     }
   }
 }

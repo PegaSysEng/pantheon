@@ -1314,7 +1314,6 @@ public class PeerDiscoveryControllerTest {
               TABLE_REFRESH_INTERVAL_MS,
               PEER_REQUIREMENT,
               blacklist,
-              whitelist,
               nodePermissioningController,
               peerBondedObservers,
               peerDroppedObservers,
