@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.ParsedExtraData;
 import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 
 /**
@@ -39,7 +40,7 @@ public class ScheduleBasedBlockHeaderFunctions<C> implements BlockHeaderFunction
   }
 
   @Override
-  public Object parseExtraData(final BlockHeader header) {
+  public ParsedExtraData parseExtraData(final BlockHeader header) {
     return getBlockHeaderFunctions(header).parseExtraData(header);
   }
 

@@ -35,7 +35,7 @@ public class BlockHeader extends SealableBlockHeader {
 
   private final Supplier<Hash> hash;
 
-  private final Supplier<Object> parsedExtraData;
+  private final Supplier<ParsedExtraData> parsedExtraData;
 
   public BlockHeader(
       final Hash parentHash,
@@ -96,7 +96,7 @@ public class BlockHeader extends SealableBlockHeader {
    *
    * @return the block extra data field
    */
-  public Object getParsedExtraData() {
+  public ParsedExtraData getParsedExtraData() {
     return parsedExtraData.get();
   }
 

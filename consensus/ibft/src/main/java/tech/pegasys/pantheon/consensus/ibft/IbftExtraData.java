@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.ParsedExtraData;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
@@ -32,7 +33,7 @@ import java.util.StringJoiner;
  * Represents the data structure stored in the extraData field of the BlockHeader used when
  * operating under an IBFT 2.0 consensus mechanism.
  */
-public class IbftExtraData {
+public class IbftExtraData implements ParsedExtraData {
 
   public static final int EXTRA_VANITY_LENGTH = 32;
 

@@ -49,7 +49,7 @@ public class CliqueExtraDataTest {
     final BytesValue serialisedData = extraData.encode();
 
     final CliqueExtraData decodedExtraData =
-        CliqueExtraData.decode(createHeaderWithExtraData(serialisedData));
+        CliqueExtraData.decodeRaw(createHeaderWithExtraData(serialisedData));
 
     assertThat(decodedExtraData.getValidators()).isEqualTo(validators);
     assertThat(decodedExtraData.getProposerSeal().get()).isEqualTo(proposerSeal);
@@ -66,7 +66,7 @@ public class CliqueExtraDataTest {
     final BytesValue bufferToInject = BytesValue.wrap(genesisBlockExtraData);
 
     final CliqueExtraData extraData =
-        CliqueExtraData.decode(
+        CliqueExtraData.decodeRaw(
             new BlockHeaderTestFixture()
                 .number(BlockHeader.GENESIS_BLOCK_NUMBER)
                 .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
@@ -82,7 +82,7 @@ public class CliqueExtraDataTest {
         BytesValue.wrap(
             new byte[Signature.BYTES_REQUIRED + CliqueExtraData.EXTRA_VANITY_LENGTH - 1]);
 
-    assertThatThrownBy(() -> CliqueExtraData.decode(createHeaderWithExtraData(illegalData)))
+    assertThatThrownBy(() -> CliqueExtraData.decodeRaw(createHeaderWithExtraData(illegalData)))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage(
             "Invalid BytesValue supplied - too short to produce a valid Clique Extra Data object.");
@@ -98,7 +98,7 @@ public class CliqueExtraDataTest {
                     + Address.SIZE
                     - 1]);
 
-    assertThatThrownBy(() -> CliqueExtraData.decode(createHeaderWithExtraData(illegalData)))
+    assertThatThrownBy(() -> CliqueExtraData.decodeRaw(createHeaderWithExtraData(illegalData)))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("BytesValue is of invalid size - i.e. contains unused bytes.");
   }
@@ -119,7 +119,7 @@ public class CliqueExtraDataTest {
     final String hexOutput = CliqueExtraData.createGenesisExtraDataString(addresses);
 
     final CliqueExtraData extraData =
-        CliqueExtraData.decode(createHeaderWithExtraData(BytesValue.fromHexString(hexOutput)));
+        CliqueExtraData.decodeRaw(createHeaderWithExtraData(BytesValue.fromHexString(hexOutput)));
 
     assertThat(extraData.getValidators()).containsExactly(addresses.toArray(new Address[0]));
   }

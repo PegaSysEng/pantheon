@@ -24,11 +24,7 @@ public class LegacyIbftBlockHeaderFunctions implements BlockHeaderFunctions {
   }
 
   @Override
-  public Object parseExtraData(final BlockHeader header) {
-    // Legacy IBFT always has an invalid genesis block so don't try to parse it.
-    if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
-      return header.getExtraData();
-    }
+  public IbftExtraData parseExtraData(final BlockHeader header) {
     return IbftExtraData.decodeRaw(header.getExtraData());
   }
 }

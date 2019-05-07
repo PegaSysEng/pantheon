@@ -18,6 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.ParsedExtraData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
@@ -34,7 +35,7 @@ import org.apache.logging.log4j.Logger;
  * Represents the data structure stored in the extraData field of the BlockHeader used when
  * operating under an Clique consensus mechanism.
  */
-public class CliqueExtraData {
+public class CliqueExtraData implements ParsedExtraData {
   private static final Logger LOG = LogManager.getLogger();
   public static final int EXTRA_VANITY_LENGTH = 32;
 
@@ -60,7 +61,7 @@ public class CliqueExtraData {
         Suppliers.memoize(() -> CliqueBlockHashing.recoverProposerAddress(header, this));
   }
 
-  public static BytesValue createUnsignedData(
+  public static BytesValue createWithoutProposerSeal(
       final BytesValue vanityData, final List<Address> validators) {
     return new CliqueExtraData(vanityData, null, validators, null).encode();
   }
@@ -72,7 +73,7 @@ public class CliqueExtraData {
     }
     LOG.warn(
         "Expected a CliqueExtraData instance but got {}. Reparsing required.",
-        inputExtraData.getClass().getSimpleName());
+        inputExtraData != null ? inputExtraData.getClass().getSimpleName() : "null");
     return decodeRaw(header);
   }
 
@@ -140,6 +141,7 @@ public class CliqueExtraData {
   }
 
   public static String createGenesisExtraDataString(final List<Address> validators) {
-    return CliqueExtraData.createUnsignedData(BytesValue.wrap(new byte[32]), validators).toString();
+    return CliqueExtraData.createWithoutProposerSeal(BytesValue.wrap(new byte[32]), validators)
+        .toString();
   }
 }

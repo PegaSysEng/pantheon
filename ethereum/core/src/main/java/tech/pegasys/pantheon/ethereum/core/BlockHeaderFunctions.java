@@ -13,10 +13,8 @@
 package tech.pegasys.pantheon.ethereum.core;
 
 /**
- * An interface for creating the block hash given a {@link BlockHeader}.
- *
- * <p>The algorithm to create the block hash may vary depending on the consensus mechanism used by
- * the chain.
+ * An interface for calculating pars of a {@link BlockHeader} which vary based on the consensus
+ * mechanism.
  */
 public interface BlockHeaderFunctions {
 
@@ -28,5 +26,14 @@ public interface BlockHeaderFunctions {
    */
   Hash hash(BlockHeader header);
 
-  Object parseExtraData(BlockHeader header);
+  /**
+   * Parse the extra data value from the header. The actual type returned from this method is
+   * consensus mechanism specific and may be cast to the specific type when used.
+   *
+   * @param header the header to parse the extra data from
+   * @return an instance {@link ParsedExtraData} that provides access to consensus specific
+   *     information parsed from the extra data field. <code>null</code> may be returned if the
+   *     consensus mechanism does not include parseable information in the extra data field.
+   */
+  ParsedExtraData parseExtraData(BlockHeader header);
 }
