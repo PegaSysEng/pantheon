@@ -1,13 +1,12 @@
 pipeline {
     agent {
         docker {
-            image ""
+            image "openjdk:8-windowsservercore-1809"
             label "windows"
         }
     }
-
     stages {
-        stage("Something") {
+        stage("Build") {
             steps {
                 sh ".\\gradlew build"
             }
