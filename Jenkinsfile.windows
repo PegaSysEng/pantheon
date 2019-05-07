@@ -1,9 +1,9 @@
 pipeline {
     agent {
-        docker {
-            image "openjdk:8-windowsservercore-1809"
+        // docker {
+        //    image "openjdk:8-windowsservercore-1809"
             label "windows"
-        }
+        // }
     }
     stages {
         stage("Build") {
