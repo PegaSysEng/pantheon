@@ -28,7 +28,6 @@ import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResu
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -239,10 +238,6 @@ public class PeerDiscoveryController {
             Math.min(REFRESH_CHECK_INTERVAL_MILLIS, tableRefreshIntervalMs),
             this::refreshTableIfRequired);
     tableRefreshTimerId = OptionalLong.of(timerId);
-
-    // TODO whitelist changed notification
-    //    nodeWhitelistController.ifPresent(
-    //        c -> c.subscribeToListUpdatedEvent(this::handleNodeWhitelistUpdatedEvent));
   }
 
   public CompletableFuture<?> stop() {
@@ -370,10 +365,6 @@ public class PeerDiscoveryController {
     }
 
     return true;
-  }
-
-  private void handleNodeWhitelistUpdatedEvent(final NodeWhitelistUpdatedEvent event) {
-    event.getRemovedNodes().stream().map(DiscoveryPeer::fromEnode).forEach(this::dropFromPeerTable);
   }
 
   @VisibleForTesting

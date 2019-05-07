@@ -54,7 +54,6 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -70,7 +69,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1058,71 +1056,6 @@ public class PeerDiscoveryControllerTest {
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
     controller.onMessage(pingPacket, peers.get(0));
     assertThat(controller.getPeers()).doesNotContain(peers.get(0));
-  }
-
-  @Test
-  public void whenObservingNodeWhitelistAndNodeIsRemovedShouldEvictPeerFromPeerTable()
-      throws IOException {
-    final PeerTable peerTableSpy = spy(peerTable);
-    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
-    final DiscoveryPeer peer = peers.get(0);
-    peerTableSpy.tryAdd(peer);
-
-    final LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final URI peerURI = URI.create(peer.getEnodeURLString());
-    config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(
-            config, Collections.emptyList(), selfEnode.getNodeId());
-
-    controller =
-        getControllerBuilder()
-            .whitelist(nodeLocalConfigPermissioningController)
-            .peerTable(peerTableSpy)
-            .build();
-
-    controller.start();
-    nodeLocalConfigPermissioningController.removeNodes(Lists.newArrayList(peerURI.toString()));
-
-    verify(peerTableSpy).tryEvict(eq(DiscoveryPeer.fromURI(peerURI)));
-  }
-
-  @Test
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public void whenObservingNodeWhitelistAndNodeIsRemovedShouldNotifyPeerDroppedObservers()
-      throws IOException {
-    final PeerTable peerTableSpy = spy(peerTable);
-    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
-    final DiscoveryPeer peer = peers.get(0);
-    peerTableSpy.tryAdd(peer);
-
-    final LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final URI peerURI = URI.create(peer.getEnodeURLString());
-    config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(
-            config, Collections.emptyList(), selfEnode.getNodeId());
-
-    final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
-    final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
-    peerDroppedSubscribers.subscribe(peerDroppedEventConsumer);
-
-    doReturn(EvictResult.evicted()).when(peerTableSpy).tryEvict(any());
-
-    controller =
-        getControllerBuilder()
-            .whitelist(nodeLocalConfigPermissioningController)
-            .peerTable(peerTableSpy)
-            .peerDroppedObservers(peerDroppedSubscribers)
-            .build();
-
-    controller.start();
-    nodeLocalConfigPermissioningController.removeNodes(Lists.newArrayList(peerURI.toString()));
-
-    ArgumentCaptor<PeerDroppedEvent> captor = ArgumentCaptor.forClass(PeerDroppedEvent.class);
-    verify(peerDroppedEventConsumer).accept(captor.capture());
-    assertThat(captor.getValue().getPeer())
-        .isEqualTo(DiscoveryPeer.fromURI(peer.getEnodeURLString()));
   }
 
   @Test
