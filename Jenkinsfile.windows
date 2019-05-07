@@ -1,0 +1,12 @@
+pipeline {
+    agent {
+        docker {
+            image ""
+            label "windows"
+        }
+    }
+
+    stages {
+        
+    }
+}
