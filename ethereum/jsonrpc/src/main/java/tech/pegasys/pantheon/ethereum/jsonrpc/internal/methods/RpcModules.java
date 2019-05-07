@@ -36,7 +36,9 @@ public class RpcModules implements JsonRpcMethod {
   }
 
   @Override
-  public String getName() { return RpcMethod.RPC_MODULES.getMethodName(); }
+  public String getName() {
+    return RpcMethod.RPC_MODULES.getMethodName();
+  }
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {

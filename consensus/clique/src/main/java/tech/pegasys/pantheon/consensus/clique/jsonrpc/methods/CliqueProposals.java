@@ -24,6 +24,6 @@ public class CliqueProposals extends AbstractVoteProposerMethod implements JsonR
 
   @Override
   public String getName() {
-    return "clique_proposals";
+    return "";
   }
 }
