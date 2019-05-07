@@ -176,7 +176,6 @@ public class PeerDiscoveryTestHelper {
     private final AtomicInteger nextAvailablePort;
 
     private PeerBlacklist blacklist = new PeerBlacklist();
-    private Optional<NodeLocalConfigPermissioningController> whitelist = Optional.empty();
     private Optional<NodePermissioningController> nodePermissioningController = Optional.empty();
     private List<URI> bootstrapPeers = Collections.emptyList();
     private boolean active = true;
