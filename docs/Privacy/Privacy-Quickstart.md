@@ -1,4 +1,4 @@
-description: Pantheon private network quickstart tutorial
+description: Pantheon private network with privacy enabled quickstart tutorial
 <!--- END of page meta data -->
 
 # Private Network with Privacy Enabled Quickstart Tutorial
