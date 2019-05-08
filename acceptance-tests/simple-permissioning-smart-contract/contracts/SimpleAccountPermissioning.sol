@@ -3,7 +3,7 @@ pragma solidity >=0.4.0 <0.6.0;
 // DO NOT USE THIS CONTRACT IN PRODUCTION APPLICATIONS
 
 contract SimpleAccountPermissioning {
-    address[] private whitelist;
+    mapping (address => bool) private whitelist;
 
     function transactionAllowed(
         address sender,
@@ -16,22 +16,12 @@ contract SimpleAccountPermissioning {
         return whitelistContains(sender);
     }
     function addAccount(address account) public {
-        whitelist.push(account);
+        whitelist[account] = true;
     }
     function removeAccount(address account) public {
-        for (uint256 i = 0; i < whitelist.length; i++) {
-          if (whitelist[i] == account) {
-            whitelist[i] = whitelist[whitelist.length - 1];
-            whitelist.length --;
-          }
-        }
+        whitelist[account] = false;
     }
     function whitelistContains(address account) public view returns(bool) {
-        for (uint256 i = 0; i < whitelist.length; i++) {
-          if (whitelist[i] == account) {
-            return true;
-          }
-        }
-        return false;
+        return whitelist[account];
     }
 }
