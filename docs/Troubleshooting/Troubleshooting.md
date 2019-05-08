@@ -15,11 +15,15 @@ of the data directory or use the [`--data-path`](../Reference/Pantheon-CLI-Synta
 If you are receiving a `Host not authorized` error when attempting to access the JSON-RPC API, ensure [`--host-whitelist`](../Reference/Pantheon-CLI-Syntax.md#host-whitelist)
 includes the host from which you are sending the RPC or `*`. 
 
-## Ports
+## Peers Fail to Connect
 
 If nodes are not communicating, ensure the [required ports are open](https://docs.pantheon.pegasys.tech/en/stable/Configuring-Pantheon/Networking/Configuring-Ports/). 
 
 If your nodes are running in AWS, check you have appropriate `SecurityGroups` to allow access to the required ports.
+
+Check the [enode URLs](../Configuring-Pantheon/Node-Keys.md#enode-url) specified for [bootnodes](../Configuring-Pantheon/Networking#bootnodes)
+or [static nodes](../Configuring-Pantheon/Networking/Managing-Peers.md#static-nodes) match the enode URLs 
+displayed when the remote nodes are started.
 
 ## Mining
 
