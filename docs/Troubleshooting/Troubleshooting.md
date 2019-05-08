@@ -7,8 +7,8 @@ If Pantheon is not working as expected, here are some things to check or try.
 
 ## Supplied Genesis Block Does Not Match Stored Chain Data 
 
-If you get a `Supplied genesis block does not match stored chain data` error, delete the `database` directory in 
-the node [data directory](../Reference/Pantheon-CLI-Syntax.md#data-path). 
+If you get a `Supplied genesis block does not match stored chain data` error, use the genesis file which matches the genesis block 
+of the data directory or use the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option to specify a different data directory. 
 
 ## Host Not Authorized 
 
