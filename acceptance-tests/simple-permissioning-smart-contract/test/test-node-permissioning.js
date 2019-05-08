@@ -1,4 +1,4 @@
-const TestPermissioning = artifacts.require('SimplePermissioning.sol');
+const TestPermissioning = artifacts.require('SimpleNodePermissioning.sol');
 var proxy;
 
 var node1High = "0x9bd359fdc3a2ed5df436c3d8914b1532740128929892092b7fcb320c1b62f375";
