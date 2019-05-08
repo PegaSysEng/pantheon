@@ -14,17 +14,39 @@ def linuxImages = [
     'openjdk:8-jdk',
     'openjdk:11-jdk',
     'openjdk:12-jdk',
-    'pegasyseng/jdk:oracle-8-0.0.1',
-    'pegasyseng/jdk:oracle-11-0.0.1',
-    'pegasyseng/jdk:corretto-8-0.0.1',
     'azul/zulu-openjdk:8',
     'azul/zulu-openjdk:11',
     'azul/zulu-openjdk:12',
     'adoptopenjdk/openjdk8-openj9:latest',
-    'adoptopenjdk/openjdk11-openj9:latest',
+    'adoptopenjdk/openjdk11-openj9:latest'
 ]
 
 def createLinuxBuild(dockerImage) {
+    return {
+        stage("Smoke ${dockerImage}") {
+            node {
+                checkout scm
+                docker.image(dockerImage).inside {
+                    try {
+                        timeout(30) {
+                            sh './gradlew --no-daemon ' + params.gradle_options + ' build'
+                        }
+                    } finally {
+                        junit testResults: '**/build/test-results/**/*.xml', allowEmptyResults: true
+                    }
+                }
+            }
+        }
+    }
+}
+
+def linuxImagesPrivate = [
+    'pegasyseng/jdk:oracle-8-0.0.1',
+    'pegasyseng/jdk:oracle-11-0.0.1',
+    'pegasyseng/jdk:corretto-8-0.0.1'
+]
+
+def createLinuxBuildPrivateImage(dockerImage) {
     return {
         stage("Smoke ${dockerImage}") {
             node {
@@ -80,12 +102,18 @@ if (params.javas != 'all') {
     builds = builds + (linuxImages.find {it.contains(params.javas)}.collectEntries {
         ["Smoke ${it}", createLinuxBuild(it)]
     })
+    builds = builds + (linuxImagesPrivate.find {it.contains(params.javas)}.collectEntries {
+        ["Smoke ${it}", createLinuxBuildPrivateImage(it)]
+    })
 } else {
     builds = builds + (windowsImages.collectEntries {
         ["Smoke ${it}", createWindowsBuild(it)]
     })
     builds = builds + (linuxImages.collectEntries {
         ["Smoke ${it}", createLinuxBuild(it)]
+    })
+    builds = builds + (linuxImagesPrivate.collectEntries {
+        ["Smoke ${it}", createLinuxBuildPrivateImage(it)]
     })
 }
 
