@@ -73,7 +73,7 @@ public class CliqueExtraData implements ParsedExtraData {
     }
     LOG.warn(
         "Expected a CliqueExtraData instance but got {}. Reparsing required.",
-        inputExtraData != null ? inputExtraData.getClass().getSimpleName() : "null");
+        inputExtraData != null ? inputExtraData.getClass().getName() : "null");
     return decodeRaw(header);
   }
 
