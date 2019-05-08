@@ -29,19 +29,19 @@ pipeline {
         //         }
         //     }
         // }
-        stage("Smoke JDK11") {
-            steps {
-                runDocker(
-                    "openjdk:11-windowsservercore",
-                    ".\\gradlew build integrationTest acceptanceTest referenceTest"
-                )
-            }
-            post {
-                always {
-                    junit "**\\build\\test-results\\**\\*.xml"
-                }
-            }
-        }
+        // stage("Smoke JDK11") {
+        //     steps {
+        //         runDocker(
+        //             "openjdk:11-windowsservercore",
+        //             ".\\gradlew build integrationTest acceptanceTest referenceTest"
+        //         )
+        //     }
+        //     post {
+        //         always {
+        //             junit "**\\build\\test-results\\**\\*.xml"
+        //         }
+        //     }
+        // }
 
         stage("Smoke JDK12") {
             steps {
