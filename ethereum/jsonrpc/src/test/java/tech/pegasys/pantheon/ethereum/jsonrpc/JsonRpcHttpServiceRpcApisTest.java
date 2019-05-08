@@ -142,7 +142,7 @@ public class JsonRpcHttpServiceRpcApisTest {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
-      final JsonRpcError expectedError = JsonRpcError.METHOD_NOT_FOUND;
+      final JsonRpcError expectedError = JsonRpcError.METHOD_NOT_ENABLED;
       testHelper.assertValidJsonRpcError(
           json, id, expectedError.getCode(), expectedError.getMessage());
     }
@@ -266,6 +266,8 @@ public class JsonRpcHttpServiceRpcApisTest {
     final Set<Capability> supportedCapabilities = new HashSet<>();
     supportedCapabilities.add(EthProtocol.ETH62);
     supportedCapabilities.add(EthProtocol.ETH63);
+    jsonRpcConfiguration.setPort(0);
+    webSocketConfiguration.setPort(0);
 
     final Map<String, JsonRpcMethod> rpcMethods =
         spy(
