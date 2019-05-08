@@ -22,11 +22,13 @@ import java.util.Optional;
 class StoredNode<V> implements Node<V> {
   private final StoredNodeFactory<V> nodeFactory;
   private final Bytes32 hash;
+  private final boolean singleUse;
   private Node<V> loaded;
 
-  StoredNode(final StoredNodeFactory<V> nodeFactory, final Bytes32 hash) {
+  StoredNode(final StoredNodeFactory<V> nodeFactory, final Bytes32 hash, final boolean singleUse) {
     this.nodeFactory = nodeFactory;
     this.hash = hash;
+    this.singleUse = singleUse;
   }
 
   /** @return True if the node needs to be persisted. */
@@ -52,6 +54,9 @@ class StoredNode<V> implements Node<V> {
   public void accept(final NodeVisitor<V> visitor) {
     final Node<V> node = load();
     node.accept(visitor);
+    if (singleUse) {
+      loaded = null;
+    }
   }
 
   @Override
