@@ -44,6 +44,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
+import tech.pegasys.pantheon.ethereum.worldstate.MarkSweepPruner;
+import tech.pegasys.pantheon.ethereum.worldstate.Pruner;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
@@ -199,6 +201,16 @@ public abstract class PantheonControllerBuilder<C> {
 
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
+    final Pruner pruner =
+        new Pruner(
+            new MarkSweepPruner(
+                protocolContext.getWorldStateArchive().getStorage(),
+                storageProvider.createPruningStorage(),
+                metricsSystem),
+            protocolContext,
+            1000);
+    addShutdownAction(pruner::stop);
+
     final boolean fastSyncEnabled = syncConfig.getSyncMode().equals(SyncMode.FAST);
     ethProtocolManager = createEthProtocolManager(protocolContext, fastSyncEnabled);
     final SyncState syncState =
@@ -210,6 +222,7 @@ public abstract class PantheonControllerBuilder<C> {
             protocolContext,
             protocolContext.getWorldStateArchive().getStorage(),
             ethProtocolManager.getBlockBroadcaster(),
+            pruner,
             ethProtocolManager.ethContext(),
             syncState,
             dataDirectory,

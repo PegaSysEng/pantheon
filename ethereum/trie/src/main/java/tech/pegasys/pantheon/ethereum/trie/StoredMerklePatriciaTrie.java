@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -31,6 +32,7 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
   private final GetVisitor<V> getVisitor = new GetVisitor<>();
   private final RemoveVisitor<V> removeVisitor = new RemoveVisitor<>();
   private final StoredNodeFactory<V> nodeFactory;
+  private final boolean singleUseNodes;
 
   private Node<V> root;
 
@@ -40,12 +42,19 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
    * @param nodeLoader The {@link NodeLoader} to retrieve node data from.
    * @param valueSerializer A function for serializing values to bytes.
    * @param valueDeserializer A function for deserializing values from bytes.
+   * @param singleUseNodes whether nodes should unload data after being visited
    */
   public StoredMerklePatriciaTrie(
       final NodeLoader nodeLoader,
       final Function<V, BytesValue> valueSerializer,
-      final Function<BytesValue, V> valueDeserializer) {
-    this(nodeLoader, MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH, valueSerializer, valueDeserializer);
+      final Function<BytesValue, V> valueDeserializer,
+      final boolean singleUseNodes) {
+    this(
+        nodeLoader,
+        MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH,
+        valueSerializer,
+        valueDeserializer,
+        singleUseNodes);
   }
 
   /**
@@ -56,17 +65,21 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
    *     storage}.
    * @param valueSerializer A function for serializing values to bytes.
    * @param valueDeserializer A function for deserializing values from bytes.
+   * @param singleUseNodes whether nodes should unload data after being visited
    */
   public StoredMerklePatriciaTrie(
       final NodeLoader nodeLoader,
       final Bytes32 rootHash,
       final Function<V, BytesValue> valueSerializer,
-      final Function<BytesValue, V> valueDeserializer) {
-    this.nodeFactory = new StoredNodeFactory<>(nodeLoader, valueSerializer, valueDeserializer);
+      final Function<BytesValue, V> valueDeserializer,
+      final boolean singleUseNodes) {
+    this.singleUseNodes = singleUseNodes;
+    this.nodeFactory =
+        new StoredNodeFactory<>(nodeLoader, valueSerializer, valueDeserializer, singleUseNodes);
     this.root =
         rootHash.equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH)
             ? NullNode.instance()
-            : new StoredNode<>(nodeFactory, rootHash);
+            : new StoredNode<>(nodeFactory, rootHash, singleUseNodes);
   }
 
   @Override
@@ -101,12 +114,17 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
     this.root =
         rootHash.equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH)
             ? NullNode.instance()
-            : new StoredNode<>(nodeFactory, rootHash);
+            : new StoredNode<>(nodeFactory, rootHash, singleUseNodes);
   }
 
   @Override
   public Map<Bytes32, V> entriesFrom(final Bytes32 startKeyHash, final int limit) {
     return StorageEntriesCollector.collectEntries(root, startKeyHash, limit);
+  }
+
+  @Override
+  public void visitAll(final Consumer<Node<V>> visitor) {
+    root.accept(new AllNodesVisitor<>(visitor));
   }
 
   @Override

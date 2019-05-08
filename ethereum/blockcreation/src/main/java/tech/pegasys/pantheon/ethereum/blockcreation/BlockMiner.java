@@ -80,6 +80,11 @@ public class BlockMiner<C, M extends AbstractBlockCreator<C>> implements Runnabl
         Thread.currentThread().interrupt();
       } catch (final Exception ex) {
         LOG.error("Block mining threw an unhandled exception.", ex);
+        try {
+          Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+        } catch (final InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
       }
     }
   }

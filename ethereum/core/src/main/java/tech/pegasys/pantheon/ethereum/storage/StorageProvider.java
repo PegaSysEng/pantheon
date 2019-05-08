@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 
 import java.io.Closeable;
 
@@ -29,4 +30,6 @@ public interface StorageProvider extends Closeable {
   PrivateTransactionStorage createPrivateTransactionStorage();
 
   PrivateStateStorage createPrivateStateStorage();
+
+  KeyValueStorage createPruningStorage();
 }

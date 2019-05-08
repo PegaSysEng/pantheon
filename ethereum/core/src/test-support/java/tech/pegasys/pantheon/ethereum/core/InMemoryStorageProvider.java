@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 
 public class InMemoryStorageProvider implements StorageProvider {
 
@@ -68,6 +69,11 @@ public class InMemoryStorageProvider implements StorageProvider {
   @Override
   public PrivateStateStorage createPrivateStateStorage() {
     return new PrivateStateKeyValueStorage(new InMemoryKeyValueStorage());
+  }
+
+  @Override
+  public KeyValueStorage createPruningStorage() {
+    return new InMemoryKeyValueStorage();
   }
 
   @Override

@@ -41,7 +41,9 @@ public class StoredMerklePatriciaTrieTest {
     valueSerializer =
         value -> (value != null) ? BytesValue.wrap(value.getBytes(Charset.forName("UTF-8"))) : null;
     valueDeserializer = bytes -> new String(bytes.getArrayUnsafe(), Charset.forName("UTF-8"));
-    trie = new StoredMerklePatriciaTrie<>(merkleStorage::get, valueSerializer, valueDeserializer);
+    trie =
+        new StoredMerklePatriciaTrie<>(
+            merkleStorage::get, valueSerializer, valueDeserializer, false);
   }
 
   @Test
@@ -329,21 +331,21 @@ public class StoredMerklePatriciaTrieTest {
     // Create new tries from root hashes and check that we find expected values
     trie =
         new StoredMerklePatriciaTrie<>(
-            merkleStorage::get, hash1, valueSerializer, valueDeserializer);
+            merkleStorage::get, hash1, valueSerializer, valueDeserializer, false);
     assertThat(trie.get(key1)).isEqualTo(Optional.of("value1"));
     assertThat(trie.get(key2)).isEqualTo(Optional.empty());
     assertThat(trie.get(key3)).isEqualTo(Optional.empty());
 
     trie =
         new StoredMerklePatriciaTrie<>(
-            merkleStorage::get, hash2, valueSerializer, valueDeserializer);
+            merkleStorage::get, hash2, valueSerializer, valueDeserializer, false);
     assertThat(trie.get(key1)).isEqualTo(Optional.of("value1"));
     assertThat(trie.get(key2)).isEqualTo(Optional.of("value2"));
     assertThat(trie.get(key3)).isEqualTo(Optional.of("value3"));
 
     trie =
         new StoredMerklePatriciaTrie<>(
-            merkleStorage::get, hash3, valueSerializer, valueDeserializer);
+            merkleStorage::get, hash3, valueSerializer, valueDeserializer, false);
     assertThat(trie.get(key1)).isEqualTo(Optional.of("value4"));
     assertThat(trie.get(key2)).isEqualTo(Optional.of("value2"));
     assertThat(trie.get(key3)).isEqualTo(Optional.of("value3"));
@@ -353,21 +355,21 @@ public class StoredMerklePatriciaTrieTest {
     final MerkleStorage newMerkleStorage = new KeyValueMerkleStorage(keyValueStore);
     trie =
         new StoredMerklePatriciaTrie<>(
-            newMerkleStorage::get, hash1, valueSerializer, valueDeserializer);
+            newMerkleStorage::get, hash1, valueSerializer, valueDeserializer, false);
     assertThat(trie.get(key1)).isEqualTo(Optional.of("value1"));
     assertThat(trie.get(key2)).isEqualTo(Optional.empty());
     assertThat(trie.get(key3)).isEqualTo(Optional.empty());
 
     trie =
         new StoredMerklePatriciaTrie<>(
-            newMerkleStorage::get, hash2, valueSerializer, valueDeserializer);
+            newMerkleStorage::get, hash2, valueSerializer, valueDeserializer, false);
     assertThat(trie.get(key1)).isEqualTo(Optional.of("value1"));
     assertThat(trie.get(key2)).isEqualTo(Optional.of("value2"));
     assertThat(trie.get(key3)).isEqualTo(Optional.of("value3"));
 
     trie =
         new StoredMerklePatriciaTrie<>(
-            newMerkleStorage::get, hash3, valueSerializer, valueDeserializer);
+            newMerkleStorage::get, hash3, valueSerializer, valueDeserializer, false);
     assertThat(trie.get(key1)).isEqualTo(Optional.of("value4"));
     assertThat(trie.get(key2)).isEqualTo(Optional.of("value2"));
     assertThat(trie.get(key3)).isEqualTo(Optional.of("value3"));
@@ -378,7 +380,7 @@ public class StoredMerklePatriciaTrieTest {
     final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
     final MerkleStorage merkleStorage = new KeyValueMerkleStorage(keyValueStorage);
     final StoredMerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b);
+        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b, false);
 
     // Both of these can be inlined in its parent branch and the branch
     // itself can be inlined into its parent extension.
@@ -389,7 +391,7 @@ public class StoredMerklePatriciaTrieTest {
     // Ensure the extension branch can be loaded correct with its inlined child.
     final Bytes32 rootHash = trie.getRootHash();
     final StoredMerklePatriciaTrie<BytesValue, BytesValue> newTrie =
-        new StoredMerklePatriciaTrie<>(merkleStorage::get, rootHash, b -> b, b -> b);
+        new StoredMerklePatriciaTrie<>(merkleStorage::get, rootHash, b -> b, b -> b, false);
     newTrie.get(BytesValue.fromHexString("0x0401"));
   }
 
@@ -400,7 +402,7 @@ public class StoredMerklePatriciaTrieTest {
     final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
     final MerkleStorage merkleStorage = new KeyValueMerkleStorage(keyValueStorage);
     final StoredMerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b);
+        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b, false);
 
     // Both of these can be inlined in its parent branch.
     trie.put(BytesValue.fromHexString("0x0400"), BytesValue.of(1));
@@ -409,7 +411,7 @@ public class StoredMerklePatriciaTrieTest {
 
     final Bytes32 rootHash = trie.getRootHash();
     final StoredMerklePatriciaTrie<BytesValue, BytesValue> newTrie =
-        new StoredMerklePatriciaTrie<>(merkleStorage::get, rootHash, b -> b, b -> b);
+        new StoredMerklePatriciaTrie<>(merkleStorage::get, rootHash, b -> b, b -> b, false);
 
     newTrie.put(BytesValue.fromHexString("0x0800"), BytesValue.of(3));
     newTrie.get(BytesValue.fromHexString("0x0401"));
