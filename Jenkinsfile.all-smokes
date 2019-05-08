@@ -26,14 +26,18 @@ def linuxImages = [
 
 def createLinuxBuild(dockerImage) {
     return {
-        timeout(30) {
-            node {
-                checkout scm
-                docker.image(dockerImage).inside {
-                    try {
-                        sh './gradlew --no-daemon ' + params.gradle_options + ' build'
-                    } finally {
-                        junit '**/build/test-results/**/*.xml'
+        stage("Smoke ${dockerImage}") {
+            timeout(30) {
+                node {
+                    checkout scm
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-pegasysengci') {
+                        docker.image(dockerImage).inside {
+                            try {
+                                sh './gradlew --no-daemon ' + params.gradle_options + ' build'
+                            } finally {
+                                junit '**/build/test-results/**/*.xml'
+                            }
+                        }
                     }
                 }
             }
@@ -49,16 +53,18 @@ def windowsImages = [
 
 def createWindowsBuild(dockerImage) {
     return {
-        timeout(30) {
-            node("windows-server-2019") {
-                checkout scm
-                try {
-                    runDocker(
-                        dockerImage,
-                        ".\\gradlew " + params.gradle_options + " build"
-                    )
-                } finally {
-                    junit "**\\build\\test-results\\**\\*.xml"
+        stage("Smoke ${dockerImage}") {
+            timeout(30) {
+                node("windows-server-2019") {
+                    checkout scm
+                    try {
+                        runDocker(
+                            dockerImage,
+                            ".\\gradlew " + params.gradle_options + " build"
+                        )
+                    } finally {
+                        junit "**\\build\\test-results\\**\\*.xml"
+                    }
                 }
             }
         }
