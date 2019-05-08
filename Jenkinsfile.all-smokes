@@ -27,19 +27,17 @@ def linuxImages = [
 def createLinuxBuild(docker_image) {
     return {
         timeout(30) {
-            stage("Smoke " + docker_image) {
-                agent {
-                    docker {
-                        image docker_image
-                    }
+            agent {
+                docker {
+                    image docker_image
                 }
-                steps {
-                    sh './gradlew --no-daemon ' + params.gradle_options + ' build'
-                }
-                post {
-                    always {
-                        junit "**/build/test-results/**/*.xml"
-                    }
+            }
+            steps {
+                sh './gradlew --no-daemon ' + params.gradle_options + ' build'
+            }
+            post {
+                always {
+                    junit "**/build/test-results/**/*.xml"
                 }
             }
         }
@@ -61,7 +59,7 @@ def createWindowsBuild(docker_image) {
             steps {
                 runDocker(
                     docker_image,
-                    ".\\gradlew build"
+                    ".\\gradlew " + params.gradle_options + " build"
                 )
             }
             post {
