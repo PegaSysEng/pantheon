@@ -1,14 +1,26 @@
+// invokeDocker.groovy
+def runDocker(image, cmd) {
+    powershell """
+        docker run `
+          --rm `
+          -w "${env.WORKSPACE}" `
+          -v "${env.WORKSPACE}:${env.WORKSPACE}:rw" `
+          -e "WORKSPACE=${env.WORKSPACE}" `
+          -e "BUILD_NUMBER=${env.BUILD_NUMBER}" `
+          $image powershell -C "$cmd"
+    """
+}
+
+def image = "openjdk:8-windowsservercore-1809"
+
 pipeline {
     agent {
-        docker {
-            image "openjdk:8-windowsservercore-1809"
-            label "windows"
-        }
+        label "windows"
     }
     stages {
         stage("Build") {
             steps {
-                bat ".\\gradlew build"
+                runDocker(image, ".\\gradlew build")
             }
             post {
                 always {
