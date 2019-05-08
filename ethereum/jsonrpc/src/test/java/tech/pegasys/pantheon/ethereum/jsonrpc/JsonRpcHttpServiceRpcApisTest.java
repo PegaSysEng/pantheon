@@ -228,7 +228,6 @@ public class JsonRpcHttpServiceRpcApisTest {
   private WebSocketConfiguration createWebSocketConfiguration() {
     final WebSocketConfiguration config = WebSocketConfiguration.createDefault();
     config.setEnabled(true);
-    configuration.setPort(0);
     return config;
   }
 
