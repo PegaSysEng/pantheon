@@ -53,9 +53,11 @@ import org.junit.Test;
 
 public class CliqueMinerExecutorTest {
 
+  private static final int EPOCH_LENGTH = 10;
   private static final GenesisConfigOptions GENESIS_CONFIG_OPTIONS =
       GenesisConfigFile.fromConfig(new JsonObject()).getConfigOptions();
   private final KeyPair proposerKeyPair = KeyPair.generate();
+  private final Random random = new Random(21341234L);
   private Address localAddress;
   private final List<Address> validatorList = Lists.newArrayList();
   private ProtocolContext<CliqueContext> cliqueProtocolContext;
@@ -81,10 +83,7 @@ public class CliqueMinerExecutorTest {
 
   @Test
   public void extraDataCreatedOnEpochBlocksContainsValidators() {
-    final byte[] vanityData = new byte[32];
-    new Random().nextBytes(vanityData);
-    final BytesValue wrappedVanityData = BytesValue.wrap(vanityData);
-    final int EPOCH_LENGTH = 10;
+    final BytesValue vanityData = generateRandomVanityData();
 
     final CliqueMinerExecutor executor =
         new CliqueMinerExecutor(
@@ -97,7 +96,7 @@ public class CliqueMinerExecutorTest {
                 TestClock.fixed(),
                 metricsSystem),
             proposerKeyPair,
-            new MiningParameters(AddressHelpers.ofValue(1), Wei.ZERO, wrappedVanityData, false),
+            new MiningParameters(AddressHelpers.ofValue(1), Wei.ZERO, vanityData, false),
             mock(CliqueBlockScheduler.class),
             new EpochManager(EPOCH_LENGTH));
 
@@ -114,17 +113,14 @@ public class CliqueMinerExecutorTest {
                 .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
                 .buildHeader());
 
-    assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
+    assertThat(cliqueExtraData.getVanityData()).isEqualTo(vanityData);
     assertThat(cliqueExtraData.getValidators())
         .containsExactly(validatorList.toArray(new Address[0]));
   }
 
   @Test
-  public void extraDataForNonEpochBlocksDoesNotContainValidators() {
-    final byte[] vanityData = new byte[32];
-    new Random().nextBytes(vanityData);
-    final BytesValue wrappedVanityData = BytesValue.wrap(vanityData);
-    final int EPOCH_LENGTH = 10;
+  public void extraDataForNonEpochBlocksDoesNotContainValidaors() {
+    final BytesValue vanityData = generateRandomVanityData();
 
     final CliqueMinerExecutor executor =
         new CliqueMinerExecutor(
@@ -137,7 +133,7 @@ public class CliqueMinerExecutorTest {
                 TestClock.fixed(),
                 metricsSystem),
             proposerKeyPair,
-            new MiningParameters(AddressHelpers.ofValue(1), Wei.ZERO, wrappedVanityData, false),
+            new MiningParameters(AddressHelpers.ofValue(1), Wei.ZERO, vanityData, false),
             mock(CliqueBlockScheduler.class),
             new EpochManager(EPOCH_LENGTH));
 
@@ -154,7 +150,40 @@ public class CliqueMinerExecutorTest {
                 .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
                 .buildHeader());
 
-    assertThat(cliqueExtraData.getVanityData()).isEqualTo(wrappedVanityData);
+    assertThat(cliqueExtraData.getVanityData()).isEqualTo(vanityData);
     assertThat(cliqueExtraData.getValidators()).isEqualTo(Lists.newArrayList());
+  }
+
+  @Test
+  public void shouldUseLatestVanityData() {
+    final BytesValue initialVanityData = generateRandomVanityData();
+    final BytesValue modifiedVanityData = generateRandomVanityData();
+
+    final CliqueMinerExecutor executor =
+        new CliqueMinerExecutor(
+            cliqueProtocolContext,
+            Executors.newSingleThreadExecutor(),
+            CliqueProtocolSchedule.create(GENESIS_CONFIG_OPTIONS, proposerKeyPair),
+            new PendingTransactions(
+                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                1,
+                TestClock.fixed(),
+                metricsSystem),
+            proposerKeyPair,
+            new MiningParameters(AddressHelpers.ofValue(1), Wei.ZERO, initialVanityData, false),
+            mock(CliqueBlockScheduler.class),
+            new EpochManager(EPOCH_LENGTH));
+
+    executor.setExtraData(modifiedVanityData);
+    final BytesValue extraDataBytes = executor.calculateExtraData(blockHeaderBuilder.buildHeader());
+
+    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(extraDataBytes);
+    assertThat(cliqueExtraData.getVanityData()).isEqualTo(modifiedVanityData);
+  }
+
+  private BytesValue generateRandomVanityData() {
+    final byte[] vanityData = new byte[32];
+    random.nextBytes(vanityData);
+    return BytesValue.wrap(vanityData);
   }
 }

@@ -10,22 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request;
+package tech.pegasys.pantheon.ethereum.graphqlrpc.internal.response;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-class NewBlockHeadersSubscriptionParam {
-
-  private final boolean includeTransaction;
-
-  @JsonCreator
-  NewBlockHeadersSubscriptionParam(
-      @JsonProperty("includeTransactions") final boolean includeTransaction) {
-    this.includeTransaction = includeTransaction;
-  }
-
-  boolean includeTransaction() {
-    return includeTransaction;
-  }
+/** Various types of responses that the JSON-RPC component may produce. */
+public enum GraphQLRpcResponseType {
+  NONE,
+  SUCCESS,
+  ERROR,
+  UNAUTHORIZED
 }
