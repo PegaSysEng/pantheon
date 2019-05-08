@@ -24,12 +24,12 @@ def linuxImages = [
     'adoptopenjdk/openjdk11-openj9:latest',
 ]
 
-def createLinuxBuild(docker_image) {
+def createLinuxBuild(dockerImage) {
     return {
         timeout(30) {
             agent {
                 docker {
-                    image docker_image
+                    image dockerImage
                 }
             }
             steps {
@@ -50,7 +50,7 @@ def windowsImages = [
     "openjdk:12-windowsservercore"
 ]
 
-def createWindowsBuild(docker_image) {
+def createWindowsBuild(dockerImage) {
     return {
         timeout(30) {
             agent {
@@ -58,7 +58,7 @@ def createWindowsBuild(docker_image) {
             }
             steps {
                 runDocker(
-                    docker_image,
+                    dockerImage,
                     ".\\gradlew " + params.gradle_options + " build"
                 )
             }
@@ -75,17 +75,17 @@ def builds = [:]
 
 if (params.javas != 'all') {
     builds = builds + (windowsImages.find {it.contains(params.javas)}.collectEntries {
-        ["Smoke ${it}", createWindowsBuild(docker_image)]
+        ["Smoke ${it}", createWindowsBuild(it)]
     })
     builds = builds + (windowsImages.find {it.contains(params.javas)}.collectEntries {
-        ["Smoke ${it}", createLinuxBuild(docker_image)]
+        ["Smoke ${it}", createLinuxBuild(it)]
     })
 } else {
     builds = builds + (windowsImages.collectEntries {
-        ["Smoke ${it}", createWindowsBuild(docker_image)]
+        ["Smoke ${it}", createWindowsBuild(it)]
     })
     builds = builds + (windowsImages.collectEntries {
-        ["Smoke ${it}", createLinuxBuild(docker_image)]
+        ["Smoke ${it}", createLinuxBuild(it)]
     })
 }
 
