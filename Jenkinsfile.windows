@@ -12,47 +12,54 @@ def runDocker(image, cmd) {
 }
 
 pipeline {
-    agent {
-        label "windows"
-    }
     stages {
-        // stage("Smoke JDK8") {
-        //     steps {
-        //         runDocker(
-        //             "openjdk:8-windowsservercore",
-        //             ".\\gradlew build integrationTest acceptanceTest referenceTest"
-        //         )
-        //     }
-        //     post {
-        //         always {
-        //             junit "**\\build\\test-results\\**\\*.xml"
-        //         }
-        //     }
-        // }
-        // stage("Smoke JDK11") {
-        //     steps {
-        //         runDocker(
-        //             "openjdk:11-windowsservercore",
-        //             ".\\gradlew build integrationTest acceptanceTest referenceTest"
-        //         )
-        //     }
-        //     post {
-        //         always {
-        //             junit "**\\build\\test-results\\**\\*.xml"
-        //         }
-        //     }
-        // }
-
-        stage("Smoke JDK12") {
-            steps {
-                runDocker(
-                    "openjdk:12-windowsservercore",
-                    ".\\gradlew build integrationTest acceptanceTest referenceTest"
-                )
+        parallel {
+            stage("Smoke JDK8") {
+                agent {
+                    label "windows-server-2019"
+                }
+                steps {
+                    runDocker(
+                        "openjdk:8-windowsservercore",
+                        ".\\gradlew build integrationTest acceptanceTest referenceTest"
+                    )
+                }
+                post {
+                    always {
+                        junit "**\\build\\test-results\\**\\*.xml"
+                    }
+                }
             }
-            post {
-                always {
-                    junit "**\\build\\test-results\\**\\*.xml"
+            stage("Smoke JDK11") {
+                agent {
+                    label "windows-server-2019"
+                }
+                steps {
+                    runDocker(
+                        "openjdk:11-windowsservercore",
+                        ".\\gradlew build integrationTest acceptanceTest referenceTest"
+                    )
+                }
+                post {
+                    always {
+                        junit "**\\build\\test-results\\**\\*.xml"
+                    }
+                }
+            }
+            stage("Smoke JDK12") {
+                agent {
+                    label "windows-server-2019"
+                }
+                steps {
+                    runDocker(
+                        "openjdk:12-windowsservercore",
+                        ".\\gradlew build integrationTest acceptanceTest referenceTest"
+                    )
+                }
+                post {
+                    always {
+                        junit "**\\build\\test-results\\**\\*.xml"
+                    }
                 }
             }
         }
