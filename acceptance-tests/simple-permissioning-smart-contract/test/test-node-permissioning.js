@@ -11,7 +11,7 @@ var node2Low = "0x892092b7fcb320c1b62f3759bd359fdc3a2ed5df436c3d8914b15327401289
 var node2Host = "0x596c3d8914b1532fdc3a2ed5df439bd3";
 var node2Port = 30304;
 
-contract('Permissioning', () => {
+contract('Permissioning: Nodes', () => {
   describe('Function: permissioning', () => {
 
     it('Should NOT permit any node when none have been added', async () => {
@@ -46,7 +46,7 @@ contract('Permissioning', () => {
 
     it('Should allow a connection between 2 added nodes', async () => {
       let permitted = await proxy.connectionAllowed(node1High, node1Low, node1Host, node1Port, node2High, node2Low, node2Host, node2Port);
-      assert.equal(permitted, true, 'expected 2 added nodes to work as source <> destination');
+      assert.equal(permitted, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'expected 2 added nodes to work as source <> destination');
     });
 
     it('Should remove a node from the whitelist and then NOT permit that node', async () => {
@@ -55,7 +55,7 @@ contract('Permissioning', () => {
       assert.equal(permitted, false, 'expected removed node NOT permitted');
 
       permitted = await proxy.connectionAllowed(node1High, node1Low, node1Host, node1Port, node2High, node2Low, node2Host, node2Port);
-      assert.equal(permitted, false, 'expected source disallowed since it was removed');
+      assert.equal(permitted, '0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'expected source disallowed since it was removed');
       
     });
 
