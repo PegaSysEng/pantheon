@@ -11,9 +11,9 @@ def runDocker(image, cmd) {
 }
 
 def linuxImages = [
-    'openjdk:8',
-    'openjdk:11',
-    'openjdk:12',
+    'openjdk:8-jdk',
+    'openjdk:11-jdk',
+    'openjdk:12-jdk',
     'pegasyseng/jdk:oracle-8-0.0.1',
     'pegasyseng/jdk:oracle-11-0.0.1',
     'pegasyseng/jdk:corretto-8-0.0.1',
