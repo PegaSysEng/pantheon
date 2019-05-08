@@ -61,26 +61,25 @@ public class PendingStateAdapter extends AdapterBase {
     final BlockchainQuery blockchainQuery =
         ((GraphQLDataFetcherContext) dataFetchingEnvironment.getContext()).getBlockchainQuery();
     final Address addr = dataFetchingEnvironment.getArgument("address");
-    final Long bn = dataFetchingEnvironment.getArgument("blockNumber");
-    final long latestBn = blockchainQuery.latestBlock().get().getHeader().getNumber();
-    final Optional<WorldState> ows = blockchainQuery.getWorldState(latestBn);
-    return ows.flatMap(ws -> Optional.ofNullable(ws.get(addr))).map(AccountAdapter::new);
+    final Long blockNumber = dataFetchingEnvironment.getArgument("blockNumber");
+    final long latestBlockNumber = blockchainQuery.latestBlock().get().getHeader().getNumber();
+    final Optional<WorldState> optionalWorldState =
+        blockchainQuery.getWorldState(latestBlockNumber);
+    return optionalWorldState
+        .flatMap(worldState -> Optional.ofNullable(worldState.get(addr)))
+        .map(AccountAdapter::new);
   }
 
   // until the miner can expose the current "proposed block" we have no
   // speculative environment, so estimate against latest.
   public Optional<Long> getEstimateGas(final DataFetchingEnvironment environment) {
-    final Optional<CallResult> result = executeCall(environment);
+    final Optional<CallResult> result = getCall(environment);
     return result.map(CallResult::getGasUsed);
   }
 
   // until the miner can expose the current "proposed block" we have no
   // speculative environment, so estimate against latest.
   public Optional<CallResult> getCall(final DataFetchingEnvironment environment) {
-    return executeCall(environment);
-  }
-
-  private Optional<CallResult> executeCall(final DataFetchingEnvironment environment) {
     final Map<String, Object> callData = environment.getArgument("data");
     final Address from = (Address) callData.get("from");
     final Address to = (Address) callData.get("to");

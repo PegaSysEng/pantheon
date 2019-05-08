@@ -324,7 +324,7 @@ public class PendingTransactions {
     private final Instant addedToPoolAt;
     private final long sequence; // Allows prioritization based on order transactions are added
 
-    TransactionInfo(
+    public TransactionInfo(
         final Transaction transaction,
         final boolean receivedFromLocalSource,
         final Instant addedToPoolAt) {
