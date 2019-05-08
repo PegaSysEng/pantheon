@@ -1,0 +1,94 @@
+def runDocker(image, cmd) {
+    powershell """
+        docker run `
+          --rm `
+          -w "${env.WORKSPACE}" `
+          -v "${env.WORKSPACE}:${env.WORKSPACE}:rw" `
+          -e "WORKSPACE=${env.WORKSPACE}" `
+          -e "BUILD_NUMBER=${env.BUILD_NUMBER}" `
+          $image powershell -C "$cmd"
+    """
+}
+
+def linuxImages = [
+    'openjdk:8',
+    'openjdk:11',
+    'openjdk:12',
+    'pegasyseng/jdk:oracle-8-0.0.1',
+    'pegasyseng/jdk:oracle-11-0.0.1',
+    'pegasyseng/jdk:corretto-8-0.0.1',
+    'azul/zulu-openjdk:8',
+    'azul/zulu-openjdk:11',
+    'azul/zulu-openjdk:12',
+    'adoptopenjdk/openjdk8-openj9:latest',
+    'adoptopenjdk/openjdk11-openj9:latest',
+]
+
+def createLinuxBuild(docker_image) {
+    return {
+        timeout(30) {
+            stage("Smoke " + docker_image) {
+                agent {
+                    docker {
+                        image docker_image
+                    }
+                }
+                steps {
+                    sh './gradlew --no-daemon ' + params.gradle_options + ' build'
+                }
+                post {
+                    always {
+                        junit "**/build/test-results/**/*.xml"
+                    }
+                }
+            }
+        }
+    }
+}
+
+def windowsImages = [
+    "openjdk:8-windowsservercore",
+    "openjdk:11-windowsservercore",
+    "openjdk:12-windowsservercore"
+]
+
+def createWindowsBuild(docker_image) {
+    return {
+        timeout(30) {
+            agent {
+                label "windows-server-2019"
+            }
+            steps {
+                runDocker(
+                    docker_image,
+                    ".\\gradlew build"
+                )
+            }
+            post {
+                always {
+                    junit "**\\build\\test-results\\**\\*.xml"
+                }
+            }
+        }
+    }
+}
+
+def builds = [:]
+
+if (params.javas != 'all') {
+    builds = builds + (windowsImages.find {it.contains(params.javas)}.collectEntries {
+        ["Smoke ${it}", createWindowsBuild(docker_image)]
+    })
+    builds = builds + (windowsImages.find {it.contains(params.javas)}.collectEntries {
+        ["Smoke ${it}", createLinuxBuild(docker_image)]
+    })
+} else {
+    builds = builds + (windowsImages.collectEntries {
+        ["Smoke ${it}", createWindowsBuild(docker_image)]
+    })
+    builds = builds + (windowsImages.collectEntries {
+        ["Smoke ${it}", createLinuxBuild(docker_image)]
+    })
+}
+
+parallel builds
