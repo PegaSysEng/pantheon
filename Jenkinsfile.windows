@@ -8,11 +8,12 @@ pipeline {
     stages {
         stage("Build") {
             steps {
-                try {
-                    bat ".\\gradlew build"
-                } finally {
-                    junit "**\\build\\test-results\\**\\*.xml"
-                }
+                bat ".\\gradlew build"
+            }
+        }
+        post {
+            always {
+                junit "**\\build\\test-results\\**\\*.xml"
             }
         }
     }
