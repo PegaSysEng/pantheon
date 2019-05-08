@@ -76,7 +76,7 @@ public class IbftExtraData implements ParsedExtraData {
     return decodeRaw(blockHeader.getExtraData());
   }
 
-  public static IbftExtraData decodeRaw(final BytesValue input) {
+  static IbftExtraData decodeRaw(final BytesValue input) {
     final RLPInput rlpInput = new BytesValueRLPInput(input, false);
 
     rlpInput.enterList(); // This accounts for the "root node" which contains IBFT data items.

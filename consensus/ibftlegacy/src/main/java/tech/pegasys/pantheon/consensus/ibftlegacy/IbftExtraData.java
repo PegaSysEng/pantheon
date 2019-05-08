@@ -70,7 +70,7 @@ public class IbftExtraData implements ParsedExtraData {
     return decodeRaw(header.getExtraData());
   }
 
-  public static IbftExtraData decodeRaw(final BytesValue input) {
+  static IbftExtraData decodeRaw(final BytesValue input) {
     checkArgument(
         input.size() > EXTRA_VANITY_LENGTH,
         "Invalid BytesValue supplied - too short to produce a valid IBFT Extra Data object.");
