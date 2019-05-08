@@ -77,14 +77,14 @@ if (params.javas != 'all') {
     builds = builds + (windowsImages.find {it.contains(params.javas)}.collectEntries {
         ["Smoke ${it}", createWindowsBuild(it)]
     })
-    builds = builds + (windowsImages.find {it.contains(params.javas)}.collectEntries {
+    builds = builds + (linuxImages.find {it.contains(params.javas)}.collectEntries {
         ["Smoke ${it}", createLinuxBuild(it)]
     })
 } else {
     builds = builds + (windowsImages.collectEntries {
         ["Smoke ${it}", createWindowsBuild(it)]
     })
-    builds = builds + (windowsImages.collectEntries {
+    builds = builds + (linuxImages.collectEntries {
         ["Smoke ${it}", createLinuxBuild(it)]
     })
 }
