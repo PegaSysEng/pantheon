@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods;
 
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.jsonrpc.AbstractVoteProposerMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 
 public class IbftGetPendingVotes extends AbstractVoteProposerMethod implements JsonRpcMethod {
@@ -24,6 +25,6 @@ public class IbftGetPendingVotes extends AbstractVoteProposerMethod implements J
 
   @Override
   public String getName() {
-    return "ibft_getPendingVotes";
+    return RpcMethod.IBFT_GET_PENDING_VOTES.getMethodName();
   }
 }
