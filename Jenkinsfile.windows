@@ -16,19 +16,19 @@ pipeline {
         label "windows"
     }
     stages {
-        stage("Smoke JDK8") {
-            steps {
-                runDocker(
-                    "openjdk:8-windowsservercore",
-                    ".\\gradlew build integrationTest acceptanceTest referenceTest"
-                )
-            }
-            post {
-                always {
-                    junit "**\\build\\test-results\\**\\*.xml"
-                }
-            }
-        }
+        // stage("Smoke JDK8") {
+        //     steps {
+        //         runDocker(
+        //             "openjdk:8-windowsservercore",
+        //             ".\\gradlew build integrationTest acceptanceTest referenceTest"
+        //         )
+        //     }
+        //     post {
+        //         always {
+        //             junit "**\\build\\test-results\\**\\*.xml"
+        //         }
+        //     }
+        // }
         stage("Smoke JDK11") {
             steps {
                 runDocker(
