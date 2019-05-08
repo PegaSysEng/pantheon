@@ -37,13 +37,16 @@ On non-mining nodes, log messages indicate blocks are being imported.
 2019-05-08 20:28:31.031+10:00 | EthScheduler-Workers-0 | INFO  | BlockPropagationManager | Imported #662 / 0 tx / 0 om / 0 (0.0%) gas / (0x0ead4e20123d3f1433d8dec894fcce386da4049819b24b309963ce7a8a0fcf03) in 0.000s.
 ``` 
 
+Use the [`eth_blockNumber`](../Reference/JSON-RPC-API-Methods.md#eth_blocknumber) JSON-RPC API method to confirm the 
+block number is increasing. 
+
 If blocks are not being created in [Clique](../Consensus-Protocols/Clique.md#extra-data) or [IBFT 2.0](../Consensus-Protocols/IBFT.md#extra-data) networks, 
 ensure the validator addresses in the genesis file match running nodes. 
  
 ## Transactions Not Being Mined 
 
-If transactions are being added to the [transaction pool](../Using-Pantheon/Transactions/Transaction-Pool.md) 
-and the transaction hash returned but never being mined, check the [`--min-gas-price`](../Reference/Pantheon-CLI-Syntax.md#min-gas-price)
+If a transaction is added to the [transaction pool](../Using-Pantheon/Transactions/Transaction-Pool.md) 
+and the transaction hash returned but the transaction is never being mined, check the [`--min-gas-price`](../Reference/Pantheon-CLI-Syntax.md#min-gas-price)
 option on mining nodes. If the `gasPrice` on a [transaction](../Using-Pantheon/Transactions/Transactions.md) 
 is lower than the `min-gas-price` for the mining node, the transaction will never be mined. 
 
