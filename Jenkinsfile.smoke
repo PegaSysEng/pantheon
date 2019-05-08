@@ -82,7 +82,7 @@ def createWindowsBuild(dockerImage) {
                     timeout(30) {
                         runDocker(
                             dockerImage,
-                            ".\\gradlew " + params.gradle_options + " build"
+                            ".\\gradlew --no-daemon " + params.gradle_options + " build"
                         )
                     }
                 } finally {
@@ -96,13 +96,13 @@ def createWindowsBuild(dockerImage) {
 def builds = [:]
 
 if (params.javas != 'all') {
-    builds = builds + (windowsImages.find {it.contains(params.javas)}.collectEntries {
+    builds = builds + (windowsImages.findAll {it.contains(params.javas)}.collectEntries {
         ["Smoke ${it}", createWindowsBuild(it)]
     })
-    builds = builds + (linuxImages.find {it.contains(params.javas)}.collectEntries {
+    builds = builds + (linuxImages.findAll {it.contains(params.javas)}.collectEntries {
         ["Smoke ${it}", createLinuxBuild(it)]
     })
-    builds = builds + (linuxImagesPrivate.find {it.contains(params.javas)}.collectEntries {
+    builds = builds + (linuxImagesPrivate.findAll {it.contains(params.javas)}.collectEntries {
         ["Smoke ${it}", createLinuxBuildPrivateImage(it)]
     })
 } else {
