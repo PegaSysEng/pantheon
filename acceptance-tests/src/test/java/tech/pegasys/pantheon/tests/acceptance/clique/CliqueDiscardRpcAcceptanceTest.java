@@ -23,17 +23,24 @@ public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldDiscardVotes() throws IOException {
-    final String[] validators = {"validator1"};
+    final String[] validators = {"validator1", "validator3"};
     final PantheonNode validator1 =
         pantheon.createCliqueNodeWithValidators("validator1", validators);
     final PantheonNode validator2 =
         pantheon.createCliqueNodeWithValidators("validator2", validators);
-    cluster.start(validator1, validator2);
+    final PantheonNode validator3 =
+        pantheon.createCliqueNodeWithValidators("validator3", validators);
+    cluster.start(validator1, validator2, validator3);
 
     validator1.execute(cliqueTransactions.createAddProposal(validator2));
-    validator1.verify(clique.proposalsEqual().addProposal(validator2).build());
+    validator1.execute(cliqueTransactions.createRemoveProposal(validator3));
+    validator1.verify(
+        clique.proposalsEqual().addProposal(validator2).removeProposal(validator3).build());
 
     validator1.execute(cliqueTransactions.createDiscardProposal(validator2));
+    validator1.verify(clique.proposalsEqual().removeProposal(validator3).build());
+
+    validator1.execute(cliqueTransactions.createDiscardProposal(validator3));
     cluster.verify(clique.noProposals());
   }
 }
