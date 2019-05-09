@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p;
 
-import java.util.Collection;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
@@ -23,9 +22,11 @@ import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 public class NetworkRunner implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();
@@ -88,7 +88,6 @@ public class NetworkRunner implements AutoCloseable {
       staticNodes.stream()
           .map(DefaultPeer::fromEnodeURL)
           .forEach(network::addMaintainConnectionPeer);
-
 
     } else {
       LOG.error("Attempted to start already running network.");
@@ -199,8 +198,8 @@ public class NetworkRunner implements AutoCloseable {
         }
       }
       final P2PNetwork network = networkProvider.build(caps);
-      return new NetworkRunner(network, subProtocolMap, protocolManagers, metricsSystem,
-          staticNodes);
+      return new NetworkRunner(
+          network, subProtocolMap, protocolManagers, metricsSystem, staticNodes);
     }
 
     public Builder protocolManagers(final List<ProtocolManager> protocolManagers) {

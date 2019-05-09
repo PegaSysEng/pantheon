@@ -57,7 +57,6 @@ import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.network.DefaultP2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
