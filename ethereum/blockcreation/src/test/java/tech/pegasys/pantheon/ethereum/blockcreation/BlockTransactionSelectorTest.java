@@ -71,7 +71,7 @@ public class BlockTransactionSelectorTest {
   private final Blockchain blockchain = new TestBlockchain();
   private final DefaultMutableWorldState worldState = inMemoryWorldState();
   private final Supplier<Boolean> isCancelled = () -> false;
-  final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
+  private final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
 
   private ProcessableBlockHeader createBlockWithGasLimit(final long gasLimit) {
     return BlockHeaderBuilder.create()
@@ -92,7 +92,7 @@ public class BlockTransactionSelectorTest {
         protocolSchedule.getByBlockNumber(0).getTransactionProcessor();
 
     // The block should fit 5 transactions only
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(5000);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(5000);
 
     final Address miningBeneficiary = AddressHelpers.ofValue(1);
 
@@ -126,7 +126,7 @@ public class BlockTransactionSelectorTest {
         .thenReturn(MainnetTransactionProcessor.Result.failed(5, ValidationResult.valid()));
 
     // The block should fit 3 transactions only
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(5000);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(5000);
 
     final Address miningBeneficiary = AddressHelpers.ofValue(1);
 
@@ -173,7 +173,7 @@ public class BlockTransactionSelectorTest {
             MainnetTransactionProcessor.Result.invalid(ValidationResult.invalid(NONCE_TOO_LOW)));
 
     // The block should fit 3 transactions only
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(5000);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(5000);
 
     final Address miningBeneficiary = AddressHelpers.ofValue(1);
 
@@ -216,7 +216,7 @@ public class BlockTransactionSelectorTest {
                 BytesValue.EMPTY,
                 ValidationResult.valid()));
 
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(301);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(301);
 
     final Address miningBeneficiary = AddressHelpers.ofValue(1);
 
@@ -249,7 +249,7 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void transactionOfferingGasPriceLessThanMinimumIsIdentifiedAndRemovedFromPending() {
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(301);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(301);
 
     final Address miningBeneficiary = AddressHelpers.ofValue(1);
     final BlockTransactionSelector selector =
@@ -276,7 +276,7 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void transactionTooLargeForBlockDoesNotPreventMoreBeingAddedIfBlockOccupancyNotReached() {
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(300);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(300);
 
     when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(
@@ -331,7 +331,7 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void transactionSelectionStopsWhenSufficientBlockOccupancyIsReached() {
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(300);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(300);
 
     // TransactionProcessor mock assumes all gas in the transaction was used (i.e. gasLimit).
     when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
@@ -398,7 +398,7 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void shouldDiscardTransactionsThatFailValidation() {
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(300);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(300);
 
     final Address miningBeneficiary = AddressHelpers.ofValue(1);
     final BlockTransactionSelector selector =
@@ -453,7 +453,7 @@ public class BlockTransactionSelectorTest {
 
   @Test
   public void transactionWithIncorrectNonceRemainsInPoolAndNotSelected() {
-    final ProcessableBlockHeader blockHeader = createBlockWithGas(5000);
+    final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(5000);
 
     final TransactionTestFixture txTestFixture = new TransactionTestFixture();
     final Transaction futureTransaction =
