@@ -23,7 +23,7 @@ public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldDiscardVotes() throws IOException {
-    final String[] validators = {"validator1", "validator2"};
+    final String[] validators = {"validator1"};
     final PantheonNode validator1 =
         pantheon.createCliqueNodeWithValidators("validator1", validators);
     final PantheonNode validator2 =
