@@ -18,13 +18,11 @@ public class DelegatingBytes32 extends BaseDelegatingBytesValue<Bytes32> impleme
   }
 
   // Make sure we don't end-up with giant chains of delegating through wrapping.
-  private static Bytes32 unwrap(final Bytes32 v) {
-    Bytes32 wrapped = v;
-
-    if (wrapped instanceof DelegatingBytes32) {
-      wrapped = ((DelegatingBytes32) wrapped).wrapped;
+  private static Bytes32 unwrap(final Bytes32 value) {
+    if (value instanceof DelegatingBytes32) {
+      return ((DelegatingBytes32) value).wrapped;
     }
-    return wrapped;
+    return value;
   }
 
   @Override
