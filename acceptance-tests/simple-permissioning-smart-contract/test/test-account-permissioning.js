@@ -10,7 +10,7 @@ var gasLimit = 77;
 var payload = "0x1234";
 
 contract('Permissioning: Accounts', () => {
-  it('Should NOT permit any transaction when acount whitelist is empty', async () => {
+  it('Should NOT permit any transaction when account whitelist is empty', async () => {
     proxy = await TestPermissioning.new();
     let permitted = await proxy.transactionAllowed(address1, address2, value, gasPrice, gasLimit, payload);
     assert.equal(permitted, false, 'expected tx NOT permitted');
