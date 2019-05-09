@@ -285,6 +285,7 @@ public class RunnerBuilder {
             .subProtocols(subProtocols)
             .network(p2pEnabled ? activeNetwork : inactiveNetwork)
             .metricsSystem(metricsSystem)
+            .staticNodes(staticNodes)
             .build();
 
     final P2PNetwork network = networkRunner.getNetwork();
@@ -310,10 +311,6 @@ public class RunnerBuilder {
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
     final P2PNetwork peerNetwork = networkRunner.getNetwork();
-
-    staticNodes.stream()
-        .map(DefaultPeer::fromEnodeURL)
-        .forEach(peerNetwork::addMaintainConnectionPeer);
 
     final Optional<NodeLocalConfigPermissioningController> nodeLocalConfigPermissioningController =
         nodePermissioningController.flatMap(NodePermissioningController::localConfigController);

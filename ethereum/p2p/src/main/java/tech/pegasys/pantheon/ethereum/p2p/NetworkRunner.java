@@ -12,8 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p;
 
+import java.util.Collection;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
+import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 public class NetworkRunner implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();
@@ -46,12 +49,14 @@ public class NetworkRunner implements AutoCloseable {
   private final Map<String, SubProtocol> subProtocols;
   private final List<ProtocolManager> protocolManagers;
   private final LabelledMetric<Counter> inboundMessageCounter;
+  private final Collection<EnodeURL> staticNodes;
 
   private NetworkRunner(
       final P2PNetwork network,
       final Map<String, SubProtocol> subProtocols,
       final List<ProtocolManager> protocolManagers,
-      final MetricsSystem metricsSystem) {
+      final MetricsSystem metricsSystem,
+      final Collection<EnodeURL> staticNodes) {
     this.network = network;
     this.protocolManagers = protocolManagers;
     this.subProtocols = subProtocols;
@@ -63,6 +68,7 @@ public class NetworkRunner implements AutoCloseable {
             "protocol",
             "name",
             "code");
+    this.staticNodes = staticNodes;
   }
 
   public P2PNetwork getNetwork() {
@@ -78,6 +84,12 @@ public class NetworkRunner implements AutoCloseable {
       LOG.info("Starting Network.");
       setupHandlers();
       network.start();
+
+      staticNodes.stream()
+          .map(DefaultPeer::fromEnodeURL)
+          .forEach(network::addMaintainConnectionPeer);
+
+
     } else {
       LOG.error("Attempted to start already running network.");
     }
@@ -169,6 +181,7 @@ public class NetworkRunner implements AutoCloseable {
     List<ProtocolManager> protocolManagers = new ArrayList<>();
     List<SubProtocol> subProtocols = new ArrayList<>();
     MetricsSystem metricsSystem;
+    Collection<EnodeURL> staticNodes = Collections.emptyList();
 
     public NetworkRunner build() {
       final Map<String, SubProtocol> subProtocolMap = new HashMap<>();
@@ -186,7 +199,8 @@ public class NetworkRunner implements AutoCloseable {
         }
       }
       final P2PNetwork network = networkProvider.build(caps);
-      return new NetworkRunner(network, subProtocolMap, protocolManagers, metricsSystem);
+      return new NetworkRunner(network, subProtocolMap, protocolManagers, metricsSystem,
+          staticNodes);
     }
 
     public Builder protocolManagers(final List<ProtocolManager> protocolManagers) {
@@ -211,6 +225,11 @@ public class NetworkRunner implements AutoCloseable {
 
     public Builder metricsSystem(final MetricsSystem metricsSystem) {
       this.metricsSystem = metricsSystem;
+      return this;
+    }
+
+    public Builder staticNodes(final Collection<EnodeURL> staticNodes) {
+      this.staticNodes = staticNodes;
       return this;
     }
   }
