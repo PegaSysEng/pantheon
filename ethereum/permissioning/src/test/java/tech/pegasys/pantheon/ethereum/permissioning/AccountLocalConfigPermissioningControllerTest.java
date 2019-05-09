@@ -37,15 +37,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AccountWhitelistControllerTest {
+public class AccountLocalConfigPermissioningControllerTest {
 
-  private AccountWhitelistController controller;
+  private AccountLocalConfigPermissioningController controller;
   @Mock private LocalPermissioningConfiguration permissioningConfig;
   @Mock private WhitelistPersistor whitelistPersistor;
 
   @Before
   public void before() {
-    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
+    controller = new AccountLocalConfigPermissioningController(permissioningConfig, whitelistPersistor);
   }
 
   @Test
@@ -53,7 +53,7 @@ public class AccountWhitelistControllerTest {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
         .thenReturn(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
+    controller = new AccountLocalConfigPermissioningController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.getAccountWhitelist())
         .contains("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
@@ -64,7 +64,7 @@ public class AccountWhitelistControllerTest {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
         .thenReturn(singletonList("0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73"));
-    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
+    controller = new AccountLocalConfigPermissioningController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.getAccountWhitelist())
         .containsExactly("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73");
@@ -74,7 +74,7 @@ public class AccountWhitelistControllerTest {
   public void whenPermConfigContainsEmptyListOfAccountsContainsShouldReturnFalse() {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist()).thenReturn(new ArrayList<>());
-    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
+    controller = new AccountLocalConfigPermissioningController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.contains("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73")).isFalse();
   }
@@ -236,7 +236,7 @@ public class AccountWhitelistControllerTest {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
         .thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
+    controller = new AccountLocalConfigPermissioningController(permissioningConfig, whitelistPersistor);
 
     controller.reload();
 
@@ -249,7 +249,7 @@ public class AccountWhitelistControllerTest {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
         .thenReturn(Arrays.asList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
+    controller = new AccountLocalConfigPermissioningController(permissioningConfig, whitelistPersistor);
 
     final Throwable thrown = catchThrowable(() -> controller.reload());
 
@@ -263,13 +263,13 @@ public class AccountWhitelistControllerTest {
 
   @Test
   public void accountThatDoesNotStartWith0xIsNotValid() {
-    assertThat(AccountWhitelistController.isValidAccountString("bob")).isFalse();
+    assertThat(AccountLocalConfigPermissioningController.isValidAccountString("bob")).isFalse();
     assertThat(
-            AccountWhitelistController.isValidAccountString(
+            AccountLocalConfigPermissioningController.isValidAccountString(
                 "b9b81ee349c3807e46bc71aa2632203c5b462032"))
         .isFalse();
     assertThat(
-            AccountWhitelistController.isValidAccountString(
+            AccountLocalConfigPermissioningController.isValidAccountString(
                 "0xb9b81ee349c3807e46bc71aa2632203c5b462032"))
         .isTrue();
   }
@@ -279,7 +279,7 @@ public class AccountWhitelistControllerTest {
     when(permissioningConfig.isAccountWhitelistEnabled()).thenReturn(true);
     when(permissioningConfig.getAccountWhitelist())
         .thenReturn(singletonList("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"));
-    controller = new AccountWhitelistController(permissioningConfig, whitelistPersistor);
+    controller = new AccountLocalConfigPermissioningController(permissioningConfig, whitelistPersistor);
 
     assertThat(controller.contains("0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73")).isTrue();
   }
