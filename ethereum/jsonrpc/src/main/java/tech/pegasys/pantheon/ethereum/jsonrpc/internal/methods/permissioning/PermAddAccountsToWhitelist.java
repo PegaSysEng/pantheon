@@ -72,7 +72,8 @@ public class PermAddAccountsToWhitelist implements JsonRpcMethod {
         case SUCCESS:
           return new JsonRpcSuccessResponse(request.getId());
         default:
-          throw new IllegalStateException("Unmapped result from AccountLocalConfigPermissioningController");
+          throw new IllegalStateException(
+              "Unmapped result from AccountLocalConfigPermissioningController");
       }
     } else {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.ACCOUNT_WHITELIST_NOT_ENABLED);

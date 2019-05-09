@@ -34,7 +34,8 @@ public class AccountLocalConfigPermissioningController {
   private List<String> accountWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
 
-  public AccountLocalConfigPermissioningController(final LocalPermissioningConfiguration configuration) {
+  public AccountLocalConfigPermissioningController(
+      final LocalPermissioningConfiguration configuration) {
     this(
         configuration,
         new WhitelistPersistor(configuration.getAccountPermissioningConfigFilePath()));
@@ -154,7 +155,8 @@ public class AccountLocalConfigPermissioningController {
   }
 
   private boolean containsInvalidAccount(final List<String> accounts) {
-    return !accounts.stream().allMatch(AccountLocalConfigPermissioningController::isValidAccountString);
+    return !accounts.stream()
+        .allMatch(AccountLocalConfigPermissioningController::isValidAccountString);
   }
 
   static boolean isValidAccountString(final String account) {

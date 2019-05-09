@@ -27,7 +27,8 @@ public class PermGetAccountsWhitelist implements JsonRpcMethod {
 
   private final Optional<AccountLocalConfigPermissioningController> whitelistController;
 
-  public PermGetAccountsWhitelist(final Optional<AccountLocalConfigPermissioningController> whitelistController) {
+  public PermGetAccountsWhitelist(
+      final Optional<AccountLocalConfigPermissioningController> whitelistController) {
     this.whitelistController = whitelistController;
   }
 
