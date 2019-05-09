@@ -177,7 +177,13 @@ public class CliqueMinerExecutorTest {
     executor.setExtraData(modifiedVanityData);
     final BytesValue extraDataBytes = executor.calculateExtraData(blockHeaderBuilder.buildHeader());
 
-    final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(extraDataBytes);
+    final CliqueExtraData cliqueExtraData =
+        CliqueExtraData.decode(
+            blockHeaderBuilder
+                .number(EPOCH_LENGTH)
+                .extraData(extraDataBytes)
+                .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
+                .buildHeader());
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(modifiedVanityData);
   }
 
