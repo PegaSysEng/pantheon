@@ -44,10 +44,10 @@ import com.google.common.collect.Lists;
  * <p>The output from this class's exeuction will be:
  *
  * <ul>
- * <li>A list of transactions to include in the block being constructed.
- * <li>A list of receipts for inclusion in the block.
- * <li>The root hash of the world state at the completion of transaction execution.
- * <li>The amount of gas consumed when executing all transactions.
+ *   <li>A list of transactions to include in the block being constructed.
+ *   <li>A list of receipts for inclusion in the block.
+ *   <li>The root hash of the world state at the completion of transaction execution.
+ *   <li>The amount of gas consumed when executing all transactions.
  * </ul>
  *
  * Once "used" this class must be discarded and another created. This class contains state which is
@@ -175,7 +175,9 @@ public class BlockTransactionSelector {
       updateTransactionResultTracking(transaction, result);
     } else {
       // If the transaction has an incorrect nonce, leave it in the pool and continue
-      if (result.getValidationResult().getInvalidReason()
+      if (result
+          .getValidationResult()
+          .getInvalidReason()
           .equals(TransactionInvalidReason.INCORRECT_NONCE)) {
         return TransactionSelectionResult.CONTINUE;
       }

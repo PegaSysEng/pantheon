@@ -65,15 +65,15 @@ public class BlockTransactionSelectorTest {
   private static final KeyPair keyPair = KeyPair.generate();
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
-  final private PendingTransactions pendingTransactions =
+  private final PendingTransactions pendingTransactions =
       new PendingTransactions(
           PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 5, TestClock.fixed(), metricsSystem);
-  final private Blockchain blockchain = new TestBlockchain();
-  final private DefaultMutableWorldState worldState = inMemoryWorldState();
-  final private Supplier<Boolean> isCancelled = () -> false;
+  private final Blockchain blockchain = new TestBlockchain();
+  private final DefaultMutableWorldState worldState = inMemoryWorldState();
+  private final Supplier<Boolean> isCancelled = () -> false;
   final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
 
-  private ProcessableBlockHeader createBlockWithGas(long gasLimit) {
+  private ProcessableBlockHeader createBlockWithGasLimit(final long gasLimit) {
     return BlockHeaderBuilder.create()
         .parentHash(Hash.EMPTY)
         .coinbase(Address.fromHexString(String.format("%020x", 1)))
@@ -122,7 +122,7 @@ public class BlockTransactionSelectorTest {
     pendingTransactions.addRemoteTransaction(transaction);
 
     when(transactionProcessor.processTransaction(
-        any(), any(), any(), eq(transaction), any(), any(), any()))
+            any(), any(), any(), eq(transaction), any(), any(), any()))
         .thenReturn(MainnetTransactionProcessor.Result.failed(5, ValidationResult.valid()));
 
     // The block should fit 3 transactions only
@@ -168,7 +168,7 @@ public class BlockTransactionSelectorTest {
                 BytesValue.EMPTY,
                 ValidationResult.valid()));
     when(transactionProcessor.processTransaction(
-        any(), any(), any(), eq(transactionsToInject.get(1)), any(), any(), any()))
+            any(), any(), any(), eq(transactionsToInject.get(1)), any(), any(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.invalid(ValidationResult.invalid(NONCE_TOO_LOW)));
 
@@ -423,24 +423,24 @@ public class BlockTransactionSelectorTest {
     pendingTransactions.addRemoteTransaction(invalidTransaction);
 
     when(transactionProcessor.processTransaction(
-        eq(blockchain),
-        any(WorldUpdater.class),
-        eq(blockHeader),
-        eq(validTransaction),
-        any(),
-        any(),
-        any()))
+            eq(blockchain),
+            any(WorldUpdater.class),
+            eq(blockHeader),
+            eq(validTransaction),
+            any(),
+            any(),
+            any()))
         .thenReturn(
             Result.successful(
                 LogSeries.empty(), 10000, BytesValue.EMPTY, ValidationResult.valid()));
     when(transactionProcessor.processTransaction(
-        eq(blockchain),
-        any(WorldUpdater.class),
-        eq(blockHeader),
-        eq(invalidTransaction),
-        any(),
-        any(),
-        any()))
+            eq(blockchain),
+            any(WorldUpdater.class),
+            eq(blockHeader),
+            eq(invalidTransaction),
+            any(),
+            any(),
+            any()))
         .thenReturn(
             Result.invalid(
                 ValidationResult.invalid(TransactionInvalidReason.EXCEEDS_BLOCK_GAS_LIMIT)));
@@ -462,13 +462,13 @@ public class BlockTransactionSelectorTest {
     pendingTransactions.addRemoteTransaction(futureTransaction);
 
     when(transactionProcessor.processTransaction(
-        eq(blockchain),
-        any(WorldUpdater.class),
-        eq(blockHeader),
-        eq(futureTransaction),
-        any(),
-        any(),
-        any()))
+            eq(blockchain),
+            any(WorldUpdater.class),
+            eq(blockHeader),
+            eq(futureTransaction),
+            any(),
+            any(),
+            any()))
         .thenReturn(
             Result.invalid(ValidationResult.invalid(TransactionInvalidReason.INCORRECT_NONCE)));
 
@@ -490,8 +490,6 @@ public class BlockTransactionSelectorTest {
 
     assertThat(pendingTransactions.getTransactionByHash(futureTransaction.hash())).isPresent();
     assertThat(results.getTransactions().size()).isEqualTo(0);
-
-
   }
 
   private Transaction createTransaction(final int transactionNumber) {
