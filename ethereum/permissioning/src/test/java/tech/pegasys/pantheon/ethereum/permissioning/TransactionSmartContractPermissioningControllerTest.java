@@ -1,0 +1,82 @@
+package tech.pegasys.pantheon.ethereum.permissioning;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
+import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.google.common.io.Resources;
+import java.io.IOException;
+import org.junit.Test;
+import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.ethereum.chain.GenesisState;
+import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
+import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+public class TransactionSmartContractPermissioningControllerTest {
+  private TransactionSmartContractPermissioningController setupController(
+      final String resourceName, final String contractAddressString) throws IOException {
+    final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
+
+    final String emptyContractFile =
+        Resources.toString(this.getClass().getResource(resourceName), UTF_8);
+    final GenesisState genesisState =
+        GenesisState.fromConfig(GenesisConfigFile.fromConfig(emptyContractFile), protocolSchedule);
+
+    final MutableBlockchain blockchain = createInMemoryBlockchain(genesisState.getBlock());
+    final WorldStateArchive worldArchive = createInMemoryWorldStateArchive();
+
+    genesisState.writeStateTo(worldArchive.getMutable());
+
+    final TransactionSimulator ts =
+        new TransactionSimulator(blockchain, worldArchive, protocolSchedule);
+    final Address contractAddress = Address.fromHexString(contractAddressString);
+
+    return new TransactionSmartContractPermissioningController(contractAddress, ts);
+  }
+
+  @Test
+  public void testAccountIncluded() throws IOException {
+    final TransactionSmartContractPermissioningController controller =
+        setupController(
+            "/TransactionSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "0x0000000000000000000000000000000000001234");
+
+    assertThat(
+        controller.isPermitted(
+            transactionForAccount(Address.fromHexString("0x1"))
+        )
+    ).isTrue();
+  }
+
+  @Test
+  public void testAccountNotIncluded() throws IOException {
+    final TransactionSmartContractPermissioningController controller =
+        setupController(
+            "/TransactionSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "0x0000000000000000000000000000000000001234");
+
+    assertThat(
+        controller.isPermitted(
+            transactionForAccount(Address.fromHexString("0x2"))
+        )
+    ).isFalse();
+  }
+
+  private Transaction transactionForAccount(final Address address) {
+    return Transaction.builder()
+        .sender(address)
+        .value(Wei.ZERO)
+        .gasPrice(Wei.ZERO)
+        .gasLimit(0)
+        .payload(BytesValue.EMPTY)
+        .build();
+  }
+}

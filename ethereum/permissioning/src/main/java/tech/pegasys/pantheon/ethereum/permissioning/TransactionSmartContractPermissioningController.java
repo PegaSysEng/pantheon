@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.permissioning.account.TransactionPermissioningProvider;
 import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
@@ -29,7 +31,8 @@ import java.util.Optional;
  * Controller that can read from a smart contract that exposes the permissioning call
  * transactionAllowed(address,address,uint256,uint256,uint256,bytes)
  */
-public class TransactionSmartContractPermissioningController {
+public class TransactionSmartContractPermissioningController implements
+    TransactionPermissioningProvider {
   private final Address contractAddress;
   private final TransactionSimulator transactionSimulator;
 
@@ -48,7 +51,7 @@ public class TransactionSmartContractPermissioningController {
   // True from a contract is 1 filled to 32 bytes
   private static final BytesValue TRUE_RESPONSE =
       BytesValue.fromHexString(
-          "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+          "0x0000000000000000000000000000000000000000000000000000000000000001");
   private static final BytesValue FALSE_RESPONSE =
       BytesValue.fromHexString(
           "0x0000000000000000000000000000000000000000000000000000000000000000");
@@ -71,6 +74,7 @@ public class TransactionSmartContractPermissioningController {
    * @param transaction The transaction to be examined
    * @return boolean of whether or not to permit the connection to occur
    */
+  @Override
   public boolean isPermitted(final Transaction transaction) {
     final BytesValue payload = createPayload(transaction);
     final CallParameter callParams =
@@ -137,7 +141,7 @@ public class TransactionSmartContractPermissioningController {
         transaction.getValue().getBytes(),
         transaction.getGasPrice().getBytes(),
         encodeLong(transaction.getGasLimit()),
-        transaction.getPayload());
+        encodeBytes(transaction.getPayload()));
   }
 
   private static BytesValue encodeAddress(final Optional<Address> address) {
@@ -149,6 +153,17 @@ public class TransactionSmartContractPermissioningController {
   }
 
   private static BytesValue encodeLong(final long l) {
-    return null;
+    checkArgument(l >= 0, "Unsigned value must be positive");
+    final byte[] longBytes = new byte[8];
+    for (int i = 0; i < 8; i++) {
+      longBytes[i] = (byte) ((l >> ((7 - i) * 8)) & 0xFF);
+    }
+    return BytesValues.concatenate(BytesValue.wrap(new byte[24]), BytesValue.wrap(longBytes));
+  }
+
+  private static BytesValue encodeBytes(final BytesValue value) {
+    final BytesValue length = encodeLong(value.size());
+    final BytesValue padding = BytesValue.wrap(new byte[(32 - (value.size() % 32))]);
+    return BytesValues.concatenate(length, value, padding);
   }
 }
