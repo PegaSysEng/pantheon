@@ -31,8 +31,8 @@ import java.util.Optional;
  * Controller that can read from a smart contract that exposes the permissioning call
  * transactionAllowed(address,address,uint256,uint256,uint256,bytes)
  */
-public class TransactionSmartContractPermissioningController implements
-    TransactionPermissioningProvider {
+public class TransactionSmartContractPermissioningController
+    implements TransactionPermissioningProvider {
   private final Address contractAddress;
   private final TransactionSimulator transactionSimulator;
 
@@ -93,9 +93,11 @@ public class TransactionSmartContractPermissioningController implements
     if (result.isPresent()) {
       switch (result.get().getResult().getStatus()) {
         case INVALID:
-          throw new IllegalStateException("Transaction permissioning transaction found to be Invalid");
+          throw new IllegalStateException(
+              "Transaction permissioning transaction found to be Invalid");
         case FAILED:
-          throw new IllegalStateException("Transaction permissioning transaction failed when processing");
+          throw new IllegalStateException(
+              "Transaction permissioning transaction failed when processing");
         default:
           break;
       }

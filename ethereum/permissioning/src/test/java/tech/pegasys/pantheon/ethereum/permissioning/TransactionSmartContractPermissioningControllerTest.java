@@ -1,14 +1,23 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
-import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.io.Resources;
-import java.io.IOException;
-import org.junit.Test;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -20,6 +29,11 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.io.IOException;
+
+import com.google.common.io.Resources;
+import org.junit.Test;
 
 public class TransactionSmartContractPermissioningControllerTest {
   private TransactionSmartContractPermissioningController setupController(
@@ -60,11 +74,8 @@ public class TransactionSmartContractPermissioningControllerTest {
             "/TransactionSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
-    assertThat(
-        controller.isPermitted(
-            transactionForAccount(Address.fromHexString("0x1"))
-        )
-    ).isTrue();
+    assertThat(controller.isPermitted(transactionForAccount(Address.fromHexString("0x1"))))
+        .isTrue();
   }
 
   @Test
@@ -74,11 +85,8 @@ public class TransactionSmartContractPermissioningControllerTest {
             "/TransactionSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
-    assertThat(
-        controller.isPermitted(
-            transactionForAccount(Address.fromHexString("0x2"))
-        )
-    ).isFalse();
+    assertThat(controller.isPermitted(transactionForAccount(Address.fromHexString("0x2"))))
+        .isFalse();
   }
 
   @Test
@@ -89,10 +97,7 @@ public class TransactionSmartContractPermissioningControllerTest {
             "0x0000000000000000000000000000000000001234");
 
     assertThatThrownBy(
-        () ->
-            controller.isPermitted(
-                transactionForAccount(Address.fromHexString("0x1"))
-            ))
+            () -> controller.isPermitted(transactionForAccount(Address.fromHexString("0x1"))))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Transaction permissioning contract does not exist");
   }
@@ -105,12 +110,8 @@ public class TransactionSmartContractPermissioningControllerTest {
             "0x0000000000000000000000000000000000001234");
 
     assertThatThrownBy(
-        () ->
-            controller.isPermitted(
-                transactionForAccount(Address.fromHexString("0x1"))
-            ))
+            () -> controller.isPermitted(transactionForAccount(Address.fromHexString("0x1"))))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Transaction permissioning transaction failed when processing");
   }
-
 }
