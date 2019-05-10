@@ -194,7 +194,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private Collection<URI> bootNodes = null;
+  private List<URI> bootNodes = null;
 
   @Option(
       names = {"--max-peers"},
@@ -353,7 +353,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       converter = RpcApisConverter.class,
       description =
           "Comma separated list of APIs to enable on JSON-RPC WebSocket service (default: ${DEFAULT-VALUE})")
-  private final Collection<RpcApi> rpcWsApis = DEFAULT_JSON_RPC_APIS;
+  private final List<RpcApi> rpcWsApis = DEFAULT_JSON_RPC_APIS;
 
   @Option(
       names = {"--rpc-ws-authentication-enabled"},

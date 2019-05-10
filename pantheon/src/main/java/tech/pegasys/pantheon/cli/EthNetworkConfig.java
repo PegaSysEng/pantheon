@@ -23,10 +23,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 
 public class EthNetworkConfig {
@@ -42,10 +42,10 @@ public class EthNetworkConfig {
   private static final String DEV_GENESIS = "/dev.json";
   private final String genesisConfig;
   private final int networkId;
-  private final Collection<URI> bootNodes;
+  private final List<URI> bootNodes;
 
   public EthNetworkConfig(
-      final String genesisConfig, final int networkId, final Collection<URI> bootNodes) {
+      final String genesisConfig, final int networkId, final List<URI> bootNodes) {
     Preconditions.checkNotNull(genesisConfig);
     Preconditions.checkNotNull(bootNodes);
     this.genesisConfig = genesisConfig;
@@ -76,7 +76,7 @@ public class EthNetworkConfig {
     final EthNetworkConfig that = (EthNetworkConfig) o;
     return networkId == that.networkId
         && Objects.equals(genesisConfig, that.genesisConfig)
-        && Objects.equals(Lists.newArrayList(bootNodes), Lists.newArrayList(that.bootNodes));
+        && Objects.equals(bootNodes, that.bootNodes);
   }
 
   @Override
@@ -146,7 +146,7 @@ public class EthNetworkConfig {
 
     private String genesisConfig;
     private int networkId;
-    private Collection<URI> bootNodes;
+    private List<URI> bootNodes;
 
     public Builder(final EthNetworkConfig ethNetworkConfig) {
       this.genesisConfig = ethNetworkConfig.genesisConfig;
@@ -164,7 +164,7 @@ public class EthNetworkConfig {
       return this;
     }
 
-    public Builder setBootNodes(final Collection<URI> bootNodes) {
+    public Builder setBootNodes(final List<URI> bootNodes) {
       this.bootNodes = bootNodes;
       return this;
     }

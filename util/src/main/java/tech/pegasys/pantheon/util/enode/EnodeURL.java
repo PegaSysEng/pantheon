@@ -19,11 +19,11 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Objects;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 
@@ -172,9 +172,9 @@ public class EnodeURL {
   }
 
   public boolean sameEndpoint(final EnodeURL enode) {
-    return Objects.equal(nodeId, enode.nodeId)
-        && Objects.equal(ip, enode.ip)
-        && Objects.equal(listeningPort, enode.listeningPort);
+    return Objects.equals(nodeId, enode.nodeId)
+        && Objects.equals(ip, enode.ip)
+        && Objects.equals(listeningPort, enode.listeningPort);
   }
 
   @Override
@@ -186,15 +186,15 @@ public class EnodeURL {
       return false;
     }
     EnodeURL enodeURL = (EnodeURL) o;
-    return Objects.equal(nodeId, enodeURL.nodeId)
-        && Objects.equal(ip, enodeURL.ip)
-        && Objects.equal(listeningPort, enodeURL.listeningPort)
-        && Objects.equal(discoveryPort, enodeURL.discoveryPort);
+    return Objects.equals(nodeId, enodeURL.nodeId)
+        && Objects.equals(ip, enodeURL.ip)
+        && Objects.equals(listeningPort, enodeURL.listeningPort)
+        && Objects.equals(discoveryPort, enodeURL.discoveryPort);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(nodeId, ip, listeningPort, discoveryPort);
+    return Objects.hash(nodeId, ip, listeningPort, discoveryPort);
   }
 
   @Override
