@@ -83,11 +83,11 @@ public class PantheonPluginContextImpl implements PantheonContext {
         "PantheonContext should be in state %s but it was in %s",
         Lifecycle.STARTED,
         state);
-    state = Lifecycle.STARTING;
+    state = Lifecycle.STOPPING;
     plugins = ServiceLoader.load(PantheonPlugin.class);
     for (final PantheonPlugin plugin : plugins) {
       plugin.stop();
     }
-    state = Lifecycle.STARTED;
+    state = Lifecycle.STOPPED;
   }
 }
