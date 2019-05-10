@@ -84,7 +84,7 @@ public class TransactionSmartContractPermissioningController implements
         transactionSimulator.doesAddressExistAtHead(contractAddress);
 
     if (contractExists.isPresent() && !contractExists.get()) {
-      throw new IllegalStateException("Permissioning contract does not exist");
+      throw new IllegalStateException("Transaction permissioning contract does not exist");
     }
 
     final Optional<TransactionSimulatorResult> result =
@@ -93,9 +93,9 @@ public class TransactionSmartContractPermissioningController implements
     if (result.isPresent()) {
       switch (result.get().getResult().getStatus()) {
         case INVALID:
-          throw new IllegalStateException("Permissioning transaction found to be Invalid");
+          throw new IllegalStateException("Transaction permissioning transaction found to be Invalid");
         case FAILED:
-          throw new IllegalStateException("Permissioning transaction failed when processing");
+          throw new IllegalStateException("Transaction permissioning transaction failed when processing");
         default:
           break;
       }
@@ -144,14 +144,17 @@ public class TransactionSmartContractPermissioningController implements
         encodeBytes(transaction.getPayload()));
   }
 
+  // Case for empty address
   private static BytesValue encodeAddress(final Optional<Address> address) {
     return encodeAddress(address.orElse(Address.wrap(BytesValue.wrap(new byte[20]))));
   }
 
+  // Address is the 20 bytes of value left padded by 12 bytes.
   private static BytesValue encodeAddress(final Address address) {
     return BytesValues.concatenate(BytesValue.wrap(new byte[12]), address);
   }
 
+  // long to uint256, 8 bytes big endian, so left padded by 24 bytes
   private static BytesValue encodeLong(final long l) {
     checkArgument(l >= 0, "Unsigned value must be positive");
     final byte[] longBytes = new byte[8];
@@ -161,6 +164,8 @@ public class TransactionSmartContractPermissioningController implements
     return BytesValues.concatenate(BytesValue.wrap(new byte[24]), BytesValue.wrap(longBytes));
   }
 
+  // A bytes array is a uint256 of its length, then the bytes that make up its value, then pad to
+  // next 32 bytes interval
   private static BytesValue encodeBytes(final BytesValue value) {
     final BytesValue length = encodeLong(value.size());
     final BytesValue padding = BytesValue.wrap(new byte[(32 - (value.size() % 32))]);

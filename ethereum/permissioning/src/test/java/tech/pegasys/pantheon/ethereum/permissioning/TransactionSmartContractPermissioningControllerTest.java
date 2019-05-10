@@ -1,6 +1,7 @@
 package tech.pegasys.pantheon.ethereum.permissioning;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +43,16 @@ public class TransactionSmartContractPermissioningControllerTest {
     return new TransactionSmartContractPermissioningController(contractAddress, ts);
   }
 
+  private Transaction transactionForAccount(final Address address) {
+    return Transaction.builder()
+        .sender(address)
+        .value(Wei.ZERO)
+        .gasPrice(Wei.ZERO)
+        .gasLimit(0)
+        .payload(BytesValue.EMPTY)
+        .build();
+  }
+
   @Test
   public void testAccountIncluded() throws IOException {
     final TransactionSmartContractPermissioningController controller =
@@ -70,13 +81,36 @@ public class TransactionSmartContractPermissioningControllerTest {
     ).isFalse();
   }
 
-  private Transaction transactionForAccount(final Address address) {
-    return Transaction.builder()
-        .sender(address)
-        .value(Wei.ZERO)
-        .gasPrice(Wei.ZERO)
-        .gasLimit(0)
-        .payload(BytesValue.EMPTY)
-        .build();
+  @Test
+  public void testPermissioningContractMissing() throws IOException {
+    final TransactionSmartContractPermissioningController controller =
+        setupController(
+            "/TransactionSmartContractPermissioningControllerTest/noSmartPermissioning.json",
+            "0x0000000000000000000000000000000000001234");
+
+    assertThatThrownBy(
+        () ->
+            controller.isPermitted(
+                transactionForAccount(Address.fromHexString("0x1"))
+            ))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Transaction permissioning contract does not exist");
   }
+
+  @Test
+  public void testPermissioningContractCorrupt() throws IOException {
+    final TransactionSmartContractPermissioningController controller =
+        setupController(
+            "/TransactionSmartContractPermissioningControllerTest/corruptSmartPermissioning.json",
+            "0x0000000000000000000000000000000000001234");
+
+    assertThatThrownBy(
+        () ->
+            controller.isPermitted(
+                transactionForAccount(Address.fromHexString("0x1"))
+            ))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Transaction permissioning transaction failed when processing");
+  }
+
 }
