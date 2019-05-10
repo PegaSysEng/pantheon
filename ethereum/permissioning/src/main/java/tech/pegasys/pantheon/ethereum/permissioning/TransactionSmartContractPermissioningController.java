@@ -14,19 +14,16 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.net.InetAddress;
-import java.util.Optional;
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
+
+import java.util.Optional;
 
 /**
  * Controller that can read from a smart contract that exposes the permissioning call
@@ -130,10 +127,7 @@ public class TransactionSmartContractPermissioningController {
 
   public static BytesValue createPayload(
       final BytesValue signature, final Transaction transaction) {
-    return BytesValues.concatenate(
-        signature,
-        encodeTransaction(transaction)
-    );
+    return BytesValues.concatenate(signature, encodeTransaction(transaction));
   }
 
   private static BytesValue encodeTransaction(final Transaction transaction) {
@@ -143,8 +137,7 @@ public class TransactionSmartContractPermissioningController {
         transaction.getValue().getBytes(),
         transaction.getGasPrice().getBytes(),
         encodeLong(transaction.getGasLimit()),
-        transaction.getPayload()
-    );
+        transaction.getPayload());
   }
 
   private static BytesValue encodeAddress(final Optional<Address> address) {
@@ -152,10 +145,7 @@ public class TransactionSmartContractPermissioningController {
   }
 
   private static BytesValue encodeAddress(final Address address) {
-    return BytesValues.concatenate(
-        BytesValue.wrap(new byte[12]),
-        address
-    );
+    return BytesValues.concatenate(BytesValue.wrap(new byte[12]), address);
   }
 
   private static BytesValue encodeLong(final long l) {
