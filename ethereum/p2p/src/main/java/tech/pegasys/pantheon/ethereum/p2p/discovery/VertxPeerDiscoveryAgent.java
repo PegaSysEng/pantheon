@@ -145,7 +145,7 @@ public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
     CompletableFuture<Void> result = new CompletableFuture<>();
     socket.send(
         packet.encode(),
-        peer.getEnodeURL().getEffectiveDiscoveryPort(),
+        peer.getEndpoint().getUdpPort(),
         peer.getEnodeURL().getIpAsString(),
         ar -> {
           if (ar.failed()) {
