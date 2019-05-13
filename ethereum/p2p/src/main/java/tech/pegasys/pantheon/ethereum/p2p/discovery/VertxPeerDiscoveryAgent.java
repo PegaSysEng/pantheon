@@ -201,7 +201,6 @@ public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
       LOG.debug("Discarding over-sized packet. Actual size (bytes): " + length);
       return;
     }
-    // We allow exceptions to bubble up, as they'll be picked up by the exception handler.
     vertx.<Packet>executeBlocking(
         future -> {
           try {
@@ -221,7 +220,6 @@ public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
             if (event.cause() instanceof PeerDiscoveryPacketDecodingException) {
               LOG.debug("Discarding invalid peer discovery packet: {}", event.cause().getMessage());
             } else {
-
               LOG.error("Encountered error while handling packet", event.cause());
             }
           }
