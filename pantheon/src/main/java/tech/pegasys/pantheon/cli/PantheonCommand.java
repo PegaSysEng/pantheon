@@ -190,7 +190,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       bootNodes =
           values.stream()
               .filter(value -> !value.isEmpty())
-              .map(value -> EnodeURL.fromString(value).toURI()).collect(Collectors.toList());
+              .map(value -> EnodeURL.fromString(value).toURI())
+              .collect(Collectors.toList());
     } catch (final IllegalArgumentException e) {
       throw new ParameterException(commandLine, e.getMessage());
     }
