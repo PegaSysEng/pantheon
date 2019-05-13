@@ -128,9 +128,9 @@ public class EnodeURL {
       return false;
     }
 
-    return Objects.equal(enodeA.nodeId, enodeB.nodeId)
-        && Objects.equal(enodeA.ip, enodeB.ip)
-        && Objects.equal(enodeA.listeningPort, enodeB.listeningPort);
+    return Objects.equals(enodeA.nodeId, enodeB.nodeId)
+        && Objects.equals(enodeA.ip, enodeB.ip)
+        && Objects.equals(enodeA.listeningPort, enodeB.listeningPort);
   }
 
   public URI toURI() {
