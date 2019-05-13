@@ -12,32 +12,33 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.permissioning.account.TransactionPermissioningProvider;
 import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
-import java.net.InetAddress;
 import java.util.Optional;
 
 /**
  * Controller that can read from a smart contract that exposes the permissioning call
- * connectionAllowed(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)
+ * transactionAllowed(address,address,uint256,uint256,uint256,bytes)
  */
-public class SmartContractPermissioningController implements NodePermissioningProvider {
+public class TransactionSmartContractPermissioningController
+    implements TransactionPermissioningProvider {
   private final Address contractAddress;
   private final TransactionSimulator transactionSimulator;
 
   // full function signature for connection allowed call
   private static final String FUNCTION_SIGNATURE =
-      "connectionAllowed(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)";
+      "transactionAllowed(address,address,uint256,uint256,uint256,bytes)";
   // hashed function signature for connection allowed call
   private static final BytesValue FUNCTION_SIGNATURE_HASH = hashSignature(FUNCTION_SIGNATURE);
 
@@ -50,10 +51,10 @@ public class SmartContractPermissioningController implements NodePermissioningPr
   // True from a contract is 1 filled to 32 bytes
   private static final BytesValue TRUE_RESPONSE =
       BytesValue.fromHexString(
-          "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+          "0x0000000000000000000000000000000000000000000000000000000000000001");
   private static final BytesValue FALSE_RESPONSE =
       BytesValue.fromHexString(
-          "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+          "0x0000000000000000000000000000000000000000000000000000000000000000");
 
   /**
    * Creates a permissioning controller attached to a blockchain
@@ -61,22 +62,21 @@ public class SmartContractPermissioningController implements NodePermissioningPr
    * @param contractAddress The address at which the permissioning smart contract resides
    * @param transactionSimulator A transaction simulator with attached blockchain and world state
    */
-  public SmartContractPermissioningController(
+  public TransactionSmartContractPermissioningController(
       final Address contractAddress, final TransactionSimulator transactionSimulator) {
     this.contractAddress = contractAddress;
     this.transactionSimulator = transactionSimulator;
   }
 
   /**
-   * Check whether a given connection from the source to destination enode should be permitted
+   * Check whether a given transaction should be permitted for the current head
    *
-   * @param sourceEnode The enode url of the node initiating the connection
-   * @param destinationEnode The enode url of the node receiving the connection
+   * @param transaction The transaction to be examined
    * @return boolean of whether or not to permit the connection to occur
    */
   @Override
-  public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    final BytesValue payload = createPayload(sourceEnode, destinationEnode);
+  public boolean isPermitted(final Transaction transaction) {
+    final BytesValue payload = createPayload(transaction);
     final CallParameter callParams =
         new CallParameter(null, contractAddress, -1, null, null, payload);
 
@@ -84,7 +84,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
         transactionSimulator.doesAddressExistAtHead(contractAddress);
 
     if (contractExists.isPresent() && !contractExists.get()) {
-      throw new IllegalStateException("Permissioning contract does not exist");
+      throw new IllegalStateException("Transaction permissioning contract does not exist");
     }
 
     final Optional<TransactionSimulatorResult> result =
@@ -93,9 +93,11 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     if (result.isPresent()) {
       switch (result.get().getResult().getStatus()) {
         case INVALID:
-          throw new IllegalStateException("Permissioning transaction found to be Invalid");
+          throw new IllegalStateException(
+              "Transaction permissioning transaction found to be Invalid");
         case FAILED:
-          throw new IllegalStateException("Permissioning transaction failed when processing");
+          throw new IllegalStateException(
+              "Transaction permissioning transaction failed when processing");
         default:
           break;
       }
@@ -115,7 +117,7 @@ public class SmartContractPermissioningController implements NodePermissioningPr
     // 0 is false
     if (result.compareTo(FALSE_RESPONSE) == 0) {
       return false;
-      // 1 filled to 32 bytes is true
+      // 32 bytes of 1's is true
     } else if (result.compareTo(TRUE_RESPONSE) == 0) {
       return true;
       // Anything else is wrong
@@ -125,50 +127,50 @@ public class SmartContractPermissioningController implements NodePermissioningPr
   }
 
   // Assemble the bytevalue payload to call the contract
-  public static BytesValue createPayload(
-      final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    return createPayload(FUNCTION_SIGNATURE_HASH, sourceEnode, destinationEnode);
+  public static BytesValue createPayload(final Transaction transaction) {
+    return createPayload(FUNCTION_SIGNATURE_HASH, transaction);
   }
 
   public static BytesValue createPayload(
-      final BytesValue signature, final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
+      final BytesValue signature, final Transaction transaction) {
+    return BytesValues.concatenate(signature, encodeTransaction(transaction));
+  }
+
+  private static BytesValue encodeTransaction(final Transaction transaction) {
     return BytesValues.concatenate(
-        signature, encodeEnodeUrl(sourceEnode), encodeEnodeUrl(destinationEnode));
+        encodeAddress(transaction.getSender()),
+        encodeAddress(transaction.getTo()),
+        transaction.getValue().getBytes(),
+        transaction.getGasPrice().getBytes(),
+        encodeLong(transaction.getGasLimit()),
+        encodeBytes(transaction.getPayload()));
   }
 
-  public static BytesValue createPayload(final BytesValue signature, final EnodeURL enodeURL) {
-    return BytesValues.concatenate(signature, encodeEnodeUrl(enodeURL));
+  // Case for empty address
+  private static BytesValue encodeAddress(final Optional<Address> address) {
+    return encodeAddress(address.orElse(Address.wrap(BytesValue.wrap(new byte[20]))));
   }
 
-  private static BytesValue encodeEnodeUrl(final EnodeURL enode) {
-    return BytesValues.concatenate(
-        enode.getNodeId(), encodeIp(enode.getIp()), encodePort(enode.getListeningPort()));
+  // Address is the 20 bytes of value left padded by 12 bytes.
+  private static BytesValue encodeAddress(final Address address) {
+    return BytesValues.concatenate(BytesValue.wrap(new byte[12]), address);
   }
 
-  // As a function parameter an ip needs to be the appropriate number of bytes, big endian, and
-  // filled to 32 bytes
-  private static BytesValue encodeIp(final InetAddress addr) {
-    // InetAddress deals with giving us the right number of bytes
-    final byte[] address = addr.getAddress();
-    final byte[] res = new byte[32];
-    if (address.length == 4) {
-      // lead with 10 bytes of 0's
-      // then 2 bytes of 1's
-      res[10] = (byte) 0xFF;
-      res[11] = (byte) 0xFF;
-      // then the ipv4
-      System.arraycopy(address, 0, res, 12, 4);
-    } else {
-      System.arraycopy(address, 0, res, 0, address.length);
+  // long to uint256, 8 bytes big endian, so left padded by 24 bytes
+  private static BytesValue encodeLong(final long l) {
+    checkArgument(l >= 0, "Unsigned value must be positive");
+    final byte[] longBytes = new byte[8];
+    for (int i = 0; i < 8; i++) {
+      longBytes[i] = (byte) ((l >> ((7 - i) * 8)) & 0xFF);
     }
-    return BytesValue.wrap(res);
+    return BytesValues.concatenate(BytesValue.wrap(new byte[24]), BytesValue.wrap(longBytes));
   }
 
-  // The port, a uint16, needs to be 2 bytes, little endian, and filled to 32 bytes
-  private static BytesValue encodePort(final Integer port) {
-    final byte[] res = new byte[32];
-    res[31] = (byte) ((port) & 0xFF);
-    res[30] = (byte) ((port >> 8) & 0xFF);
-    return BytesValue.wrap(res);
+  // A bytes array is a uint256 of its length, then the bytes that make up its value, then pad to
+  // next 32 bytes interval
+  private static BytesValue encodeBytes(final BytesValue value) {
+    final BytesValue length = encodeLong(value.size());
+    final BytesValue padding = BytesValue.wrap(new byte[(32 - (value.size() % 32))]);
+    return BytesValues.concatenate(length, value, padding);
   }
 }
