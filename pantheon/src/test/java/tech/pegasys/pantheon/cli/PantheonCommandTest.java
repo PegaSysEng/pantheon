@@ -60,7 +60,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -235,6 +234,22 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
+  public void callingWithNoBootnodesConfig() throws Exception {
+    assumeTrue(isFullInstantiation());
+
+    final URL configFile = this.getClass().getResource("/no_bootnodes.toml");
+    final Path toml = createTempFile("toml", Resources.toString(configFile, UTF_8));
+
+    parseCommand("--config-file", toml.toAbsolutePath().toString());
+
+    verify(mockRunnerBuilder).ethNetworkConfig(ethNetworkConfigArgumentCaptor.capture());
+    assertThat(ethNetworkConfigArgumentCaptor.getValue().getBootNodes()).isEmpty();
+
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(commandOutput.toString()).isEmpty();
+  }
+
+  @Test
   public void callingWithConfigOptionButInvalidValueTomlFileShouldDisplayHelp() throws Exception {
     assumeTrue(isFullInstantiation());
 
@@ -261,7 +276,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
             .replace("~/genesis.json", escapeTomlString(genesisFile.toString()));
     final Path toml = createTempFile("toml", updatedConfig.getBytes(UTF_8));
 
-    final Collection<RpcApi> expectedApis = asList(ETH, WEB3);
+    final List<RpcApi> expectedApis = asList(ETH, WEB3);
 
     final JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     jsonRpcConfiguration.setEnabled(false);
@@ -299,11 +314,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).metricsConfiguration(eq(metricsConfiguration));
     verify(mockRunnerBuilder).build();
 
-    final Collection<URI> nodes =
+    final List<EnodeURL> nodes =
         asList(
-            URI.create("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"),
-            URI.create("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"),
-            URI.create("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"));
+            EnodeURL.fromString("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"),
+            EnodeURL.fromString("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"),
+            EnodeURL.fromString("enode://" + VALID_NODE_ID + "@192.168.0.1:4567"));
     assertThat(ethNetworkConfigArgumentCaptor.getValue().getBootNodes()).isEqualTo(nodes);
 
     final EthNetworkConfig networkConfig =
@@ -941,6 +956,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
   }
 
+  @Test
+  public void callingWithBootnodeThatHasDiscoveryDisabledMustDisplayErrorAndUsage() {
+    final String validBootnode =
+        "enode://d2567893371ea5a6fa6371d483891ed0d129e79a8fc74d6df95a00a6545444cd4a6960bbffe0b4e2edcf35135271de57ee559c0909236bbc2074346ef2b5b47c@127.0.0.1:30304";
+    final String invalidBootnode =
+        "enode://02567893371ea5a6fa6371d483891ed0d129e79a8fc74d6df95a00a6545444cd4a6960bbffe0b4e2edcf35135271de57ee559c0909236bbc2074346ef2b5b47c@127.0.0.1:30303?discport=0";
+    final String bootnodesValue = validBootnode + "," + invalidBootnode;
+    parseCommand("--bootnodes", bootnodesValue);
+    assertThat(commandOutput.toString()).isEmpty();
+    final String expectedErrorOutputStart =
+        "Bootnodes must have discovery enabled. Invalid bootnodes: " + invalidBootnode + ".";
+    assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
+  }
+
   // This test ensures non regression on https://pegasys1.atlassian.net/browse/PAN-2387
   @Test
   public void callingWithInvalidBootnodeAndEqualSignMustDisplayErrorAndUsage() {
@@ -969,7 +998,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).build();
 
     assertThat(ethNetworkConfigArgumentCaptor.getValue().getBootNodes())
-        .isEqualTo(Stream.of(validENodeStrings).map(URI::create).collect(Collectors.toList()));
+        .isEqualTo(
+            Stream.of(validENodeStrings).map(EnodeURL::fromString).collect(Collectors.toList()));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -2188,7 +2218,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).build();
 
     assertThat(networkArg.getValue().getBootNodes())
-        .isEqualTo(Stream.of(validENodeStrings).map(URI::create).collect(Collectors.toList()));
+        .isEqualTo(
+            Stream.of(validENodeStrings).map(EnodeURL::fromString).collect(Collectors.toList()));
     assertThat(networkArg.getValue().getNetworkId()).isEqualTo(1234567);
 
     assertThat(commandOutput.toString()).isEmpty();
@@ -2410,12 +2441,14 @@ public class PantheonCommandTest extends CommandTestAbstract {
             .nodeId(
                 "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa")
             .ipAddress("127.0.0.1")
+            .useDefaultPorts()
             .build();
 
     final EnodeURL whiteListedNode =
         EnodeURL.builder()
             .nodeId(
                 "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa")
+            .useDefaultPorts()
             .ipAddress("127.0.0.1")
             .listeningPort(30304)
             .build();
