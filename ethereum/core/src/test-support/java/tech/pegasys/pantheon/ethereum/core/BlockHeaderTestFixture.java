@@ -56,7 +56,6 @@ public class BlockHeaderTestFixture {
     builder.extraData(extraData);
     builder.mixHash(mixHash);
     builder.nonce(nonce);
-    blockHeaderFunctions = new MainnetBlockHeaderFunctions();
     builder.blockHeaderFunctions(blockHeaderFunctions);
 
     return builder.buildBlockHeader();

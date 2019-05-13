@@ -41,7 +41,8 @@ public class CliqueBlockInterfaceTest {
 
   private final CliqueBlockInterface blockInterface = new CliqueBlockInterface();
 
-  private final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
+  private final BlockHeaderTestFixture headerBuilder =
+      new BlockHeaderTestFixture().blockHeaderFunctions(new CliqueBlockHeaderFunctions());
 
   private final BlockHeader header =
       TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);

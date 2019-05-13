@@ -52,6 +52,7 @@ public class CliqueExtraData implements ParsedExtraData {
 
     checkNotNull(vanityData);
     checkNotNull(validators);
+    checkNotNull(header);
     checkArgument(vanityData.size() == EXTRA_VANITY_LENGTH);
 
     this.vanityData = vanityData;
@@ -63,7 +64,7 @@ public class CliqueExtraData implements ParsedExtraData {
 
   public static BytesValue createWithoutProposerSeal(
       final BytesValue vanityData, final List<Address> validators) {
-    return new CliqueExtraData(vanityData, null, validators, null).encode();
+    return CliqueExtraData.encodeUnsealed(vanityData, validators);
   }
 
   public static CliqueExtraData decode(final BlockHeader header) {
@@ -119,6 +120,18 @@ public class CliqueExtraData implements ParsedExtraData {
   }
 
   public BytesValue encode() {
+    return encode(vanityData, validators, proposerSeal);
+  }
+
+  public static BytesValue encodeUnsealed(
+      final BytesValue vanityData, final List<Address> validators) {
+    return encode(vanityData, validators, Optional.empty());
+  }
+
+  private static BytesValue encode(
+      final BytesValue vanityData,
+      final List<Address> validators,
+      final Optional<Signature> proposerSeal) {
     final BytesValue validatorData = BytesValues.concatenate(validators.toArray(new Address[0]));
     return BytesValues.concatenate(
         vanityData,

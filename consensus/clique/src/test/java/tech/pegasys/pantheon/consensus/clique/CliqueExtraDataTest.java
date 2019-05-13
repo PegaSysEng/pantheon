@@ -44,7 +44,8 @@ public class CliqueExtraDataTest {
     final BytesValue vanityData = BytesValue.fromHexString("11223344", 32);
 
     final CliqueExtraData extraData =
-        new CliqueExtraData(vanityData, proposerSeal, validators, null);
+        new CliqueExtraData(
+            vanityData, proposerSeal, validators, new BlockHeaderTestFixture().buildHeader());
 
     final BytesValue serialisedData = extraData.encode();
 
