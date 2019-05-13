@@ -18,11 +18,12 @@ import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.M
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.RINKEBY_BOOTSTRAP_NODES;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.ROPSTEN_BOOTSTRAP_NODES;
 
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,10 +43,10 @@ public class EthNetworkConfig {
   private static final String DEV_GENESIS = "/dev.json";
   private final String genesisConfig;
   private final int networkId;
-  private final List<URI> bootNodes;
+  private final List<EnodeURL> bootNodes;
 
   public EthNetworkConfig(
-      final String genesisConfig, final int networkId, final List<URI> bootNodes) {
+      final String genesisConfig, final int networkId, final List<EnodeURL> bootNodes) {
     Preconditions.checkNotNull(genesisConfig);
     Preconditions.checkNotNull(bootNodes);
     this.genesisConfig = genesisConfig;
@@ -61,7 +62,7 @@ public class EthNetworkConfig {
     return networkId;
   }
 
-  public Collection<URI> getBootNodes() {
+  public List<EnodeURL> getBootNodes() {
     return bootNodes;
   }
 
@@ -146,7 +147,7 @@ public class EthNetworkConfig {
 
     private String genesisConfig;
     private int networkId;
-    private List<URI> bootNodes;
+    private List<EnodeURL> bootNodes;
 
     public Builder(final EthNetworkConfig ethNetworkConfig) {
       this.genesisConfig = ethNetworkConfig.genesisConfig;
@@ -164,7 +165,7 @@ public class EthNetworkConfig {
       return this;
     }
 
-    public Builder setBootNodes(final List<URI> bootNodes) {
+    public Builder setBootNodes(final List<EnodeURL> bootNodes) {
       this.bootNodes = bootNodes;
       return this;
     }
