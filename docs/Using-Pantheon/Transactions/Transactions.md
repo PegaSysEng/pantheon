@@ -9,7 +9,7 @@ These examples describe how to create a signed raw transaction that can be passe
 
 !!!tip
     To avoid exposing your private keys, create signed transactions offline.
-    
+
 The examples use the following libraries to create signed transactions:
 
 * [web3.js](https://github.com/ethereum/web3.js/)
