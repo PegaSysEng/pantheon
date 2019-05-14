@@ -117,6 +117,18 @@ public class PantheonController<C> implements java.io.Closeable {
     return additionalJsonRpcMethodsFactory.createJsonRpcMethods(enabledRpcApis);
   }
 
+  public void start(final boolean p2pEnabled) {
+    if (p2pEnabled) {
+      synchronizer.start();
+    }
+  }
+
+  public void stop(final boolean p2pEnabled) {
+    if (p2pEnabled) {
+      synchronizer.stop();
+    }
+  }
+
   public static class Builder {
 
     public PantheonControllerBuilder<?> fromEthNetworkConfig(
