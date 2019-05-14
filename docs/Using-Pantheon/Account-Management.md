@@ -16,3 +16,4 @@ In Pantheon, you can use the JSON-RPC methods:
  
 !!! tip 
     [EthSigner](http://docs.ethsigner.pegasys.tech/en/latest/) implements [`eth_sendTransaction`](http://docs.ethsigner.pegasys.tech/en/latest/Using-EthSigner#eth_sendTransaction).
+
