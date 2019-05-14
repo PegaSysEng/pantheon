@@ -3,9 +3,9 @@ description: Some use cases of creating transactions on a Pantheon network
 
 # Creating and Sending Transactions
 
-You can send signed transactions using the [`eth_sendRawTransaction`](../../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction) JSON-RPC API method.
+You can send signed transactions using the [`eth_sendRawTransaction`](../../Reference/Pantheon-API-Methods.md#eth_sendrawtransaction) JSON-RPC API method.
 
-These examples describe how to create a signed raw transaction that can be passed to [`eth_sendRawTransaction`](../../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction).
+These examples describe how to create a signed raw transaction that can be passed to [`eth_sendRawTransaction`](../../Reference/Pantheon-API-Methods.md#eth_sendrawtransaction).
 
 !!!tip
     To avoid exposing your private keys, create signed transactions offline.
@@ -20,6 +20,8 @@ The examples use the following libraries to create signed transactions:
     and tools (such as [MyEtherWallet](https://kb.myetherwallet.com/offline/making-offline-transaction-on-myetherwallet.html) 
     or [MyCrypto](https://mycrypto.com/)) can also be used to create signed transactions. 
 
+    [EthSigner](https://docs.ethsigner.pegasys.tech/en/latest/) provides transaction signing and implements [`eth_sendTransaction`](https://docs.ethsigner.pegasys.tech/en/latest/Using-EthSigner#eth_sendTransaction). 
+    
 Example Javascript scripts are provided to create signed raw transaction strings to:
  
 * [Send ether](#sending-ether)
@@ -146,7 +148,7 @@ All accounts and private keys in the examples are from the `dev.json` genesis fi
 
 ## eth_call or eth_sendRawTransaction
 
-You can interact with contracts using [eth_call](../../Reference/JSON-RPC-API-Methods.md#eth_call) or [eth_sendRawTransaction](../../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction). The table below compares the characteristics of both calls.
+You can interact with contracts using [eth_call](../../Reference/Pantheon-API-Methods.md#eth_call) or [eth_sendRawTransaction](../../Reference/Pantheon-API-Methods.md#eth_sendrawtransaction). The table below compares the characteristics of both calls.
 
 | eth_call                                                | eth_sendRawTransaction                                                                                                         |
 |---------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|

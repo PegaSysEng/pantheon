@@ -18,7 +18,7 @@ Pantheon supports enterprise features including privacy and permissioning.
 
 ## What can you do with Pantheon?
 
-Pantheon includes a [command line interface](Reference/Pantheon-CLI-Syntax.md) and [JSON-RPC API](JSON-RPC-API/JSON-RPC-API.md)
+Pantheon includes a [command line interface](Reference/Pantheon-CLI-Syntax.md) and [JSON-RPC API](Pantheon-API/JSON-RPC-API.md)
 for running, maintaining, debugging, and monitoring nodes in an Ethereum network. You can use the API via RPC
 over HTTP or via WebSockets, and Pub/Sub is supported. The API supports typical Ethereum functionalities such as:
 
@@ -30,4 +30,6 @@ over HTTP or via WebSockets, and Pub/Sub is supported. The API supports typical 
 
 The Pantheon client supports common smart contract and Dapp development, deployment, and operational use cases, using tools such as [Truffle](http://truffleframework.com/), [Remix](https://github.com/ethereum/remix), and [web3j](https://web3j.io/). The client supports common JSON-RPC API methods such as eth, net, web3, debug, and miner.
 
-Pantheon doesn't support [Account management](Using-Pantheon/Account-Management.md).
+Pantheon doesn't support [key management](Using-Pantheon/Account-Management.md) inside the client. You can use 
+[EthSigner](http://docs.ethsigner.pegasys.tech/en/latest/) with Pantheon to provide access to your key store
+and sign transactions.  

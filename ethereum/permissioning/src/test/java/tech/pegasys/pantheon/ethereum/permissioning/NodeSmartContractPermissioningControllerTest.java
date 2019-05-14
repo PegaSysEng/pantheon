@@ -33,9 +33,9 @@ import java.io.IOException;
 import com.google.common.io.Resources;
 import org.junit.Test;
 
-public class SmartContractPermissioningControllerTest {
+public class NodeSmartContractPermissioningControllerTest {
 
-  private SmartContractPermissioningController setupController(
+  private NodeSmartContractPermissioningController setupController(
       final String resourceName, final String contractAddressString) throws IOException {
     final ProtocolSchedule<Void> protocolSchedule = MainnetProtocolSchedule.create();
 
@@ -53,14 +53,14 @@ public class SmartContractPermissioningControllerTest {
         new TransactionSimulator(blockchain, worldArchive, protocolSchedule);
     final Address contractAddress = Address.fromHexString(contractAddressString);
 
-    return new SmartContractPermissioningController(contractAddress, ts);
+    return new NodeSmartContractPermissioningController(contractAddress, ts);
   }
 
   @Test
   public void testIpv4Included() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -74,9 +74,9 @@ public class SmartContractPermissioningControllerTest {
 
   @Test
   public void testIpv4DestinationMissing() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -90,9 +90,9 @@ public class SmartContractPermissioningControllerTest {
 
   @Test
   public void testIpv4SourceMissing() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -106,9 +106,9 @@ public class SmartContractPermissioningControllerTest {
 
   @Test
   public void testIpv6Included() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -122,9 +122,9 @@ public class SmartContractPermissioningControllerTest {
 
   @Test
   public void testIpv6SourceMissing() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -138,9 +138,9 @@ public class SmartContractPermissioningControllerTest {
 
   @Test
   public void testIpv6DestinationMissing() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/preseededSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThat(
@@ -154,9 +154,9 @@ public class SmartContractPermissioningControllerTest {
 
   @Test
   public void testPermissioningContractMissing() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/noSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/noSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThatThrownBy(
@@ -172,9 +172,9 @@ public class SmartContractPermissioningControllerTest {
 
   @Test
   public void testPermissioningContractCorrupt() throws IOException {
-    final SmartContractPermissioningController controller =
+    final NodeSmartContractPermissioningController controller =
         setupController(
-            "/SmartContractPermissioningControllerTest/corruptSmartPermissioning.json",
+            "/NodeSmartContractPermissioningControllerTest/corruptSmartPermissioning.json",
             "0x0000000000000000000000000000000000001234");
 
     assertThatThrownBy(

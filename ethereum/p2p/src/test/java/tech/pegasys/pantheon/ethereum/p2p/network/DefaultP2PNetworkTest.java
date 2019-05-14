@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.p2p.network;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Java6Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -68,7 +69,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -110,6 +110,37 @@ public final class DefaultP2PNetworkTest {
 
     assertThat(network.peerMaintainConnectionList).contains(peer);
     verify(network, times(1)).connect(peer);
+  }
+
+  @Test
+  public void addMaintainConnectionPeer_beforeStartingNetwork() {
+    final DefaultP2PNetwork network = mockNetwork();
+    final Peer peer = mockPeer();
+
+    assertThat(network.addMaintainConnectionPeer(peer)).isTrue();
+
+    assertThat(network.peerMaintainConnectionList).contains(peer);
+    verify(network, never()).connect(peer);
+  }
+
+  @Test
+  public void addMaintainConnectionPeer_withNonListeningEnode() {
+    final DefaultP2PNetwork network = mockNetwork();
+    network.start();
+    final Peer peer =
+        DefaultPeer.fromEnodeURL(
+            EnodeURL.builder()
+                .nodeId(Peer.randomId())
+                .ipAddress("127.0.0.1")
+                .useDefaultPorts()
+                .disableListening()
+                .build());
+
+    assertThatThrownBy(() -> network.addMaintainConnectionPeer(peer))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("Enode url must contain a non-zero listening port");
+
+    verify(network, never()).connect(peer);
   }
 
   @Test
@@ -194,6 +225,7 @@ public final class DefaultP2PNetworkTest {
   @Test
   public void shouldntAttemptNewConnectionToPendingPeer() {
     final P2PNetwork network = network();
+    network.start();
     final Peer peer = mockPeer();
 
     final CompletableFuture<PeerConnection> connectingFuture = network.connect(peer);
@@ -477,6 +509,39 @@ public final class DefaultP2PNetworkTest {
     verify(network, times(0)).connect(any());
   }
 
+  @Test
+  public void connect_beforeStartingNetwork() {
+    final DefaultP2PNetwork network = network();
+    final Peer peer = mockPeer();
+
+    final CompletableFuture<PeerConnection> connectionResult = network.connect(peer);
+    assertThat(connectionResult).isCompletedExceptionally();
+    assertThatThrownBy(connectionResult::get)
+        .hasCauseInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("Attempt to connect to peer before network is ready");
+  }
+
+  @Test
+  public void connect_toNonListeningPeer() {
+    final DefaultP2PNetwork network = network();
+    network.start();
+    final Peer peer =
+        DefaultPeer.fromEnodeURL(
+            EnodeURL.builder()
+                .ipAddress("127.0.0.1")
+                .nodeId(Peer.randomId())
+                .disableListening()
+                .discoveryPort(30303)
+                .build());
+
+    final CompletableFuture<PeerConnection> connectionResult = network.connect(peer);
+    assertThat(connectionResult).isCompletedExceptionally();
+    assertThatThrownBy(connectionResult::get)
+        .hasCauseInstanceOf(IllegalStateException.class)
+        .hasMessageContaining(
+            "Attempt to connect to peer with no listening port: " + peer.getEnodeURLString());
+  }
+
   private DiscoveryPeer createDiscoveryPeer() {
     return createDiscoveryPeer(Peer.randomId(), 999);
   }
@@ -504,7 +569,7 @@ public final class DefaultP2PNetworkTest {
             5,
             "test",
             Arrays.asList(Capability.create("eth", 63)),
-            remoteEnode.getListeningPort(),
+            remoteEnode.getListeningPortOrZero(),
             remoteEnode.getNodeId());
 
     final PeerConnection peerConnection = mock(PeerConnection.class);
@@ -587,32 +652,12 @@ public final class DefaultP2PNetworkTest {
     return EnodeURL.builder()
         .ipAddress(InetAddress.getLoopbackAddress().getHostAddress())
         .nodeId(nodeId)
-        .listeningPort(listenPort)
+        .discoveryAndListeningPorts(listenPort)
         .build();
   }
 
-  public static class EnodeURLMatcher implements ArgumentMatcher<EnodeURL> {
-
-    private final EnodeURL enodeURL;
-
-    EnodeURLMatcher(final EnodeURL enodeURL) {
-      this.enodeURL = enodeURL;
-    }
-
-    @Override
-    public boolean matches(final EnodeURL argument) {
-      if (argument == null) {
-        return false;
-      } else {
-        return enodeURL.getNodeId().equals(argument.getNodeId())
-            && enodeURL.getIp().equals(argument.getIp())
-            && enodeURL.getListeningPort() == argument.getListeningPort();
-      }
-    }
-  }
-
   private EnodeURL enodeEq(final EnodeURL enodeURL) {
-    return argThat(new EnodeURLMatcher(enodeURL));
+    return argThat((EnodeURL e) -> EnodeURL.sameListeningEndpoint(e, enodeURL));
   }
 
   private static SubProtocol subProtocol() {

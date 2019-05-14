@@ -13,17 +13,18 @@
 package tech.pegasys.pantheon.util.enode;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import tech.pegasys.pantheon.util.NetworkUtility;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Objects;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 
@@ -37,20 +38,22 @@ public class EnodeURL {
 
   private final BytesValue nodeId;
   private final InetAddress ip;
-  private final Integer listeningPort;
-  // DiscoveryPort will only be present if it differs from listening port, otherwise
-  // the discovery port is assumed to match the listening port
+  private final OptionalInt listeningPort;
   private final OptionalInt discoveryPort;
+
+  // Error messages
+  public static String INVALID_NODE_ID_LENGTH =
+      "Invalid node ID: node ID must have exactly 128 hexadecimal characters and should not include any '0x' hex prefix.";
 
   private EnodeURL(
       final BytesValue nodeId,
       final InetAddress address,
-      final Integer listeningPort,
+      final OptionalInt listeningPort,
       final OptionalInt discoveryPort) {
     checkArgument(
         nodeId.size() == NODE_ID_SIZE, "Invalid node id.  Expected id of length: 64 bytes.");
     checkArgument(
-        NetworkUtility.isValidPort(listeningPort),
+        !listeningPort.isPresent() || NetworkUtility.isValidPort(listeningPort.getAsInt()),
         "Invalid listening port.  Port should be between 1 - 65535.");
     checkArgument(
         !discoveryPort.isPresent() || NetworkUtility.isValidPort(discoveryPort.getAsInt()),
@@ -59,12 +62,7 @@ public class EnodeURL {
     this.nodeId = nodeId;
     this.ip = address;
     this.listeningPort = listeningPort;
-    // Only explicitly define a discovery port if it differs from the listening port
-    if (discoveryPort.isPresent() && discoveryPort.getAsInt() != listeningPort) {
-      this.discoveryPort = discoveryPort;
-    } else {
-      this.discoveryPort = OptionalInt.empty();
-    }
+    this.discoveryPort = discoveryPort;
   }
 
   public static Builder builder() {
@@ -93,9 +91,11 @@ public class EnodeURL {
 
     checkArgument(
         uri.getScheme().equalsIgnoreCase("enode"), "Invalid URI scheme (must equal \"enode\").");
-    checkArgument(
-        NODE_ID_PATTERN.matcher(uri.getUserInfo()).matches(),
-        "Invalid node ID: node ID must have exactly 128 hexadecimal characters and should not include any '0x' hex prefix.");
+    checkArgument(NODE_ID_PATTERN.matcher(uri.getUserInfo()).matches(), INVALID_NODE_ID_LENGTH);
+
+    final BytesValue id = BytesValue.fromHexString(uri.getUserInfo());
+    String host = uri.getHost();
+    int tcpPort = uri.getPort();
 
     // Parse discport if it exists
     OptionalInt discoveryPort = OptionalInt.empty();
@@ -107,11 +107,9 @@ public class EnodeURL {
         discoveryPort = discPort == null ? discoveryPort : OptionalInt.of(discPort);
       }
       checkArgument(discoveryPort.isPresent(), "Invalid discovery port: '" + query + "'.");
+    } else {
+      discoveryPort = OptionalInt.of(tcpPort);
     }
-
-    final BytesValue id = BytesValue.fromHexString(uri.getUserInfo());
-    String host = uri.getHost();
-    int tcpPort = uri.getPort();
 
     return builder()
         .ipAddress(host)
@@ -125,16 +123,41 @@ public class EnodeURL {
     checkArgument(argument != null && !argument.trim().isEmpty(), message);
   }
 
+  public static boolean sameListeningEndpoint(final EnodeURL enodeA, final EnodeURL enodeB) {
+    if (enodeA == null || enodeB == null) {
+      return false;
+    }
+
+    return Objects.equals(enodeA.nodeId, enodeB.nodeId)
+        && Objects.equals(enodeA.ip, enodeB.ip)
+        && Objects.equals(enodeA.listeningPort, enodeB.listeningPort);
+  }
+
   public URI toURI() {
     final String uri =
         String.format(
             "enode://%s@%s:%d",
-            nodeId.toUnprefixedString(), InetAddresses.toUriString(ip), listeningPort);
-    if (discoveryPort.isPresent()) {
-      return URI.create(uri + String.format("?discport=%d", discoveryPort.getAsInt()));
+            nodeId.toUnprefixedString(), InetAddresses.toUriString(ip), getListeningPortOrZero());
+    final OptionalInt discPort = getDiscPortQueryParam();
+    if (discPort.isPresent()) {
+      return URI.create(uri + String.format("?discport=%d", discPort.getAsInt()));
     } else {
       return URI.create(uri);
     }
+  }
+
+  /**
+   * Returns the discovery port only if it differs from the listening port
+   *
+   * @return
+   */
+  private OptionalInt getDiscPortQueryParam() {
+    final int listeningPort = getListeningPortOrZero();
+    final int discoveryPort = getDiscoveryPortOrZero();
+    if (listeningPort == discoveryPort) {
+      return OptionalInt.empty();
+    }
+    return OptionalInt.of(discoveryPort);
   }
 
   public static URI asURI(final String url) {
@@ -153,26 +176,28 @@ public class EnodeURL {
     return ip;
   }
 
-  public int getListeningPort() {
+  public boolean isListening() {
+    return listeningPort.isPresent();
+  }
+
+  public boolean isRunningDiscovery() {
+    return discoveryPort.isPresent();
+  }
+
+  public OptionalInt getListeningPort() {
     return listeningPort;
+  }
+
+  public int getListeningPortOrZero() {
+    return listeningPort.orElse(0);
   }
 
   public OptionalInt getDiscoveryPort() {
     return discoveryPort;
   }
 
-  /**
-   * @return Returns the discovery port if explicitly specified, otherwise returns the listening
-   *     port.
-   */
-  public int getEffectiveDiscoveryPort() {
-    return discoveryPort.orElse(listeningPort);
-  }
-
-  public boolean sameEndpoint(final EnodeURL enode) {
-    return Objects.equal(nodeId, enode.nodeId)
-        && Objects.equal(ip, enode.ip)
-        && Objects.equal(listeningPort, enode.listeningPort);
+  public int getDiscoveryPortOrZero() {
+    return discoveryPort.orElse(0);
   }
 
   @Override
@@ -184,15 +209,15 @@ public class EnodeURL {
       return false;
     }
     EnodeURL enodeURL = (EnodeURL) o;
-    return Objects.equal(nodeId, enodeURL.nodeId)
-        && Objects.equal(ip, enodeURL.ip)
-        && Objects.equal(listeningPort, enodeURL.listeningPort)
-        && Objects.equal(discoveryPort, enodeURL.discoveryPort);
+    return Objects.equals(nodeId, enodeURL.nodeId)
+        && Objects.equals(ip, enodeURL.ip)
+        && Objects.equals(listeningPort, enodeURL.listeningPort)
+        && Objects.equals(discoveryPort, enodeURL.discoveryPort);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(nodeId, ip, listeningPort, discoveryPort);
+    return Objects.hash(nodeId, ip, listeningPort, discoveryPort);
   }
 
   @Override
@@ -203,14 +228,29 @@ public class EnodeURL {
   public static class Builder {
 
     private BytesValue nodeId;
-    private Integer listeningPort = 30303;
-    private OptionalInt discoveryPort = OptionalInt.empty();
+    private OptionalInt listeningPort;
+    private OptionalInt discoveryPort;
     private InetAddress ip;
 
     private Builder() {};
 
     public EnodeURL build() {
+      validate();
       return new EnodeURL(nodeId, ip, listeningPort, discoveryPort);
+    }
+
+    private void validate() {
+      checkState(nodeId != null, "Node id must be configured.");
+      checkState(listeningPort != null, "Listening port must be configured.");
+      checkState(discoveryPort != null, "Discovery port must be configured.");
+      checkState(ip != null, "Ip address must be configured.");
+    }
+
+    public Builder configureFromEnode(final EnodeURL enode) {
+      return this.nodeId(enode.getNodeId())
+          .listeningPort(enode.getListeningPort())
+          .discoveryPort(enode.getDiscoveryPort())
+          .ipAddress(enode.getIp());
     }
 
     public Builder nodeId(final BytesValue nodeId) {
@@ -244,18 +284,92 @@ public class EnodeURL {
       return this;
     }
 
-    public Builder listeningPort(final Integer listeningPort) {
-      this.listeningPort = listeningPort;
+    public Builder discoveryAndListeningPorts(final int listeningAndDiscoveryPorts) {
+      listeningPort(listeningAndDiscoveryPorts);
+      discoveryPort(listeningAndDiscoveryPorts);
       return this;
     }
 
+    public Builder disableListening() {
+      this.listeningPort = OptionalInt.empty();
+      return this;
+    }
+
+    public Builder disableDiscovery() {
+      this.discoveryPort = OptionalInt.empty();
+      return this;
+    }
+
+    public Builder useDefaultPorts() {
+      discoveryAndListeningPorts(EnodeURL.DEFAULT_LISTENING_PORT);
+      return this;
+    }
+
+    /**
+     * An optional listening port value. If the value is empty of equal to 0, the listening port
+     * will be empty - indicating the corresponding node is not listening.
+     *
+     * @param listeningPort If non-empty represents the port to listen on, if empty means the node
+     *     is not listening
+     * @return The modified builder
+     */
+    public Builder listeningPort(final OptionalInt listeningPort) {
+      if (listeningPort.isPresent() && listeningPort.getAsInt() == 0) {
+        this.listeningPort = OptionalInt.empty();
+      } else {
+        this.listeningPort = listeningPort;
+      }
+      return this;
+    }
+
+    /**
+     * An listening port value. A value of 0 means the node is not listening.
+     *
+     * @param listeningPort If non-zero, represents the port on which to listen for connections. A
+     *     value of 0 means the node is not listening for connections.
+     * @return The modified builder
+     */
+    public Builder listeningPort(final int listeningPort) {
+      if (listeningPort == 0) {
+        this.listeningPort = OptionalInt.empty();
+      } else {
+        this.listeningPort = OptionalInt.of(listeningPort);
+      }
+      return this;
+    }
+
+    /**
+     * The port on which to listen for discovery messages. A value that is empty or equal to 0,
+     * indicates that the node is not listening for discovery messages.
+     *
+     * @param discoveryPort If non-empty and non-zero, represents the port on which to listen for
+     *     discovery messages. Otherwise, indicates that the node is not running discovery.
+     * @return The modified builder
+     */
     public Builder discoveryPort(final OptionalInt discoveryPort) {
-      this.discoveryPort = discoveryPort;
+      if (discoveryPort.isPresent() && discoveryPort.getAsInt() == 0) {
+        this.discoveryPort = OptionalInt.empty();
+      } else {
+        this.discoveryPort = discoveryPort;
+      }
+
       return this;
     }
 
+    /**
+     * The port on which to listen for discovery messages. A value that is equal to 0, indicates
+     * that the node is not listening for discovery messages.
+     *
+     * @param discoveryPort If non-zero, represents the port on which to listen for discovery
+     *     messages. Otherwise, indicates that the node is not running discovery.
+     * @return The modified builder
+     */
     public Builder discoveryPort(final int discoveryPort) {
-      this.discoveryPort = OptionalInt.of(discoveryPort);
+      if (discoveryPort == 0) {
+        this.discoveryPort = OptionalInt.empty();
+      } else {
+        this.discoveryPort = OptionalInt.of(discoveryPort);
+      }
       return this;
     }
   }
