@@ -11,8 +11,8 @@ Pantheon doesn't support key management inside the client. Use:
 
 In Pantheon, you can use the JSON-RPC methods:
 
- * [eth_getBalance](../Reference/JSON-RPC-API-Methods.md#eth_getbalance) to obtain the account balance
- * [eth_sendRawTransaction](../Reference/JSON-RPC-API-Methods.md#eth_sendrawtransaction) to transfer ether or create and interact with contracts (for more information, refer to [Transactions](Transactions/Transactions.md#transactions)).  
+ * [eth_getBalance](../Reference/Pantheon-API-Methods.md#eth_getbalance) to obtain the account balance
+ * [eth_sendRawTransaction](../Reference/Pantheon-API-Methods.md#eth_sendrawtransaction) to transfer ether or create and interact with contracts (for more information, refer to [Transactions](Transactions/Transactions.md#transactions)).  
  
 !!! tip 
     [EthSigner](http://docs.ethsigner.pegasys.tech/en/latest/) implements [`eth_sendTransaction`](http://docs.ethsigner.pegasys.tech/en/latest/Using-EthSigner#eth_sendTransaction).

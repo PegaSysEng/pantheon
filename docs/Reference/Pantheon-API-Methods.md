@@ -646,7 +646,7 @@ Returns a list of account addresses that the client owns.
 
 !!!note
 <<<<<<< HEAD:docs/Reference/JSON-RPC-API-Methods.md
-    This method returns an empty object because Pantheon [doesn't support key management](../JSON-RPC-API/Using-JSON-RPC-API.md#account-management)
+    This method returns an empty object because Pantheon [doesn't support key management](../Pantheon-API/Using-JSON-RPC-API.md#account-management)
     inside the client.
     
     Use [EthSigner](http://docs.ethsigner.pegasys.tech/en/latest/) with Pantheon to provide access to your key store and sign transactions.

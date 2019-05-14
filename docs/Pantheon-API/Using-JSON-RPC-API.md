@@ -110,5 +110,5 @@ The block parameter can have the following values:
 * `blockNumber` : `quantity` - Block number. Can be specified in hexadecimal or decimal. 0 represents the genesis block.
 * `earliest` : `tag` - Earliest (genesis) block. 
 * `latest` : `tag` - Last block mined.
-* `pending` : `tag` - Last block mined plus pending transactions. Use only with [eth_getTransactionCount](../Reference/JSON-RPC-API-Methods.md#eth_gettransactioncount).  
+* `pending` : `tag` - Last block mined plus pending transactions. Use only with [eth_getTransactionCount](../Reference/Pantheon-API-Methods.md#eth_gettransactioncount).  
 
