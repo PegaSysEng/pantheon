@@ -17,12 +17,44 @@ jar {
   baseName 'pantheon-plugins'
   manifest {
     attributes(
-      'Specification-Title': baseName,
-      'Specification-Version': project.version,
-      'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
-      )
+        'Specification-Title': baseName,
+        'Specification-Version': project.version,
+        'Implementation-Title': baseName,
+        'Implementation-Version': calculateVersion()
+    )
   }
 }
 
-dependencies { implementation('com.google.guava:guava') }
+dependencies {
+  implementation 'com.google.guava:guava'
+  implementation 'org.apache.logging.log4j:log4j-api'
+
+  testAnnotationProcessor 'com.google.auto.service:auto-service'
+
+  testImplementation 'com.google.auto.service:auto-service'
+  testImplementation 'info.picocli:picocli'
+  testImplementation 'org.apache.logging.log4j:log4j-api'
+}
+
+task testJar(type: Jar) {
+  baseName 'pantheon-plugins-test'
+  manifest {
+    attributes(
+        'Specification-Title': baseName,
+        'Specification-Version': project.version,
+        'Implementation-Title': baseName,
+        'Implementation-Version': calculateVersion()
+    )
+  }
+  classifier = 'tests'
+  from sourceSets.test.output
+}
+
+configurations {
+  testArtifacts
+}
+
+artifacts {
+  testArtifacts testJar
+}
+

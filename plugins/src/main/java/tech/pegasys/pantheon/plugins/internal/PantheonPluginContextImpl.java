@@ -18,15 +18,30 @@ import static com.google.common.base.Preconditions.checkState;
 import tech.pegasys.pantheon.plugins.PantheonContext;
 import tech.pegasys.pantheon.plugins.PantheonPlugin;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PantheonPluginContextImpl implements PantheonContext {
 
+  private static final Logger LOG = LogManager.getLogger();
+
   private enum Lifecycle {
-    UNINITIALZED,
+    UNINITIALIZED,
     REGISTERING,
     REGISTERED,
     STARTING,
@@ -35,11 +50,11 @@ public class PantheonPluginContextImpl implements PantheonContext {
     STOPPED
   }
 
-  private Lifecycle state = Lifecycle.UNINITIALZED;
+  private Lifecycle state = Lifecycle.UNINITIALIZED;
   private final Map<Class<?>, ? super Object> serviceRegistry = new HashMap<>();
-  private ServiceLoader<PantheonPlugin> plugins;
+  private final List<PantheonPlugin> plugins = new ArrayList<>();
 
-  public void addService(final Class<?> serviceType, final Object service) {
+  public <T> void addService(final Class<T> serviceType, final T service) {
     checkArgument(serviceType.isInterface(), "Services must be Java interfaces.");
     checkArgument(
         serviceType.isInstance(service),
@@ -50,16 +65,49 @@ public class PantheonPluginContextImpl implements PantheonContext {
   @SuppressWarnings("unchecked")
   @Override
   public <T> Optional<T> getService(final Class<T> serviceType) {
-    return (Optional<T>) Optional.ofNullable((Map<Class<T>, T>) serviceRegistry.get(serviceType));
+    return Optional.ofNullable((T) serviceRegistry.get(serviceType));
   }
 
-  public void registerPlugins() {
-    checkState(state == Lifecycle.UNINITIALZED, "PantheonContext has already beein registered.");
-    state = Lifecycle.REGISTERING;
-    plugins = ServiceLoader.load(PantheonPlugin.class);
-    for (final PantheonPlugin plugin : plugins) {
-      plugin.register(this);
+  public void registerPlugins(final Path pluginsDir) {
+    checkState(state == Lifecycle.UNINITIALIZED, "PantheonContext has already been registered.");
+    if (pluginsDir == null) {
+      LOG.debug("Plugins are disabled.");
+      return;
     }
+    state = Lifecycle.REGISTERING;
+
+    LOG.debug("Searching for plugins in {}", pluginsDir.toAbsolutePath().toString());
+    try (final Stream<Path> pluginFilesList = Files.list(pluginsDir)) {
+      final URL[] pluginJarURLs =
+          pluginFilesList
+              .filter(p -> p.getFileName().toString().endsWith(".jar"))
+              .map(PantheonPluginContextImpl::pathToURIOrNull)
+              .toArray(URL[]::new);
+      final ServiceLoader<PantheonPlugin> serviceLoader =
+          ServiceLoader.load(
+              PantheonPlugin.class,
+              new URLClassLoader(pluginJarURLs, this.getClass().getClassLoader()));
+
+      for (final PantheonPlugin plugin : serviceLoader) {
+        try {
+          plugin.register(this);
+          LOG.debug("Registered plugin of type {}.", plugin.getClass().getName());
+        } catch (final Exception e) {
+          LOG.error(
+              "Error registering plugin of type {}, start and stop will not be called. \n{}",
+              plugin.getClass(),
+              e);
+          continue;
+        }
+        plugins.add(plugin);
+      }
+
+    } catch (final MalformedURLException e) {
+      LOG.error("Error converting files to URLs, could not load plugins", e);
+    } catch (final IOException e) {
+      LOG.error("Error enumerating plugins, could not load plugins", e);
+    }
+    LOG.debug("Plugin registration complete.");
     state = Lifecycle.REGISTERED;
   }
 
@@ -70,10 +118,24 @@ public class PantheonPluginContextImpl implements PantheonContext {
         Lifecycle.REGISTERED,
         state);
     state = Lifecycle.STARTING;
-    plugins = ServiceLoader.load(PantheonPlugin.class);
-    for (final PantheonPlugin plugin : plugins) {
-      plugin.start();
+    final Iterator<PantheonPlugin> pluginsIterator = plugins.iterator();
+
+    while (pluginsIterator.hasNext()) {
+      final PantheonPlugin plugin = pluginsIterator.next();
+
+      try {
+        plugin.start();
+        LOG.debug("Started plugin of type {}.", plugin.getClass().getName());
+      } catch (final Exception e) {
+        LOG.error(
+            "Error starting plugin of type {}, stop will not be called. \n{}",
+            plugin.getClass(),
+            e);
+        pluginsIterator.remove();
+      }
     }
+
+    LOG.debug("Plugin startup complete.");
     state = Lifecycle.STARTED;
   }
 
@@ -84,10 +146,25 @@ public class PantheonPluginContextImpl implements PantheonContext {
         Lifecycle.STARTED,
         state);
     state = Lifecycle.STOPPING;
-    plugins = ServiceLoader.load(PantheonPlugin.class);
+
     for (final PantheonPlugin plugin : plugins) {
-      plugin.stop();
+      try {
+        plugin.stop();
+        LOG.debug("Stopped plugin of type {}.", plugin.getClass().getName());
+      } catch (final Exception e) {
+        LOG.error("Error stopping plugin of type {}. \n{}", plugin.getClass(), e);
+      }
     }
+
+    LOG.debug("Plugin shutdown complete.");
     state = Lifecycle.STOPPED;
+  }
+
+  private static URL pathToURIOrNull(final Path p) {
+    try {
+      return p.toUri().toURL();
+    } catch (final MalformedURLException e) {
+      return null;
+    }
   }
 }

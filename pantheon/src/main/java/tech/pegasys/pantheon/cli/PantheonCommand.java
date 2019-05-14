@@ -633,10 +633,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     pantheonPluginContext.addService(
         PicoCLIOptions.class,
-        (PicoCLIOptions)
             (namespace, optionObject) ->
-                commandLine.addMixin("pantheonplugin-" + namespace, optionObject));
-    pantheonPluginContext.registerPlugins();
+                commandLine.addMixin("Plugin " + namespace, optionObject));
+    pantheonPluginContext.registerPlugins(pluginsDir());
 
     // Create a handler that will search for a config file option and use it for
     // default values
@@ -703,7 +702,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       logger.info("Connecting to {} static nodes.", staticNodes.size());
       logger.trace("Static Nodes = {}", staticNodes);
 
-      List<URI> enodeURIs =
+      final List<URI> enodeURIs =
           ethNetworkConfig.getBootNodes().stream()
               .map(EnodeURL::toURI)
               .collect(Collectors.toList());
@@ -1216,6 +1215,21 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {
       return getDefaultPantheonDataPath(this);
+    }
+  }
+
+  private Path pluginsDir() {
+    if (isFullInstantiation()) {
+      final String pluginsDir = System.getenv("PANTHEON_PLUGINS");
+      if (pluginsDir == null) {
+        return new File("plugins").toPath();
+      } else {
+        return new File(pluginsDir).toPath();
+      }
+    } else if (isDocker) {
+      return Paths.get(DOCKER_PLUGINSDIR_LOCATION);
+    } else {
+      return null; // null means no plugins
     }
   }
 
