@@ -26,7 +26,9 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class PantheonFactoryConfigurationBuilder {
@@ -45,6 +47,7 @@ public class PantheonFactoryConfigurationBuilder {
   private Boolean p2pEnabled = true;
   private boolean discoveryEnabled = true;
   private boolean bootnodeEligible = true;
+  private List<String> plugins = new ArrayList<>();
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
     this.name = name;
@@ -169,6 +172,12 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder setPlugins(final List<String> plugins) {
+    this.plugins.clear();
+    this.plugins.addAll(plugins);
+    return this;
+  }
+
   public PantheonFactoryConfiguration build() {
     return new PantheonFactoryConfiguration(
         name,
@@ -183,6 +192,7 @@ public class PantheonFactoryConfigurationBuilder {
         genesisConfigProvider,
         p2pEnabled,
         discoveryEnabled,
-        bootnodeEligible);
+        bootnodeEligible,
+        plugins);
   }
 }

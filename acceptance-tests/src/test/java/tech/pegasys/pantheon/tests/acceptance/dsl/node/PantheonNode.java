@@ -96,6 +96,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private HttpRequestFactory httpRequestFactory;
   private boolean useWsForJsonRpc = false;
   private String token = null;
+  private List<String> plugins = new ArrayList<>();
 
   public PantheonNode(
       final String name,
@@ -110,7 +111,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final GenesisConfigProvider genesisConfigProvider,
       final boolean p2pEnabled,
       final boolean discoveryEnabled,
-      final boolean bootnodeEligible)
+      final boolean bootnodeEligible,
+      final List<String> plugins)
       throws IOException {
     this.bootnodeEligible = bootnodeEligible;
     this.homeDirectory = Files.createTempDirectory("acctest");
@@ -135,6 +137,16 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     this.devMode = devMode;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
+    plugins.forEach(
+        pluginName -> {
+          try {
+            homeDirectory.resolve("plugins").toFile().mkdirs();
+            copyResource(pluginName + ".jar", homeDirectory.resolve("plugins/" + pluginName + ".jar"));
+            PantheonNode.this.plugins.add(pluginName);
+          } catch (final IOException e) {
+            LOG.error("Could not find plugin \"{}\" in resources", pluginName);
+          }
+        });
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -390,7 +402,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     return Util.publicKeyToAddress(keyPair.getPublicKey());
   }
 
-  Path homeDirectory() {
+  public Path homeDirectory() {
     return homeDirectory;
   }
 
@@ -483,6 +495,16 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   Optional<PermissioningConfiguration> getPermissioningConfiguration() {
     return permissioningConfiguration;
+  }
+
+  public List<String> getPlugins() {
+    return plugins;
+  }
+
+  @Override
+  public void setPlugins(final List<String> plugins) {
+    this.plugins.clear();
+    this.plugins.addAll(plugins);
   }
 
   @Override

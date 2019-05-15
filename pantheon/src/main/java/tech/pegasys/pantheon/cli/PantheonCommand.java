@@ -633,8 +633,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     pantheonPluginContext.addService(
         PicoCLIOptions.class,
-            (namespace, optionObject) ->
-                commandLine.addMixin("Plugin " + namespace, optionObject));
+        (namespace, optionObject) -> commandLine.addMixin("Plugin " + namespace, optionObject));
     pantheonPluginContext.registerPlugins(pluginsDir());
 
     // Create a handler that will search for a config file option and use it for
@@ -1220,7 +1219,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private Path pluginsDir() {
     if (isFullInstantiation()) {
-      final String pluginsDir = System.getenv("PANTHEON_PLUGINS");
+      final String pluginsDir = System.getProperty("pantheon.plugins.dir");
       if (pluginsDir == null) {
         return new File("plugins").toPath();
       } else {

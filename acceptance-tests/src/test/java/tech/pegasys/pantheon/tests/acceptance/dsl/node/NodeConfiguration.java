@@ -43,4 +43,6 @@ public interface NodeConfiguration {
   boolean isDiscoveryEnabled();
 
   boolean isBootnodeEligible();
+
+  void setPlugins(List<String> plugins);
 }
