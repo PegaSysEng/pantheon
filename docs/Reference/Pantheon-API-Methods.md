@@ -631,7 +631,7 @@ None
     ```bash tab="wscat WS request"
     {"jsonrpc":"2.0","method":"eth_gasPrice","params":[],"id":53}
     ```
-    
+     
     ```json tab="JSON result"
     {
       "jsonrpc" : "2.0",
@@ -639,6 +639,18 @@ None
       "result" : "0x3e8"
     }
     ```
+
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{gasPrice}"}' http://localhost:8547/graphql
+    ```
+    
+    ```json tab="GraphQL result"
+    {
+      "data" : {
+        "gasPrice" : "0x3e8"
+      }
+    }
+    ```   
 
 ### eth_accounts
 
@@ -739,7 +751,21 @@ Returns the account balance of the specified address.
       "result" : "0x0"
     }
     ```
-
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{ account ( address: \"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\") { balance } }"}' http://localhost:8547/graphql
+    ```
+    
+    ```bash tab="GraphQL result"
+    {
+      "data": {
+        "account": {
+          "balance": "0xac70d23585eadfc2e"
+        }
+      }
+    }    
+    ```
+    
 ### eth_getStorageAt
 
 Returns the value of a storage position at a specified address.
@@ -774,6 +800,20 @@ Returns the value of a storage position at a specified address.
       "result" : "0x0000000000000000000000000000000000000000000000000000000000000000"
     }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{account(address: \"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\") {storage(slot: \"0x04\")}}"}' http://localhost:8547/graphql
+    ```
+        
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "account" : {
+          "storage" : "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    }   
+    ```
 
 ### eth_getTransactionCount
 
@@ -805,6 +845,22 @@ Returns the number of transactions sent from a specified address. Use the `pendi
       "result" : "0x1"
     }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{ account (address:\"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\"){transactionCount}}"}' http://localhost:8547/graphql
+    ```
+            
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "account" : {
+          "transactionCount" : 5
+        }
+      }
+    }
+    ```
+    
+    
 
 ### eth_getBlockTransactionCountByHash
 
