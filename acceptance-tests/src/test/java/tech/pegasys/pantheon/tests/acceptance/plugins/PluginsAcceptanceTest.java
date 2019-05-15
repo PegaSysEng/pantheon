@@ -13,11 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.plugins;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
 
 import java.io.File;
 import java.nio.file.Files;

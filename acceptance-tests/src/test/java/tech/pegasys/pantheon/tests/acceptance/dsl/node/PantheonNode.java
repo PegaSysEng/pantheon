@@ -141,7 +141,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
         pluginName -> {
           try {
             homeDirectory.resolve("plugins").toFile().mkdirs();
-            copyResource(pluginName + ".jar", homeDirectory.resolve("plugins/" + pluginName + ".jar"));
+            copyResource(
+                pluginName + ".jar", homeDirectory.resolve("plugins/" + pluginName + ".jar"));
             PantheonNode.this.plugins.add(pluginName);
           } catch (final IOException e) {
             LOG.error("Could not find plugin \"{}\" in resources", pluginName);
