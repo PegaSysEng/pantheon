@@ -37,7 +37,7 @@ dependencies {
 }
 
 task testJar(type: Jar) {
-  baseName 'pantheon-plugins-testPlugin'
+  archiveName 'testPlugin.jar'
   manifest {
     attributes(
       'Specification-Title': baseName,
@@ -46,7 +46,7 @@ task testJar(type: Jar) {
       'Implementation-Version': calculateVersion()
       )
   }
-  classifier = 'tests'
+  archiveClassifier = 'tests'
   from sourceSets.test.output
 }
 
