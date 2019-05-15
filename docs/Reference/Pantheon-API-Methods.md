@@ -709,15 +709,25 @@ None
     {"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":51}
     ```
     
-    ```bash tab="curl GraphQL request"
-    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block{number}}"}' http://localhost:8547/graphql
-    ```
-    
     ```json tab="JSON result"
     {
       "jsonrpc" : "2.0",
       "id" : 51,
       "result" : "0x2377"
+    }
+    ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block{number}}"}' http://localhost:8547/graphql
+    ```
+    
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "number" : 16221
+        }
+      }
     }
     ```
 
@@ -860,8 +870,6 @@ Returns the number of transactions sent from a specified address. Use the `pendi
     }
     ```
     
-    
-
 ### eth_getBlockTransactionCountByHash
 
 Returns the number of transactions in the block matching the given block hash.
@@ -1085,6 +1093,24 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
     }
     ```
 
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block {number call (data : {from : \"0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b\", to: \"0x69498dd54bd25aa0c886cf1f8b8ae0856d55ff13\", data :\"0x12a7b914\"}){data status}}}"}' http://localhost:8547/graphql
+    ```
+        
+    ```json tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "number" : 17449,
+          "call" : {
+            "data" : "0x",
+            "status" : 1
+          }
+        }
+      }
+    }
+    ```
+        
 ### eth_estimateGas
 
 Returns an estimate of how much gas is needed for a transaction to complete. The estimation process does not use
@@ -1123,6 +1149,20 @@ The following example returns an estimate of 21000 wei (0x5208) for the transact
       "id" : 53,
       "result" : "0x5208"
     }
+    ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block{estimateGas (data: {from :\"0x6295ee1b4f6dd65047762f924ecd367c17eabf8f\", to :\"0x8888f1f195afa192cfee860698584c030f4c9db1\"})}}"}' http://localhost:8547/graphql
+    ```
+                
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "estimateGas" : 21000
+        }
+      }
+    }   
     ```
 
 The following example request estimates the cost of deploying a simple storage smart contract to the network. The data field
@@ -1207,6 +1247,37 @@ Returns information about the block by hash.
       }
     }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block (hash : \"0xb0efed1fc9326fee967cb2d845d4ebe57c5350a0670c8e86f8052dea6f219f92\") {number transactions{hash} timestamp difficulty totalDifficulty gasUsed gasLimit hash noce ommerCount logsBloom mixHash ommerHash extraData stateRoot receiptsRoot transactionCount transactionsRoot}}"}' http://localhost:8547/graphql
+    ```
+    
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "number" : 17607,
+          "transactions" : [ ],
+          "timestamp" : "0x5cdbdfb5",
+          "difficulty" : "0x1",
+          "totalDifficulty" : "0x44c8",
+          "gasUsed" : 0,
+          "gasLimit" : 4700000,
+          "hash" : "0xb0efed1fc9326fee967cb2d845d4ebe57c5350a0670c8e86f8052dea6f219f92",
+          "nonce" : "0x0000000000000000",
+          "ommerCount" : 0,
+          "logsBloom" : "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "mixHash" : "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+          "ommerHash" : "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "extraData" : "0xf882a00000000000000000000000000000000000000000000000000000000000000000d5949811ebc35d7b06b3fa8dc5809a1f9c52751e1deb808400000000f843b841fae6d25da0b91e3e88669d0a765c98479d86d53e9ea1f3fb6b36d7ff22fa622a3da0c49c20e5562c774e90acae8ad487936f6b6019cd8a782db684693cba1e9800",
+          "stateRoot" : "0xa7086c266aed46cd3bc45579178f8acb36d9d147de575a3ecbf8c7e6f1c737fc",
+          "receiptsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "transactionCount" : 0,
+          "transactionsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+        }
+      }
+    }
+    ```
 
 ### eth_getBlockByNumber
 
@@ -1258,6 +1329,48 @@ Returns information about a block by block number.
       }
     }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block (number : \"0x1e\") {transactions{hash} timestamp difficulty totalDifficulty gasUsed gasLimit hash nonce ommerCount logsBloom mixHash ommerHash extraData stateoot receiptsRoot transactionCount transactionsRoot ommers{hash} ommerAt(index : 1){hash} miner{address} account(address: \"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\"){balance} parent{hash} }}"}' http://localhost:8547/graphql
+    ```
+        
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "transactions" : [ ],
+          "timestamp" : "0x5cd108a7",
+          "difficulty" : "0x1",
+          "totalDifficulty" : "0x1f",
+          "gasUsed" : 0,
+          "gasLimit" : 4700000,
+          "hash" : "0xd76a32711579e1af86854e44af50ea58ab0e58584462e34e87f9e88a8e9277b5",
+          "nonce" : "0x0000000000000000",
+          "ommerCount" : 0,
+          "logsBloom" : "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "mixHash" : "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+          "ommerHash" : "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "extraData" : "0xf882a00000000000000000000000000000000000000000000000000000000000000000d5949811ebc35d7b06b3fa8dc5809a1f9c52751e1deb808400000000f843b84152a94b8fe5eb84995b758ff2db13d55db23fc23f662021537a3546c05aa6a9b12cd7a63dc08acd8614fb26a8109ed182c05fe46c516085b606f58ba01327bc5001",
+          "stateRoot" : "0x9c4ad4bc40394ecc74251f86f537004536894f26e46144f402e8574022e5df51",
+          "receiptsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "transactionCount" : 0,
+          "transactionsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "ommers" : [ ],
+          "ommerAt" : null,
+          "miner" : {
+            "address" : "0x9811ebc35d7b06b3fa8dc5809a1f9c52751e1deb"
+          },
+          "account" : {
+            "balance" : "0xad4419dc0b16f98d6"
+          },
+          "parent" : {
+            "hash" : "0x0a4b9e322d317c6170dbdd7eba57bc4c930c9d0467d453a513a929257ee7fadf"
+          }
+        }
+      }
+    }
+    ```
+    
 
 ### eth_getTransactionByHash
 
@@ -1299,6 +1412,36 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
         "v" : "0xfe7",
         "r" : "0x84caf09aefbd5e539295acc67217563438a4efb224879b6855f56857fa2037d3",
         "s" : "0x5e863be3829812c81439f0ae9d8ecb832b531d651fb234c848d1bf45e62be8b9"
+      }
+    }
+    ```
+    
+    0x6f5f9176c71e6ebe5526cfce27d64ef1f46b2b7ab6b330bf1015de159b9dff9f
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{transaction(hash : \"0x03d80b9ca0a71435399a268609d6d7896f7155d2147cc22b780672bcb59b170d\") { block{hash} gas gasPrice hash nonce value from {address} to {address} status}}"}' http://localhost:8547/graphql
+    ```
+            
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "transaction" : {
+          "block" : {
+            "hash" : "0xb1ef35744bade6980c3a933024b2557a8c724a19e5fdd2116bac712aa5e57198"
+          },
+          "gas" : 21000,
+          "gasPrice" : "0x2540be400",
+          "hash" : "0x03d80b9ca0a71435399a268609d6d7896f7155d2147cc22b780672bcb59b170d",
+          "nonce" : 6,
+          "value" : "0x8ac7230489e80000",
+          "from" : {
+            "address" : "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
+          },
+          "to" : {
+            "address" : "0x9d8f8572f345e1ae53db1dfa4a7fce49b467bd7f"
+          },
+          "status" : 1
+        }
       }
     }
     ```
