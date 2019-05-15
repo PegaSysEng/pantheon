@@ -144,6 +144,16 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
                 " URL - {}",
                 net.consensys.cava.io.file.Files.class
                     .getClassLoader()
+                    .getResource(""));
+            LOG.info(
+                " URL - {}",
+                net.consensys.cava.io.file.Files.class
+                    .getClassLoader()
+                    .getResource("key"));
+            LOG.info(
+                " URL - {}",
+                net.consensys.cava.io.file.Files.class
+                    .getClassLoader()
                     .getResource(pluginName + ".jar"));
             LOG.info(
                 " reading - {}",
