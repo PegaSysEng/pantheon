@@ -73,7 +73,9 @@ public class Runner implements AutoCloseable {
     try {
       LOG.info("Starting Ethereum main loop ... ");
       networkRunner.start();
-      pantheonController.start(networkRunner.getNetwork().isP2pEnabled());
+      if (networkRunner.getNetwork().isP2pEnabled()) {
+        pantheonController.getSynchronizer().start();
+      }
       vertx.setPeriodic(
           TimeUnit.MINUTES.toMillis(1),
           time ->
@@ -105,7 +107,9 @@ public class Runner implements AutoCloseable {
   @Override
   public void close() throws Exception {
     try {
-      pantheonController.stop(networkRunner.getNetwork().isP2pEnabled());
+      if (networkRunner.getNetwork().isP2pEnabled()) {
+        pantheonController.getSynchronizer().stop();
+      }
 
       networkRunner.stop();
       networkRunner.awaitStop();
