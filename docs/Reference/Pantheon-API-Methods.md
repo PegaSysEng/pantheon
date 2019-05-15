@@ -645,14 +645,10 @@ None
 Returns a list of account addresses that the client owns.
 
 !!!note
-<<<<<<< HEAD:docs/Reference/JSON-RPC-API-Methods.md
     This method returns an empty object because Pantheon [doesn't support key management](../Pantheon-API/Using-JSON-RPC-API.md#account-management)
     inside the client.
     
     Use [EthSigner](http://docs.ethsigner.pegasys.tech/en/latest/) with Pantheon to provide access to your key store and sign transactions.
-=======
-    This method returns an empty object because Pantheon [does not support account management](../Pantheon-API/Using-JSON-RPC-API.md#account-management).
->>>>>>> be69db85885db2fbe6c0cee53fea63cccb65baa8:docs/Reference/Pantheon-API-Methods.md
 
 **Parameters**
 
@@ -699,6 +695,10 @@ None
     
     ```bash tab="wscat WS request"
     {"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":51}
+    ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block{number}}"}' http://localhost:8547/graphql
     ```
     
     ```json tab="JSON result"
