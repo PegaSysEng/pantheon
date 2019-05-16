@@ -85,7 +85,7 @@ public class PrivateTransactionTest {
               Byte.valueOf("0")),
           BytesValue.fromHexString("0x"),
           Address.wrap(BytesValue.fromHexString("0x8411b12666f68ef74cace3615c9d5a377729d03f")),
-          0,
+          Optional.empty(),
           BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)),
           Lists.newArrayList(
               BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)),
@@ -113,7 +113,7 @@ public class PrivateTransactionTest {
                       + "0029"))
           .sender(
               Address.wrap(BytesValue.fromHexString("0x1c9a6e1ee3b7ac6028e786d9519ae3d24ee31e79")))
-          .chainId(4)
+          .chainId(BigInteger.valueOf(4))
           .privateFrom(
               BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)))
           .privateFor(
