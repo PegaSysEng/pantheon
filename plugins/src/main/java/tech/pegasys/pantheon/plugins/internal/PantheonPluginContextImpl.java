@@ -69,7 +69,7 @@ public class PantheonPluginContextImpl implements PantheonContext {
   }
 
   public void registerPlugins(final Path pluginsDir) {
-    checkState(state == Lifecycle.UNINITIALIZED, "PantheonContext has already been registered.");
+    checkState(state == Lifecycle.UNINITIALIZED, "Pantheon plugins have already been registered.  Cannot register additional plugins.");
     if (pluginsDir == null) {
       LOG.debug("Plugins are disabled.");
       return;
