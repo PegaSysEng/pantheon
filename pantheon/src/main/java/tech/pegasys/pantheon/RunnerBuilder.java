@@ -61,7 +61,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodePermissioningControllerFactory;
@@ -76,7 +76,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -205,7 +204,7 @@ public class RunnerBuilder {
 
     final DiscoveryConfiguration discoveryConfiguration;
     if (discovery) {
-      final Collection<URI> bootstrap;
+      final List<EnodeURL> bootstrap;
       if (ethNetworkConfig.getBootNodes() == null) {
         bootstrap = DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
       } else {
@@ -215,7 +214,7 @@ public class RunnerBuilder {
           DiscoveryConfiguration.create()
               .setBindPort(p2pListenPort)
               .setAdvertisedHost(p2pAdvertisedHost)
-              .setBootstrapPeers(bootstrap);
+              .setBootnodes(bootstrap);
     } else {
       discoveryConfiguration = DiscoveryConfiguration.create().setActive(false);
     }
@@ -246,10 +245,7 @@ public class RunnerBuilder {
         new PeerBlacklist(
             bannedNodeIds.stream().map(BytesValue::fromHexString).collect(Collectors.toSet()));
 
-    final List<EnodeURL> bootnodesAsEnodeURLs =
-        discoveryConfiguration.getBootstrapPeers().stream()
-            .map(p -> EnodeURL.fromString(p.getEnodeURLString()))
-            .collect(Collectors.toList());
+    final List<EnodeURL> bootnodes = discoveryConfiguration.getBootnodes();
 
     final Optional<LocalPermissioningConfiguration> localPermissioningConfiguration =
         permissioningConfiguration.flatMap(PermissioningConfiguration::getLocalConfig);
@@ -263,7 +259,7 @@ public class RunnerBuilder {
     final BytesValue localNodeId = keyPair.getPublicKey().getEncodedBytes();
     final Optional<NodePermissioningController> nodePermissioningController =
         buildNodePermissioningController(
-            bootnodesAsEnodeURLs, synchronizer, transactionSimulator, localNodeId);
+            bootnodes, synchronizer, transactionSimulator, localNodeId);
 
     NetworkBuilder inactiveNetwork = (caps) -> new NoopP2PNetwork();
     NetworkBuilder activeNetwork =
@@ -291,17 +287,17 @@ public class RunnerBuilder {
     nodePermissioningController.ifPresent(
         n ->
             n.setInsufficientPeersPermissioningProvider(
-                new InsufficientPeersPermissioningProvider(network, bootnodesAsEnodeURLs)));
+                new InsufficientPeersPermissioningProvider(network, bootnodes)));
 
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
-    final Optional<AccountWhitelistController> accountWhitelistController =
+    final Optional<AccountLocalConfigPermissioningController> accountWhitelistController =
         localPermissioningConfiguration
             .filter(LocalPermissioningConfiguration::isAccountWhitelistEnabled)
             .map(
                 configuration -> {
-                  final AccountWhitelistController whitelistController =
-                      new AccountWhitelistController(configuration);
+                  final AccountLocalConfigPermissioningController whitelistController =
+                      new AccountLocalConfigPermissioningController(configuration);
                   transactionPool.setAccountFilter(whitelistController::contains);
                   return whitelistController;
                 });
@@ -468,7 +464,7 @@ public class RunnerBuilder {
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> jsonRpcApis,
       final FilterManager filterManager,
-      final Optional<AccountWhitelistController> accountWhitelistController,
+      final Optional<AccountLocalConfigPermissioningController> accountWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,

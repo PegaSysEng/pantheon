@@ -30,7 +30,7 @@ public class PermissioningConfigurationBuilder {
   public static SmartContractPermissioningConfiguration smartContractPermissioningConfiguration(
       final Address address, final boolean smartContractPermissionedNodeEnabled) {
     SmartContractPermissioningConfiguration config = new SmartContractPermissioningConfiguration();
-    config.setSmartContractAddress(address);
+    config.setNodeSmartContractAddress(address);
     config.setSmartContractNodeWhitelistEnabled(smartContractPermissionedNodeEnabled);
     return config;
   }
@@ -110,7 +110,7 @@ public class PermissioningConfigurationBuilder {
                 .collect(Collectors.toList());
 
         accountsWhitelistToml.stream()
-            .filter(s -> !AccountWhitelistController.isValidAccountString(s))
+            .filter(s -> !AccountLocalConfigPermissioningController.isValidAccountString(s))
             .findFirst()
             .ifPresent(
                 s -> {

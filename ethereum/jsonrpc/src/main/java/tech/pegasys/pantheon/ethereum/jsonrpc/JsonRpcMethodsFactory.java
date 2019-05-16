@@ -99,10 +99,10 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.BlockResultFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
@@ -136,7 +136,7 @@ public class JsonRpcMethodsFactory {
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> rpcApis,
       final FilterManager filterManager,
-      final Optional<AccountWhitelistController> accountsWhitelistController,
+      final Optional<AccountLocalConfigPermissioningController> accountsWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
@@ -179,7 +179,7 @@ public class JsonRpcMethodsFactory {
       final MiningCoordinator miningCoordinator,
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
-      final Optional<AccountWhitelistController> accountsWhitelistController,
+      final Optional<AccountLocalConfigPermissioningController> accountsWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final Collection<RpcApi> rpcApis,
       final PrivacyParameters privacyParameters,
@@ -259,7 +259,7 @@ public class JsonRpcMethodsFactory {
           new DebugTraceBlock(
               parameter,
               new BlockTracer(blockReplay),
-              ScheduleBasedBlockHashFunction.create(protocolSchedule),
+              ScheduleBasedBlockHeaderFunctions.create(protocolSchedule),
               blockchainQueries),
           new DebugTraceBlockByNumber(parameter, new BlockTracer(blockReplay), blockchainQueries),
           new DebugTraceBlockByHash(parameter, new BlockTracer(blockReplay)));
