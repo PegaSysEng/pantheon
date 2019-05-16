@@ -1416,8 +1416,6 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
     }
     ```
     
-    0x6f5f9176c71e6ebe5526cfce27d64ef1f46b2b7ab6b330bf1015de159b9dff9f
-    
     ```bash tab="curl GraphQL request"
     curl -X POST -H "Content-Type: application/json" --data '{"query": "{transaction(hash : \"0x03d80b9ca0a71435399a268609d6d7896f7155d2147cc22b780672bcb59b170d\") { block{hash} gas gasPrice hash nonce value from {address} to {address} status}}"}' http://localhost:8547/graphql
     ```
@@ -1491,6 +1489,25 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
       }
      }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{ block(hash: \"0x9270651f9c6fa36232c379d0ecf69b519383aa275815a65f1e03114346668f69\") { transactionAt(index: 0) {block{hash}  hash } } }"}' http://localhost:8547/graphql
+    ```
+                
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "transactionAt" : {
+            "block" : {
+              "hash" : "0x9270651f9c6fa36232c379d0ecf69b519383aa275815a65f1e03114346668f69"
+            },
+            "hash" : "0x5f5366af89e8777d5ae62a1af94a0876bdccbc22417bed0aff361eefa3e37f86"
+          }
+        }
+      }
+    }
+    ```
 
 ### eth_getTransactionByBlockNumberAndIndex
 
@@ -1543,6 +1560,25 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
     }
     ```
 
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{block(number:\"0x4f4f\") {transactionAt(index: 0) {block{hash} hash}}}"}' http://localhost:8547/graphql
+    ```
+                    
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "transactionAt" : {
+          "block" : {
+            "hash" : "0x9270651f9c6fa36232c379d0ecf69b519383aa275815a65f1e03114346668f69"
+          },
+          "hash" : "0x5f5366af89e8777d5ae62a1af94a0876bdccbc22417bed0aff361eefa3e37f86"
+          }
+        }
+      }
+    }
+    ```
+
 ### eth_getTransactionReceipt
 
 Returns the receipt of a transaction by transaction hash. Receipts for pending transactions are not available.
@@ -1582,6 +1618,36 @@ Returns the receipt of a transaction by transaction hash. Receipts for pending t
             "transactionHash": "0xc00e97af59c6f88de163306935f7682af1a34c67245e414537d02e422815efc3",
             "transactionIndex": "0x0"
         }
+    }
+    ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{transaction(hash: \"0x5f5366af89e8777d5ae62a1af94a0876bdccbc22417bed0aff361eefa3e37f86\") {block{hash logsBloom} hash createdContract{address} cumulativeGasUsed gas gasUsed logs{topics} from{address} to{address} index}}"}' http://localhost:8547/graphql
+    ```
+                        
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "transaction" : {
+          "block" : {
+            "hash" : "0x9270651f9c6fa36232c379d0ecf69b519383aa275815a65f1e03114346668f69",
+            "logsBloom" : "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "hash" : "0x5f5366af89e8777d5ae62a1af94a0876bdccbc22417bed0aff361eefa3e37f86",
+          "createdContract" : null,
+          "cumulativeGasUsed" : 21000,
+          "gas" : 21000,
+          "gasUsed" : 21000,
+          "logs" : [ ],
+          "from" : {
+            "address" : "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
+          },
+          "to" : {
+            "address" : "0x9d8f8572f345e1ae53db1dfa4a7fce49b467bd7f"
+          },
+          "index" : 0
+        }
+      }
     }
     ```
 
