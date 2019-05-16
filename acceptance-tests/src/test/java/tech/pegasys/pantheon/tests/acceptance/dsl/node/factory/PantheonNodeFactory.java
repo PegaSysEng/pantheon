@@ -180,9 +180,9 @@ public class PantheonNodeFactory {
       throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setPlugins(plugins)
-            .setExtraCLIOptions(extraCLIOptions)
+            .name(name)
+            .plugins(plugins)
+            .extraCLIOptions(extraCLIOptions)
             .build());
   }
 

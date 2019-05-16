@@ -173,13 +173,13 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setPlugins(final List<String> plugins) {
+  public PantheonFactoryConfigurationBuilder plugins(final List<String> plugins) {
     this.plugins.clear();
     this.plugins.addAll(plugins);
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setExtraCLIOptions(
+  public PantheonFactoryConfigurationBuilder extraCLIOptions(
       final List<String> extraCLIOptions) {
     this.extraCLIOptions.clear();
     this.extraCLIOptions.addAll(extraCLIOptions);
