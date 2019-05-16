@@ -61,7 +61,8 @@ public class PantheonNodeFactory {
         config.isP2pEnabled(),
         config.isDiscoveryEnabled(),
         config.isBootnodeEligible(),
-        config.getPlugins());
+        config.getPlugins(),
+        config.getExtraCLIOptions());
   }
 
   public PantheonNode createMinerNode(final String name) throws IOException {
@@ -174,10 +175,15 @@ public class PantheonNodeFactory {
     return create(new PantheonFactoryConfigurationBuilder().setName(name).build());
   }
 
-  public PantheonNode createPluginsNode(final String name, final List<String> plugins)
+  public PantheonNode createPluginsNode(
+      final String name, final List<String> plugins, final List<String> extraCLIOptions)
       throws IOException {
     return create(
-        new PantheonFactoryConfigurationBuilder().setName(name).setPlugins(plugins).build());
+        new PantheonFactoryConfigurationBuilder()
+            .setName(name)
+            .setPlugins(plugins)
+            .setExtraCLIOptions(extraCLIOptions)
+            .build());
   }
 
   public PantheonNode createArchiveNodeWithRpcApis(

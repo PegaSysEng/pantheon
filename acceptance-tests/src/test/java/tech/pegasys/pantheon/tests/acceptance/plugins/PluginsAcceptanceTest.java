@@ -12,10 +12,13 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.plugins;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -30,20 +33,37 @@ import org.junit.Test;
 public class PluginsAcceptanceTest extends AcceptanceTestBase {
   private PantheonNode node;
 
+  // context: https://en.wikipedia.org/wiki/The_Magic_Words_are_Squeamish_Ossifrage
+  private static final String MAGIC_WORDS = "Squemish Ossifrage";
+
   @Before
   public void setUp() throws Exception {
-    node = pantheon.createPluginsNode("node1", Collections.singletonList("testPlugin"));
+    node =
+        pantheon.createPluginsNode(
+            "node1",
+            Collections.singletonList("testPlugin"),
+            Collections.singletonList("--Xtest-option=" + MAGIC_WORDS));
     cluster.start(node);
   }
 
   @Test
-  public void shouldRegister() {
-    waitForFile(node.homeDirectory().resolve("plugins/testPlugin.registered"));
+  public void shouldRegister() throws IOException {
+    final Path registrationFile = node.homeDirectory().resolve("plugins/testPlugin.registered");
+    waitForFile(registrationFile);
+
+    // this assert is false as CLI will not be parsed at this point
+    assertThat(Files.readAllLines(registrationFile).stream().anyMatch(s -> s.contains(MAGIC_WORDS)))
+        .isFalse();
   }
 
   @Test
-  public void shouldStart() {
-    waitForFile(node.homeDirectory().resolve("plugins/testPlugin.started"));
+  public void shouldStart() throws IOException {
+    final Path registrationFile = node.homeDirectory().resolve("plugins/testPlugin.started");
+    waitForFile(registrationFile);
+
+    // this assert is false as CLI will be parsed at this point
+    assertThat(Files.readAllLines(registrationFile).stream().anyMatch(s -> s.contains(MAGIC_WORDS)))
+        .isTrue();
   }
 
   @Test

@@ -39,6 +39,7 @@ class PantheonFactoryConfiguration {
   private final boolean discoveryEnabled;
   private final boolean bootnodeEligible;
   private final List<String> plugins;
+  private final List<String> extraCLIOptions;
 
   PantheonFactoryConfiguration(
       final String name,
@@ -54,7 +55,8 @@ class PantheonFactoryConfiguration {
       final boolean p2pEnabled,
       final boolean discoveryEnabled,
       final boolean bootnodeEligible,
-      final List<String> plugins) {
+      final List<String> plugins,
+      final List<String> extraCLIOptions) {
     this.name = name;
     this.miningParameters = miningParameters;
     this.privacyParameters = privacyParameters;
@@ -69,6 +71,7 @@ class PantheonFactoryConfiguration {
     this.discoveryEnabled = discoveryEnabled;
     this.bootnodeEligible = bootnodeEligible;
     this.plugins = plugins;
+    this.extraCLIOptions = extraCLIOptions;
   }
 
   public String getName() {
@@ -125,5 +128,9 @@ class PantheonFactoryConfiguration {
 
   public List<String> getPlugins() {
     return plugins;
+  }
+
+  public List<String> getExtraCLIOptions() {
+    return extraCLIOptions;
   }
 }

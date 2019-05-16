@@ -25,6 +25,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,7 +71,9 @@ public class PantheonPluginContextImpl implements PantheonContext {
   }
 
   public void registerPlugins(final Path pluginsDir) {
-    checkState(state == Lifecycle.UNINITIALIZED, "Pantheon plugins have already been registered.  Cannot register additional plugins.");
+    checkState(
+        state == Lifecycle.UNINITIALIZED,
+        "Pantheon plugins have already been registered.  Cannot register additional plugins.");
     if (pluginsDir == null) {
       LOG.debug("Plugins are disabled.");
       return;
@@ -166,5 +170,10 @@ public class PantheonPluginContextImpl implements PantheonContext {
     } catch (final MalformedURLException e) {
       return null;
     }
+  }
+
+  @VisibleForTesting
+  List<PantheonPlugin> getPlugins() {
+    return Collections.unmodifiableList(plugins);
   }
 }

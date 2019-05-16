@@ -48,6 +48,7 @@ public class PantheonFactoryConfigurationBuilder {
   private boolean discoveryEnabled = true;
   private boolean bootnodeEligible = true;
   private List<String> plugins = new ArrayList<>();
+  private List<String> extraCLIOptions = new ArrayList<>();
 
   public PantheonFactoryConfigurationBuilder setName(final String name) {
     this.name = name;
@@ -178,6 +179,13 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder setExtraCLIOptions(
+      final List<String> extraCLIOptions) {
+    this.extraCLIOptions.clear();
+    this.extraCLIOptions.addAll(extraCLIOptions);
+    return this;
+  }
+
   public PantheonFactoryConfiguration build() {
     return new PantheonFactoryConfiguration(
         name,
@@ -193,6 +201,7 @@ public class PantheonFactoryConfigurationBuilder {
         p2pEnabled,
         discoveryEnabled,
         bootnodeEligible,
-        plugins);
+        plugins,
+        extraCLIOptions);
   }
 }

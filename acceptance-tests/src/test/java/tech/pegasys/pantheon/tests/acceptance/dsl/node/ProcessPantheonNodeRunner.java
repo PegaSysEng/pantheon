@@ -177,6 +177,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
                 params.add(permissioningConfiguration.getNodeSmartContractAddress().toString());
               }
             });
+    params.addAll(node.getExtraCLIOptions());
 
     LOG.info("Creating pantheon process with params {}", params);
     final ProcessBuilder processBuilder =

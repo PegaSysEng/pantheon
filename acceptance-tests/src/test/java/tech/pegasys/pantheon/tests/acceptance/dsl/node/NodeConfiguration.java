@@ -44,5 +44,5 @@ public interface NodeConfiguration {
 
   boolean isBootnodeEligible();
 
-  void setPlugins(List<String> plugins);
+  List<String> getExtraCLIOptions();
 }

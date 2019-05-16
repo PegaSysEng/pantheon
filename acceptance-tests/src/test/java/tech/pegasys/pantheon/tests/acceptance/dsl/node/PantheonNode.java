@@ -96,7 +96,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private HttpRequestFactory httpRequestFactory;
   private boolean useWsForJsonRpc = false;
   private String token = null;
-  private List<String> plugins = new ArrayList<>();
+  private final List<String> plugins = new ArrayList<>();
+  private final List<String> extraCLIOptions;
 
   public PantheonNode(
       final String name,
@@ -112,7 +113,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final boolean p2pEnabled,
       final boolean discoveryEnabled,
       final boolean bootnodeEligible,
-      final List<String> plugins)
+      final List<String> plugins,
+      final List<String> extraCLIOptions)
       throws IOException {
     this.bootnodeEligible = bootnodeEligible;
     this.homeDirectory = Files.createTempDirectory("acctest");
@@ -120,7 +122,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
         path -> {
           try {
             copyResource(path, homeDirectory.resolve("key"));
-          } catch (IOException e) {
+          } catch (final IOException e) {
             LOG.error("Could not find key file \"{}\" in resources", path);
           }
         });
@@ -148,6 +150,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
             LOG.error("Could not find plugin \"{}\" in resources", pluginName);
           }
         });
+    this.extraCLIOptions = extraCLIOptions;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -503,9 +506,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public void setPlugins(final List<String> plugins) {
-    this.plugins.clear();
-    this.plugins.addAll(plugins);
+  public List<String> getExtraCLIOptions() {
+    return extraCLIOptions;
   }
 
   @Override

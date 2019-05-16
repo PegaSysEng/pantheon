@@ -33,7 +33,10 @@ dependencies {
 
   testImplementation 'com.google.auto.service:auto-service'
   testImplementation 'info.picocli:picocli'
+  testImplementation 'junit:junit'
   testImplementation 'org.apache.logging.log4j:log4j-api'
+  testImplementation 'org.assertj:assertj-core'
+  testImplementation 'org.mockito:mockito-core'
 }
 
 task testJar(type: Jar) {
