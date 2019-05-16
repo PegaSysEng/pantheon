@@ -61,7 +61,7 @@ public class PluginsAcceptanceTest extends AcceptanceTestBase {
     final Path registrationFile = node.homeDirectory().resolve("plugins/testPlugin.started");
     waitForFile(registrationFile);
 
-    // this assert is false as CLI will be parsed at this point
+    // this assert is true as CLI will be parsed at this point
     assertThat(Files.readAllLines(registrationFile).stream().anyMatch(s -> s.contains(MAGIC_WORDS)))
         .isTrue();
   }
