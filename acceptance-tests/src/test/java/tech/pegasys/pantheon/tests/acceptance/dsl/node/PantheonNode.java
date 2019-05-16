@@ -140,26 +140,6 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     plugins.forEach(
         pluginName -> {
           try {
-            LOG.info(
-                " URL - {}",
-                net.consensys.cava.io.file.Files.class
-                    .getClassLoader()
-                    .getResource(""));
-            LOG.info(
-                " URL - {}",
-                net.consensys.cava.io.file.Files.class
-                    .getClassLoader()
-                    .getResource("key"));
-            LOG.info(
-                " URL - {}",
-                net.consensys.cava.io.file.Files.class
-                    .getClassLoader()
-                    .getResource(pluginName + ".jar"));
-            LOG.info(
-                " reading - {}",
-                net.consensys.cava.io.file.Files.class
-                    .getClassLoader()
-                    .getResourceAsStream(pluginName + ".jar"));
             homeDirectory.resolve("plugins").toFile().mkdirs();
             copyResource(
                 pluginName + ".jar", homeDirectory.resolve("plugins/" + pluginName + ".jar"));

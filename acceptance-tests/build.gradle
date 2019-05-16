@@ -54,7 +54,7 @@ dependencies {
 test.enabled = false
 
 sourceSets {
-  test { resources { srcDirs "${rootDir}/plugins/build/libs" } }
+  test { resources {  srcDirs "${rootDir}/plugins/build/libs" } }
 }
 
 processTestResources.dependsOn(':plugins:testJar')
