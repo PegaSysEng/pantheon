@@ -82,7 +82,7 @@ public class PrivateTransactionHandler {
       sendResponse = enclave.send(sendRequest);
       return sendResponse.getKey();
     } catch (IOException e) {
-      LOG.error("Failed to store private transaction in enclave", e);
+      LOG.error("Failed to store private transaction in enclave {}", e.getMessage());
       throw e;
     }
   }

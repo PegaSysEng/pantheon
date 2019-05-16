@@ -58,7 +58,6 @@ public class PrivacyPrecompiledContractIntegrationTest {
 
   @ClassRule public static final TemporaryFolder folder = new TemporaryFolder();
 
-  //  private static final String PAYLOAD = "a wonderful transaction";
   private static final byte[] VALID_PRIVATE_TRANSACTION_RLP_BASE64 =
       Base64.getEncoder()
           .encode(
@@ -170,5 +169,37 @@ public class PrivacyPrecompiledContractIntegrationTest {
             BytesValue.wrap(sr.getKey().getBytes(UTF_8)), messageFrame);
 
     assertThat(actual).isEqualTo(BytesValue.fromHexString(DEFAULT_OUTPUT));
+  }
+
+  @Test
+  public void testNoPrivateKeyError() throws RuntimeException {
+    List<String> publicKeys = testHarness.getPublicKeys();
+    publicKeys.add("noPrivateKey");
+
+    String s = new String(VALID_PRIVATE_TRANSACTION_RLP_BASE64, UTF_8);
+    SendRequest sc = new SendRequest(s, publicKeys.get(0), publicKeys);
+    try {
+      enclave.send(sc);
+    } catch (IOException e) {
+      if (!e.getMessage().contains("EnclaveDecodePublicKey")) {
+        throw new RuntimeException("Failed to receive expected Exception");
+      }
+    }
+  }
+
+  @Test
+  public void testWrongPrivateKeyError() throws RuntimeException {
+    List<String> publicKeys = testHarness.getPublicKeys();
+    publicKeys.add("noPrivateKenoPrivateKenoPrivateKenoPrivateK");
+
+    String s = new String(VALID_PRIVATE_TRANSACTION_RLP_BASE64, UTF_8);
+    SendRequest sc = new SendRequest(s, publicKeys.get(0), publicKeys);
+    try {
+      enclave.send(sc);
+    } catch (IOException e) {
+      if (!e.getMessage().contains("NodeMissingPeerUrl")) {
+        throw new RuntimeException("Failed to receive expected Exception");
+      }
+    }
   }
 }
