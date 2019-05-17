@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.enclave;
 
+import tech.pegasys.pantheon.enclave.types.ErrorResponse;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
@@ -19,8 +20,6 @@ import tech.pegasys.pantheon.enclave.types.SendResponse;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.MediaType;
@@ -76,21 +75,16 @@ public class Enclave {
 
   private <T> T executePost(final Request request, final Class<T> responseType) throws IOException {
     try (Response response = client.newCall(request).execute()) {
-      return objectMapper.readValue(response.body().string(), responseType);
+      if (response.isSuccessful()) {
+        return objectMapper.readValue(response.body().string(), responseType);
+      } else {
+        ErrorResponse errorResponse =
+            objectMapper.readValue(response.body().string(), ErrorResponse.class);
+        throw new IOException(errorResponse.getError());
+      }
     } catch (IOException e) {
       LOG.error("Enclave failed to execute {}", request);
-      String regex = "\\{(.*?)(\"([^\"]*)\")\\}";
-      Pattern p = Pattern.compile(regex);
-      Matcher m = p.matcher(e.getMessage());
-      String error;
-
-      // This works only for Orion
-      if (m.find()) {
-        error = m.group(3);
-      } else {
-        error = "Enclave failed to execute post";
-      }
-      throw new IOException(error, e);
+      throw new IOException(e.getMessage());
     }
   }
 }
