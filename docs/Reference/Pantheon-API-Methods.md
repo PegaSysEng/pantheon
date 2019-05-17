@@ -444,6 +444,10 @@ None
 	
 ## Eth Methods
 
+!!! note
+    Methods with an equivalent [GraphQL](../Pantheon-API/GraphQL.md) query include a GraphQL request and result in the method example.
+    The parameter and result descriptions apply to the JSON-RPC requests. The GraphQL specification is defined in the [schema](https://github.com/PegaSysEng/pantheon/blob/master/ethereum/graphqlrpc/src/main/resources/schema.graphqls).  
+
 ### eth_syncing
 
 Returns an object with data about the synchronization status, or `false` if not synchronizing.
@@ -1622,9 +1626,6 @@ Returns transaction information for the specified block number and transaction i
 
 Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `null` when no transaction is found.
 
-!!!note
-    Your node must be synchronized to at least the block containing the transaction for the request to return it.
-
 !!! example
     This request returns the third transaction in the 82990 block on the Ropsten testnet. You can also view this [block](https://ropsten.etherscan.io/txs?block=82990) and [transaction](https://ropsten.etherscan.io/tx/0xfc766a71c406950d4a4955a340a092626c35083c64c7be907060368a5e6811d6) on Etherscan.
 
@@ -2028,8 +2029,6 @@ Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) matching a spec
 `array` - [Log objects](Pantheon-API-Objects.md#log-object)
 
 !!! example
-    The following request returns all logs for the contract at address `0x2e1f232a9439c3d459fceca0beef13acc8259dd8`. 
-
     ```bash tab="curl HTTP request"
     curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getLogs","params":[{"fromBlock":"earliest", "toBlock":"latest", "address": "0x2e1f232a9439c3d459fceca0beef13acc8259dd8", "topics":[]}], "id":1}' http://127.0.0.1:8545
     ```

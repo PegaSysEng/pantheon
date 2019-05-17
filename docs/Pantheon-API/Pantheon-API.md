@@ -5,9 +5,14 @@ Access the [Pantheon API](../Reference/Pantheon-API-Methods.md) using:
 
 * [JSON-RPC over HTTP or WebSockets](Using-JSON-RPC-API.md) 
 * [RPC Pub/Sub over WebSockets](RPC-PubSub.md)
-* GraphQL RPC over HTTP
+* [GraphQL over HTTP](GraphQL.md)
 
 Information applying to JSON-RPC, RPC Pub/Sub, and GraphQL is included below. 
+
+## Enabling API Access 
+
+Use the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled), [`--ws-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled),
+and [`--graphql-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-enabled) options to enable API access.
 
 ## RPC Hosts
 

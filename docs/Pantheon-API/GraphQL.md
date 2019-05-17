@@ -3,22 +3,25 @@ description: How to access the Pantheon API using GraphQL-RPC
 
 # GraphQL over HTTP
 
-To enable GraphQL-RPC over HTTP, use the [`--graphql-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-enabled) 
-option.
+GraphQL can reduce the overhead needed for common queries. For example, instead of querying each receipt in a
+block, GraphQL can obtain the same result with a single query for the entire block. 
 
 ## GraphQL Requests with Curl 
 
-```bash
-curl -X POST -H "Content-Type: application/json" --data '{ "query": "{ protocolVersion }" }' http://localhost:8547/graphql
-```
+[Pantheon JSON-RPC API methods](../Reference/Pantheon-API-Methods.md) with an equivalent [GraphQL](../Pantheon-API/GraphQL.md) 
+query include a GraphQL request and result in the method example. 
 
+!!! example
+    ```bash
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{syncing{startingBlock currentBlock highestBlock}}"}' http://localhost:8547/graphql
+    ```
 
 ## GraphQL Requests with GraphiQL App
 
-The [GraphiQL app](https://github.com/skevy/graphiql-app) provides a tabbed interface for editing and testing GraphQL 
+The third-party tool [GraphiQL](https://github.com/skevy/graphiql-app) provides a tabbed interface for editing and testing GraphQL 
 queries and mutations. GraphiQL also provides access the Pantheon GraphQL schema from within the app. 
 
 ![GraphiQL](../images/GraphiQL.png) 
 
 
-Examples in Pantheon API Methods - eth_ methods only 
+ 
