@@ -486,6 +486,22 @@ None
       }
     }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{syncing{startingBlock currentBlock highestBlock}}"}' http://localhost:8547/graphql
+    ```
+    
+    ```json tab="GraphQL result"
+    {
+      "data" : {
+        "syncing" : {
+          "startingBlock" : 1592,
+          "currentBlock" : 31988,
+          "highestBlock" : 4389714
+        }
+      }
+    }
+    ```
 
 ### eth_chainId
 
@@ -899,6 +915,20 @@ Returns the number of transactions in the block matching the given block hash.
     }
     ```
 
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(hash:\"0xe455c14f757b0b9b67774baad1be1c180a4c1657df52259dbb685bf375408097\"){transactionCount}}"}' http://localhost:8547/graphql
+    ```
+                
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "transactionCount" : 1
+        }
+      }
+    }
+    ```
+
 ### eth_getBlockTransactionCountByNumber
 
 Returns the number of transactions in a block matching the specified block number.
@@ -927,6 +957,21 @@ Returns the number of transactions in a block matching the specified block numbe
       "result" : "0x8"
     }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(number:\"0x58a6\"){transactionCount}}"}' http://localhost:8547/graphql
+    ```
+                    
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "transactionCount" : 1
+        }
+      }
+    }
+    ```
+
 
 ### eth_getUncleCountByBlockHash
 
@@ -953,7 +998,21 @@ Returns the number of uncles in a block from a block matching the given block ha
     {
       "jsonrpc" : "2.0",
       "id" : 1,
-      "result" : null
+      "result" : 0x0
+    }
+    ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(hash:\"0x65c08d792e4192b9ece6b6f2390da7da464208b22d88490be8add9373917b426\"){ommerCount}}"}' http://localhost:8547/graphql
+    ```
+                        
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "ommerCount" : 2
+        }
+      }
     }
     ```
 
@@ -985,7 +1044,21 @@ Returns the number of uncles in a block matching the specified block number.
       "result" : "0x1"
     }
     ```
-
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(number:\"0x59fd\"){ommerCount}}"}' http://localhost:8547/graphql
+    ```
+    
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "ommerCount" : 0
+        }
+      }
+    }
+    ```
+    
 ### eth_getCode
 
 Returns the code of the smart contract at the specified address. Compiled smart contract code is stored as a hexadecimal value. 
@@ -1016,7 +1089,21 @@ Returns the code of the smart contract at the specified address. Compiled smart 
         "result": "0x60806040526004361060485763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416633fa4f2458114604d57806355241077146071575b600080fd5b348015605857600080fd5b50605f6088565b60408051918252519081900360200190f35b348015607c57600080fd5b506086600435608e565b005b60005481565b60008190556040805182815290517f199cd93e851e4c78c437891155e2112093f8f15394aa89dab09e38d6ca0727879181900360200190a1505600a165627a7a723058209d8929142720a69bde2ab3bfa2da6217674b984899b62753979743c0470a2ea70029"
     }
     ```
-
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{account(address: \"0x686afd6e502a81d2e77f2e038a23c0def4949a20\"){ code }}"}' http://localhost:8547/graphql
+    ```
+                        
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "account" : {
+          "code" : "0x608060405260043610610051576000357c010000000000000000000000000000000000000000000000000000000090048063010fc842146100565780630718e0ad146100815780637b8d56e3146100ac575b600080fd5b34801561006257600080fd5b5061006b6100f1565b6040518082815260200191505060405180910390f35b34801561008d57600080fd5b506100966100f7565b6040518082815260200191505060405180910390f35b3480156100b857600080fd5b506100ef600480360360408110156100cf57600080fd5b8101908080359060200190929190803590602001909291905050506100fd565b005b60005481565b60015481565b8160008190555080600181905550817fd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8826040518082815260200191505060405180910390a2505056fea165627a7a72305820badb5d43679c5579ebc76394df6e60b3e93a05481167e24711205dae2023edd70029"
+        }
+      }
+    }
+    ```
+    
 ### eth_sendRawTransaction
 
 Sends a [signed transaction](../Using-Pantheon/Transactions/Transactions.md). A transaction can send ether, deploy a contract, or interact with a contract.  
@@ -1059,6 +1146,18 @@ To avoid exposing your private key, create signed transactions offline and send 
       "result": "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
     }
     ```
+    
+     ```bash tab="curl GraphQL request"
+     curl -X POST -H "Content-Type: application/json" --data '{ "query": "mutation {sendRawTransaction(data: \"0xf8670e8082520894f17f52151ebef6c7334fad080c5704d77216b732880de0b6b3a7640000801ca091c7ca57b4a93acc46d1d29a43abfb7af925f6f11ef0c641630bbc05cdf63ba2a06a9d03b8327de9c79b819f7a4096e3aee2fc56c1bf150857011e310631388807\")}"}' http://localhost:8547/graphql
+     ```
+        
+     ```json tab="GraphQL result"
+     {
+       "data" : {
+         "sendRawTransaction" : "0xa2db60eac9bc638cd09c49c6c3d7f2b534c6d222b0926daca8a510ce5708a8dd"
+       }
+     }
+     ```
 
 ### eth_call
 
@@ -1074,7 +1173,7 @@ You can interact with contracts using [eth_sendRawTransaction or eth_call](../Us
 
 **Returns**
 
-`result` (*DATA*) - Return value of the executed contract.
+`result` - `data` - Return value of the executed contract.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -1964,6 +2063,30 @@ Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) matching a spec
         "data" : "0x0000000000000000000000000000000000000000000000000000000000000005",
         "topics" : [ "0x04474795f5b996ff80cb47c148d4c5ccdbe09ef27551820caa9c2f8ed149cce3" ]
       } ]
+    }
+    ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{block(number:\"0x59fd\") {logs(filter:{topics:[[\"0xd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8\", \"0x0000000000000000000000000000000000000000000000000000000000000002\"]]}) {index topics data account{address} transaction{hash} }}}"}' http://localhost:8547/graphql
+    ```
+                            
+    ```bash tab="GraphQL result"
+    {
+      "data" : {
+        "block" : {
+          "logs" : [ {
+            "index" : 0,
+            "topics" : [ "0xd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8", "0x0000000000000000000000000000000000000000000000000000000000000002" ],
+            "data" : "0x0000000000000000000000000000000000000000000000000000000000000003",
+            "account" : {
+              "address" : "0x686afd6e502a81d2e77f2e038a23c0def4949a20"
+            },
+            "transaction" : {
+              "hash" : "0x29b541c12ad308960d4e7e0da00e0281a18428b3417f0f9b4ad8f68c4f5adc3c"
+            }
+          } ]
+        }
+      }
     }
     ```
 
