@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 public interface PantheonEvents {
 
   /**
-   * Returns the raw RLP of a block that Pantheon has receieved and that has passed basic validation
+   * Returns the raw RLP of a block that Pantheon has received and that has passed basic validation
    * checks.
    *
    * @param blockJSONListener The listener that will accept a JSON string as the event.

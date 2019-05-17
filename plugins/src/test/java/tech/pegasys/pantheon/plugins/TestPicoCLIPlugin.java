@@ -27,14 +27,14 @@ import org.apache.logging.log4j.Logger;
 import picocli.CommandLine.Option;
 
 @AutoService(PantheonPlugin.class)
-public class TestPlugin implements PantheonPlugin {
+public class TestPicoCLIPlugin implements PantheonPlugin {
   private static final Logger LOG = LogManager.getLogger();
 
   private PantheonContext context;
   private Optional<Object> listenerReference;
 
   @Option(names = "--Xtest-option", hidden = true, defaultValue = "UNSET")
-  String testOption = System.getProperty("testPlugin.testOption");
+  String testOption = System.getProperty("testPicoCLIPlugin.testOption");
 
   private String state = "uninited";
 
@@ -52,7 +52,8 @@ public class TestPlugin implements PantheonPlugin {
     context
         .getService(PicoCLIOptions.class)
         .ifPresent(
-            picoCLIOptions -> picoCLIOptions.addPicoCLIOptions("Test Plugin", TestPlugin.this));
+            picoCLIOptions ->
+                picoCLIOptions.addPicoCLIOptions("Test PicoCLI Plugin", TestPicoCLIPlugin.this));
 
     writeSignal("registered");
     state = "registered";
