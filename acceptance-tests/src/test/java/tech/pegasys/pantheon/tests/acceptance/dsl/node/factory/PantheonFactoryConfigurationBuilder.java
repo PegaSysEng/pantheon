@@ -179,8 +179,7 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder extraCLIOptions(
-      final List<String> extraCLIOptions) {
+  public PantheonFactoryConfigurationBuilder extraCLIOptions(final List<String> extraCLIOptions) {
     this.extraCLIOptions.clear();
     this.extraCLIOptions.addAll(extraCLIOptions);
     return this;
