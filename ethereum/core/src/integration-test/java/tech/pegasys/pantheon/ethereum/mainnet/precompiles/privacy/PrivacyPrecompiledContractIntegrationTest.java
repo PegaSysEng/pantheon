@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.mainnet.precompiles.privacy;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -146,7 +147,7 @@ public class PrivacyPrecompiledContractIntegrationTest {
   }
 
   @Test
-  public void testSendAndReceive() throws IOException {
+  public void testSendAndReceive() throws Exception {
     List<String> publicKeys = testHarness.getPublicKeys();
 
     String s = new String(VALID_PRIVATE_TRANSACTION_RLP_BASE64, UTF_8);
@@ -178,13 +179,10 @@ public class PrivacyPrecompiledContractIntegrationTest {
 
     String s = new String(VALID_PRIVATE_TRANSACTION_RLP_BASE64, UTF_8);
     SendRequest sc = new SendRequest(s, publicKeys.get(0), publicKeys);
-    try {
-      enclave.send(sc);
-    } catch (IOException e) {
-      if (!e.getMessage().contains("EnclaveDecodePublicKey")) {
-        throw new RuntimeException("Failed to receive expected Exception");
-      }
-    }
+
+    final Throwable thrown = catchThrowable(() -> enclave.send(sc));
+
+    assertThat(thrown).hasMessageContaining("EnclaveDecodePublicKey");
   }
 
   @Test
@@ -194,12 +192,9 @@ public class PrivacyPrecompiledContractIntegrationTest {
 
     String s = new String(VALID_PRIVATE_TRANSACTION_RLP_BASE64, UTF_8);
     SendRequest sc = new SendRequest(s, publicKeys.get(0), publicKeys);
-    try {
-      enclave.send(sc);
-    } catch (IOException e) {
-      if (!e.getMessage().contains("NodeMissingPeerUrl")) {
-        throw new RuntimeException("Failed to receive expected Exception");
-      }
-    }
+
+    final Throwable thrown = catchThrowable(() -> enclave.send(sc));
+
+    assertThat(thrown).hasMessageContaining("NodeMissingPeerUrl");
   }
 }

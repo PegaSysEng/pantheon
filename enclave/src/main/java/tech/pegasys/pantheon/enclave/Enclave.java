@@ -56,35 +56,35 @@ public class Enclave {
     }
   }
 
-  public SendResponse send(final SendRequest content) throws IOException {
+  public SendResponse send(final SendRequest content) throws Exception {
     Request request = buildPostRequest(JSON, content, "/send");
     return executePost(request, SendResponse.class);
   }
 
-  public ReceiveResponse receive(final ReceiveRequest content) throws IOException {
+  public ReceiveResponse receive(final ReceiveRequest content) throws Exception {
     Request request = buildPostRequest(ORION, content, "/receive");
     return executePost(request, ReceiveResponse.class);
   }
 
   private Request buildPostRequest(
-      final MediaType mediaType, final Object content, final String endpoint) throws IOException {
+      final MediaType mediaType, final Object content, final String endpoint) throws Exception {
     RequestBody body = RequestBody.create(mediaType, objectMapper.writeValueAsString(content));
     String url = enclaveUri.resolve(endpoint).toString();
     return new Request.Builder().url(url).post(body).build();
   }
 
-  private <T> T executePost(final Request request, final Class<T> responseType) throws IOException {
+  private <T> T executePost(final Request request, final Class<T> responseType) throws Exception {
     try (Response response = client.newCall(request).execute()) {
       if (response.isSuccessful()) {
         return objectMapper.readValue(response.body().string(), responseType);
       } else {
         ErrorResponse errorResponse =
             objectMapper.readValue(response.body().string(), ErrorResponse.class);
-        throw new IOException(errorResponse.getError());
+        throw new EnclaveException(errorResponse.getError());
       }
-    } catch (IOException e) {
+    } catch (Exception e) {
       LOG.error("Enclave failed to execute {}", request);
-      throw new IOException(e.getMessage());
+      throw new Exception(e.getMessage());
     }
   }
 }

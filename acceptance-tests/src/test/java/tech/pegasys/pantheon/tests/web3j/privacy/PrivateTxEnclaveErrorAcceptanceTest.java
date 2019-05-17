@@ -13,7 +13,8 @@
 package tech.pegasys.pantheon.tests.web3j.privacy;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
@@ -86,12 +87,12 @@ public class PrivateTxEnclaveErrorAcceptanceTest extends PrivateAcceptanceTestBa
             .keyPair(keypair)
             .build(TransactionType.STORE);
 
-    try {
-      minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
-    } catch (Exception e) {
-      assertTrue(
-          e.getMessage().contains(JsonRpcError.ENCLAVE_NO_MATCHING_PRIVATE_KEY.getMessage()));
-    }
+    final Throwable thrown =
+        catchThrowable(
+            () -> minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue)));
+
+    assertThat(thrown)
+        .hasMessageContaining(JsonRpcError.ENCLAVE_NO_MATCHING_PRIVATE_KEY.getMessage());
   }
 
   @Test
@@ -112,11 +113,11 @@ public class PrivateTxEnclaveErrorAcceptanceTest extends PrivateAcceptanceTestBa
             .keyPair(keypair)
             .build(TransactionType.STORE);
 
-    try {
-      minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue));
-    } catch (Exception e) {
-      assertTrue(e.getMessage().contains(JsonRpcError.NODE_MISSING_PEER_URL.getMessage()));
-    }
+    final Throwable thrown =
+        catchThrowable(
+            () -> minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue)));
+
+    assertThat(thrown).hasMessageContaining(JsonRpcError.NODE_MISSING_PEER_URL.getMessage());
   }
 
   @After
