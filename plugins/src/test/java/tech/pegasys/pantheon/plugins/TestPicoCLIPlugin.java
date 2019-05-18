@@ -30,9 +30,6 @@ import picocli.CommandLine.Option;
 public class TestPicoCLIPlugin implements PantheonPlugin {
   private static final Logger LOG = LogManager.getLogger();
 
-  private PantheonContext context;
-  private Optional<Object> listenerReference;
-
   @Option(names = "--Xtest-option", hidden = true, defaultValue = "UNSET")
   String testOption = System.getProperty("testPicoCLIPlugin.testOption");
 
@@ -48,7 +45,6 @@ public class TestPicoCLIPlugin implements PantheonPlugin {
       throw new RuntimeException("I was told to fail at registration");
     }
 
-    this.context = context;
     context
         .getService(PicoCLIOptions.class)
         .ifPresent(
@@ -69,14 +65,6 @@ public class TestPicoCLIPlugin implements PantheonPlugin {
       throw new RuntimeException("I was told to fail at startup");
     }
 
-    listenerReference =
-        context
-            .getService(PantheonEvents.class)
-            .map(
-                pantheonEvents ->
-                    pantheonEvents.addBlockAddedListener(
-                        s -> System.out.println("BlockAdded - " + s)));
-
     writeSignal("started");
     state = "started";
   }
@@ -90,12 +78,6 @@ public class TestPicoCLIPlugin implements PantheonPlugin {
       state = "failstop";
       throw new RuntimeException("I was told to fail at stop");
     }
-
-    listenerReference.ifPresent(
-        reference ->
-            context
-                .getService(PantheonEvents.class)
-                .ifPresent(pantheonEvents -> pantheonEvents.removeBlockAddedObserver(reference)));
 
     writeSignal("stopped");
     state = "stopped";

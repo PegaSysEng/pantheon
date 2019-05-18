@@ -1241,7 +1241,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     if (isFullInstantiation()) {
       final String pluginsDir = System.getProperty("pantheon.plugins.dir");
       if (pluginsDir == null) {
-        return new File("plugins").toPath();
+        return new File(System.getProperty("pantheon.home", "."), "plugins").toPath();
       } else {
         return new File(pluginsDir).toPath();
       }
