@@ -12,14 +12,12 @@
  */
 package tech.pegasys.pantheon.plugins;
 
-import tech.pegasys.pantheon.plugins.services.PantheonEvents;
 import tech.pegasys.pantheon.plugins.services.PicoCLIOptions;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
-import java.util.Optional;
 
 import com.google.auto.service.AutoService;
 import org.apache.logging.log4j.LogManager;
