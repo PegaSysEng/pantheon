@@ -1,4 +1,4 @@
-description: How to access the Pantheon API using GraphQL-RPC
+description: How to access the Pantheon API using GraphQL
 <!--- END of page meta data -->
 
 # GraphQL over HTTP
@@ -12,6 +12,7 @@ block, GraphQL can obtain the same result with a single query for the entire blo
 query include a GraphQL request and result in the method example. 
 
 !!! example
+    The following [`syncing`](../Reference/Pantheon-API-Methods.md#eth_syncing) request returns data about the synchronization status.
     ```bash
     curl -X POST -H "Content-Type: application/json" --data '{ "query": "{syncing{startingBlock currentBlock highestBlock}}"}' http://localhost:8547/graphql
     ```

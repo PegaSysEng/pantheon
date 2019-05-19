@@ -462,10 +462,6 @@ None
 
 * `startingBlock` : *quantity* - Index of the highest block on the blockchain when the network synchronization starts.
 
-    If you start with an empty blockchain, the starting block is the beginning of the blockchain (`startingBlock` = 0).
-
-    If you import a block file using `pantheon import <block-file>`, the synchronization starts at the head of the blockchain, and the starting block is the next block synchronized. For example, if you imported 1000 blocks, the import would include blocks 0 to 999, so in that case `startingBlock` = 1000.
-
 * `currentBlock` : *quantity* - Index of the latest block (also known as the best block) for the current node. This is the same index that [eth_blockNumber](#eth_blocknumber) returns.
 
 * `highestBlock`: *quantity* - Index of the highest known block in the peer network (that is, the highest block so far discovered among peer nodes). This is the same value as `currentBlock` if the current node has no peers.
@@ -651,7 +647,7 @@ None
     ```bash tab="wscat WS request"
     {"jsonrpc":"2.0","method":"eth_gasPrice","params":[],"id":53}
     ```
-     
+    
     ```json tab="JSON result"
     {
       "jsonrpc" : "2.0",
@@ -963,7 +959,7 @@ Returns the number of transactions in a block matching the specified block numbe
     ```
     
     ```bash tab="curl GraphQL request"
-    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(number:\"0x58a6\"){transactionCount}}"}' http://localhost:8547/graphql
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(number:232){transactionCount}}"}' http://localhost:8547/graphql
     ```
                     
     ```bash tab="GraphQL result"
@@ -1095,14 +1091,14 @@ Returns the code of the smart contract at the specified address. Compiled smart 
     ```
     
     ```bash tab="curl GraphQL request"
-    curl -X POST -H "Content-Type: application/json" --data '{"query": "{account(address: \"0x686afd6e502a81d2e77f2e038a23c0def4949a20\"){ code }}"}' http://localhost:8547/graphql
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{account(address: \"0xa50a51c09a5c451c52bb714527e1974b686d8e77\"){ code }}"}' http://localhost:8547/graphql
     ```
                         
     ```bash tab="GraphQL result"
     {
       "data" : {
         "account" : {
-          "code" : "0x608060405260043610610051576000357c010000000000000000000000000000000000000000000000000000000090048063010fc842146100565780630718e0ad146100815780637b8d56e3146100ac575b600080fd5b34801561006257600080fd5b5061006b6100f1565b6040518082815260200191505060405180910390f35b34801561008d57600080fd5b506100966100f7565b6040518082815260200191505060405180910390f35b3480156100b857600080fd5b506100ef600480360360408110156100cf57600080fd5b8101908080359060200190929190803590602001909291905050506100fd565b005b60005481565b60015481565b8160008190555080600181905550817fd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8826040518082815260200191505060405180910390a2505056fea165627a7a72305820badb5d43679c5579ebc76394df6e60b3e93a05481167e24711205dae2023edd70029"
+          "code" : "0x60806040526004361060485763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416633fa4f2458114604d57806355241077146071575b600080fd5b348015605857600080fd5b50605f6088565b60408051918252519081900360200190f35b348015607c57600080fd5b506086600435608e565b005b60005481565b60008190556040805182815290517f199cd93e851e4c78c437891155e2112093f8f15394aa89dab09e38d6ca0727879181900360200190a1505600a165627a7a723058209d8929142720a69bde2ab3bfa2da6217674b984899b62753979743c0470a2ea70029"
         }
       }
     }
@@ -1152,13 +1148,13 @@ To avoid exposing your private key, create signed transactions offline and send 
     ```
     
      ```bash tab="curl GraphQL request"
-     curl -X POST -H "Content-Type: application/json" --data '{ "query": "mutation {sendRawTransaction(data: \"0xf8670e8082520894f17f52151ebef6c7334fad080c5704d77216b732880de0b6b3a7640000801ca091c7ca57b4a93acc46d1d29a43abfb7af925f6f11ef0c641630bbc05cdf63ba2a06a9d03b8327de9c79b819f7a4096e3aee2fc56c1bf150857011e310631388807\")}"}' http://localhost:8547/graphql
+     curl -X POST -H "Content-Type: application/json" --data '{ "query": "mutation {sendRawTransaction(data: \"0xf869018203e882520894f17f52151ebef6c7334fad080c5704d77216b732881bc16d674ec80000801ba02da1c48b670996dcb1f447ef9ef00b33033c48a4fe938f420bec3e56bfd24071a062e0aa78a81bf0290afbc3a9d8e9a068e6d74caa66c5e0fa8a46deaae96b0833\")}"}' http://localhost:8547/graphql
      ```
         
      ```json tab="GraphQL result"
      {
        "data" : {
-         "sendRawTransaction" : "0xa2db60eac9bc638cd09c49c6c3d7f2b534c6d222b0926daca8a510ce5708a8dd"
+         "sendRawTransaction" : "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
        }
      }
      ```
@@ -1434,7 +1430,7 @@ Returns information about a block by block number.
     ```
     
     ```bash tab="curl GraphQL request"
-    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block (number : \"0x1e\") {transactions{hash} timestamp difficulty totalDifficulty gasUsed gasLimit hash nonce ommerCount logsBloom mixHash ommerHash extraData stateoot receiptsRoot transactionCount transactionsRoot ommers{hash} ommerAt(index : 1){hash} miner{address} account(address: \"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\"){balance} parent{hash} }}"}' http://localhost:8547/graphql
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block (number : 100) {transactions{hash} timestamp difficulty totalDifficulty gasUsed gasLimit hash nonce ommerCount logsBloom mixHash ommerHash extraData stateRoot receiptsRoot transactionCount transactionsRoot ommers{hash} ommerAt(index : 1){hash} miner{address} account(address: \"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\"){balance} parent{hash} }}"}' http://localhost:8547/graphql
     ```
         
     ```bash tab="GraphQL result"
@@ -1442,19 +1438,19 @@ Returns information about a block by block number.
       "data" : {
         "block" : {
           "transactions" : [ ],
-          "timestamp" : "0x5cd108a7",
+          "timestamp" : "0x5cd10933",
           "difficulty" : "0x1",
-          "totalDifficulty" : "0x1f",
+          "totalDifficulty" : "0x65",
           "gasUsed" : 0,
           "gasLimit" : 4700000,
-          "hash" : "0xd76a32711579e1af86854e44af50ea58ab0e58584462e34e87f9e88a8e9277b5",
+          "hash" : "0x63b3ea2bc37fec8f82680eb823652da6af8acebb4f6c4d0ff659c55be473c8b0",
           "nonce" : "0x0000000000000000",
           "ommerCount" : 0,
           "logsBloom" : "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
           "mixHash" : "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
           "ommerHash" : "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
-          "extraData" : "0xf882a00000000000000000000000000000000000000000000000000000000000000000d5949811ebc35d7b06b3fa8dc5809a1f9c52751e1deb808400000000f843b84152a94b8fe5eb84995b758ff2db13d55db23fc23f662021537a3546c05aa6a9b12cd7a63dc08acd8614fb26a8109ed182c05fe46c516085b606f58ba01327bc5001",
-          "stateRoot" : "0x9c4ad4bc40394ecc74251f86f537004536894f26e46144f402e8574022e5df51",
+          "extraData" : "0xf882a00000000000000000000000000000000000000000000000000000000000000000d5949811ebc35d7b06b3fa8dc5809a1f9c52751e1deb808400000000f843b8414d877d8d0ced37ea138fab55a978f3740367a24a31731322ecdc3368f11e0d4966c9ce17ae59a76fb94eb436e8a386868f6bd6b0a5678e58daf49f5dd940558b00",
+          "stateRoot" : "0xd650578a04b39f50cc979155f4510ec28c2c0a7c1e5fdbf84609bc7b1c430f48",
           "receiptsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
           "transactionCount" : 0,
           "transactionsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
@@ -1464,10 +1460,10 @@ Returns information about a block by block number.
             "address" : "0x9811ebc35d7b06b3fa8dc5809a1f9c52751e1deb"
           },
           "account" : {
-            "balance" : "0xad4419dc0b16f98d6"
+            "balance" : "0xad0f47f269cbf31ac"
           },
           "parent" : {
-            "hash" : "0x0a4b9e322d317c6170dbdd7eba57bc4c930c9d0467d453a513a929257ee7fadf"
+            "hash" : "0x7bca25e1fa5e395fd6029eb496a70b6b5495843976bf9e49b993c723ded29d9e"
           }
         }
       }
@@ -1661,7 +1657,7 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
     ```
 
     ```bash tab="curl GraphQL request"
-    curl -X POST -H "Content-Type: application/json" --data '{"query": "{block(number:\"0x4f4f\") {transactionAt(index: 0) {block{hash} hash}}}"}' http://localhost:8547/graphql
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{block(number:20303) {transactionAt(index: 0) {block{hash} hash}}}"}' http://localhost:8547/graphql
     ```
                     
     ```bash tab="GraphQL result"
@@ -2066,7 +2062,7 @@ Returns an array of [logs](../Using-Pantheon/Events-and-Logs.md) matching a spec
     ```
     
     ```bash tab="curl GraphQL request"
-    curl -X POST -H "Content-Type: application/json" --data '{"query": "{block(number:\"0x59fd\") {logs(filter:{topics:[[\"0xd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8\", \"0x0000000000000000000000000000000000000000000000000000000000000002\"]]}) {index topics data account{address} transaction{hash} }}}"}' http://localhost:8547/graphql
+    curl -X POST -H "Content-Type: application/json" --data '{"query": "{block(number:23037) {logs(filter:{topics:[[\"0xd3610b1c54575b7f4f0dc03d210b8ac55624ae007679b7a928a4f25a709331a8\", \"0x0000000000000000000000000000000000000000000000000000000000000002\"]]}) {index topics data account{address} transaction{hash} }}}"}' http://localhost:8547/graphql
     ```
                             
     ```bash tab="GraphQL result"

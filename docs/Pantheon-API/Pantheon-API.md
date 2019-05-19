@@ -14,22 +14,22 @@ Information applying to JSON-RPC, RPC Pub/Sub, and GraphQL is included below.
 Use the [`--rpc-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled), [`--ws-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled),
 and [`--graphql-http-enabled`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-enabled) options to enable API access.
 
-## RPC Hosts
+## Service Hosts
 
 Use the [`--rpc-http-host`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-host), [`--rpc-ws-host`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-host),
-and [`--graphql-http-host`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-host) options to specify the host on which the RPC listens. 
+and [`--graphql-http-host`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-host) options to specify the host on which the API service listens. 
 The default host is 127.0.0.1.  
 
 Set the host to `0.0.0.0` to allow remote connections. 
 
 !!! caution 
-    Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
+    Setting the host to 0.0.0.0 exposes the API service connection on your node to any remote connection. In a 
     production environment, ensure you use a firewall to avoid exposing your node to the internet.  
 
-## RPC Ports
+## Service Ports
 
 Use the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port), [`--rpc-ws-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-port),
-and [`--graphql-http-port`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-port) options to specify the port on which the JSON-RPC listens. 
+and [`--graphql-http-port`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-port) options to specify the port on which the API service listens. 
 
 The default ports are: 
 
