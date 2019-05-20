@@ -113,7 +113,7 @@ public class PantheonPluginContextImpl implements PantheonContext {
         LOG.error("Error enumerating plugins, could not load plugins", e);
       }
       LOG.debug("Plugin registration complete.");
-      } else {
+    } else {
       LOG.debug("Plugin directory does not exist, skipping registation. - {}", pluginsDir);
     }
     state = Lifecycle.REGISTERED;
