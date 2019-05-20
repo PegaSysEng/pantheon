@@ -28,22 +28,22 @@ public class BlockBroadcaster {
   private static final Logger LOG = LogManager.getLogger();
 
   private final EthContext ethContext;
-  private final Subscribers<Consumer<Block>> newBlockSubscribers = new Subscribers<>();
+  private final Subscribers<Consumer<Block>> blockPropagatedSubscribers = new Subscribers<>();
 
   public BlockBroadcaster(final EthContext ethContext) {
     this.ethContext = ethContext;
   }
 
   public long subscribePropagateNewBlocks(final Consumer<Block> callback) {
-    return newBlockSubscribers.subscribe(callback);
+    return blockPropagatedSubscribers.subscribe(callback);
   }
 
   public void unsubscribePropagateNewBlocks(final long id) {
-    newBlockSubscribers.unsubscribe(id);
+    blockPropagatedSubscribers.unsubscribe(id);
   }
 
   public void propagate(final Block block, final UInt256 totalDifficulty) {
-    newBlockSubscribers.forEach(listener -> listener.accept(block));
+    blockPropagatedSubscribers.forEach(listener -> listener.accept(block));
     final NewBlockMessage newBlockMessage = NewBlockMessage.create(block, totalDifficulty);
     ethContext
         .getEthPeers()

@@ -53,7 +53,7 @@ public class PantheonEventsImplTest {
   @Test
   public void eventFiresAfterSubscribe() {
     final AtomicReference<String> result = new AtomicReference<>();
-    serviceImpl.addBlockAddedListener(result::set);
+    serviceImpl.addNewBlockPropagatedLister(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
@@ -64,12 +64,12 @@ public class PantheonEventsImplTest {
   @Test
   public void eventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<String> result = new AtomicReference<>();
-    final Object id = serviceImpl.addBlockAddedListener(result::set);
+    final Object id = serviceImpl.addNewBlockPropagatedLister(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
 
-    serviceImpl.removeBlockAddedObserver(id);
+    serviceImpl.removeNewBlockPropagatedListener(id);
     result.set(null);
 
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
@@ -82,10 +82,10 @@ public class PantheonEventsImplTest {
   }
 
   @Test
-  public void uselessUnsubscribesComplete() {
-    serviceImpl.removeBlockAddedObserver("doesNotExist");
-    serviceImpl.removeBlockAddedObserver(5);
-    serviceImpl.removeBlockAddedObserver(5L);
+  public void uselessUnsubscribesCompletes() {
+    serviceImpl.removeNewBlockPropagatedListener("doesNotExist");
+    serviceImpl.removeNewBlockPropagatedListener(5);
+    serviceImpl.removeNewBlockPropagatedListener(5L);
   }
 
   private Block generateBlock() {

@@ -16,16 +16,10 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.plugins.services.PantheonEvents;
 
-import java.util.function.Consumer;
-
 import com.google.common.collect.ImmutableMap;
 import io.vertx.core.json.Json;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class PantheonEventsImpl implements PantheonEvents {
-  private static Logger LOG = LogManager.getLogger();
-
   private final BlockBroadcaster blockBroadcaster;
 
   public PantheonEventsImpl(final BlockBroadcaster blockBroadcaster) {
@@ -33,22 +27,20 @@ public class PantheonEventsImpl implements PantheonEvents {
   }
 
   @Override
-  public Object addBlockAddedListener(final Consumer<String> blockJSONListener) {
-    LOG.info("Adding Listener");
+  public Object addNewBlockPropagatedLister(final NewBlockPropagatedListener listener) {
     return blockBroadcaster.subscribePropagateNewBlocks(
-        block -> dispatchNewBlockMessage(block, blockJSONListener));
+        block -> dispatchNewBlockPropagatedMessage(block, listener));
   }
 
   @Override
-  public void removeBlockAddedObserver(final Object listenerIdentifier) {
-    LOG.info("Removing Listener");
+  public void removeNewBlockPropagatedListener(final Object listenerIdentifier) {
     if (listenerIdentifier instanceof Long) {
       blockBroadcaster.unsubscribePropagateNewBlocks((Long) listenerIdentifier);
     }
   }
 
-  private void dispatchNewBlockMessage(final Block block, final Consumer<String> callback) {
-    LOG.info("dispatching Event");
+  private void dispatchNewBlockPropagatedMessage(
+      final Block block, final NewBlockPropagatedListener listener) {
     final ImmutableMap<Object, Object> result =
         new ImmutableMap.Builder<>()
             .put("type", "NewBlock")
@@ -56,6 +48,6 @@ public class PantheonEventsImpl implements PantheonEvents {
             .put("blockNumber", block.getHeader().getNumber())
             .put("timestamp", block.getHeader().getTimestamp())
             .build();
-    callback.accept(Json.encode(result));
+    listener.newBlockPropagated(Json.encode(result));
   }
 }

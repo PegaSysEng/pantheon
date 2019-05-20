@@ -44,7 +44,7 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
     subscriptionId =
         context
             .getService(PantheonEvents.class)
-            .map(events -> events.addBlockAddedListener(this::onBlockAnnounce));
+            .map(events -> events.addNewBlockPropagatedLister(this::onBlockAnnounce));
     LOG.info("Listening with ID#" + subscriptionId);
   }
 
@@ -54,7 +54,7 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
         id ->
             context
                 .getService(PantheonEvents.class)
-                .ifPresent(pantheonEvents -> pantheonEvents.removeBlockAddedObserver(id)));
+                .ifPresent(pantheonEvents -> pantheonEvents.removeNewBlockPropagatedListener(id)));
     LOG.info("No longer listening with ID#" + subscriptionId);
   }
 

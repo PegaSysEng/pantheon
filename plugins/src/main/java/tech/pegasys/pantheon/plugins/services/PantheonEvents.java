@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.plugins.services;
 
-import java.util.function.Consumer;
-
 public interface PantheonEvents {
 
   /**
@@ -23,12 +21,16 @@ public interface PantheonEvents {
    * @param blockJSONListener The listener that will accept a JSON string as the event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  Object addBlockAddedListener(Consumer<String> blockJSONListener);
+  Object addNewBlockPropagatedLister(NewBlockPropagatedListener blockJSONListener);
 
   /**
    * Remove the blockAdded listener from pantheon notifications.
    *
    * @param listenerIdentifier The instance that was returned from addBlockAddedListener;
    */
-  void removeBlockAddedObserver(Object listenerIdentifier);
+  void removeNewBlockPropagatedListener(Object listenerIdentifier);
+
+  interface NewBlockPropagatedListener {
+    void newBlockPropagated(String jsonBlock);
+  }
 }
