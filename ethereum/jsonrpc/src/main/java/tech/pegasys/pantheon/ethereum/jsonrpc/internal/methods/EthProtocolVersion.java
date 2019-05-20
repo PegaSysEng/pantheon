@@ -43,6 +43,7 @@ public class EthProtocolVersion implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
-    return new JsonRpcSuccessResponse(req.getId(), Quantity.create(highestEthVersion));
+    return new JsonRpcSuccessResponse(
+        req.getId(), highestEthVersion == null ? null : Quantity.create(highestEthVersion));
   }
 }
