@@ -547,18 +547,30 @@ None
 
 !!! example
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":53}' http://127.0.0.1:8545
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eth_protocolVersion","params":[],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eth_mining","params":[],"id":53}
+    {"jsonrpc":"2.0","method":"eth_protocolVersion","params":[],"id":1}
     ```
     
     ```json tab="JSON result"
     {
       "jsonrpc" : "2.0",
-      "id" : 53,
-      "result" : true
+      "id" : 1,
+      "result" : 63
+    }
+    ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{protocolVersion}"}' http://localhost:8547/graphql
+    ```
+        
+    ```json tab="GraphQL result"
+    {
+      "data" : {
+        "protocolVersion" : 63
+      }
     }
     ```
 
@@ -1011,7 +1023,7 @@ Returns uncle specified by block hash and index.
 
 `data` - 32-byte block hash.
 
-`quanity` - Integer index of the uncle.
+`quantity` - Index of the uncle.
 
 **Returns**
 
@@ -1056,6 +1068,33 @@ Returns uncle specified by block hash and index.
       }
     }
     ```
+    
+    ```bash tab="curl GraphQL request"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(hash:\"0xc48fb64230a82f65a08e7280bd8745e7fea87bc7c206309dee32209fe9a985f7\){ ommerAt(index: 0) {difficulty extraData gasLimit gasUsed hash logsBloom mixHash nonce number receiptsRoot stateRoot timestamp totalDifficulty transactionsRoot}}}"}' http://localhost:8547/graphql
+    ```
+                        
+    ```bash tab="GraphQL result"
+    {
+      "data": {
+        "block": {
+          "difficulty": "0x1",
+          "extraData": "0xf882a00000000000000000000000000000000000000000000000000000000000000000d5949811ebc35d7b06b3fa8dc5809a1f9c52751e1deb808400000000f843b8418e98ef756acdae1e510b1df4b507b7af04eb3802db7fa0f3e73e7d0721b3645e76f4eb3d0dbf0de75620c4405bd5a663247cdd9616482c883053856d857f884a01",
+          "gasLimit": 4700000,
+          "gasUsed": 0,
+          "hash": "0x0efe67972b982eb6be5df84e5238eb07475f86afa8a7de708f6a13ac0ff60d6c",
+          "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+          "nonce": "0x0000000000000000",
+          "number": 200,
+          "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "stateRoot": "0xd650578a04b39f50cc979155f4510ec28c2c0a7c1e5fdbf84609bc7b1c430f48",
+          "timestamp": "0x5cd109fb",
+          "totalDifficulty": "0xc9",
+          "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+        }
+      }
+    }
+    ```
 
 ### eth_getUncleByBlockNumberAndIndex
 
@@ -1063,9 +1102,9 @@ Returns uncle specified by block number and index.
 
 **Parameters**
 
-`quanity|tag` - Integer index of the block, or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../Pantheon-API/Using-JSON-RPC-API.md#block-parameter).
+`quantity|tag` - Index of the block, or one of the string tags `latest`, `earliest`, or `pending`, as described in [Block Parameter](../Pantheon-API/Using-JSON-RPC-API.md#block-parameter).
 
-`quanity` - Integer index of the uncle.
+`quantity` - Index of the uncle.
 
 **Returns**
 
@@ -1110,6 +1149,20 @@ Returns uncle specified by block number and index.
       }
     }
     ```
+    
+     ```bash tab="curl GraphQL request"
+     curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block(number:2587){ ommerAt(index: 0) {difficulty extraData gasLimit gasUsed hash logsBloom mixHash nonce number receiptsRoot stateRoot timestamp totalDifficulty transactionsRoot}}}"}' http://localhost:8547/graphql
+     ```
+                            
+     ```bash tab="GraphQL result"
+     {
+       "data" : {
+         "block" : {
+           "ommerAt" : null
+         }
+       }
+     }
+     ```
 
 ### eth_getUncleCountByBlockHash
 
