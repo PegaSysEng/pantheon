@@ -27,7 +27,7 @@ public class PantheonEventsImpl implements PantheonEvents {
   }
 
   @Override
-  public Object addNewBlockPropagatedLister(final NewBlockPropagatedListener listener) {
+  public Object addNewBlockPropagatedListener(final NewBlockPropagatedListener listener) {
     return blockBroadcaster.subscribePropagateNewBlocks(
         block -> dispatchNewBlockPropagatedMessage(block, listener));
   }

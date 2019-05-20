@@ -21,7 +21,7 @@ public interface PantheonEvents {
    * @param blockJSONListener The listener that will accept a JSON string as the event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  Object addNewBlockPropagatedLister(NewBlockPropagatedListener blockJSONListener);
+  Object addNewBlockPropagatedListener(NewBlockPropagatedListener blockJSONListener);
 
   /**
    * Remove the blockAdded listener from pantheon notifications.

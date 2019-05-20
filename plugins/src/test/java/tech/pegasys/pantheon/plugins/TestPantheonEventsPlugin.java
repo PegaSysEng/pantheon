@@ -44,7 +44,7 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
     subscriptionId =
         context
             .getService(PantheonEvents.class)
-            .map(events -> events.addNewBlockPropagatedLister(this::onBlockAnnounce));
+            .map(events -> events.addNewBlockPropagatedListener(this::onBlockAnnounce));
     LOG.info("Listening with ID#" + subscriptionId);
   }
 

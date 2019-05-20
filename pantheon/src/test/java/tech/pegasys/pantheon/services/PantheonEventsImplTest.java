@@ -53,7 +53,7 @@ public class PantheonEventsImplTest {
   @Test
   public void eventFiresAfterSubscribe() {
     final AtomicReference<String> result = new AtomicReference<>();
-    serviceImpl.addNewBlockPropagatedLister(result::set);
+    serviceImpl.addNewBlockPropagatedListener(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
@@ -64,7 +64,7 @@ public class PantheonEventsImplTest {
   @Test
   public void eventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<String> result = new AtomicReference<>();
-    final Object id = serviceImpl.addNewBlockPropagatedLister(result::set);
+    final Object id = serviceImpl.addNewBlockPropagatedListener(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
