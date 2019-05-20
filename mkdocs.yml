@@ -26,7 +26,7 @@ extra:
     url_contains: /latest/
     text: 'You are reading Pantheon development version documentation and
     some displayed features may not be available in the stable release.
-    You may switch to stable version to read the doc for our latest release.'
+    You can switch to stable version using the version box at screen bottom.'
   support:
     gitter: https://gitter.im/PegaSysEng/pantheon
     email: support@pegasys.tech
