@@ -43,6 +43,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.privacy.PrivateTransactionReceiptResult;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionStorage;
+import tech.pegasys.pantheon.ethereum.privacy.Restriction;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -91,13 +92,13 @@ public class EeaGetTransactionReceiptTest {
                       + "5820cb1d0935d14b589300b12fcd0ab849a7e9019c81da24d6"
                       + "daa4f6b2f003d1b0180029"))
           .sender(sender)
-          .chainId(2018)
+          .chainId(BigInteger.valueOf(2018))
           .privateFrom(
               BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)))
           .privateFor(
               Lists.newArrayList(
                   BytesValue.wrap("Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs=".getBytes(UTF_8))))
-          .restriction(BytesValue.wrap("restricted".getBytes(UTF_8)))
+          .restriction(Restriction.RESTRICTED)
           .signAndBuild(KEY_PAIR);
 
   private final Transaction transaction =

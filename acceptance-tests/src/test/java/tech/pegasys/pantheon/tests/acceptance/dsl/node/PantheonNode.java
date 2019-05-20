@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpRequestFac
 import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.AdminJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CustomNetJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EeaJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.IbftJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
@@ -96,6 +97,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private HttpRequestFactory httpRequestFactory;
   private boolean useWsForJsonRpc = false;
   private String token = null;
+  private final List<String> plugins = new ArrayList<>();
+  private final List<String> extraCLIOptions;
 
   public PantheonNode(
       final String name,
@@ -110,7 +113,9 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final GenesisConfigProvider genesisConfigProvider,
       final boolean p2pEnabled,
       final boolean discoveryEnabled,
-      final boolean bootnodeEligible)
+      final boolean bootnodeEligible,
+      final List<String> plugins,
+      final List<String> extraCLIOptions)
       throws IOException {
     this.bootnodeEligible = bootnodeEligible;
     this.homeDirectory = Files.createTempDirectory("acctest");
@@ -118,7 +123,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
         path -> {
           try {
             copyResource(path, homeDirectory.resolve("key"));
-          } catch (IOException e) {
+          } catch (final IOException e) {
             LOG.error("Could not find key file \"{}\" in resources", path);
           }
         });
@@ -135,10 +140,23 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     this.devMode = devMode;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
+    plugins.forEach(
+        pluginName -> {
+          try {
+            homeDirectory.resolve("plugins").toFile().mkdirs();
+            copyResource(
+                pluginName + ".jar", homeDirectory.resolve("plugins/" + pluginName + ".jar"));
+            PantheonNode.this.plugins.add(pluginName);
+          } catch (final IOException e) {
+            LOG.error("Could not find plugin \"{}\" in resources", pluginName);
+          }
+        });
+    this.extraCLIOptions = extraCLIOptions;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
-  private boolean isJsonRpcEnabled() {
+  @Override
+  public boolean isJsonRpcEnabled() {
     return jsonRpcConfiguration().isEnabled();
   }
 
@@ -213,7 +231,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public Optional<Integer> jsonRpcWebSocketPort() {
+  public Optional<Integer> getJsonRpcWebSocketPort() {
     if (isWebSocketsRpcEnabled()) {
       return Optional.of(Integer.valueOf(portsProperties.getProperty("ws-rpc")));
     } else {
@@ -222,7 +240,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public String hostName() {
+  public String getHostName() {
     return LOCALHOST;
   }
 
@@ -265,6 +283,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
               new PermissioningJsonRpcRequestFactory(web3jService),
               new AdminJsonRpcRequestFactory(web3jService),
               new EeaJsonRpcRequestFactory(web3jService),
+              new CustomNetJsonRpcRequestFactory(web3jService),
               websocketService);
     }
 
@@ -370,7 +389,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   @Override
   public void awaitPeerDiscovery(final Condition condition) {
-    if (jsonRpcEnabled()) {
+    if (this.isJsonRpcEnabled()) {
       verify(condition);
     }
   }
@@ -390,13 +409,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     return Util.publicKeyToAddress(keyPair.getPublicKey());
   }
 
-  Path homeDirectory() {
+  public Path homeDirectory() {
     return homeDirectory;
-  }
-
-  @Override
-  public boolean jsonRpcEnabled() {
-    return isJsonRpcEnabled();
   }
 
   JsonRpcConfiguration jsonRpcConfiguration() {
@@ -444,7 +458,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public List<URI> bootnodes() {
+  public List<URI> getBootnodes() {
     return unmodifiableList(bootnodes);
   }
 
@@ -459,7 +473,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public void bootnodes(final List<URI> bootnodes) {
+  public void getBootnodes(final List<URI> bootnodes) {
     this.bootnodes.clear();
     this.bootnodes.addAll(bootnodes);
   }
@@ -483,6 +497,15 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   Optional<PermissioningConfiguration> getPermissioningConfiguration() {
     return permissioningConfiguration;
+  }
+
+  public List<String> getPlugins() {
+    return plugins;
+  }
+
+  @Override
+  public List<String> getExtraCLIOptions() {
+    return extraCLIOptions;
   }
 
   @Override
@@ -516,7 +539,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public GenesisConfigProvider genesisConfigProvider() {
+  public GenesisConfigProvider getGenesisConfigProvider() {
     return genesisConfigProvider;
   }
 

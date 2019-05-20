@@ -60,13 +60,15 @@ public class PantheonNodeFactory {
         config.getGenesisConfigProvider(),
         config.isP2pEnabled(),
         config.isDiscoveryEnabled(),
-        config.isBootnodeEligible());
+        config.isBootnodeEligible(),
+        config.getPlugins(),
+        config.getExtraCLIOptions());
   }
 
   public PantheonNode createMinerNode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .miningEnabled()
             .jsonRpcEnabled()
             .webSocketEnabled()
@@ -78,10 +80,10 @@ public class PantheonNodeFactory {
       throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .miningEnabled()
             .jsonRpcEnabled()
-            .setKeyFilePath(keyFilePath)
+            .keyFilePath(keyFilePath)
             .enablePrivateTransactions(privacyParameters)
             .webSocketEnabled()
             .build());
@@ -92,9 +94,9 @@ public class PantheonNodeFactory {
       throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .jsonRpcEnabled()
-            .setKeyFilePath(keyFilePath)
+            .keyFilePath(keyFilePath)
             .enablePrivateTransactions(privacyParameters)
             .webSocketEnabled()
             .build());
@@ -103,7 +105,7 @@ public class PantheonNodeFactory {
   public PantheonNode createArchiveNode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
             .build());
@@ -112,7 +114,7 @@ public class PantheonNodeFactory {
   public Node createArchiveNodeThatMustNotBeTheBootnode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
             .bootnodeEligible(false)
@@ -123,10 +125,34 @@ public class PantheonNodeFactory {
       throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setJsonRpcConfiguration(jsonRpcConfigWithAdmin())
+            .name(name)
+            .jsonRpcConfiguration(jsonRpcConfigWithAdmin())
             .webSocketEnabled()
-            .setDiscoveryEnabled(false)
+            .discoveryEnabled(false)
+            .build());
+  }
+
+  public PantheonNode createArchiveNodeNetServicesEnabled(final String name) throws IOException {
+    // TODO: Enable metrics coverage in the acceptance tests. See PIE-1606
+    // final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    // metricsConfiguration.setEnabled(true);
+    // metricsConfiguration.setPort(0);
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .name(name)
+            // .setMetricsConfiguration(metricsConfiguration)
+            .jsonRpcConfiguration(jsonRpcConfigWithAdmin())
+            .webSocketEnabled()
+            .p2pEnabled(true)
+            .build());
+  }
+
+  public PantheonNode createArchiveNodeNetServicesDisabled(final String name) throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .name(name)
+            .jsonRpcConfiguration(jsonRpcConfigWithAdmin())
+            .p2pEnabled(false)
             .build());
   }
 
@@ -134,7 +160,7 @@ public class PantheonNodeFactory {
       throws IOException, URISyntaxException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .jsonRpcEnabled()
             .jsonRpcAuthenticationEnabled()
             .webSocketEnabled()
@@ -145,7 +171,7 @@ public class PantheonNodeFactory {
       throws IOException, URISyntaxException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .webSocketEnabled()
             .webSocketAuthenticationEnabled()
             .build());
@@ -154,23 +180,34 @@ public class PantheonNodeFactory {
   public PantheonNode createNodeWithP2pDisabled(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setP2pEnabled(false)
-            .setJsonRpcConfiguration(createJsonRpcEnabledConfig())
+            .name(name)
+            .p2pEnabled(false)
+            .jsonRpcConfiguration(createJsonRpcEnabledConfig())
             .build());
   }
 
   public PantheonNode createNodeWithP2pDisabledAndAdmin(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setP2pEnabled(false)
-            .setJsonRpcConfiguration(jsonRpcConfigWithAdmin())
+            .name(name)
+            .p2pEnabled(false)
+            .jsonRpcConfiguration(jsonRpcConfigWithAdmin())
             .build());
   }
 
   public PantheonNode createArchiveNodeWithRpcDisabled(final String name) throws IOException {
-    return create(new PantheonFactoryConfigurationBuilder().setName(name).build());
+    return create(new PantheonFactoryConfigurationBuilder().name(name).build());
+  }
+
+  public PantheonNode createPluginsNode(
+      final String name, final List<String> plugins, final List<String> extraCLIOptions)
+      throws IOException {
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .name(name)
+            .plugins(plugins)
+            .extraCLIOptions(extraCLIOptions)
+            .build());
   }
 
   public PantheonNode createArchiveNodeWithRpcApis(
@@ -182,38 +219,38 @@ public class PantheonNodeFactory {
 
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
-            .setJsonRpcConfiguration(jsonRpcConfig)
-            .setWebSocketConfiguration(webSocketConfig)
+            .name(name)
+            .jsonRpcConfiguration(jsonRpcConfig)
+            .webSocketConfiguration(webSocketConfig)
             .build());
   }
 
   public PantheonNode createNodeWithNoDiscovery(final String name) throws IOException {
     return create(
-        new PantheonFactoryConfigurationBuilder().setName(name).setDiscoveryEnabled(false).build());
+        new PantheonFactoryConfigurationBuilder().name(name).discoveryEnabled(false).build());
   }
 
   public PantheonNode createCliqueNode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(createJsonRpcConfigWithClique())
-            .setWebSocketConfiguration(createWebSocketEnabledConfig())
-            .setDevMode(false)
-            .setGenesisConfigProvider(this::createCliqueGenesisConfig)
+            .jsonRpcConfiguration(createJsonRpcConfigWithClique())
+            .webSocketConfiguration(createWebSocketEnabledConfig())
+            .devMode(false)
+            .genesisConfigProvider(this::createCliqueGenesisConfig)
             .build());
   }
 
   public PantheonNode createIbftNode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(createJsonRpcConfigWithIbft())
-            .setWebSocketConfiguration(createWebSocketEnabledConfig())
-            .setDevMode(false)
-            .setGenesisConfigProvider(this::createIbftGenesisConfig)
+            .jsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .webSocketConfiguration(createWebSocketEnabledConfig())
+            .devMode(false)
+            .genesisConfigProvider(this::createIbftGenesisConfig)
             .build());
   }
 
@@ -222,11 +259,11 @@ public class PantheonNodeFactory {
     final String genesisFile = readGenesisFile(genesisPath);
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
-            .setGenesisConfigProvider((a) -> Optional.of(genesisFile))
-            .setDevMode(false)
+            .genesisConfigProvider((a) -> Optional.of(genesisFile))
+            .devMode(false)
             .bootnodeEligible(canBeBootnode)
             .build());
   }
@@ -236,12 +273,12 @@ public class PantheonNodeFactory {
 
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(createJsonRpcConfigWithClique())
-            .setWebSocketConfiguration(createWebSocketEnabledConfig())
-            .setDevMode(false)
-            .setGenesisConfigProvider(
+            .jsonRpcConfiguration(createJsonRpcConfigWithClique())
+            .webSocketConfiguration(createWebSocketEnabledConfig())
+            .devMode(false)
+            .genesisConfigProvider(
                 nodes ->
                     createGenesisConfigForValidators(
                         asList(validators), nodes, this::createCliqueGenesisConfig))
@@ -253,12 +290,12 @@ public class PantheonNodeFactory {
 
     return create(
         new PantheonFactoryConfigurationBuilder()
-            .setName(name)
+            .name(name)
             .miningEnabled()
-            .setJsonRpcConfiguration(createJsonRpcConfigWithIbft())
-            .setWebSocketConfiguration(createWebSocketEnabledConfig())
-            .setDevMode(false)
-            .setGenesisConfigProvider(
+            .jsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .webSocketConfiguration(createWebSocketEnabledConfig())
+            .devMode(false)
+            .genesisConfigProvider(
                 nodes ->
                     createGenesisConfigForValidators(
                         asList(validators), nodes, this::createIbftGenesisConfig))

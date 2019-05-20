@@ -26,7 +26,9 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.GenesisConfigProvider;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class PantheonFactoryConfigurationBuilder {
@@ -45,13 +47,15 @@ public class PantheonFactoryConfigurationBuilder {
   private Boolean p2pEnabled = true;
   private boolean discoveryEnabled = true;
   private boolean bootnodeEligible = true;
+  private List<String> plugins = new ArrayList<>();
+  private List<String> extraCLIOptions = new ArrayList<>();
 
-  public PantheonFactoryConfigurationBuilder setName(final String name) {
+  public PantheonFactoryConfigurationBuilder name(final String name) {
     this.name = name;
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setMiningParameters(
+  public PantheonFactoryConfigurationBuilder miningParameters(
       final MiningParameters miningParameters) {
     this.miningParameters = miningParameters;
     return this;
@@ -62,7 +66,7 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setJsonRpcConfiguration(
+  public PantheonFactoryConfigurationBuilder jsonRpcConfiguration(
       final JsonRpcConfiguration jsonRpcConfiguration) {
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     return this;
@@ -97,13 +101,13 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setWebSocketConfiguration(
+  public PantheonFactoryConfigurationBuilder webSocketConfiguration(
       final WebSocketConfiguration webSocketConfiguration) {
     this.webSocketConfiguration = webSocketConfiguration;
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setMetricsConfiguration(
+  public PantheonFactoryConfigurationBuilder metricsConfiguration(
       final MetricsConfiguration metricsConfiguration) {
     this.metricsConfiguration = metricsConfiguration;
     return this;
@@ -137,35 +141,47 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setPermissioningConfiguration(
+  public PantheonFactoryConfigurationBuilder permissioningConfiguration(
       final PermissioningConfiguration permissioningConfiguration) {
     this.permissioningConfiguration = Optional.of(permissioningConfiguration);
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setKeyFilePath(final String keyFilePath) {
+  public PantheonFactoryConfigurationBuilder keyFilePath(final String keyFilePath) {
     this.keyFilePath = Optional.of(keyFilePath);
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setDevMode(final boolean devMode) {
+  public PantheonFactoryConfigurationBuilder devMode(final boolean devMode) {
     this.devMode = devMode;
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setGenesisConfigProvider(
+  public PantheonFactoryConfigurationBuilder genesisConfigProvider(
       final GenesisConfigProvider genesisConfigProvider) {
     this.genesisConfigProvider = genesisConfigProvider;
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setP2pEnabled(final Boolean p2pEnabled) {
+  public PantheonFactoryConfigurationBuilder p2pEnabled(final Boolean p2pEnabled) {
     this.p2pEnabled = p2pEnabled;
     return this;
   }
 
-  public PantheonFactoryConfigurationBuilder setDiscoveryEnabled(final boolean discoveryEnabled) {
+  public PantheonFactoryConfigurationBuilder discoveryEnabled(final boolean discoveryEnabled) {
     this.discoveryEnabled = discoveryEnabled;
+    return this;
+  }
+
+  public PantheonFactoryConfigurationBuilder plugins(final List<String> plugins) {
+    this.plugins.clear();
+    this.plugins.addAll(plugins);
+    return this;
+  }
+
+  public PantheonFactoryConfigurationBuilder extraCLIOptions(final List<String> extraCLIOptions) {
+    this.extraCLIOptions.clear();
+    this.extraCLIOptions.addAll(extraCLIOptions);
     return this;
   }
 
@@ -183,6 +199,8 @@ public class PantheonFactoryConfigurationBuilder {
         genesisConfigProvider,
         p2pEnabled,
         discoveryEnabled,
-        bootnodeEligible);
+        bootnodeEligible,
+        plugins,
+        extraCLIOptions);
   }
 }

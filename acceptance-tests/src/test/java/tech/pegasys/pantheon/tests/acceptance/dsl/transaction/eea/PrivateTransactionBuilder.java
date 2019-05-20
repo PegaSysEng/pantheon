@@ -12,15 +12,15 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
+import tech.pegasys.pantheon.ethereum.privacy.Restriction;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public class PrivateTransactionBuilder {
@@ -124,10 +124,10 @@ public class PrivateTransactionBuilder {
                       .value(Wei.ZERO)
                       .payload(payload)
                       .sender(from)
-                      .chainId(2018)
+                      .chainId(BigInteger.valueOf(2018))
                       .privateFrom(privateFrom)
                       .privateFor(privateFor)
-                      .restriction(BytesValue.wrap("restricted".getBytes(UTF_8)))
+                      .restriction(Restriction.RESTRICTED)
                       .signAndBuild(keyPair)
                   ::writeTo)
           .toString();

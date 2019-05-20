@@ -19,6 +19,9 @@ copyright: Pantheon and its documentation are licensed under Apache 2.0 license 
 
 #extra project info and template customisation
 extra:
+  versions:
+    pantheon_stable: &pantheon_stable_version 1.1.0
+    quickstart: *pantheon_stable_version
   support:
     gitter: https://gitter.im/PegaSysEng/pantheon
     email: support@pegasys.tech
@@ -62,8 +65,9 @@ nav:
     - Pantheon API:
         - Overview: Pantheon-API/Pantheon-API.md
         - JSON-RPC over HTTP or WebSockets: Pantheon-API/Using-JSON-RPC-API.md
-        - Authentication: Pantheon-API/Authentication.md
         - RPC Pub/Sub over WebSockets: Pantheon-API/RPC-PubSub.md
+        - GraphQL over HTTP: Pantheon-API/GraphQL.md
+        - Authentication: Pantheon-API/Authentication.md
     - Configuring Pantheon:
         - Network vs Node Configuration: Configuring-Pantheon/Network-vs-Node.md
         - Configuration File: Configuring-Pantheon/Using-Configuration-File.md
@@ -148,3 +152,4 @@ markdown_extensions:
 
 plugins:
     - search
+    - markdownextradata
