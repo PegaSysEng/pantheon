@@ -556,9 +556,9 @@ None
     
     ```json tab="JSON result"
     {
-      "jsonrpc" : "2.0",
-      "id" : 1,
-      "result" : 63
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": "0x3f"
     }
     ```
     
@@ -1206,7 +1206,7 @@ Returns the number of uncles in a block from a block matching the given block ha
       }
     }
     ```
-        
+    
 ### eth_getUncleCountByBlockNumber
 
 Returns the number of uncles in a block matching the specified block number.
