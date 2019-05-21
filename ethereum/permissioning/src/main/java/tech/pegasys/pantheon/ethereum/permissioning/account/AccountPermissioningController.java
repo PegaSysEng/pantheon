@@ -6,7 +6,6 @@ import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPerm
 
 public class AccountPermissioningController {
 
-  //TODO should we rename the classes?
   private final AccountLocalConfigPermissioningController accountLocalConfigPermissioningController;
   private final TransactionSmartContractPermissioningController transactionSmartContractPermissioningController;
 
@@ -17,13 +16,13 @@ public class AccountPermissioningController {
     this.transactionSmartContractPermissioningController = transactionSmartContractPermissioningController;
   }
 
-  boolean isPermittedGlobally(final Transaction transaction) {
-    return accountLocalConfigPermissioningController.isPermitted(transaction)
-        && transactionSmartContractPermissioningController.isPermitted(transaction);
-  }
-
-  boolean isPermittedOnChainOnly(final Transaction transaction) {
-    return transactionSmartContractPermissioningController.isPermitted(transaction);
+  public boolean isPermitted(final Transaction transaction, final boolean includeOnChainCheck) {
+    if (includeOnChainCheck) {
+      return accountLocalConfigPermissioningController.isPermitted(transaction)
+          && transactionSmartContractPermissioningController.isPermitted(transaction);
+    } else {
+      return accountLocalConfigPermissioningController.isPermitted(transaction);
+    }
   }
 
 }

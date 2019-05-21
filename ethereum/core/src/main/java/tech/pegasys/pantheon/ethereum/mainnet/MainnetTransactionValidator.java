@@ -23,7 +23,6 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Account;
-import tech.pegasys.pantheon.ethereum.core.AccountFilter;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
@@ -47,8 +46,7 @@ public class MainnetTransactionValidator implements TransactionValidator {
 
   private final Optional<BigInteger> chainId;
 
-  private Optional<TransactionFilter> onChainAccountFilter = Optional.empty();
-  private Optional<TransactionFilter> globalAccountFilter = Optional.empty();
+  private Optional<TransactionFilter> transactionFilter = Optional.empty();
 
   public MainnetTransactionValidator(
       final GasCalculator gasCalculator,
@@ -80,11 +78,8 @@ public class MainnetTransactionValidator implements TransactionValidator {
   }
 
   @Override
-  public ValidationResult<TransactionInvalidReason> validateForSender(
-      final Transaction transaction, final Account sender, final boolean allowFutureNonce) {
-
-    //TODO add flag to use the proper account permissioning check
-
+  public ValidationResult<TransactionInvalidReason> validateForSender(final Transaction transaction,
+      final Account sender, final TransactionValidationParams validationParams) {
     Wei senderBalance = Account.DEFAULT_BALANCE;
     long senderNonce = Account.DEFAULT_NONCE;
 
@@ -109,7 +104,7 @@ public class MainnetTransactionValidator implements TransactionValidator {
               transaction.getNonce(), senderNonce));
     }
 
-    if (!allowFutureNonce && senderNonce != transaction.getNonce()) {
+    if (!validationParams.isAllowFutureNonce() && senderNonce != transaction.getNonce()) {
       return ValidationResult.invalid(
           INCORRECT_NONCE,
           String.format(
@@ -117,8 +112,7 @@ public class MainnetTransactionValidator implements TransactionValidator {
               transaction.getNonce(), senderNonce));
     }
 
-    //TODO remove allowFutureNonce and use proper flag
-    if (!isSenderAllowed(transaction, allowFutureNonce)) {
+    if (!isSenderAllowed(transaction, validationParams.isStateChange())) {
       return ValidationResult.invalid(TX_SENDER_NOT_AUTHORIZED,
           String.format("Sender %s is not on the Account Whitelist", transaction.getSender()));
     }
@@ -165,21 +159,11 @@ public class MainnetTransactionValidator implements TransactionValidator {
     return ValidationResult.valid();
   }
 
-  private boolean isSenderAllowed(final Transaction transaction, final boolean blockValidation) {
-    if (blockValidation) {
-      return onChainAccountFilter.map(c -> !c.permitted(transaction)).orElse(true);
-    } else {
-      return globalAccountFilter.map(c -> !c.permitted(transaction)).orElse(true);
-    }
+  private boolean isSenderAllowed(final Transaction transaction, final boolean isStateChange) {
+    return transactionFilter.map(c -> !c.permitted(transaction, isStateChange)).orElse(true);
   }
 
-  public void setOnChainAccountFilter(
-      final Optional<TransactionFilter> onChainAccountFilter) {
-    this.onChainAccountFilter = onChainAccountFilter;
-  }
-
-  public void setGlobalAccountFilter(
-      final Optional<TransactionFilter> globalAccountFilter) {
-    this.globalAccountFilter = globalAccountFilter;
+  public void setTransactionFilter(final TransactionFilter transactionFilter) {
+    this.transactionFilter = Optional.of(transactionFilter);
   }
 }
