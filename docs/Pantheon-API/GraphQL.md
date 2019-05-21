@@ -34,7 +34,7 @@ queries and mutations. GraphiQL also provides access the Pantheon GraphQL schema
 The Pending query is supported for `transactionCount` and `transactions`. 
 
 !!! important 
-    Pantheon doesn't execute pending transactions so result from `account`, `call`, and `estimateGas` for the Pending query
+    Pantheon doesn't execute pending transactions so result from `account`, `call`, and `estimateGas` for Pending
     do not reflect pending transactions. 
 
 !!! example
@@ -53,7 +53,7 @@ The Pending query is supported for `transactionCount` and `transactions`.
     ```
     
 !!! example
-    ```bash tab="Pending Transaction Count"
+    ```bash tab="Pending Transactions"
     curl -X POST -H "Content-Type: application/json" --data '{ "query": "{pending {transactions{hash}}}"}' http://localhost:8547/graphql
     ```
         
