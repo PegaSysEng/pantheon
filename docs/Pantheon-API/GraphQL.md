@@ -36,8 +36,37 @@ The Pending query is supported for `transactionCount` and `transactions`.
 !!! important 
     Pantheon doesn't execute pending transactions so result from `account`, `call`, and `estimateGas` for the Pending query
     do not reflect pending transactions. 
+
+!!! example
+    ```bash tab="Pending Transaction Count"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{pending {transactionCount}}"}' http://localhost:8547/graphql
+    ```
     
-!!! example "Transaction Count "
-
-
- 
+    ```bash tab="Result"
+    {
+      "data" : {
+        "pending" : {
+          "transactionCount" : 2
+        }
+      }
+    }
+    ```
+    
+!!! example
+    ```bash tab="Pending Transaction Count"
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{pending {transactions{hash}}}"}' http://localhost:8547/graphql
+    ```
+        
+    ```bash tab="Result"
+    {
+      "data" : {
+        "pending" : {
+          "transactions" : [ {
+            "hash" : "0xbb3ab8e2113a4afdde9753782cb0680408c0d5b982572dda117a4c72fafbf3fa"
+          }, {
+            "hash" : "0xf6bd6b1bccf765024bd482a71c6855428e2903895982090ab5dbb0feda717af6"
+          } ]
+        }
+      }
+    }
+    ``` 
