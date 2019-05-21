@@ -208,7 +208,7 @@ public class AccountLocalConfigPermissioningController implements TransactionPer
 
   @Override
   public boolean isPermitted(final Transaction transaction) {
-    //TODO implement tests
+    // TODO implement tests
     final Address sender = transaction.getSender();
     if (sender == null) {
       return false;

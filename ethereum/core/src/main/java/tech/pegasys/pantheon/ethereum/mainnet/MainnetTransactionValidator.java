@@ -78,8 +78,10 @@ public class MainnetTransactionValidator implements TransactionValidator {
   }
 
   @Override
-  public ValidationResult<TransactionInvalidReason> validateForSender(final Transaction transaction,
-      final Account sender, final TransactionValidationParams validationParams) {
+  public ValidationResult<TransactionInvalidReason> validateForSender(
+      final Transaction transaction,
+      final Account sender,
+      final TransactionValidationParams validationParams) {
     Wei senderBalance = Account.DEFAULT_BALANCE;
     long senderNonce = Account.DEFAULT_NONCE;
 
@@ -113,7 +115,8 @@ public class MainnetTransactionValidator implements TransactionValidator {
     }
 
     if (!isSenderAllowed(transaction, validationParams.isStateChange())) {
-      return ValidationResult.invalid(TX_SENDER_NOT_AUTHORIZED,
+      return ValidationResult.invalid(
+          TX_SENDER_NOT_AUTHORIZED,
           String.format("Sender %s is not on the Account Whitelist", transaction.getSender()));
     }
 

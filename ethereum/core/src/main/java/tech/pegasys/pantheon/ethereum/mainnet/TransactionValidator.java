@@ -46,9 +46,8 @@ public interface TransactionValidator {
    */
   default ValidationResult<TransactionInvalidReason> validateForSender(
       Transaction transaction, Account sender, boolean allowFutureNonce) {
-    final TransactionValidationParams validationParams = new TransactionValidationParams.Builder()
-        .allowFutureNonce(allowFutureNonce)
-        .build();
+    final TransactionValidationParams validationParams =
+        new TransactionValidationParams.Builder().allowFutureNonce(allowFutureNonce).build();
     return validateForSender(transaction, sender, validationParams);
   }
 

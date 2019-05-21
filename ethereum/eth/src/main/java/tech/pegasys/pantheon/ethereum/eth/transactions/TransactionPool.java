@@ -178,10 +178,8 @@ public class TransactionPool implements BlockAddedObserver {
               transaction.getGasLimit(), chainHeadBlockHeader.getGasLimit()));
     }
 
-    final TransactionValidationParams validationParams = new TransactionValidationParams.Builder()
-        .allowFutureNonce(true)
-        .stateChange(false)
-        .build();
+    final TransactionValidationParams validationParams =
+        new TransactionValidationParams.Builder().allowFutureNonce(true).stateChange(false).build();
 
     return protocolContext
         .getWorldStateArchive()
