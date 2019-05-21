@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer.SyncStatusListener;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.ArrayList;
@@ -58,7 +59,8 @@ public class SyncStatusNodePermissioningProviderTest {
     when(synchronizer.observeSyncStatus(captor.capture())).thenReturn(syncStatusObserverId);
     bootnodes.add(bootnode);
 
-    this.provider = new SyncStatusNodePermissioningProvider(synchronizer, bootnodes);
+    this.provider =
+        new SyncStatusNodePermissioningProvider(synchronizer, bootnodes, new NoOpMetricsSystem());
     this.syncStatusListener = captor.getValue();
 
     verify(synchronizer).observeSyncStatus(any());

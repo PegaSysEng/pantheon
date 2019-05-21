@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvid
 import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -62,7 +63,9 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
    * @param transactionSimulator A transaction simulator with attached blockchain and world state
    */
   public NodeSmartContractPermissioningController(
-      final Address contractAddress, final TransactionSimulator transactionSimulator) {
+      final Address contractAddress,
+      final TransactionSimulator transactionSimulator,
+      final MetricsSystem metricsSystem) {
     this.contractAddress = contractAddress;
     this.transactionSimulator = transactionSimulator;
   }

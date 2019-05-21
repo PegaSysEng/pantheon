@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.IOException;
@@ -53,7 +54,8 @@ public class NodeSmartContractPermissioningControllerTest {
         new TransactionSimulator(blockchain, worldArchive, protocolSchedule);
     final Address contractAddress = Address.fromHexString(contractAddressString);
 
-    return new NodeSmartContractPermissioningController(contractAddress, ts);
+    return new NodeSmartContractPermissioningController(
+        contractAddress, ts, new NoOpMetricsSystem());
   }
 
   @Test
