@@ -7,11 +7,11 @@ Network configuration items are specified in the genesis file.
  
 | Item                | Description                                                                                                                              |
 |---------------------|-:----------------------------------------------------------------------------------------------------------------------------------------|
-| Chain ID            | [Chain ID for the network](NeworkID-And-ChainID.md)                                                                                      |
+| Chain ID            | [Chain ID for the network](NetworkID-And-ChainID.md)                                                                                      |
 | Milestone blocks    | [Milestone blocks for the network](#milestone-blocks)                                                                                    |
-| `ethash`            | Specifies network uses [Ethash](../Consesus-Protocols/Overview-Consensus.md) and contains [`fixeddifficulty`](#Fixed Difficulty)         |
-| `clique`            | Specifies network uses [Clique] and contains [Clique configuration items](../Consensus-Protocols/Clique.md)                              |
-| `ibft2`             | Specifies network uses [IBFT 2.0] and contains [IBFT 2.0 configuration items](../Consensus-Protocols/IBFT.md)                            |
+| `ethash`            | Specifies network uses [Ethash](../Consensus-Protocols/Overview-Consensus.md) and contains [`fixeddifficulty`](#Fixed Difficulty)         |
+| `clique`            | Specifies network uses [Clique](../Consensus-Protocols/Clique.md) and contains [Clique configuration items](../Consensus-Protocols/Clique.md#genesis-file)                              |
+| `ibft2`             | Specifies network uses [IBFT 2.0](../Consensus-Protocols/IBFT.md) and contains [IBFT 2.0 configuration items](../Consensus-Protocols/IBFT.md#genesis-file)                            |
 | `contractSizeLimit` | Maximum contract size in bytes. Specify in [free gas networks](FreeGas.md). Default is `24576` and the maximum size is `2147483647`.     |
 | `evmStackSize`      | Maximum stack size. Specify to increase the maximum stack size in private networks with very complex smart contracts. Default is `1024`. |
 
