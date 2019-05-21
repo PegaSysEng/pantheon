@@ -208,6 +208,7 @@ Use the `newPendingTransactions` parameter with `eth_subscribe` to be notified o
 added to the transaction pool for the node. 
 
 The pending transactions subscription returns the transaction hashes or transaction details of the pending transactions. 
+If the `includeTransactions` parameter is not included, the default is transaction hashes only. 
 
 If a chain reorganization occurs, transactions are resubmitted to be included in the new canonical chain. 
 This means the subscription can publish notifications for the same pending transaction more than once.
