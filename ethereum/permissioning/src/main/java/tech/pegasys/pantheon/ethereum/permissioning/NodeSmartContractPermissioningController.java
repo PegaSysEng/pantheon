@@ -20,6 +20,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvid
 import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
@@ -41,6 +43,9 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
       "connectionAllowed(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)";
   // hashed function signature for connection allowed call
   private static final BytesValue FUNCTION_SIGNATURE_HASH = hashSignature(FUNCTION_SIGNATURE);
+  private final Counter checkCounter;
+  private final Counter checkCounterPermitted;
+  private final Counter checkCounterUnpermitted;
 
   // The first 4 bytes of the hash of the full textual signature of the function is used in
   // contract calls to determine the function being called
@@ -68,6 +73,22 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
       final MetricsSystem metricsSystem) {
     this.contractAddress = contractAddress;
     this.transactionSimulator = transactionSimulator;
+
+    this.checkCounter =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "node_smart_contract_check_count",
+            "Number of times the sync status permissioning provider has been checked");
+    this.checkCounterPermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "node_smart_contract_check_count_permitted",
+            "Number of times the sync status permissioning provider has been checked and returned permitted");
+    this.checkCounterUnpermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "node_smart_contract_check_count_unpermitted",
+            "Number of times the sync status permissioning provider has been checked and returned unpermitted");
   }
 
   /**
@@ -79,6 +100,7 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
    */
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
+    this.checkCounter.inc();
     final BytesValue payload = createPayload(sourceEnode, destinationEnode);
     final CallParameter callParams =
         new CallParameter(null, contractAddress, -1, null, null, payload);
@@ -104,7 +126,13 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
       }
     }
 
-    return result.map(r -> checkTransactionResult(r.getOutput())).orElse(false);
+    if (result.map(r -> checkTransactionResult(r.getOutput())).orElse(false)) {
+      this.checkCounterPermitted.inc();
+      return true;
+    } else {
+      this.checkCounterUnpermitted.inc();
+      return false;
+    }
   }
 
   // Checks the returned bytes from the permissioning contract call to see if it's a value we

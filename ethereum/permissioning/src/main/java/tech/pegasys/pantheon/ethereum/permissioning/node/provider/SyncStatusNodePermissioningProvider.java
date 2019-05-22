@@ -48,23 +48,23 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
 
     metricsSystem.createIntegerGauge(
         MetricCategory.PERMISSIONING,
-        "sync_status_sync_reached",
+        "sync_status_node_sync_reached",
         "Whether the sync status permissioning provider has realised sync yet",
         () -> hasReachedSync ? 0 : 1);
     this.checkCounter =
         metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,
-            "sync_status_check_count",
+            "sync_status_node_check_count",
             "Number of times the sync status permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,
-            "sync_status_check_count_permitted",
+            "sync_status_node_check_count_permitted",
             "Number of times the sync status permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,
-            "sync_status_check_count_unpermitted",
+            "sync_status_node_check_count_unpermitted",
             "Number of times the sync status permissioning provider has been checked and returned unpermitted");
   }
 
