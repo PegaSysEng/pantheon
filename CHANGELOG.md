@@ -18,6 +18,7 @@
 
 ### Technical Improvements 
 
+- Create MaintainedPeers class [\#1484](https://github.com/PegaSysEng/pantheon/pull/1484) 
 - Fix for permissioned network with single bootnode [\#1479](https://github.com/PegaSysEng/pantheon/pull/1479) 
 - Have ThreadPantheonNodeRunner support plugin tests [\#1477](https://github.com/PegaSysEng/pantheon/pull/1477) 
 - Less pointless plugins errors [\#1473](https://github.com/PegaSysEng/pantheon/pull/1473) 
