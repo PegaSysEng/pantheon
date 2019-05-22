@@ -45,10 +45,10 @@ require greater than or equal to 2/3 of validators to be operating to create blo
 * 4-5, 1 unresponsive node is tolerated 
 * 6-8, 2 unresponsive nodes are tolerated 
 
+Networks with 3 or less validators are able to produce blocks but do not guarantee finality when operating 
+in adversarial environments.
+
 !!! important 
-    An IBFT 2.0 network with 3 validators can tolerate one unresponsive node (that is, continue to produce blocks)
-    but cannot tolerate any Byzantine nodes (that is, forks can occur with one Byzantine node). 
-    
     We recommend not using IBFT 2.0 networks with 3 nodes for production purposes.  
 
 ### Speed 
