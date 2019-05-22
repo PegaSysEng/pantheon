@@ -14,6 +14,9 @@ package tech.pegasys.pantheon.ethereum.p2p.network;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -28,6 +31,8 @@ import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.network.exceptions.IncompatiblePeerException;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
+import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions.Action;
 import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissionsBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
@@ -120,17 +125,18 @@ public class P2PNetworkTest {
       final BytesValue listenId = listenerEnode.getNodeId();
       final int listenPort = listenerEnode.getListeningPort().getAsInt();
 
-      assertThat(
-              connector
-                  .connect(createPeer(listenId, listenPort))
-                  .get(30L, TimeUnit.SECONDS)
-                  .getPeerInfo()
-                  .getNodeId())
-          .isEqualTo(listenId);
-      final CompletableFuture<PeerConnection> secondConnectionFuture =
+      final CompletableFuture<PeerConnection> firstFuture =
           connector.connect(createPeer(listenId, listenPort));
-      assertThatThrownBy(secondConnectionFuture::get)
-          .hasCause(new IllegalStateException("Client already connected"));
+      final CompletableFuture<PeerConnection> secondFuture =
+          connector.connect(createPeer(listenId, listenPort));
+
+      final PeerConnection firstConnection = firstFuture.get(30L, TimeUnit.SECONDS);
+      final PeerConnection secondConnection = secondFuture.get(30L, TimeUnit.SECONDS);
+      assertThat(firstConnection.getPeerInfo().getNodeId()).isEqualTo(listenId);
+
+      // Connections should reference the same instance - i.e. we shouldn't create 2 distinct
+      // connections
+      assertThat(firstConnection == secondConnection).isTrue();
     }
   }
 
@@ -314,6 +320,49 @@ public class P2PNetworkTest {
       final CompletableFuture<PeerConnection> connectFuture = remoteNetwork.connect(localPeer);
 
       // Check connection is made, and then a disconnect is registered at remote
+      assertThat(connectFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
+          .isEqualTo(localId);
+      assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId()).isEqualTo(localId);
+      assertThat(reasonFuture.get(5L, TimeUnit.SECONDS))
+          .isEqualByComparingTo(DisconnectReason.UNKNOWN);
+    }
+  }
+
+  @Test
+  public void rejectIncomingConnectionFromDisallowedPeer() throws Exception {
+    final PeerPermissions peerPermissions = mock(PeerPermissions.class);
+    when(peerPermissions.isPermitted(any(), any(), any())).thenReturn(true);
+
+    try (final P2PNetwork localNetwork =
+            builder().peerPermissions(peerPermissions).blockchain(blockchain).build();
+        final P2PNetwork remoteNetwork = builder().build()) {
+
+      localNetwork.start();
+      remoteNetwork.start();
+
+      final EnodeURL localEnode = localNetwork.getLocalEnode().get();
+      final Peer localPeer = DefaultPeer.fromEnodeURL(localEnode);
+      final Peer remotePeer = DefaultPeer.fromEnodeURL(remoteNetwork.getLocalEnode().get());
+
+      // Deny incoming connection permissions for remotePeer
+      when(peerPermissions.isPermitted(
+              eq(localPeer), eq(remotePeer), eq(Action.RLPX_ALLOW_NEW_INBOUND_CONNECTION)))
+          .thenReturn(false);
+
+      // Setup disconnect listener
+      final CompletableFuture<PeerConnection> peerFuture = new CompletableFuture<>();
+      final CompletableFuture<DisconnectReason> reasonFuture = new CompletableFuture<>();
+      remoteNetwork.subscribeDisconnect(
+          (peerConnection, reason, initiatedByPeer) -> {
+            peerFuture.complete(peerConnection);
+            reasonFuture.complete(reason);
+          });
+
+      // Remote connect to local
+      final CompletableFuture<PeerConnection> connectFuture = remoteNetwork.connect(localPeer);
+
+      // Check connection is made, and then a disconnect is registered at remote
+      final BytesValue localId = localEnode.getNodeId();
       assertThat(connectFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
           .isEqualTo(localId);
       assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId()).isEqualTo(localId);
