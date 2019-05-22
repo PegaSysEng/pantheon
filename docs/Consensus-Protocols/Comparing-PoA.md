@@ -34,19 +34,22 @@ Clique does not have immediate finality. Implementations using Clique must be aw
 
 IBFT 2.0 requires 4 validators to be Byzantine fault tolerant. 
 
+Clique can operate with a single validator but operating with a single validator offers no redundancy if
+the validator fails. 
+
 ### Liveness 
 
 Clique is more fault tolerant than IBFT 2.0. Clique tolerates up to half to the validators failing. IBFT 2.0 networks 
 require greater than or equal to 2/3 of validators to be operating to create blocks. For example, in an IBFT 2.0 network of:
 
-* 4-5, 1 bad node is tolerated 
-* 6-9, 2 bad nodes are tolerated 
+* 4-5, 1 unresponsive node is tolerated 
+* 6-8, 2 unresponsive nodes are tolerated 
 
 !!! important 
-    An IBFT 2.0 network with 3 validators can tolerate one bad node (that is, continue to produce blocks)
-    but is not Byzantine fault tolerant. 
+    An IBFT 2.0 network with 3 validators can tolerate one unresponsive node (that is, continue to produce blocks)
+    but cannot tolerate any Byzantine nodes (that is, forks can occur with one Byzantine node). 
     
-    We do not recommend using IBFT 2.0 networks with 3 nodes for production purposes.  
+    We recommend not using IBFT 2.0 networks with 3 nodes for production purposes.  
 
 ### Speed 
 
