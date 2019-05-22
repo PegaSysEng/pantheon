@@ -1031,7 +1031,7 @@ Maximum number of transactions kept in the transaction pool. Default is 4096.
 tx-pool-retention-hours="5"
 ```
 
-Maximum period to retain pending transactions in hours. Default is 13. 
+Maximum period in hours to retain pending transactions in the transaction pool. Default is 13. 
 
 ### help
 
