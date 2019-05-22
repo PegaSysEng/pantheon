@@ -22,6 +22,11 @@ extra:
   versions:
     pantheon_stable: &pantheon_stable_version 1.1.0
     quickstart: *pantheon_stable_version
+  latest_version_warning:
+    url_contains: /latest/
+    text: 'You are reading Pantheon development version documentation and
+    some displayed features may not be available in the stable release.
+    You can switch to stable version using the version box at screen bottom.'
   support:
     gitter: https://gitter.im/PegaSysEng/pantheon
     email: support@pegasys.tech
@@ -71,6 +76,7 @@ nav:
     - Configuring Pantheon:
         - Network vs Node Configuration: Configuring-Pantheon/Network-vs-Node.md
         - Configuration File: Configuring-Pantheon/Using-Configuration-File.md
+        - Configuration Items in Genesis File: Configuring-Pantheon/Config-Items.md
         - Network ID and Chain ID: Configuring-Pantheon/NetworkID-And-ChainID.md
         - Free Gas Networks: Configuring-Pantheon/FreeGas.md
         - Contracts in Genesis: Configuring-Pantheon/Contracts-in-Genesis.md
