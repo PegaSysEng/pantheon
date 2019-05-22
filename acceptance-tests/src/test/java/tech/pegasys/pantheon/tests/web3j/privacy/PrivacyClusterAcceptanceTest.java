@@ -29,7 +29,7 @@ import org.junit.Test;
 public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
   private static final String CONTRACT_NAME = "Event Emmiter";
 
-  private EventEmmiterHarness eventEmmiterHarness;
+  private EventEmitterHarness eventEmitterHarness;
   private PrivacyNet privacyNet;
 
   @Before
@@ -41,8 +41,8 @@ public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
             .addMinerNode("Charlie")
             .build();
     privacyNet.startPrivacyNet();
-    eventEmmiterHarness =
-        new EventEmmiterHarness(
+    eventEmitterHarness =
+        new EventEmitterHarness(
             privateTransactionBuilder,
             privacyNet,
             privateTransactions,
@@ -52,31 +52,31 @@ public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
 
   @Test
   public void node2CanSeeContract() {
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
   }
 
   @Test
   public void node2CanExecuteContract() {
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
-    eventEmmiterHarness.store(CONTRACT_NAME, "Bob", "Alice");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
+    eventEmitterHarness.store(CONTRACT_NAME, "Bob", "Alice");
   }
 
   @Test
   public void node2CanSeePrivateTransactionReceipt() {
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
-    eventEmmiterHarness.store(CONTRACT_NAME, "Bob", "Alice");
-    eventEmmiterHarness.get(CONTRACT_NAME, "Bob", "Alice");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
+    eventEmitterHarness.store(CONTRACT_NAME, "Bob", "Alice");
+    eventEmitterHarness.get(CONTRACT_NAME, "Bob", "Alice");
   }
 
   @Test(expected = RuntimeException.class)
   public void node2ExpectError() {
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
 
     String invalidStoreValueFromNode2 =
         PrivateTransactionBuilder.builder()
             .nonce(0)
             .from(privacyNet.getPantheon("Bob").getAddress())
-            .to(Address.fromHexString(eventEmmiterHarness.resolveContractAddress(CONTRACT_NAME)))
+            .to(Address.fromHexString(eventEmitterHarness.resolveContractAddress(CONTRACT_NAME)))
             .privateFrom(
                 BytesValue.wrap(
                     privacyNet
@@ -99,32 +99,32 @@ public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
   @Test
   public void node1CanDeployMultipleTimes() {
 
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
-    eventEmmiterHarness.store(CONTRACT_NAME, "Bob", "Alice");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice", "Bob");
+    eventEmitterHarness.store(CONTRACT_NAME, "Bob", "Alice");
 
     final String secondContract = "Event Emitter 2";
 
-    eventEmmiterHarness.deploy(secondContract, "Alice", "Bob");
-    eventEmmiterHarness.store(secondContract, "Bob", "Alice");
+    eventEmitterHarness.deploy(secondContract, "Alice", "Bob");
+    eventEmitterHarness.store(secondContract, "Bob", "Alice");
   }
 
   @Test
   public void node1CanInteractWithMultiplePrivacyGroups() {
 
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice", "Bob", "Charlie");
-    eventEmmiterHarness.store(CONTRACT_NAME, "Alice", "Bob", "Charlie");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice", "Bob", "Charlie");
+    eventEmitterHarness.store(CONTRACT_NAME, "Alice", "Bob", "Charlie");
 
     final String secondContract = "Event Emitter 2";
 
-    eventEmmiterHarness.store(
+    eventEmitterHarness.store(
         secondContract,
         privateTransactionVerifier.noValidEventReturned(),
         privateTransactionVerifier.noValidEventReturned(),
         "Alice",
         "Bob");
-    eventEmmiterHarness.deploy(secondContract, "Alice", "Bob");
-    eventEmmiterHarness.store(secondContract, "Alice", "Bob");
-    eventEmmiterHarness.get(secondContract, "Alice", "Bob");
+    eventEmitterHarness.deploy(secondContract, "Alice", "Bob");
+    eventEmitterHarness.store(secondContract, "Alice", "Bob");
+    eventEmitterHarness.get(secondContract, "Alice", "Bob");
   }
 
   @After

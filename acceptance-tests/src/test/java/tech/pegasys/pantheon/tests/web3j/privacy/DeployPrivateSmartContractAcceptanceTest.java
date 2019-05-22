@@ -23,7 +23,7 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivacyAcceptanceT
 
   protected static final String CONTRACT_NAME = "Event Emitter";
 
-  private EventEmmiterHarness eventEmmiterHarness;
+  private EventEmitterHarness eventEmitterHarness;
   private PrivacyNet privacyNet;
 
   @Before
@@ -31,8 +31,8 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivacyAcceptanceT
     privacyNet =
         PrivacyNet.builder(privacy, privacyPantheon, cluster, false).addMinerNode("Alice").build();
     privacyNet.startPrivacyNet();
-    eventEmmiterHarness =
-        new EventEmmiterHarness(
+    eventEmitterHarness =
+        new EventEmitterHarness(
             privateTransactionBuilder,
             privacyNet,
             privateTransactions,
@@ -42,20 +42,20 @@ public class DeployPrivateSmartContractAcceptanceTest extends PrivacyAcceptanceT
 
   @Test
   public void deployingMustGiveValidReceipt() {
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice");
   }
 
   @Test
   public void privateSmartContractMustEmitEvents() {
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice");
-    eventEmmiterHarness.store(CONTRACT_NAME, "Alice");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice");
+    eventEmitterHarness.store(CONTRACT_NAME, "Alice");
   }
 
   @Test
   public void privateSmartContractMustReturnValues() {
-    eventEmmiterHarness.deploy(CONTRACT_NAME, "Alice");
-    eventEmmiterHarness.store(CONTRACT_NAME, "Alice");
-    eventEmmiterHarness.get(CONTRACT_NAME, "Alice");
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice");
+    eventEmitterHarness.store(CONTRACT_NAME, "Alice");
+    eventEmitterHarness.get(CONTRACT_NAME, "Alice");
   }
 
   @After

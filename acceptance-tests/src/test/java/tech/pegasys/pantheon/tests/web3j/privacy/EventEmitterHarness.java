@@ -40,7 +40,7 @@ import org.web3j.rlp.RlpString;
 import org.web3j.rlp.RlpType;
 import org.web3j.utils.Numeric;
 
-public class EventEmmiterHarness {
+public class EventEmitterHarness {
 
   private PrivateTransactionBuilder.Builder privateTransactionBuilder;
   private PrivacyNet privacyNet;
@@ -50,7 +50,7 @@ public class EventEmmiterHarness {
 
   private Map<String, String> contracts;
 
-  public EventEmmiterHarness(
+  public EventEmitterHarness(
       final PrivateTransactionBuilder.Builder privateTransactionBuilder,
       final PrivacyNet privacyNet,
       final PrivateTransactions privateTransactions,
