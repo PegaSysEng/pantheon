@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class Ibft2DiscardRpcAcceptanceTest extends AcceptanceTestBase {
+public class IbftTwoDiscardRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldDiscardVotes() throws IOException {

@@ -22,7 +22,7 @@ import org.junit.Test;
 
 // These tests prove the ibft_proposeValidatorVote and ibft_getValidatorsByBlockNumber (implicitly)
 // JSON RPC calls.
-public class Ibft2ProposeRpcAcceptanceTest extends AcceptanceTestBase {
+public class IbftTwoProposeRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void validatorsCanBeAddedAndThenRemoved() throws IOException {

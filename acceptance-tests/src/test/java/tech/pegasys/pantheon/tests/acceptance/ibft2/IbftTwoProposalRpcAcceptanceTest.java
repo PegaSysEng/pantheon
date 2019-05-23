@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class Ibft2ProposalRpcAcceptanceTest extends AcceptanceTestBase {
+public class IbftTwoProposalRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldReturnProposals() throws IOException {

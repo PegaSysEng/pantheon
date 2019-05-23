@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class Ibft2MiningAcceptanceTest extends AcceptanceTestBase {
+public class IbftTwoMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineOnSingleNode() throws IOException {
