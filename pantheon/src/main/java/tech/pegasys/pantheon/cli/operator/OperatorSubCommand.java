@@ -100,8 +100,6 @@ public class OperatorSubCommand implements Runnable {
     }
 
     private void generateNetworkConfig() {
-      parentCommand.out.println("generateNetworkConfig");
-      parentCommand.out.println(outputDirectory.toPath().toString());
       try {
         if (!outputDirectory.exists()) {
           Files.createDirectory(outputDirectory.toPath());
