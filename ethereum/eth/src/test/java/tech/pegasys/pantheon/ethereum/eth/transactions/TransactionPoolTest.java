@@ -19,7 +19,6 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -34,6 +33,11 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED;
 import static tech.pegasys.pantheon.ethereum.mainnet.ValidationResult.valid;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import org.junit.Before;
+import org.junit.Test;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -64,13 +68,6 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class TransactionPoolTest {
 
