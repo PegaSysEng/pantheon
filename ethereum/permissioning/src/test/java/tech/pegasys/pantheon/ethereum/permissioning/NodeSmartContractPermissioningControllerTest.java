@@ -74,19 +74,19 @@ public class NodeSmartContractPermissioningControllerTest {
     when(metricsSystem.createCounter(
         MetricCategory.PERMISSIONING,
         "node_smart_contract_check_count",
-        "Number of times the sync status permissioning provider has been checked"
+        "Number of times the node smart contract permissioning provider has been checked"
     )).thenReturn(checkCounter);
 
     when(metricsSystem.createCounter(
         MetricCategory.PERMISSIONING,
         "node_smart_contract_check_count_permitted",
-        "Number of times the sync status permissioning provider has been checked and returned permitted"
+        "Number of times the node smart contract permissioning provider has been checked and returned permitted"
     )).thenReturn(checkPermittedCounter);
 
     when(metricsSystem.createCounter(
         MetricCategory.PERMISSIONING,
         "node_smart_contract_check_count_unpermitted",
-        "Number of times the sync status permissioning provider has been checked and returned unpermitted"
+        "Number of times the node smart contract permissioning provider has been checked and returned unpermitted"
     )).thenReturn(checkUnpermittedCounter);
 
     return new NodeSmartContractPermissioningController(

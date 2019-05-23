@@ -78,17 +78,17 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
         metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,
             "node_smart_contract_check_count",
-            "Number of times the sync status permissioning provider has been checked");
+            "Number of times the node smart contract permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,
             "node_smart_contract_check_count_permitted",
-            "Number of times the sync status permissioning provider has been checked and returned permitted");
+            "Number of times the node smart contract permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,
             "node_smart_contract_check_count_unpermitted",
-            "Number of times the sync status permissioning provider has been checked and returned unpermitted");
+            "Number of times the node smart contract permissioning provider has been checked and returned unpermitted");
   }
 
   /**
