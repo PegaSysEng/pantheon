@@ -57,6 +57,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool.TransactionBatchAddedListener;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidationParams;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -290,13 +291,13 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(true)))
+            eq(transaction1), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(true)))
+            eq(transaction2), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction3), nullable(Account.class), eq(true)))
+            eq(transaction3), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     assertThat(transactionPool.addLocalTransaction(transaction1)).isEqualTo(valid());
@@ -318,13 +319,13 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(true)))
+            eq(transaction1), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(true)))
+            eq(transaction2), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction3), nullable(Account.class), eq(true)))
+            eq(transaction3), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     transactionPool.addRemoteTransactions(asList(transaction3, transaction1, transaction2));
@@ -344,10 +345,10 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(true)))
+            eq(transaction1), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(true)))
+            eq(transaction2), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     transactionPool.addRemoteTransactions(singletonList(transaction1));
@@ -368,10 +369,10 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(true)))
+            eq(transaction1), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(true)))
+            eq(transaction2), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     transactionPool.addLocalTransaction(transaction1);
@@ -473,13 +474,13 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(true)))
+            eq(transaction1), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(true)))
+            eq(transaction2), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction3), nullable(Account.class), eq(true)))
+            eq(transaction3), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     transactionPool.addRemoteTransactions(asList(transaction3, transaction1, transaction2));
@@ -499,13 +500,13 @@ public class TransactionPoolTest {
 
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction1), nullable(Account.class), eq(true)))
+            eq(transaction1), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction2), nullable(Account.class), eq(true)))
+            eq(transaction2), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction3), nullable(Account.class), eq(true)))
+            eq(transaction3), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     transactionPool.addRemoteTransactions(asList(transaction3, transaction1, transaction2));
@@ -535,7 +536,7 @@ public class TransactionPoolTest {
     final Transaction transactionRemote = builder.nonce(2).createTransaction(KEY_PAIR1);
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            any(Transaction.class), nullable(Account.class), eq(true)))
+            any(Transaction.class), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     transactionPool.addLocalTransaction(transactionLocal);
@@ -600,7 +601,7 @@ public class TransactionPoolTest {
   private void givenTransactionIsValid(final Transaction transaction) {
     when(transactionValidator.validate(transaction)).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            eq(transaction), nullable(Account.class), anyBoolean()))
+            eq(transaction), nullable(Account.class), any(TransactionValidationParams.class)))
         .thenReturn(valid());
   }
 }
