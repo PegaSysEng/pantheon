@@ -65,11 +65,25 @@ options to specify the [credentials file](#credentials-file).
 
 ## Obtaining an Authentication Token 
 
-To obtain an authentication token, make a request to the `/login` endpoint with your username and password. 
+To obtain an authentication token, make a request to the `/login` endpoint with your username and password. Specify the 
+HTTPS port or the WS port to obtain a token to authenticate over HTTPS or WS respectively. A different token is required 
+for HTTPS and WS. 
 
 !!! example
-    ```bash tab="curl HTTPS request"
-    curl -X POST --data '{"username":"username1","password":"pegasys"}' <JSON-RPC-https-endpoint:port>/login
+    ```bash tab="Obtain Token for HTTPS"
+    curl -X POST --data '{"username":"username1","password":"pegasys"}' <JSON-RPC-https-endpoint:https-port>/login
+    ```
+    
+    ```bash tab="Example for HTTPS"
+    curl -X POST --data '{"username":"username1","password":"pegasys"}' https://localhost:8545/login
+    ```
+    
+    ```bash tab="Obtain Token for WS"
+    curl -X POST --data '{"username":"username1","password":"pegasys"}' <JSON-RPC-https-endpoint:ws-port>/login
+    ```
+    
+    ```bash tab="Example for WS"
+    curl -X POST --data '{"username":"username1","password":"pegasys"}' http://localhost:8546/login
     ```
     
     ```json tab="JSON result"
