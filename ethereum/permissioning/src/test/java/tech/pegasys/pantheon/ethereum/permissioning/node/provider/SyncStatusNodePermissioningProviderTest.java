@@ -68,9 +68,10 @@ public class SyncStatusNodePermissioningProviderTest {
         ArgumentCaptor.forClass(SyncStatusListener.class);
     when(synchronizer.observeSyncStatus(captor.capture())).thenReturn(syncStatusObserverId);
     bootnodes.add(bootnode);
-
+    final Class<Supplier<Integer>> supplierClass =
+        (Class<Supplier<Integer>>) (Class) Supplier.class;
     final ArgumentCaptor<Supplier<Integer>> syncGaugeCallbackCaptor =
-        ArgumentCaptor.forClass(Supplier.class);
+        ArgumentCaptor.forClass(supplierClass);
 
     when(metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,
