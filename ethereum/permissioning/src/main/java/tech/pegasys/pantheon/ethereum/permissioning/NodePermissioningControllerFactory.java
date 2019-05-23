@@ -66,7 +66,8 @@ public class NodePermissioningControllerFactory {
         syncStatusProviderOptional = Optional.empty();
       } else {
         syncStatusProviderOptional =
-            Optional.of(new SyncStatusNodePermissioningProvider(synchronizer, fixedNodes, metricsSystem));
+            Optional.of(
+                new SyncStatusNodePermissioningProvider(synchronizer, fixedNodes, metricsSystem));
       }
     } else {
       syncStatusProviderOptional = Optional.empty();

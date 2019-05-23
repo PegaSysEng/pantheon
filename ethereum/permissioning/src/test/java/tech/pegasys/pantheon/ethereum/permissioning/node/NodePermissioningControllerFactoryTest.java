@@ -176,7 +176,12 @@ public class NodePermissioningControllerFactoryTest {
     NodePermissioningControllerFactory factory = new NodePermissioningControllerFactory();
     NodePermissioningController controller =
         factory.create(
-            config, synchronizer, fixedNodes, selfEnode.getNodeId(), transactionSimulator);
+            config,
+            synchronizer,
+            fixedNodes,
+            selfEnode.getNodeId(),
+            transactionSimulator,
+            new NoOpMetricsSystem());
 
     assertThat(controller.getSyncStatusNodePermissioningProvider()).isPresent();
   }
