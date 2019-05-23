@@ -163,7 +163,7 @@ public class MainnetTransactionValidator implements TransactionValidator {
   }
 
   private boolean isSenderAllowed(final Transaction transaction, final boolean isStateChange) {
-    return transactionFilter.map(c -> !c.permitted(transaction, isStateChange)).orElse(true);
+    return transactionFilter.map(c -> c.permitted(transaction, isStateChange)).orElse(true);
   }
 
   public void setTransactionFilter(final TransactionFilter transactionFilter) {

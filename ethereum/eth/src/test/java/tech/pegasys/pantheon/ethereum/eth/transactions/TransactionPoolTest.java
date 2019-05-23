@@ -33,11 +33,6 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED;
 import static tech.pegasys.pantheon.ethereum.mainnet.ValidationResult.valid;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -68,6 +63,14 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class TransactionPoolTest {
 
@@ -533,7 +536,9 @@ public class TransactionPoolTest {
     final Transaction transactionRemote = builder.nonce(2).createTransaction(KEY_PAIR1);
     when(transactionValidator.validate(any(Transaction.class))).thenReturn(valid());
     when(transactionValidator.validateForSender(
-            any(Transaction.class), nullable(Account.class), any(TransactionValidationParams.class)))
+            any(Transaction.class),
+            nullable(Account.class),
+            any(TransactionValidationParams.class)))
         .thenReturn(valid());
 
     transactionPool.addLocalTransaction(transactionLocal);
@@ -545,6 +550,23 @@ public class TransactionPoolTest {
         peerTransactionTracker.claimTransactionsToSendToPeer(peer.getEthPeer());
 
     assertThat(transactionsToSendToPeer).containsExactly(transactionLocal);
+  }
+
+  @Test
+  public void shouldCallValidatorWithExpectedValidationParameters() {
+    final ArgumentCaptor<TransactionValidationParams> txValidationParamCaptor =
+        ArgumentCaptor.forClass(TransactionValidationParams.class);
+    when(transactionValidator.validate(transaction1)).thenReturn(valid());
+    when(transactionValidator.validateForSender(any(), any(), txValidationParamCaptor.capture()))
+        .thenReturn(valid());
+
+    final TransactionValidationParams expectedValidationParams =
+        new TransactionValidationParams.Builder().stateChange(false).allowFutureNonce(true).build();
+
+    transactionPool.addLocalTransaction(transaction1);
+
+    assertThat(txValidationParamCaptor.getValue())
+        .isEqualToComparingFieldByField(expectedValidationParams);
   }
 
   private void assertTransactionPending(final Transaction t) {
