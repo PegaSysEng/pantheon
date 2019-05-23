@@ -50,7 +50,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
         MetricCategory.PERMISSIONING,
         "sync_status_node_sync_reached",
         "Whether the sync status permissioning provider has realised sync yet",
-        () -> hasReachedSync ? 0 : 1);
+        () -> hasReachedSync ? 1 : 0);
     this.checkCounter =
         metricsSystem.createCounter(
             MetricCategory.PERMISSIONING,

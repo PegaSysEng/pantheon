@@ -45,14 +45,13 @@ import org.junit.Test;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NodeSmartContractPermissioningControllerTest {
   @Mock
-  MetricsSystem metricsSystem;
-
+  private MetricsSystem metricsSystem;
   @Mock
-  Counter checkCounter;
+  private Counter checkCounter;
   @Mock
-  Counter checkPermittedCounter;
+  private Counter checkPermittedCounter;
   @Mock
-  Counter checkUnpermittedCounter;
+  private Counter checkUnpermittedCounter;
 
   private NodeSmartContractPermissioningController setupController(
       final String resourceName, final String contractAddressString) throws IOException {
