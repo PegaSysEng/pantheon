@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.ibft;
+package tech.pegasys.pantheon.tests.acceptance.ibft2;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
@@ -22,7 +22,7 @@ import org.junit.Test;
 
 // These tests prove the ibft_proposeValidatorVote and ibft_getValidatorsByBlockNumber (implicitly)
 // JSON RPC calls.
-public class IbftProposeRpcAcceptanceTest extends AcceptanceTestBase {
+public class Ibft2ProposeRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void validatorsCanBeAddedAndThenRemoved() throws IOException {

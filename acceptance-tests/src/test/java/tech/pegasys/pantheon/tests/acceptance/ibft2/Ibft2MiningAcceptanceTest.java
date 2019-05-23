@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.ibft;
+package tech.pegasys.pantheon.tests.acceptance.ibft2;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
+public class Ibft2MiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineOnSingleNode() throws IOException {
