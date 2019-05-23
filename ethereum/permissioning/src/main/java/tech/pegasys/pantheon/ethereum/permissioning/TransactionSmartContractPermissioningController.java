@@ -69,8 +69,9 @@ public class TransactionSmartContractPermissioningController
    * @param transactionSimulator A transaction simulator with attached blockchain and world state
    */
   public TransactionSmartContractPermissioningController(
-      final Address contractAddress, final TransactionSimulator transactionSimulator, final
-      MetricsSystem metricsSystem) {
+      final Address contractAddress,
+      final TransactionSimulator transactionSimulator,
+      final MetricsSystem metricsSystem) {
     this.contractAddress = contractAddress;
     this.transactionSimulator = transactionSimulator;
 

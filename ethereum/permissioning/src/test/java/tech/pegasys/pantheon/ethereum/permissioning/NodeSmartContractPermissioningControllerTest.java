@@ -21,9 +21,6 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -41,17 +38,16 @@ import java.io.IOException;
 
 import com.google.common.io.Resources;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NodeSmartContractPermissioningControllerTest {
-  @Mock
-  private MetricsSystem metricsSystem;
-  @Mock
-  private Counter checkCounter;
-  @Mock
-  private Counter checkPermittedCounter;
-  @Mock
-  private Counter checkUnpermittedCounter;
+  @Mock private MetricsSystem metricsSystem;
+  @Mock private Counter checkCounter;
+  @Mock private Counter checkPermittedCounter;
+  @Mock private Counter checkUnpermittedCounter;
 
   private NodeSmartContractPermissioningController setupController(
       final String resourceName, final String contractAddressString) throws IOException {
@@ -72,25 +68,24 @@ public class NodeSmartContractPermissioningControllerTest {
     final Address contractAddress = Address.fromHexString(contractAddressString);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "node_smart_contract_check_count",
-        "Number of times the node smart contract permissioning provider has been checked"
-    )).thenReturn(checkCounter);
+            MetricCategory.PERMISSIONING,
+            "node_smart_contract_check_count",
+            "Number of times the node smart contract permissioning provider has been checked"))
+        .thenReturn(checkCounter);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "node_smart_contract_check_count_permitted",
-        "Number of times the node smart contract permissioning provider has been checked and returned permitted"
-    )).thenReturn(checkPermittedCounter);
+            MetricCategory.PERMISSIONING,
+            "node_smart_contract_check_count_permitted",
+            "Number of times the node smart contract permissioning provider has been checked and returned permitted"))
+        .thenReturn(checkPermittedCounter);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "node_smart_contract_check_count_unpermitted",
-        "Number of times the node smart contract permissioning provider has been checked and returned unpermitted"
-    )).thenReturn(checkUnpermittedCounter);
+            MetricCategory.PERMISSIONING,
+            "node_smart_contract_check_count_unpermitted",
+            "Number of times the node smart contract permissioning provider has been checked and returned unpermitted"))
+        .thenReturn(checkUnpermittedCounter);
 
-    return new NodeSmartContractPermissioningController(
-        contractAddress, ts, metricsSystem);
+    return new NodeSmartContractPermissioningController(contractAddress, ts, metricsSystem);
   }
 
   private void verifyCountersUntouched() {

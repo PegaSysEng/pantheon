@@ -21,9 +21,6 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
@@ -37,24 +34,22 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
 
 import com.google.common.io.Resources;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class TransactionSmartContractPermissioningControllerTest {
-  @Mock
-  private MetricsSystem metricsSystem;
-  @Mock
-  private Counter checkCounter;
-  @Mock
-  private Counter checkPermittedCounter;
-  @Mock
-  private Counter checkUnpermittedCounter;
+  @Mock private MetricsSystem metricsSystem;
+  @Mock private Counter checkCounter;
+  @Mock private Counter checkPermittedCounter;
+  @Mock private Counter checkUnpermittedCounter;
 
   private TransactionSmartContractPermissioningController setupController(
       final String resourceName, final String contractAddressString) throws IOException {
@@ -75,22 +70,22 @@ public class TransactionSmartContractPermissioningControllerTest {
     final Address contractAddress = Address.fromHexString(contractAddressString);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "transaction_smart_contract_check_count",
-        "Number of times the transaction smart contract permissioning provider has been checked"
-    )).thenReturn(checkCounter);
+            MetricCategory.PERMISSIONING,
+            "transaction_smart_contract_check_count",
+            "Number of times the transaction smart contract permissioning provider has been checked"))
+        .thenReturn(checkCounter);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "transaction_smart_contract_check_count_permitted",
-        "Number of times the transaction smart contract permissioning provider has been checked and returned permitted"
-    )).thenReturn(checkPermittedCounter);
+            MetricCategory.PERMISSIONING,
+            "transaction_smart_contract_check_count_permitted",
+            "Number of times the transaction smart contract permissioning provider has been checked and returned permitted"))
+        .thenReturn(checkPermittedCounter);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "transaction_smart_contract_check_count_unpermitted",
-        "Number of times the transaction smart contract permissioning provider has been checked and returned unpermitted"
-    )).thenReturn(checkUnpermittedCounter);
+            MetricCategory.PERMISSIONING,
+            "transaction_smart_contract_check_count_unpermitted",
+            "Number of times the transaction smart contract permissioning provider has been checked and returned unpermitted"))
+        .thenReturn(checkUnpermittedCounter);
 
     return new TransactionSmartContractPermissioningController(contractAddress, ts, metricsSystem);
   }
@@ -128,7 +123,6 @@ public class TransactionSmartContractPermissioningControllerTest {
     verify(checkPermittedCounter, times(0)).inc();
     verify(checkUnpermittedCounter, times(0)).inc();
   }
-
 
   @Test
   public void testAccountIncluded() throws IOException {
