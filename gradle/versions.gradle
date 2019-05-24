@@ -26,7 +26,7 @@ dependencyManagement {
     dependency 'com.google.errorprone:error_prone_test_helpers:2.3.3'
 
     dependency 'com.graphql-java:graphql-java:11.0'
-    
+
     dependency 'com.google.guava:guava:27.1-jre'
 
     dependency 'com.squareup.okhttp3:okhttp:3.13.1'
@@ -78,11 +78,13 @@ dependencyManagement {
     dependency 'org.rocksdb:rocksdbjni:5.15.10'
 
     dependency 'org.springframework.security:spring-security-crypto:5.1.4.RELEASE'
-    
+
     dependency 'org.web3j:abi:4.1.1'
     dependency 'org.web3j:core:4.1.1'
     dependency 'org.web3j:crypto:4.1.1'
 
     dependency 'org.xerial.snappy:snappy-java:1.1.7.2'
+    dependency 'com.google.code.gson:gson:2.8.5'
+
   }
 }

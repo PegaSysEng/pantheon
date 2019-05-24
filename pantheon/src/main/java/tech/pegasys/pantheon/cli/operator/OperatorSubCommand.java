@@ -13,6 +13,8 @@
 package tech.pegasys.pantheon.cli.operator;
 
 import com.google.common.io.Resources;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +24,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
 import tech.pegasys.pantheon.cli.PantheonCommand;
+import tech.pegasys.pantheon.cli.rlp.RLPType;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
@@ -31,6 +34,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -121,6 +127,7 @@ public class OperatorSubCommand implements Runnable {
     private JsonObject networkConfig;
     private JsonObject nodesConfig;
     private boolean generateNodesKeys;
+    private List<String> addressesForGenesisExtraData = new LinkedList<>();
 
     @Override
     public void run() {
@@ -132,11 +139,12 @@ public class OperatorSubCommand implements Runnable {
     /** Generates output directory with all required configuration files. */
     private void generateNetworkConfig() {
       try {
-        createOutputDirectorIfNotExists();
+        createOutputDirectory();
         parseConfig();
         if (generateNodesKeys) {
           generateNodesKeys();
         }
+        processExtraData();
         writeGenesisFile(outputDirectory, genesisFileName, genesisConfig);
       } catch (IOException e) {
         LOG.error("An error occurred while trying to generate network configuration.", e);
@@ -160,6 +168,7 @@ public class OperatorSubCommand implements Runnable {
         LOG.info("Generating keypair for node {}.", node);
         SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
         Address nodeAddress = Util.publicKeyToAddress(keyPair.getPublicKey());
+        addressesForGenesisExtraData.add(nodeAddress.toUnprefixedString());
         Path nodeDirectoryPath = outputDirectory.toPath().resolve(nodeAddress.toString());
         Files.createDirectory(nodeDirectoryPath);
         createFileAndWrite(nodeDirectoryPath, publicKeyFileName, keyPair.getPublicKey().toString());
@@ -169,6 +178,14 @@ public class OperatorSubCommand implements Runnable {
       } catch (IOException e) {
         LOG.error("An error occurred while trying to generate node keypair.", e);
       }
+    }
+
+    private void processExtraData() throws IOException {
+      LOG.info("Generating genesis extra data.");
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      String jsonAddresses = gson.toJson(addressesForGenesisExtraData);
+      String extraData = RLPType.IBFT_EXTRA_DATA.getAdapter().encode(jsonAddresses).toString();
+      genesisConfig.put("extraData", extraData);
     }
 
     private void createFileAndWrite(Path directory, String fileName, String content)
@@ -197,10 +214,16 @@ public class OperatorSubCommand implements Runnable {
      *
      * @throws IOException
      */
-    private void createOutputDirectorIfNotExists() throws IOException {
-      if (!outputDirectory.exists()) {
-        Files.createDirectory(outputDirectory.toPath());
+    private void createOutputDirectory() throws IOException {
+      Path outputDirectoryPath = outputDirectory.toPath();
+      if (outputDirectory.exists() && outputDirectory.isDirectory()) {
+        Files.walk(outputDirectoryPath)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
+        Files.deleteIfExists(outputDirectoryPath);
       }
+      Files.createDirectory(outputDirectoryPath);
     }
 
     /**
@@ -215,6 +238,7 @@ public class OperatorSubCommand implements Runnable {
         throws IOException {
       Path genesisPath = directory.toPath().resolve(fileName);
       Files.deleteIfExists(genesisPath);
+      LOG.info("Writing genesis file.");
       Files.write(genesisPath, genesis.encodePrettily().getBytes(UTF_8));
     }
   }
