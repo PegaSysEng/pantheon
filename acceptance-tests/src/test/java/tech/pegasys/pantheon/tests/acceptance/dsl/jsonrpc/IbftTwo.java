@@ -31,10 +31,10 @@ import com.google.common.collect.ImmutableMap;
 
 public class IbftTwo {
 
-  private final IbftTwoTransactions transaction;
+  private final IbftTwoTransactions ibftTwo;
 
-  public IbftTwo(final IbftTwoTransactions transactions) {
-    this.transaction = transactions;
+  public IbftTwo(final IbftTwoTransactions ibftTwo) {
+    this.ibftTwo = ibftTwo;
   }
 
   public List<PantheonNode> validators(final PantheonNode[] nodes) {
@@ -46,7 +46,7 @@ public class IbftTwo {
   }
 
   public ExpectValidators validatorsEqual(final PantheonNode... validators) {
-    return new ExpectValidators(transaction, validatorAddresses(validators));
+    return new ExpectValidators(ibftTwo, validatorAddresses(validators));
   }
 
   private Address[] validatorAddresses(final PantheonNode[] validators) {
@@ -54,11 +54,11 @@ public class IbftTwo {
   }
 
   public Condition noProposals() {
-    return new ExpectProposals(transaction, ImmutableMap.of());
+    return new ExpectProposals(ibftTwo, ImmutableMap.of());
   }
 
   public PendingVotesConfig pendingVotesEqual() {
-    return new PendingVotesConfig(transaction);
+    return new PendingVotesConfig(ibftTwo);
   }
 
   public static class PendingVotesConfig {
