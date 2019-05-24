@@ -23,16 +23,16 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.IbftTwoTrans
 import java.util.Map;
 
 public class ExpectProposals implements Condition {
-  private final IbftTwoTransactions ibft;
+  private final IbftTwoTransactions ibftTwo;
   private final Map<Address, Boolean> proposers;
 
-  public ExpectProposals(final IbftTwoTransactions ibft, final Map<Address, Boolean> proposers) {
-    this.ibft = ibft;
+  public ExpectProposals(final IbftTwoTransactions ibftTwo, final Map<Address, Boolean> proposers) {
+    this.ibftTwo = ibftTwo;
     this.proposers = proposers;
   }
 
   @Override
   public void verify(final Node node) {
-    waitFor(() -> assertThat(node.execute(ibft.createProposals())).isEqualTo(proposers));
+    waitFor(() -> assertThat(node.execute(ibftTwo.createProposals())).isEqualTo(proposers));
   }
 }
