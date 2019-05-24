@@ -83,7 +83,7 @@ To stop the message being displayed, add the following to the environment:
 export PANTHEON_OPTS="--add-opens java.base/sun.security.provider=ALL-UNNAMED"
 ```
     
-```Windows"
+```bash tab="Windows"
 set PANTHEON_OPTS="--add-opens java.base\sun.security.provider=ALL-UNNAMED"
 ```
 
