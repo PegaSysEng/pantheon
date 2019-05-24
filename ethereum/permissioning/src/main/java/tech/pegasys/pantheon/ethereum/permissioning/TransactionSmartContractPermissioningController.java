@@ -67,6 +67,7 @@ public class TransactionSmartContractPermissioningController
    *
    * @param contractAddress The address at which the permissioning smart contract resides
    * @param transactionSimulator A transaction simulator with attached blockchain and world state
+   * @param metricsSystem The metrics provider that is to be reported to
    */
   public TransactionSmartContractPermissioningController(
       final Address contractAddress,
