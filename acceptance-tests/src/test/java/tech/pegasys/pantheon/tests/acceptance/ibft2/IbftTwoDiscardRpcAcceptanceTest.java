@@ -24,9 +24,12 @@ public class IbftTwoDiscardRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldDiscardVotes() throws IOException {
     final String[] validators = {"validator1", "validator3"};
-    final PantheonNode validator1 = pantheon.createIbftNodeWithValidators("validator1", validators);
-    final PantheonNode validator2 = pantheon.createIbftNodeWithValidators("validator2", validators);
-    final PantheonNode validator3 = pantheon.createIbftNodeWithValidators("validator3", validators);
+    final PantheonNode validator1 =
+        pantheon.createIbftTwoNodeWithValidators("validator1", validators);
+    final PantheonNode validator2 =
+        pantheon.createIbftTwoNodeWithValidators("validator2", validators);
+    final PantheonNode validator3 =
+        pantheon.createIbftTwoNodeWithValidators("validator3", validators);
     cluster.start(validator1, validator2, validator3);
 
     validator1.execute(ibftTransactions.createAddProposal(validator2));

@@ -140,15 +140,6 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
             .build());
   }
 
-  public PantheonNode createNodeWithP2pDisabledAndAdmin(final String name) throws IOException {
-    return create(
-        new PantheonFactoryConfigurationBuilder()
-            .name(name)
-            .p2pEnabled(false)
-            .jsonRpcConfiguration(jsonRpcConfigWithAdmin())
-            .build());
-  }
-
   public PantheonNode createArchiveNodeWithRpcDisabled(final String name) throws IOException {
     return create(new PantheonFactoryConfigurationBuilder().name(name).build());
   }
@@ -196,7 +187,7 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
             .build());
   }
 
-  public PantheonNode createIbftNode(final String name) throws IOException {
+  public PantheonNode createIbftTwoNode(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .name(name)
@@ -239,7 +230,7 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
             .build());
   }
 
-  public PantheonNode createIbftNodeWithValidators(final String name, final String... validators)
+  public PantheonNode createIbftTwoNodeWithValidators(final String name, final String... validators)
       throws IOException {
 
     return create(
