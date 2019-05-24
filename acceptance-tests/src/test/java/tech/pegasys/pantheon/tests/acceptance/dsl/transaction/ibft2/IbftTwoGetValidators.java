@@ -32,7 +32,7 @@ public class IbftTwoGetValidators implements Transaction<List<Address>> {
   @Override
   public List<Address> execute(final JsonRequestFactories node) {
     try {
-      final SignersBlockResponse result = node.ibft().getValidators(blockNumber).send();
+      final SignersBlockResponse result = node.ibft().validatorsAtBlock(blockNumber).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

@@ -33,7 +33,7 @@ public class IbftTwoGetValidatorsAtHash implements Transaction<List<Address>> {
   @Override
   public List<Address> execute(final JsonRequestFactories node) {
     try {
-      final SignersBlockResponse result = node.ibft().getSignersAtHash(hash).send();
+      final SignersBlockResponse result = node.ibft().signersAtHash(hash).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

@@ -52,7 +52,7 @@ public class IbftTwoJsonRpcRequestFactory {
         "ibft_getPendingVotes", emptyList(), web3jService, ProposalsResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> getValidators(final String blockNumber) {
+  public Request<?, SignersBlockResponse> validatorsAtBlock(final String blockNumber) {
     return new Request<>(
         "ibft_getValidatorsByBlockNumber",
         singletonList(blockNumber),
@@ -60,7 +60,7 @@ public class IbftTwoJsonRpcRequestFactory {
         SignersBlockResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> getSignersAtHash(final Hash hash) {
+  public Request<?, SignersBlockResponse> signersAtHash(final Hash hash) {
     return new Request<>(
         "ibft_getValidatorsByBlockHash",
         singletonList(hash.toString()),
