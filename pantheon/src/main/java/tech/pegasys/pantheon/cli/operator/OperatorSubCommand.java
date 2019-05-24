@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.cli.operator;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -128,6 +129,7 @@ public class OperatorSubCommand implements Runnable {
     private JsonObject nodesConfig;
     private boolean generateNodesKeys;
     private List<String> addressesForGenesisExtraData = new LinkedList<>();
+    private Path keysDirectory;
 
     @Override
     public void run() {
@@ -143,12 +145,19 @@ public class OperatorSubCommand implements Runnable {
         parseConfig();
         if (generateNodesKeys) {
           generateNodesKeys();
+        } else {
+          importKeysFromConfig();
         }
         processExtraData();
         writeGenesisFile(outputDirectory, genesisFileName, genesisConfig);
       } catch (IOException e) {
         LOG.error("An error occurred while trying to generate network configuration.", e);
       }
+    }
+
+    private void importKeysFromConfig() {
+      JsonArray keys = nodesConfig.getJsonArray("keys");
+      keys.stream().forEach(publicKeyString -> {});
     }
 
     /** Generates nodes keypairs. */
@@ -169,7 +178,7 @@ public class OperatorSubCommand implements Runnable {
         SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
         Address nodeAddress = Util.publicKeyToAddress(keyPair.getPublicKey());
         addressesForGenesisExtraData.add(nodeAddress.toUnprefixedString());
-        Path nodeDirectoryPath = outputDirectory.toPath().resolve(nodeAddress.toString());
+        Path nodeDirectoryPath = keysDirectory.resolve(nodeAddress.toString());
         Files.createDirectory(nodeDirectoryPath);
         createFileAndWrite(nodeDirectoryPath, publicKeyFileName, keyPair.getPublicKey().toString());
         createFileAndWrite(
@@ -224,6 +233,8 @@ public class OperatorSubCommand implements Runnable {
         Files.deleteIfExists(outputDirectoryPath);
       }
       Files.createDirectory(outputDirectoryPath);
+      keysDirectory = outputDirectoryPath.resolve("keys");
+      Files.createDirectory(keysDirectory);
     }
 
     /**
