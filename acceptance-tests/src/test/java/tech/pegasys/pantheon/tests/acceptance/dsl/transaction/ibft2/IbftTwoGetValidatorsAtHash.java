@@ -10,27 +10,30 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.DiscardResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.SignersBlockResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
+import java.util.List;
 
-public class IbftDiscard implements Transaction<Boolean> {
-  private final String address;
+public class IbftTwoGetValidatorsAtHash implements Transaction<List<Address>> {
+  private final Hash hash;
 
-  public IbftDiscard(final String address) {
-    this.address = address;
+  public IbftTwoGetValidatorsAtHash(final Hash hash) {
+    this.hash = hash;
   }
 
   @Override
-  public Boolean execute(final JsonRequestFactories node) {
+  public List<Address> execute(final JsonRequestFactories node) {
     try {
-      final DiscardResponse result = node.ibft().ibftDiscard(address).send();
+      final SignersBlockResponse result = node.ibft().getSignersAtHash(hash).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

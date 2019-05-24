@@ -10,29 +10,24 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposeResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposalsResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
+import java.util.Map;
 
-public class IbftPropose implements Transaction<Boolean> {
-  private final String address;
-  private final boolean auth;
-
-  public IbftPropose(final String address, final boolean auth) {
-    this.address = address;
-    this.auth = auth;
-  }
+public class IbftTwoProposals implements Transaction<Map<Address, Boolean>> {
 
   @Override
-  public Boolean execute(final JsonRequestFactories node) {
+  public Map<Address, Boolean> execute(final JsonRequestFactories node) {
     try {
-      final ProposeResponse result = node.ibft().ibftPropose(address, auth).send();
+      final ProposalsResponse result = node.ibft().proposals().send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

@@ -32,14 +32,14 @@ public class IbftTwoProposalRpcAcceptanceTest extends AcceptanceTestBase {
         pantheon.createIbftTwoNodeWithValidators("validator3", validators);
     cluster.start(validator1, validator2, validator3);
 
-    cluster.verify(ibft.noProposals());
-    validator1.execute(ibftTransactions.createAddProposal(validator3));
-    validator1.execute(ibftTransactions.createRemoveProposal(validator2));
-    validator2.execute(ibftTransactions.createRemoveProposal(validator3));
+    cluster.verify(ibftTwo.noProposals());
+    validator1.execute(ibftTwoTransactions.createAddProposal(validator3));
+    validator1.execute(ibftTwoTransactions.createRemoveProposal(validator2));
+    validator2.execute(ibftTwoTransactions.createRemoveProposal(validator3));
 
     validator1.verify(
-        ibft.pendingVotesEqual().addProposal(validator3).removeProposal(validator2).build());
-    validator2.verify(ibft.pendingVotesEqual().removeProposal(validator3).build());
-    validator3.verify(ibft.noProposals());
+        ibftTwo.pendingVotesEqual().addProposal(validator3).removeProposal(validator2).build());
+    validator2.verify(ibftTwo.pendingVotesEqual().removeProposal(validator3).build());
+    validator3.verify(ibftTwo.noProposals());
   }
 }

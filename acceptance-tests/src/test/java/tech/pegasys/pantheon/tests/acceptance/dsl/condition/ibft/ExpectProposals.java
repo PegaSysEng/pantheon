@@ -18,15 +18,15 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.IbftTwoTransactions;
 
 import java.util.Map;
 
 public class ExpectProposals implements Condition {
-  private final IbftTransactions ibft;
+  private final IbftTwoTransactions ibft;
   private final Map<Address, Boolean> proposers;
 
-  public ExpectProposals(final IbftTransactions ibft, final Map<Address, Boolean> proposers) {
+  public ExpectProposals(final IbftTwoTransactions ibft, final Map<Address, Boolean> proposers) {
     this.ibft = ibft;
     this.proposers = proposers;
   }

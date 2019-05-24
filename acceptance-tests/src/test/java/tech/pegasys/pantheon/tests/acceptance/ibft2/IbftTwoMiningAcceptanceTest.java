@@ -105,7 +105,7 @@ public class IbftTwoMiningAcceptanceTest extends AcceptanceTestBase {
     final PantheonNode minerNode3 = pantheon.createIbftTwoNode("miner3");
     final PantheonNode minerNode4 = pantheon.createIbftTwoNode("miner4");
     final List<PantheonNode> validators =
-        ibft.validators(new PantheonNode[] {minerNode1, minerNode2, minerNode3, minerNode4});
+        ibftTwo.validators(new PantheonNode[] {minerNode1, minerNode2, minerNode3, minerNode4});
     final PantheonNode nonProposerNode = validators.get(validators.size() - 1);
     cluster.start(validators);
 

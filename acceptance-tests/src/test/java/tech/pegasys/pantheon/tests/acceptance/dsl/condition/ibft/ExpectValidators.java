@@ -14,18 +14,18 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions.LATEST;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.IbftTwoTransactions.LATEST;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.IbftTwoTransactions;
 
 public class ExpectValidators implements Condition {
-  private final IbftTransactions ibft;
+  private final IbftTwoTransactions ibft;
   private final Address[] validators;
 
-  public ExpectValidators(final IbftTransactions ibft, final Address... validators) {
+  public ExpectValidators(final IbftTwoTransactions ibft, final Address... validators) {
     this.ibft = ibft;
     this.validators = validators;
   }

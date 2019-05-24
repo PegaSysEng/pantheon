@@ -37,19 +37,19 @@ public class IbftTwoProposeRpcAcceptanceTest extends AcceptanceTestBase {
         pantheon.createIbftTwoNodeWithValidators("non-validator", validators);
     cluster.start(validator1, validator2, validator3, nonValidatorNode);
 
-    cluster.verify(ibft.validatorsEqual(validator1, validator2, validator3));
+    cluster.verify(ibftTwo.validatorsEqual(validator1, validator2, validator3));
     final WaitCondition addedCondition = wait.ibftValidatorsChanged(validator1);
-    validator1.execute(ibftTransactions.createAddProposal(nonValidatorNode));
-    validator2.execute(ibftTransactions.createAddProposal(nonValidatorNode));
+    validator1.execute(ibftTwoTransactions.createAddProposal(nonValidatorNode));
+    validator2.execute(ibftTwoTransactions.createAddProposal(nonValidatorNode));
 
     cluster.waitUntil(addedCondition);
-    cluster.verify(ibft.validatorsEqual(validator1, validator2, validator3, nonValidatorNode));
+    cluster.verify(ibftTwo.validatorsEqual(validator1, validator2, validator3, nonValidatorNode));
 
     final WaitCondition removedCondition = wait.ibftValidatorsChanged(validator1);
-    validator2.execute(ibftTransactions.createRemoveProposal(nonValidatorNode));
-    validator3.execute(ibftTransactions.createRemoveProposal(nonValidatorNode));
-    nonValidatorNode.execute(ibftTransactions.createRemoveProposal(nonValidatorNode));
+    validator2.execute(ibftTwoTransactions.createRemoveProposal(nonValidatorNode));
+    validator3.execute(ibftTwoTransactions.createRemoveProposal(nonValidatorNode));
+    nonValidatorNode.execute(ibftTwoTransactions.createRemoveProposal(nonValidatorNode));
     cluster.waitUntil(removedCondition);
-    cluster.verify(ibft.validatorsEqual(validator1, validator2, validator3));
+    cluster.verify(ibftTwo.validatorsEqual(validator1, validator2, validator3));
   }
 }

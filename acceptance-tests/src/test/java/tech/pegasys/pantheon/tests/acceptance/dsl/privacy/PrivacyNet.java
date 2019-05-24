@@ -228,7 +228,7 @@ public class PrivacyNet {
                 name, generatePrivacyParameters(orion), keyFilePath, orion);
       } else {
         node =
-            pantheonNodeFactory.createIbftNodePrivacyEnabled(
+            pantheonNodeFactory.createIbftTwoNodePrivacyEnabled(
                 name, generatePrivacyParameters(orion), keyFilePath, orion);
       }
 

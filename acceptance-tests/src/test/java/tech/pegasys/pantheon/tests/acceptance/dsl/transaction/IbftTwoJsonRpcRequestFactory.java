@@ -26,15 +26,15 @@ import java.util.Arrays;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
 
-public class IbftJsonRpcRequestFactory {
+public class IbftTwoJsonRpcRequestFactory {
 
   private final Web3jService web3jService;
 
-  public IbftJsonRpcRequestFactory(final Web3jService web3jService) {
+  public IbftTwoJsonRpcRequestFactory(final Web3jService web3jService) {
     this.web3jService = web3jService;
   }
 
-  public Request<?, ProposeResponse> ibftPropose(final String address, final Boolean auth) {
+  public Request<?, ProposeResponse> propose(final String address, final Boolean auth) {
     return new Request<>(
         "ibft_proposeValidatorVote",
         Arrays.asList(address, auth.toString()),
@@ -42,17 +42,17 @@ public class IbftJsonRpcRequestFactory {
         ProposeResponse.class);
   }
 
-  public Request<?, DiscardResponse> ibftDiscard(final String address) {
+  public Request<?, DiscardResponse> discard(final String address) {
     return new Request<>(
         "ibft_discardValidatorVote", singletonList(address), web3jService, DiscardResponse.class);
   }
 
-  public Request<?, ProposalsResponse> ibftProposals() {
+  public Request<?, ProposalsResponse> proposals() {
     return new Request<>(
         "ibft_getPendingVotes", emptyList(), web3jService, ProposalsResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> ibftGetValidators(final String blockNumber) {
+  public Request<?, SignersBlockResponse> getValidators(final String blockNumber) {
     return new Request<>(
         "ibft_getValidatorsByBlockNumber",
         singletonList(blockNumber),
@@ -60,7 +60,7 @@ public class IbftJsonRpcRequestFactory {
         SignersBlockResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> ibftGetSignersAtHash(final Hash hash) {
+  public Request<?, SignersBlockResponse> getSignersAtHash(final Hash hash) {
     return new Request<>(
         "ibft_getValidatorsByBlockHash",
         singletonList(hash.toString()),

@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.IbftTwoTransactions;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -29,12 +29,12 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 
-public class Ibft {
+public class IbftTwo {
 
-  private final IbftTransactions ibft;
+  private final IbftTwoTransactions transaction;
 
-  public Ibft(final IbftTransactions ibft) {
-    this.ibft = ibft;
+  public IbftTwo(final IbftTwoTransactions transactions) {
+    this.transaction = transactions;
   }
 
   public List<PantheonNode> validators(final PantheonNode[] nodes) {
@@ -46,7 +46,7 @@ public class Ibft {
   }
 
   public ExpectValidators validatorsEqual(final PantheonNode... validators) {
-    return new ExpectValidators(ibft, validatorAddresses(validators));
+    return new ExpectValidators(transaction, validatorAddresses(validators));
   }
 
   private Address[] validatorAddresses(final PantheonNode[] validators) {
@@ -54,18 +54,18 @@ public class Ibft {
   }
 
   public Condition noProposals() {
-    return new ExpectProposals(ibft, ImmutableMap.of());
+    return new ExpectProposals(transaction, ImmutableMap.of());
   }
 
   public PendingVotesConfig pendingVotesEqual() {
-    return new PendingVotesConfig(ibft);
+    return new PendingVotesConfig(transaction);
   }
 
   public static class PendingVotesConfig {
     private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
-    private final IbftTransactions ibft;
+    private final IbftTwoTransactions ibft;
 
-    public PendingVotesConfig(final IbftTransactions ibft) {
+    private PendingVotesConfig(final IbftTwoTransactions ibft) {
       this.ibft = ibft;
     }
 

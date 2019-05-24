@@ -180,7 +180,7 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
         new PantheonFactoryConfigurationBuilder()
             .name(name)
             .miningEnabled()
-            .jsonRpcConfiguration(createJsonRpcConfigWithClique())
+            .jsonRpcConfiguration(createJsonRpcWithCliqueEnabledConfig())
             .webSocketConfiguration(createWebSocketEnabledConfig())
             .devMode(false)
             .genesisConfigProvider(this::createCliqueGenesisConfig)
@@ -192,10 +192,10 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
         new PantheonFactoryConfigurationBuilder()
             .name(name)
             .miningEnabled()
-            .jsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .jsonRpcConfiguration(createJsonRpcWithIbftTwoEnabledConfig())
             .webSocketConfiguration(createWebSocketEnabledConfig())
             .devMode(false)
-            .genesisConfigProvider(this::createIbftGenesisConfig)
+            .genesisConfigProvider(this::createIbftTwoGenesisConfig)
             .build());
   }
 
@@ -220,7 +220,7 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
         new PantheonFactoryConfigurationBuilder()
             .name(name)
             .miningEnabled()
-            .jsonRpcConfiguration(createJsonRpcConfigWithClique())
+            .jsonRpcConfiguration(createJsonRpcWithCliqueEnabledConfig())
             .webSocketConfiguration(createWebSocketEnabledConfig())
             .devMode(false)
             .genesisConfigProvider(
@@ -237,13 +237,13 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
         new PantheonFactoryConfigurationBuilder()
             .name(name)
             .miningEnabled()
-            .jsonRpcConfiguration(createJsonRpcConfigWithIbft())
+            .jsonRpcConfiguration(createJsonRpcWithIbftTwoEnabledConfig())
             .webSocketConfiguration(createWebSocketEnabledConfig())
             .devMode(false)
             .genesisConfigProvider(
                 nodes ->
                     createGenesisConfigForValidators(
-                        asList(validators), nodes, this::createIbftGenesisConfig))
+                        asList(validators), nodes, this::createIbftTwoGenesisConfig))
             .build());
   }
 }

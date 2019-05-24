@@ -10,39 +10,39 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
-public class IbftTransactions {
+public class IbftTwoTransactions {
   public static final String LATEST = "latest";
 
-  public IbftPropose createRemoveProposal(final PantheonNode node) {
+  public IbftTwoPropose createRemoveProposal(final PantheonNode node) {
     return propose(node.getAddress().toString(), false);
   }
 
-  public IbftPropose createAddProposal(final PantheonNode node) {
+  public IbftTwoPropose createAddProposal(final PantheonNode node) {
     return propose(node.getAddress().toString(), true);
   }
 
-  private IbftPropose propose(final String address, final boolean auth) {
-    return new IbftPropose(address, auth);
+  private IbftTwoPropose propose(final String address, final boolean auth) {
+    return new IbftTwoPropose(address, auth);
   }
 
-  public IbftProposals createProposals() {
-    return new IbftProposals();
+  public IbftTwoProposals createProposals() {
+    return new IbftTwoProposals();
   }
 
-  public IbftGetValidators createGetValidators(final String blockNumber) {
-    return new IbftGetValidators(blockNumber);
+  public IbftTwoGetValidators createGetValidators(final String blockNumber) {
+    return new IbftTwoGetValidators(blockNumber);
   }
 
-  public IbftGetValidatorsAtHash createGetValidatorsAtHash(final Hash blockHash) {
-    return new IbftGetValidatorsAtHash(blockHash);
+  public IbftTwoGetValidatorsAtHash createGetValidatorsAtHash(final Hash blockHash) {
+    return new IbftTwoGetValidatorsAtHash(blockHash);
   }
 
-  public IbftDiscard createDiscardProposal(final PantheonNode node) {
-    return new IbftDiscard(node.getAddress().toString());
+  public IbftTwoDiscard createDiscardProposal(final PantheonNode node) {
+    return new IbftTwoDiscard(node.getAddress().toString());
   }
 }
