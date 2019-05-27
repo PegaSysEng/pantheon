@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -74,19 +75,23 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldContinueMiningWhenSufficientValidators() throws IOException {
+  public void shouldStillMineWhenANonProposerNodeFailsAndHasSufficientValidators()
+      throws IOException {
     final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
     final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
     final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
-    cluster.start(minerNode1, minerNode2, minerNode3);
+    final List<PantheonNode> validators =
+        clique.validators(new PantheonNode[] {minerNode1, minerNode2, minerNode3});
+    final PantheonNode nonProposerNode = validators.get(validators.size() - 1);
+    cluster.start(validators);
+
     cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 1, 85));
 
-    cluster.stopNode(minerNode3);
-    cluster.verifyOnActiveNodes(net.awaitPeerCount(1));
+    final Account receiver = accounts.createAccount("account2");
 
-    final Account sender = accounts.createAccount("account1");
-    minerNode1.execute(transactions.createTransfer(sender, 50));
-    cluster.verifyOnActiveNodes(sender.balanceEquals(50));
+    cluster.stopNode(nonProposerNode);
+    validators.get(0).execute(transactions.createTransfer(receiver, 80));
+
+    cluster.verifyOnActiveNodes(receiver.balanceEquals(80));
   }
-
 }
