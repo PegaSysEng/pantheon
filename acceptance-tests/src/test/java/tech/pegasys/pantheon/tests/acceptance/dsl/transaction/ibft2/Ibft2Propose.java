@@ -15,22 +15,24 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.DiscardResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposeResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 
-public class IbftTwoDiscard implements Transaction<Boolean> {
+public class Ibft2Propose implements Transaction<Boolean> {
   private final String address;
+  private final boolean auth;
 
-  public IbftTwoDiscard(final String address) {
+  public Ibft2Propose(final String address, final boolean auth) {
     this.address = address;
+    this.auth = auth;
   }
 
   @Override
   public Boolean execute(final JsonRequestFactories node) {
     try {
-      final DiscardResponse result = node.ibft().discard(address).send();
+      final ProposeResponse result = node.ibft().propose(address, auth).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

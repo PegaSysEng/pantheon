@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.IbftTwoTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2Transactions;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 
-public class IbftTwo {
+public class Ibft2 {
 
-  private final IbftTwoTransactions ibftTwo;
+  private final Ibft2Transactions ibftTwo;
 
-  public IbftTwo(final IbftTwoTransactions ibftTwo) {
+  public Ibft2(final Ibft2Transactions ibftTwo) {
     this.ibftTwo = ibftTwo;
   }
 
@@ -63,9 +63,9 @@ public class IbftTwo {
 
   public static class PendingVotesConfig {
     private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
-    private final IbftTwoTransactions ibft;
+    private final Ibft2Transactions ibft;
 
-    private PendingVotesConfig(final IbftTwoTransactions ibft) {
+    private PendingVotesConfig(final Ibft2Transactions ibft) {
       this.ibft = ibft;
     }
 

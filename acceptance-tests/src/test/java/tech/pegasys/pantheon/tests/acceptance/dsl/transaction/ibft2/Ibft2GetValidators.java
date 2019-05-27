@@ -22,10 +22,10 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import java.io.IOException;
 import java.util.List;
 
-public class IbftTwoGetValidators implements Transaction<List<Address>> {
+public class Ibft2GetValidators implements Transaction<List<Address>> {
   private final String blockNumber;
 
-  public IbftTwoGetValidators(final String blockNumber) {
+  public Ibft2GetValidators(final String blockNumber) {
     this.blockNumber = blockNumber;
   }
 

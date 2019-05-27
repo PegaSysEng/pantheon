@@ -187,15 +187,15 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
             .build());
   }
 
-  public PantheonNode createIbftTwoNode(final String name) throws IOException {
+  public PantheonNode createIbft2Node(final String name) throws IOException {
     return create(
         new PantheonFactoryConfigurationBuilder()
             .name(name)
             .miningEnabled()
-            .jsonRpcConfiguration(createJsonRpcWithIbftTwoEnabledConfig())
+            .jsonRpcConfiguration(createJsonRpcWithIbft2EnabledConfig())
             .webSocketConfiguration(createWebSocketEnabledConfig())
             .devMode(false)
-            .genesisConfigProvider(this::createIbftTwoGenesisConfig)
+            .genesisConfigProvider(this::createIbft2GenesisConfig)
             .build());
   }
 
@@ -230,20 +230,20 @@ public class PantheonNodeFactory extends PantheonNodeFactoryUtils {
             .build());
   }
 
-  public PantheonNode createIbftTwoNodeWithValidators(final String name, final String... validators)
+  public PantheonNode createIbft2NodeWithValidators(final String name, final String... validators)
       throws IOException {
 
     return create(
         new PantheonFactoryConfigurationBuilder()
             .name(name)
             .miningEnabled()
-            .jsonRpcConfiguration(createJsonRpcWithIbftTwoEnabledConfig())
+            .jsonRpcConfiguration(createJsonRpcWithIbft2EnabledConfig())
             .webSocketConfiguration(createWebSocketEnabledConfig())
             .devMode(false)
             .genesisConfigProvider(
                 nodes ->
                     createGenesisConfigForValidators(
-                        asList(validators), nodes, this::createIbftTwoGenesisConfig))
+                        asList(validators), nodes, this::createIbft2GenesisConfig))
             .build());
   }
 }

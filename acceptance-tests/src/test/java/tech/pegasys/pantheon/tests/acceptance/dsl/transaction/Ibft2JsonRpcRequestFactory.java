@@ -26,11 +26,11 @@ import java.util.Arrays;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
 
-public class IbftTwoJsonRpcRequestFactory {
+public class Ibft2JsonRpcRequestFactory {
 
   private final Web3jService web3jService;
 
-  public IbftTwoJsonRpcRequestFactory(final Web3jService web3jService) {
+  public Ibft2JsonRpcRequestFactory(final Web3jService web3jService) {
     this.web3jService = web3jService;
   }
 

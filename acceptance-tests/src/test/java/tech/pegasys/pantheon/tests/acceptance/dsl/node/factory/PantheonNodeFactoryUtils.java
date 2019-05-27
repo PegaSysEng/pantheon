@@ -49,7 +49,7 @@ public class PantheonNodeFactoryUtils {
         validators, template, CliqueExtraData::createGenesisExtraDataString);
   }
 
-  public Optional<String> createIbftTwoGenesisConfig(
+  public Optional<String> createIbft2GenesisConfig(
       final Collection<? extends RunnableNode> validators) {
     final String template = readGenesisFile("/ibft/ibft.json");
     return updateGenesisExtraData(
@@ -89,7 +89,7 @@ public class PantheonNodeFactoryUtils {
     return createJsonRpcWithRpcApiEnabledConfig(CLIQUE);
   }
 
-  public JsonRpcConfiguration createJsonRpcWithIbftTwoEnabledConfig() {
+  public JsonRpcConfiguration createJsonRpcWithIbft2EnabledConfig() {
     return createJsonRpcWithRpcApiEnabledConfig(IBFT);
   }
 

@@ -14,25 +14,26 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposeResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.SignersBlockResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
+import java.util.List;
 
-public class IbftTwoPropose implements Transaction<Boolean> {
-  private final String address;
-  private final boolean auth;
+public class Ibft2GetValidatorsAtHash implements Transaction<List<Address>> {
+  private final Hash hash;
 
-  public IbftTwoPropose(final String address, final boolean auth) {
-    this.address = address;
-    this.auth = auth;
+  public Ibft2GetValidatorsAtHash(final Hash hash) {
+    this.hash = hash;
   }
 
   @Override
-  public Boolean execute(final JsonRequestFactories node) {
+  public List<Address> execute(final JsonRequestFactories node) {
     try {
-      final ProposeResponse result = node.ibft().propose(address, auth).send();
+      final SignersBlockResponse result = node.ibft().signersAtHash(hash).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

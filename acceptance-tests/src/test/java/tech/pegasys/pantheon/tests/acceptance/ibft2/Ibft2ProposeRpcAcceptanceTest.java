@@ -22,19 +22,19 @@ import org.junit.Test;
 
 // These tests prove the ibft_proposeValidatorVote and ibft_getValidatorsByBlockNumber (implicitly)
 // JSON RPC calls.
-public class IbftTwoProposeRpcAcceptanceTest extends AcceptanceTestBase {
+public class Ibft2ProposeRpcAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void validatorsCanBeAddedAndThenRemoved() throws IOException {
     final String[] validators = {"validator1", "validator2", "validator3"};
     final PantheonNode validator1 =
-        pantheon.createIbftTwoNodeWithValidators("validator1", validators);
+        pantheon.createIbft2NodeWithValidators("validator1", validators);
     final PantheonNode validator2 =
-        pantheon.createIbftTwoNodeWithValidators("validator2", validators);
+        pantheon.createIbft2NodeWithValidators("validator2", validators);
     final PantheonNode validator3 =
-        pantheon.createIbftTwoNodeWithValidators("validator3", validators);
+        pantheon.createIbft2NodeWithValidators("validator3", validators);
     final PantheonNode nonValidatorNode =
-        pantheon.createIbftTwoNodeWithValidators("non-validator", validators);
+        pantheon.createIbft2NodeWithValidators("non-validator", validators);
     cluster.start(validator1, validator2, validator3, nonValidatorNode);
 
     cluster.verify(ibftTwo.validatorsEqual(validator1, validator2, validator3));

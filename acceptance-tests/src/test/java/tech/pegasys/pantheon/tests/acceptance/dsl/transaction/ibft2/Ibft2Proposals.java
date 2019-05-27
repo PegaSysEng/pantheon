@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import java.io.IOException;
 import java.util.Map;
 
-public class IbftTwoProposals implements Transaction<Map<Address, Boolean>> {
+public class Ibft2Proposals implements Transaction<Map<Address, Boolean>> {
 
   @Override
   public Map<Address, Boolean> execute(final JsonRequestFactories node) {

@@ -15,34 +15,34 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
-public class IbftTwoTransactions {
+public class Ibft2Transactions {
   public static final String LATEST = "latest";
 
-  public IbftTwoPropose createRemoveProposal(final PantheonNode node) {
+  public Ibft2Propose createRemoveProposal(final PantheonNode node) {
     return propose(node.getAddress().toString(), false);
   }
 
-  public IbftTwoPropose createAddProposal(final PantheonNode node) {
+  public Ibft2Propose createAddProposal(final PantheonNode node) {
     return propose(node.getAddress().toString(), true);
   }
 
-  private IbftTwoPropose propose(final String address, final boolean auth) {
-    return new IbftTwoPropose(address, auth);
+  private Ibft2Propose propose(final String address, final boolean auth) {
+    return new Ibft2Propose(address, auth);
   }
 
-  public IbftTwoProposals createProposals() {
-    return new IbftTwoProposals();
+  public Ibft2Proposals createProposals() {
+    return new Ibft2Proposals();
   }
 
-  public IbftTwoGetValidators createGetValidators(final String blockNumber) {
-    return new IbftTwoGetValidators(blockNumber);
+  public Ibft2GetValidators createGetValidators(final String blockNumber) {
+    return new Ibft2GetValidators(blockNumber);
   }
 
-  public IbftTwoGetValidatorsAtHash createGetValidatorsAtHash(final Hash blockHash) {
-    return new IbftTwoGetValidatorsAtHash(blockHash);
+  public Ibft2GetValidatorsAtHash createGetValidatorsAtHash(final Hash blockHash) {
+    return new Ibft2GetValidatorsAtHash(blockHash);
   }
 
-  public IbftTwoDiscard createDiscardProposal(final PantheonNode node) {
-    return new IbftTwoDiscard(node.getAddress().toString());
+  public Ibft2Discard createDiscardProposal(final PantheonNode node) {
+    return new Ibft2Discard(node.getAddress().toString());
   }
 }
