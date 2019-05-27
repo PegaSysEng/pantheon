@@ -12,12 +12,20 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.HttpRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2JsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
+
 import java.util.Optional;
 
 import org.web3j.protocol.core.JsonRpc2_0Web3j;
 import org.web3j.protocol.websocket.WebSocketService;
 
-public class JsonRequestFactories {
+public class NodeRequests {
 
   private final JsonRpc2_0Web3j netEth;
   private final CliqueJsonRpcRequestFactory clique;
@@ -25,18 +33,20 @@ public class JsonRequestFactories {
   private final PermissioningJsonRpcRequestFactory perm;
   private final AdminJsonRpcRequestFactory admin;
   private final EeaJsonRpcRequestFactory eea;
-  private final CustomNetJsonRpcRequestFactory customNet;
+  private final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet;
   private final Optional<WebSocketService> websocketService;
+  private final HttpRequestFactory http;
 
-  public JsonRequestFactories(
+  public NodeRequests(
       final JsonRpc2_0Web3j netEth,
       final CliqueJsonRpcRequestFactory clique,
       final Ibft2JsonRpcRequestFactory ibft,
       final PermissioningJsonRpcRequestFactory perm,
       final AdminJsonRpcRequestFactory admin,
       final EeaJsonRpcRequestFactory eea,
-      final CustomNetJsonRpcRequestFactory customNet,
-      final Optional<WebSocketService> websocketService) {
+      final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet,
+      final Optional<WebSocketService> websocketService,
+      final HttpRequestFactory http) {
     this.netEth = netEth;
     this.clique = clique;
     this.ibft = ibft;
@@ -45,6 +55,7 @@ public class JsonRequestFactories {
     this.eea = eea;
     this.customNet = customNet;
     this.websocketService = websocketService;
+    this.http = http;
   }
 
   public JsonRpc2_0Web3j eth() {
@@ -71,12 +82,16 @@ public class JsonRequestFactories {
     return admin;
   }
 
-  public CustomNetJsonRpcRequestFactory customNet() {
+  public NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet() {
     return customNet;
   }
 
   public EeaJsonRpcRequestFactory eea() {
     return eea;
+  }
+
+  public HttpRequestFactory http() {
+    return http;
   }
 
   public void shutdown() {

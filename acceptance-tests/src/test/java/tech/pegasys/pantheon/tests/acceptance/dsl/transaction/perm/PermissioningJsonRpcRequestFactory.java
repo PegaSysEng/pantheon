@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.AddAccountsToWhitelistResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.AddNodeResponse;
@@ -34,7 +34,7 @@ public class PermissioningJsonRpcRequestFactory {
     this.web3jService = web3jService;
   }
 
-  public Request<?, AddNodeResponse> addNodesToWhitelist(final List<URI> enodeList) {
+  Request<?, AddNodeResponse> addNodesToWhitelist(final List<URI> enodeList) {
     return new Request<>(
         "perm_addNodesToWhitelist",
         Collections.singletonList(enodeList),
@@ -42,7 +42,7 @@ public class PermissioningJsonRpcRequestFactory {
         AddNodeResponse.class);
   }
 
-  public Request<?, RemoveNodeResponse> removeNodesFromWhitelist(final List<URI> enodeList) {
+  Request<?, RemoveNodeResponse> removeNodesFromWhitelist(final List<URI> enodeList) {
     return new Request<>(
         "perm_removeNodesFromWhitelist",
         Collections.singletonList(enodeList),
@@ -50,18 +50,17 @@ public class PermissioningJsonRpcRequestFactory {
         RemoveNodeResponse.class);
   }
 
-  public Request<?, GetNodesWhitelistResponse> getNodesWhitelist() {
+  Request<?, GetNodesWhitelistResponse> getNodesWhitelist() {
     return new Request<>(
         "perm_getNodesWhitelist", Lists.emptyList(), web3jService, GetNodesWhitelistResponse.class);
   }
 
-  public Request<?, GetAccountsWhitelistResponse> getAccountsWhitelist() {
+  Request<?, GetAccountsWhitelistResponse> getAccountsWhitelist() {
     return new Request<>(
         "perm_getAccountsWhitelist", null, web3jService, GetAccountsWhitelistResponse.class);
   }
 
-  public Request<?, AddAccountsToWhitelistResponse> addAccountsToWhitelist(
-      final List<String> accounts) {
+  Request<?, AddAccountsToWhitelistResponse> addAccountsToWhitelist(final List<String> accounts) {
     return new Request<>(
         "perm_addAccountsToWhitelist",
         Collections.singletonList(accounts),
@@ -69,7 +68,7 @@ public class PermissioningJsonRpcRequestFactory {
         AddAccountsToWhitelistResponse.class);
   }
 
-  public Request<?, RemoveAccountsFromWhitelistResponse> removeAccountsFromWhitelist(
+  Request<?, RemoveAccountsFromWhitelistResponse> removeAccountsFromWhitelist(
       final List<String> accounts) {
     return new Request<>(
         "perm_removeAccountsFromWhitelist",

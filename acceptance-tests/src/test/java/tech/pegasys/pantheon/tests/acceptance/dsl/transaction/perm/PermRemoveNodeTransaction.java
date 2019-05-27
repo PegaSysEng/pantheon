@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.RemoveNodeResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
@@ -30,7 +30,7 @@ public class PermRemoveNodeTransaction implements Transaction<String> {
   }
 
   @Override
-  public String execute(final JsonRequestFactories node) {
+  public String execute(final NodeRequests node) {
     try {
       final RemoveNodeResponse result = node.perm().removeNodesFromWhitelist(enodeList).send();
       assertThat(result).isNotNull();

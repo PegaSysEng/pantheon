@@ -37,7 +37,7 @@ public class DeploySmartContractTransaction<T extends Contract> implements Trans
   }
 
   @Override
-  public T execute(final JsonRequestFactories node) {
+  public T execute(final NodeRequests node) {
     try {
       final Method method =
           clazz.getMethod(

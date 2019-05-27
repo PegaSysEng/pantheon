@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,8 +34,7 @@ public class HttpRequestFactory {
     client = new OkHttpClient();
   }
 
-  public JsonObject loginSuccessful(final String username, final String password)
-      throws IOException {
+  JsonObject loginSuccessful(final String username, final String password) throws IOException {
     final RequestBody requestBody =
         RequestBody.create(
             JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
@@ -56,7 +55,7 @@ public class HttpRequestFactory {
     }
   }
 
-  public void loginUnauthorized(final String username, final String password) throws IOException {
+  void loginUnauthorized(final String username, final String password) throws IOException {
     final RequestBody requestBody =
         RequestBody.create(
             JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
@@ -67,7 +66,7 @@ public class HttpRequestFactory {
     }
   }
 
-  public String loginResponds(final String username, final String password) throws IOException {
+  String login(final String username, final String password) throws IOException {
     final RequestBody requestBody =
         RequestBody.create(
             JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");

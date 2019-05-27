@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -26,43 +26,39 @@ import java.util.Arrays;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
 
-public class Ibft2JsonRpcRequestFactory {
+public class CliqueJsonRpcRequestFactory {
 
   private final Web3jService web3jService;
 
-  public Ibft2JsonRpcRequestFactory(final Web3jService web3jService) {
+  public CliqueJsonRpcRequestFactory(final Web3jService web3jService) {
     this.web3jService = web3jService;
   }
 
-  public Request<?, ProposeResponse> propose(final String address, final Boolean auth) {
+  Request<?, ProposeResponse> cliquePropose(final String address, final Boolean auth) {
     return new Request<>(
-        "ibft_proposeValidatorVote",
+        "clique_propose",
         Arrays.asList(address, auth.toString()),
         web3jService,
         ProposeResponse.class);
   }
 
-  public Request<?, DiscardResponse> discard(final String address) {
+  Request<?, DiscardResponse> cliqueDiscard(final String address) {
     return new Request<>(
-        "ibft_discardValidatorVote", singletonList(address), web3jService, DiscardResponse.class);
+        "clique_discard", singletonList(address), web3jService, DiscardResponse.class);
   }
 
-  public Request<?, ProposalsResponse> proposals() {
-    return new Request<>(
-        "ibft_getPendingVotes", emptyList(), web3jService, ProposalsResponse.class);
+  Request<?, ProposalsResponse> cliqueProposals() {
+    return new Request<>("clique_proposals", emptyList(), web3jService, ProposalsResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> validatorsAtBlock(final String blockNumber) {
+  Request<?, SignersBlockResponse> cliqueGetSigners(final String blockNumber) {
     return new Request<>(
-        "ibft_getValidatorsByBlockNumber",
-        singletonList(blockNumber),
-        web3jService,
-        SignersBlockResponse.class);
+        "clique_getSigners", singletonList(blockNumber), web3jService, SignersBlockResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> signersAtHash(final Hash hash) {
+  Request<?, SignersBlockResponse> cliqueGetSignersAtHash(final Hash hash) {
     return new Request<>(
-        "ibft_getValidatorsByBlockHash",
+        "clique_getSignersAtHash",
         singletonList(hash.toString()),
         web3jService,
         SignersBlockResponse.class);

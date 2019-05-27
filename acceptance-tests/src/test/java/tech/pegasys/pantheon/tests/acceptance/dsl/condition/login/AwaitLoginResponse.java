@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.LoginResponds;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.LoginResponds;
 
 public class AwaitLoginResponse implements Condition {
 
@@ -29,6 +29,6 @@ public class AwaitLoginResponse implements Condition {
 
   @Override
   public void verify(final Node node) {
-    WaitUtils.waitFor(() -> assertThat(node.executeHttpTransaction(transaction)).isNotNull());
+    WaitUtils.waitFor(() -> assertThat(node.execute(transaction)).isNotNull());
   }
 }

@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.PrivateTransactionReceiptResponse;
 
@@ -29,8 +29,8 @@ public class EeaJsonRpcRequestFactory {
     this.web3jService = web3jService;
   }
 
-  public Request<?, org.web3j.protocol.core.methods.response.EthSendTransaction>
-      eeaSendRawTransaction(final String signedTransactionData) {
+  Request<?, org.web3j.protocol.core.methods.response.EthSendTransaction> eeaSendRawTransaction(
+      final String signedTransactionData) {
     return new Request<>(
         "eea_sendRawTransaction",
         Collections.singletonList(signedTransactionData),
@@ -38,8 +38,7 @@ public class EeaJsonRpcRequestFactory {
         org.web3j.protocol.core.methods.response.EthSendTransaction.class);
   }
 
-  public Request<?, PrivateTransactionReceiptResponse> eeaGetTransactionReceipt(
-      final String txHash) {
+  Request<?, PrivateTransactionReceiptResponse> eeaGetTransactionReceipt(final String txHash) {
     return new Request<>(
         "eea_getTransactionReceipt",
         Lists.newArrayList(txHash),
@@ -47,7 +46,7 @@ public class EeaJsonRpcRequestFactory {
         PrivateTransactionReceiptResponse.class);
   }
 
-  public Request<?, EthGetTransactionCount> eeaGetTransactionCount(
+  Request<?, EthGetTransactionCount> eeaGetTransactionCount(
       final String accountAddress, final String privacyGroupId) {
     return new Request<>(
         "eea_getTransactionCount",
