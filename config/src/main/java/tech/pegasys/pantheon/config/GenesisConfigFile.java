@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-
 import com.google.common.io.Resources;
 import io.vertx.core.json.JsonObject;
 
@@ -133,20 +132,19 @@ public class GenesisConfigFile {
   private static JsonObject normalizeKeys(final JsonObject genesis) {
     final Map<String, Object> normalized = new HashMap<>();
     genesis
-            .getMap()
-            .forEach(
-                    (key, value) -> {
-                      final String normalizedKey = key.toLowerCase(Locale.US);
-                      if (value instanceof JsonObject) {
-                        normalized.put(normalizedKey, normalizeKeys((JsonObject) value));
-                      } else if (value instanceof Map) {
-                        normalized.put(
-                                normalizedKey, normalizeKeys(new JsonObject((Map<String, Object>) value)));
-                      } else {
-                        normalized.put(normalizedKey, value);
-                      }
-                    });
+        .getMap()
+        .forEach(
+            (key, value) -> {
+              final String normalizedKey = key.toLowerCase(Locale.US);
+              if (value instanceof JsonObject) {
+                normalized.put(normalizedKey, normalizeKeys((JsonObject) value));
+              } else if (value instanceof Map) {
+                normalized.put(
+                    normalizedKey, normalizeKeys(new JsonObject((Map<String, Object>) value)));
+              } else {
+                normalized.put(normalizedKey, value);
+              }
+            });
     return new JsonObject(normalized);
   }
-
 }

@@ -12,18 +12,12 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
-import com.google.common.io.Resources;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.ParentCommand;
-import picocli.CommandLine.Spec;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
+import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
+import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
+
 import tech.pegasys.pantheon.cli.PantheonCommand;
 import tech.pegasys.pantheon.cli.rlp.RLPType;
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -41,11 +35,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
-import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
-import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
+import com.google.common.io.Resources;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.ParentCommand;
+import picocli.CommandLine.Spec;
 
 /** Operator related sub-command */
 @Command(
@@ -156,12 +157,18 @@ public class OperatorSubCommand implements Runnable {
       }
     }
 
+    /** Imports public keys from input configuration. */
     private void importPublicKeysFromConfig() {
       LOG.info("Importing public keys from configuration.");
       JsonArray keys = nodesConfig.getJsonArray("keys");
       keys.stream().parallel().forEach(this::importPublicKey);
     }
 
+    /**
+     * Imports a single public key.
+     *
+     * @param publicKeyObject The public key.
+     */
     private void importPublicKey(Object publicKeyObject) {
       try {
         SECP256K1.PublicKey publicKey =
@@ -196,6 +203,14 @@ public class OperatorSubCommand implements Runnable {
       }
     }
 
+    /**
+     * Writes public and private keys in separate files. Both are written in the same directory
+     * named with the address derived from the public key.
+     *
+     * @param publicKey The public key.
+     * @param privateKey The private key. No file is created if privateKey is NULL.
+     * @throws IOException
+     */
     private void writeKeypair(SECP256K1.PublicKey publicKey, SECP256K1.PrivateKey privateKey)
         throws IOException {
       Address nodeAddress = Util.publicKeyToAddress(publicKey);
@@ -208,6 +223,11 @@ public class OperatorSubCommand implements Runnable {
       }
     }
 
+    /**
+     * Computes RLP encoded exta data from pre filled list of addresses.
+     *
+     * @throws IOException
+     */
     private void processExtraData() throws IOException {
       LOG.info("Generating genesis extra data.");
       Gson gson = new GsonBuilder().setPrettyPrinting().create();
