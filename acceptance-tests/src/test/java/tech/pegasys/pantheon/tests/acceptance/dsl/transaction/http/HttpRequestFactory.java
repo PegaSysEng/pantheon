@@ -26,9 +26,12 @@ import okhttp3.ResponseBody;
 
 public class HttpRequestFactory {
 
+  private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+  private static final String AUTHENTICATION_REQUEST = "{\"username\":\"%s\",\"password\":\"%s\"}";
+  private static final String LOGIN_PATH = "/login";
+
   private final String contextRootUrl;
   private final OkHttpClient client;
-  private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
   public HttpRequestFactory(final String contextRootUrl) {
     this.contextRootUrl = contextRootUrl;
@@ -36,11 +39,7 @@ public class HttpRequestFactory {
   }
 
   JsonObject loginSuccessful(final String username, final String password) throws IOException {
-    final RequestBody requestBody =
-        RequestBody.create(
-            JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
-    final Request request =
-        new Request.Builder().post(requestBody).url(contextRootUrl + "/login").build();
+    final Request request = loginRequest(username, password);
 
     try (final Response response = client.newCall(request).execute()) {
       assertThat(response).isNotNull();
@@ -48,6 +47,7 @@ public class HttpRequestFactory {
       assertThat(response.message()).isEqualTo("OK");
 
       final ResponseBody responseBody = response.body();
+      assertThat(responseBody).isNotNull();
       assertThat(responseBody.contentType()).isNotNull();
       assertThat(responseBody.contentType().type()).isEqualTo("application");
       assertThat(responseBody.contentType().subtype()).isEqualTo("json");
@@ -59,14 +59,6 @@ public class HttpRequestFactory {
       return new JsonObject(bodyString);
     }
   }
-
-  void loginUnauthorized(final String username, final String password) throws IOException {
-    final String response = login(username, password);
-    assertThat(response).isEqualTo("Unauthorized");
-  }
-
-  private static final String AUTHENTICATION_REQUEST = "{\"username\":\"%s\",\"password\":\"%s\"}";
-  private static final String LOGIN_PATH = "/login";
 
   String login(final String username, final String password) throws IOException {
     final Request request = loginRequest(username, password);

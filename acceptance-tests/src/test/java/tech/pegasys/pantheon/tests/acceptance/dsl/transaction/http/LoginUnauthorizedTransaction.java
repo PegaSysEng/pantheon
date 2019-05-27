@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
@@ -20,6 +21,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import java.io.IOException;
 
 public class LoginUnauthorizedTransaction implements Transaction<Void> {
+
   private final String username;
   private final String password;
 
@@ -31,7 +33,8 @@ public class LoginUnauthorizedTransaction implements Transaction<Void> {
   @Override
   public Void execute(final NodeRequests node) {
     try {
-      node.http().loginUnauthorized(username, password);
+      final String response = node.http().login(username, password);
+      assertThat(response).isEqualTo("Unauthorized");
       return null;
     } catch (IOException e) {
       fail("Login request failed with exception: " + e.toString());
