@@ -20,7 +20,7 @@ copyright: Pantheon and its documentation are licensed under Apache 2.0 license 
 #extra project info and template customisation
 extra:
   versions:
-    pantheon_stable: &pantheon_stable_version 1.1.0
+    pantheon_stable: &pantheon_stable_version 1.1.1
     quickstart: *pantheon_stable_version
   latest_version_warning:
     url_contains: /latest/
@@ -35,6 +35,9 @@ extra:
   google:
     site_verification: 'za1cLzyS6LXDGO-pMzvfQdYTZ0Zc67uZtY0asA4YXZ0'
     tag_manager: 'GTM-5B7N84J'
+  search:
+    language: 'en'
+    tokenizer: '[\s]+'
 
 # Repository
 repo_name: PegaSysEng/pantheon
