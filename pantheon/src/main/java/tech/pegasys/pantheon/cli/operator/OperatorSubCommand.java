@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.cli.rlp.RLPType;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public class OperatorSubCommand implements Runnable {
   }
 
   @Command(
-      name = "generate-network-config",
+      name = "generate-blockchain-config",
       description = "This command generates blockchain network configuration files.",
       mixinStandardHelpOptions = true)
   static class GenerateNetworkConfigSubCommand implements Runnable {
@@ -125,7 +126,7 @@ public class OperatorSubCommand implements Runnable {
 
     private JsonObject operatorConfig;
     private JsonObject genesisConfig;
-    private JsonObject networkConfig;
+    private JsonObject blockchainConfig;
     private JsonObject nodesConfig;
     private boolean generateNodesKeys;
     private List<String> addressesForGenesisExtraData = new LinkedList<>();
@@ -135,18 +136,18 @@ public class OperatorSubCommand implements Runnable {
     public void run() {
       checkNotNull(parentCommand);
       checkNotNull(parentCommand.parentCommand);
-      generateNetworkConfig();
+      generateBlockchainConfig();
     }
 
     /** Generates output directory with all required configuration files. */
-    private void generateNetworkConfig() {
+    private void generateBlockchainConfig() {
       try {
         createOutputDirectory();
         parseConfig();
         if (generateNodesKeys) {
           generateNodesKeys();
         } else {
-          importKeysFromConfig();
+          importPublicKeysFromConfig();
         }
         processExtraData();
         writeGenesisFile(outputDirectory, genesisFileName, genesisConfig);
@@ -155,9 +156,21 @@ public class OperatorSubCommand implements Runnable {
       }
     }
 
-    private void importKeysFromConfig() {
+    private void importPublicKeysFromConfig() {
+      LOG.info("Importing public keys from configuration.");
       JsonArray keys = nodesConfig.getJsonArray("keys");
-      keys.stream().forEach(publicKeyString -> {});
+      keys.stream().parallel().forEach(this::importPublicKey);
+    }
+
+    private void importPublicKey(Object publicKeyObject) {
+      try {
+        SECP256K1.PublicKey publicKey =
+            SECP256K1.PublicKey.create(BytesValue.fromHexString((String) publicKeyObject));
+        writeKeypair(publicKey, null);
+        LOG.info("Public key imported from configuration.({})", publicKey.toString());
+      } catch (IOException e) {
+        LOG.error("An error occurred while trying to import node public key.", e);
+      }
     }
 
     /** Generates nodes keypairs. */
@@ -176,16 +189,22 @@ public class OperatorSubCommand implements Runnable {
       try {
         LOG.info("Generating keypair for node {}.", node);
         SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
-        Address nodeAddress = Util.publicKeyToAddress(keyPair.getPublicKey());
-        addressesForGenesisExtraData.add(nodeAddress.toUnprefixedString());
-        Path nodeDirectoryPath = keysDirectory.resolve(nodeAddress.toString());
-        Files.createDirectory(nodeDirectoryPath);
-        createFileAndWrite(nodeDirectoryPath, publicKeyFileName, keyPair.getPublicKey().toString());
-        createFileAndWrite(
-            nodeDirectoryPath, privateKeyFileName, keyPair.getPrivateKey().toString());
+        writeKeypair(keyPair.getPublicKey(), keyPair.getPrivateKey());
 
       } catch (IOException e) {
         LOG.error("An error occurred while trying to generate node keypair.", e);
+      }
+    }
+
+    private void writeKeypair(SECP256K1.PublicKey publicKey, SECP256K1.PrivateKey privateKey)
+        throws IOException {
+      Address nodeAddress = Util.publicKeyToAddress(publicKey);
+      addressesForGenesisExtraData.add(nodeAddress.toUnprefixedString());
+      Path nodeDirectoryPath = keysDirectory.resolve(nodeAddress.toString());
+      Files.createDirectory(nodeDirectoryPath);
+      createFileAndWrite(nodeDirectoryPath, publicKeyFileName, publicKey.toString());
+      if (privateKey != null) {
+        createFileAndWrite(nodeDirectoryPath, privateKeyFileName, privateKey.toString());
       }
     }
 
@@ -213,8 +232,8 @@ public class OperatorSubCommand implements Runnable {
       String configString = Resources.toString(configurationFile.toPath().toUri().toURL(), UTF_8);
       operatorConfig = new JsonObject(configString);
       genesisConfig = operatorConfig.getJsonObject("genesis");
-      networkConfig = operatorConfig.getJsonObject("network");
-      nodesConfig = networkConfig.getJsonObject("nodes");
+      blockchainConfig = operatorConfig.getJsonObject("blockchain");
+      nodesConfig = blockchainConfig.getJsonObject("nodes");
       generateNodesKeys = nodesConfig.getBoolean("generate", false);
     }
 
