@@ -34,8 +34,7 @@ public class LoginTransaction implements Transaction<String> {
   public String execute(final NodeRequests node) {
     try {
       final JsonObject response = node.http().loginSuccessful(username, password);
-      final String token = response.getString("token");
-      return token;
+      return response.getString("token");
     } catch (IOException e) {
       fail("Login request failed with exception: " + e.toString());
       return null;

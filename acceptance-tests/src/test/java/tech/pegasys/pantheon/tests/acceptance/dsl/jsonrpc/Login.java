@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.login.AwaitLoginResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.LoginResponds;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.LoginTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.LoginUnauthorizedTransaction;
 
@@ -46,6 +45,6 @@ public class Login {
   }
 
   public Condition awaitResponse(final String username, final String password) {
-    return new AwaitLoginResponse(new LoginResponds(username, password));
+    return new AwaitLoginResponse(new LoginTransaction(username, password));
   }
 }

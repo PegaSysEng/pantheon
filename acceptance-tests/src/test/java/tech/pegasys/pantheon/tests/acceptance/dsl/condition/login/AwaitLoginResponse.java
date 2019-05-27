@@ -17,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.LoginResponds;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.LoginTransaction;
 
 public class AwaitLoginResponse implements Condition {
 
-  private final LoginResponds transaction;
+  private final LoginTransaction transaction;
 
-  public AwaitLoginResponse(final LoginResponds transaction) {
+  public AwaitLoginResponse(final LoginTransaction transaction) {
     this.transaction = transaction;
   }
 

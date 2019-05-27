@@ -36,7 +36,7 @@ public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
     authenticatedCluster = new Cluster(clusterConfiguration, net);
     node = pantheon.createArchiveNodeWithAuthentication("node1");
     authenticatedCluster.start(node);
-    node.verify(login.awaitResponse("user", "badpassword"));
+    //    node.verify(login.awaitResponse("user", "badpassword"));
   }
 
   @Test
