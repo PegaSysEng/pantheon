@@ -32,8 +32,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.HttpRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2JsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction.CustomNetJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
@@ -93,7 +93,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   private Optional<String> genesisConfig = Optional.empty();
   private NodeRequests nodeRequests;
-  private HttpRequestFactory httpRequestFactory;
+  private LoginRequestFactory loginRequestFactory;
   private boolean useWsForJsonRpc = false;
   private String token = null;
   private final List<String> plugins = new ArrayList<>();
@@ -284,14 +284,14 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
               new EeaJsonRpcRequestFactory(web3jService),
               new CustomNetJsonRpcRequestFactory(web3jService),
               websocketService,
-              httpRequestFactory());
+              loginRequestFactory());
     }
 
     return nodeRequests;
   }
 
-  private HttpRequestFactory httpRequestFactory() {
-    if (httpRequestFactory == null) {
+  private LoginRequestFactory loginRequestFactory() {
+    if (loginRequestFactory == null) {
       final Optional<String> baseUrl;
       final String port;
       if (useWsForJsonRpc) {
@@ -301,10 +301,10 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
         baseUrl = jsonRpcBaseUrl();
         port = "8545";
       }
-      httpRequestFactory =
-          new HttpRequestFactory(baseUrl.orElse("http://" + LOCALHOST + ":" + port));
+      loginRequestFactory =
+          new LoginRequestFactory(baseUrl.orElse("http://" + LOCALHOST + ":" + port));
     }
-    return httpRequestFactory;
+    return loginRequestFactory;
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
@@ -321,8 +321,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       nodeRequests = null;
     }
 
-    if (httpRequestFactory != null) {
-      httpRequestFactory = null;
+    if (loginRequestFactory != null) {
+      loginRequestFactory = null;
     }
   }
 
@@ -335,8 +335,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       nodeRequests = null;
     }
 
-    if (httpRequestFactory != null) {
-      httpRequestFactory = null;
+    if (loginRequestFactory != null) {
+      loginRequestFactory = null;
     }
 
     this.token = token;

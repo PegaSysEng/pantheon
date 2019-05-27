@@ -10,9 +10,8 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
@@ -20,22 +19,23 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 
-public class LoginUnauthorizedTransaction implements Transaction<Void> {
+import io.vertx.core.json.JsonObject;
 
+public class LoginSuccessfulTransaction implements Transaction<String> {
   private final String username;
   private final String password;
 
-  public LoginUnauthorizedTransaction(final String username, final String password) {
+  public LoginSuccessfulTransaction(final String username, final String password) {
     this.username = username;
     this.password = password;
   }
 
   @Override
-  public Void execute(final NodeRequests node) {
+  public String execute(final NodeRequests node) {
     try {
-      assertThat(node.http().login(username, password)).isEqualTo("Unauthorized");
-      return null;
-    } catch (final IOException e) {
+      final JsonObject response = node.login().successful(username, password);
+      return response.getString("token");
+    } catch (IOException e) {
       fail("Login request failed with exception: " + e.toString());
       return null;
     }

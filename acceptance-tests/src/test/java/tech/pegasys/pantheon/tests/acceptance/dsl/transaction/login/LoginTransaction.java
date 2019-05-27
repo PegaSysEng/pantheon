@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login;
 
 import static org.junit.Assert.fail;
 
@@ -19,11 +19,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 
-public class LoginResponds implements Transaction<String> {
+public class LoginTransaction implements Transaction<String> {
   private final String username;
   private final String password;
 
-  public LoginResponds(final String username, final String password) {
+  public LoginTransaction(final String username, final String password) {
     this.username = username;
     this.password = password;
   }
@@ -31,7 +31,7 @@ public class LoginResponds implements Transaction<String> {
   @Override
   public String execute(final NodeRequests node) {
     try {
-      return node.http().login(username, password);
+      return node.login().send(username, password);
     } catch (IOException e) {
       fail("Login request failed with exception: " + e.toString());
       return null;

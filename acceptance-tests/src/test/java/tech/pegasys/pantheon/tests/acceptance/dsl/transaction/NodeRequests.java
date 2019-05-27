@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.HttpRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2JsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
 
@@ -35,7 +35,7 @@ public class NodeRequests {
   private final EeaJsonRpcRequestFactory eea;
   private final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet;
   private final Optional<WebSocketService> websocketService;
-  private final HttpRequestFactory http;
+  private final LoginRequestFactory login;
 
   public NodeRequests(
       final JsonRpc2_0Web3j netEth,
@@ -46,7 +46,7 @@ public class NodeRequests {
       final EeaJsonRpcRequestFactory eea,
       final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet,
       final Optional<WebSocketService> websocketService,
-      final HttpRequestFactory http) {
+      final LoginRequestFactory login) {
     this.netEth = netEth;
     this.clique = clique;
     this.ibft = ibft;
@@ -55,7 +55,7 @@ public class NodeRequests {
     this.eea = eea;
     this.customNet = customNet;
     this.websocketService = websocketService;
-    this.http = http;
+    this.login = login;
   }
 
   public JsonRpc2_0Web3j eth() {
@@ -90,8 +90,8 @@ public class NodeRequests {
     return eea;
   }
 
-  public HttpRequestFactory http() {
-    return http;
+  public LoginRequestFactory login() {
+    return login;
   }
 
   public void shutdown() {

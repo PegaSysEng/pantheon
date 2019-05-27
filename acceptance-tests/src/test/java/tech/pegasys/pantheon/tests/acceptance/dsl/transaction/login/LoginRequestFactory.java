@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,7 +24,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class HttpRequestFactory {
+public class LoginRequestFactory {
 
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
   private static final String AUTHENTICATION_REQUEST = "{\"username\":\"%s\",\"password\":\"%s\"}";
@@ -33,12 +33,12 @@ public class HttpRequestFactory {
   private final String contextRootUrl;
   private final OkHttpClient client;
 
-  public HttpRequestFactory(final String contextRootUrl) {
+  public LoginRequestFactory(final String contextRootUrl) {
     this.contextRootUrl = contextRootUrl;
-    client = new OkHttpClient();
+    this.client = new OkHttpClient();
   }
 
-  JsonObject loginSuccessful(final String username, final String password) throws IOException {
+  JsonObject successful(final String username, final String password) throws IOException {
     final Request request = loginRequest(username, password);
 
     try (final Response response = client.newCall(request).execute()) {
@@ -49,8 +49,8 @@ public class HttpRequestFactory {
       final ResponseBody responseBody = response.body();
       assertThat(responseBody).isNotNull();
       assertThat(responseBody.contentType()).isNotNull();
-      assertThat(responseBody.contentType().type()).isEqualTo("application");
-      assertThat(responseBody.contentType().subtype()).isEqualTo("json");
+      assertThat(responseBody.contentType().type()).isEqualTo(JSON.type());
+      assertThat(responseBody.contentType().subtype()).isEqualTo(JSON.subtype());
 
       final String bodyString = responseBody.string();
       assertThat(bodyString).isNotNull();
@@ -60,7 +60,7 @@ public class HttpRequestFactory {
     }
   }
 
-  String login(final String username, final String password) throws IOException {
+  String send(final String username, final String password) throws IOException {
     final Request request = loginRequest(username, password);
 
     try (final Response response = client.newCall(request).execute()) {
