@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.jsonrpc;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
@@ -25,8 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
+
   private Cluster authenticatedCluster;
-  private Node node;
+  private PantheonNode node;
 
   @Before
   public void setUp() throws IOException, URISyntaxException {
@@ -51,7 +52,9 @@ public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void jsonRpcMethodShouldSucceedWithAuthenticatedUserAndPermission() {
-    node.verify(login.successAndSetsAuthenticationToken("user", "pegasys"));
+    final String token = node.execute(transactions.createSuccessfulLogin("user", "pegasys"));
+    node.useAuthenticationTokenInHeaderForJsonRpc(token);
+
     node.verify(net.awaitPeerCount(0));
     node.verify(net.netVersionUnauthorizedExceptional("Unauthorized"));
   }

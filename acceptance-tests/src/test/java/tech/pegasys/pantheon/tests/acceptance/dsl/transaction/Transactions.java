@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTr
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaGetTransactionReceiptTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionCountTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginSuccessfulTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermAddAccountsToWhitelistTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermAddNodeTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermGetAccountsWhitelistTransaction;
@@ -147,5 +148,10 @@ public class Transactions {
 
   public PermGetNodesWhitelistTransaction getNodesWhiteList() {
     return new PermGetNodesWhitelistTransaction();
+  }
+
+  public LoginSuccessfulTransaction createSuccessfulLogin(
+      final String username, final String password) {
+    return new LoginSuccessfulTransaction(username, password);
   }
 }

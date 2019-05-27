@@ -12,37 +12,20 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.login.AwaitLoginResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginSuccessfulTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.login.ExpectLoginSuccess;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.login.ExpectLoginUnauthorized;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginTransaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginUnauthorizedTransaction;
 
 public class Login {
 
   public Condition success(final String username, final String password) {
-    return (node) -> {
-      final String token = node.execute(new LoginSuccessfulTransaction(username, password));
-      assertThat(token).isNotBlank();
-    };
+    return new ExpectLoginSuccess(username, password);
   }
 
   public Condition failure(final String username, final String password) {
-    return (node) -> {
-      node.execute(new LoginUnauthorizedTransaction(username, password));
-    };
-  }
-
-  public Condition successAndSetsAuthenticationToken(final String username, final String password) {
-
-    return (node) -> {
-      final String token = node.execute(new LoginSuccessfulTransaction(username, password));
-      assertThat(token).isNotBlank();
-      ((PantheonNode) node).useAuthenticationTokenInHeaderForJsonRpc(token);
-    };
+    return new ExpectLoginUnauthorized(username, password);
   }
 
   public Condition awaitResponse(final String username, final String password) {
