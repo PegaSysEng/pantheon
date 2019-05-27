@@ -33,17 +33,17 @@ public class WebsocketServiceLoginAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldFailLoginWithWrongCredentials() {
-    node.verify(login.loginFails("user", "badpassword"));
+    node.verify(login.failure("user", "badpassword"));
   }
 
   @Test
   public void shouldSucceedLoginWithCorrectCredentials() {
-    node.verify(login.loginSucceeds("user", "pegasys"));
+    node.verify(login.success("user", "pegasys"));
   }
 
   @Test
   public void jsonRpcMethodShouldSucceedWithAuthenticatedUserAndPermission() {
-    node.verify(login.loginSucceedsAndSetsAuthenticationToken("user", "pegasys"));
+    node.verify(login.successAndSetsAuthenticationToken("user", "pegasys"));
     node.verify(net.awaitPeerCount(0));
     node.verify(net.netVersionUnauthorizedResponse());
   }

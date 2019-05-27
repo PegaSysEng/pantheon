@@ -25,12 +25,13 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class HttpRequestFactory {
-  private final String uri;
+
+  private final String contextRootUrl;
   private final OkHttpClient client;
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-  public HttpRequestFactory(final String uri) {
-    this.uri = uri;
+  public HttpRequestFactory(final String contextRootUrl) {
+    this.contextRootUrl = contextRootUrl;
     client = new OkHttpClient();
   }
 
@@ -38,15 +39,19 @@ public class HttpRequestFactory {
     final RequestBody requestBody =
         RequestBody.create(
             JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
-    final Request request = new Request.Builder().post(requestBody).url(uri + "/login").build();
-    try (final Response response = client.newCall(request).execute()) {
+    final Request request =
+        new Request.Builder().post(requestBody).url(contextRootUrl + "/login").build();
 
+    try (final Response response = client.newCall(request).execute()) {
+      assertThat(response).isNotNull();
       assertThat(response.code()).isEqualTo(200);
       assertThat(response.message()).isEqualTo("OK");
+
       final ResponseBody responseBody = response.body();
       assertThat(responseBody.contentType()).isNotNull();
       assertThat(responseBody.contentType().type()).isEqualTo("application");
       assertThat(responseBody.contentType().subtype()).isEqualTo("json");
+
       final String bodyString = responseBody.string();
       assertThat(bodyString).isNotNull();
       assertThat(bodyString).isNotBlank();
@@ -56,25 +61,30 @@ public class HttpRequestFactory {
   }
 
   void loginUnauthorized(final String username, final String password) throws IOException {
-    final RequestBody requestBody =
-        RequestBody.create(
-            JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
-    final Request request = new Request.Builder().post(requestBody).url(uri + "/login").build();
-    try (final Response response = client.newCall(request).execute()) {
-      assertThat(response.code()).isEqualTo(401);
-      assertThat(response.message()).isEqualTo("Unauthorized");
-    }
+    final String response = login(username, password);
+    assertThat(response).isEqualTo("Unauthorized");
   }
 
+  private static final String AUTHENTICATION_REQUEST = "{\"username\":\"%s\",\"password\":\"%s\"}";
+  private static final String LOGIN_PATH = "/login";
+
   String login(final String username, final String password) throws IOException {
-    final RequestBody requestBody =
-        RequestBody.create(
-            JSON, "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}");
-    final Request request = new Request.Builder().post(requestBody).url(uri + "/login").build();
+    final Request request = loginRequest(username, password);
+
     try (final Response response = client.newCall(request).execute()) {
       assertThat(response).isNotNull();
       assertThat(response.message()).isNotNull();
       return response.message();
     }
+  }
+
+  private Request loginRequest(final String username, final String password) {
+    final RequestBody requestBody =
+        RequestBody.create(JSON, String.format(AUTHENTICATION_REQUEST, username, password));
+    return new Request.Builder().post(requestBody).url(loginUri()).build();
+  }
+
+  private String loginUri() {
+    return contextRootUrl + LOGIN_PATH;
   }
 }

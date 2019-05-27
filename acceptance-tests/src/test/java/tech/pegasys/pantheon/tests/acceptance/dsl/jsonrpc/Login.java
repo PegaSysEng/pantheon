@@ -23,21 +23,20 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.http.LoginUnauthor
 
 public class Login {
 
-  public Condition loginSucceeds(final String username, final String password) {
+  public Condition success(final String username, final String password) {
     return (node) -> {
       final String token = node.execute(new LoginTransaction(username, password));
       assertThat(token).isNotBlank();
     };
   }
 
-  public Condition loginFails(final String username, final String password) {
+  public Condition failure(final String username, final String password) {
     return (node) -> {
       node.execute(new LoginUnauthorizedTransaction(username, password));
     };
   }
 
-  public Condition loginSucceedsAndSetsAuthenticationToken(
-      final String username, final String password) {
+  public Condition successAndSetsAuthenticationToken(final String username, final String password) {
 
     return (node) -> {
       final String token = node.execute(new LoginTransaction(username, password));
@@ -46,7 +45,7 @@ public class Login {
     };
   }
 
-  public Condition awaitLoginResponse(final String username, final String password) {
+  public Condition awaitResponse(final String username, final String password) {
     return new AwaitLoginResponse(new LoginResponds(username, password));
   }
 }
