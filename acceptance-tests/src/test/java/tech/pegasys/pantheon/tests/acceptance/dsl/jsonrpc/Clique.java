@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectBlockHasProposer;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectProposals;
@@ -52,7 +53,7 @@ public class Clique {
     this.clique = clique;
   }
 
-  public List<PantheonNode> validators(final PantheonNode[] nodes) {
+  public List<PantheonNode> validatorsSortedByAddress(final PantheonNode[] nodes) {
     final Comparator<PantheonNode> compareByAddress =
         Comparator.comparing(PantheonNode::getAddress);
     List<PantheonNode> pantheonNodes = Arrays.asList(nodes);
@@ -106,6 +107,10 @@ public class Clique {
 
   private Address[] validatorAddresses(final PantheonNode[] validators) {
     return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
+  }
+
+  public Condition proposerAtChainHeadEqual(final PantheonNode proposer) {
+    return new ExpectBlockHasProposer(eth, proposer.getAddress());
   }
 
   public static class ProposalsConfig {

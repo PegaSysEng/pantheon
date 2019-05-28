@@ -174,4 +174,10 @@ public class Cluster implements AutoCloseable {
       node.waitUntil(condition);
     }
   }
+
+  public void waitOnActiveNodesUntil(final WaitCondition condition) {
+    nodes.values().stream()
+        .filter(node -> pantheonNodeRunner.isActive(node.getName()))
+        .forEach(condition::waitUntil);
+  }
 }
