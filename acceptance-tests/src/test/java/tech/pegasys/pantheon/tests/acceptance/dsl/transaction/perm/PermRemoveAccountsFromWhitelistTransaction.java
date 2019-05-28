@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.RemoveAccountsFromWhitelistResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.RemoveAccountsFromWhitelistResponse;
 
 import java.io.IOException;
 import java.util.List;

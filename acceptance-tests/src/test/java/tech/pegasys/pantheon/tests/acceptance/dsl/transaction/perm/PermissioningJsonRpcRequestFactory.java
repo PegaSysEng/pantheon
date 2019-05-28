@@ -12,12 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.AddAccountsToWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.AddNodeResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.GetAccountsWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.GetNodesWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.RemoveAccountsFromWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.RemoveNodeResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.AddAccountsToWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.AddNodeResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.GetAccountsWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.GetNodesWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.RemoveAccountsFromWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.RemoveNodeResponse;
 
 import java.net.URI;
 import java.util.Collections;

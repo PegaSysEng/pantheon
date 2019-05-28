@@ -19,18 +19,6 @@ import org.web3j.protocol.core.methods.response.Log;
 
 public class ResponseTypes {
 
-  public static class AddAccountsToWhitelistResponse extends Response<String> {}
-
-  public static class RemoveAccountsFromWhitelistResponse extends Response<String> {}
-
-  public static class GetAccountsWhitelistResponse extends Response<List<String>> {}
-
-  public static class AddNodeResponse extends Response<String> {}
-
-  public static class RemoveNodeResponse extends Response<String> {}
-
-  public static class GetNodesWhitelistResponse extends Response<List<String>> {}
-
   public static class PrivateTransactionReceiptResponse
       extends Response<PrivateTransactionReceipt> {}
 
