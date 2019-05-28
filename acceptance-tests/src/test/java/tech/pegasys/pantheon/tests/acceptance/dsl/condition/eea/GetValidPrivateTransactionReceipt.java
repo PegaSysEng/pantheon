@@ -16,8 +16,8 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eea;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaResponseTypes.PrivateTransactionReceipt;
 
 public abstract class GetValidPrivateTransactionReceipt implements EeaCondition {
 
@@ -29,11 +29,11 @@ public abstract class GetValidPrivateTransactionReceipt implements EeaCondition 
     this.transactions = transactions;
   }
 
-  ResponseTypes.PrivateTransactionReceipt getPrivateTransactionReceipt(
+  PrivateTransactionReceipt getPrivateTransactionReceipt(
       final PantheonNode node, final String transactionHash) {
 
     waitFor(() -> node.verify(eea.expectSuccessfulTransactionReceipt(transactionHash)));
-    ResponseTypes.PrivateTransactionReceipt privateTxReceipt =
+    PrivateTransactionReceipt privateTxReceipt =
         node.execute(transactions.getPrivateTransactionReceipt(transactionHash));
     return privateTxReceipt;
   }

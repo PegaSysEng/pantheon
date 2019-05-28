@@ -10,14 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
+package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea;
 
 import java.util.List;
 
 import org.web3j.protocol.core.Response;
 import org.web3j.protocol.core.methods.response.Log;
 
-public class ResponseTypes {
+public class EeaResponseTypes {
 
   public static class PrivateTransactionReceiptResponse
       extends Response<PrivateTransactionReceipt> {}

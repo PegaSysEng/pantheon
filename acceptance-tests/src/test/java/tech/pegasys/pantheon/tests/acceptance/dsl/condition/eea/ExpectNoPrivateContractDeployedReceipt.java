@@ -16,8 +16,8 @@ import static org.junit.Assert.assertNull;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eea;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaResponseTypes.PrivateTransactionReceipt;
 
 public class ExpectNoPrivateContractDeployedReceipt extends GetValidPrivateTransactionReceipt {
 
@@ -27,7 +27,7 @@ public class ExpectNoPrivateContractDeployedReceipt extends GetValidPrivateTrans
 
   @Override
   public void verify(final PantheonNode node, final String transactionHash) {
-    ResponseTypes.PrivateTransactionReceipt privateTxReceipt =
+    final PrivateTransactionReceipt privateTxReceipt =
         getPrivateTransactionReceipt(node, transactionHash);
 
     assertNull(privateTxReceipt.getContractAddress());

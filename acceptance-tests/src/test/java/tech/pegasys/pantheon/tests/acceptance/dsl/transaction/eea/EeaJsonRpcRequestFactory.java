@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.PrivateTransactionReceiptResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaResponseTypes.PrivateTransactionReceiptResponse;
 
 import java.util.Collections;
 
