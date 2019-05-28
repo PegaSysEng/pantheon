@@ -12,19 +12,11 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
-import org.junit.After;
 import org.junit.Test;
 import picocli.CommandLine.Model.CommandSpec;
 import tech.pegasys.pantheon.cli.CommandTestAbstract;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.nio.file.Files;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
 
 public class OperatorSubCommandTest extends CommandTestAbstract {
 
@@ -48,7 +40,6 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
   private static final String GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME =
       "generate-blockchain-config";
 
-  // RLP sub-command
   @Test
   public void operatorSubCommandExistAnbHaveSubCommands() {
     final CommandSpec spec = parseCommand();
