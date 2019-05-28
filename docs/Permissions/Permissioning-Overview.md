@@ -3,7 +3,7 @@ description: Pantheon Permissioning feature
 
 # Permissioning 
 
-A permissioned network allows only specified nodes and accounts to participate, by enabling node permissioning and/or account permissioning on the network.
+A permissioned network allows only specified nodes and accounts to participate by enabling node permissioning and/or account permissioning on the network.
 
 !!! note
     In peer-to-peer networks, node-level permissions can be used to enforce rules on nodes you control. 
