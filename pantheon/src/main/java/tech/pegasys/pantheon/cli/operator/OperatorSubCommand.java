@@ -83,7 +83,6 @@ public class OperatorSubCommand implements Runnable {
       description = "This command generates blockchain network configuration files.",
       mixinStandardHelpOptions = true)
   static class GenerateNetworkConfigSubCommand implements Runnable {
-
     @Option(
         required = true,
         names = "--config-file",
@@ -169,9 +168,9 @@ public class OperatorSubCommand implements Runnable {
      *
      * @param publicKeyObject The public key.
      */
-    private void importPublicKey(Object publicKeyObject) {
+    private void importPublicKey(final Object publicKeyObject) {
       try {
-        SECP256K1.PublicKey publicKey =
+        final SECP256K1.PublicKey publicKey =
             SECP256K1.PublicKey.create(BytesValue.fromHexString((String) publicKeyObject));
         writeKeypair(publicKey, null);
         LOG.info("Public key imported from configuration.({})", publicKey.toString());
@@ -182,7 +181,7 @@ public class OperatorSubCommand implements Runnable {
 
     /** Generates nodes keypairs. */
     private void generateNodesKeys() {
-      int nodesCount = nodesConfig.getInteger("count");
+      final int nodesCount = nodesConfig.getInteger("count");
       LOG.info("Generating {} nodes keys.", nodesCount);
       IntStream.range(0, nodesCount).parallel().forEach(this::generateNodeKeypair);
     }
@@ -192,10 +191,10 @@ public class OperatorSubCommand implements Runnable {
      *
      * @param node The number of the node.
      */
-    private void generateNodeKeypair(int node) {
+    private void generateNodeKeypair(final int node) {
       try {
         LOG.info("Generating keypair for node {}.", node);
-        SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
+        final SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
         writeKeypair(keyPair.getPublicKey(), keyPair.getPrivateKey());
 
       } catch (IOException e) {
@@ -211,11 +210,12 @@ public class OperatorSubCommand implements Runnable {
      * @param privateKey The private key. No file is created if privateKey is NULL.
      * @throws IOException
      */
-    private void writeKeypair(SECP256K1.PublicKey publicKey, SECP256K1.PrivateKey privateKey)
+    private void writeKeypair(
+        final SECP256K1.PublicKey publicKey, final SECP256K1.PrivateKey privateKey)
         throws IOException {
-      Address nodeAddress = Util.publicKeyToAddress(publicKey);
+      final Address nodeAddress = Util.publicKeyToAddress(publicKey);
       addressesForGenesisExtraData.add(nodeAddress.toUnprefixedString());
-      Path nodeDirectoryPath = keysDirectory.resolve(nodeAddress.toString());
+      final Path nodeDirectoryPath = keysDirectory.resolve(nodeAddress.toString());
       Files.createDirectory(nodeDirectoryPath);
       createFileAndWrite(nodeDirectoryPath, publicKeyFileName, publicKey.toString());
       if (privateKey != null) {
@@ -230,15 +230,16 @@ public class OperatorSubCommand implements Runnable {
      */
     private void processExtraData() throws IOException {
       LOG.info("Generating genesis extra data.");
-      Gson gson = new GsonBuilder().setPrettyPrinting().create();
-      String jsonAddresses = gson.toJson(addressesForGenesisExtraData);
-      String extraData = RLPType.IBFT_EXTRA_DATA.getAdapter().encode(jsonAddresses).toString();
+      final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      final String jsonAddresses = gson.toJson(addressesForGenesisExtraData);
+      final String extraData =
+          RLPType.IBFT_EXTRA_DATA.getAdapter().encode(jsonAddresses).toString();
       genesisConfig.put("extraData", extraData);
     }
 
-    private void createFileAndWrite(Path directory, String fileName, String content)
-        throws IOException {
-      Path filePath = directory.resolve(fileName);
+    private void createFileAndWrite(
+        final Path directory, final String fileName, final String content) throws IOException {
+      final Path filePath = directory.resolve(fileName);
       Files.createFile(filePath);
       Files.write(filePath, content.getBytes(UTF_8));
     }
@@ -249,7 +250,8 @@ public class OperatorSubCommand implements Runnable {
      * @throws IOException
      */
     private void parseConfig() throws IOException {
-      String configString = Resources.toString(configurationFile.toPath().toUri().toURL(), UTF_8);
+      final String configString =
+          Resources.toString(configurationFile.toPath().toUri().toURL(), UTF_8);
       operatorConfig = new JsonObject(configString);
       genesisConfig = operatorConfig.getJsonObject("genesis");
       blockchainConfig = operatorConfig.getJsonObject("blockchain");
@@ -263,7 +265,7 @@ public class OperatorSubCommand implements Runnable {
      * @throws IOException
      */
     private void createOutputDirectory() throws IOException {
-      Path outputDirectoryPath = outputDirectory.toPath();
+      final Path outputDirectoryPath = outputDirectory.toPath();
       if (outputDirectory.exists() && outputDirectory.isDirectory()) {
         Files.walk(outputDirectoryPath)
             .sorted(Comparator.reverseOrder())
@@ -284,9 +286,9 @@ public class OperatorSubCommand implements Runnable {
      * @param genesis The genesis content.
      * @throws IOException
      */
-    private void writeGenesisFile(File directory, String fileName, JsonObject genesis)
-        throws IOException {
-      Path genesisPath = directory.toPath().resolve(fileName);
+    private void writeGenesisFile(
+        final File directory, final String fileName, final JsonObject genesis) throws IOException {
+      final Path genesisPath = directory.toPath().resolve(fileName);
       Files.deleteIfExists(genesisPath);
       LOG.info("Writing genesis file.");
       Files.write(genesisPath, genesis.encodePrettily().getBytes(UTF_8));
