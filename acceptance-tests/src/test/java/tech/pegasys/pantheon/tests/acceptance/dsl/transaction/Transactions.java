@@ -20,7 +20,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTr
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransactionSet;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaGetTransactionReceiptTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionCountTransaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginSuccessfulTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermAddAccountsToWhitelistTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermAddNodeTransaction;
@@ -59,16 +58,6 @@ public class Transactions {
         .sender(sender)
         .recipient(recipient)
         .amount(Amount.ether(amount))
-        .build();
-  }
-
-  public TransferTransaction createTransfer(
-      final Account sender, final Account recipient, final Amount amount, final Amount gasPrice) {
-    return new TransferTransactionBuilder()
-        .sender(sender)
-        .recipient(recipient)
-        .amount(amount)
-        .gasPrice(gasPrice)
         .build();
   }
 
@@ -127,10 +116,6 @@ public class Transactions {
 
   public EthGetTransactionCountTransaction getTransactionCount(final String accountAddress) {
     return new EthGetTransactionCountTransaction(accountAddress);
-  }
-
-  public EthGetTransactionReceiptTransaction getTransactionReceipt(final String transactionHash) {
-    return new EthGetTransactionReceiptTransaction(transactionHash);
   }
 
   public EeaGetTransactionReceiptTransaction getPrivateTransactionReceipt(
