@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.SignersBlockResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.SignersBlockResponse;
 
 import java.io.IOException;
 import java.util.List;

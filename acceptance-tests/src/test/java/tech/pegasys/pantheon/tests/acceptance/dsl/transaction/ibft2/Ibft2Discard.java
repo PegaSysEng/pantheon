@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.DiscardResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.DiscardResponse;
 
 import java.io.IOException;
 

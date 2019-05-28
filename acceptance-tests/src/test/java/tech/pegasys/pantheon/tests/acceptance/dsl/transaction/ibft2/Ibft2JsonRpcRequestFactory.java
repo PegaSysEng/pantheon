@@ -16,10 +16,10 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.DiscardResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposalsResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposeResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.SignersBlockResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.DiscardResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.ProposalsResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.ProposeResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.SignersBlockResponse;
 
 import java.util.Arrays;
 
