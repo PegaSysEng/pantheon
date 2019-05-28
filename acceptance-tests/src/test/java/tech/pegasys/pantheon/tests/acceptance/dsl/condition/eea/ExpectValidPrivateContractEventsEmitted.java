@@ -16,18 +16,19 @@ import static org.junit.Assert.assertEquals;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eea;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaResponseTypes.PrivateTransactionReceipt;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 
 import java.math.BigInteger;
 
 import org.web3j.utils.Numeric;
 
 public class ExpectValidPrivateContractEventsEmitted extends GetValidPrivateTransactionReceipt {
+
   private final String eventValue;
 
   public ExpectValidPrivateContractEventsEmitted(
-      final String eventValue, final Eea eea, final Transactions transactions) {
+      final String eventValue, final Eea eea, final EeaTransactions transactions) {
     super(eea, transactions);
     this.eventValue = eventValue;
   }

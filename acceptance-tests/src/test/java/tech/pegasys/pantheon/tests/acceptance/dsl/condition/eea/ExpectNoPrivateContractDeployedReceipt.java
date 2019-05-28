@@ -16,12 +16,12 @@ import static org.junit.Assert.assertNull;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eea;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaResponseTypes.PrivateTransactionReceipt;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 
 public class ExpectNoPrivateContractDeployedReceipt extends GetValidPrivateTransactionReceipt {
 
-  public ExpectNoPrivateContractDeployedReceipt(final Eea eea, final Transactions transactions) {
+  public ExpectNoPrivateContractDeployedReceipt(final Eea eea, final EeaTransactions transactions) {
     super(eea, transactions);
   }
 

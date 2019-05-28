@@ -52,7 +52,8 @@ public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void jsonRpcMethodShouldSucceedWithAuthenticatedUserAndPermission() {
-    final String token = node.execute(transactions.createSuccessfulLogin("user", "pegasys"));
+    final String token =
+        node.execute(permissioningTransactions.createSuccessfulLogin("user", "pegasys"));
     node.useAuthenticationTokenInHeaderForJsonRpc(token);
 
     node.verify(net.awaitPeerCount(0));

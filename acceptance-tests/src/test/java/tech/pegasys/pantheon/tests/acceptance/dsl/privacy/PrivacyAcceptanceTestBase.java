@@ -36,7 +36,7 @@ public class PrivacyAcceptanceTestBase extends AcceptanceTestBase {
     privateTransactions = new PrivateTransactions();
     eea = new Eea(eeaTransactions);
     privateTransactionBuilder = PrivateTransactionBuilder.builder();
-    privateTransactionVerifier = new PrivateTransactionVerifier(eea, transactions);
+    privateTransactionVerifier = new PrivateTransactionVerifier(eea, eeaTransactions);
     privacyPantheon = new PrivacyPantheonNodeFactory();
   }
 }
