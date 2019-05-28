@@ -67,7 +67,7 @@ specific errors. Ensure a sufficient milestone is included in the genesis file (
 
 ## Illegal Reflective Access Error on Startup
 
-The following error message may be displayed on startup and does not affect the operation of Pantheon: 
+When using Java 9 or later, the following error message may be displayed on startup and does not affect the operation of Pantheon: 
 
 ```
 WARNING: An illegal reflective access operation has occurred
@@ -84,7 +84,7 @@ export PANTHEON_OPTS="--add-opens java.base/sun.security.provider=ALL-UNNAMED"
 ```
     
 ```bash tab="Windows"
-set PANTHEON_OPTS="--add-opens java.base\sun.security.provider=ALL-UNNAMED"
+set PANTHEON_OPTS="--add-opens java.base/sun.security.provider=ALL-UNNAMED"
 ```
 
 ## Command Line Options
