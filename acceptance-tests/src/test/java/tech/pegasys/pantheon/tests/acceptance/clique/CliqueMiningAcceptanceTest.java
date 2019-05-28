@@ -78,9 +78,9 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
   public void shouldStillMineWhenANonProposerNodeFailsAndHasSufficientValidators()
       throws IOException {
     final PantheonNode[] nodes = {
-        pantheon.createCliqueNode("miner1"),
-        pantheon.createCliqueNode("miner2"),
-        pantheon.createCliqueNode("miner3")
+      pantheon.createCliqueNode("miner1"),
+      pantheon.createCliqueNode("miner2"),
+      pantheon.createCliqueNode("miner3")
     };
     final List<PantheonNode> validators = clique.validatorsSortedByAddress(nodes);
     final PantheonNode validator1 = validators.get(0);
