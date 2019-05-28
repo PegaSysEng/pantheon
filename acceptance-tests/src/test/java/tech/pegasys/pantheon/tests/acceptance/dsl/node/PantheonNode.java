@@ -27,6 +27,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.NodeConfiguration;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminJsonRpcRequestFactory;
@@ -85,7 +87,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final WebSocketConfiguration webSocketConfiguration;
   private final MetricsConfiguration metricsConfiguration;
   private final Optional<PermissioningConfiguration> permissioningConfiguration;
-  private final GenesisConfigProvider genesisConfigProvider;
+  private final GenesisConfigurationProvider genesisConfigProvider;
   private final boolean devMode;
   private final boolean discoveryEnabled;
   private final List<URI> bootnodes = new ArrayList<>();
@@ -109,7 +111,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final Optional<PermissioningConfiguration> permissioningConfiguration,
       final Optional<String> keyfilePath,
       final boolean devMode,
-      final GenesisConfigProvider genesisConfigProvider,
+      final GenesisConfigurationProvider genesisConfigProvider,
       final boolean p2pEnabled,
       final boolean discoveryEnabled,
       final boolean bootnodeEligible,
@@ -533,6 +535,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
+  @SuppressWarnings("UnstableApiUsage")
   public void close() {
     stop();
     try {
@@ -543,7 +546,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public GenesisConfigProvider getGenesisConfigProvider() {
+  public GenesisConfigurationProvider getGenesisConfigProvider() {
     return genesisConfigProvider;
   }
 

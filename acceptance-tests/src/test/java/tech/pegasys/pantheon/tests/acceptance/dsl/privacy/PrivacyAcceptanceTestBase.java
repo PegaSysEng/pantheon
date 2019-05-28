@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.privacy;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eea;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
 
