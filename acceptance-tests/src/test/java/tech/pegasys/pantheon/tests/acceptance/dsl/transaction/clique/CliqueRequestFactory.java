@@ -26,11 +26,11 @@ import java.util.Arrays;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
 
-public class CliqueJsonRpcRequestFactory {
+public class CliqueRequestFactory {
 
   private final Web3jService web3jService;
 
-  public CliqueJsonRpcRequestFactory(final Web3jService web3jService) {
+  public CliqueRequestFactory(final Web3jService web3jService) {
     this.web3jService = web3jService;
   }
 

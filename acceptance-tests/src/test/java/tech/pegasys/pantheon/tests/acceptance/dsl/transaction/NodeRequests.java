@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2JsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
@@ -28,22 +28,22 @@ import org.web3j.protocol.websocket.WebSocketService;
 public class NodeRequests {
 
   private final JsonRpc2_0Web3j netEth;
-  private final CliqueJsonRpcRequestFactory clique;
-  private final Ibft2JsonRpcRequestFactory ibft;
+  private final CliqueRequestFactory clique;
+  private final Ibft2RequestFactory ibft;
   private final PermissioningJsonRpcRequestFactory perm;
-  private final AdminJsonRpcRequestFactory admin;
-  private final EeaJsonRpcRequestFactory eea;
+  private final AdminRequestFactory admin;
+  private final EeaRequestFactory eea;
   private final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet;
   private final Optional<WebSocketService> websocketService;
   private final LoginRequestFactory login;
 
   public NodeRequests(
       final JsonRpc2_0Web3j netEth,
-      final CliqueJsonRpcRequestFactory clique,
-      final Ibft2JsonRpcRequestFactory ibft,
+      final CliqueRequestFactory clique,
+      final Ibft2RequestFactory ibft,
       final PermissioningJsonRpcRequestFactory perm,
-      final AdminJsonRpcRequestFactory admin,
-      final EeaJsonRpcRequestFactory eea,
+      final AdminRequestFactory admin,
+      final EeaRequestFactory eea,
       final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet,
       final Optional<WebSocketService> websocketService,
       final LoginRequestFactory login) {
@@ -66,11 +66,11 @@ public class NodeRequests {
     return netEth;
   }
 
-  public CliqueJsonRpcRequestFactory clique() {
+  public CliqueRequestFactory clique() {
     return clique;
   }
 
-  public Ibft2JsonRpcRequestFactory ibft() {
+  public Ibft2RequestFactory ibft() {
     return ibft;
   }
 
@@ -78,7 +78,7 @@ public class NodeRequests {
     return perm;
   }
 
-  public AdminJsonRpcRequestFactory admin() {
+  public AdminRequestFactory admin() {
     return admin;
   }
 
@@ -86,7 +86,7 @@ public class NodeRequests {
     return customNet;
   }
 
-  public EeaJsonRpcRequestFactory eea() {
+  public EeaRequestFactory eea() {
     return eea;
   }
 

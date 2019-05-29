@@ -31,10 +31,10 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.NodeConfigu
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2JsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction.CustomNetJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
@@ -279,11 +279,11 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       nodeRequests =
           new NodeRequests(
               new JsonRpc2_0Web3j(web3jService, 2000, Async.defaultExecutorService()),
-              new CliqueJsonRpcRequestFactory(web3jService),
-              new Ibft2JsonRpcRequestFactory(web3jService),
+              new CliqueRequestFactory(web3jService),
+              new Ibft2RequestFactory(web3jService),
               new PermissioningJsonRpcRequestFactory(web3jService),
-              new AdminJsonRpcRequestFactory(web3jService),
-              new EeaJsonRpcRequestFactory(web3jService),
+              new AdminRequestFactory(web3jService),
+              new EeaRequestFactory(web3jService),
               new CustomNetJsonRpcRequestFactory(web3jService),
               websocketService,
               loginRequestFactory());

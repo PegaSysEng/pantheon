@@ -21,11 +21,11 @@ import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 
-public class EeaJsonRpcRequestFactory {
+public class EeaRequestFactory {
 
   private final Web3jService web3jService;
 
-  public EeaJsonRpcRequestFactory(final Web3jService web3jService) {
+  public EeaRequestFactory(final Web3jService web3jService) {
     this.web3jService = web3jService;
   }
 
