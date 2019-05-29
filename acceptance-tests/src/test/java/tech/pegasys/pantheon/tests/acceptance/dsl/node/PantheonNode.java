@@ -245,7 +245,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     return LOCALHOST;
   }
 
-  private NodeRequests jsonRequestFactories() {
+  private NodeRequests nodeRequests() {
     Optional<WebSocketService> websocketService = Optional.empty();
     if (nodeRequests == null) {
       final Web3jService web3jService;
@@ -562,7 +562,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   @Override
   public <T> T execute(final Transaction<T> transaction) {
-    return transaction.execute(jsonRequestFactories());
+    return transaction.execute(nodeRequests());
   }
 
   @Override
