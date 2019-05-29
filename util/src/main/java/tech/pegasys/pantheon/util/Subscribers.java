@@ -75,7 +75,7 @@ public class Subscribers<T> {
    * @param action the action to perform for each subscriber
    */
   public void forEach(final Consumer<T> action) {
-    subscribers.values().forEach(action);
+    subscribers.values().parallelStream().forEach(action);
   }
 
   /**
