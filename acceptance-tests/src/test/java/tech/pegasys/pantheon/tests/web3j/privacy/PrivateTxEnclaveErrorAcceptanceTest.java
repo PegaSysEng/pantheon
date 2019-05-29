@@ -15,81 +15,66 @@ package tech.pegasys.pantheon.tests.web3j.privacy;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
+import static tech.pegasys.pantheon.tests.web3j.privacy.PrivacyGroup.generatePrivacyGroup;
 
-import tech.pegasys.orion.testutil.OrionTestHarness;
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivateAcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
+import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyNet;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder.TransactionType;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.math.BigInteger;
+import java.util.Base64;
 
 import com.google.common.collect.Lists;
+import net.consensys.cava.crypto.sodium.Box;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PrivateTxEnclaveErrorAcceptanceTest extends PrivateAcceptanceTestBase {
+public class PrivateTxEnclaveErrorAcceptanceTest extends PrivacyAcceptanceTestBase {
+  protected static final String CONTRACT_NAME = "Event Emitter";
 
-  // Contract address is generated from sender address and transaction nonce and privacy group id
-  protected static final Address CONTRACT_ADDRESS =
-      Address.fromHexString("0x06088ead8384df709132151403e08c2b978beb85");
-  protected static final String PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
-  protected static final String WRONG_PUBLIC_KEY = "k2zXEin4Ip/qBGlRkJejnGWdP9cjkK+DAvKNW31L2C8=";
-  private SECP256K1.KeyPair keypair =
-      SECP256K1.KeyPair.create(
-          SECP256K1.PrivateKey.create(
-              new BigInteger(
-                  "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63", 16)));
-
-  private PantheonNode minerNode;
-  private static OrionTestHarness enclave;
-  private String deployContract;
+  private EventEmitterHarness eventEmitterHarness;
+  private PrivacyNet privacyNet;
+  private BytesValue wrongPublicKey;
+  private BytesValue privacyGroup;
 
   @Before
   public void setUp() throws Exception {
-    enclave = createEnclave("orion_key_0.pub", "orion_key_0.key");
-    minerNode =
-        pantheon.createPrivateTransactionEnabledMinerNode(
-            "miner-node", getPrivacyParameters(enclave), "key");
-    cluster.start(minerNode);
-
-    deployContract =
-        privateTransactionBuilder
-            .nonce(0)
-            .from(minerNode.getAddress())
-            .to(null)
-            .privateFrom(BytesValue.wrap(PUBLIC_KEY.getBytes(UTF_8)))
-            .privateFor(Lists.newArrayList())
-            .keyPair(keypair)
-            .build(TransactionType.CREATE_CONTRACT);
+    privacyNet =
+        PrivacyNet.builder(privacy, privacyPantheon, cluster, false).addMinerNode("Alice").build();
+    privacyNet.startPrivacyNet();
+    privacyGroup = generatePrivacyGroup(privacyNet, "Alice");
+    eventEmitterHarness =
+        new EventEmitterHarness(
+            privateTransactionBuilder,
+            privacyNet,
+            privateTransactions,
+            privateTransactionVerifier,
+            eea);
+    wrongPublicKey =
+        BytesValue.wrap(Base64.getEncoder().encode(Box.KeyPair.random().publicKey().bytesArray()));
   }
 
   @Test
   @SuppressWarnings("MissingFail")
   public void enclaveNoMatchingPrivateKeyError() {
 
-    String transactionHash =
-        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
-    waitForTransactionToBeMined(transactionHash);
-
-    String storeValue =
-        privateTransactionBuilder
-            .nonce(1)
-            .from(minerNode.getAddress())
-            .to(CONTRACT_ADDRESS)
-            .privateFrom(BytesValue.wrap(WRONG_PUBLIC_KEY.getBytes(UTF_8)))
-            .privateFor(Lists.newArrayList())
-            .keyPair(keypair)
-            .build(TransactionType.STORE);
+    final String invalidDeploy =
+        PrivateTransactionBuilder.builder()
+            .nonce(privacyNet.getNode("Alice").nextNonce(privacyGroup))
+            .from(privacyNet.getNode("Alice").getAddress())
+            .privateFrom(wrongPublicKey)
+            .keyPair(privacyNet.getNode("Alice").keyPair())
+            .build(TransactionType.CREATE_CONTRACT);
 
     final Throwable thrown =
         catchThrowable(
-            () -> minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue)));
+            () ->
+                privacyNet
+                    .getNode("Alice")
+                    .execute(privateTransactions.createPrivateRawTransaction(invalidDeploy)));
 
     assertThat(thrown)
         .hasMessageContaining(JsonRpcError.ENCLAVE_NO_MATCHING_PRIVATE_KEY.getMessage());
@@ -99,33 +84,31 @@ public class PrivateTxEnclaveErrorAcceptanceTest extends PrivateAcceptanceTestBa
   @SuppressWarnings("MissingFail")
   public void enclaveNoPeerUrlError() {
 
-    String transactionHash =
-        minerNode.execute(privateTransactions.deployPrivateSmartContract(deployContract));
-    waitForTransactionToBeMined(transactionHash);
+    eventEmitterHarness.deploy(CONTRACT_NAME, "Alice");
 
-    String storeValue =
-        privateTransactionBuilder
-            .nonce(1)
-            .from(minerNode.getAddress())
-            .to(CONTRACT_ADDRESS)
-            .privateFrom(BytesValue.wrap(PUBLIC_KEY.getBytes(UTF_8)))
-            .privateFor(Lists.newArrayList(BytesValue.wrap(WRONG_PUBLIC_KEY.getBytes(UTF_8))))
-            .keyPair(keypair)
-            .build(TransactionType.STORE);
+    final String invalidStore =
+        PrivateTransactionBuilder.builder()
+            .nonce(privacyNet.getNode("Alice").nextNonce(privacyGroup))
+            .from(privacyNet.getNode("Alice").getAddress())
+            .privateFrom(
+                BytesValue.wrap(
+                    privacyNet.getEnclave("Alice").getPublicKeys().get(0).getBytes(UTF_8)))
+            .privateFor(Lists.newArrayList(wrongPublicKey))
+            .keyPair(privacyNet.getNode("Alice").keyPair())
+            .build(TransactionType.CREATE_CONTRACT);
 
     final Throwable thrown =
         catchThrowable(
-            () -> minerNode.execute(privateTransactions.createPrivateRawTransaction(storeValue)));
+            () ->
+                privacyNet
+                    .getNode("Alice")
+                    .execute(privateTransactions.createPrivateRawTransaction(invalidStore)));
 
     assertThat(thrown).hasMessageContaining(JsonRpcError.NODE_MISSING_PEER_URL.getMessage());
   }
 
   @After
   public void tearDown() {
-    enclave.getOrion().stop();
-  }
-
-  public void waitForTransactionToBeMined(final String transactionHash) {
-    waitFor(() -> minerNode.verify(eea.expectSuccessfulTransactionReceipt(transactionHash)));
+    privacyNet.stopPrivacyNet();
   }
 }

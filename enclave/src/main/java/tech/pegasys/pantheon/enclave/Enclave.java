@@ -83,8 +83,8 @@ public class Enclave {
         throw new EnclaveException(errorResponse.getError());
       }
     } catch (Exception e) {
-      LOG.error("Enclave failed to execute {}", request);
-      throw new Exception(e.getMessage());
+      LOG.error("Enclave failed to execute {}", request, e);
+      throw e;
     }
   }
 }
