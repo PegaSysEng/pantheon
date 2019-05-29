@@ -46,15 +46,24 @@ public class MainnetTransactionValidator implements TransactionValidator {
 
   private final Optional<BigInteger> chainId;
 
-  private Optional<TransactionFilter> transactionFilter = Optional.empty();
+  private final Optional<TransactionFilter> transactionFilter;
 
   public MainnetTransactionValidator(
       final GasCalculator gasCalculator,
       final boolean checkSignatureMalleability,
       final Optional<BigInteger> chainId) {
+    this(gasCalculator, checkSignatureMalleability, chainId, Optional.empty());
+  }
+
+  public MainnetTransactionValidator(
+      final GasCalculator gasCalculator,
+      final boolean checkSignatureMalleability,
+      final Optional<BigInteger> chainId,
+      final Optional<TransactionFilter> transactionFilter) {
     this.gasCalculator = gasCalculator;
     this.disallowSignatureMalleability = checkSignatureMalleability;
     this.chainId = chainId;
+    this.transactionFilter = transactionFilter;
   }
 
   @Override
@@ -164,9 +173,5 @@ public class MainnetTransactionValidator implements TransactionValidator {
 
   private boolean isSenderAllowed(final Transaction transaction, final boolean isStateChange) {
     return transactionFilter.map(c -> c.permitted(transaction, isStateChange)).orElse(true);
-  }
-
-  public void setTransactionFilter(final TransactionFilter transactionFilter) {
-    this.transactionFilter = Optional.of(transactionFilter);
   }
 }

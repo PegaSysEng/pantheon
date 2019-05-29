@@ -157,9 +157,8 @@ public class MainnetTransactionValidatorTest {
   @Test
   public void shouldRejectTransactionIfAccountIsNotPermitted() {
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, Optional.empty());
-
-    validator.setTransactionFilter(transactionFilter(false));
+        new MainnetTransactionValidator(gasCalculator, false, Optional.empty(),
+            transactionFilter(false));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
         .isEqualTo(ValidationResult.invalid(TX_SENDER_NOT_AUTHORIZED));
@@ -168,9 +167,8 @@ public class MainnetTransactionValidatorTest {
   @Test
   public void shouldAcceptValidTransactionIfAccountIsPermitted() {
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, Optional.empty());
-
-    validator.setTransactionFilter(transactionFilter(true));
+        new MainnetTransactionValidator(gasCalculator, false, Optional.empty(),
+            transactionFilter(true));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
         .isEqualTo(ValidationResult.valid());
@@ -178,14 +176,14 @@ public class MainnetTransactionValidatorTest {
 
   @Test
   public void shouldPropagateCorrectStateChangeParamToTransactionFilter() {
-    final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, Optional.empty());
-
     final ArgumentCaptor<Boolean> stateChangeParamCaptor = ArgumentCaptor.forClass(Boolean.class);
     final TransactionFilter transactionFilter = mock(TransactionFilter.class);
     when(transactionFilter.permitted(any(Transaction.class), stateChangeParamCaptor.capture()))
         .thenReturn(true);
-    validator.setTransactionFilter(transactionFilter);
+
+    final MainnetTransactionValidator validator =
+        new MainnetTransactionValidator(gasCalculator, false, Optional.empty(),
+            Optional.of(transactionFilter));
 
     final TransactionValidationParams validationParams =
         new TransactionValidationParams.Builder().stateChange(true).build();
@@ -206,9 +204,9 @@ public class MainnetTransactionValidatorTest {
     return account;
   }
 
-  private TransactionFilter transactionFilter(final boolean permitted) {
+  private Optional<TransactionFilter> transactionFilter(final boolean permitted) {
     final TransactionFilter transactionFilter = mock(TransactionFilter.class);
     when(transactionFilter.permitted(any(Transaction.class), anyBoolean())).thenReturn(permitted);
-    return transactionFilter;
+    return Optional.of(transactionFilter);
   }
 }
