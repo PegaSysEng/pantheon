@@ -19,12 +19,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.Map;
 
-import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.core.Request;
-import org.web3j.protocol.core.Response;
 import org.web3j.protocol.core.methods.response.NetPeerCount;
 
 public class NetPeerCountTransaction implements Transaction<BigInteger> {
@@ -40,22 +35,6 @@ public class NetPeerCountTransaction implements Transaction<BigInteger> {
       return result.getQuantity();
     } catch (final IOException e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  public static class CustomNetJsonRpcRequestFactory {
-
-    public static class NetServicesResponse extends Response<Map<String, Map<String, String>>> {}
-
-    private final Web3jService web3jService;
-
-    public CustomNetJsonRpcRequestFactory(final Web3jService web3jService) {
-      this.web3jService = web3jService;
-    }
-
-    public Request<?, NetServicesResponse> netServices() {
-      return new Request<>(
-          "net_services", Collections.emptyList(), web3jService, NetServicesResponse.class);
     }
   }
 }
