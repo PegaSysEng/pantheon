@@ -160,7 +160,7 @@ public class OperatorSubCommand implements Runnable {
     private void importPublicKeysFromConfig() {
       LOG.info("Importing public keys from configuration.");
       JsonArray keys = nodesConfig.getJsonArray("keys");
-      keys.stream().parallel().forEach(this::importPublicKey);
+      keys.stream().forEach(this::importPublicKey);
     }
 
     /**
@@ -183,7 +183,7 @@ public class OperatorSubCommand implements Runnable {
     private void generateNodesKeys() {
       final int nodesCount = nodesConfig.getInteger("count");
       LOG.info("Generating {} nodes keys.", nodesCount);
-      IntStream.range(0, nodesCount).parallel().forEach(this::generateNodeKeypair);
+      IntStream.range(0, nodesCount).forEach(this::generateNodeKeypair);
     }
 
     /**

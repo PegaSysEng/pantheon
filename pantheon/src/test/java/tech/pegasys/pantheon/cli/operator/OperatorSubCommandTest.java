@@ -12,11 +12,28 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 import picocli.CommandLine.Model.CommandSpec;
 import tech.pegasys.pantheon.cli.CommandTestAbstract;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
+import static org.junit.Assert.assertTrue;
 
 public class OperatorSubCommandTest extends CommandTestAbstract {
 
@@ -34,7 +51,6 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
           + "  generate-blockchain-config  This command generates blockchain network"
           + System.lineSeparator()
           + "                                configuration files.";
-
 
   private static final String OPERATOR_SUBCOMMAND_NAME = "operator";
   private static final String GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME =
@@ -64,5 +80,39 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
+  @Test
+  public void generateBlockchainConfigMustGenerateKeysWhenGenerateIsTrue() throws IOException {
+    final URL configFilePath = this.getClass().getResource("/operator/config_generate_keys.json");
+    final DocumentContext configDocumentContext = JsonPath.parse(contentOf(configFilePath, UTF_8));
 
+    final Path outputDirectoryPath = Files.createTempDirectory("output");
+    parseCommand(
+        OPERATOR_SUBCOMMAND_NAME,
+        GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME,
+        "--config-file",
+        configFilePath.getPath(),
+        "--to",
+        outputDirectoryPath.toString());
+    assertThat(commandErrorOutput.toString()).isEmpty();
+
+    final Path outputGenesisExpectedPath = outputDirectoryPath.resolve("genesis.json");
+    final File outputGenesisFile = new File(outputGenesisExpectedPath.toUri());
+    assertTrue("Output genesis file must exist.", outputGenesisFile.exists());
+    final String genesisString = contentOf(outputGenesisFile, UTF_8);
+    final JsonObject genesisContent = new JsonObject(genesisString);
+    assertTrue(genesisContent.containsKey("extraData"));
+
+    final Path expectedKeysPath = outputDirectoryPath.resolve("keys");
+    final File keysDirectory = new File(expectedKeysPath.toUri());
+    assertTrue(keysDirectory.exists());
+    final File[] nodesKeysFolders = keysDirectory.listFiles();
+    assertTrue(
+        nodesKeysFolders.length
+            == configDocumentContext.read("$.blockchain.nodes.count", Integer.class));
+    final Stream<File> nodesKeysFoldersStream = stream(nodesKeysFolders);
+
+    nodesKeysFoldersStream.forEach(
+        nodeFolder ->
+            assertTrue(asList(nodeFolder.list()).containsAll(asList("key.pub", "key.priv"))));
+  }
 }
