@@ -34,9 +34,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransaction
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -51,14 +49,6 @@ public class Clique {
   public Clique(final EthTransactions eth, final CliqueTransactions clique) {
     this.eth = eth;
     this.clique = clique;
-  }
-
-  public List<PantheonNode> validators(final PantheonNode[] nodes) {
-    final Comparator<PantheonNode> compareByAddress =
-        Comparator.comparing(PantheonNode::getAddress);
-    List<PantheonNode> pantheonNodes = Arrays.asList(nodes);
-    pantheonNodes.sort(compareByAddress);
-    return pantheonNodes;
   }
 
   public ExpectValidators validatorsEqual(final PantheonNode... validators) {

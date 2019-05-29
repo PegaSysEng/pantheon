@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -75,29 +74,21 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldStillMineWhenANonProposerNodeFailsAndHasSufficientValidators()
-      throws IOException {
-    final PantheonNode[] nodes = {
-      pantheon.createCliqueNode("miner1"),
-      pantheon.createCliqueNode("miner2"),
-      pantheon.createCliqueNode("miner3")
-    };
-    final List<PantheonNode> validators = clique.validators(nodes);
-    final PantheonNode validator1 = validators.get(0);
-    final PantheonNode validator2 = validators.get(1);
-    final PantheonNode validator3 = validators.get(2);
+  public void shouldStillMineWhenSufficientValidators() throws IOException {
+    final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
+    final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
+    final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
+    cluster.start(minerNode1, minerNode2, minerNode3);
 
-    cluster.start(validators);
-    cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(validator1, 1, 85));
+    cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 1, 85));
 
-    cluster.stopNode(validator3);
-    validator1.verify(net.awaitPeerCount(1));
-    validator2.verify(net.awaitPeerCount(1));
+    cluster.stopNode(minerNode3);
+    cluster.verifyOnActiveNodes(net.awaitPeerCount(1));
 
-    cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(validator1, 1));
-    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(validator1));
+    cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 1));
+    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(minerNode1));
 
-    cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(validator1, 1));
-    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(validator2));
+    cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 1));
+    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(minerNode2));
   }
 }
