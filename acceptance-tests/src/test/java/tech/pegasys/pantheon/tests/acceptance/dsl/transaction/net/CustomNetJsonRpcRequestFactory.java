@@ -12,14 +12,16 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.CustomNetResponseTypes.NetServicesResponse;
-
 import java.util.Collections;
+import java.util.Map;
 
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
+import org.web3j.protocol.core.Response;
 
 public class CustomNetJsonRpcRequestFactory {
+
+  public static class NetServicesResponse extends Response<Map<String, Map<String, String>>> {}
 
   private final Web3jService web3jService;
 

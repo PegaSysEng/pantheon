@@ -12,13 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.AddAccountsToWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.AddNodeResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.GetAccountsWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.GetNodesWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.RemoveAccountsFromWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningResponseTypes.RemoveNodeResponse;
-
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +19,22 @@ import java.util.List;
 import org.assertj.core.util.Lists;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
+import org.web3j.protocol.core.Response;
 
 public class PermissioningJsonRpcRequestFactory {
+
+  public static class AddAccountsToWhitelistResponse extends Response<String> {}
+
+  public static class RemoveAccountsFromWhitelistResponse extends Response<String> {}
+
+  public static class GetAccountsWhitelistResponse extends Response<List<String>> {}
+
+  public static class AddNodeResponse extends Response<String> {}
+
+  public static class RemoveNodeResponse extends Response<String> {}
+
+  public static class GetNodesWhitelistResponse extends Response<List<String>> {}
+
   private final Web3jService web3jService;
 
   public PermissioningJsonRpcRequestFactory(final Web3jService web3jService) {

@@ -12,16 +12,70 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaResponseTypes.PrivateTransactionReceiptResponse;
-
 import java.util.Collections;
+import java.util.List;
 
 import org.assertj.core.util.Lists;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
+import org.web3j.protocol.core.Response;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.core.methods.response.Log;
 
 public class EeaRequestFactory {
+
+  public static class PrivateTransactionReceiptResponse
+      extends Response<PrivateTransactionReceipt> {}
+
+  public static class PrivateTransactionReceipt {
+    private String contractAddress;
+    private String from;
+    private String to;
+    private String output;
+    private List<Log> logs;
+
+    public PrivateTransactionReceipt() {}
+
+    public String getContractAddress() {
+      return contractAddress;
+    }
+
+    public void setContractAddress(final String contractAddress) {
+      this.contractAddress = contractAddress;
+    }
+
+    public String getFrom() {
+      return from;
+    }
+
+    public void setFrom(final String from) {
+      this.from = from;
+    }
+
+    public String getTo() {
+      return to;
+    }
+
+    public void setTo(final String to) {
+      this.to = to;
+    }
+
+    public List<Log> getLogs() {
+      return logs;
+    }
+
+    public void setLogs(final List<Log> logs) {
+      this.logs = logs;
+    }
+
+    public String getOutput() {
+      return output;
+    }
+
+    public void setOutput(final String output) {
+      this.output = output;
+    }
+  }
 
   private final Web3jService web3jService;
 

@@ -15,18 +15,26 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.DiscardResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.ProposalsResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.ProposeResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2ResponseTypes.SignersBlockResponse;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
+import org.web3j.protocol.core.Response;
 
 public class Ibft2RequestFactory {
+
+  public static class ProposeResponse extends Response<Boolean> {}
+
+  public static class DiscardResponse extends Response<Boolean> {}
+
+  public static class SignersBlockResponse extends Response<List<Address>> {}
+
+  public static class ProposalsResponse extends Response<Map<Address, Boolean>> {}
 
   private final Web3jService web3jService;
 
