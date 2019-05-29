@@ -131,7 +131,7 @@ public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<C
     final Optional<BlockHeader> genesisBlockHeader =
         context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
     if (!genesisBlockHeader.isPresent()) {
-      LOG.error("Genesis block cannot be retriefed from chain.");
+      LOG.error("Genesis block cannot be retrieved from chain.");
       return false;
     }
     final CliqueExtraData extraData = CliqueExtraData.decode(genesisBlockHeader.get());
