@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueReque
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.CustomNetJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class NodeRequests {
   private final PermissioningJsonRpcRequestFactory perm;
   private final AdminRequestFactory admin;
   private final EeaRequestFactory eea;
-  private final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet;
+  private final CustomNetJsonRpcRequestFactory customNet;
   private final Optional<WebSocketService> websocketService;
   private final LoginRequestFactory login;
 
@@ -44,7 +44,7 @@ public class NodeRequests {
       final PermissioningJsonRpcRequestFactory perm,
       final AdminRequestFactory admin,
       final EeaRequestFactory eea,
-      final NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet,
+      final CustomNetJsonRpcRequestFactory customNet,
       final Optional<WebSocketService> websocketService,
       final LoginRequestFactory login) {
     this.netEth = netEth;
@@ -82,7 +82,7 @@ public class NodeRequests {
     return admin;
   }
 
-  public NetPeerCountTransaction.CustomNetJsonRpcRequestFactory customNet() {
+  public CustomNetJsonRpcRequestFactory customNet() {
     return customNet;
   }
 

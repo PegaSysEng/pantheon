@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction.CustomNetJsonRpcRequestFactory;
 
 import java.util.Map;
 
