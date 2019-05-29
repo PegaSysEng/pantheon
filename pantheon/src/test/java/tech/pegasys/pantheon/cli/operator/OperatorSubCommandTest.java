@@ -12,28 +12,27 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import io.vertx.core.json.JsonObject;
-import org.junit.Test;
-import picocli.CommandLine.Model.CommandSpec;
-import tech.pegasys.pantheon.cli.CommandTestAbstract;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.contentOf;
 import static org.junit.Assert.assertTrue;
+
+import tech.pegasys.pantheon.cli.CommandTestAbstract;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import io.vertx.core.json.JsonObject;
+import org.junit.Test;
+import picocli.CommandLine.Model.CommandSpec;
 
 public class OperatorSubCommandTest extends CommandTestAbstract {
 

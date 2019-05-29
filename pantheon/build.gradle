@@ -70,7 +70,6 @@ dependencies {
   testImplementation 'org.mockito:mockito-core'
   testImplementation 'org.apache.commons:commons-text'
   testImplementation 'com.jayway.jsonpath:json-path'
-
 }
 
 task writeInfoFile(type: ProjectPropertiesFile) {
