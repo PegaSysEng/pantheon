@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.cli.operator;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.contentOf;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +27,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import com.jayway.jsonpath.DocumentContext;
@@ -81,7 +84,16 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void generateBlockchainConfigMustGenerateKeysWhenGenerateIsTrue() throws IOException {
-    final URL configFilePath = this.getClass().getResource("/operator/config_generate_keys.json");
+    generateBlockchainConfig("/operator/config_generate_keys.json", true);
+  }
+
+  @Test
+  public void generateBlockchainConfigMustImportKeysWhenGenerateIsFalse() throws IOException {
+    generateBlockchainConfig("/operator/config_import_keys.json", false);
+  }
+
+  private void generateBlockchainConfig(String configFile, boolean generate) throws IOException {
+    final URL configFilePath = this.getClass().getResource(configFile);
     final DocumentContext configDocumentContext = JsonPath.parse(contentOf(configFilePath, UTF_8));
 
     final Path outputDirectoryPath = Files.createTempDirectory("output");
@@ -105,13 +117,16 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
     final File keysDirectory = new File(expectedKeysPath.toUri());
     assertTrue(keysDirectory.exists());
     final File[] nodesKeysFolders = keysDirectory.listFiles();
-    assertTrue(
-        nodesKeysFolders.length
-            == configDocumentContext.read("$.blockchain.nodes.count", Integer.class));
+    if (generate) {
+      assertTrue(
+          nodesKeysFolders.length
+              == configDocumentContext.read("$.blockchain.nodes.count", Integer.class));
+    }
     final Stream<File> nodesKeysFoldersStream = stream(nodesKeysFolders);
 
+    final List<String> expectedKeyFiles =
+        generate ? asList("key.pub", "key.priv") : singletonList("key.pub");
     nodesKeysFoldersStream.forEach(
-        nodeFolder ->
-            assertTrue(asList(nodeFolder.list()).containsAll(asList("key.pub", "key.priv"))));
+        nodeFolder -> assertTrue(asList(nodeFolder.list()).containsAll(expectedKeyFiles)));
   }
 }
