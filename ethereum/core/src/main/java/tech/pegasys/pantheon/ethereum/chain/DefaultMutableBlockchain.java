@@ -75,6 +75,12 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
         () ->
             BytesValues.asUnsignedBigInteger(this.getChainHead().getTotalDifficulty().getBytes())
                 .longValue());
+
+    metricsSystem.createLongGauge(
+        MetricCategory.BLOCKCHAIN,
+        "chain_head_timestamp",
+        "Timestamp from the current chain head",
+        () -> getChainHeadHeader().getTimestamp());
   }
 
   @Override
