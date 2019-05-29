@@ -194,6 +194,8 @@ public abstract class PantheonControllerBuilder<C> {
             protocolSchedule,
             metricsSystem,
             this::createConsensusContext);
+    validateContext(protocolContext);
+
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
     final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
@@ -298,6 +300,10 @@ public abstract class PantheonControllerBuilder<C> {
       EthProtocolManager ethProtocolManager);
 
   protected abstract ProtocolSchedule<C> createProtocolSchedule();
+
+  protected boolean validateContext(final ProtocolContext<C> context) {
+    return true;
+  }
 
   protected abstract C createConsensusContext(
       Blockchain blockchain, WorldStateArchive worldStateArchive);

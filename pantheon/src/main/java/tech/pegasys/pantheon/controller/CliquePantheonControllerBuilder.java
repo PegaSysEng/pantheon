@@ -12,9 +12,12 @@
  */
 package tech.pegasys.pantheon.controller;
 
+import static tech.pegasys.pantheon.ethereum.core.BlockHeader.GENESIS_BLOCK_NUMBER;
+
 import tech.pegasys.pantheon.config.CliqueConfigOptions;
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
+import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.clique.CliqueMiningTracker;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueBlockScheduler;
@@ -29,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
@@ -38,6 +42,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFact
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -119,6 +124,22 @@ public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<C
   protected ProtocolSchedule<CliqueContext> createProtocolSchedule() {
     return CliqueProtocolSchedule.create(
         genesisConfig.getConfigOptions(), nodeKeys, privacyParameters);
+  }
+
+  @Override
+  protected boolean validateContext(final ProtocolContext<CliqueContext> context) {
+    final Optional<BlockHeader> genesisBlockHeader =
+        context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
+    if (!genesisBlockHeader.isPresent()) {
+      LOG.error("Genesis block cannot be retriefed from chain.");
+      return false;
+    }
+    final CliqueExtraData extraData = CliqueExtraData.decode(genesisBlockHeader.get());
+    if (extraData.getValidators().isEmpty()) {
+      LOG.warn("Genesis block contains no signers - chain will not progress.");
+      return false;
+    }
+    return true;
   }
 
   @Override

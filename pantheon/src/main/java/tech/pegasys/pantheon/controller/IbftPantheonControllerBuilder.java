@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.controller;
 
+import static tech.pegasys.pantheon.ethereum.core.BlockHeader.GENESIS_BLOCK_NUMBER;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 
 import tech.pegasys.pantheon.config.IbftConfigOptions;
@@ -26,6 +27,7 @@ import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
+import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
@@ -51,6 +53,7 @@ import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
@@ -63,6 +66,7 @@ import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.Subscribers;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -210,6 +214,22 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
   @Override
   protected ProtocolSchedule<IbftContext> createProtocolSchedule() {
     return IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), privacyParameters);
+  }
+
+  @Override
+  protected boolean validateContext(final ProtocolContext<IbftContext> context) {
+    final Optional<BlockHeader> genesisBlockHeader =
+        context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
+    if (!genesisBlockHeader.isPresent()) {
+      LOG.error("Genesis block cannot be retriefed from chain.");
+      return false;
+    }
+    final IbftExtraData extraData = IbftExtraData.decode(genesisBlockHeader.get());
+    if (extraData.getValidators().isEmpty()) {
+      LOG.warn("Genesis block contains no signers - chain will not progress.");
+      return false;
+    }
+    return true;
   }
 
   @Override
