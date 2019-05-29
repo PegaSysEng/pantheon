@@ -53,7 +53,7 @@ public class Clique {
     this.clique = clique;
   }
 
-  public List<PantheonNode> validatorsSortedByAddress(final PantheonNode[] nodes) {
+  public List<PantheonNode> validators(final PantheonNode[] nodes) {
     final Comparator<PantheonNode> compareByAddress =
         Comparator.comparing(PantheonNode::getAddress);
     List<PantheonNode> pantheonNodes = Arrays.asList(nodes);

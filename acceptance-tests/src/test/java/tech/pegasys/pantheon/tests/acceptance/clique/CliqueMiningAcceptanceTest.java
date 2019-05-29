@@ -82,7 +82,7 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
       pantheon.createCliqueNode("miner2"),
       pantheon.createCliqueNode("miner3")
     };
-    final List<PantheonNode> validators = clique.validatorsSortedByAddress(nodes);
+    final List<PantheonNode> validators = clique.validators(nodes);
     final PantheonNode validator1 = validators.get(0);
     final PantheonNode validator2 = validators.get(1);
     final PantheonNode validator3 = validators.get(2);
