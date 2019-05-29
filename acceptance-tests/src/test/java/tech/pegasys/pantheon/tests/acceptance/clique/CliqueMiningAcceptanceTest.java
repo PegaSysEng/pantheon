@@ -95,9 +95,9 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
     validator2.verify(net.awaitPeerCount(1));
 
     cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(validator1, 1));
-    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(validators.get(0)));
+    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(validator1));
 
     cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(validator1, 1));
-    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(validators.get(1)));
+    cluster.verifyOnActiveNodes(clique.proposerAtChainHeadEqual(validator2));
   }
 }
