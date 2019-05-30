@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.cli.operator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.deleteIfExists;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
@@ -30,10 +31,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
@@ -129,7 +132,7 @@ public class OperatorSubCommand implements Runnable {
     private JsonObject blockchainConfig;
     private JsonObject nodesConfig;
     private boolean generateNodesKeys;
-    private List<String> addressesForGenesisExtraData = new LinkedList<>();
+    private List<String> addressesForGenesisExtraData = new ArrayList<>();
     private Path keysDirectory;
 
     @Override
@@ -266,12 +269,12 @@ public class OperatorSubCommand implements Runnable {
      */
     private void createOutputDirectory() throws IOException {
       final Path outputDirectoryPath = outputDirectory.toPath();
+
       if (outputDirectory.exists() && outputDirectory.isDirectory()) {
-        Files.walk(outputDirectoryPath)
-            .sorted(Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(File::delete);
-        Files.deleteIfExists(outputDirectoryPath);
+        try (Stream<Path> stream = Files.walk(outputDirectoryPath)) {
+          stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+          deleteIfExists(outputDirectoryPath);
+        }
       }
       Files.createDirectory(outputDirectoryPath);
       keysDirectory = outputDirectoryPath.resolve("keys");
@@ -289,7 +292,7 @@ public class OperatorSubCommand implements Runnable {
     private void writeGenesisFile(
         final File directory, final String fileName, final JsonObject genesis) throws IOException {
       final Path genesisPath = directory.toPath().resolve(fileName);
-      Files.deleteIfExists(genesisPath);
+      deleteIfExists(genesisPath);
       LOG.info("Writing genesis file.");
       Files.write(genesisPath, genesis.encodePrettily().getBytes(UTF_8));
     }
