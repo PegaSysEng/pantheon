@@ -12,15 +12,13 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import static tech.pegasys.pantheon.ethereum.core.BlockHeader.GENESIS_BLOCK_NUMBER;
-
 import tech.pegasys.pantheon.config.IbftConfigOptions;
+import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.consensus.ibftlegacy.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftLegacyBlockInterface;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64Protocol;
@@ -37,14 +35,13 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
-import java.util.Optional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IbftLegacyPantheonControllerBuilder extends PantheonControllerBuilder<IbftContext> {
 
   private static final Logger LOG = LogManager.getLogger();
+  private final BlockInterface blockInterface = new IbftLegacyBlockInterface();
 
   @Override
   protected SubProtocolConfiguration createSubProtocolConfiguration(
@@ -78,28 +75,21 @@ public class IbftLegacyPantheonControllerBuilder extends PantheonControllerBuild
     final VoteTallyCache voteTallyCache =
         new VoteTallyCache(
             blockchain,
-            new VoteTallyUpdater(epochManager, new IbftLegacyBlockInterface()),
+            new VoteTallyUpdater(epochManager, blockInterface),
             epochManager,
-            new IbftLegacyBlockInterface());
+            blockInterface);
 
     final VoteProposer voteProposer = new VoteProposer();
     return new IbftContext(voteTallyCache, voteProposer);
   }
 
   @Override
-  protected boolean validateContext(final ProtocolContext<IbftContext> context) {
-    final Optional<BlockHeader> genesisBlockHeader =
-        context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
-    if (!genesisBlockHeader.isPresent()) {
-      LOG.error("Genesis block cannot be retriefed from chain.");
-      return false;
-    }
-    final IbftExtraData extraData = IbftExtraData.decode(genesisBlockHeader.get());
-    if (extraData.getValidators().isEmpty()) {
+  protected void validateContext(final ProtocolContext<IbftContext> context) {
+    final BlockHeader genesisBlockHeader = context.getBlockchain().getGenesisBlock().getHeader();
+
+    if (blockInterface.validatorsInBlock(genesisBlockHeader).isEmpty()) {
       LOG.warn("Genesis block contains no signers - chain will not progress.");
-      return false;
     }
-    return true;
   }
 
   @Override

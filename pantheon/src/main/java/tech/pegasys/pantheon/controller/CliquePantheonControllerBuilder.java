@@ -12,18 +12,16 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import static tech.pegasys.pantheon.ethereum.core.BlockHeader.GENESIS_BLOCK_NUMBER;
-
 import tech.pegasys.pantheon.config.CliqueConfigOptions;
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.consensus.clique.CliqueContext;
-import tech.pegasys.pantheon.consensus.clique.CliqueExtraData;
 import tech.pegasys.pantheon.consensus.clique.CliqueMiningTracker;
 import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueBlockScheduler;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueMinerExecutor;
 import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueMiningCoordinator;
 import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueJsonRpcMethodsFactory;
+import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
@@ -42,7 +40,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFact
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +53,7 @@ public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<C
   private Address localAddress;
   private EpochManager epochManager;
   private long secondsBetweenBlocks;
+  private final BlockInterface blockInterface = new CliqueBlockInterface();
 
   @Override
   protected void prepForBuild() {
@@ -128,10 +126,9 @@ public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<C
 
   @Override
   protected void validateContext(final ProtocolContext<CliqueContext> context) {
-    final Optional<BlockHeader> genesisBlockHeader =
-        context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
-    final CliqueExtraData extraData = CliqueExtraData.decode(genesisBlockHeader.get());
-    if (extraData.getValidators().isEmpty()) {
+    final BlockHeader genesisBlockHeader = context.getBlockchain().getGenesisBlock().getHeader();
+
+    if (blockInterface.validatorsInBlock(genesisBlockHeader).isEmpty()) {
       LOG.warn("Genesis block contains no signers - chain will not progress.");
     }
   }
@@ -142,9 +139,9 @@ public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<C
     return new CliqueContext(
         new VoteTallyCache(
             blockchain,
-            new VoteTallyUpdater(epochManager, new CliqueBlockInterface()),
+            new VoteTallyUpdater(epochManager, blockInterface),
             epochManager,
-            new CliqueBlockInterface()),
+            blockInterface),
         new VoteProposer(),
         epochManager);
   }

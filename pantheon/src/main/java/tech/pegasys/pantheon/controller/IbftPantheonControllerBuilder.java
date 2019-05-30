@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import static tech.pegasys.pantheon.ethereum.core.BlockHeader.GENESIS_BLOCK_NUMBER;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 
 import tech.pegasys.pantheon.config.IbftConfigOptions;
@@ -27,7 +26,6 @@ import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
@@ -66,7 +64,6 @@ import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.Subscribers;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -80,6 +77,7 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
   private IbftEventQueue ibftEventQueue;
   private IbftConfigOptions ibftConfig;
   private ValidatorPeers peers;
+  private final BlockInterface blockInterface = new IbftBlockInterface();
 
   @Override
   protected void prepForBuild() {
@@ -120,7 +118,6 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
             miningParameters,
             Util.publicKeyToAddress(nodeKeys.getPublicKey()));
 
-    final BlockInterface blockInterface = new IbftBlockInterface();
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, blockInterface, true);
 
@@ -218,10 +215,9 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
 
   @Override
   protected void validateContext(final ProtocolContext<IbftContext> context) {
-    final Optional<BlockHeader> genesisBlockHeader =
-        context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
-    final IbftExtraData extraData = IbftExtraData.decode(genesisBlockHeader.get());
-    if (extraData.getValidators().isEmpty()) {
+    final BlockHeader genesisBlockHeader = context.getBlockchain().getGenesisBlock().getHeader();
+
+    if (blockInterface.validatorsInBlock(genesisBlockHeader).isEmpty()) {
       LOG.warn("Genesis block contains no signers - chain will not progress.");
     }
   }
