@@ -105,21 +105,21 @@ public class OperatorSubCommand implements Runnable {
     @Option(
         names = "--genesis-file-name",
         paramLabel = MANDATORY_PATH_FORMAT_HELP,
-        description = "Name of the genesis file.",
+        description = "Name of the genesis file. (default: ${DEFAULT-VALUE})",
         arity = "1..1")
     private String genesisFileName = "genesis.json";
 
     @Option(
         names = "--private-key-file-name",
         paramLabel = MANDATORY_PATH_FORMAT_HELP,
-        description = "Name of the private key file.",
+        description = "Name of the private key file. (default: ${DEFAULT-VALUE})",
         arity = "1..1")
     private String privateKeyFileName = "key.priv";
 
     @Option(
         names = "--public-key-file-name",
         paramLabel = MANDATORY_PATH_FORMAT_HELP,
-        description = "Name of the public key file.",
+        description = "Name of the public key file. (default: ${DEFAULT-VALUE})",
         arity = "1..1")
     private String publicKeyFileName = "key.pub";
 
