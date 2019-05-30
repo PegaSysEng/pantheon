@@ -26,11 +26,11 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransaction
 
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 
-public class ExpectBlockHasProposer implements Condition {
+public class ExpectedBlockHasProposer implements Condition {
   private final EthTransactions eth;
   private Address proposer;
 
-  public ExpectBlockHasProposer(final EthTransactions eth, final Address proposer) {
+  public ExpectedBlockHasProposer(final EthTransactions eth, final Address proposer) {
     this.eth = eth;
     this.proposer = proposer;
   }

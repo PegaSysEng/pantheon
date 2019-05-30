@@ -20,13 +20,13 @@ import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectBlockHasProposer;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidatorsAtBlock;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidatorsAtBlockHash;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectedBlockHasProposer;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
@@ -99,8 +99,8 @@ public class Clique {
     return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
   }
 
-  public Condition aBlockIsCreatedByProposer(final PantheonNode proposer) {
-    return new ExpectBlockHasProposer(eth, proposer.getAddress());
+  public Condition blockIsCreatedByProposer(final PantheonNode proposer) {
+    return new ExpectedBlockHasProposer(eth, proposer.getAddress());
   }
 
   public static class ProposalsConfig {

@@ -86,7 +86,7 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
     cluster.verifyOnActiveNodes(net.awaitPeerCount(1));
 
     cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 2));
-    cluster.verifyOnActiveNodes(clique.aBlockIsCreatedByProposer(minerNode1));
-    cluster.verifyOnActiveNodes(clique.aBlockIsCreatedByProposer(minerNode2));
+    cluster.verifyOnActiveNodes(clique.blockIsCreatedByProposer(minerNode1));
+    cluster.verifyOnActiveNodes(clique.blockIsCreatedByProposer(minerNode2));
   }
 }
