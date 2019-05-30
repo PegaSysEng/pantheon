@@ -12,30 +12,34 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
-import static org.junit.Assert.assertTrue;
-
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import io.vertx.core.json.JsonObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import picocli.CommandLine.Model.CommandSpec;
 import tech.pegasys.pantheon.cli.CommandTestAbstract;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import io.vertx.core.json.JsonObject;
-import org.junit.Test;
-import picocli.CommandLine.Model.CommandSpec;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createTempDirectory;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static tech.pegasys.pantheon.cli.operator.OperatorSubCommandTest.Cmd.cmd;
 
 public class OperatorSubCommandTest extends CommandTestAbstract {
 
@@ -57,6 +61,12 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
   private static final String OPERATOR_SUBCOMMAND_NAME = "operator";
   private static final String GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME =
       "generate-blockchain-config";
+  private static Path tmpOutputDirectoryPath;
+
+  @BeforeClass
+  public static void init() throws IOException {
+    tmpOutputDirectoryPath = createTempDirectory("output");
+  }
 
   @Test
   public void operatorSubCommandExistAnbHaveSubCommands() {
@@ -84,29 +94,81 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void generateBlockchainConfigMustGenerateKeysWhenGenerateIsTrue() throws IOException {
-    generateBlockchainConfig("/operator/config_generate_keys.json", true);
+    generateBlockchainConfig(
+        cmd(),
+        "/operator/config_generate_keys.json",
+        tmpOutputDirectoryPath,
+        "genesis.json",
+        true,
+        asList("key.pub", "key.priv"));
   }
 
   @Test
   public void generateBlockchainConfigMustImportKeysWhenGenerateIsFalse() throws IOException {
-    generateBlockchainConfig("/operator/config_import_keys.json", false);
+    generateBlockchainConfig(
+        cmd(),
+        "/operator/config_import_keys.json",
+        tmpOutputDirectoryPath,
+        "genesis.json",
+        false,
+        singletonList("key.pub"));
   }
 
-  private void generateBlockchainConfig(String configFile, boolean generate) throws IOException {
+  @Test
+  public void genesisFileNameShouldBeEqualToOption() throws IOException {
+    generateBlockchainConfig(
+        cmd("--genesis-file-name", "option.json"),
+        "/operator/config_generate_keys.json",
+        tmpOutputDirectoryPath,
+        "option.json",
+        true,
+        asList("key.pub", "key.priv"));
+  }
+
+  @Test
+  public void publicKeyFileNameShouldBeEqualToOption() throws IOException {
+    generateBlockchainConfig(
+        cmd("--public-key-file-name", "pub.test"),
+        "/operator/config_generate_keys.json",
+        tmpOutputDirectoryPath,
+        "genesis.json",
+        true,
+        asList("pub.test", "key.priv"));
+  }
+
+  @Test
+  public void privateKeyFileNameShouldBeEqualToOption() throws IOException {
+    generateBlockchainConfig(
+        cmd("--private-key-file-name", "priv.test"),
+        "/operator/config_generate_keys.json",
+        tmpOutputDirectoryPath,
+        "genesis.json",
+        true,
+        asList("key.pub", "priv.test"));
+  }
+
+  private void generateBlockchainConfig(
+      final Cmd cmd,
+      final String configFile,
+      final Path outputDirectoryPath,
+      final String genesisFileName,
+      final boolean generate,
+      final Collection<String> expectedKeyFiles) {
     final URL configFilePath = this.getClass().getResource(configFile);
     final DocumentContext configDocumentContext = JsonPath.parse(contentOf(configFilePath, UTF_8));
-
-    final Path outputDirectoryPath = Files.createTempDirectory("output");
     parseCommand(
-        OPERATOR_SUBCOMMAND_NAME,
-        GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME,
-        "--config-file",
-        configFilePath.getPath(),
-        "--to",
-        outputDirectoryPath.toString());
+        cmd(
+                OPERATOR_SUBCOMMAND_NAME,
+                GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME,
+                "--config-file",
+                configFilePath.getPath(),
+                "--to",
+                outputDirectoryPath.toString())
+            .args(cmd.argsArray())
+            .argsArray());
     assertThat(commandErrorOutput.toString()).isEmpty();
 
-    final Path outputGenesisExpectedPath = outputDirectoryPath.resolve("genesis.json");
+    final Path outputGenesisExpectedPath = outputDirectoryPath.resolve(genesisFileName);
     final File outputGenesisFile = new File(outputGenesisExpectedPath.toUri());
     assertTrue("Output genesis file must exist.", outputGenesisFile.exists());
     final String genesisString = contentOf(outputGenesisFile, UTF_8);
@@ -117,16 +179,38 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
     final File keysDirectory = new File(expectedKeysPath.toUri());
     assertTrue(keysDirectory.exists());
     final File[] nodesKeysFolders = keysDirectory.listFiles();
+    assert nodesKeysFolders != null;
     if (generate) {
-      assertTrue(
-          nodesKeysFolders.length
-              == configDocumentContext.read("$.blockchain.nodes.count", Integer.class));
+      assertEquals(
+          nodesKeysFolders.length,
+          (int) configDocumentContext.read("$.blockchain.nodes.count", Integer.class));
     }
     final Stream<File> nodesKeysFoldersStream = stream(nodesKeysFolders);
 
-    final List<String> expectedKeyFiles =
-        generate ? asList("key.pub", "key.priv") : singletonList("key.pub");
     nodesKeysFoldersStream.forEach(
-        nodeFolder -> assertTrue(asList(nodeFolder.list()).containsAll(expectedKeyFiles)));
+        nodeFolder ->
+            assertTrue(asList(requireNonNull(nodeFolder.list())).containsAll(expectedKeyFiles)));
+  }
+
+  static class Cmd {
+    private List<String> args;
+
+    private Cmd(final List<String> args) {
+      this.args = args;
+    }
+
+    static Cmd cmd(final String... args) {
+      return new Cmd(new LinkedList<>(asList(args)));
+    }
+
+    Cmd args(final String... args) {
+      this.args.addAll(asList(args));
+      return this;
+    }
+
+    String[] argsArray() {
+      String[] wrapper = new String[] {};
+      return args.toArray(wrapper);
+    }
   }
 }
