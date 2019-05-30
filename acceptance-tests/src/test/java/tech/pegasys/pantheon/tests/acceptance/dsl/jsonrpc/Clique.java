@@ -99,7 +99,7 @@ public class Clique {
     return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
   }
 
-  public Condition proposerAtChainHeadEqual(final PantheonNode proposer) {
+  public Condition aBlockIsCreatedByProposer(final PantheonNode proposer) {
     return new ExpectBlockHasProposer(eth, proposer.getAddress());
   }
 
