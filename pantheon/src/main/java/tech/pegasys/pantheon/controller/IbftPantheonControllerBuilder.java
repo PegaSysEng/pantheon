@@ -217,19 +217,13 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
   }
 
   @Override
-  protected boolean validateContext(final ProtocolContext<IbftContext> context) {
+  protected void validateContext(final ProtocolContext<IbftContext> context) {
     final Optional<BlockHeader> genesisBlockHeader =
         context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
-    if (!genesisBlockHeader.isPresent()) {
-      LOG.error("Genesis block cannot be retriefed from chain.");
-      return false;
-    }
     final IbftExtraData extraData = IbftExtraData.decode(genesisBlockHeader.get());
     if (extraData.getValidators().isEmpty()) {
       LOG.warn("Genesis block contains no signers - chain will not progress.");
-      return false;
     }
-    return true;
   }
 
   @Override

@@ -301,9 +301,7 @@ public abstract class PantheonControllerBuilder<C> {
 
   protected abstract ProtocolSchedule<C> createProtocolSchedule();
 
-  protected boolean validateContext(final ProtocolContext<C> context) {
-    return true;
-  }
+  protected void validateContext(final ProtocolContext<C> context) { }
 
   protected abstract C createConsensusContext(
       Blockchain blockchain, WorldStateArchive worldStateArchive);

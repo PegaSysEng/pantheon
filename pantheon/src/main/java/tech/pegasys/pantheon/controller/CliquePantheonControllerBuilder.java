@@ -127,19 +127,13 @@ public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<C
   }
 
   @Override
-  protected boolean validateContext(final ProtocolContext<CliqueContext> context) {
+  protected void validateContext(final ProtocolContext<CliqueContext> context) {
     final Optional<BlockHeader> genesisBlockHeader =
         context.getBlockchain().getBlockHeader(GENESIS_BLOCK_NUMBER);
-    if (!genesisBlockHeader.isPresent()) {
-      LOG.error("Genesis block cannot be retrieved from chain.");
-      return false;
-    }
     final CliqueExtraData extraData = CliqueExtraData.decode(genesisBlockHeader.get());
     if (extraData.getValidators().isEmpty()) {
       LOG.warn("Genesis block contains no signers - chain will not progress.");
-      return false;
     }
-    return true;
   }
 
   @Override
