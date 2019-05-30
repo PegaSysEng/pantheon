@@ -24,8 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -200,7 +200,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
     }
 
     static Cmd cmd(final String... args) {
-      return new Cmd(new LinkedList<>(asList(args)));
+      return new Cmd(new ArrayList<>(asList(args)));
     }
 
     Cmd args(final String... args) {
