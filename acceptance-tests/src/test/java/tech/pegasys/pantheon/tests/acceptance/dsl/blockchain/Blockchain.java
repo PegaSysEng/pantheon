@@ -14,10 +14,13 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.blockchain;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBeneficiary;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumberAbove;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.blockchain.ExpectMinimumBlockNumber;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
+
+import java.math.BigInteger;
 
 public class Blockchain {
 
@@ -33,5 +36,24 @@ public class Blockchain {
 
   public Condition beneficiaryEquals(final PantheonNode node) {
     return new ExpectBeneficiary(eth, node);
+  }
+
+  public Condition minimumHeight(final long blockNumber) {
+    return new ExpectBlockNumberAbove(eth, BigInteger.valueOf(blockNumber));
+  }
+
+  // TODO use transactions here
+  public Condition minimumHeightProgression(
+      final PantheonNode node, final int blocksAheadOfLatest) {
+    final BigInteger futureBlock =
+        node.execute(eth.blockNumber()).add(BigInteger.valueOf(blocksAheadOfLatest));
+    return new ExpectBlockNumberAbove(eth, futureBlock);
+  }
+
+  public Condition minimumHeightProgression(
+      final PantheonNode node, final int blocksAheadOfLatest, final int timeout) {
+    final BigInteger futureBlock =
+        node.execute(eth.blockNumber()).add(BigInteger.valueOf(blocksAheadOfLatest));
+    return new ExpectBlockNumberAbove(eth, futureBlock, timeout);
   }
 }
