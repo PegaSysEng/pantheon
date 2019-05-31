@@ -324,7 +324,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
     this.checkCounter.inc();
-    if(isPermitted(sourceEnode) && isPermitted(destinationEnode)) {
+    if (isPermitted(sourceEnode) && isPermitted(destinationEnode)) {
       this.checkCounterPermitted.inc();
       return true;
     } else {

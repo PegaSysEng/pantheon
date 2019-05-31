@@ -74,21 +74,21 @@ public class NodeLocalConfigPermissioningControllerTest {
     bootnodesList.clear();
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "node_local_check_count",
-        "Number of times the node local permissioning provider has been checked"))
+            MetricCategory.PERMISSIONING,
+            "node_local_check_count",
+            "Number of times the node local permissioning provider has been checked"))
         .thenReturn(checkCounter);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "node_local_check_count_permitted",
-        "Number of times the node local permissioning provider has been checked and returned permitted"))
+            MetricCategory.PERMISSIONING,
+            "node_local_check_count_permitted",
+            "Number of times the node local permissioning provider has been checked and returned permitted"))
         .thenReturn(checkPermittedCounter);
 
     when(metricsSystem.createCounter(
-        MetricCategory.PERMISSIONING,
-        "node_local_check_count_unpermitted",
-        "Number of times the node local permissioning provider has been checked and returned unpermitted"))
+            MetricCategory.PERMISSIONING,
+            "node_local_check_count_unpermitted",
+            "Number of times the node local permissioning provider has been checked and returned unpermitted"))
         .thenReturn(checkUnpermittedCounter);
 
     controller =
@@ -98,7 +98,6 @@ public class NodeLocalConfigPermissioningControllerTest {
             selfEnode.getNodeId(),
             whitelistPersistor,
             metricsSystem);
-
   }
 
   @Test
@@ -197,7 +196,8 @@ public class NodeLocalConfigPermissioningControllerTest {
 
     verifyCountersUntouched();
 
-    assertThat(controller.isPermitted(EnodeURL.fromString(peer2), EnodeURL.fromString(peer1))).isFalse();
+    assertThat(controller.isPermitted(EnodeURL.fromString(peer2), EnodeURL.fromString(peer1)))
+        .isFalse();
 
     verifyCountersUnpermitted();
   }
