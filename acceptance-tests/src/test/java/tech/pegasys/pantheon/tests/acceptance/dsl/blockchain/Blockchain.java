@@ -31,7 +31,7 @@ public class Blockchain {
   }
 
   public Condition blockNumberMustBeLatest(final Node node) {
-    return new ExpectMinimumBlockNumber(eth, node.execute(eth.blockNumber()));
+    return new ExpectMinimumBlockNumber(eth, currentHeight(node));
   }
 
   public Condition beneficiaryEquals(final PantheonNode node) {
@@ -42,18 +42,21 @@ public class Blockchain {
     return new ExpectBlockNumberAbove(eth, BigInteger.valueOf(blockNumber));
   }
 
-  // TODO use transactions here
   public Condition minimumHeightProgression(
       final PantheonNode node, final int blocksAheadOfLatest) {
-    final BigInteger futureBlock =
-        node.execute(eth.blockNumber()).add(BigInteger.valueOf(blocksAheadOfLatest));
-    return new ExpectBlockNumberAbove(eth, futureBlock);
+    return new ExpectBlockNumberAbove(eth, futureHeight(node, blocksAheadOfLatest));
   }
 
   public Condition minimumHeightProgression(
       final PantheonNode node, final int blocksAheadOfLatest, final int timeout) {
-    final BigInteger futureBlock =
-        node.execute(eth.blockNumber()).add(BigInteger.valueOf(blocksAheadOfLatest));
-    return new ExpectBlockNumberAbove(eth, futureBlock, timeout);
+    return new ExpectBlockNumberAbove(eth, futureHeight(node, blocksAheadOfLatest), timeout);
+  }
+
+  private BigInteger futureHeight(final Node node, final int blocksAheadOfLatest) {
+    return currentHeight(node).add(BigInteger.valueOf(blocksAheadOfLatest));
+  }
+
+  private BigInteger currentHeight(final Node node) {
+    return node.execute(eth.blockNumber());
   }
 }
