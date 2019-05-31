@@ -74,7 +74,7 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
   }
 
   @Test
-  public void shouldStillMineWhenSufficientValidators() throws IOException {
+  public void shouldStillMineWhenANodeFailsAndHasSufficientValidators() throws IOException {
     final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
     final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
     final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
