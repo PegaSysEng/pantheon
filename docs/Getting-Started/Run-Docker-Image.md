@@ -32,10 +32,10 @@ docker run pegasyseng/pantheon:{{ versions.pantheon_stable }}
 !!! note
     `latest` runs the latest cached version. To pull the latest version, use `docker pull pegasyseng/pantheon:latest`. 
  
-## Command Line Options 
+## Command Line Limitations 
  
 !!!note
-    You cannot use the following Pantheon command line options when running Pantheon from the Docker image:
+    You cannot use the following Pantheon command line options when you run Pantheon from the Docker image:
     
     * [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path), see [Data Directory](#data-directory)
     * [`--config-file`](../Reference/Pantheon-CLI-Syntax.md#config), see [Custom Configuration File](#custom-configuration-file)
@@ -48,14 +48,14 @@ docker run pegasyseng/pantheon:{{ versions.pantheon_stable }}
       [`--rpc-ws-authentication-credentials-file`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-authentication-credentials-file), see [Credentials Files](#credentials-files).
     * [`--node-private-key-file`](../Reference/Pantheon-CLI-Syntax.md#node-private-key-file). When running from the Docker image, 
     Pantheon always uses the key file in the [data directory](#data-directory). 
-    * Host and port options, see [Exposing Ports](#exposing-ports). Host and port options are: 
+    * Host and port options. For more information, see [Exposing Ports](#exposing-ports).
         - [`--rpc-http-host`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-host) and [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port)
         - [`--metrics-host`](../Reference/Pantheon-CLI-Syntax.md#metrics-host) and [`--metrics-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-port)
         - [`--metrics-push-host`](../Reference/Pantheon-CLI-Syntax.md#metrics-push-host) and [`--metrics-push-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-push-port)
         - [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) and [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port)
         - [`--rpc-ws-host`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-host) and [`--rpc-ws-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-port)
     
-    All other [Pantheon command line options](/Reference/Pantheon-CLI-Syntax) work in the same way as when Pantheon is installed locally.
+    All other [Pantheon command line options](../Reference/Pantheon-CLI-Syntax) work in the same way as they work when Pantheon is installed locally.
  
 ## Starting Pantheon 
 
