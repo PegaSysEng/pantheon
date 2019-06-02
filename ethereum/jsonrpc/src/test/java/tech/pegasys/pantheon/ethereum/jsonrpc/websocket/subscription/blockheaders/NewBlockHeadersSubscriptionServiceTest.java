@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.blockheade
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -84,7 +85,7 @@ public class NewBlockHeadersSubscriptionServiceTest {
 
     simulateAddingBlock();
 
-    verify(subscriptionManager)
+    verify(subscriptionManager, timeout(100))
         .sendMessage(subscriptionIdCaptor.capture(), responseCaptor.capture());
     final Long actualSubscriptionId = subscriptionIdCaptor.getValue();
     final Object actualBlock = responseCaptor.getValue();
@@ -108,7 +109,7 @@ public class NewBlockHeadersSubscriptionServiceTest {
 
     simulateAddingBlock();
 
-    verify(subscriptionManager)
+    verify(subscriptionManager, timeout(100))
         .sendMessage(subscriptionIdCaptor.capture(), responseCaptor.capture());
     final Long actualSubscriptionId = subscriptionIdCaptor.getValue();
     final Object actualBlock = responseCaptor.getValue();
@@ -139,7 +140,7 @@ public class NewBlockHeadersSubscriptionServiceTest {
 
     simulateAddingBlock();
 
-    verify(subscriptionManager)
+    verify(subscriptionManager, timeout(100))
         .sendMessage(subscriptionIdCaptor.capture(), responseCaptor.capture());
     final Long actualSubscriptionId = subscriptionIdCaptor.getValue();
     final Object actualBlock = responseCaptor.getValue();

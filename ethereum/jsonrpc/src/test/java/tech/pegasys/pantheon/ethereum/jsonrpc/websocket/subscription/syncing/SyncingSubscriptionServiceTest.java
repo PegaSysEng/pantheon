@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,7 +59,7 @@ public class SyncingSubscriptionServiceTest {
 
     syncStatusListener.onSyncStatus(syncStatus);
 
-    verify(subscriptionManager).sendMessage(eq(subscription.getId()), eq(expectedSyncingResult));
+    verify(subscriptionManager, timeout(100)).sendMessage(eq(subscription.getId()), eq(expectedSyncingResult));
   }
 
   @Test
@@ -70,7 +71,7 @@ public class SyncingSubscriptionServiceTest {
 
     syncStatusListener.onSyncStatus(syncStatus);
 
-    verify(subscriptionManager)
+    verify(subscriptionManager, timeout(100))
         .sendMessage(eq(subscription.getId()), any(NotSynchronisingResult.class));
   }
 }

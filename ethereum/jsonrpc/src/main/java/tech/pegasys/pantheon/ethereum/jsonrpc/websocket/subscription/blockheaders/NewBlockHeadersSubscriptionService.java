@@ -23,6 +23,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.Subscriptio
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class NewBlockHeadersSubscriptionService implements BlockAddedObserver {
 
@@ -38,20 +40,23 @@ public class NewBlockHeadersSubscriptionService implements BlockAddedObserver {
 
   @Override
   public void onBlockAdded(final BlockAddedEvent event, final Blockchain blockchain) {
-    final List<NewBlockHeadersSubscription> subscribers =
-        subscriptionManager.subscriptionsOfType(
-            SubscriptionType.NEW_BLOCK_HEADERS, NewBlockHeadersSubscription.class);
+    final ExecutorService executor = Executors.newSingleThreadExecutor();
+    executor.submit(() ->{
+      final List<NewBlockHeadersSubscription> subscribers =
+              subscriptionManager.subscriptionsOfType(
+                      SubscriptionType.NEW_BLOCK_HEADERS, NewBlockHeadersSubscription.class);
 
-    final Hash newBlockHash = event.getBlock().getHash();
+      final Hash newBlockHash = event.getBlock().getHash();
 
-    for (final NewBlockHeadersSubscription subscription : subscribers) {
-      final BlockResult newBlock =
-          subscription.getIncludeTransactions()
-              ? blockWithCompleteTransaction(newBlockHash)
-              : blockWithTransactionHash(newBlockHash);
+      for (final NewBlockHeadersSubscription subscription : subscribers) {
+        final BlockResult newBlock =
+                subscription.getIncludeTransactions()
+                        ? blockWithCompleteTransaction(newBlockHash)
+                        : blockWithTransactionHash(newBlockHash);
 
-      subscriptionManager.sendMessage(subscription.getId(), newBlock);
-    }
+        subscriptionManager.sendMessage(subscription.getId(), newBlock);
+      }
+    });
   }
 
   private BlockResult blockWithCompleteTransaction(final Hash hash) {
