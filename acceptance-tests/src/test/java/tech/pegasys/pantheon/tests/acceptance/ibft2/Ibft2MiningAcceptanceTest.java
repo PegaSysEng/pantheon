@@ -28,18 +28,18 @@ public class Ibft2MiningAcceptanceTest extends AcceptanceTestBase {
     final PantheonNode minerNode = pantheon.createIbft2Node("miner1");
     cluster.start(minerNode);
 
-    cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(minerNode, 1));
+    cluster.verify(blockchain.reachesHeight(minerNode, 1));
 
     final Account sender = accounts.createAccount("account1");
     final Account receiver = accounts.createAccount("account2");
 
-    minerNode.execute(transactions.createTransfer(sender, 50));
+    minerNode.execute(accountTransactions.createTransfer(sender, 50));
     cluster.verify(sender.balanceEquals(50));
 
-    minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
+    minerNode.execute(accountTransactions.createIncrementalTransfers(sender, receiver, 1));
     cluster.verify(receiver.balanceEquals(1));
 
-    minerNode.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
+    minerNode.execute(accountTransactions.createIncrementalTransfers(sender, receiver, 2));
     cluster.verify(receiver.balanceEquals(3));
   }
 
@@ -51,21 +51,21 @@ public class Ibft2MiningAcceptanceTest extends AcceptanceTestBase {
     final PantheonNode minerNode4 = pantheon.createIbft2Node("miner4");
     cluster.start(minerNode1, minerNode2, minerNode3, minerNode4);
 
-    cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 1, 85));
+    cluster.verify(blockchain.reachesHeight(minerNode1, 1, 85));
 
     final Account sender = accounts.createAccount("account1");
     final Account receiver = accounts.createAccount("account2");
 
-    minerNode1.execute(transactions.createTransfer(sender, 50));
+    minerNode1.execute(accountTransactions.createTransfer(sender, 50));
     cluster.verify(sender.balanceEquals(50));
 
-    minerNode2.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
+    minerNode2.execute(accountTransactions.createIncrementalTransfers(sender, receiver, 1));
     cluster.verify(receiver.balanceEquals(1));
 
-    minerNode3.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
+    minerNode3.execute(accountTransactions.createIncrementalTransfers(sender, receiver, 2));
     cluster.verify(receiver.balanceEquals(3));
 
-    minerNode4.execute(transactions.createIncrementalTransfers(sender, receiver, 3));
+    minerNode4.execute(accountTransactions.createIncrementalTransfers(sender, receiver, 3));
     cluster.verify(receiver.balanceEquals(6));
   }
 
@@ -82,18 +82,18 @@ public class Ibft2MiningAcceptanceTest extends AcceptanceTestBase {
         pantheon.createIbft2NodeWithValidators("non-validator", validators);
     cluster.start(validator1, validator2, validator3, nonValidatorNode);
 
-    cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(validator1, 1, 85));
+    cluster.verify(blockchain.reachesHeight(validator1, 1, 85));
 
     final Account sender = accounts.createAccount("account1");
     final Account receiver = accounts.createAccount("account2");
 
-    validator1.execute(transactions.createTransfer(sender, 50));
+    validator1.execute(accountTransactions.createTransfer(sender, 50));
     cluster.verify(sender.balanceEquals(50));
 
-    validator2.execute(transactions.createIncrementalTransfers(sender, receiver, 1));
+    validator2.execute(accountTransactions.createIncrementalTransfers(sender, receiver, 1));
     cluster.verify(receiver.balanceEquals(1));
 
-    nonValidatorNode.execute(transactions.createIncrementalTransfers(sender, receiver, 2));
+    nonValidatorNode.execute(accountTransactions.createIncrementalTransfers(sender, receiver, 2));
     cluster.verify(receiver.balanceEquals(3));
   }
 
@@ -109,12 +109,12 @@ public class Ibft2MiningAcceptanceTest extends AcceptanceTestBase {
     final PantheonNode nonProposerNode = validators.get(validators.size() - 1);
     cluster.start(validators);
 
-    cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 1, 85));
+    cluster.verify(blockchain.reachesHeight(minerNode1, 1, 85));
 
     final Account receiver = accounts.createAccount("account2");
 
     cluster.stopNode(nonProposerNode);
-    validators.get(0).execute(transactions.createTransfer(receiver, 80));
+    validators.get(0).execute(accountTransactions.createTransfer(receiver, 80));
 
     cluster.verifyOnActiveNodes(receiver.balanceEquals(80));
   }
