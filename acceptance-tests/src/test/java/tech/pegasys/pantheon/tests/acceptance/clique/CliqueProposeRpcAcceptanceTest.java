@@ -35,10 +35,8 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
-    final Condition cliqueValidatorsChanged = clique.awaitSignerSetChange(minerNode1);
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
     minerNode2.execute(cliqueTransactions.createAddProposal(minerNode3));
-    cluster.verify(cliqueValidatorsChanged);
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
   }
 
