@@ -80,12 +80,12 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
     final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
     cluster.start(minerNode1, minerNode2, minerNode3);
 
-    cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 1, 85));
+    cluster.verifyOnActiveNodes(blockchain.reachesHeight(minerNode1, 1, 85));
 
     cluster.stopNode(minerNode3);
     cluster.verifyOnActiveNodes(net.awaitPeerCount(1));
 
-    cluster.waitOnActiveNodesUntil(wait.chainHeadHasProgressedByAtLeast(minerNode1, 2));
+    cluster.verifyOnActiveNodes(blockchain.reachesHeight(minerNode1, 2));
     cluster.verifyOnActiveNodes(clique.blockIsCreatedByProposer(minerNode1));
     cluster.verifyOnActiveNodes(clique.blockIsCreatedByProposer(minerNode2));
   }
