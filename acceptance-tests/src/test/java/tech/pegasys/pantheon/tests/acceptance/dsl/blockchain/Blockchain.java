@@ -42,12 +42,11 @@ public class Blockchain {
     return new ExpectBlockNumberAbove(eth, BigInteger.valueOf(blockNumber));
   }
 
-  public Condition minimumHeightProgression(
-      final PantheonNode node, final int blocksAheadOfLatest) {
+  public Condition reachesHeight(final PantheonNode node, final int blocksAheadOfLatest) {
     return new ExpectBlockNumberAbove(eth, futureHeight(node, blocksAheadOfLatest));
   }
 
-  public Condition minimumHeightProgression(
+  public Condition reachesHeight(
       final PantheonNode node, final int blocksAheadOfLatest, final int timeout) {
     return new ExpectBlockNumberAbove(eth, futureHeight(node, blocksAheadOfLatest), timeout);
   }

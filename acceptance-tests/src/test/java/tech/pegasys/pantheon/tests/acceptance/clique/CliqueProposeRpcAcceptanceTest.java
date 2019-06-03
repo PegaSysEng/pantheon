@@ -72,7 +72,7 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
-    minerNode1.verify(blockchain.minimumHeightProgression(minerNode1, 1));
+    minerNode1.verify(blockchain.reachesHeight(minerNode1, 1));
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
   }
 
@@ -85,7 +85,7 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
     minerNode1.execute(cliqueTransactions.createRemoveProposal(minerNode3));
-    minerNode1.verify(blockchain.minimumHeightProgression(minerNode1, 1));
+    minerNode1.verify(blockchain.reachesHeight(minerNode1, 1));
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
   }
 
@@ -101,12 +101,12 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
-    minerNode1.verify(blockchain.minimumHeightProgression(minerNode1, 1));
+    minerNode1.verify(blockchain.reachesHeight(minerNode1, 1));
     minerNode1.verify(blockchain.beneficiaryEquals(minerNode3));
     minerNode1.verify(clique.nonceVoteEquals(CLIQUE_NONCE_VOTE.AUTH));
 
     minerNode1.execute(cliqueTransactions.createRemoveProposal(minerNode2));
-    minerNode1.verify(blockchain.minimumHeightProgression(minerNode1, 1));
+    minerNode1.verify(blockchain.reachesHeight(minerNode1, 1));
     minerNode1.verify(blockchain.beneficiaryEquals(minerNode2));
     minerNode1.verify(clique.nonceVoteEquals(CLIQUE_NONCE_VOTE.DROP));
   }

@@ -40,7 +40,7 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     minerNode1.verify(blockchain.minimumHeight(1));
 
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode2));
-    cluster.verify(blockchain.minimumHeightProgression(minerNode1, 1));
+    cluster.verify(blockchain.reachesHeight(minerNode1, 1));
     cluster.verify(clique.validatorsAtBlockEqual("0x2", minerNode1, minerNode2));
     cluster.verify(clique.validatorsAtBlockEqual(LATEST, minerNode1, minerNode2));
   }
@@ -51,7 +51,7 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     minerNode1.verify(blockchain.minimumHeight(1));
 
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode2));
-    cluster.verify(blockchain.minimumHeightProgression(minerNode1, 1));
+    cluster.verify(blockchain.reachesHeight(minerNode1, 1));
     cluster.verify(
         clique.validatorsAtBlockHashFromBlockNumberEqual(minerNode1, 2, minerNode1, minerNode2));
   }
