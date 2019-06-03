@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableMap;
 import org.web3j.protocol.core.DefaultBlockParameter;
 
 public class CliqueConditions {
+
   private final EthTransactions eth;
   private final CliqueTransactions clique;
 
@@ -98,7 +99,12 @@ public class CliqueConditions {
     return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
   }
 
+  public Condition blockIsCreatedByProposer(final PantheonNode proposer) {
+    return new ExpectedBlockHasProposer(eth, proposer.getAddress());
+  }
+
   public static class ProposalsConfig {
+
     private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
     private final CliqueTransactions clique;
 
