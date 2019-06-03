@@ -80,10 +80,10 @@ final class NettyPeerConnection implements PeerConnection {
     if (isDisconnected()) {
       throw new PeerNotConnected("Attempt to send message to a closed peer connection");
     }
-    forceSend(capability, message);
+    doSend(capability, message);
   }
 
-  private void forceSend(final Capability capability, final MessageData message) {
+  private void doSend(final Capability capability, final MessageData message) {
     if (capability != null) {
       // Validate message is valid for this capability
       final SubProtocol subProtocol = multiplexer.subProtocol(capability);
@@ -150,7 +150,7 @@ final class NettyPeerConnection implements PeerConnection {
     if (disconnected.compareAndSet(false, true)) {
       LOG.debug("Disconnecting ({}) from {}", reason, peerInfo);
       callbacks.invokeDisconnect(this, reason, false);
-      forceSend(null, DisconnectMessage.create(reason));
+      doSend(null, DisconnectMessage.create(reason));
       ctx.channel().eventLoop().schedule((Callable<ChannelFuture>) ctx::close, 2L, SECONDS);
     }
   }
