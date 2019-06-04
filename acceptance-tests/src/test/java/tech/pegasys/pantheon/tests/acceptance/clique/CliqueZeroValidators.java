@@ -22,12 +22,13 @@ import org.junit.Test;
 public class CliqueZeroValidators extends AcceptanceTestBase {
 
   @Test
-  public void startingWithZeroValidatorsProducesValidCluster() throws IOException {
-    final String[] validators = {""};
-    final PantheonNode node1 = pantheon.createCliqueNodeWithValidators("node1", validators);
-    final PantheonNode node2 = pantheon.createCliqueNodeWithValidators("node2", validators);
+  public void zeroValidatorsFormValidCluster() throws IOException {
+    final String[] signers = {};
+    final PantheonNode node1 = pantheon.createCliqueNodeWithValidators("node1", signers);
+    final PantheonNode node2 = pantheon.createCliqueNodeWithValidators("node2", signers);
+
     cluster.start(node1, node2);
 
-    node1.verify(net.awaitPeerCount(1));
+    cluster.verify(net.awaitPeerCount(1));
   }
 }

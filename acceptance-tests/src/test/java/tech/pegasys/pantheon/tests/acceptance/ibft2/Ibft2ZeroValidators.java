@@ -29,6 +29,6 @@ public class Ibft2ZeroValidators extends AcceptanceTestBase {
 
     cluster.start(node1, node2);
 
-    node1.verify(net.awaitPeerCount(1));
+    cluster.verify(net.awaitPeerCount(1));
   }
 }
