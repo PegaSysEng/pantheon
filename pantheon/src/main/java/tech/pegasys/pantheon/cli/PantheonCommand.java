@@ -753,9 +753,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
       final AccountPermissioningController accountPermissioningController =
           buildAccountPermissioningController(permissioningConfiguration, pantheonController);
-      pantheonController
-          .getProtocolSchedule()
-          .addTransactionFilterToTransactionValidators(accountPermissioningController::isPermitted);
+      if (permissionsAccountsEnabled || permissionsAccountsContractEnabled) {
+        pantheonController
+            .getProtocolSchedule()
+            .addTransactionFilterToTransactionValidators(
+                accountPermissioningController::isPermitted);
+      }
 
       pantheonPluginContext.addService(
           PantheonEvents.class,
@@ -800,7 +803,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         if (localPermissioningConfiguration.isAccountWhitelistEnabled()) {
           accountLocalConfigPermissioningController =
               Optional.of(
-                  new AccountLocalConfigPermissioningController(localPermissioningConfiguration));
+                  new AccountLocalConfigPermissioningController(
+                      localPermissioningConfiguration, metricsSystem.get()));
         }
       }
 
