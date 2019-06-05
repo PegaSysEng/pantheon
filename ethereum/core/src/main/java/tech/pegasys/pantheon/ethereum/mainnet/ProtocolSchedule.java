@@ -14,10 +14,13 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import java.math.BigInteger;
 import java.util.Optional;
+import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
 
 public interface ProtocolSchedule<C> {
 
   ProtocolSpec<C> getByBlockNumber(long number);
 
   Optional<BigInteger> getChainId();
+
+  void addTransactionFilterToTransactionValidators(TransactionFilter transactionFilter);
 }
