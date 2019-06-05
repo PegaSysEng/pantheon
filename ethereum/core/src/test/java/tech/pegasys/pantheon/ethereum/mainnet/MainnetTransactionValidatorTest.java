@@ -157,8 +157,7 @@ public class MainnetTransactionValidatorTest {
   @Test
   public void shouldRejectTransactionIfAccountIsNotPermitted() {
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(
-            gasCalculator, false, Optional.empty());
+        new MainnetTransactionValidator(gasCalculator, false, Optional.empty());
     validator.setTransactionFilter(transactionFilter(false));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
@@ -168,8 +167,7 @@ public class MainnetTransactionValidatorTest {
   @Test
   public void shouldAcceptValidTransactionIfAccountIsPermitted() {
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(
-            gasCalculator, false, Optional.empty());
+        new MainnetTransactionValidator(gasCalculator, false, Optional.empty());
     validator.setTransactionFilter(transactionFilter(true));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
@@ -184,8 +182,7 @@ public class MainnetTransactionValidatorTest {
         .thenReturn(true);
 
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(
-            gasCalculator, false, Optional.empty());
+        new MainnetTransactionValidator(gasCalculator, false, Optional.empty());
     validator.setTransactionFilter(transactionFilter);
 
     final TransactionValidationParams validationParams =

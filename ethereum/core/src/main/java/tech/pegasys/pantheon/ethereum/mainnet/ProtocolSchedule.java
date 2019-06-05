@@ -12,9 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
+import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
+
 import java.math.BigInteger;
 import java.util.Optional;
-import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
 
 public interface ProtocolSchedule<C> {
 

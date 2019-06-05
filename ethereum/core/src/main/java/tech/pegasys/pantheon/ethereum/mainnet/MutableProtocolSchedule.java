@@ -14,13 +14,14 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
+
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
 
 public class MutableProtocolSchedule<C> implements ProtocolSchedule<C> {
 
@@ -72,7 +73,8 @@ public class MutableProtocolSchedule<C> implements ProtocolSchedule<C> {
   }
 
   @Override
-  public void addTransactionFilterToTransactionValidators(final TransactionFilter transactionFilter) {
+  public void addTransactionFilterToTransactionValidators(
+      final TransactionFilter transactionFilter) {
     protocolSpecs.forEach(spec -> spec.getSpec().addTransactionFilter(transactionFilter));
   }
 }

@@ -21,8 +21,6 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.UPFRONT_COST_EXCEEDS_BALANCE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID;
 
-import java.math.BigInteger;
-import java.util.Optional;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Gas;
@@ -30,6 +28,9 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
+
+import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * Validates a transaction based on Frontier protocol runtime requirements.
