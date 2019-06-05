@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
@@ -40,7 +41,8 @@ public class AccountPermissioningControllerTest {
   @Before
   public void before() {
     permissioningController =
-        new AccountPermissioningController(localConfigController, smartContractController);
+        new AccountPermissioningController(Optional.of(localConfigController),
+            Optional.of(smartContractController));
   }
 
   @Test

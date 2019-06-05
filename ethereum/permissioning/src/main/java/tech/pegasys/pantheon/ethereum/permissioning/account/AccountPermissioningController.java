@@ -12,31 +12,38 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.account;
 
+import java.util.Optional;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
 
 public class AccountPermissioningController {
 
-  private final AccountLocalConfigPermissioningController accountLocalConfigPermissioningController;
-  private final TransactionSmartContractPermissioningController
+  private final Optional<AccountLocalConfigPermissioningController> accountLocalConfigPermissioningController;
+  private final Optional<TransactionSmartContractPermissioningController>
       transactionSmartContractPermissioningController;
 
   public AccountPermissioningController(
-      final AccountLocalConfigPermissioningController accountLocalConfigPermissioningController,
-      final TransactionSmartContractPermissioningController
-          transactionSmartContractPermissioningController) {
+      final Optional<AccountLocalConfigPermissioningController> accountLocalConfigPermissioningController,
+      final Optional<TransactionSmartContractPermissioningController> transactionSmartContractPermissioningController) {
     this.accountLocalConfigPermissioningController = accountLocalConfigPermissioningController;
-    this.transactionSmartContractPermissioningController =
-        transactionSmartContractPermissioningController;
+    this.transactionSmartContractPermissioningController = transactionSmartContractPermissioningController;
   }
 
   public boolean isPermitted(final Transaction transaction, final boolean includeOnChainCheck) {
     if (includeOnChainCheck) {
-      return accountLocalConfigPermissioningController.isPermitted(transaction)
-          && transactionSmartContractPermissioningController.isPermitted(transaction);
+      return accountLocalConfigPermissioningController.map(c -> c.isPermitted(transaction))
+          .orElse(true)
+          && transactionSmartContractPermissioningController.map(c -> c.isPermitted(transaction))
+          .orElse(true);
     } else {
-      return accountLocalConfigPermissioningController.isPermitted(transaction);
+      return accountLocalConfigPermissioningController
+          .map(c -> c.isPermitted(transaction))
+          .orElse(true);
     }
+  }
+
+  public Optional<AccountLocalConfigPermissioningController> getAccountLocalConfigPermissioningController() {
+    return accountLocalConfigPermissioningController;
   }
 }
