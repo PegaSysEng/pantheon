@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
@@ -53,7 +54,7 @@ public class AdminNodeInfo implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return "admin_nodeInfo";
+    return RpcMethod.ADMIN_NODE_INFO.getMethodName();
   }
 
   @Override
@@ -72,13 +73,19 @@ public class AdminNodeInfo implements JsonRpcMethod {
 
     final BytesValue nodeId = enode.getNodeId();
     response.put("enode", enode.toString());
-    ports.put("discovery", enode.getEffectiveDiscoveryPort());
-    response.put("ip", enode.getIp());
-    response.put("listenAddr", enode.getIp() + ":" + enode.getListeningPort());
+    response.put("ip", enode.getIpAsString());
+    if (enode.isListening()) {
+      response.put("listenAddr", enode.getIpAsString() + ":" + enode.getListeningPort().getAsInt());
+    }
     response.put("id", nodeId.toUnprefixedString());
     response.put("name", clientVersion);
 
-    ports.put("listener", enode.getListeningPort());
+    if (enode.isRunningDiscovery()) {
+      ports.put("discovery", enode.getDiscoveryPortOrZero());
+    }
+    if (enode.isListening()) {
+      ports.put("listener", enode.getListeningPort().getAsInt());
+    }
     response.put("ports", ports);
 
     final ChainHead chainHead = blockchainQueries.getBlockchain().getChainHead();

@@ -12,7 +12,9 @@
  */
 package tech.pegasys.pantheon.config;
 
+import java.math.BigInteger;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
@@ -48,9 +50,11 @@ public interface GenesisConfigOptions {
 
   OptionalLong getConstantinopleFixBlockNumber();
 
-  OptionalInt getChainId();
+  Optional<BigInteger> getChainId();
 
   OptionalInt getContractSizeLimit();
+
+  OptionalInt getEvmStackSize();
 
   Map<String, Object> asMap();
 }

@@ -148,7 +148,7 @@ public class RequestManager {
       dispatchBufferedResponses();
     }
 
-    public EthPeer peer() {
+    public EthPeer getPeer() {
       return peer;
     }
 

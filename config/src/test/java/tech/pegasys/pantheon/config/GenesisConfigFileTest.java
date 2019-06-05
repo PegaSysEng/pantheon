@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -24,8 +25,8 @@ import org.junit.Test;
 
 public class GenesisConfigFileTest {
 
-  private static final int MAINNET_CHAIN_ID = 1;
-  private static final int DEVELOPMENT_CHAIN_ID = 2018;
+  private static final BigInteger MAINNET_CHAIN_ID = BigInteger.ONE;
+  private static final BigInteger DEVELOPMENT_CHAIN_ID = BigInteger.valueOf(2018);
   private static final GenesisConfigFile EMPTY_CONFIG = GenesisConfigFile.fromConfig("{}");
 
   @Test
@@ -34,7 +35,7 @@ public class GenesisConfigFileTest {
     // Sanity check some basic properties to confirm this is the mainnet file.
     assertThat(config.getConfigOptions().isEthHash()).isTrue();
     assertThat(config.getConfigOptions().getChainId()).hasValue(MAINNET_CHAIN_ID);
-    assertThat(config.getAllocations().map(GenesisAllocation::getAddress))
+    assertThat(config.streamAllocations().map(GenesisAllocation::getAddress))
         .contains(
             "000d836201318ec6899a67540690382780743280",
             "001762430ea9c3a26e5749afdb70da5f78ddbb8c",
@@ -47,7 +48,7 @@ public class GenesisConfigFileTest {
     // Sanity check some basic properties to confirm this is the dev file.
     assertThat(config.getConfigOptions().isEthHash()).isTrue();
     assertThat(config.getConfigOptions().getChainId()).hasValue(DEVELOPMENT_CHAIN_ID);
-    assertThat(config.getAllocations().map(GenesisAllocation::getAddress))
+    assertThat(config.streamAllocations().map(GenesisAllocation::getAddress))
         .contains(
             "fe3b557e8fb62b89f4916b721be55ceb828dbd73",
             "627306090abab3a6e1400e9345bc60c78a8bef57",
@@ -154,7 +155,7 @@ public class GenesisConfigFileTest {
 
     final Map<String, String> allocations =
         config
-            .getAllocations()
+            .streamAllocations()
             .collect(
                 Collectors.toMap(GenesisAllocation::getAddress, GenesisAllocation::getBalance));
     assertThat(allocations)
@@ -167,7 +168,18 @@ public class GenesisConfigFileTest {
   @Test
   public void shouldGetEmptyAllocationsWhenAllocNotPresent() {
     final GenesisConfigFile config = GenesisConfigFile.fromConfig("{}");
-    assertThat(config.getAllocations()).isEmpty();
+    assertThat(config.streamAllocations()).isEmpty();
+  }
+
+  @Test
+  public void shouldGetLargeChainId() {
+    final GenesisConfigFile config =
+        GenesisConfigFile.fromConfig(
+            "{\"config\": { \"chainId\": 31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095 }}");
+    assertThat(config.getConfigOptions().getChainId())
+        .contains(
+            new BigInteger(
+                "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095"));
   }
 
   private GenesisConfigFile configWithProperty(final String key, final String value) {

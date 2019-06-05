@@ -12,24 +12,25 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 
 import java.util.Optional;
 
 public class PermReloadPermissionsFromFile implements JsonRpcMethod {
 
-  private final Optional<AccountWhitelistController> accountWhitelistController;
+  private final Optional<AccountLocalConfigPermissioningController> accountWhitelistController;
   private final Optional<NodeLocalConfigPermissioningController> nodesWhitelistController;
 
   public PermReloadPermissionsFromFile(
-      final Optional<AccountWhitelistController> accountWhitelistController,
+      final Optional<AccountLocalConfigPermissioningController> accountWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodesWhitelistController) {
     this.accountWhitelistController = accountWhitelistController;
     this.nodesWhitelistController = nodesWhitelistController;
@@ -37,7 +38,7 @@ public class PermReloadPermissionsFromFile implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return "perm_reloadPermissionsFromFile";
+    return RpcMethod.PERM_RELOAD_PERMISSIONS_FROM_FILE.getMethodName();
   }
 
   @Override
@@ -47,7 +48,7 @@ public class PermReloadPermissionsFromFile implements JsonRpcMethod {
     }
 
     try {
-      accountWhitelistController.ifPresent(AccountWhitelistController::reload);
+      accountWhitelistController.ifPresent(AccountLocalConfigPermissioningController::reload);
       nodesWhitelistController.ifPresent(NodeLocalConfigPermissioningController::reload);
       return new JsonRpcSuccessResponse(request.getId());
     } catch (Exception e) {

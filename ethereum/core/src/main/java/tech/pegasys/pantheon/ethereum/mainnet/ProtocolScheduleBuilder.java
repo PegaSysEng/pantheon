@@ -15,6 +15,8 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 
+import java.math.BigInteger;
+import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Function;
 
@@ -25,22 +27,38 @@ public class ProtocolScheduleBuilder<C> {
   private static final Logger LOG = LogManager.getLogger();
   private final GenesisConfigOptions config;
   private final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter;
-  private final int defaultChainId;
+  private final Optional<BigInteger> defaultChainId;
   private final PrivacyParameters privacyParameters;
 
   public ProtocolScheduleBuilder(
       final GenesisConfigOptions config,
-      final int defaultChainId,
+      final BigInteger defaultChainId,
+      final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter,
+      final PrivacyParameters privacyParameters) {
+    this(config, Optional.of(defaultChainId), protocolSpecAdapter, privacyParameters);
+  }
+
+  public ProtocolScheduleBuilder(
+      final GenesisConfigOptions config,
+      final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter,
+      final PrivacyParameters privacyParameters) {
+    this(config, Optional.empty(), protocolSpecAdapter, privacyParameters);
+  }
+
+  private ProtocolScheduleBuilder(
+      final GenesisConfigOptions config,
+      final Optional<BigInteger> defaultChainId,
       final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter,
       final PrivacyParameters privacyParameters) {
     this.config = config;
-    this.protocolSpecAdapter = protocolSpecAdapter;
     this.defaultChainId = defaultChainId;
+    this.protocolSpecAdapter = protocolSpecAdapter;
     this.privacyParameters = privacyParameters;
   }
 
   public ProtocolSchedule<C> createProtocolSchedule() {
-    final int chainId = config.getChainId().orElse(defaultChainId);
+    final Optional<BigInteger> chainId =
+        config.getChainId().map(Optional::of).orElse(defaultChainId);
     final MutableProtocolSchedule<C> protocolSchedule = new MutableProtocolSchedule<>(chainId);
 
     validateForkOrdering();
@@ -48,11 +66,13 @@ public class ProtocolScheduleBuilder<C> {
     addProtocolSpec(
         protocolSchedule,
         OptionalLong.of(0),
-        MainnetProtocolSpecs.frontierDefinition(config.getContractSizeLimit()));
+        MainnetProtocolSpecs.frontierDefinition(
+            config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getHomesteadBlockNumber(),
-        MainnetProtocolSpecs.homesteadDefinition(config.getContractSizeLimit()));
+        MainnetProtocolSpecs.homesteadDefinition(
+            config.getContractSizeLimit(), config.getEvmStackSize()));
 
     config
         .getDaoForkBlock()
@@ -63,12 +83,13 @@ public class ProtocolScheduleBuilder<C> {
               addProtocolSpec(
                   protocolSchedule,
                   OptionalLong.of(daoBlockNumber),
-                  MainnetProtocolSpecs.daoRecoveryInitDefinition(config.getContractSizeLimit()));
+                  MainnetProtocolSpecs.daoRecoveryInitDefinition(
+                      config.getContractSizeLimit(), config.getEvmStackSize()));
               addProtocolSpec(
                   protocolSchedule,
                   OptionalLong.of(daoBlockNumber + 1),
                   MainnetProtocolSpecs.daoRecoveryTransitionDefinition(
-                      config.getContractSizeLimit()));
+                      config.getContractSizeLimit(), config.getEvmStackSize()));
 
               // Return to the previous protocol spec after the dao fork has completed.
               protocolSchedule.putMilestone(daoBlockNumber + 10, originalProtocolSpec);
@@ -77,23 +98,28 @@ public class ProtocolScheduleBuilder<C> {
     addProtocolSpec(
         protocolSchedule,
         config.getTangerineWhistleBlockNumber(),
-        MainnetProtocolSpecs.tangerineWhistleDefinition(config.getContractSizeLimit()));
+        MainnetProtocolSpecs.tangerineWhistleDefinition(
+            config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getSpuriousDragonBlockNumber(),
-        MainnetProtocolSpecs.spuriousDragonDefinition(chainId, config.getContractSizeLimit()));
+        MainnetProtocolSpecs.spuriousDragonDefinition(
+            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getByzantiumBlockNumber(),
-        MainnetProtocolSpecs.byzantiumDefinition(chainId, config.getContractSizeLimit()));
+        MainnetProtocolSpecs.byzantiumDefinition(
+            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getConstantinopleBlockNumber(),
-        MainnetProtocolSpecs.constantinopleDefinition(chainId, config.getContractSizeLimit()));
+        MainnetProtocolSpecs.constantinopleDefinition(
+            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getConstantinopleFixBlockNumber(),
-        MainnetProtocolSpecs.constantinopleFixDefinition(chainId, config.getContractSizeLimit()));
+        MainnetProtocolSpecs.constantinopleFixDefinition(
+            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
 
     LOG.info("Protocol schedule created with milestones: {}", protocolSchedule.listMilestones());
     return protocolSchedule;

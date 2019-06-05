@@ -19,26 +19,25 @@ import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.Packet;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDiscoveryController;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDiscoveryController.AsyncExecutor;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.TimerUtil;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.VertxTimerUtil;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
-import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
+import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.NetworkUtility;
-import tech.pegasys.pantheon.util.Preconditions;
 
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
 
+import io.netty.channel.EventLoopGroup;
+import io.netty.util.concurrent.SingleThreadEventExecutor;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Vertx;
 import io.vertx.core.datagram.DatagramPacket;
@@ -58,21 +57,25 @@ public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
       final Vertx vertx,
       final KeyPair keyPair,
       final DiscoveryConfiguration config,
-      final PeerRequirement peerRequirement,
-      final PeerBlacklist peerBlacklist,
-      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
-      final Optional<NodePermissioningController> nodePermissioningController,
+      final PeerPermissions peerPermissions,
       final MetricsSystem metricsSystem) {
-    super(
-        keyPair,
-        config,
-        peerRequirement,
-        peerBlacklist,
-        nodeWhitelistController,
-        nodePermissioningController,
-        metricsSystem);
+    super(keyPair, config, peerPermissions, metricsSystem);
     checkArgument(vertx != null, "vertx instance cannot be null");
     this.vertx = vertx;
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.NETWORK,
+        "vertx_eventloop_pending_tasks",
+        "The number of pending tasks in the Vertx event loop",
+        pendingTaskCounter(vertx.nettyEventLoopGroup()));
+  }
+
+  private IntSupplier pendingTaskCounter(final EventLoopGroup eventLoopGroup) {
+    return () ->
+        StreamSupport.stream(eventLoopGroup.spliterator(), false)
+            .filter(eventExecutor -> eventExecutor instanceof SingleThreadEventExecutor)
+            .mapToInt(eventExecutor -> ((SingleThreadEventExecutor) eventExecutor).pendingTasks())
+            .sum();
   }
 
   @Override
@@ -141,7 +144,7 @@ public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
     socket.send(
         packet.encode(),
         peer.getEndpoint().getUdpPort(),
-        peer.getEndpoint().getHost(),
+        peer.getEnodeURL().getIpAsString(),
         ar -> {
           if (ar.failed()) {
             result.completeExceptionally(ar.cause());
@@ -191,26 +194,34 @@ public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
    * @param datagram the received datagram.
    */
   private void handlePacket(final DatagramPacket datagram) {
-    try {
-      final int length = datagram.data().length();
-      Preconditions.checkGuard(
-          validatePacketSize(length),
-          PeerDiscoveryPacketDecodingException::new,
-          "Packet too large. Actual size (bytes): %s",
-          length);
-
-      // We allow exceptions to bubble up, as they'll be picked up by the exception handler.
-      final Packet packet = Packet.decode(datagram.data());
-      // Acquire the senders coordinates to build a Peer representation from them.
-      final String host = datagram.sender().host();
-      final int port = datagram.sender().port();
-      final Endpoint endpoint = new Endpoint(host, port, OptionalInt.empty());
-      handleIncomingPacket(endpoint, packet);
-    } catch (final PeerDiscoveryPacketDecodingException e) {
-      LOG.debug("Discarding invalid peer discovery packet: {}", e.getMessage());
-    } catch (final Throwable t) {
-      LOG.error("Encountered error while handling packet", t);
+    final int length = datagram.data().length();
+    if (!validatePacketSize(length)) {
+      LOG.debug("Discarding over-sized packet. Actual size (bytes): " + length);
+      return;
     }
+    vertx.<Packet>executeBlocking(
+        future -> {
+          try {
+            future.complete(Packet.decode(datagram.data()));
+          } catch (final Throwable t) {
+            future.fail(t);
+          }
+        },
+        event -> {
+          if (event.succeeded()) {
+            // Acquire the senders coordinates to build a Peer representation from them.
+            final String host = datagram.sender().host();
+            final int port = datagram.sender().port();
+            final Endpoint endpoint = new Endpoint(host, port, OptionalInt.empty());
+            handleIncomingPacket(endpoint, event.result());
+          } else {
+            if (event.cause() instanceof PeerDiscoveryPacketDecodingException) {
+              LOG.debug("Discarding invalid peer discovery packet: {}", event.cause().getMessage());
+            } else {
+              LOG.error("Encountered error while handling packet", event.cause());
+            }
+          }
+        });
   }
 
   private class VertxAsyncExecutor implements AsyncExecutor {

@@ -13,10 +13,10 @@
 package tech.pegasys.pantheon;
 
 import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketService;
 import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
-import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
@@ -43,6 +43,7 @@ public class Runner implements AutoCloseable {
 
   private final NetworkRunner networkRunner;
   private final Optional<JsonRpcHttpService> jsonRpc;
+  private final Optional<GraphQLHttpService> graphQLHttp;
   private final Optional<WebSocketService> websocketRpc;
   private final Optional<MetricsService> metrics;
 
@@ -53,12 +54,14 @@ public class Runner implements AutoCloseable {
       final Vertx vertx,
       final NetworkRunner networkRunner,
       final Optional<JsonRpcHttpService> jsonRpc,
+      final Optional<GraphQLHttpService> graphQLHttp,
       final Optional<WebSocketService> websocketRpc,
       final Optional<MetricsService> metrics,
       final PantheonController<?> pantheonController,
       final Path dataDir) {
     this.vertx = vertx;
     this.networkRunner = networkRunner;
+    this.graphQLHttp = graphQLHttp;
     this.jsonRpc = jsonRpc;
     this.websocketRpc = websocketRpc;
     this.metrics = metrics;
@@ -73,7 +76,15 @@ public class Runner implements AutoCloseable {
       if (networkRunner.getNetwork().isP2pEnabled()) {
         pantheonController.getSynchronizer().start();
       }
+      vertx.setPeriodic(
+          TimeUnit.MINUTES.toMillis(1),
+          time ->
+              pantheonController
+                  .getTransactionPool()
+                  .getPendingTransactions()
+                  .evictOldTransactions());
       jsonRpc.ifPresent(service -> waitForServiceToStart("jsonRpc", service.start()));
+      graphQLHttp.ifPresent(service -> waitForServiceToStart("graphQLHttp", service.start()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.start()));
       metrics.ifPresent(service -> waitForServiceToStart("metrics", service.start()));
       LOG.info("Ethereum main loop is up.");
@@ -95,11 +106,16 @@ public class Runner implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    networkRunner.stop();
-    networkRunner.awaitStop();
-
     try {
+      if (networkRunner.getNetwork().isP2pEnabled()) {
+        pantheonController.getSynchronizer().stop();
+      }
+
+      networkRunner.stop();
+      networkRunner.awaitStop();
+
       jsonRpc.ifPresent(service -> waitForServiceToStop("jsonRpc", service.stop()));
+      graphQLHttp.ifPresent(service -> waitForServiceToStop("graphQLHttp", service.stop()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.stop()));
       metrics.ifPresent(service -> waitForServiceToStop("metrics", service.stop()));
     } finally {
@@ -144,23 +160,28 @@ public class Runner implements AutoCloseable {
 
   private void writePantheonPortsToFile() {
     final Properties properties = new Properties();
-    final P2PNetwork network = networkRunner.getNetwork();
     if (networkRunner.getNetwork().isP2pEnabled()) {
       networkRunner
           .getNetwork()
           .getLocalEnode()
           .ifPresent(
               enode -> {
-                if (network.isDiscoveryEnabled()) {
+                if (enode.getDiscoveryPort().isPresent()) {
                   properties.setProperty(
-                      "discovery", String.valueOf(enode.getEffectiveDiscoveryPort()));
+                      "discovery", String.valueOf(enode.getDiscoveryPort().getAsInt()));
                 }
-                properties.setProperty("p2p", String.valueOf(enode.getListeningPort()));
+                if (enode.getListeningPort().isPresent()) {
+                  properties.setProperty(
+                      "p2p", String.valueOf(enode.getListeningPort().getAsInt()));
+                }
               });
     }
 
     if (getJsonRpcPort().isPresent()) {
       properties.setProperty("json-rpc", String.valueOf(getJsonRpcPort().get()));
+    }
+    if (getGraphQLHttpPort().isPresent()) {
+      properties.setProperty("graphql-http", String.valueOf(getGraphQLHttpPort().get()));
     }
     if (getWebsocketPort().isPresent()) {
       properties.setProperty("ws-rpc", String.valueOf(getWebsocketPort().get()));
@@ -183,6 +204,10 @@ public class Runner implements AutoCloseable {
 
   public Optional<Integer> getJsonRpcPort() {
     return jsonRpc.map(service -> service.socketAddress().getPort());
+  }
+
+  public Optional<Integer> getGraphQLHttpPort() {
+    return graphQLHttp.map(service -> service.socketAddress().getPort());
   }
 
   public Optional<Integer> getWebsocketPort() {

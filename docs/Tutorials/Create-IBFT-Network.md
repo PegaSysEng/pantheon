@@ -1,3 +1,8 @@
+description: Pantheon IBFT 2.0 Proof-of-Authority (PoA) private network tutorial 
+<!--- END of page meta data -->
+
+*[Byzantine fault tolerant]: Ability to function correctly and reach consensus despite nodes failing or propagating incorrect information to peers.
+
 # Creating a Private Network using IBFT 2.0 (Proof of Authority) Consensus Protocol
 
 A private network provides a configurable network for testing. This private network uses the [IBFT 2.0 (Proof of Authority)
@@ -6,6 +11,9 @@ consensus protocol](../Consensus-Protocols/IBFT.md).
 !!!important
     An Ethereum private network created as described here is isolated but not protected or secure. 
     We recommend running the private network behind a properly configured firewall.
+    
+    This tuturial configures a private network using IBFT 2.0 for education purposes only. IBFT 2.0 requires 
+    4 validators to be Byzantine fault tolerant. 
 
 ## Prerequisites 
 
@@ -101,7 +109,7 @@ Copy the following genesis definition to a file called `ibftGenesis.json` and sa
 ```json
 {
   "config": {
-    "chainId": 1981,
+    "chainId": 2018,
     "constantinoplefixblock": 0,
     "ibft2": {
       "blockperiodseconds": 2,
@@ -226,7 +234,7 @@ The command line specifies:
 
 ### 9. Confirm Private Network is Working 
 
-Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/JSON-RPC-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
+Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/Pantheon-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
 ```bash
 curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' localhost:8545

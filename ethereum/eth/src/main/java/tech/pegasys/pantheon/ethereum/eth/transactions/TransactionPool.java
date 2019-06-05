@@ -25,15 +25,16 @@ import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.AccountFilter;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidationParams;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,7 @@ import org.apache.logging.log4j.Logger;
  * <p>This class is safe for use across multiple threads.
  */
 public class TransactionPool implements BlockAddedObserver {
+
   private static final Logger LOG = getLogger();
   private static final long SYNC_TOLERANCE = 100L;
   private final PendingTransactions pendingTransactions;
@@ -57,18 +59,31 @@ public class TransactionPool implements BlockAddedObserver {
   private final TransactionBatchAddedListener transactionBatchAddedListener;
   private final SyncState syncState;
   private Optional<AccountFilter> accountFilter = Optional.empty();
+  private final PeerTransactionTracker peerTransactionTracker;
 
   public TransactionPool(
       final PendingTransactions pendingTransactions,
       final ProtocolSchedule<?> protocolSchedule,
       final ProtocolContext<?> protocolContext,
       final TransactionBatchAddedListener transactionBatchAddedListener,
-      final SyncState syncState) {
+      final SyncState syncState,
+      final EthContext ethContext,
+      final PeerTransactionTracker peerTransactionTracker) {
     this.pendingTransactions = pendingTransactions;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.transactionBatchAddedListener = transactionBatchAddedListener;
     this.syncState = syncState;
+    this.peerTransactionTracker = peerTransactionTracker;
+
+    ethContext.getEthPeers().subscribeConnect(this::handleConnect);
+  }
+
+  private void handleConnect(final EthPeer peer) {
+    List<Transaction> localTransactions = getLocalTransactions();
+    for (Transaction transaction : localTransactions) {
+      peerTransactionTracker.addToPeerSendQueue(peer, transaction);
+    }
   }
 
   public List<Transaction> getLocalTransactions() {
@@ -91,11 +106,11 @@ public class TransactionPool implements BlockAddedObserver {
   }
 
   public void addRemoteTransactions(final Collection<Transaction> transactions) {
+    if (!syncState.isInSync(SYNC_TOLERANCE)) {
+      return;
+    }
     final Set<Transaction> addedTransactions = new HashSet<>();
-    for (final Transaction transaction : sortByNonce(transactions)) {
-      if (!syncState.isInSync(SYNC_TOLERANCE)) {
-        return;
-      }
+    for (final Transaction transaction : transactions) {
       final ValidationResult<TransactionInvalidReason> validationResult =
           validateTransaction(transaction);
       if (validationResult.isValid()) {
@@ -113,13 +128,6 @@ public class TransactionPool implements BlockAddedObserver {
     if (!addedTransactions.isEmpty()) {
       transactionBatchAddedListener.onTransactionsAdded(addedTransactions);
     }
-  }
-
-  // Sort transactions by nonce to ensure we import sequences of transactions correctly
-  private List<Transaction> sortByNonce(final Collection<Transaction> transactions) {
-    final List<Transaction> sortedTransactions = new ArrayList<>(transactions);
-    sortedTransactions.sort(Comparator.comparing(Transaction::getNonce));
-    return sortedTransactions;
   }
 
   public void addTransactionListener(final PendingTransactionListener listener) {
@@ -170,13 +178,17 @@ public class TransactionPool implements BlockAddedObserver {
               transaction.getGasLimit(), chainHeadBlockHeader.getGasLimit()));
     }
 
+    final TransactionValidationParams validationParams =
+        new TransactionValidationParams.Builder().allowFutureNonce(true).stateChange(false).build();
+
     return protocolContext
         .getWorldStateArchive()
         .get(chainHeadBlockHeader.getStateRoot())
         .map(
             worldState -> {
               final Account senderAccount = worldState.get(transaction.getSender());
-              return getTransactionValidator().validateForSender(transaction, senderAccount, true);
+              return getTransactionValidator()
+                  .validateForSender(transaction, senderAccount, validationParams);
             })
         .orElseGet(() -> ValidationResult.invalid(CHAIN_HEAD_WORLD_STATE_NOT_AVAILABLE));
   }

@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.metrics.Observation;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.OperationTimer.TimingContext;
 
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
@@ -85,15 +85,15 @@ public class NoOpMetricsSystem implements MetricsSystem {
       final MetricCategory category,
       final String name,
       final String help,
-      final Supplier<Double> valueSupplier) {}
+      final DoubleSupplier valueSupplier) {}
 
   @Override
-  public Stream<Observation> getMetrics(final MetricCategory category) {
+  public Stream<Observation> streamObservations(final MetricCategory category) {
     return Stream.empty();
   }
 
   @Override
-  public Stream<Observation> getMetrics() {
+  public Stream<Observation> streamObservations() {
     return Stream.empty();
   }
 

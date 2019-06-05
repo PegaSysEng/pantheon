@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -41,7 +42,7 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return "perm_removeNodesFromWhitelist";
+    return RpcMethod.PERM_REMOVE_NODES_FROM_WHITELIST.getMethodName();
   }
 
   @Override
@@ -70,9 +71,9 @@ public class PermRemoveNodesFromWhitelist implements JsonRpcMethod {
               return new JsonRpcErrorResponse(req.getId(), JsonRpcError.WHITELIST_PERSIST_FAILURE);
             case ERROR_WHITELIST_FILE_SYNC:
               return new JsonRpcErrorResponse(req.getId(), JsonRpcError.WHITELIST_FILE_SYNC);
-            case ERROR_BOOTNODE_CANNOT_BE_REMOVED:
+            case ERROR_FIXED_NODE_CANNOT_BE_REMOVED:
               return new JsonRpcErrorResponse(
-                  req.getId(), JsonRpcError.NODE_WHITELIST_BOOTNODE_CANNOT_BE_REMOVED);
+                  req.getId(), JsonRpcError.NODE_WHITELIST_FIXED_NODE_CANNOT_BE_REMOVED);
             default:
               throw new Exception();
           }

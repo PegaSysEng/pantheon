@@ -34,12 +34,16 @@ public class EthHashMinerExecutorTest {
     final MiningParameters miningParameters =
         new MiningParametersTestBuilder().coinbase(null).build();
 
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(
+            PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 1, TestClock.fixed(), metricsSystem);
+
     final EthHashMinerExecutor executor =
         new EthHashMinerExecutor(
             null,
             Executors.newCachedThreadPool(),
             null,
-            new PendingTransactions(1, TestClock.fixed(), metricsSystem),
+            pendingTransactions,
             miningParameters,
             new DefaultBlockScheduler(1, 10, TestClock.fixed()));
 
@@ -52,12 +56,16 @@ public class EthHashMinerExecutorTest {
   public void settingCoinbaseToNullThrowsException() {
     final MiningParameters miningParameters = new MiningParametersTestBuilder().build();
 
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(
+            PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 1, TestClock.fixed(), metricsSystem);
+
     final EthHashMinerExecutor executor =
         new EthHashMinerExecutor(
             null,
             Executors.newCachedThreadPool(),
             null,
-            new PendingTransactions(1, TestClock.fixed(), metricsSystem),
+            pendingTransactions,
             miningParameters,
             new DefaultBlockScheduler(1, 10, TestClock.fixed()));
 

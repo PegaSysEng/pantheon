@@ -17,28 +17,55 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.OptionalLong;
 
 public class SyncStatusNodePermissioningProvider implements NodePermissioningProvider {
 
   private final Synchronizer synchronizer;
-  private final Collection<EnodeURL> bootnodes = new HashSet<>();
+  private final Collection<EnodeURL> fixedNodes = new HashSet<>();
+  private final Counter checkCounter;
+  private final Counter checkCounterPermitted;
+  private final Counter checkCounterUnpermitted;
   private OptionalLong syncStatusObserverId;
   private boolean hasReachedSync = false;
-  private Optional<Runnable> hasReachedSyncCallback = Optional.empty();
 
   public SyncStatusNodePermissioningProvider(
-      final Synchronizer synchronizer, final Collection<EnodeURL> bootnodes) {
+      final Synchronizer synchronizer,
+      final Collection<EnodeURL> fixedNodes,
+      final MetricsSystem metricsSystem) {
     checkNotNull(synchronizer);
     this.synchronizer = synchronizer;
     long id = this.synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
     this.syncStatusObserverId = OptionalLong.of(id);
-    this.bootnodes.addAll(bootnodes);
+    this.fixedNodes.addAll(fixedNodes);
+
+    metricsSystem.createIntegerGauge(
+        MetricCategory.PERMISSIONING,
+        "sync_status_node_sync_reached",
+        "Whether the sync status permissioning provider has realised sync yet",
+        () -> hasReachedSync ? 1 : 0);
+    this.checkCounter =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "sync_status_node_check_count",
+            "Number of times the sync status permissioning provider has been checked");
+    this.checkCounterPermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "sync_status_node_check_count_permitted",
+            "Number of times the sync status permissioning provider has been checked and returned permitted");
+    this.checkCounterUnpermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "sync_status_node_check_count_unpermitted",
+            "Number of times the sync status permissioning provider has been checked and returned unpermitted");
   }
 
   private void handleSyncStatusUpdate(final SyncStatus syncStatus) {
@@ -47,7 +74,6 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
       if (blocksBehind <= 0) {
         synchronized (this) {
           if (!hasReachedSync) {
-            runCallback();
             syncStatusObserverId.ifPresent(
                 id -> {
                   synchronizer.removeObserver(id);
@@ -60,21 +86,8 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
     }
   }
 
-  public synchronized void setHasReachedSyncCallback(final Runnable runnable) {
-    if (hasReachedSync) {
-      runCallback();
-    } else {
-      this.hasReachedSyncCallback = Optional.of(runnable);
-    }
-  }
-
-  private synchronized void runCallback() {
-    hasReachedSyncCallback.ifPresent(Runnable::run);
-    hasReachedSyncCallback = Optional.empty();
-  }
-
   /**
-   * Before reaching a sync'd state, the node will only be allowed to talk to its bootnodes
+   * Before reaching a sync'd state, the node will only be allowed to talk to its fixedNodes
    * (outgoing connections). After reaching a sync'd state, it is expected that other providers will
    * check the permissions (most likely the smart contract based provider). That's why we always
    * return true after reaching a sync'd state.
@@ -89,7 +102,14 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
     if (hasReachedSync) {
       return true;
     } else {
-      return bootnodes.contains(destinationEnode);
+      checkCounter.inc();
+      if (fixedNodes.contains(destinationEnode)) {
+        checkCounterPermitted.inc();
+        return true;
+      } else {
+        checkCounterUnpermitted.inc();
+        return false;
+      }
     }
   }
 

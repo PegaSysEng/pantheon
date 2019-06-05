@@ -143,10 +143,84 @@ The path to the genesis file.
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-genesis-file). 
 
+
+### graphql-http-cors-origins
+
+```bash tab="Syntax"
+--graphql-http-cors-origins=<graphQLHttpCorsAllowedOrigins>
+```
+
+```bash tab="Example Command Line"
+--graphql-http-cors-origins="http://medomain.com","https://meotherdomain.com"
+```
+
+```bash tab="Example Configuration File"
+graphql-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
+```
+
+Comma separated origin domain URLs for CORS validation. The default is none. 
+
+### graphql-http-enabled
+
+```bash tab="Syntax"
+--graphql-http-enabled
+```
+
+```bash tab="Example Configuration File"
+graphql-http-enabled=true
+```
+
+Set to `true` to enable the GraphQL HTTP service.
+The default is `false`.
+
+### graphql-http-host
+
+```bash tab="Syntax"
+--graphql-http-host=<HOST>
+```
+
+```bash tab="Example Command Line"
+# to listen on all interfaces
+--graphql-http-host=0.0.0.0
+```
+
+```bash tab="Example Configuration File"
+graphql-http-host="0.0.0.0"
+```
+
+Host for GraphQL HTTP to listen on.
+The default is 127.0.0.1.
+
+To allow remote connections, set to `0.0.0.0`
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
+    
+### graphql-http-port
+
+```bash tab="Syntax"
+--graphql-http-port=<PORT>
+```
+
+```bash tab="Example Command Line"
+# to listen on port 6175
+--graphql-http-port=6175
+```
+
+```bash tab="Example Configuration File"
+graphql-http-port="6175"
+```
+
+Specifies GraphQL HTTP listening port (TCP).
+The default is 8547. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
+
 ### host-whitelist
 
 ```bash tab="Syntax"
---host-whitelist=<hostname>[,<hostname>...]... or * or all
+--host-whitelist=<hostname>[,<hostname>...]... or *
 ```
 
 ```bash tab="Example Command Line"
@@ -157,11 +231,11 @@ The path to the genesis file.
 host-whitelist=["medomain.com", "meotherdomain.com"]
 ```
 
-Comma-separated list of hostnames to allow [access to the JSON-RPC API](../JSON-RPC-API/Using-JSON-RPC-API.md#host-whitelist). 
+Comma-separated list of hostnames to allow [access to the JSON-RPC API](../Pantheon-API/Using-JSON-RPC-API.md#host-whitelist). 
 By default, access from `localhost` and `127.0.0.1` is accepted. 
 
 !!!tip
-    To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
+    To allow all hostnames, use `*`. We don't recommend allowing all hostnames for production code.
 
 ### max-peers
 
@@ -207,7 +281,7 @@ Comma separated list of categories for which to track metrics. The default is al
 metrics-enabled=true
 ```
 
-Set to `true` to enable the [metrics exporter](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
+Set to `true` to enable the [metrics exporter](../Using-Pantheon/Monitoring.md#monitor-node-performance-using-prometheus).
 The default is `false`.
 
 `--metrics-enabled` cannot be specified with `--metrics-push-enabled`. That is, either Prometheus polling or Prometheus 
@@ -227,7 +301,7 @@ push gateway support can be enabled but not both at once.
 metrics-host="127.0.0.1"
 ```
 
-Specifies the host on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus). 
+Specifies the host on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Monitoring.md#monitor-node-performance-using-prometheus). 
 The metrics server respects the [`--host-whitelist` option](#host-whitelist).
 
 The default is `127.0.0.1`. 
@@ -246,7 +320,7 @@ The default is `127.0.0.1`.
 metrics-port="6174"
 ```
 
-Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-prometheus).
+Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Monitoring.md#monitor-node-performance-using-prometheus).
 The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
 
 ### metrics-push-enabled 
@@ -263,7 +337,7 @@ The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pant
 metrics-push-enabled="true"
 ```
 
-Set to `true` to start the [push gateway integration](../Using-Pantheon/Debugging.md#running-prometheus-with-pantheon-in-push-mode).
+Set to `true` to start the [push gateway integration](../Using-Pantheon/Monitoring.md#running-prometheus-with-pantheon-in-push-mode).
 
 `--metrics-push-enabled` cannot be specified with `--metrics-enabled`. That is, either Prometheus polling or Prometheus 
 push gateway support can be enabled but not both at once.
@@ -355,7 +429,7 @@ Job name when in `push` mode. The default is `pantheon-client`.
 
 Account to which mining rewards are paid.
 You must specify a valid coinbase when you enable mining using the [`--miner-enabled`](#miner-enabled) 
-option or the [`miner_start`](JSON-RPC-API-Methods.md#miner_start) JSON RPC-API method.
+option or the [`miner_start`](Pantheon-API-Methods.md#miner_start) JSON RPC-API method.
 
 !!!note
     This option is ignored in networks using [Clique](../Consensus-Protocols/Clique.md) and [IBFT 2.0](../Consensus-Protocols/IBFT.md) consensus protocols. 
@@ -644,10 +718,7 @@ Default is the `permissions_config.toml` file in the [data directory](#data-path
 permissions-nodes-contract-address=xyz
 ```
 
-Specifies the contract address for contract-based nodes permissions.
-
-!!!note
-    Contract-based nodes permissions are under development and will be available in v1.1.  
+Specifies the contract address for [onchain node permissioning](../Permissions/Onchain-Permissioning.md).
 
 ### permissions-nodes-contract-enabled
 
@@ -663,10 +734,7 @@ Specifies the contract address for contract-based nodes permissions.
 permissions-nodes-contract-enabled=true
 ```
 
-Set to enable contract-based node level permissions. Default is `false`.
-
-!!!note
-    Contract-based nodes permissions are under development and will be available in v1.1.  
+Enables contract-based [onchain node permissioning](../Permissions/Onchain-Permissioning.md). Default is `false`.
 
 ### privacy-enabled
 
@@ -766,7 +834,7 @@ The default is: `ETH`, `NET`, `WEB3`.
 rpc-http-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
-[Credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
+[Credentials file](../Pantheon-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../Pantheon-API/Authentication.md). 
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files).
@@ -785,7 +853,7 @@ rpc-http-authentication-credentials-file="/home/me/me_node/auth.toml"
 rpc-http-authentication-enabled=true
 ```
 
-Set to `true` to require [authentication](../JSON-RPC-API/Authentication.md) for the HTTP JSON-RPC service.  
+Set to `true` to require [authentication](../Pantheon-API/Authentication.md) for the HTTP JSON-RPC service.  
 
 ### rpc-http-cors-origins
 
@@ -925,7 +993,7 @@ The default is: `ETH`, `NET`, `WEB3`.
 rpc-ws-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
-[Credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md).
+[Credentials file](../Pantheon-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../Pantheon-API/Authentication.md).
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files). 
@@ -944,10 +1012,10 @@ rpc-ws-authentication-credentials-file="/home/me/me_node/auth.toml"
 rpc-ws-authentication-enabled=true
 ```
 
-Set to `true` to require [authentication](../JSON-RPC-API/Authentication.md) for the WebSockets JSON-RPC service.
+Set to `true` to require [authentication](../Pantheon-API/Authentication.md) for the WebSockets JSON-RPC service.
 
 !!! note 
-    `wscat` does not support headers. [Authentication](../JSON-RPC-API/Authentication.md) requires an authentication token to be passed in the 
+    `wscat` does not support headers. [Authentication](../Pantheon-API/Authentication.md) requires an authentication token to be passed in the 
     request header. To use authentication with WebSockets, an app that supports headers is required. 
 
 ### rpc-ws-enabled
@@ -1023,6 +1091,22 @@ tx-pool-max-size="2000"
 
 Maximum number of transactions kept in the transaction pool. Default is 4096. 
 
+### tx-pool-retention-hours
+
+```bash tab="Syntax"
+--tx-pool-retention-hours=<INTEGER>
+```
+
+```bash tab="Example Command Line"
+--tx-pool-retention-hours=5
+```
+
+```bash tab="Example Configuration File"
+tx-pool-retention-hours="5"
+```
+
+Maximum period in hours to retain pending transactions in the transaction pool. Default is 13. 
+
 ### help
 
 ```bash tab="Syntax"
@@ -1058,10 +1142,6 @@ Default is `INFO`.
 Print version information and exit.
 
 ## Fast Sync Options 
-
-!!! important 
-    Support for fast sync is currently experimental. Fast sync is in active development. The fast sync options are available
-    but hidden on the command line. 
 
 ### sync-mode
 
@@ -1106,11 +1186,11 @@ This command provides blocks related actions.
 ### import
 
 ```bash tab="Syntax"
-$ pantheon blocks import --from=<block-file>
+pantheon blocks import --from=<block-file>
 ```
 
 ```bash tab="Example"
-$ pantheon blocks import --from=/home/me/me_project/mainnet.blocks
+pantheon blocks import --from=/home/me/me_project/mainnet.blocks
 ```
 
 Imports blocks from the specified file into the blockchain database
@@ -1122,15 +1202,15 @@ This command provides node public key related actions.
 ### export
 
 ```bash tab="Syntax"
-$ pantheon public-key export [--to=<key-file>]
+pantheon public-key export [--to=<key-file>]
 ```
 
 ```bash tab="Example (to standard output)"
-$ pantheon --data-path=<node data path> public-key export
+pantheon --data-path=<node data path> public-key export
 ```
 
 ```bash tab="Example (to file)"
-$ pantheon --data-path=<node data path> public-key export --to=/home/me/me_project/not_precious_pub_key
+pantheon --data-path=<node data path> public-key export --to=/home/me/me_project/not_precious_pub_key
 ```
 
 Outputs the node public key to standard output or writes it to the specified file if 
@@ -1139,15 +1219,15 @@ Outputs the node public key to standard output or writes it to the specified fil
 ### export-address
 
 ```bash tab="Syntax"
-$ pantheon public-key export-address [--to=<address-file>]
+pantheon public-key export-address [--to=<address-file>]
 ```
 
 ```bash tab="Example (to standard output)"
-$ pantheon --data-path=<node data path> public-key export-address
+pantheon --data-path=<node data path> public-key export-address
 ```
 
 ```bash tab="Example (to file)"
-$ pantheon --data-path=<node data path> public-key export-address --to=/home/me/me_project/me_node_address
+pantheon --data-path=<node data path> public-key export-address --to=/home/me/me_project/me_node_address
 ```
 
 Outputs the node public key address to standard output or writes it to the specified file if  
@@ -1159,15 +1239,15 @@ This command provides password related actions.
 
 ### hash
 
-This command generates the hash of a given password. Include the hash in the [credentials file](../JSON-RPC-API/Authentication.md#credentials-file)
- for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md). 
+This command generates the hash of a given password. Include the hash in the [credentials file](../Pantheon-API/Authentication.md#credentials-file)
+ for JSON-RPC API [authentication](../Pantheon-API/Authentication.md). 
 
 ```bash tab="Syntax"
-$ pantheon password hash --password=<my-password>
+pantheon password hash --password=<my-password>
 ```
 
 ```bash tab="Example"
-$ pantheon password hash --password=myPassword123
+pantheon password hash --password=myPassword123
 ```
 
 ### rlp
@@ -1179,15 +1259,15 @@ This command provides RLP related actions.
 This command encodes a typed JSON value from a file or from the standard input into an RLP hexadecimal string.
 
 ```bash tab="Syntax"
-$ pantheon rlp encode [--from=<FILE>] [--to=<FILE>] [--type=<type>]
+pantheon rlp encode [--from=<FILE>] [--to=<FILE>] [--type=<type>]
 ```
 
 ```bash tab="File Example"
-$ pantheon rlp encode --from=ibft_extra_data.json --to=extra_data_for_ibft_genesis.txt --type=IBFT_EXTRA_DATA
+pantheon rlp encode --from=ibft_extra_data.json --to=extra_data_for_ibft_genesis.txt --type=IBFT_EXTRA_DATA
 ```
 
 ```bash tab="Standart Input/Output Example"
-$ cat extra_data.json | pantheon rlp encode > rlp.txt
+cat extra_data.json | pantheon rlp encode > rlp.txt
 ```
 
 The `IBFT_EXTRA_DATA` type is the only type supported for RLP encoding.

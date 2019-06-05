@@ -77,6 +77,13 @@ public class PeerInfo {
     return capabilities;
   }
 
+  /**
+   * This value is meant to represent the port at which a peer is listening for connections. A value
+   * of zero means the peer is not listening for incoming connections.
+   *
+   * @return The tcp port on which the peer is listening for connections, 0 indicates the peer is
+   *     not listening for connections.
+   */
   public int getPort() {
     return port;
   }

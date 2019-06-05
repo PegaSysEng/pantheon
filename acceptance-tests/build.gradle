@@ -21,21 +21,25 @@ dependencies {
   testImplementation project(':consensus:ibft')
   testImplementation project(':crypto')
   testImplementation project(':enclave')
-  testImplementation project(':ethereum:eth')
-  testImplementation project(':ethereum:core')
   testImplementation project(':ethereum:blockcreation')
+  testImplementation project(':ethereum:core')
+  testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
+  testImplementation project(':ethereum:eth')
+  testImplementation project(':ethereum:graphql')
   testImplementation project(':ethereum:jsonrpc')
+  testImplementation project(':ethereum:p2p')
   testImplementation project(':ethereum:permissioning')
   testImplementation project(':ethereum:rlp')
   testImplementation project(':metrics:core')
   testImplementation project(':pantheon')
+  testImplementation project(path: ':pantheon', configuration: 'testArtifacts')
   testImplementation project(':services:kvstore')
   testImplementation project(':testutil')
   testImplementation project(':util')
-  testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
 
   testImplementation 'com.google.guava:guava'
   testImplementation 'com.squareup.okhttp3:okhttp'
+  testImplementation 'info.picocli:picocli'
   testImplementation 'io.reactivex.rxjava2:rxjava'
   testImplementation 'io.vertx:vertx-core'
   testImplementation 'junit:junit'
@@ -47,14 +51,21 @@ dependencies {
   testImplementation 'org.web3j:abi'
   testImplementation 'org.web3j:core'
   testImplementation 'org.web3j:crypto'
+  testImplementation 'tech.pegasys.pantheon:plugin-api'
 }
 
 test.enabled = false
 
+sourceSets {
+  test { resources {  srcDirs "${rootDir}/pantheon/build/libs" } }
+}
+
+processTestResources.dependsOn(':pantheon:testJar')
+
 task acceptanceTest(type: Test) {
+  dependsOn(rootProject.installDist)
   systemProperty 'acctests.runPantheonAsProcess', 'true'
   mustRunAfter rootProject.subprojects*.test
   description = 'Runs Pantheon acceptance tests.'
   group = 'verification'
 }
-acceptanceTest.dependsOn(rootProject.installDist)

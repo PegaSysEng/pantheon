@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
@@ -42,9 +43,14 @@ public class PendingTransactionsTest {
   private static final KeyPair KEYS1 = KeyPair.generate();
   private static final KeyPair KEYS2 = KeyPair.generate();
 
+  private final TestClock clock = new TestClock();
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final PendingTransactions transactions =
-      new PendingTransactions(MAX_TRANSACTIONS, TestClock.fixed(), metricsSystem);
+      new PendingTransactions(
+          PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+          MAX_TRANSACTIONS,
+          TestClock.fixed(),
+          metricsSystem);
   private final Transaction transaction1 = createTransaction(2);
   private final Transaction transaction2 = createTransaction(1);
 
@@ -408,5 +414,50 @@ public class PendingTransactionsTest {
         .value(Wei.of(transactionNumber))
         .nonce(transactionNumber)
         .createTransaction(KEYS1);
+  }
+
+  @Test
+  public void shouldEvictMultipleOldTransactions() {
+    final int maxTransactionRetentionHours = 1;
+    final PendingTransactions transactions =
+        new PendingTransactions(
+            maxTransactionRetentionHours, MAX_TRANSACTIONS, clock, metricsSystem);
+
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(1);
+    transactions.addRemoteTransaction(transaction2);
+    assertThat(transactions.size()).isEqualTo(2);
+
+    clock.step(2L, ChronoUnit.HOURS);
+    transactions.evictOldTransactions();
+    assertThat(transactions.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldEvictSingleOldTransaction() {
+    final int maxTransactionRetentionHours = 1;
+    final PendingTransactions transactions =
+        new PendingTransactions(
+            maxTransactionRetentionHours, MAX_TRANSACTIONS, clock, metricsSystem);
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(1);
+    clock.step(2L, ChronoUnit.HOURS);
+    transactions.evictOldTransactions();
+    assertThat(transactions.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldEvictExclusivelyOldTransactions() {
+    final int maxTransactionRetentionHours = 2;
+    final PendingTransactions transactions =
+        new PendingTransactions(
+            maxTransactionRetentionHours, MAX_TRANSACTIONS, clock, metricsSystem);
+    transactions.addRemoteTransaction(transaction1);
+    assertThat(transactions.size()).isEqualTo(1);
+    clock.step(3L, ChronoUnit.HOURS);
+    transactions.addRemoteTransaction(transaction2);
+    assertThat(transactions.size()).isEqualTo(2);
+    transactions.evictOldTransactions();
+    assertThat(transactions.size()).isEqualTo(1);
   }
 }

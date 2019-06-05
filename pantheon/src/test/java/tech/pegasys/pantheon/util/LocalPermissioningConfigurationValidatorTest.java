@@ -19,10 +19,14 @@ import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.NetworkName;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.common.io.Resources;
 import org.junit.Test;
@@ -30,8 +34,8 @@ import org.junit.Test;
 public class LocalPermissioningConfigurationValidatorTest {
 
   static final String PERMISSIONING_CONFIG_ROPSTEN_BOOTNODES =
-      "permissioning_config_ropsten_bootnodes.toml";
-  static final String PERMISSIONING_CONFIG = "permissioning_config.toml";
+      "/permissioning_config_ropsten_bootnodes.toml";
+  static final String PERMISSIONING_CONFIG = "/permissioning_config.toml";
 
   @Test
   public void ropstenWithNodesWhitelistOptionWhichDoesIncludeRopstenBootnodesMustNotError()
@@ -39,7 +43,7 @@ public class LocalPermissioningConfigurationValidatorTest {
 
     EthNetworkConfig ethNetworkConfig = EthNetworkConfig.getNetworkConfig(NetworkName.ROPSTEN);
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG_ROPSTEN_BOOTNODES);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG_ROPSTEN_BOOTNODES);
     final Path toml = Files.createTempFile("toml", "");
     Files.write(toml, Resources.toByteArray(configFile));
 
@@ -47,8 +51,10 @@ public class LocalPermissioningConfigurationValidatorTest {
         PermissioningConfigurationBuilder.permissioningConfiguration(
             true, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
 
+    final List<URI> enodeURIs =
+        ethNetworkConfig.getBootNodes().stream().map(EnodeURL::toURI).collect(Collectors.toList());
     PermissioningConfigurationValidator.areAllNodesAreInWhitelist(
-        ethNetworkConfig.getBootNodes(), permissioningConfiguration);
+        enodeURIs, permissioningConfiguration);
   }
 
   @Test
@@ -56,7 +62,7 @@ public class LocalPermissioningConfigurationValidatorTest {
 
     EthNetworkConfig ethNetworkConfig = EthNetworkConfig.getNetworkConfig(NetworkName.ROPSTEN);
 
-    final URL configFile = Resources.getResource(PERMISSIONING_CONFIG);
+    final URL configFile = this.getClass().getResource(PERMISSIONING_CONFIG);
     final Path toml = Files.createTempFile("toml", "");
     toml.toFile().deleteOnExit();
     Files.write(toml, Resources.toByteArray(configFile));
@@ -66,8 +72,12 @@ public class LocalPermissioningConfigurationValidatorTest {
             true, toml.toAbsolutePath().toString(), true, toml.toAbsolutePath().toString());
 
     try {
+      final List<URI> enodeURIs =
+          ethNetworkConfig.getBootNodes().stream()
+              .map(EnodeURL::toURI)
+              .collect(Collectors.toList());
       PermissioningConfigurationValidator.areAllNodesAreInWhitelist(
-          ethNetworkConfig.getBootNodes(), permissioningConfiguration);
+          enodeURIs, permissioningConfiguration);
       fail("expected exception because ropsten bootnodes are not in node-whitelist");
     } catch (Exception e) {
       assertThat(e.getMessage()).startsWith("Specified node(s) not in nodes-whitelist");

@@ -14,7 +14,11 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.IOException;
@@ -24,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -37,34 +42,57 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
   private static final Logger LOG = LogManager.getLogger();
 
   private LocalPermissioningConfiguration configuration;
-  private final List<EnodeURL> bootnodes;
-  private final EnodeURL selfEnode;
+  private final List<EnodeURL> fixedNodes;
+  private final BytesValue localNodeId;
   private final List<EnodeURL> nodesWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
   private final Subscribers<Consumer<NodeWhitelistUpdatedEvent>> nodeWhitelistUpdatedObservers =
       new Subscribers<>();
 
+  private final Counter checkCounter;
+  private final Counter checkCounterPermitted;
+  private final Counter checkCounterUnpermitted;
+
   public NodeLocalConfigPermissioningController(
       final LocalPermissioningConfiguration permissioningConfiguration,
-      final List<EnodeURL> bootnodes,
-      final EnodeURL selfEnode) {
+      final List<EnodeURL> fixedNodes,
+      final BytesValue localNodeId,
+      final MetricsSystem metricsSystem) {
     this(
         permissioningConfiguration,
-        bootnodes,
-        selfEnode,
-        new WhitelistPersistor(permissioningConfiguration.getNodePermissioningConfigFilePath()));
+        fixedNodes,
+        localNodeId,
+        new WhitelistPersistor(permissioningConfiguration.getNodePermissioningConfigFilePath()),
+        metricsSystem);
   }
 
   public NodeLocalConfigPermissioningController(
       final LocalPermissioningConfiguration configuration,
-      final List<EnodeURL> bootnodes,
-      final EnodeURL selfEnode,
-      final WhitelistPersistor whitelistPersistor) {
+      final List<EnodeURL> fixedNodes,
+      final BytesValue localNodeId,
+      final WhitelistPersistor whitelistPersistor,
+      final MetricsSystem metricsSystem) {
     this.configuration = configuration;
-    this.bootnodes = bootnodes;
-    this.selfEnode = selfEnode;
+    this.fixedNodes = fixedNodes;
+    this.localNodeId = localNodeId;
     this.whitelistPersistor = whitelistPersistor;
     readNodesFromConfig(configuration);
+
+    this.checkCounter =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "node_local_check_count",
+            "Number of times the node local permissioning provider has been checked");
+    this.checkCounterPermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "node_local_check_count_permitted",
+            "Number of times the node local permissioning provider has been checked and returned permitted");
+    this.checkCounterUnpermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "node_local_check_count_unpermitted",
+            "Number of times the node local permissioning provider has been checked and returned unpermitted");
   }
 
   private void readNodesFromConfig(final LocalPermissioningConfiguration configuration) {
@@ -103,7 +131,7 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
     return new NodesWhitelistResult(WhitelistOperationResult.SUCCESS);
   }
 
-  private boolean addNode(final EnodeURL enodeURL) {
+  public boolean addNode(final EnodeURL enodeURL) {
     return nodesWhitelist.add(enodeURL);
   }
 
@@ -115,9 +143,9 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
     final List<EnodeURL> peers =
         enodeURLs.stream().map(EnodeURL::fromString).collect(Collectors.toList());
 
-    boolean anyBootnode = peers.stream().anyMatch(bootnodes::contains);
+    boolean anyBootnode = peers.stream().anyMatch(fixedNodes::contains);
     if (anyBootnode) {
-      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_BOOTNODE_CANNOT_BE_REMOVED);
+      return new NodesWhitelistResult(WhitelistOperationResult.ERROR_FIXED_NODE_CANNOT_BE_REMOVED);
     }
 
     for (EnodeURL peer : peers) {
@@ -197,32 +225,15 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
     return peers.parallelStream().map(EnodeURL::toString).collect(Collectors.toList());
   }
 
-  private boolean checkSelfEnode(final EnodeURL node) {
-    return selfEnode.getNodeId().equals(node.getNodeId());
-  }
-
-  private boolean compareEnodes(final EnodeURL nodeA, final EnodeURL nodeB) {
-    boolean idsMatch = nodeA.getNodeId().equals(nodeB.getNodeId());
-    boolean hostsMatch = nodeA.getIp().equals(nodeB.getIp());
-    boolean listeningPortsMatch = nodeA.getListeningPort().equals(nodeB.getListeningPort());
-    boolean discoveryPortsMatch = true;
-    if (nodeA.getDiscoveryPort().isPresent() && nodeB.getDiscoveryPort().isPresent()) {
-      discoveryPortsMatch =
-          nodeA.getDiscoveryPort().getAsInt() == nodeB.getDiscoveryPort().getAsInt();
-    }
-
-    return idsMatch && hostsMatch && listeningPortsMatch && discoveryPortsMatch;
-  }
-
   public boolean isPermitted(final String enodeURL) {
     return isPermitted(EnodeURL.fromString(enodeURL));
   }
 
   public boolean isPermitted(final EnodeURL node) {
-    if (checkSelfEnode(node)) {
+    if (Objects.equals(localNodeId, node.getNodeId())) {
       return true;
     }
-    return nodesWhitelist.stream().anyMatch(p -> compareEnodes(p, node));
+    return nodesWhitelist.stream().anyMatch(p -> EnodeURL.sameListeningEndpoint(p, node));
   }
 
   public List<String> getNodesWhitelist() {
@@ -312,6 +323,13 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
   @Override
   public boolean isPermitted(final EnodeURL sourceEnode, final EnodeURL destinationEnode) {
-    return isPermitted(sourceEnode) && isPermitted(destinationEnode);
+    this.checkCounter.inc();
+    if (isPermitted(sourceEnode) && isPermitted(destinationEnode)) {
+      this.checkCounterPermitted.inc();
+      return true;
+    } else {
+      this.checkCounterUnpermitted.inc();
+      return false;
+    }
   }
 }

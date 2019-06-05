@@ -12,12 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 /**
- * In Consensys' client, net_version maps to the network id, as specified in *
+ * In ConsenSys' client, net_version maps to the network id, as specified in *
  * https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
  *
  * <p>This method can be deprecated in the future, @see https://github.com/ethereum/EIPs/issues/611
@@ -25,13 +29,13 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 public class NetVersion implements JsonRpcMethod {
   private final String chainId;
 
-  public NetVersion(final int chainId) {
-    this.chainId = String.valueOf(chainId);
+  public NetVersion(final Optional<BigInteger> chainId) {
+    this.chainId = String.valueOf(chainId.orElse(null));
   }
 
   @Override
   public String getName() {
-    return "net_version";
+    return RpcMethod.NET_VERSION.getMethodName();
   }
 
   @Override

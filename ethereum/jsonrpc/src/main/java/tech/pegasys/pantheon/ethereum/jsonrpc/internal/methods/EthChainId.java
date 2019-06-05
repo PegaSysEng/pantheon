@@ -12,26 +12,30 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.Quantity;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 public class EthChainId implements JsonRpcMethod {
 
-  private final int chainId;
+  private final Optional<BigInteger> chainId;
 
-  public EthChainId(final int chainId) {
+  public EthChainId(final Optional<BigInteger> chainId) {
     this.chainId = chainId;
   }
 
   @Override
   public String getName() {
-    return "eth_chainId";
+    return RpcMethod.ETH_CHAIN_ID.getMethodName();
   }
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
-    return new JsonRpcSuccessResponse(req.getId(), Quantity.create(chainId));
+    return new JsonRpcSuccessResponse(req.getId(), chainId.map(Quantity::create).orElse(null));
   }
 }

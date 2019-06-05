@@ -12,7 +12,9 @@
  */
 package tech.pegasys.pantheon.config;
 
+import java.math.BigInteger;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
@@ -27,8 +29,9 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   private OptionalLong byzantiumBlockNumber = OptionalLong.empty();
   private OptionalLong constantinopleBlockNumber = OptionalLong.empty();
   private OptionalLong constantinopleFixBlockNumber = OptionalLong.empty();
-  private OptionalInt chainId = OptionalInt.empty();
+  private Optional<BigInteger> chainId = Optional.empty();
   private OptionalInt contractSizeLimit = OptionalInt.empty();
+  private OptionalInt stackSizeLimit = OptionalInt.empty();
 
   @Override
   public boolean isEthHash() {
@@ -111,14 +114,19 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public OptionalInt getChainId() {
+  public OptionalInt getEvmStackSize() {
+    return stackSizeLimit;
+  }
+
+  @Override
+  public Optional<BigInteger> getChainId() {
     return chainId;
   }
 
   @Override
   public Map<String, Object> asMap() {
     final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-    builder.put("chainId", getChainId().getAsInt());
+    getChainId().ifPresent(chainId -> builder.put("chainId", chainId));
     getHomesteadBlockNumber().ifPresent(l -> builder.put("homesteadBlock", l));
     getDaoForkBlock()
         .ifPresent(
@@ -137,6 +145,7 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
     getConstantinopleBlockNumber().ifPresent(l -> builder.put("constantinopleBlock", l));
     getConstantinopleFixBlockNumber().ifPresent(l -> builder.put("constantinopleFixBlock", l));
     getContractSizeLimit().ifPresent(l -> builder.put("contractSizeLimit", l));
+    getEvmStackSize().ifPresent(l -> builder.put("evmStackSize", l));
     if (isClique()) {
       builder.put("clique", getCliqueConfigOptions().asMap());
     }
@@ -187,13 +196,18 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
     return this;
   }
 
-  public StubGenesisConfigOptions chainId(final int chainId) {
-    this.chainId = OptionalInt.of(chainId);
+  public StubGenesisConfigOptions chainId(final BigInteger chainId) {
+    this.chainId = Optional.ofNullable(chainId);
     return this;
   }
 
   public StubGenesisConfigOptions contractSizeLimit(final int contractSizeLimit) {
     this.contractSizeLimit = OptionalInt.of(contractSizeLimit);
+    return this;
+  }
+
+  public StubGenesisConfigOptions stackSizeLimit(final int stackSizeLimit) {
+    this.stackSizeLimit = OptionalInt.of(stackSizeLimit);
     return this;
   }
 }

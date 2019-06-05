@@ -14,13 +14,13 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-  id 'com.diffplug.gradle.spotless' version '3.19.0'
+  id 'com.diffplug.gradle.spotless' version '3.23.0'
   id 'com.jfrog.bintray' version '1.8.4'
   id 'com.github.ben-manes.versions' version '0.21.0'
   id 'com.github.hierynomus.license' version '0.15.0'
   id 'io.spring.dependency-management' version '1.0.7.RELEASE'
   id 'me.champeau.gradle.jmh' version '0.4.8' apply false
-  id 'net.ltgt.errorprone' version '0.7.1'
+  id 'net.ltgt.errorprone' version '0.8'
   id 'net.researchgate.release' version '2.7.0'
 }
 
@@ -89,6 +89,7 @@ allprojects {
     } else {
       jcenter()
       mavenCentral()
+      mavenLocal()
       maven { url  "https://consensys.bintray.com/pegasys-repo" }
     }
   }
@@ -105,7 +106,7 @@ allprojects {
     java {
       // This path needs to be relative to each project
       target fileTree('.') {
-        include '**/*.java'
+        include '**/src/*/java/**/*.java'
         exclude '**/generalstate/GeneralStateReferenceTest*.java'
         exclude '**/generalstate/GeneralStateRegressionReferenceTest*.java'
         exclude '**/blockchain/BlockchainReferenceTest*.java'
@@ -123,11 +124,12 @@ allprojects {
       target '*.gradle'
       greclipse().configFile(rootProject.file('gradle/formatter.properties'))
       endWithNewline()
+      paddedCell()
     }
 
     // Below this line are currently only license header tasks
     format 'groovy', {
-      target '**/*.groovy'
+      target '**/src/*/grovy/**/*.groovy'
       licenseHeaderFile "${rootDir}/gradle/spotless.java.license", 'import'
     }
 
@@ -159,7 +161,7 @@ allprojects {
     ]
 
     options.errorprone {
-      excludedPaths '.*/(generated/*.*|.*ReferenceTest_.*)'
+      excludedPaths = '.*/(generated/*.*|.*ReferenceTest_.*)'
 
       // Our equals need to be symmetric, this checker doesn't respect that.
       check('EqualsGetClass', CheckSeverity.OFF)

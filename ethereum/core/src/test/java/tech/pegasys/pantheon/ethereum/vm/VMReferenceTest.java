@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
+import static tech.pegasys.pantheon.ethereum.vm.MessageFrame.DEFAULT_MAX_STACK_SIZE;
 import static tech.pegasys.pantheon.ethereum.vm.OperationTracer.NO_TRACING;
 
 import tech.pegasys.pantheon.ethereum.core.Gas;
@@ -28,8 +29,10 @@ import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltException;
 import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutableWorldState;
 import tech.pegasys.pantheon.testutil.JsonTestParameters;
 
+import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import org.junit.runner.RunWith;
@@ -92,7 +95,7 @@ public class VMReferenceTest extends AbstractRetryingTest {
     "CallToPrecompiledContract",
     "createNameRegistrator"
   };
-  private static final int CHAIN_ID = 1;
+  private static final Optional<BigInteger> CHAIN_ID = Optional.of(BigInteger.ONE);
   private final String name;
 
   private final VMReferenceTestCaseSpec spec;
@@ -117,7 +120,7 @@ public class VMReferenceTest extends AbstractRetryingTest {
     final EnvironmentInformation execEnv = spec.getExec();
 
     final ProtocolSpec<Void> protocolSpec =
-        MainnetProtocolSpecs.frontierDefinition(OptionalInt.empty())
+        MainnetProtocolSpecs.frontierDefinition(OptionalInt.empty(), OptionalInt.empty())
             .privacyParameters(PrivacyParameters.DEFAULT)
             .build(new MutableProtocolSchedule<>(CHAIN_ID));
 
@@ -143,6 +146,7 @@ public class VMReferenceTest extends AbstractRetryingTest {
             .completer(c -> {})
             .miningBeneficiary(execEnv.getBlockHeader().getCoinbase())
             .blockHashLookup(new BlockHashLookup(execEnv.getBlockHeader(), blockchain))
+            .maxStackSize(DEFAULT_MAX_STACK_SIZE)
             .build();
 
     // This is normally set inside the containing message executing the code.

@@ -21,14 +21,14 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHashFunction;
+import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
@@ -96,7 +96,7 @@ public class BlockchainSetupUtil<C> {
     final TemporaryFolder temp = new TemporaryFolder();
     try {
       temp.create();
-      final URL genesisFileUrl = getResourceUrl(temp, "testGenesis.json");
+      final URL genesisFileUrl = getResourceUrl(temp, "/testGenesis.json");
       final GenesisState genesisState =
           GenesisState.fromJson(
               Resources.toString(genesisFileUrl, Charsets.UTF_8), protocolSchedule);
@@ -107,12 +107,13 @@ public class BlockchainSetupUtil<C> {
       final ProtocolContext<Void> protocolContext =
           new ProtocolContext<>(blockchain, worldArchive, null);
 
-      final Path blocksPath = getResourcePath(temp, "testBlockchain.blocks");
+      final Path blocksPath = getResourcePath(temp, "/testBlockchain.blocks");
       final List<Block> blocks = new ArrayList<>();
-      final BlockHashFunction blockHashFunction =
-          ScheduleBasedBlockHashFunction.create(protocolSchedule);
+      final BlockHeaderFunctions blockHeaderFunctions =
+          ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
       try (final RawBlockIterator iterator =
-          new RawBlockIterator(blocksPath, rlp -> BlockHeader.readFrom(rlp, blockHashFunction))) {
+          new RawBlockIterator(
+              blocksPath, rlp -> BlockHeader.readFrom(rlp, blockHeaderFunctions))) {
         while (iterator.hasNext()) {
           blocks.add(iterator.next());
         }
@@ -128,7 +129,7 @@ public class BlockchainSetupUtil<C> {
 
   private static Path getResourcePath(final TemporaryFolder temp, final String resource)
       throws IOException {
-    final URL url = Resources.getResource(resource);
+    final URL url = BlockchainSetupUtil.class.getResource(resource);
     final Path path =
         Files.write(
             temp.newFile().toPath(),

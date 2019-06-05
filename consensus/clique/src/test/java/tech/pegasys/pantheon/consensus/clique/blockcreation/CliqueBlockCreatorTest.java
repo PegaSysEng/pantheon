@@ -105,15 +105,19 @@ public class CliqueBlockCreatorTest {
   @Test
   public void proposerAddressCanBeExtractFromAConstructedBlock() {
 
-    final CliqueExtraData extraData =
-        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validatorList);
+    final BytesValue extraData =
+        CliqueExtraData.createWithoutProposerSeal(BytesValue.wrap(new byte[32]), validatorList);
 
     final Address coinbase = AddressHelpers.ofValue(1);
     final CliqueBlockCreator blockCreator =
         new CliqueBlockCreator(
             coinbase,
-            parent -> extraData.encode(),
-            new PendingTransactions(5, TestClock.fixed(), metricsSystem),
+            parent -> extraData,
+            new PendingTransactions(
+                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                5,
+                TestClock.fixed(),
+                metricsSystem),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,
@@ -130,8 +134,8 @@ public class CliqueBlockCreatorTest {
 
   @Test
   public void insertsValidVoteIntoConstructedBlock() {
-    final CliqueExtraData extraData =
-        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validatorList);
+    final BytesValue extraData =
+        CliqueExtraData.createWithoutProposerSeal(BytesValue.wrap(new byte[32]), validatorList);
     final Address a1 = Address.fromHexString("5");
     voteProposer.auth(a1);
     final Address coinbase = AddressHelpers.ofValue(1);
@@ -139,8 +143,12 @@ public class CliqueBlockCreatorTest {
     final CliqueBlockCreator blockCreator =
         new CliqueBlockCreator(
             coinbase,
-            parent -> extraData.encode(),
-            new PendingTransactions(5, TestClock.fixed(), metricsSystem),
+            parent -> extraData,
+            new PendingTransactions(
+                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                5,
+                TestClock.fixed(),
+                metricsSystem),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,
@@ -156,8 +164,8 @@ public class CliqueBlockCreatorTest {
 
   @Test
   public void insertsNoVoteWhenAuthInValidators() {
-    final CliqueExtraData extraData =
-        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validatorList);
+    final BytesValue extraData =
+        CliqueExtraData.createWithoutProposerSeal(BytesValue.wrap(new byte[32]), validatorList);
     final Address a1 = Util.publicKeyToAddress(otherKeyPair.getPublicKey());
     voteProposer.auth(a1);
     final Address coinbase = AddressHelpers.ofValue(1);
@@ -165,8 +173,12 @@ public class CliqueBlockCreatorTest {
     final CliqueBlockCreator blockCreator =
         new CliqueBlockCreator(
             coinbase,
-            parent -> extraData.encode(),
-            new PendingTransactions(5, TestClock.fixed(), metricsSystem),
+            parent -> extraData,
+            new PendingTransactions(
+                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                5,
+                TestClock.fixed(),
+                metricsSystem),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,
@@ -185,8 +197,8 @@ public class CliqueBlockCreatorTest {
     // ensure that the next block is epoch
     epochManager = new EpochManager(1);
 
-    final CliqueExtraData extraData =
-        new CliqueExtraData(BytesValue.wrap(new byte[32]), null, validatorList);
+    final BytesValue extraData =
+        CliqueExtraData.createWithoutProposerSeal(BytesValue.wrap(new byte[32]), validatorList);
     final Address a1 = Address.fromHexString("5");
     voteProposer.auth(a1);
     final Address coinbase = AddressHelpers.ofValue(1);
@@ -194,8 +206,12 @@ public class CliqueBlockCreatorTest {
     final CliqueBlockCreator blockCreator =
         new CliqueBlockCreator(
             coinbase,
-            parent -> extraData.encode(),
-            new PendingTransactions(5, TestClock.fixed(), metricsSystem),
+            parent -> extraData,
+            new PendingTransactions(
+                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                5,
+                TestClock.fixed(),
+                metricsSystem),
             protocolContext,
             protocolSchedule,
             gasLimit -> gasLimit,

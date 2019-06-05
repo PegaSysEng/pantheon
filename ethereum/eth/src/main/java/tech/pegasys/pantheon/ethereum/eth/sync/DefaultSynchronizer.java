@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 import tech.pegasys.pantheon.util.Subscribers;
@@ -44,7 +45,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   private static final Logger LOG = LogManager.getLogger();
 
   private final SyncState syncState;
-  private final AtomicBoolean started = new AtomicBoolean(false);
+  private final AtomicBoolean running = new AtomicBoolean(false);
   private final Subscribers<SyncStatusListener> syncStatusListeners = new Subscribers<>();
   private final BlockPropagationManager<C> blockPropagationManager;
   private final Optional<FastSyncDownloader<C>> fastSyncDownloader;
@@ -55,6 +56,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final WorldStateStorage worldStateStorage,
+      final BlockBroadcaster blockBroadcaster,
       final EthContext ethContext,
       final SyncState syncState,
       final Path dataDirectory,
@@ -78,7 +80,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             syncState,
             new PendingBlocks(),
             metricsSystem,
-            new BlockBroadcaster(ethContext));
+            blockBroadcaster);
 
     this.fullSyncDownloader =
         new FullSyncDownloader<>(
@@ -94,6 +96,17 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             worldStateStorage,
             syncState,
             clock);
+
+    metricsSystem.createLongGauge(
+        MetricCategory.SYNCHRONIZER,
+        "best_known_block",
+        "Height of best known block from any connected peer",
+        () -> syncState.syncStatus().getHighestBlock());
+    metricsSystem.createIntegerGauge(
+        MetricCategory.SYNCHRONIZER,
+        "in_sync",
+        "Whether or not the local node has caught up to the best known peer",
+        () -> getSyncStatus().isPresent() ? 0 : 1);
   }
 
   private TrailingPeerRequirements calculateTrailingPeerRequirements() {
@@ -104,8 +117,10 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   @Override
   public void start() {
-    if (started.compareAndSet(false, true)) {
+    if (running.compareAndSet(false, true)) {
+      LOG.info("Starting synchronizer.");
       syncState.addSyncStatusListener(this::syncStatusCallback);
+      blockPropagationManager.start();
       if (fastSyncDownloader.isPresent()) {
         fastSyncDownloader.get().start().whenComplete(this::handleFastSyncResult);
       } else {
@@ -116,7 +131,20 @@ public class DefaultSynchronizer<C> implements Synchronizer {
     }
   }
 
+  @Override
+  public void stop() {
+    if (running.compareAndSet(true, false)) {
+      LOG.info("Stopping synchronizer");
+      fastSyncDownloader.ifPresent(FastSyncDownloader::stop);
+      fullSyncDownloader.stop();
+    }
+  }
+
   private void handleFastSyncResult(final FastSyncState result, final Throwable error) {
+    if (!running.get()) {
+      // We've been shutdown which will have triggered the fast sync future to complete
+      return;
+    }
     final Throwable rootCause = ExceptionUtils.rootCause(error);
     if (rootCause instanceof FastSyncException) {
       LOG.error(
@@ -135,14 +163,12 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   }
 
   private void startFullSync() {
-    LOG.info("Starting synchronizer.");
-    blockPropagationManager.start();
     fullSyncDownloader.start();
   }
 
   @Override
   public Optional<SyncStatus> getSyncStatus() {
-    if (!started.get()) {
+    if (!running.get()) {
       return Optional.empty();
     }
     if (syncState.syncStatus().getCurrentBlock() == syncState.syncStatus().getHighestBlock()) {

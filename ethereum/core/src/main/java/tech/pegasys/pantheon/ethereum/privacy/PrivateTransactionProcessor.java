@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
+import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
+
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -53,6 +55,8 @@ public class PrivateTransactionProcessor {
   private final AbstractMessageProcessor contractCreationProcessor;
 
   private final AbstractMessageProcessor messageCallProcessor;
+
+  private final int maxStackSize;
 
   public static class Result implements TransactionProcessor.Result {
 
@@ -133,12 +137,14 @@ public class PrivateTransactionProcessor {
       final TransactionValidator transactionValidator,
       final AbstractMessageProcessor contractCreationProcessor,
       final AbstractMessageProcessor messageCallProcessor,
-      final boolean clearEmptyAccounts) {
+      final boolean clearEmptyAccounts,
+      final int maxStackSize) {
     this.gasCalculator = gasCalculator;
     this.transactionValidator = transactionValidator;
     this.contractCreationProcessor = contractCreationProcessor;
     this.messageCallProcessor = messageCallProcessor;
     this.clearEmptyAccounts = clearEmptyAccounts;
+    this.maxStackSize = maxStackSize;
   }
 
   @SuppressWarnings("unused")
@@ -161,6 +167,15 @@ public class PrivateTransactionProcessor {
             ? maybePrivateSender
             : privateWorldState.createAccount(senderAddress, 0, Wei.ZERO);
 
+    if (transaction.getNonce() < sender.getNonce()) {
+      return Result.invalid(
+          ValidationResult.invalid(
+              NONCE_TOO_LOW,
+              String.format(
+                  "transaction nonce %s below sender account nonce %s",
+                  transaction.getNonce(), sender.getNonce())));
+    }
+
     final long previousNonce = sender.incrementNonce();
     LOG.trace(
         "Incremented private sender {} nonce ({} -> {})",
@@ -172,7 +187,14 @@ public class PrivateTransactionProcessor {
     final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
     if (transaction.isContractCreation()) {
       final Address privateContractAddress =
-          Address.privateContractAddress(senderAddress, sender.getNonce() - 1L, privacyGroupId);
+          Address.privateContractAddress(senderAddress, previousNonce, privacyGroupId);
+
+      LOG.debug(
+          "Calculated contract address {} from sender {} with nonce {} and privacy group {}",
+          privateContractAddress.toString(),
+          senderAddress,
+          previousNonce,
+          privacyGroupId.toString());
 
       initialFrame =
           MessageFrame.builder()
@@ -195,6 +217,7 @@ public class PrivateTransactionProcessor {
               .completer(c -> {})
               .miningBeneficiary(miningBeneficiary)
               .blockHashLookup(blockHashLookup)
+              .maxStackSize(maxStackSize)
               .build();
 
     } else {
@@ -222,6 +245,7 @@ public class PrivateTransactionProcessor {
               .completer(c -> {})
               .miningBeneficiary(miningBeneficiary)
               .blockHashLookup(blockHashLookup)
+              .maxStackSize(maxStackSize)
               .build();
     }
 

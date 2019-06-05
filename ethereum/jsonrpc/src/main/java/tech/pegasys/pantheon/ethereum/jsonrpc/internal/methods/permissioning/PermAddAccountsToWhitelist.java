@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -19,7 +20,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
 
 import java.util.List;
@@ -28,10 +29,10 @@ import java.util.Optional;
 public class PermAddAccountsToWhitelist implements JsonRpcMethod {
 
   private final JsonRpcParameter parameters;
-  private final Optional<AccountWhitelistController> whitelistController;
+  private final Optional<AccountLocalConfigPermissioningController> whitelistController;
 
   public PermAddAccountsToWhitelist(
-      final Optional<AccountWhitelistController> whitelistController,
+      final Optional<AccountLocalConfigPermissioningController> whitelistController,
       final JsonRpcParameter parameters) {
     this.whitelistController = whitelistController;
     this.parameters = parameters;
@@ -39,7 +40,7 @@ public class PermAddAccountsToWhitelist implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return "perm_addAccountsToWhitelist";
+    return RpcMethod.PERM_ADD_ACCOUNTS_TO_WHITELIST.getMethodName();
   }
 
   @Override
@@ -71,7 +72,8 @@ public class PermAddAccountsToWhitelist implements JsonRpcMethod {
         case SUCCESS:
           return new JsonRpcSuccessResponse(request.getId());
         default:
-          throw new IllegalStateException("Unmapped result from AccountWhitelistController");
+          throw new IllegalStateException(
+              "Unmapped result from AccountLocalConfigPermissioningController");
       }
     } else {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.ACCOUNT_WHITELIST_NOT_ENABLED);

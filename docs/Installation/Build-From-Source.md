@@ -9,6 +9,8 @@ description: Building Pantheon from source code
 
 !!!important
     Pantheon requires Java 8+ to compile; earlier versions are not supported.
+    
+    From v1.2, Pantheon will require Java 11.  That is, Pantheon on Java 8 will no longer be supported.
 
 * [Git](https://git-scm.com/downloads) or [GitHub Desktop](https://desktop.github.com/)
 
@@ -29,7 +31,7 @@ description: Building Pantheon from source code
 Clone the **PegaSysEng/pantheon** repo to your home directory (`/home/<user>`):
 
 ```bash
-$ git clone --recursive https://github.com/PegaSysEng/pantheon.git
+git clone --recursive https://github.com/PegaSysEng/pantheon.git
 ```
 
 ### Build Pantheon
@@ -39,23 +41,23 @@ After cloning, go to the `pantheon` directory.
 Build Pantheon with the Gradle wrapper `gradlew`, omitting tests as follows:
 
 ```bash
-$ ./gradlew build -x test
+./gradlew build -x test
 ```
 
 Go to the distribution directory: 
 ```bash
-$ cd build/distributions/
+cd build/distributions/
 ```
 
 Expand the distribution archive: 
 ```bash
-$ tar -xzf pantheon-<version>.tar.gz
+tar -xzf pantheon-<version>.tar.gz
 ```
 
 Move to the expanded folder and display the Pantheon help to confirm installation. 
 ````bash
-$ cd pantheon-<version>/
-$ bin/pantheon --help
+cd pantheon-<version>/
+bin/pantheon --help
 ````
 
 !!! note "Linux Open File Limit"

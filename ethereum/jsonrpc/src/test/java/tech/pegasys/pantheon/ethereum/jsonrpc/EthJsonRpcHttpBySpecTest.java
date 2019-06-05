@@ -32,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthGetTransaction
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewBlockFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewPendingTransactionFilter;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthProtocolVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSendRawTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthUninstallFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -235,9 +236,10 @@ public class EthJsonRpcHttpBySpecTest extends AbstractEthJsonRpcHttpServiceTest 
     specs.put(EthEstimateGas.class, "eth_estimateGas_noParams");
     specs.put(EthEstimateGas.class, "eth_estimateGas_insufficientGas");
 
+    specs.put(EthProtocolVersion.class, "eth_protocolVersion");
+
     return specs.values();
   }
-  // @formatter:on
 
   @Test
   public void jsonRPCCallWithSpecFile() throws Exception {

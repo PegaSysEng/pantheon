@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHashFunction;
+import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage;
@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 
+import java.math.BigInteger;
 import java.util.function.Function;
 
 public class ExecutionContextTestFixture {
@@ -50,7 +51,7 @@ public class ExecutionContextTestFixture {
         new DefaultMutableBlockchain(
             genesis,
             new KeyValueStoragePrefixedKeyBlockchainStorage(
-                keyValueStorage, MainnetBlockHashFunction::createHash),
+                keyValueStorage, new MainnetBlockHeaderFunctions()),
             new NoOpMetricsSystem());
     this.stateArchive =
         new WorldStateArchive(new KeyValueStorageWorldStateStorage(keyValueStorage));
@@ -111,7 +112,7 @@ public class ExecutionContextTestFixture {
         protocolSchedule =
             new ProtocolScheduleBuilder<>(
                     new StubGenesisConfigOptions().constantinopleFixBlock(0),
-                    42,
+                    BigInteger.valueOf(42),
                     Function.identity(),
                     new PrivacyParameters())
                 .createProtocolSchedule();

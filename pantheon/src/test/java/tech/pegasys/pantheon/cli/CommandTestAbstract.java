@@ -16,21 +16,28 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.controller.PantheonController;
+import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
+import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.util.BlockImporter;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,7 +57,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import picocli.CommandLine;
 import picocli.CommandLine.Help.Ansi;
@@ -69,16 +75,23 @@ public abstract class CommandTestAbstract {
 
   @Mock RunnerBuilder mockRunnerBuilder;
   @Mock Runner mockRunner;
-  @Mock PantheonControllerBuilder mockControllerBuilder;
+
+  @Mock PantheonController.Builder mockControllerBuilderFactory;
+
+  @Mock PantheonControllerBuilder<Void> mockControllerBuilder;
+  @Mock EthProtocolManager mockEthProtocolManager;
+  @Mock BlockBroadcaster mockBlockBroadcaster;
   @Mock SynchronizerConfiguration.Builder mockSyncConfBuilder;
   @Mock EthereumWireProtocolConfiguration.Builder mockEthereumWireProtocolConfigurationBuilder;
   @Mock SynchronizerConfiguration mockSyncConf;
   @Mock RocksDbConfiguration.Builder mockRocksDbConfBuilder;
   @Mock RocksDbConfiguration mockRocksDbConf;
-  @Mock PantheonController<?> mockController;
+  @Mock PantheonController<Object> mockController;
   @Mock BlockImporter mockBlockImporter;
   @Mock Logger mockLogger;
+  @Mock PantheonPluginContextImpl mockPantheonPluginContext;
 
+  @Captor ArgumentCaptor<Collection<BytesValue>> bytesValueCollectionCollector;
   @Captor ArgumentCaptor<Collection<String>> stringListArgumentCaptor;
   @Captor ArgumentCaptor<Path> pathArgumentCaptor;
   @Captor ArgumentCaptor<File> fileArgumentCaptor;
@@ -86,6 +99,7 @@ public abstract class CommandTestAbstract {
   @Captor ArgumentCaptor<Integer> intArgumentCaptor;
   @Captor ArgumentCaptor<EthNetworkConfig> ethNetworkConfigArgumentCaptor;
   @Captor ArgumentCaptor<JsonRpcConfiguration> jsonRpcConfigArgumentCaptor;
+  @Captor ArgumentCaptor<GraphQLConfiguration> graphQLConfigArgumentCaptor;
   @Captor ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
   @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
 
@@ -101,20 +115,28 @@ public abstract class CommandTestAbstract {
 
   @Before
   public void initMocks() throws Exception {
+
     // doReturn used because of generic PantheonController
-    Mockito.doReturn(mockController).when(mockControllerBuilder).build();
+    doReturn(mockControllerBuilder).when(mockControllerBuilderFactory).fromEthNetworkConfig(any());
     when(mockControllerBuilder.synchronizerConfiguration(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.ethereumWireProtocolConfiguration(any()))
         .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.rocksDbConfiguration(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.homePath(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.ethNetworkConfig(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.dataDirectory(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.miningParameters(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.devMode(anyBoolean())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.maxPendingTransactions(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.maxPendingTransactions(anyInt())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.pendingTransactionRetentionPeriod(anyInt()))
+        .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.nodePrivateKeyFile(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
+
+    // doReturn used because of generic PantheonController
+    doReturn(mockController).when(mockControllerBuilder).build();
+    when(mockController.getProtocolManager()).thenReturn(mockEthProtocolManager);
+
+    when(mockEthProtocolManager.getBlockBroadcaster()).thenReturn(mockBlockBroadcaster);
 
     when(mockSyncConfBuilder.syncMode(any())).thenReturn(mockSyncConfBuilder);
     when(mockSyncConfBuilder.maxTrailingPeers(anyInt())).thenReturn(mockSyncConfBuilder);
@@ -136,6 +158,7 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.maxPeers(anyInt())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.p2pEnabled(anyBoolean())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.jsonRpcConfiguration(any())).thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.graphQLConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.webSocketConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.dataDir(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.bannedNodeIds(any())).thenReturn(mockRunnerBuilder);
@@ -181,11 +204,12 @@ public abstract class CommandTestAbstract {
             mockLogger,
             mockBlockImporter,
             mockRunnerBuilder,
-            mockControllerBuilder,
+            mockControllerBuilderFactory,
             mockSyncConfBuilder,
             mockEthereumWireProtocolConfigurationBuilder,
             mockRocksDbConfBuilder,
-            keyLoader);
+            keyLoader,
+            mockPantheonPluginContext);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
     pantheonCommand.parse(
@@ -210,19 +234,21 @@ public abstract class CommandTestAbstract {
         final Logger mockLogger,
         final BlockImporter mockBlockImporter,
         final RunnerBuilder mockRunnerBuilder,
-        final PantheonControllerBuilder mockControllerBuilder,
+        final PantheonController.Builder controllerBuilderFactory,
         final SynchronizerConfiguration.Builder mockSyncConfBuilder,
         final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
         final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
-        final KeyLoader keyLoader) {
+        final KeyLoader keyLoader,
+        final PantheonPluginContextImpl pantheonPluginContext) {
       super(
           mockLogger,
           mockBlockImporter,
           mockRunnerBuilder,
-          mockControllerBuilder,
+          controllerBuilderFactory,
           mockSyncConfBuilder,
           mockEthereumConfigurationMockBuilder,
-          mockRocksDbConfBuilder);
+          mockRocksDbConfBuilder,
+          pantheonPluginContext);
       this.keyLoader = keyLoader;
     }
   }

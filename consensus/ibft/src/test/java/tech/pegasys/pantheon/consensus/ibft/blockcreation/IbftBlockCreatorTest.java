@@ -81,6 +81,10 @@ public class IbftBlockCreatorTest {
             createInMemoryWorldStateArchive(),
             setupContextWithValidators(initialValidatorList));
 
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(
+            PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 1, TestClock.fixed(), metricsSystem);
+
     final IbftBlockCreator blockCreator =
         new IbftBlockCreator(
             initialValidatorList.get(0),
@@ -92,7 +96,7 @@ public class IbftBlockCreatorTest {
                         0,
                         initialValidatorList)
                     .encode(),
-            new PendingTransactions(1, TestClock.fixed(), metricsSystem),
+            pendingTransactions,
             protContext,
             protocolSchedule,
             parentGasLimit -> parentGasLimit,
@@ -112,7 +116,7 @@ public class IbftBlockCreatorTest {
     assertThat(validationResult).isTrue();
 
     final BlockHeader header = block.getHeader();
-    final IbftExtraData extraData = IbftExtraData.decode(header.getExtraData());
+    final IbftExtraData extraData = IbftExtraData.decode(header);
     assertThat(block.getHash())
         .isEqualTo(IbftBlockHashing.calculateDataHashForCommittedSeal(header, extraData));
   }

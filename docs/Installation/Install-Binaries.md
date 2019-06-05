@@ -12,13 +12,13 @@ description: Install Pantheon from binary distribution
 ### Install Using Homebrew
 
 ```bash
-$ brew tap pegasyseng/pantheon
-$ brew install pantheon
+brew tap pegasyseng/pantheon
+brew install pantheon
 ```
 Display Pantheon command line help to confirm installation: 
 
 ```bash
-$ pantheon --help
+pantheon --help
 ```
 
 ## Windows with Chocolatey 
@@ -62,6 +62,8 @@ pantheon --help
     Pantheon is currently supported only on 64-bit versions of Windows, and requires a 64-bit version of JDK/JRE. 
     We recommend that you also remove any 32-bit JDK/JRE installations.
     
+    From v1.2, Pantheon will require Java 11.  That is, Pantheon on Java 8 will no longer be supported.
+    
 !!! note "Linux Open File Limit"
     If synchronizing to MainNet on Linux or other chains with large data requirements, increase the maximum 
     number of open files allowed using `ulimit`. If the open files limit is not high enough, a `Too many open files` RocksDB exception occurs. 
@@ -75,7 +77,7 @@ Unpack the downloaded files and change into the `pantheon-<release>` directory.
 Display Pantheon command line help to confirm installation: 
 
 ```bash tab="Linux/macOS"
-$ bin/pantheon --help
+bin/pantheon --help
 ```
 
 ```bat tab="Windows"

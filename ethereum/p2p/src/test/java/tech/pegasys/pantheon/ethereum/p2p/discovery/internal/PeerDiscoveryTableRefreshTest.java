@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
@@ -25,7 +24,6 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
-import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -46,30 +44,25 @@ public class PeerDiscoveryTableRefreshTest {
   public void tableRefreshSingleNode() {
     final List<SECP256K1.KeyPair> keypairs = PeerDiscoveryTestHelper.generateKeyPairs(2);
     final List<DiscoveryPeer> peers = helper.createDiscoveryPeers(keypairs);
-    DiscoveryPeer localPeer = peers.get(0);
-    KeyPair localKeyPair = keypairs.get(0);
+    final DiscoveryPeer localPeer = peers.get(0);
+    final KeyPair localKeyPair = keypairs.get(0);
 
     // Create and start the PeerDiscoveryController
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     final MockTimerUtil timer = new MockTimerUtil();
     final PeerDiscoveryController controller =
         spy(
-            new PeerDiscoveryController(
-                localKeyPair,
-                localPeer,
-                new PeerTable(localPeer.getId()),
-                emptyList(),
-                outboundMessageHandler,
-                timer,
-                new BlockingAsyncExecutor(),
-                0,
-                () -> true,
-                new PeerBlacklist(),
-                Optional.empty(),
-                Optional.empty(),
-                new Subscribers<>(),
-                new Subscribers<>(),
-                new NoOpMetricsSystem()));
+            PeerDiscoveryController.builder()
+                .keypair(localKeyPair)
+                .localPeer(localPeer)
+                .peerTable(new PeerTable(localPeer.getId()))
+                .outboundMessageHandler(outboundMessageHandler)
+                .timerUtil(timer)
+                .workerExecutor(new BlockingAsyncExecutor())
+                .tableRefreshIntervalMs(0)
+                .peerBondedObservers(new Subscribers<>())
+                .metricsSystem(new NoOpMetricsSystem())
+                .build());
     controller.start();
 
     // Send a PING, so as to add a Peer in the controller.
@@ -79,7 +72,7 @@ public class PeerDiscoveryTableRefreshTest {
     controller.onMessage(pingPacket, peers.get(1));
 
     // Wait until the controller has added the newly found peer.
-    assertThat(controller.getPeers()).hasSize(1);
+    assertThat(controller.streamDiscoveredPeers()).hasSize(1);
 
     // Simulate a PONG message from peer 0.
     final PongPacketData pongPacketData =
@@ -93,7 +86,7 @@ public class PeerDiscoveryTableRefreshTest {
 
       controller.getRecursivePeerRefreshState().cancel();
       timer.runPeriodicHandlers();
-      controller.getPeers().forEach(p -> p.setStatus(PeerDiscoveryStatus.KNOWN));
+      controller.streamDiscoveredPeers().forEach(p -> p.setStatus(PeerDiscoveryStatus.KNOWN));
       controller.onMessage(pingPacket, peers.get(1));
     }
     verify(outboundMessageHandler, atLeast(5)).send(eq(peers.get(1)), captor.capture());
@@ -106,7 +99,7 @@ public class PeerDiscoveryTableRefreshTest {
     // Collect targets from find neighbors packets
     final List<BytesValue> targets = new ArrayList<>();
     for (final Packet captured : capturedFindNeighborsPackets) {
-      Optional<FindNeighborsPacketData> maybeData =
+      final Optional<FindNeighborsPacketData> maybeData =
           captured.getPacketData(FindNeighborsPacketData.class);
       assertThat(maybeData).isPresent();
       final FindNeighborsPacketData neighborsData = maybeData.get();

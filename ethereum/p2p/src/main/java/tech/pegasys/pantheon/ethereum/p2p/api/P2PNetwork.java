@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.api;
 
+import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /** P2P Network Interface. */
 public interface P2PNetwork extends Closeable {
@@ -33,6 +35,14 @@ public interface P2PNetwork extends Closeable {
    * @return Peers currently connected.
    */
   Collection<PeerConnection> getPeers();
+
+  /**
+   * Returns a stream of peers that have been discovered on the network. These peers are not
+   * necessarily connected.
+   *
+   * @return A stream of discovered peers on the network.
+   */
+  Stream<DiscoveryPeer> streamDiscoveredPeers();
 
   /**
    * Connects to a {@link Peer}.
@@ -67,21 +77,23 @@ public interface P2PNetwork extends Closeable {
   void subscribeDisconnect(DisconnectCallback consumer);
 
   /**
-   * Adds a {@link Peer} to a list indicating efforts should be made to always stay connected to it
+   * Adds a {@link Peer} to a list indicating efforts should be made to always stay connected
+   * regardless of maxPeer limits. Non-permitted peers may be added to this list, but will not
+   * actually be connected to as long as they are prohibited.
    *
    * @param peer The peer that should be connected to
-   * @return boolean representing whether or not the peer has been added to the list or was already
-   *     on it
+   * @return boolean representing whether or not the peer has been added to the list, false is
+   *     returned if the peer was already on the list
    */
   boolean addMaintainConnectionPeer(final Peer peer);
 
   /**
-   * Removes a {@link Peer} from a list indicating any existing efforts to connect to a given peer
-   * should be removed, and if connected, the peer should be disconnected
+   * Disconnect and remove the given {@link Peer} from the maintained peer list. Peer is
+   * disconnected even if it is not in the maintained peer list. See {@link
+   * #addMaintainConnectionPeer(Peer)} for details on the maintained peer list.
    *
    * @param peer The peer to which connections are not longer required
-   * @return boolean representing whether or not the peer has been disconnected, or if it was not
-   *     currently connected.
+   * @return boolean representing whether the peer was removed from the maintained peer list
    */
   boolean removeMaintainedConnectionPeer(final Peer peer);
 

@@ -12,27 +12,29 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 
 import java.util.Optional;
 
 public class PermGetAccountsWhitelist implements JsonRpcMethod {
 
-  private final Optional<AccountWhitelistController> whitelistController;
+  private final Optional<AccountLocalConfigPermissioningController> whitelistController;
 
-  public PermGetAccountsWhitelist(final Optional<AccountWhitelistController> whitelistController) {
+  public PermGetAccountsWhitelist(
+      final Optional<AccountLocalConfigPermissioningController> whitelistController) {
     this.whitelistController = whitelistController;
   }
 
   @Override
   public String getName() {
-    return "perm_getAccountsWhitelist";
+    return RpcMethod.PERM_GET_ACCOUNTS_WHITELIST.getMethodName();
   }
 
   @Override

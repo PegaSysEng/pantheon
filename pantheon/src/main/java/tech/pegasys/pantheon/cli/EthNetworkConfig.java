@@ -18,15 +18,16 @@ import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.M
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.RINKEBY_BOOTSTRAP_NODES;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.ROPSTEN_BOOTSTRAP_NODES;
 
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 
 public class EthNetworkConfig {
@@ -35,17 +36,17 @@ public class EthNetworkConfig {
   public static final int RINKEBY_NETWORK_ID = 4;
   public static final int GOERLI_NETWORK_ID = 5;
   public static final int DEV_NETWORK_ID = 2018;
-  private static final String MAINNET_GENESIS = "mainnet.json";
-  private static final String ROPSTEN_GENESIS = "ropsten.json";
-  private static final String RINKEBY_GENESIS = "rinkeby.json";
-  private static final String GOERLI_GENESIS = "goerli.json";
-  private static final String DEV_GENESIS = "dev.json";
+  private static final String MAINNET_GENESIS = "/mainnet.json";
+  private static final String ROPSTEN_GENESIS = "/ropsten.json";
+  private static final String RINKEBY_GENESIS = "/rinkeby.json";
+  private static final String GOERLI_GENESIS = "/goerli.json";
+  private static final String DEV_GENESIS = "/dev.json";
   private final String genesisConfig;
   private final int networkId;
-  private final Collection<URI> bootNodes;
+  private final List<EnodeURL> bootNodes;
 
   public EthNetworkConfig(
-      final String genesisConfig, final int networkId, final Collection<URI> bootNodes) {
+      final String genesisConfig, final int networkId, final List<EnodeURL> bootNodes) {
     Preconditions.checkNotNull(genesisConfig);
     Preconditions.checkNotNull(bootNodes);
     this.genesisConfig = genesisConfig;
@@ -61,7 +62,7 @@ public class EthNetworkConfig {
     return networkId;
   }
 
-  public Collection<URI> getBootNodes() {
+  public List<EnodeURL> getBootNodes() {
     return bootNodes;
   }
 
@@ -76,7 +77,7 @@ public class EthNetworkConfig {
     final EthNetworkConfig that = (EthNetworkConfig) o;
     return networkId == that.networkId
         && Objects.equals(genesisConfig, that.genesisConfig)
-        && Objects.equals(Lists.newArrayList(bootNodes), Lists.newArrayList(that.bootNodes));
+        && Objects.equals(bootNodes, that.bootNodes);
   }
 
   @Override
@@ -118,7 +119,7 @@ public class EthNetworkConfig {
 
   private static String jsonConfig(final String resourceName) {
     try {
-      final URI uri = Resources.getResource(resourceName).toURI();
+      final URI uri = EthNetworkConfig.class.getResource(resourceName).toURI();
       return Resources.toString(uri.toURL(), UTF_8);
     } catch (final URISyntaxException | IOException e) {
       throw new IllegalStateException(e);
@@ -146,7 +147,7 @@ public class EthNetworkConfig {
 
     private String genesisConfig;
     private int networkId;
-    private Collection<URI> bootNodes;
+    private List<EnodeURL> bootNodes;
 
     public Builder(final EthNetworkConfig ethNetworkConfig) {
       this.genesisConfig = ethNetworkConfig.genesisConfig;
@@ -164,7 +165,7 @@ public class EthNetworkConfig {
       return this;
     }
 
-    public Builder setBootNodes(final Collection<URI> bootNodes) {
+    public Builder setBootNodes(final List<EnodeURL> bootNodes) {
       this.bootNodes = bootNodes;
       return this;
     }

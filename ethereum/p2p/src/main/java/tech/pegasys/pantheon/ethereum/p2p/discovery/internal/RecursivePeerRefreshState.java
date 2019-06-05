@@ -16,8 +16,6 @@ import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDistance
 
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.List;
@@ -38,8 +36,7 @@ public class RecursivePeerRefreshState {
   private static final Logger LOG = LogManager.getLogger();
   private static final int MAX_CONCURRENT_REQUESTS = 3;
   private BytesValue target;
-  private final PeerBlacklist peerBlacklist;
-  private final Optional<NodePermissioningController> nodePermissioningController;
+  private final PeerDiscoveryPermissions peerPermissions;
   private final PeerTable peerTable;
   private final DiscoveryPeer localPeer;
 
@@ -58,31 +55,30 @@ public class RecursivePeerRefreshState {
   List<DiscoveryPeer> initialPeers;
 
   RecursivePeerRefreshState(
-      final PeerBlacklist peerBlacklist,
-      final Optional<NodePermissioningController> nodePermissioningController,
       final BondingAgent bondingAgent,
       final FindNeighbourDispatcher neighborFinder,
       final TimerUtil timerUtil,
       final DiscoveryPeer localPeer,
       final PeerTable peerTable,
+      final PeerDiscoveryPermissions peerPermissions,
       final int timeoutPeriodInSeconds,
       final int maxRounds) {
-    this.peerBlacklist = peerBlacklist;
-    this.nodePermissioningController = nodePermissioningController;
     this.bondingAgent = bondingAgent;
     this.findNeighbourDispatcher = neighborFinder;
     this.timerUtil = timerUtil;
     this.localPeer = localPeer;
     this.peerTable = peerTable;
+    this.peerPermissions = peerPermissions;
     this.timeoutPeriodInSeconds = timeoutPeriodInSeconds;
     this.maxRounds = maxRounds;
   }
 
   void start(final List<DiscoveryPeer> initialPeers, final BytesValue target) {
     if (iterativeSearchInProgress) {
-      LOG.debug("Skipping discovery because previous search is still in progress.");
+      LOG.debug("Skip peer search because previous search is still in progress.");
       return;
     }
+    LOG.debug("Start peer search.");
     iterativeSearchInProgress = true;
     this.target = target;
     currentRoundTimeout.ifPresent(RoundTimeout::cancelTimeout);
@@ -153,7 +149,10 @@ public class RecursivePeerRefreshState {
     currentRoundTimeout.ifPresent(RoundTimeout::cancelTimeout);
     final List<MetadataPeer> candidates = neighboursRoundCandidates();
     if (candidates.isEmpty() || reachedMaximumNumberOfRounds()) {
-      LOG.debug("Iterative peer search complete");
+      LOG.debug(
+          "Iterative peer search complete.  {} peers processed over {} rounds.",
+          oneTrueMap.size(),
+          currentRound + 1);
       iterativeSearchInProgress = false;
       return;
     }
@@ -182,26 +181,17 @@ public class RecursivePeerRefreshState {
 
   private boolean satisfiesMapAdditionCriteria(final DiscoveryPeer discoPeer) {
     return !oneTrueMap.containsKey(discoPeer.getId())
-        && !peerBlacklist.contains(discoPeer)
-        && isPeerPermitted(discoPeer)
         && (initialPeers.contains(discoPeer) || !peerTable.get(discoPeer).isPresent())
         && !discoPeer.getId().equals(localPeer.getId());
   }
 
-  private Boolean isPeerPermitted(final DiscoveryPeer discoPeer) {
-    return nodePermissioningController
-        .map(controller -> controller.isPermitted(localPeer.getEnodeURL(), discoPeer.getEnodeURL()))
-        .orElse(true);
-  }
-
-  void onNeighboursPacketReceived(
-      final DiscoveryPeer peer, final NeighborsPacketData neighboursPacket) {
+  void onNeighboursReceived(final DiscoveryPeer peer, final List<DiscoveryPeer> peers) {
     final MetadataPeer metadataPeer = oneTrueMap.get(peer.getId());
     if (metadataPeer == null) {
       return;
     }
-    LOG.debug("Received neighbours packet with {} neighbours", neighboursPacket.getNodes().size());
-    for (final DiscoveryPeer receivedDiscoPeer : neighboursPacket.getNodes()) {
+    LOG.debug("Received neighbours packet with {} neighbours", peers.size());
+    for (final DiscoveryPeer receivedDiscoPeer : peers) {
       if (satisfiesMapAdditionCriteria(receivedDiscoPeer)) {
         final MetadataPeer receivedMetadataPeer =
             new MetadataPeer(receivedDiscoPeer, distance(target, receivedDiscoPeer.getId()));
@@ -255,12 +245,14 @@ public class RecursivePeerRefreshState {
   private List<MetadataPeer> bondingRoundCandidates() {
     return oneTrueMap.values().stream()
         .filter(MetadataPeer::isBondingCandidate)
+        .filter(p -> peerPermissions.allowOutboundBonding(p.getPeer()))
         .collect(Collectors.toList());
   }
 
   private List<MetadataPeer> neighboursRoundCandidates() {
     return oneTrueMap.values().stream()
         .filter(MetadataPeer::isNeighboursRoundCandidate)
+        .filter(p -> peerPermissions.allowOutboundNeighborsRequest(p.getPeer()))
         .limit(MAX_CONCURRENT_REQUESTS)
         .collect(Collectors.toList());
   }

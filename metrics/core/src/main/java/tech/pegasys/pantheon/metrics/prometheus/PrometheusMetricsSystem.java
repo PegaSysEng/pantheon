@@ -29,7 +29,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 
 import io.prometheus.client.Collector;
@@ -138,7 +138,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       final MetricCategory category,
       final String name,
       final String help,
-      final Supplier<Double> valueSupplier) {
+      final DoubleSupplier valueSupplier) {
     final String metricName = convertToPrometheusName(category, name);
     if (enabledCategories.contains(category)) {
       final Collector collector = new CurrentValueCollector(metricName, help, valueSupplier);
@@ -160,7 +160,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
   }
 
   @Override
-  public Stream<Observation> getMetrics(final MetricCategory category) {
+  public Stream<Observation> streamObservations(final MetricCategory category) {
     return collectors.getOrDefault(category, Collections.emptySet()).stream()
         .flatMap(collector -> collector.collect().stream())
         .flatMap(familySamples -> convertSamplesToObservations(category, familySamples));

@@ -26,7 +26,7 @@ import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
@@ -85,6 +85,7 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Iterables;
 
 public class TestContextBuilder {
+
   private static MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
   private static class ControllerAndState {
@@ -162,7 +163,7 @@ public class TestContextBuilder {
 
     final Block genesisBlock = createGenesisBlock(networkNodes.getValidatorAddresses());
     final MutableBlockchain blockChain =
-        createInMemoryBlockchain(genesisBlock, IbftBlockHashing::calculateHashOfIbftBlockOnChain);
+        createInMemoryBlockchain(genesisBlock, IbftBlockHeaderFunctions.forOnChainBlock());
 
     final KeyPair nodeKeys = networkNodes.getLocalNode().getNodeKeyPair();
 
@@ -282,10 +283,14 @@ public class TestContextBuilder {
         new ProtocolContext<>(
             blockChain, worldStateArchive, new IbftContext(voteTallyCache, voteProposer));
 
+    final PendingTransactions pendingTransactions =
+        new PendingTransactions(
+            PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 1, clock, metricsSystem);
+
     final IbftBlockCreatorFactory blockCreatorFactory =
         new IbftBlockCreatorFactory(
             (gasLimit) -> gasLimit,
-            new PendingTransactions(1, clock, metricsSystem), // changed from IbftPantheonController
+            pendingTransactions, // changed from IbftPantheonController
             protocolContext,
             protocolSchedule,
             miningParams,

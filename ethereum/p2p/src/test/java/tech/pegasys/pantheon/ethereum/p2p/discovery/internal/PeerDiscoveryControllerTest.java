@@ -26,24 +26,19 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.p2p.NodePermissioningControllerTestHelper;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerDroppedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.EvictResult;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Endpoint;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
+import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
+import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions.Action;
+import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissionsBlacklist;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -53,25 +48,17 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import tech.pegasys.pantheon.util.uint.UInt256;
 import tech.pegasys.pantheon.util.uint.UInt256Value;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,9 +77,6 @@ public class PeerDiscoveryControllerTest {
   private KeyPair localKeyPair;
   private final AtomicInteger counter = new AtomicInteger(1);
   private final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
-  private final String selfEnodeString =
-      "enode://5f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.10:1111";
-  private final EnodeURL selfEnode = EnodeURL.fromString(selfEnodeString);
 
   @Before
   public void initializeMocks() {
@@ -156,7 +140,7 @@ public class PeerDiscoveryControllerTest {
                 .send(eq(p), matchPacketOfType(PacketType.PING)));
 
     controller
-        .getPeers()
+        .streamDiscoveredPeers()
         .forEach(p -> assertThat(p.getStatus()).isEqualTo(PeerDiscoveryStatus.BONDING));
   }
 
@@ -294,7 +278,10 @@ public class PeerDiscoveryControllerTest {
 
     controller.start();
 
-    assertThat(controller.getPeers().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+    assertThat(
+            controller
+                .streamDiscoveredPeers()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
     // Simulate PONG messages from all peers
@@ -318,9 +305,15 @@ public class PeerDiscoveryControllerTest {
           .send(eq(peers.get(i)), matchPacketOfType(PacketType.FIND_NEIGHBORS));
     }
 
-    assertThat(controller.getPeers().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+    assertThat(
+            controller
+                .streamDiscoveredPeers()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(0);
-    assertThat(controller.getPeers().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDED))
+    assertThat(
+            controller
+                .streamDiscoveredPeers()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDED))
         .hasSize(3);
   }
 
@@ -345,7 +338,10 @@ public class PeerDiscoveryControllerTest {
 
     controller.start();
 
-    assertThat(controller.getPeers().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+    assertThat(
+            controller
+                .streamDiscoveredPeers()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
 
     // Send a PONG packet from peer 1, with an incorrect hash.
@@ -358,7 +354,10 @@ public class PeerDiscoveryControllerTest {
     verify(outboundMessageHandler, never())
         .send(eq(peers.get(1)), matchPacketOfType(PacketType.FIND_NEIGHBORS));
 
-    assertThat(controller.getPeers().filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
+    assertThat(
+            controller
+                .streamDiscoveredPeers()
+                .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDING))
         .hasSize(3);
   }
 
@@ -410,8 +409,8 @@ public class PeerDiscoveryControllerTest {
     final FindNeighborsPacketData data = maybeData.get();
     assertThat(data.getTarget()).isEqualTo(localPeer.getId());
 
-    assertThat(controller.getPeers()).hasSize(1);
-    assertThat(controller.getPeers().findFirst().get().getStatus())
+    assertThat(controller.streamDiscoveredPeers()).hasSize(1);
+    assertThat(controller.streamDiscoveredPeers().findFirst().get().getStatus())
         .isEqualTo(PeerDiscoveryStatus.BONDED);
   }
 
@@ -463,11 +462,11 @@ public class PeerDiscoveryControllerTest {
     respondWithPong(peers.get(0), keyPairs.get(0), pingPacket.getHash());
 
     // Assert that we're bonding with the third peer.
-    assertThat(controller.getPeers()).hasSize(2);
-    assertThat(controller.getPeers())
+    assertThat(controller.streamDiscoveredPeers()).hasSize(2);
+    assertThat(controller.streamDiscoveredPeers())
         .filteredOn(p -> p.getStatus() == PeerDiscoveryStatus.BONDING)
         .hasSize(1);
-    assertThat(controller.getPeers())
+    assertThat(controller.streamDiscoveredPeers())
         .filteredOn(p -> p.getStatus() == PeerDiscoveryStatus.BONDED)
         .hasSize(1);
 
@@ -488,8 +487,8 @@ public class PeerDiscoveryControllerTest {
     controller.onMessage(neighborsPacket0, peers.get(0));
 
     // Assert that we're bonded with the third peer.
-    assertThat(controller.getPeers()).hasSize(2);
-    assertThat(controller.getPeers())
+    assertThat(controller.streamDiscoveredPeers()).hasSize(2);
+    assertThat(controller.streamDiscoveredPeers())
         .filteredOn(p -> p.getStatus() == PeerDiscoveryStatus.BONDED)
         .hasSize(2);
 
@@ -511,7 +510,7 @@ public class PeerDiscoveryControllerTest {
     controller.onMessage(pongPacket2, peers.get(2));
 
     // Assert we're now bonded with peer[2].
-    assertThat(controller.getPeers())
+    assertThat(controller.streamDiscoveredPeers())
         .filteredOn(p -> p.equals(peers.get(2)) && p.getStatus() == PeerDiscoveryStatus.BONDED)
         .hasSize(1);
 
@@ -540,19 +539,18 @@ public class PeerDiscoveryControllerTest {
 
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
     controller.onMessage(pingPacket, peers.get(0));
-    assertThat(controller.getPeers()).contains(peers.get(0));
+    assertThat(controller.streamDiscoveredPeers()).contains(peers.get(0));
   }
 
   @Test
   public void shouldNotAddSelfWhenReceivedPingFromSelf() {
     startPeerDiscoveryController();
-    final DiscoveryPeer localPeer =
-        new DiscoveryPeer(this.localPeer.getId(), this.localPeer.getEndpoint());
+    final DiscoveryPeer localPeer = DiscoveryPeer.fromEnode(this.localPeer.getEnodeURL());
 
     final Packet pingPacket = mockPingPacket(this.localPeer, this.localPeer);
     controller.onMessage(pingPacket, localPeer);
 
-    assertThat(controller.getPeers()).doesNotContain(localPeer);
+    assertThat(controller.streamDiscoveredPeers()).doesNotContain(localPeer);
   }
 
   @Test
@@ -567,9 +565,9 @@ public class PeerDiscoveryControllerTest {
     final Packet pingPacket = mockPingPacket(peers.get(16), localPeer);
     controller.onMessage(pingPacket, peers.get(16));
 
-    assertThat(controller.getPeers()).contains(peers.get(16));
+    assertThat(controller.streamDiscoveredPeers()).contains(peers.get(16));
     // The first peer added should have been evicted.
-    assertThat(controller.getPeers()).doesNotContain(peers.get(0));
+    assertThat(controller.streamDiscoveredPeers()).doesNotContain(peers.get(0));
   }
 
   @Test
@@ -578,12 +576,12 @@ public class PeerDiscoveryControllerTest {
     startPeerDiscoveryController();
 
     peerTable.tryAdd(peers.get(0));
-    assertThat(controller.getPeers()).contains(peers.get(0));
+    assertThat(controller.streamDiscoveredPeers()).contains(peers.get(0));
 
     final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
     controller.onMessage(pingPacket, peers.get(0));
 
-    assertThat(controller.getPeers()).contains(peers.get(0));
+    assertThat(controller.streamDiscoveredPeers()).contains(peers.get(0));
   }
 
   @Test
@@ -594,12 +592,12 @@ public class PeerDiscoveryControllerTest {
     final DiscoveryPeer otherPeer = peers.get(1);
     final DiscoveryPeer otherPeer2 = peers.get(2);
 
-    final PeerBlacklist blacklist = new PeerBlacklist();
+    final PeerPermissionsBlacklist blacklist = PeerPermissionsBlacklist.create();
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     controller =
         getControllerBuilder()
             .peers(discoPeer)
-            .blacklist(blacklist)
+            .peerPermissions(blacklist)
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -650,10 +648,10 @@ public class PeerDiscoveryControllerTest {
         MockPacketDataFactory.mockPongPacket(otherPeer2, pingPacket2.getHash());
     controller.onMessage(pongPacket2, otherPeer2);
 
-    assertThat(controller.getPeers()).hasSize(2);
-    assertThat(controller.getPeers()).contains(discoPeer);
-    assertThat(controller.getPeers()).contains(otherPeer);
-    assertThat(controller.getPeers()).doesNotContain(otherPeer2);
+    assertThat(controller.streamDiscoveredPeers()).hasSize(2);
+    assertThat(controller.streamDiscoveredPeers()).contains(discoPeer);
+    assertThat(controller.streamDiscoveredPeers()).contains(otherPeer);
+    assertThat(controller.streamDiscoveredPeers()).doesNotContain(otherPeer2);
   }
 
   private PacketData matchPingDataForPeer(final DiscoveryPeer peer) {
@@ -672,12 +670,12 @@ public class PeerDiscoveryControllerTest {
     final DiscoveryPeer otherPeer = peers.get(1);
     final DiscoveryPeer otherPeer2 = peers.get(2);
 
-    final PeerBlacklist blacklist = new PeerBlacklist();
+    final PeerPermissionsBlacklist blacklist = PeerPermissionsBlacklist.create();
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     controller =
         getControllerBuilder()
             .peers(discoPeer)
-            .blacklist(blacklist)
+            .peerPermissions(blacklist)
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -723,18 +721,15 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  public void shouldRespondToNeighborsRequestFromKnownPeer()
-      throws InterruptedException, ExecutionException, TimeoutException {
+  public void shouldRespondToNeighborsRequestFromKnownPeer() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
 
     final DiscoveryPeer discoPeer = peers.get(0);
 
-    final PeerBlacklist blacklist = new PeerBlacklist();
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     controller =
         getControllerBuilder()
             .peers(discoPeer)
-            .blacklist(blacklist)
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -765,19 +760,16 @@ public class PeerDiscoveryControllerTest {
   }
 
   @Test
-  public void shouldNotRespondToNeighborsRequestFromUnknownPeer()
-      throws InterruptedException, ExecutionException, TimeoutException {
+  public void shouldNotRespondToNeighborsRequestFromUnknownPeer() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 2);
 
     final DiscoveryPeer discoPeer = peers.get(0);
     final DiscoveryPeer otherPeer = peers.get(1);
 
-    final PeerBlacklist blacklist = new PeerBlacklist();
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     controller =
         getControllerBuilder()
             .peers(discoPeer)
-            .blacklist(blacklist)
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -813,12 +805,12 @@ public class PeerDiscoveryControllerTest {
 
     final DiscoveryPeer discoPeer = peers.get(0);
 
-    final PeerBlacklist blacklist = new PeerBlacklist();
+    final PeerPermissionsBlacklist blacklist = PeerPermissionsBlacklist.create();
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
     controller =
         getControllerBuilder()
             .peers(discoPeer)
-            .blacklist(blacklist)
+            .peerPermissions(blacklist)
             .outboundMessageHandler(outboundMessageHandler)
             .build();
 
@@ -876,7 +868,7 @@ public class PeerDiscoveryControllerTest {
         MockPacketDataFactory.mockPongPacket(peers.get(0), pingPacket.getHash());
     controller.onMessage(pongPacket, peers.get(0));
 
-    assertThat(controller.getPeers()).contains(peers.get(0));
+    assertThat(controller.streamDiscoveredPeers()).contains(peers.get(0));
   }
 
   @Test
@@ -932,15 +924,15 @@ public class PeerDiscoveryControllerTest {
         MockPacketDataFactory.mockPongPacket(peers.get(16), pingPacket.getHash());
     controller.onMessage(pongPacket16, peers.get(16));
 
-    assertThat(controller.getPeers()).contains(peers.get(16));
-    assertThat(controller.getPeers().collect(Collectors.toList())).hasSize(16);
+    assertThat(controller.streamDiscoveredPeers()).contains(peers.get(16));
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList())).hasSize(16);
     assertThat(evictedPeerFromBucket(bootstrapPeers, controller)).isTrue();
   }
 
   private boolean evictedPeerFromBucket(
       final List<DiscoveryPeer> peers, final PeerDiscoveryController controller) {
     for (final DiscoveryPeer peer : peers) {
-      if (controller.getPeers().noneMatch(candidate -> candidate.equals(peer))) {
+      if (controller.streamDiscoveredPeers().noneMatch(candidate -> candidate.equals(peer))) {
         return true;
       }
     }
@@ -976,177 +968,212 @@ public class PeerDiscoveryControllerTest {
     verify(outboundMessageHandler, times(1))
         .send(eq(peers.get(0)), matchPacketOfType(PacketType.FIND_NEIGHBORS));
 
-    assertThat(controller.getPeers()).doesNotContain(peers.get(1));
+    assertThat(controller.streamDiscoveredPeers()).doesNotContain(peers.get(1));
   }
 
   @Test
-  public void shouldNotBondWithNonPermittedPeer() {
+  public void streamDiscoveredPeers() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
-
-    final DiscoveryPeer discoveryPeer = peers.get(0);
-    final DiscoveryPeer notPermittedPeer = peers.get(1);
-    final DiscoveryPeer permittedPeer = peers.get(2);
-
-    final PeerBlacklist blacklist = new PeerBlacklist();
-
-    final NodePermissioningController nodePermissioningController =
-        new NodePermissioningControllerTestHelper(localPeer)
-            .withPermittedPeers(discoveryPeer, permittedPeer)
-            .withForbiddenPeers(notPermittedPeer)
-            .build();
-
     final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
+    final PeerPermissions peerPermissions = mock(PeerPermissions.class);
+    doReturn(true).when(peerPermissions).isPermitted(any(), any(), any());
+
+    final DiscoveryPeer localNode =
+        DiscoveryPeer.fromEnode(
+            EnodeURL.builder()
+                .ipAddress("127.0.0.1")
+                .nodeId(Peer.randomId())
+                .discoveryAndListeningPorts(30303)
+                .build());
+
     controller =
         getControllerBuilder()
-            .peers(discoveryPeer)
-            .blacklist(blacklist)
-            .nodePermissioningController(nodePermissioningController)
+            .localPeer(localNode)
+            .peers(peers)
             .outboundMessageHandler(outboundMessageHandler)
+            .peerPermissions(peerPermissions)
             .build();
-
-    final Endpoint localEndpoint = localPeer.getEndpoint();
-
-    // Setup ping to be sent to discoveryPeer
-    List<SECP256K1.KeyPair> keyPairs = PeerDiscoveryTestHelper.generateKeyPairs(1);
-    PingPacketData pingPacketData =
-        PingPacketData.create(localEndpoint, discoveryPeer.getEndpoint());
-    final Packet discoPeerPing = Packet.create(PacketType.PING, pingPacketData, keyPairs.get(0));
-    mockPacketCreation(PacketType.PING, discoveryPeer, discoPeerPing);
-
     controller.start();
-    verify(outboundMessageHandler, times(1)).send(any(), matchPacketOfType(PacketType.PING));
 
-    final Packet pongFromDiscoPeer =
-        MockPacketDataFactory.mockPongPacket(discoveryPeer, discoPeerPing.getHash());
-    controller.onMessage(pongFromDiscoPeer, discoveryPeer);
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrderElementsOf(peers);
 
-    verify(outboundMessageHandler, times(1))
-        .send(eq(discoveryPeer), matchPacketOfType(PacketType.FIND_NEIGHBORS));
+    // Disallow peer - it should be filtered from list
+    final Peer disallowed = peers.get(0);
+    doReturn(false)
+        .when(peerPermissions)
+        .isPermitted(eq(localNode), eq(disallowed), eq(Action.DISCOVERY_ALLOW_IN_PEER_TABLE));
 
-    // Setup ping to be sent to otherPeer after neighbors packet is received
-    keyPairs = PeerDiscoveryTestHelper.generateKeyPairs(1);
-    pingPacketData = PingPacketData.create(localEndpoint, notPermittedPeer.getEndpoint());
-    final Packet pingPacket = Packet.create(PacketType.PING, pingPacketData, keyPairs.get(0));
-    mockPacketCreation(PacketType.PING, notPermittedPeer, pingPacket);
-
-    // Setup ping to be sent to otherPeer2 after neighbors packet is received
-    keyPairs = PeerDiscoveryTestHelper.generateKeyPairs(1);
-    pingPacketData = PingPacketData.create(localEndpoint, permittedPeer.getEndpoint());
-    final Packet pingPacket2 = Packet.create(PacketType.PING, pingPacketData, keyPairs.get(0));
-    mockPacketCreation(PacketType.PING, permittedPeer, pingPacket2);
-
-    final Packet neighborsPacket =
-        MockPacketDataFactory.mockNeighborsPacket(discoveryPeer, notPermittedPeer, permittedPeer);
-    controller.onMessage(neighborsPacket, discoveryPeer);
-
-    verify(controller, times(0)).bond(notPermittedPeer);
-    verify(controller, times(1)).bond(permittedPeer);
+    // Peer stream should filter disallowed
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrder(peers.get(1), peers.get(2));
   }
 
   @Test
-  public void shouldNotRespondToPingFromNonWhitelistedDiscoveryPeer() {
+  public void updatePermissions_restrictWithList() {
     final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
-    final DiscoveryPeer discoPeer = peers.get(0);
+    final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
+    final TestPeerPermissions peerPermissions = spy(new TestPeerPermissions());
+    doReturn(true).when(peerPermissions).isPermitted(any(), any(), any());
 
-    final NodePermissioningController nodePermissioningController =
-        new NodePermissioningControllerTestHelper(localPeer).withForbiddenPeers(discoPeer).build();
-
-    controller =
-        getControllerBuilder()
-            .peers(discoPeer)
-            .nodePermissioningController(nodePermissioningController)
-            .build();
-
-    final Packet pingPacket = mockPingPacket(peers.get(0), localPeer);
-    controller.onMessage(pingPacket, peers.get(0));
-    assertThat(controller.getPeers()).doesNotContain(peers.get(0));
-  }
-
-  @Test
-  public void whenObservingNodeWhitelistAndNodeIsRemovedShouldEvictPeerFromPeerTable()
-      throws IOException {
-    final PeerTable peerTableSpy = spy(peerTable);
-    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
-    final DiscoveryPeer peer = peers.get(0);
-    peerTableSpy.tryAdd(peer);
-
-    final LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final URI peerURI = URI.create(peer.getEnodeURLString());
-    config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
+    final DiscoveryPeer localNode =
+        DiscoveryPeer.fromEnode(
+            EnodeURL.builder()
+                .ipAddress("127.0.0.1")
+                .nodeId(Peer.randomId())
+                .discoveryAndListeningPorts(30303)
+                .build());
 
     controller =
         getControllerBuilder()
-            .whitelist(nodeLocalConfigPermissioningController)
-            .peerTable(peerTableSpy)
+            .localPeer(localNode)
+            .peers(peers)
+            .outboundMessageHandler(outboundMessageHandler)
+            .peerPermissions(peerPermissions)
             .build();
-
     controller.start();
-    nodeLocalConfigPermissioningController.removeNodes(Lists.newArrayList(peerURI.toString()));
 
-    verify(peerTableSpy).tryEvict(eq(DiscoveryPeer.fromURI(peerURI)));
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrderElementsOf(peers);
+
+    // Disallow peer - it should be filtered from list
+    final Peer disallowed = peers.get(0);
+    doReturn(false)
+        .when(peerPermissions)
+        .isPermitted(eq(localNode), eq(disallowed), eq(Action.DISCOVERY_ALLOW_IN_PEER_TABLE));
+    peerPermissions.testDispatchUpdate(true, Optional.of(Collections.singletonList(disallowed)));
+
+    // Peer stream should filter disallowed
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrder(peers.get(1), peers.get(2));
+
+    // Peer should be dropped
+    verify(controller, times(1)).dropPeer(any());
+    verify(controller, times(1)).dropPeer(disallowed);
   }
 
   @Test
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public void whenObservingNodeWhitelistAndNodeIsRemovedShouldNotifyPeerDroppedObservers()
-      throws IOException {
-    final PeerTable peerTableSpy = spy(peerTable);
-    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
-    final DiscoveryPeer peer = peers.get(0);
-    peerTableSpy.tryAdd(peer);
+  public void updatePermissions_restrictWithNoList() {
+    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
+    final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
+    final TestPeerPermissions peerPermissions = spy(new TestPeerPermissions());
+    final MockTimerUtil timerUtil = new MockTimerUtil();
+    doReturn(true).when(peerPermissions).isPermitted(any(), any(), any());
 
-    final LocalPermissioningConfiguration config = permissioningConfigurationWithTempFile();
-    final URI peerURI = URI.create(peer.getEnodeURLString());
-    config.setNodeWhitelist(Lists.newArrayList(peerURI));
-    final NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController =
-        new NodeLocalConfigPermissioningController(config, Collections.emptyList(), selfEnode);
-
-    final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
-    final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
-    peerDroppedSubscribers.subscribe(peerDroppedEventConsumer);
-
-    doReturn(EvictResult.evicted()).when(peerTableSpy).tryEvict(any());
+    final DiscoveryPeer localNode =
+        DiscoveryPeer.fromEnode(
+            EnodeURL.builder()
+                .ipAddress("127.0.0.1")
+                .nodeId(Peer.randomId())
+                .discoveryAndListeningPorts(30303)
+                .build());
 
     controller =
         getControllerBuilder()
-            .whitelist(nodeLocalConfigPermissioningController)
-            .peerTable(peerTableSpy)
-            .peerDroppedObservers(peerDroppedSubscribers)
+            .localPeer(localNode)
+            .peers(peers)
+            .outboundMessageHandler(outboundMessageHandler)
+            .peerPermissions(peerPermissions)
+            .timerUtil(timerUtil)
             .build();
-
     controller.start();
-    nodeLocalConfigPermissioningController.removeNodes(Lists.newArrayList(peerURI.toString()));
 
-    ArgumentCaptor<PeerDroppedEvent> captor = ArgumentCaptor.forClass(PeerDroppedEvent.class);
-    verify(peerDroppedEventConsumer).accept(captor.capture());
-    assertThat(captor.getValue().getPeer())
-        .isEqualTo(DiscoveryPeer.fromURI(peer.getEnodeURLString()));
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrderElementsOf(peers);
+
+    // Disallow peer - it should be filtered from list
+    final Peer disallowed = peers.get(0);
+    doReturn(false)
+        .when(peerPermissions)
+        .isPermitted(eq(localNode), eq(disallowed), eq(Action.DISCOVERY_ALLOW_IN_PEER_TABLE));
+    peerPermissions.testDispatchUpdate(true, Optional.empty());
+    timerUtil.runHandlers();
+
+    // Peer stream should filter disallowed
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrder(peers.get(1), peers.get(2));
+
+    // Peer should be dropped
+    verify(controller, times(1)).dropPeer(any());
+    verify(controller, times(1)).dropPeer(disallowed);
   }
 
   @Test
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public void whenPeerIsNotEvictedDropFromTableShouldReturnFalseAndNotifyZeroObservers() {
-    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 1);
-    final DiscoveryPeer peer = peers.get(0);
-    final PeerTable peerTableSpy = spy(peerTable);
-    final Consumer<PeerDroppedEvent> peerDroppedEventConsumer = mock(Consumer.class);
-    final Subscribers<Consumer<PeerDroppedEvent>> peerDroppedSubscribers = new Subscribers();
-    peerDroppedSubscribers.subscribe(peerDroppedEventConsumer);
+  public void updatePermissions_relaxPermissionsWithList() {
+    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
+    final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
+    final TestPeerPermissions peerPermissions = spy(new TestPeerPermissions());
+    final MockTimerUtil timerUtil = new MockTimerUtil();
+    doReturn(true).when(peerPermissions).isPermitted(any(), any(), any());
 
-    doReturn(EvictResult.absent()).when(peerTableSpy).tryEvict(any());
+    final DiscoveryPeer localNode =
+        DiscoveryPeer.fromEnode(
+            EnodeURL.builder()
+                .ipAddress("127.0.0.1")
+                .nodeId(Peer.randomId())
+                .discoveryAndListeningPorts(30303)
+                .build());
 
-    controller = getControllerBuilder().peerDroppedObservers(peerDroppedSubscribers).build();
-
+    controller =
+        getControllerBuilder()
+            .localPeer(localNode)
+            .peers(peers)
+            .outboundMessageHandler(outboundMessageHandler)
+            .peerPermissions(peerPermissions)
+            .timerUtil(timerUtil)
+            .build();
     controller.start();
-    boolean dropped = controller.dropFromPeerTable(peer);
 
-    assertThat(dropped).isFalse();
-    verifyZeroInteractions(peerDroppedEventConsumer);
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrderElementsOf(peers);
+
+    final Peer firstPeer = peers.get(0);
+    peerPermissions.testDispatchUpdate(false, Optional.of(Collections.singletonList(firstPeer)));
+    timerUtil.runHandlers();
+
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrderElementsOf(peers);
+    verify(controller, never()).dropPeer(any());
   }
 
-  private static Packet mockPingPacket(final Peer from, final Peer to) {
+  @Test
+  public void updatePermissions_relaxPermissionsWithNoList() {
+    final List<DiscoveryPeer> peers = createPeersInLastBucket(localPeer, 3);
+    final OutboundMessageHandler outboundMessageHandler = mock(OutboundMessageHandler.class);
+    final TestPeerPermissions peerPermissions = spy(new TestPeerPermissions());
+    final MockTimerUtil timerUtil = new MockTimerUtil();
+    doReturn(true).when(peerPermissions).isPermitted(any(), any(), any());
+
+    final DiscoveryPeer localNode =
+        DiscoveryPeer.fromEnode(
+            EnodeURL.builder()
+                .ipAddress("127.0.0.1")
+                .nodeId(Peer.randomId())
+                .discoveryAndListeningPorts(30303)
+                .build());
+
+    controller =
+        getControllerBuilder()
+            .localPeer(localNode)
+            .peers(peers)
+            .outboundMessageHandler(outboundMessageHandler)
+            .peerPermissions(peerPermissions)
+            .timerUtil(timerUtil)
+            .build();
+    controller.start();
+
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrderElementsOf(peers);
+
+    peerPermissions.testDispatchUpdate(false, Optional.empty());
+    timerUtil.runHandlers();
+
+    assertThat(controller.streamDiscoveredPeers().collect(Collectors.toList()))
+        .containsExactlyInAnyOrderElementsOf(peers);
+    verify(controller, never()).dropPeer(any());
+  }
+
+  private static Packet mockPingPacket(final DiscoveryPeer from, final DiscoveryPeer to) {
     final Packet packet = mock(Packet.class);
 
     final PingPacketData pingPacketData =
@@ -1161,7 +1188,7 @@ public class PeerDiscoveryControllerTest {
   }
 
   private List<DiscoveryPeer> createPeersInLastBucket(final Peer host, final int n) {
-    final List<DiscoveryPeer> newPeers = new ArrayList<DiscoveryPeer>(n);
+    final List<DiscoveryPeer> newPeers = new ArrayList<>(n);
 
     // Flipping the most significant bit of the keccak256 will place the peer
     // in the last bucket for the corresponding host peer.
@@ -1178,12 +1205,12 @@ public class PeerDiscoveryControllerTest {
       UInt256.of(i).getBytes().copyTo(id, id.size() - UInt256Value.SIZE);
       final DiscoveryPeer peer =
           spy(
-              new DiscoveryPeer(
-                  id,
-                  new Endpoint(
-                      localPeer.getEndpoint().getHost(),
-                      100 + counter.incrementAndGet(),
-                      OptionalInt.empty())));
+              DiscoveryPeer.fromEnode(
+                  EnodeURL.builder()
+                      .nodeId(id)
+                      .ipAddress("127.0.0.1")
+                      .discoveryAndListeningPorts(100 + counter.incrementAndGet())
+                      .build()));
       doReturn(keccak).when(peer).keccak256();
       newPeers.add(peer);
     }
@@ -1205,21 +1232,8 @@ public class PeerDiscoveryControllerTest {
     return controller;
   }
 
-  private LocalPermissioningConfiguration permissioningConfigurationWithTempFile()
-      throws IOException {
-    final LocalPermissioningConfiguration config = LocalPermissioningConfiguration.createDefault();
-    Path tempFile = Files.createTempFile("test", "test");
-    tempFile.toFile().deleteOnExit();
-    config.setNodePermissioningConfigFilePath(tempFile.toAbsolutePath().toString());
-    config.setAccountPermissioningConfigFilePath(tempFile.toAbsolutePath().toString());
-    return config;
-  }
-
   static class ControllerBuilder {
     private Collection<DiscoveryPeer> discoPeers = Collections.emptyList();
-    private PeerBlacklist blacklist = new PeerBlacklist();
-    private Optional<NodeLocalConfigPermissioningController> whitelist = Optional.empty();
-    private Optional<NodePermissioningController> nodePermissioningController = Optional.empty();
     private MockTimerUtil timerUtil = new MockTimerUtil();
     private KeyPair keypair;
     private DiscoveryPeer localPeer;
@@ -1227,7 +1241,7 @@ public class PeerDiscoveryControllerTest {
     private OutboundMessageHandler outboundMessageHandler = OutboundMessageHandler.NOOP;
     private static final PeerDiscoveryTestHelper helper = new PeerDiscoveryTestHelper();
     private Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers = new Subscribers<>();
-    private Subscribers<Consumer<PeerDroppedEvent>> peerDroppedObservers = new Subscribers<>();
+    private PeerPermissions peerPermissions = PeerPermissions.noop();
 
     public static ControllerBuilder create() {
       return new ControllerBuilder();
@@ -1243,18 +1257,8 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder blacklist(final PeerBlacklist blacklist) {
-      this.blacklist = blacklist;
-      return this;
-    }
-
-    ControllerBuilder whitelist(final NodeLocalConfigPermissioningController whitelist) {
-      this.whitelist = Optional.of(whitelist);
-      return this;
-    }
-
-    ControllerBuilder nodePermissioningController(final NodePermissioningController controller) {
-      this.nodePermissioningController = Optional.of(controller);
+    ControllerBuilder peerPermissions(final PeerPermissions peerPermissions) {
+      this.peerPermissions = peerPermissions;
       return this;
     }
 
@@ -1288,12 +1292,6 @@ public class PeerDiscoveryControllerTest {
       return this;
     }
 
-    ControllerBuilder peerDroppedObservers(
-        final Subscribers<Consumer<PeerDroppedEvent>> observers) {
-      this.peerDroppedObservers = observers;
-      return this;
-    }
-
     PeerDiscoveryController build() {
       checkNotNull(keypair);
       if (localPeer == null) {
@@ -1303,22 +1301,33 @@ public class PeerDiscoveryControllerTest {
         peerTable = new PeerTable(localPeer.getId());
       }
       return spy(
-          new PeerDiscoveryController(
-              keypair,
-              localPeer,
-              peerTable,
-              discoPeers,
-              outboundMessageHandler,
-              timerUtil,
-              new BlockingAsyncExecutor(),
-              TABLE_REFRESH_INTERVAL_MS,
-              PEER_REQUIREMENT,
-              blacklist,
-              whitelist,
-              nodePermissioningController,
-              peerBondedObservers,
-              peerDroppedObservers,
-              new NoOpMetricsSystem()));
+          PeerDiscoveryController.builder()
+              .keypair(keypair)
+              .localPeer(localPeer)
+              .peerTable(peerTable)
+              .bootstrapNodes(discoPeers)
+              .outboundMessageHandler(outboundMessageHandler)
+              .timerUtil(timerUtil)
+              .workerExecutor(new BlockingAsyncExecutor())
+              .tableRefreshIntervalMs(TABLE_REFRESH_INTERVAL_MS)
+              .peerRequirement(PEER_REQUIREMENT)
+              .peerPermissions(peerPermissions)
+              .peerBondedObservers(peerBondedObservers)
+              .metricsSystem(new NoOpMetricsSystem())
+              .build());
+    }
+  }
+
+  private static class TestPeerPermissions extends PeerPermissions {
+
+    @Override
+    public boolean isPermitted(final Peer localNode, final Peer remotePeer, final Action action) {
+      return true;
+    }
+
+    public void testDispatchUpdate(
+        final boolean permissionsRestricted, final Optional<List<Peer>> affectedPeers) {
+      this.dispatchUpdate(permissionsRestricted, affectedPeers);
     }
   }
 }

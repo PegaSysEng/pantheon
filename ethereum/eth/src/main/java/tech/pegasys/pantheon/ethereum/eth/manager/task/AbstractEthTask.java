@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -41,22 +40,29 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   private final Collection<CompletableFuture<?>> subTaskFutures = new ConcurrentLinkedDeque<>();
 
   protected AbstractEthTask(final MetricsSystem metricsSystem) {
+    this(buildOperationTimer(metricsSystem));
+  }
+
+  protected AbstractEthTask(final OperationTimer taskTimer) {
+    this.taskTimer = taskTimer;
+  }
+
+  private static OperationTimer buildOperationTimer(final MetricsSystem metricsSystem) {
     final LabelledMetric<OperationTimer> ethTasksTimer =
         metricsSystem.createLabelledTimer(
             MetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
     if (ethTasksTimer == NoOpMetricsSystem.NO_OP_LABELLED_1_OPERATION_TIMER) {
-      taskTimer =
-          () ->
-              new OperationTimer.TimingContext() {
-                final Stopwatch stopwatch = Stopwatch.createStarted();
+      return () ->
+          new OperationTimer.TimingContext() {
+            final Stopwatch stopwatch = Stopwatch.createStarted();
 
-                @Override
-                public double stopTimer() {
-                  return stopwatch.elapsed(TimeUnit.MILLISECONDS) / 1000.0;
-                }
-              };
+            @Override
+            public double stopTimer() {
+              return stopwatch.elapsed(TimeUnit.MILLISECONDS) / 1000.0;
+            }
+          };
     } else {
-      taskTimer = ethTasksTimer.labels(getClass().getSimpleName());
+      return ethTasksTimer.labels(AbstractEthTask.class.getSimpleName());
     }
   }
 
@@ -72,7 +78,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   @Override
   public final CompletableFuture<T> runAsync(final ExecutorService executor) {
     if (result.compareAndSet(null, new CompletableFuture<>())) {
-      executor.submit(this::executeTaskTimed);
+      executor.execute(this::executeTaskTimed);
       result.get().whenComplete((r, t) -> cleanup());
     }
     return result.get();
@@ -124,21 +130,6 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   }
 
   /**
-   * Utility for registering completable futures for cleanup if this EthTask is cancelled.
-   *
-   * @param <S> the type of data returned from the CompletableFuture
-   * @param subTaskFuture the future to be registered.
-   */
-  protected final <S> void registerSubTask(final CompletableFuture<S> subTaskFuture) {
-    synchronized (result) {
-      if (!isCancelled()) {
-        subTaskFutures.add(subTaskFuture);
-        subTaskFuture.whenComplete((r, t) -> subTaskFutures.remove(subTaskFuture));
-      }
-    }
-  }
-
-  /**
    * Helper method for sending subTask to worker that will clean up if this EthTask is cancelled.
    *
    * @param scheduler the scheduler that will run worker task
@@ -149,17 +140,6 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   protected final <S> CompletableFuture<S> executeWorkerSubTask(
       final EthScheduler scheduler, final Supplier<CompletableFuture<S>> subTask) {
     return executeSubTask(() -> scheduler.scheduleSyncWorkerTask(subTask));
-  }
-
-  public final T result() {
-    if (!isSucceeded()) {
-      return null;
-    }
-    try {
-      return result.get().get();
-    } catch (final InterruptedException | ExecutionException e) {
-      return null;
-    }
   }
 
   /** Execute core task logic. */

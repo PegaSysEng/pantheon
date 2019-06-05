@@ -9,7 +9,13 @@ Use this Docker image to run a single Pantheon node without installing Pantheon.
 
 ## Prerequisites
 
-To run Pantheon from the Docker image, you must have [Docker](https://docs.docker.com/install/) installed.  
+* [Docker](https://docs.docker.com/install/)   
+
+* MacOS or Linux 
+    
+    !!! important 
+        The Docker image does not run on Windows. 
+
 
 ## Quickstart
 
@@ -19,8 +25,8 @@ To run a Pantheon node in a container connected to the Ethereum mainnet:
 docker run pegasyseng/pantheon:latest
 ```
 
-```bash tab="1.0"
-docker run pegasyseng/pantheon:1.0
+```bash tab="{{ versions.pantheon_stable }}"
+docker run pegasyseng/pantheon:{{ versions.pantheon_stable }}
 ```
 
 !!! note
@@ -182,7 +188,7 @@ Where `myprivacypublickeyfile` is the file containing the public key and `path` 
     
 ## Credentials Files 
 
-Specify a [credentials file](../JSON-RPC-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../JSON-RPC-API/Authentication.md).
+Specify a [credentials file](../Pantheon-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../Pantheon-API/Authentication.md).
 
 To run Pantheon specifying a credentials file for HTTP JSON-RPC: 
 ```bash
@@ -202,21 +208,21 @@ Where `myauthconfig.toml` is the credentials file and `path` is the absolute pat
     ```
     
     ```bash tab="WS"
-        docker run --mount type=bind,source=/Users/username/pantheon/myauthconfig.toml,target=/etc/pantheon/rpc_ws_auth_config.toml pegasyseng/pantheon:latest
+    docker run --mount type=bind,source=/Users/username/pantheon/myauthconfig.toml,target=/etc/pantheon/rpc_ws_auth_config.toml pegasyseng/pantheon:latest
     ```
     
 
 ## Exposing Ports
 
-Expose ports for P2P peer discovery, metrics, and HTTP and WebSockets JSON-RPC. This is required to use the 
+Expose ports for P2P peer discovery, GraphQL, metrics, and HTTP and WebSockets JSON-RPC. This is required to use the 
 defaults ports or specify different ports (the equivalent of specifying the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port), 
 [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port), [`--rpc-ws-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-port), 
-[`--metrics-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-port), and [`--metrics-push-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-push-port) 
-options).
+[`--metrics-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-port), [`--graphql-http-port`](../Reference/Pantheon-CLI-Syntax.md#graphql-http-port), 
+and [`--metrics-push-port`](../Reference/Pantheon-CLI-Syntax.md#metrics-push-port) options).
 
 To run Pantheon exposing local ports for access: 
 ```bash
-$ docker run -p <localportJSON-RPC>:8545 -p <localportWS>:8546 -p <localportP2P>:30303 pegasyseng/pantheon:latest --rpc-http-enabled --rpc-ws-enabled
+docker run -p <localportJSON-RPC>:8545 -p <localportWS>:8546 -p <localportP2P>:30303 pegasyseng/pantheon:latest --rpc-http-enabled --rpc-ws-enabled
 ```
 
 !!!example

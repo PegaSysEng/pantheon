@@ -42,7 +42,13 @@ public abstract class AdminModifyPeer implements JsonRpcMethod {
     } catch (final InvalidJsonRpcParameters e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
     } catch (final IllegalArgumentException e) {
-      return new JsonRpcErrorResponse(req.getId(), JsonRpcError.PARSE_ERROR);
+      if (e.getMessage()
+          .endsWith(
+              "Invalid node ID: node ID must have exactly 128 hexadecimal characters and should not include any '0x' hex prefix.")) {
+        return new JsonRpcErrorResponse(req.getId(), JsonRpcError.ENODE_ID_INVALID);
+      } else {
+        return new JsonRpcErrorResponse(req.getId(), JsonRpcError.PARSE_ERROR);
+      }
     } catch (final P2pDisabledException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
     }

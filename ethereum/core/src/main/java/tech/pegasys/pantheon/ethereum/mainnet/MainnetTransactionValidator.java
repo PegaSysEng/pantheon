@@ -17,6 +17,7 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED;
+import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.UPFRONT_COST_EXCEEDS_BALANCE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID;
 
@@ -24,10 +25,12 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 
-import java.util.OptionalInt;
+import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * Validates a transaction based on Frontier protocol runtime requirements.
@@ -37,30 +40,21 @@ import java.util.OptionalInt;
  */
 public class MainnetTransactionValidator implements TransactionValidator {
 
-  public static final int NO_CHAIN_ID = -1;
-
-  public static MainnetTransactionValidator create() {
-    return new MainnetTransactionValidator(new FrontierGasCalculator(), false);
-  }
-
   private final GasCalculator gasCalculator;
 
   private final boolean disallowSignatureMalleability;
 
-  private final OptionalInt chainId;
+  private final Optional<BigInteger> chainId;
 
-  public MainnetTransactionValidator(
-      final GasCalculator gasCalculator, final boolean checkSignatureMalleability) {
-    this(gasCalculator, checkSignatureMalleability, NO_CHAIN_ID);
-  }
+  private Optional<TransactionFilter> transactionFilter = Optional.empty();
 
   public MainnetTransactionValidator(
       final GasCalculator gasCalculator,
       final boolean checkSignatureMalleability,
-      final int chainId) {
+      final Optional<BigInteger> chainId) {
     this.gasCalculator = gasCalculator;
     this.disallowSignatureMalleability = checkSignatureMalleability;
-    this.chainId = chainId > 0 ? OptionalInt.of(chainId) : OptionalInt.empty();
+    this.chainId = chainId;
   }
 
   @Override
@@ -85,8 +79,9 @@ public class MainnetTransactionValidator implements TransactionValidator {
 
   @Override
   public ValidationResult<TransactionInvalidReason> validateForSender(
-      final Transaction transaction, final Account sender, final boolean allowFutureNonce) {
-
+      final Transaction transaction,
+      final Account sender,
+      final TransactionValidationParams validationParams) {
     Wei senderBalance = Account.DEFAULT_BALANCE;
     long senderNonce = Account.DEFAULT_NONCE;
 
@@ -111,12 +106,18 @@ public class MainnetTransactionValidator implements TransactionValidator {
               transaction.getNonce(), senderNonce));
     }
 
-    if (!allowFutureNonce && senderNonce != transaction.getNonce()) {
+    if (!validationParams.isAllowFutureNonce() && senderNonce != transaction.getNonce()) {
       return ValidationResult.invalid(
           INCORRECT_NONCE,
           String.format(
               "transaction nonce %s does not match sender account nonce %s.",
               transaction.getNonce(), senderNonce));
+    }
+
+    if (!isSenderAllowed(transaction, validationParams.isStateChange())) {
+      return ValidationResult.invalid(
+          TX_SENDER_NOT_AUTHORIZED,
+          String.format("Sender %s is not on the Account Whitelist", transaction.getSender()));
     }
 
     return ValidationResult.valid();
@@ -130,7 +131,7 @@ public class MainnetTransactionValidator implements TransactionValidator {
           WRONG_CHAIN_ID,
           String.format(
               "transaction was meant for chain id %s and not this chain id %s",
-              transaction.getChainId().getAsInt(), chainId.getAsInt()));
+              transaction.getChainId().get(), chainId.get()));
     }
 
     if (!chainId.isPresent() && transaction.getChainId().isPresent()) {
@@ -159,5 +160,13 @@ public class MainnetTransactionValidator implements TransactionValidator {
     }
 
     return ValidationResult.valid();
+  }
+
+  private boolean isSenderAllowed(final Transaction transaction, final boolean isStateChange) {
+    return transactionFilter.map(c -> c.permitted(transaction, isStateChange)).orElse(true);
+  }
+
+  public void setTransactionFilter(final TransactionFilter transactionFilter) {
+    this.transactionFilter = Optional.of(transactionFilter);
   }
 }

@@ -20,13 +20,11 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.BlockingAsyncExecutor;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.MockPeerDiscoveryAgent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.MockTimerUtil;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.OutboundMessageHandler;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.Packet;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PacketType;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDiscoveryController;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PingPacketData;
-import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.Subscribers;
 
@@ -49,26 +47,20 @@ public class PeerDiscoveryTimestampsTest {
 
     final MockPeerDiscoveryAgent agent = mock(MockPeerDiscoveryAgent.class);
     when(agent.getAdvertisedPeer()).thenReturn(Optional.of(peers.get(0)));
-    DiscoveryPeer localPeer = peers.get(0);
-    KeyPair localKeyPair = keypairs.get(0);
+    final DiscoveryPeer localPeer = peers.get(0);
+    final KeyPair localKeyPair = keypairs.get(0);
 
     final PeerDiscoveryController controller =
-        new PeerDiscoveryController(
-            localKeyPair,
-            localPeer,
-            new PeerTable(agent.getAdvertisedPeer().get().getId()),
-            Collections.emptyList(),
-            OutboundMessageHandler.NOOP,
-            new MockTimerUtil(),
-            new BlockingAsyncExecutor(),
-            TimeUnit.HOURS.toMillis(1),
-            () -> true,
-            new PeerBlacklist(),
-            Optional.empty(),
-            Optional.empty(),
-            new Subscribers<>(),
-            new Subscribers<>(),
-            new NoOpMetricsSystem());
+        PeerDiscoveryController.builder()
+            .keypair(localKeyPair)
+            .localPeer(localPeer)
+            .peerTable(new PeerTable(agent.getAdvertisedPeer().get().getId()))
+            .timerUtil(new MockTimerUtil())
+            .workerExecutor(new BlockingAsyncExecutor())
+            .tableRefreshIntervalMs(TimeUnit.HOURS.toMillis(1))
+            .peerBondedObservers(new Subscribers<>())
+            .metricsSystem(new NoOpMetricsSystem())
+            .build();
     controller.start();
 
     final PingPacketData ping =
@@ -80,9 +72,9 @@ public class PeerDiscoveryTimestampsTest {
     final AtomicLong lastSeen = new AtomicLong();
     final AtomicLong firstDiscovered = new AtomicLong();
 
-    assertThat(controller.getPeers()).hasSize(1);
+    assertThat(controller.streamDiscoveredPeers()).hasSize(1);
 
-    DiscoveryPeer p = controller.getPeers().iterator().next();
+    DiscoveryPeer p = controller.streamDiscoveredPeers().iterator().next();
     assertThat(p.getLastSeen()).isGreaterThan(0);
     assertThat(p.getFirstDiscovered()).isGreaterThan(0);
 
@@ -91,9 +83,9 @@ public class PeerDiscoveryTimestampsTest {
 
     controller.onMessage(packet, peers.get(1));
 
-    assertThat(controller.getPeers()).hasSize(1);
+    assertThat(controller.streamDiscoveredPeers()).hasSize(1);
 
-    p = controller.getPeers().iterator().next();
+    p = controller.streamDiscoveredPeers().iterator().next();
     assertThat(p.getLastSeen()).isGreaterThan(lastSeen.get());
     assertThat(p.getFirstDiscovered()).isEqualTo(firstDiscovered.get());
   }
@@ -101,20 +93,20 @@ public class PeerDiscoveryTimestampsTest {
   @Test
   public void lastContactedTimestampUpdatedOnOutboundMessage() {
     final MockPeerDiscoveryAgent agent = helper.startDiscoveryAgent(Collections.emptyList());
-    assertThat(agent.getPeers()).hasSize(0);
+    assertThat(agent.streamDiscoveredPeers()).hasSize(0);
 
     // Start a test peer and send a PING packet to the agent under test.
     final MockPeerDiscoveryAgent testAgent = helper.startDiscoveryAgent();
     final Packet ping = helper.createPingPacket(testAgent, agent);
     helper.sendMessageBetweenAgents(testAgent, agent, ping);
 
-    assertThat(agent.getPeers()).hasSize(1);
+    assertThat(agent.streamDiscoveredPeers()).hasSize(1);
 
     final AtomicLong lastContacted = new AtomicLong();
     final AtomicLong lastSeen = new AtomicLong();
     final AtomicLong firstDiscovered = new AtomicLong();
 
-    DiscoveryPeer peer = agent.getPeers().iterator().next();
+    DiscoveryPeer peer = agent.streamDiscoveredPeers().iterator().next();
     final long lc = peer.getLastContacted();
     final long ls = peer.getLastSeen();
     final long fd = peer.getFirstDiscovered();
@@ -130,7 +122,7 @@ public class PeerDiscoveryTimestampsTest {
     // Send another packet and ensure that timestamps are updated accordingly.
     helper.sendMessageBetweenAgents(testAgent, agent, ping);
 
-    peer = agent.getPeers().iterator().next();
+    peer = agent.streamDiscoveredPeers().iterator().next();
 
     assertThat(peer.getLastContacted()).isGreaterThan(lastContacted.get());
     assertThat(peer.getLastSeen()).isGreaterThan(lastSeen.get());

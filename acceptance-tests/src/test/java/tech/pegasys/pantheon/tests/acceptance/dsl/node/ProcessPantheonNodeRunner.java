@@ -94,11 +94,11 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
     params.add("--bootnodes");
 
-    if (!node.bootnodes().isEmpty()) {
-      params.add(node.bootnodes().stream().map(URI::toString).collect(Collectors.joining(",")));
+    if (!node.getBootnodes().isEmpty()) {
+      params.add(node.getBootnodes().stream().map(URI::toString).collect(Collectors.joining(",")));
     }
 
-    if (node.jsonRpcEnabled()) {
+    if (node.isJsonRpcEnabled()) {
       params.add("--rpc-http-enabled");
       params.add("--rpc-http-host");
       params.add(node.jsonRpcListenHost().get());
@@ -172,11 +172,12 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
               if (permissioningConfiguration.isSmartContractNodeWhitelistEnabled()) {
                 params.add("--permissions-nodes-contract-enabled");
               }
-              if (permissioningConfiguration.getSmartContractAddress() != null) {
+              if (permissioningConfiguration.getNodeSmartContractAddress() != null) {
                 params.add("--permissions-nodes-contract-address");
-                params.add(permissioningConfiguration.getSmartContractAddress().toString());
+                params.add(permissioningConfiguration.getNodeSmartContractAddress().toString());
               }
             });
+    params.addAll(node.getExtraCLIOptions());
 
     LOG.info("Creating pantheon process with params {}", params);
     final ProcessBuilder processBuilder =
@@ -184,10 +185,17 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
             .directory(new File(System.getProperty("user.dir")).getParentFile())
             .redirectErrorStream(true)
             .redirectInput(Redirect.INHERIT);
+    if (!node.getPlugins().isEmpty()) {
+      processBuilder
+          .environment()
+          .put(
+              "PANTHEON_OPTS",
+              "-Dpantheon.plugins.dir=" + dataDir.resolve("plugins").toAbsolutePath().toString());
+    }
 
     try {
       final Process process = processBuilder.start();
-      outputProcessorExecutor.submit(() -> printOutput(node, process));
+      outputProcessorExecutor.execute(() -> printOutput(node, process));
       pantheonProcesses.put(node.getName(), process);
     } catch (final IOException e) {
       LOG.error("Error starting PantheonNode process", e);

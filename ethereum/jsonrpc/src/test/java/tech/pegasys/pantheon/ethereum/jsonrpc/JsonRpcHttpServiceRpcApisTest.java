@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -37,10 +36,9 @@ import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.netty.NettyP2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.network.DefaultP2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
@@ -143,7 +141,7 @@ public class JsonRpcHttpServiceRpcApisTest {
       assertThat(resp.code()).isEqualTo(400);
       // Check general format of result
       final JsonObject json = new JsonObject(resp.body().string());
-      final JsonRpcError expectedError = JsonRpcError.METHOD_NOT_FOUND;
+      final JsonRpcError expectedError = JsonRpcError.METHOD_NOT_ENABLED;
       testHelper.assertValidJsonRpcError(
           json, id, expectedError.getCode(), expectedError.getMessage());
     }
@@ -200,7 +198,7 @@ public class JsonRpcHttpServiceRpcApisTest {
                     mock(EthHashMiningCoordinator.class),
                     new NoOpMetricsSystem(),
                     supportedCapabilities,
-                    Optional.of(mock(AccountWhitelistController.class)),
+                    Optional.of(mock(AccountLocalConfigPermissioningController.class)),
                     Optional.of(mock(NodeLocalConfigPermissioningController.class)),
                     config.getRpcApis(),
                     mock(PrivacyParameters.class),
@@ -233,22 +231,20 @@ public class JsonRpcHttpServiceRpcApisTest {
   }
 
   private P2PNetwork createP2pNetwork() {
-    final SECP256K1.KeyPair keyPair = SECP256K1.KeyPair.generate();
     final NetworkingConfiguration config =
         NetworkingConfiguration.create()
             .setRlpx(RlpxConfiguration.create().setBindPort(0))
             .setDiscovery(DiscoveryConfiguration.create().setBindPort(0));
 
-    final NettyP2PNetwork p2pNetwork =
-        new NettyP2PNetwork(
-            vertx,
-            keyPair,
-            config,
-            emptyList(),
-            new PeerBlacklist(),
-            new NoOpMetricsSystem(),
-            Optional.empty(),
-            Optional.empty());
+    final P2PNetwork p2pNetwork =
+        DefaultP2PNetwork.builder()
+            .supportedCapabilities(Capability.create("eth", 63))
+            .keyPair(SECP256K1.KeyPair.generate())
+            .vertx(vertx)
+            .config(config)
+            .metricsSystem(new NoOpMetricsSystem())
+            .build();
+
     p2pNetwork.start();
     return p2pNetwork;
   }
@@ -268,6 +264,8 @@ public class JsonRpcHttpServiceRpcApisTest {
     final Set<Capability> supportedCapabilities = new HashSet<>();
     supportedCapabilities.add(EthProtocol.ETH62);
     supportedCapabilities.add(EthProtocol.ETH63);
+    jsonRpcConfiguration.setPort(0);
+    webSocketConfiguration.setPort(0);
 
     final Map<String, JsonRpcMethod> rpcMethods =
         spy(
@@ -285,7 +283,7 @@ public class JsonRpcHttpServiceRpcApisTest {
                     mock(EthHashMiningCoordinator.class),
                     new NoOpMetricsSystem(),
                     supportedCapabilities,
-                    Optional.of(mock(AccountWhitelistController.class)),
+                    Optional.of(mock(AccountLocalConfigPermissioningController.class)),
                     Optional.of(mock(NodeLocalConfigPermissioningController.class)),
                     jsonRpcConfiguration.getRpcApis(),
                     mock(PrivacyParameters.class),

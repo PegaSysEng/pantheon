@@ -27,16 +27,17 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.httptransaction.HttpTransaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.AdminJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.EeaJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.IbftJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PermissioningJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.NodeConfiguration;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.NodeRequests;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.admin.AdminRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.CustomNetJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -85,17 +86,19 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final WebSocketConfiguration webSocketConfiguration;
   private final MetricsConfiguration metricsConfiguration;
   private final Optional<PermissioningConfiguration> permissioningConfiguration;
-  private final GenesisConfigProvider genesisConfigProvider;
+  private final GenesisConfigurationProvider genesisConfigProvider;
   private final boolean devMode;
   private final boolean discoveryEnabled;
   private final List<URI> bootnodes = new ArrayList<>();
   private final boolean bootnodeEligible;
 
   private Optional<String> genesisConfig = Optional.empty();
-  private JsonRequestFactories jsonRequestFactories;
-  private HttpRequestFactory httpRequestFactory;
+  private NodeRequests nodeRequests;
+  private LoginRequestFactory loginRequestFactory;
   private boolean useWsForJsonRpc = false;
   private String token = null;
+  private final List<String> plugins = new ArrayList<>();
+  private final List<String> extraCLIOptions;
 
   public PantheonNode(
       final String name,
@@ -107,10 +110,12 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final Optional<PermissioningConfiguration> permissioningConfiguration,
       final Optional<String> keyfilePath,
       final boolean devMode,
-      final GenesisConfigProvider genesisConfigProvider,
+      final GenesisConfigurationProvider genesisConfigProvider,
       final boolean p2pEnabled,
       final boolean discoveryEnabled,
-      final boolean bootnodeEligible)
+      final boolean bootnodeEligible,
+      final List<String> plugins,
+      final List<String> extraCLIOptions)
       throws IOException {
     this.bootnodeEligible = bootnodeEligible;
     this.homeDirectory = Files.createTempDirectory("acctest");
@@ -118,7 +123,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
         path -> {
           try {
             copyResource(path, homeDirectory.resolve("key"));
-          } catch (IOException e) {
+          } catch (final IOException e) {
             LOG.error("Could not find key file \"{}\" in resources", path);
           }
         });
@@ -135,10 +140,23 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     this.devMode = devMode;
     this.p2pEnabled = p2pEnabled;
     this.discoveryEnabled = discoveryEnabled;
+    plugins.forEach(
+        pluginName -> {
+          try {
+            homeDirectory.resolve("plugins").toFile().mkdirs();
+            copyResource(
+                pluginName + ".jar", homeDirectory.resolve("plugins/" + pluginName + ".jar"));
+            PantheonNode.this.plugins.add(pluginName);
+          } catch (final IOException e) {
+            LOG.error("Could not find plugin \"{}\" in resources", pluginName);
+          }
+        });
+    this.extraCLIOptions = extraCLIOptions;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
-  private boolean isJsonRpcEnabled() {
+  @Override
+  public boolean isJsonRpcEnabled() {
     return jsonRpcConfiguration().isEnabled();
   }
 
@@ -213,7 +231,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public Optional<Integer> jsonRpcWebSocketPort() {
+  public Optional<Integer> getJsonRpcWebSocketPort() {
     if (isWebSocketsRpcEnabled()) {
       return Optional.of(Integer.valueOf(portsProperties.getProperty("ws-rpc")));
     } else {
@@ -222,13 +240,13 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public String hostName() {
+  public String getHostName() {
     return LOCALHOST;
   }
 
-  private JsonRequestFactories jsonRequestFactories() {
+  private NodeRequests nodeRequests() {
     Optional<WebSocketService> websocketService = Optional.empty();
-    if (jsonRequestFactories == null) {
+    if (nodeRequests == null) {
       final Web3jService web3jService;
 
       if (useWsForJsonRpc) {
@@ -257,22 +275,24 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
         }
       }
 
-      jsonRequestFactories =
-          new JsonRequestFactories(
+      nodeRequests =
+          new NodeRequests(
               new JsonRpc2_0Web3j(web3jService, 2000, Async.defaultExecutorService()),
-              new CliqueJsonRpcRequestFactory(web3jService),
-              new IbftJsonRpcRequestFactory(web3jService),
+              new CliqueRequestFactory(web3jService),
+              new Ibft2RequestFactory(web3jService),
               new PermissioningJsonRpcRequestFactory(web3jService),
-              new AdminJsonRpcRequestFactory(web3jService),
-              new EeaJsonRpcRequestFactory(web3jService),
-              websocketService);
+              new AdminRequestFactory(web3jService),
+              new EeaRequestFactory(web3jService),
+              new CustomNetJsonRpcRequestFactory(web3jService),
+              websocketService,
+              loginRequestFactory());
     }
 
-    return jsonRequestFactories;
+    return nodeRequests;
   }
 
-  private HttpRequestFactory httpRequestFactory() {
-    if (httpRequestFactory == null) {
+  private LoginRequestFactory loginRequestFactory() {
+    if (loginRequestFactory == null) {
       final Optional<String> baseUrl;
       final String port;
       if (useWsForJsonRpc) {
@@ -282,10 +302,10 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
         baseUrl = jsonRpcBaseUrl();
         port = "8545";
       }
-      httpRequestFactory =
-          new HttpRequestFactory(baseUrl.orElse("http://" + LOCALHOST + ":" + port));
+      loginRequestFactory =
+          new LoginRequestFactory(baseUrl.orElse("http://" + LOCALHOST + ":" + port));
     }
-    return httpRequestFactory;
+    return loginRequestFactory;
   }
 
   /** All future JSON-RPC calls are made via a web sockets connection. */
@@ -297,13 +317,13 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
     useWsForJsonRpc = true;
 
-    if (jsonRequestFactories != null) {
-      jsonRequestFactories.shutdown();
-      jsonRequestFactories = null;
+    if (nodeRequests != null) {
+      nodeRequests.shutdown();
+      nodeRequests = null;
     }
 
-    if (httpRequestFactory != null) {
-      httpRequestFactory = null;
+    if (loginRequestFactory != null) {
+      loginRequestFactory = null;
     }
   }
 
@@ -311,13 +331,13 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   @Override
   public void useAuthenticationTokenInHeaderForJsonRpc(final String token) {
 
-    if (jsonRequestFactories != null) {
-      jsonRequestFactories.shutdown();
-      jsonRequestFactories = null;
+    if (nodeRequests != null) {
+      nodeRequests.shutdown();
+      nodeRequests = null;
     }
 
-    if (httpRequestFactory != null) {
-      httpRequestFactory = null;
+    if (loginRequestFactory != null) {
+      loginRequestFactory = null;
     }
 
     this.token = token;
@@ -370,7 +390,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   @Override
   public void awaitPeerDiscovery(final Condition condition) {
-    if (jsonRpcEnabled()) {
+    if (this.isJsonRpcEnabled()) {
       verify(condition);
     }
   }
@@ -390,13 +410,12 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     return Util.publicKeyToAddress(keyPair.getPublicKey());
   }
 
-  Path homeDirectory() {
-    return homeDirectory;
+  public KeyPair keyPair() {
+    return keyPair;
   }
 
-  @Override
-  public boolean jsonRpcEnabled() {
-    return isJsonRpcEnabled();
+  public Path homeDirectory() {
+    return homeDirectory;
   }
 
   JsonRpcConfiguration jsonRpcConfiguration() {
@@ -444,7 +463,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public List<URI> bootnodes() {
+  public List<URI> getBootnodes() {
     return unmodifiableList(bootnodes);
   }
 
@@ -459,7 +478,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public void bootnodes(final List<URI> bootnodes) {
+  public void getBootnodes(final List<URI> bootnodes) {
     this.bootnodes.clear();
     this.bootnodes.addAll(bootnodes);
   }
@@ -485,6 +504,15 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
     return permissioningConfiguration;
   }
 
+  public List<String> getPlugins() {
+    return plugins;
+  }
+
+  @Override
+  public List<String> getExtraCLIOptions() {
+    return extraCLIOptions;
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
@@ -499,13 +527,14 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   @Override
   public void stop() {
-    if (jsonRequestFactories != null) {
-      jsonRequestFactories.shutdown();
-      jsonRequestFactories = null;
+    if (nodeRequests != null) {
+      nodeRequests.shutdown();
+      nodeRequests = null;
     }
   }
 
   @Override
+  @SuppressWarnings("UnstableApiUsage")
   public void close() {
     stop();
     try {
@@ -516,7 +545,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public GenesisConfigProvider genesisConfigProvider() {
+  public GenesisConfigurationProvider getGenesisConfigProvider() {
     return genesisConfigProvider;
   }
 
@@ -532,21 +561,11 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   @Override
   public <T> T execute(final Transaction<T> transaction) {
-    return transaction.execute(jsonRequestFactories());
-  }
-
-  @Override
-  public <T> T executeHttpTransaction(final HttpTransaction<T> transaction) {
-    return transaction.execute(httpRequestFactory());
+    return transaction.execute(nodeRequests());
   }
 
   @Override
   public void verify(final Condition expected) {
     expected.verify(this);
-  }
-
-  @Override
-  public void waitUntil(final WaitCondition expected) {
-    expected.waitUntil(this);
   }
 }
