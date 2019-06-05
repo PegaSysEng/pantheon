@@ -6,8 +6,9 @@ access to the JSON-RPC method they are requesting.
 Pantheon uses the username and password to authenticate users and [JWT tokens](https://jwt.io/introduction/) to authorize JSON-RPC requests. 
 
 !!! important 
-    Authenticated requests must be made over HTTPS. HTTPS is encrypted which prevents eavesdropping on the connection
-    to obtain the JWT token from the requests. Run Pantheon behind a reverse proxy or load balancer to perform the SSL. 
+    To prevent interception of authentication credentials and authenticated tokens, make authenticated requests over HTTPS. 
+    We recommended production deployments are run behind a network layer that 
+    provides SSL termination. Pantheon does not provide a HTTPS connection natively.
 
 ## Credentials File 
 
