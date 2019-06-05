@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.Subscriptio
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 import com.google.common.collect.Lists;
+import io.vertx.core.Vertx;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ public class SyncingSubscriptionServiceTest {
   @Mock private SubscriptionManager subscriptionManager;
   @Mock private Synchronizer synchronizer;
   private SyncStatusListener syncStatusListener;
+  private final Vertx vertx = Vertx.vertx();
 
   @Before
   public void before() {
@@ -47,6 +49,7 @@ public class SyncingSubscriptionServiceTest {
     when(synchronizer.observeSyncStatus(captor.capture())).thenReturn(1L);
     new SyncingSubscriptionService(subscriptionManager, synchronizer);
     syncStatusListener = captor.getValue();
+    when(subscriptionManager.getVertx()).thenReturn(vertx);
   }
 
   @Test
@@ -59,7 +62,8 @@ public class SyncingSubscriptionServiceTest {
 
     syncStatusListener.onSyncStatus(syncStatus);
 
-    verify(subscriptionManager, timeout(100)).sendMessage(eq(subscription.getId()), eq(expectedSyncingResult));
+    verify(subscriptionManager, timeout(10000))
+        .sendMessage(eq(subscription.getId()), eq(expectedSyncingResult));
   }
 
   @Test
@@ -71,7 +75,7 @@ public class SyncingSubscriptionServiceTest {
 
     syncStatusListener.onSyncStatus(syncStatus);
 
-    verify(subscriptionManager, timeout(100))
+    verify(subscriptionManager, timeout(10000))
         .sendMessage(eq(subscription.getId()), any(NotSynchronisingResult.class));
   }
 }

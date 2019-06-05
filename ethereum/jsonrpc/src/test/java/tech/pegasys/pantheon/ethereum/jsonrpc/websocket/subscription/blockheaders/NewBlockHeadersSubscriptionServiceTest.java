@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.common.collect.Lists;
+import io.vertx.core.Vertx;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,11 +66,13 @@ public class NewBlockHeadersSubscriptionServiceTest {
   private final TransactionTestFixture txTestFixture = new TransactionTestFixture();
   private final BlockHeader blockHeader = blockHeaderTestFixture.buildHeader();
   private final BlockResultFactory blockResultFactory = new BlockResultFactory();
+  private final Vertx vertx = Vertx.vertx();
 
   @Before
   public void before() {
     newBlockHeadersSubscriptionService =
         new NewBlockHeadersSubscriptionService(subscriptionManager, blockchainQueries);
+    when(subscriptionManager.getVertx()).thenReturn(vertx);
   }
 
   @Test
@@ -85,7 +88,7 @@ public class NewBlockHeadersSubscriptionServiceTest {
 
     simulateAddingBlock();
 
-    verify(subscriptionManager, timeout(100))
+    verify(subscriptionManager, timeout(10000))
         .sendMessage(subscriptionIdCaptor.capture(), responseCaptor.capture());
     final Long actualSubscriptionId = subscriptionIdCaptor.getValue();
     final Object actualBlock = responseCaptor.getValue();
@@ -109,7 +112,7 @@ public class NewBlockHeadersSubscriptionServiceTest {
 
     simulateAddingBlock();
 
-    verify(subscriptionManager, timeout(100))
+    verify(subscriptionManager, timeout(10000))
         .sendMessage(subscriptionIdCaptor.capture(), responseCaptor.capture());
     final Long actualSubscriptionId = subscriptionIdCaptor.getValue();
     final Object actualBlock = responseCaptor.getValue();
@@ -140,7 +143,7 @@ public class NewBlockHeadersSubscriptionServiceTest {
 
     simulateAddingBlock();
 
-    verify(subscriptionManager, timeout(100))
+    verify(subscriptionManager, timeout(10000))
         .sendMessage(subscriptionIdCaptor.capture(), responseCaptor.capture());
     final Long actualSubscriptionId = subscriptionIdCaptor.getValue();
     final Object actualBlock = responseCaptor.getValue();
