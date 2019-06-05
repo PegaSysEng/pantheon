@@ -158,7 +158,8 @@ public class MainnetTransactionValidatorTest {
   public void shouldRejectTransactionIfAccountIsNotPermitted() {
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(
-            gasCalculator, false, Optional.empty(), transactionFilter(false));
+            gasCalculator, false, Optional.empty());
+    validator.setTransactionFilter(transactionFilter(false));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
         .isEqualTo(ValidationResult.invalid(TX_SENDER_NOT_AUTHORIZED));
@@ -168,7 +169,8 @@ public class MainnetTransactionValidatorTest {
   public void shouldAcceptValidTransactionIfAccountIsPermitted() {
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(
-            gasCalculator, false, Optional.empty(), transactionFilter(true));
+            gasCalculator, false, Optional.empty());
+    validator.setTransactionFilter(transactionFilter(true));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
         .isEqualTo(ValidationResult.valid());
@@ -183,7 +185,8 @@ public class MainnetTransactionValidatorTest {
 
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(
-            gasCalculator, false, Optional.empty(), Optional.of(transactionFilter));
+            gasCalculator, false, Optional.empty());
+    validator.setTransactionFilter(transactionFilter);
 
     final TransactionValidationParams validationParams =
         new TransactionValidationParams.Builder().stateChange(true).build();
@@ -204,9 +207,9 @@ public class MainnetTransactionValidatorTest {
     return account;
   }
 
-  private Optional<TransactionFilter> transactionFilter(final boolean permitted) {
+  private TransactionFilter transactionFilter(final boolean permitted) {
     final TransactionFilter transactionFilter = mock(TransactionFilter.class);
     when(transactionFilter.permitted(any(Transaction.class), anyBoolean())).thenReturn(permitted);
-    return Optional.of(transactionFilter);
+    return transactionFilter;
   }
 }

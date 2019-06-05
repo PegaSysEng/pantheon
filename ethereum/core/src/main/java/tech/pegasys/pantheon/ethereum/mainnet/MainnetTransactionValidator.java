@@ -21,6 +21,8 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.UPFRONT_COST_EXCEEDS_BALANCE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID;
 
+import java.math.BigInteger;
+import java.util.Optional;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Gas;
@@ -28,9 +30,6 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-
-import java.math.BigInteger;
-import java.util.Optional;
 
 /**
  * Validates a transaction based on Frontier protocol runtime requirements.
@@ -46,24 +45,15 @@ public class MainnetTransactionValidator implements TransactionValidator {
 
   private final Optional<BigInteger> chainId;
 
-  private final Optional<TransactionFilter> transactionFilter;
+  private Optional<TransactionFilter> transactionFilter = Optional.empty();
 
   public MainnetTransactionValidator(
       final GasCalculator gasCalculator,
       final boolean checkSignatureMalleability,
       final Optional<BigInteger> chainId) {
-    this(gasCalculator, checkSignatureMalleability, chainId, Optional.empty());
-  }
-
-  public MainnetTransactionValidator(
-      final GasCalculator gasCalculator,
-      final boolean checkSignatureMalleability,
-      final Optional<BigInteger> chainId,
-      final Optional<TransactionFilter> transactionFilter) {
     this.gasCalculator = gasCalculator;
     this.disallowSignatureMalleability = checkSignatureMalleability;
     this.chainId = chainId;
-    this.transactionFilter = transactionFilter;
   }
 
   @Override
@@ -173,5 +163,10 @@ public class MainnetTransactionValidator implements TransactionValidator {
 
   private boolean isSenderAllowed(final Transaction transaction, final boolean isStateChange) {
     return transactionFilter.map(c -> c.permitted(transaction, isStateChange)).orElse(true);
+  }
+
+  @Override
+  public void setTransactionFilter(final TransactionFilter transactionFilter) {
+    this.transactionFilter = Optional.of(transactionFilter);
   }
 }
