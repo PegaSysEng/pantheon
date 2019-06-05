@@ -12,6 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.permissioning.account.TransactionPermissioningProvider;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -25,7 +31,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AccountLocalConfigPermissioningController {
+public class AccountLocalConfigPermissioningController implements TransactionPermissioningProvider {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -34,19 +40,40 @@ public class AccountLocalConfigPermissioningController {
   private List<String> accountWhitelist = new ArrayList<>();
   private final WhitelistPersistor whitelistPersistor;
 
+  private final Counter checkCounter;
+  private final Counter checkCounterPermitted;
+  private final Counter checkCounterUnpermitted;
+
   public AccountLocalConfigPermissioningController(
-      final LocalPermissioningConfiguration configuration) {
+      final LocalPermissioningConfiguration configuration, final MetricsSystem metricsSystem) {
     this(
         configuration,
-        new WhitelistPersistor(configuration.getAccountPermissioningConfigFilePath()));
+        new WhitelistPersistor(configuration.getAccountPermissioningConfigFilePath()),
+        metricsSystem);
   }
 
   public AccountLocalConfigPermissioningController(
       final LocalPermissioningConfiguration configuration,
-      final WhitelistPersistor whitelistPersistor) {
+      final WhitelistPersistor whitelistPersistor,
+      final MetricsSystem metricsSystem) {
     this.configuration = configuration;
     this.whitelistPersistor = whitelistPersistor;
     readAccountsFromConfig(configuration);
+    this.checkCounter =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "account_local_check_count",
+            "Number of times the account local permissioning provider has been checked");
+    this.checkCounterPermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "account_local_check_count_permitted",
+            "Number of times the account local permissioning provider has been checked and returned permitted");
+    this.checkCounterUnpermitted =
+        metricsSystem.createCounter(
+            MetricCategory.PERMISSIONING,
+            "account_local_check_count_unpermitted",
+            "Number of times the account local permissioning provider has been checked and returned unpermitted");
   }
 
   private void readAccountsFromConfig(final LocalPermissioningConfiguration configuration) {
@@ -200,6 +227,24 @@ public class AccountLocalConfigPermissioningController {
       return accounts.parallelStream().map(String::toLowerCase).collect(Collectors.toList());
     } else {
       return Collections.emptyList();
+    }
+  }
+
+  @Override
+  public boolean isPermitted(final Transaction transaction) {
+    this.checkCounter.inc();
+    final Address sender = transaction.getSender();
+    if (sender == null) {
+      this.checkCounterUnpermitted.inc();
+      return false;
+    } else {
+      if (contains(sender.toString())) {
+        this.checkCounterPermitted.inc();
+        return true;
+      } else {
+        this.checkCounterUnpermitted.inc();
+        return false;
+      }
     }
   }
 }

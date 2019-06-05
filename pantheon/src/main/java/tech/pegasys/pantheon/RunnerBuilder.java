@@ -295,7 +295,7 @@ public class RunnerBuilder {
             .map(
                 configuration -> {
                   final AccountLocalConfigPermissioningController whitelistController =
-                      new AccountLocalConfigPermissioningController(configuration);
+                      new AccountLocalConfigPermissioningController(configuration, metricsSystem);
                   transactionPool.setAccountFilter(whitelistController::contains);
                   return whitelistController;
                 });
@@ -427,7 +427,13 @@ public class RunnerBuilder {
     return permissioningConfiguration.map(
         config ->
             new NodePermissioningControllerFactory()
-                .create(config, synchronizer, fixedNodes, localNodeId, transactionSimulator));
+                .create(
+                    config,
+                    synchronizer,
+                    fixedNodes,
+                    localNodeId,
+                    transactionSimulator,
+                    metricsSystem));
   }
 
   @VisibleForTesting

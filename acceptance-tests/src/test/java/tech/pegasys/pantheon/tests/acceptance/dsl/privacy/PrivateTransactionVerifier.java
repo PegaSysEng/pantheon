@@ -12,15 +12,22 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.privacy;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc.Eea;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.EeaConditions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.ExpectNoPrivateContractDeployedReceipt;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.ExpectNoValidPrivateContractEventsEmitted;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.ExpectNoValidPrivateContractValuesReturned;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.ExpectValidPrivateContractDeployedReceipt;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.ExpectValidPrivateContractEventsEmitted;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.ExpectValidPrivateContractValuesReturned;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.eea.ExpectValidPrivateTransactionReceipt;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 
 public class PrivateTransactionVerifier {
 
-  private final Transactions transactions;
-  private final Eea eea;
+  private final EeaTransactions transactions;
+  private final EeaConditions eea;
 
-  public PrivateTransactionVerifier(final Eea eea, final Transactions transactions) {
+  public PrivateTransactionVerifier(final EeaConditions eea, final EeaTransactions transactions) {
     this.eea = eea;
     this.transactions = transactions;
   }
@@ -40,6 +47,10 @@ public class PrivateTransactionVerifier {
 
   public ExpectValidPrivateContractEventsEmitted validEventReturned(final String eventValue) {
     return new ExpectValidPrivateContractEventsEmitted(eventValue, eea, transactions);
+  }
+
+  public ExpectNoValidPrivateContractEventsEmitted noValidEventReturned() {
+    return new ExpectNoValidPrivateContractEventsEmitted(eea, transactions);
   }
 
   public ExpectValidPrivateContractValuesReturned validOutputReturned(final String returnValue) {

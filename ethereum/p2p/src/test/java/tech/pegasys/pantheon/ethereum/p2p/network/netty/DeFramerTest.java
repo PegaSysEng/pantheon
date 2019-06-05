@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.p2p.network.exceptions.UnexpectedPeerConne
 import tech.pegasys.pantheon.ethereum.p2p.network.netty.testhelpers.NettyMocks;
 import tech.pegasys.pantheon.ethereum.p2p.network.netty.testhelpers.SubProtocolMock;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.LocalNode;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.framing.Framer;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.framing.FramingException;
@@ -42,6 +43,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.HelloMessage;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.PingMessage;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.WireMessageCodes;
+import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -81,13 +83,19 @@ public class DeFramerTest {
   private final int remotePort = 12345;
   private final InetSocketAddress remoteAddress = new InetSocketAddress("127.0.0.1", remotePort);
 
-  private final PeerInfo peerInfo =
-      new PeerInfo(
-          5,
-          "abc",
-          Arrays.asList(Capability.create("eth", 63)),
-          30303,
-          BytesValue.fromHexString("0x01"));
+  private final int p2pVersion = 5;
+  private final String clientId = "abc";
+  private final int port = 30303;
+  private final List<Capability> capabilities = Arrays.asList(Capability.create("eth", 63));
+  private final EnodeURL localEnode =
+      EnodeURL.builder()
+          .ipAddress("127.0.0.1")
+          .discoveryAndListeningPorts(port)
+          .nodeId(Peer.randomId())
+          .build();
+  private final LocalNode localNode =
+      LocalNode.create(clientId, p2pVersion, capabilities, localEnode);
+
   private final DeFramer deFramer = createDeFramer(null);
 
   @Before
@@ -112,6 +120,16 @@ public class DeFramerTest {
     connectFuture.complete(peerConnection);
 
     deFramer.exceptionCaught(ctx, new DecoderException(new FramingException("Test")));
+
+    verify(peerConnection).disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
+  }
+
+  @Test
+  public void exceptionCaught_shouldDisconnectForBreachOfProtocolWhenRlpExceptionThrown()
+      throws Exception {
+    connectFuture.complete(peerConnection);
+
+    deFramer.exceptionCaught(ctx, new DecoderException(new RLPException("Test")));
 
     verify(peerConnection).disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
   }
@@ -188,12 +206,7 @@ public class DeFramerTest {
 
     final Peer peer = createRemotePeer();
     final PeerInfo remotePeerInfo =
-        new PeerInfo(
-            peerInfo.getVersion(),
-            peerInfo.getClientId(),
-            peerInfo.getCapabilities(),
-            0,
-            peer.getId());
+        new PeerInfo(p2pVersion, clientId, capabilities, 0, peer.getId());
     final DeFramer deFramer = createDeFramer(null);
 
     HelloMessage helloMessage = HelloMessage.create(remotePeerInfo);
@@ -244,9 +257,9 @@ public class DeFramerTest {
     final BytesValue mismatchedId = Peer.randomId();
     final PeerInfo remotePeerInfo =
         new PeerInfo(
-            peerInfo.getVersion(),
-            peerInfo.getClientId(),
-            peerInfo.getCapabilities(),
+            p2pVersion,
+            clientId,
+            capabilities,
             peer.getEnodeURL().getListeningPortOrZero(),
             mismatchedId);
     final DeFramer deFramer = createDeFramer(peer);
@@ -278,10 +291,10 @@ public class DeFramerTest {
 
     PeerInfo remotePeerInfo =
         new PeerInfo(
-            peerInfo.getVersion(),
-            peerInfo.getClientId(),
+            p2pVersion,
+            "bla",
             Arrays.asList(Capability.create("eth", 254)),
-            peerInfo.getPort(),
+            30303,
             Peer.randomId());
     HelloMessage helloMessage = HelloMessage.create(remotePeerInfo);
     ByteBuf data = Unpooled.wrappedBuffer(helloMessage.getData().extractArray());
@@ -357,9 +370,9 @@ public class DeFramerTest {
 
   private PeerInfo createPeerInfo(final Peer forPeer) {
     return new PeerInfo(
-        peerInfo.getVersion(),
-        peerInfo.getClientId(),
-        peerInfo.getCapabilities(),
+        p2pVersion,
+        clientId,
+        capabilities,
         forPeer.getEnodeURL().getListeningPortOrZero(),
         forPeer.getId());
   }
@@ -368,7 +381,7 @@ public class DeFramerTest {
     return new DeFramer(
         framer,
         Arrays.asList(SubProtocolMock.create("eth")),
-        peerInfo,
+        localNode,
         Optional.ofNullable(expectedPeer),
         callbacks,
         connectFuture,
