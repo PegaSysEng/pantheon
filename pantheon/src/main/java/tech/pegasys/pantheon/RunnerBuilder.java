@@ -306,6 +306,12 @@ public class RunnerBuilder {
     final Optional<NodeLocalConfigPermissioningController> nodeLocalConfigPermissioningController =
         nodePermissioningController.flatMap(NodePermissioningController::localConfigController);
 
+    final Optional<AccountLocalConfigPermissioningController>
+        accountLocalConfigPermissioningController =
+            accountPermissioningController != null
+                ? accountPermissioningController.getAccountLocalConfigPermissioningController()
+                : Optional.empty();
+
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
       final Map<String, JsonRpcMethod> jsonRpcMethods =
@@ -321,7 +327,7 @@ public class RunnerBuilder {
               supportedCapabilities,
               jsonRpcConfiguration.getRpcApis(),
               filterManager,
-              accountPermissioningController.getAccountLocalConfigPermissioningController(),
+              accountLocalConfigPermissioningController,
               nodeLocalConfigPermissioningController,
               privacyParameters,
               jsonRpcConfiguration,
@@ -372,7 +378,7 @@ public class RunnerBuilder {
               supportedCapabilities,
               webSocketConfiguration.getRpcApis(),
               filterManager,
-              accountPermissioningController.getAccountLocalConfigPermissioningController(),
+              accountLocalConfigPermissioningController,
               nodeLocalConfigPermissioningController,
               privacyParameters,
               jsonRpcConfiguration,

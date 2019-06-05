@@ -12,13 +12,20 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.account;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class AccountPermissioningController {
+
+  private static final Logger LOG = LogManager.getLogger();
 
   private final Optional<AccountLocalConfigPermissioningController>
       accountLocalConfigPermissioningController;
@@ -36,18 +43,34 @@ public class AccountPermissioningController {
   }
 
   public boolean isPermitted(final Transaction transaction, final boolean includeOnChainCheck) {
+    final Hash transactionHash = transaction.hash();
+    final Address sender = transaction.getSender();
+
+    LOG.trace("Account permissioning: Checking transaction {}", transactionHash);
+
+    boolean permitted;
     if (includeOnChainCheck) {
-      return accountLocalConfigPermissioningController
-              .map(c -> c.isPermitted(transaction))
-              .orElse(true)
-          && transactionSmartContractPermissioningController
+      permitted =
+          accountLocalConfigPermissioningController
+                  .map(c -> c.isPermitted(transaction))
+                  .orElse(true)
+              && transactionSmartContractPermissioningController
+                  .map(c -> c.isPermitted(transaction))
+                  .orElse(true);
+    } else {
+      permitted =
+          accountLocalConfigPermissioningController
               .map(c -> c.isPermitted(transaction))
               .orElse(true);
-    } else {
-      return accountLocalConfigPermissioningController
-          .map(c -> c.isPermitted(transaction))
-          .orElse(true);
     }
+
+    if (permitted) {
+      LOG.trace("Account permissioning: Permitted transaction {} from {}", transactionHash, sender);
+    } else {
+      LOG.trace("Account permissioning: Rejected transaction {} from {}", transactionHash, sender);
+    }
+
+    return permitted;
   }
 
   public Optional<AccountLocalConfigPermissioningController>

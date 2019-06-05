@@ -245,7 +245,7 @@ public class ProtocolSpec<C> {
     return precompileContractRegistry;
   }
 
-  public void addTransactionFilter(final TransactionFilter transactionFilter) {
+  public void setTransactionFilter(final TransactionFilter transactionFilter) {
     transactionValidator.setTransactionFilter(transactionFilter);
   }
 }
