@@ -157,8 +157,8 @@ public class MainnetTransactionValidatorTest {
   @Test
   public void shouldRejectTransactionIfAccountIsNotPermitted() {
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, Optional.empty(),
-            transactionFilter(false));
+        new MainnetTransactionValidator(
+            gasCalculator, false, Optional.empty(), transactionFilter(false));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
         .isEqualTo(ValidationResult.invalid(TX_SENDER_NOT_AUTHORIZED));
@@ -167,8 +167,8 @@ public class MainnetTransactionValidatorTest {
   @Test
   public void shouldAcceptValidTransactionIfAccountIsPermitted() {
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, Optional.empty(),
-            transactionFilter(true));
+        new MainnetTransactionValidator(
+            gasCalculator, false, Optional.empty(), transactionFilter(true));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
         .isEqualTo(ValidationResult.valid());
@@ -182,8 +182,8 @@ public class MainnetTransactionValidatorTest {
         .thenReturn(true);
 
     final MainnetTransactionValidator validator =
-        new MainnetTransactionValidator(gasCalculator, false, Optional.empty(),
-            Optional.of(transactionFilter));
+        new MainnetTransactionValidator(
+            gasCalculator, false, Optional.empty(), Optional.of(transactionFilter));
 
     final TransactionValidationParams validationParams =
         new TransactionValidationParams.Builder().stateChange(true).build();

@@ -515,6 +515,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean permissionsNodesContractEnabled = false;
 
   @Option(
+      names = {"--permissions-accounts-contract-address"},
+      description = "Address of the account permissioning smart contract",
+      arity = "1")
+  private final Address permissionsAccountsContractAddress = null;
+
+  @Option(
+      names = {"--permissions-accounts-contract-enabled"},
+      description =
+          "Enable account level permissions via smart contract (default: ${DEFAULT-VALUE})")
+  private final Boolean permissionsAccountsContractEnabled = false;
+
+  @Option(
       names = {"--privacy-enabled"},
       description = "Enable private transactions (default: ${DEFAULT-VALUE})")
   private final Boolean isPrivacyEnabled = false;
@@ -924,10 +936,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {
-    final Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
-    final Optional<SmartContractPermissioningConfiguration>
-        smartContractPermissioningConfigurationOptional;
-
     if (!(localPermissionsEnabled() || contractPermissionsEnabled())) {
       if (rpcHttpApis.contains(RpcApis.PERM) || rpcWsApis.contains(RpcApis.PERM)) {
         logger.warn(
@@ -936,6 +944,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       return Optional.empty();
     }
 
+    final Optional<LocalPermissioningConfiguration> localPermissioningConfigurationOptional;
     if (localPermissionsEnabled()) {
       final Optional<String> nodePermissioningConfigFile =
           Optional.ofNullable(nodePermissionsConfigFile());
@@ -965,30 +974,46 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       localPermissioningConfigurationOptional = Optional.empty();
     }
 
-    if (contractPermissionsEnabled()) {
+    final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+        SmartContractPermissioningConfiguration.createDefault();
+    if (permissionsNodesContractEnabled) {
       if (permissionsNodesContractAddress == null) {
         throw new ParameterException(
             this.commandLine,
-            "No contract address specified. Cannot enable contract based permissions.");
-      }
-      final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
-          PermissioningConfigurationBuilder.smartContractPermissioningConfiguration(
-              permissionsNodesContractAddress, permissionsNodesContractEnabled);
-      smartContractPermissioningConfigurationOptional =
-          Optional.of(smartContractPermissioningConfiguration);
-    } else {
-      if (permissionsNodesContractAddress != null) {
-        logger.warn(
-            "Smart contract address set {} but no contract permissions enabled",
+            "No node permissioning contract address specified. Cannot enable smart contract based node permissioning.");
+      } else {
+        smartContractPermissioningConfiguration.setSmartContractNodeWhitelistEnabled(
+            permissionsNodesContractEnabled);
+        smartContractPermissioningConfiguration.setNodeSmartContractAddress(
             permissionsNodesContractAddress);
       }
-      smartContractPermissioningConfigurationOptional = Optional.empty();
+    } else if (permissionsNodesContractAddress != null) {
+      logger.warn(
+          "Node permissioning smart contract address set {} but smart contract node permissioning is disabled.",
+          permissionsNodesContractAddress);
+    }
+
+    if (permissionsAccountsContractEnabled) {
+      if (permissionsAccountsContractAddress == null) {
+        throw new ParameterException(
+            this.commandLine,
+            "No account permissioning contract address specified. Cannot enable smart contract based account permissioning.");
+      } else {
+        smartContractPermissioningConfiguration.setSmartContractAccountWhitelistEnabled(
+            permissionsAccountsContractEnabled);
+        smartContractPermissioningConfiguration.setAccountSmartContractAddress(
+            permissionsAccountsContractAddress);
+      }
+    } else if (permissionsAccountsContractAddress != null) {
+      logger.warn(
+          "Account permissioning smart contract address set {} but smart contract account permissioning is disabled.",
+          permissionsAccountsContractAddress);
     }
 
     final PermissioningConfiguration permissioningConfiguration =
         new PermissioningConfiguration(
             localPermissioningConfigurationOptional,
-            smartContractPermissioningConfigurationOptional);
+            Optional.of(smartContractPermissioningConfiguration));
 
     return Optional.of(permissioningConfiguration);
   }
@@ -998,8 +1023,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private boolean contractPermissionsEnabled() {
-    // TODO add permissionsAccountsContractEnabled
-    return permissionsNodesContractEnabled;
+    return permissionsNodesContractEnabled || permissionsAccountsContractEnabled;
   }
 
   private PrivacyParameters privacyParameters() throws IOException {
