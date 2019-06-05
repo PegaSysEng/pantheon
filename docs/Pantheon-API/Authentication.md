@@ -7,8 +7,8 @@ Pantheon uses the username and password to authenticate users and [JWT tokens](h
 
 !!! important 
     To prevent interception of authentication credentials and authenticated tokens, make authenticated requests over HTTPS. 
-    We recommended production deployments are run behind a network layer that 
-    provides SSL termination. Pantheon does not provide a HTTPS connection natively.
+    We recommended production deployments are run behind a network layer that provides SSL termination. 
+    Pantheon does not provide a HTTPS connection natively.
 
 ## Credentials File 
 
