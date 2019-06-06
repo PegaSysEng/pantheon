@@ -23,5 +23,5 @@ public interface ProtocolSchedule<C> {
 
   Optional<BigInteger> getChainId();
 
-  void addTransactionFilterToTransactionValidators(TransactionFilter transactionFilter);
+  void setTransactionFilter(TransactionFilter transactionFilter);
 }

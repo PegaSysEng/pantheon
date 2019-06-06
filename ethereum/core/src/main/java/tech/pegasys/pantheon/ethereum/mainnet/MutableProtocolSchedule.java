@@ -73,8 +73,7 @@ public class MutableProtocolSchedule<C> implements ProtocolSchedule<C> {
   }
 
   @Override
-  public void addTransactionFilterToTransactionValidators(
-      final TransactionFilter transactionFilter) {
+  public void setTransactionFilter(final TransactionFilter transactionFilter) {
     protocolSpecs.forEach(spec -> spec.getSpec().setTransactionFilter(transactionFilter));
   }
 }

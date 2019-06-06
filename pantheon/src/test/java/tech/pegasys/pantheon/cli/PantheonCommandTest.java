@@ -476,7 +476,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         Address.fromHexString(smartContractAddress));
     smartContractPermissioningConfiguration.setSmartContractAccountWhitelistEnabled(true);
 
-    verify(mockController.getProtocolSchedule()).addTransactionFilterToTransactionValidators(any());
+    verify(mockController.getProtocolSchedule()).setTransactionFilter(any());
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
@@ -620,9 +620,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
     localPermissioningConfiguration.setAccountWhitelist(
         Collections.singletonList("0x0000000000000000000000000000000000000009"));
 
-    verify(mockRunnerBuilder).accountPermissioningController(accountPermissioningControllerArgumentCaptor.capture());
+    verify(mockRunnerBuilder)
+        .accountPermissioningController(accountPermissioningControllerArgumentCaptor.capture());
 
-    AccountPermissioningController controller = accountPermissioningControllerArgumentCaptor.getValue();
+    AccountPermissioningController controller =
+        accountPermissioningControllerArgumentCaptor.getValue();
     assertThat(controller.getAccountLocalConfigPermissioningController()).isPresent();
 
     assertThat(commandErrorOutput.toString()).isEmpty();

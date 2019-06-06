@@ -756,8 +756,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       if (permissionsAccountsEnabled || permissionsAccountsContractEnabled) {
         pantheonController
             .getProtocolSchedule()
-            .addTransactionFilterToTransactionValidators(
-                accountPermissioningController::isPermitted);
+            .setTransactionFilter(accountPermissioningController::isPermitted);
       }
 
       pantheonPluginContext.addService(

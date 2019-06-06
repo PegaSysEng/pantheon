@@ -109,6 +109,7 @@ public abstract class CommandTestAbstract {
   @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
 
   @Captor ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
+
   @Captor
   ArgumentCaptor<AccountPermissioningController> accountPermissioningControllerArgumentCaptor;
 
