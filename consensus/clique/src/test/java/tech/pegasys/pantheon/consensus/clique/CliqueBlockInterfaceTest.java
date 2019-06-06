@@ -48,7 +48,7 @@ public class CliqueBlockInterfaceTest {
       TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
 
   private final BlockHeaderBuilder builder =
-      BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
+      BlockHeaderBuilder.fromHeader(headerBuilder.number(1).buildHeader())
           .blockHeaderFunctions(new CliqueBlockHeaderFunctions());
 
   @Test
