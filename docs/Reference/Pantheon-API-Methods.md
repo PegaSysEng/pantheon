@@ -1705,7 +1705,7 @@ Returns information about the block by hash.
     ```
     
     ```bash tab="curl GraphQL"
-    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block (hash : \"0xb0efed1fc9326fee967cb2d845d4ebe57c5350a0670c8e86f8052dea6f219f92\") {number transactions{hash} timestamp difficulty totalDifficulty gasUsed gasLimit hash noce ommerCount logsBloom mixHash ommerHash extraData stateRoot receiptsRoot transactionCount transactionsRoot}}"}' http://localhost:8547/graphql
+    curl -X POST -H "Content-Type: application/json" --data '{ "query": "{block (hash : \"0xb0efed1fc9326fee967cb2d845d4ebe57c5350a0670c8e86f8052dea6f219f92\") {number transactions{hash} timestamp difficulty totalDifficulty gasUsed gasLimit hash nonce ommerCount logsBloom mixHash ommerHash extraData stateRoot receiptsRoot transactionCount transactionsRoot}}"}' http://localhost:8547/graphql
     ```
     
     ```bash tab="GraphQL"
@@ -1721,7 +1721,7 @@ Returns information about the block by hash.
         gasUsed
         gasLimit
         hash
-        noce
+        nonce
         ommerCount
         logsBloom
         mixHash
