@@ -42,13 +42,13 @@ public class CliqueBlockInterfaceTest {
   private final CliqueBlockInterface blockInterface = new CliqueBlockInterface();
 
   private final BlockHeaderTestFixture headerBuilder =
-      new BlockHeaderTestFixture().blockHeaderFunctions(new CliqueBlockHeaderFunctions());
+      new BlockHeaderTestFixture().blockHeaderFunctions(new CliqueBlockHeaderFunctions()).number(1);
 
   private final BlockHeader header =
       TestHelpers.createCliqueSignedBlockHeader(headerBuilder, proposerKeys, validatorList);
 
   private final BlockHeaderBuilder builder =
-      BlockHeaderBuilder.fromHeader(headerBuilder.number(1).buildHeader())
+      BlockHeaderBuilder.fromHeader(headerBuilder.buildHeader())
           .blockHeaderFunctions(new CliqueBlockHeaderFunctions());
 
   @Test
