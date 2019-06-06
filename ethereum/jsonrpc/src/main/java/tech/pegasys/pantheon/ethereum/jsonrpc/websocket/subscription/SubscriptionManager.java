@@ -174,7 +174,7 @@ public class SubscriptionManager extends AbstractVerticle {
         },
         result -> {
           if (result.failed()) {
-            LOG.error("Failed to notify subscribers. Cause: {}", result.cause().getMessage());
+            LOG.error("Failed to notify subscribers.", result.cause());
           }
         });
     return null;
