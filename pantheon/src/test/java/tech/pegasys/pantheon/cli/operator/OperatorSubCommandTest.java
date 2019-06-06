@@ -12,18 +12,14 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createTempDirectory;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.singletonList;
-import static java.util.Objects.requireNonNull;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static tech.pegasys.pantheon.cli.operator.OperatorSubCommandTest.Cmd.cmd;
-
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vertx.core.json.JsonObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import picocli.CommandLine.Model.CommandSpec;
 import tech.pegasys.pantheon.cli.CommandTestAbstract;
 
 import java.io.File;
@@ -35,12 +31,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import io.vertx.core.json.JsonObject;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import picocli.CommandLine.Model.CommandSpec;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createTempDirectory;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static tech.pegasys.pantheon.cli.operator.OperatorSubCommandTest.Cmd.cmd;
 
 public class OperatorSubCommandTest extends CommandTestAbstract {
 
@@ -154,9 +155,8 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
       final Path outputDirectoryPath,
       final String genesisFileName,
       final boolean generate,
-      final Collection<String> expectedKeyFiles) {
+      final Collection<String> expectedKeyFiles) throws IOException {
     final URL configFilePath = this.getClass().getResource(configFile);
-    final DocumentContext configDocumentContext = JsonPath.parse(contentOf(configFilePath, UTF_8));
     parseCommand(
         cmd(
                 OPERATOR_SUBCOMMAND_NAME,
@@ -182,9 +182,13 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
     final File[] nodesKeysFolders = keysDirectory.listFiles();
     assert nodesKeysFolders != null;
     if (generate) {
+      final JsonFactory jsonFactory = new JsonFactory();
+      final JsonParser jp = jsonFactory.createParser(configFilePath);
+      jp.setCodec(new ObjectMapper());
+      final JsonNode jsonNode = jp.readValueAsTree();
+      final int nodeCount = jsonNode.get("blockchain").get("nodes").get("count").asInt();
       assertEquals(
-          nodesKeysFolders.length,
-          (int) configDocumentContext.read("$.blockchain.nodes.count", Integer.class));
+          nodesKeysFolders.length,nodeCount);
     }
     final Stream<File> nodesKeysFoldersStream = stream(nodesKeysFolders);
 

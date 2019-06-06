@@ -19,6 +19,7 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORM
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
 
+import io.vertx.core.json.Json;
 import tech.pegasys.pantheon.cli.PantheonCommand;
 import tech.pegasys.pantheon.cli.rlp.RLPType;
 import tech.pegasys.pantheon.crypto.SECP256K1;
@@ -136,9 +137,14 @@ public class OperatorSubCommand implements Runnable {
 
     @Override
     public void run() {
+      checkPreconditions();
+      generateBlockchainConfig();
+    }
+
+
+    private void checkPreconditions(){
       checkNotNull(parentCommand);
       checkNotNull(parentCommand.parentCommand);
-      generateBlockchainConfig();
     }
 
     /** Generates output directory with all required configuration files. */
@@ -233,7 +239,7 @@ public class OperatorSubCommand implements Runnable {
     private void processExtraData() throws IOException {
       LOG.info("Generating genesis extra data.");
       final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-      final String jsonAddresses = gson.toJson(addressesForGenesisExtraData);
+      final String jsonAddresses = Json.encodePrettily(addressesForGenesisExtraData);
       final String extraData =
           RLPType.IBFT_EXTRA_DATA.getAdapter().encode(jsonAddresses).toString();
       genesisConfig.put("extraData", extraData);
