@@ -1,10 +1,61 @@
 # Changelog
 
-## 1.1.1 
-
 ### Java 11 Required from v1.2
 
 From v1.2, Pantheon will require Java 11.  That is, Pantheon on Java 8 will no longer be supported.
+
+## 1.1.2
+
+### Additions and Improvements
+
+Documentation updates include: 
+
+- Added [GraphQL options](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#graphql-http-cors-origins) 
+- Added [troubleshooting point about illegal reflective access error](https://docs.pantheon.pegasys.tech/en/latest/Troubleshooting/Troubleshooting/#illegal-reflective-access-error-on-startup)
+- Added [trusted bootnode behaviour for permissioning]()
+- Added [how to obtain a WS authentication token](https://docs.pantheon.pegasys.tech/en/latest/Pantheon-API/Authentication/#obtaining-an-authentication-token)
+
+
+### Technical Improvements 
+
+- Fix estimate gas RPC failing for clique when no blocks have been created [\#1528](https://github.com/PegaSysEng/pantheon/pull/1528) ([jframe](https://github.com/jframe))
+- Avoid auto-boxing for gauge metrics [\#1526](https://github.com/PegaSysEng/pantheon/pull/1526) ([ajsutton](https://github.com/ajsutton))
+- Add AT to ensure 0-miner Clique/IBFT are valid [\#1525](https://github.com/PegaSysEng/pantheon/pull/1525) ([rain-on](https://github.com/rain-on))
+- AT DSL - renaming to suffix of Conditions and co-locating with Conditions [\#1524](https://github.com/PegaSysEng/pantheon/pull/1524) ([CjHare](https://github.com/CjHare))
+- Set disconnect flag immediately when disconnecting a peer [\#1521](https://github.com/PegaSysEng/pantheon/pull/1521) ([ajsutton](https://github.com/ajsutton))
+- \[PAN-2547\] Modified JSON-RPC subscription processing to avoid blocking [\#1519](https://github.com/PegaSysEng/pantheon/pull/1519) ([mark-terry](https://github.com/mark-terry))
+- Dependency Version Updates [\#1517](https://github.com/PegaSysEng/pantheon/pull/1517) ([shemnon](https://github.com/shemnon))
+- AT DSL - renaming ibft to ibft2 [\#1516](https://github.com/PegaSysEng/pantheon/pull/1516) ([CjHare](https://github.com/CjHare))
+- \[PIE-1578\] Added local transaction permissioning metrics [\#1515](https://github.com/PegaSysEng/pantheon/pull/1515) ([macfarla](https://github.com/macfarla))
+- \[PIE-1577\] Added node local metrics [\#1514](https://github.com/PegaSysEng/pantheon/pull/1514) ([macfarla](https://github.com/macfarla))
+- AT DSL - Removing WaitCondition, consistently applying Condition instead [\#1513](https://github.com/PegaSysEng/pantheon/pull/1513) ([CjHare](https://github.com/CjHare))
+- Remove usage of deprecated ConcurrentSet [\#1512](https://github.com/PegaSysEng/pantheon/pull/1512) ([ajsutton](https://github.com/ajsutton))
+- Log error if clique or ibft have 0 validators in genesis [\#1509](https://github.com/PegaSysEng/pantheon/pull/1509) ([rain-on](https://github.com/rain-on))
+- GraphQL library upgrade changes. [\#1508](https://github.com/PegaSysEng/pantheon/pull/1508) ([shemnon](https://github.com/shemnon))
+- Add metrics to assist monitoring and alerting [\#1506](https://github.com/PegaSysEng/pantheon/pull/1506) ([ajsutton](https://github.com/ajsutton))
+- Use external pantheon-plugin-api library [\#1505](https://github.com/PegaSysEng/pantheon/pull/1505) ([shemnon](https://github.com/shemnon))
+- Tilde [\#1504](https://github.com/PegaSysEng/pantheon/pull/1504) ([shemnon](https://github.com/shemnon))
+- Dependency version updates [\#1503](https://github.com/PegaSysEng/pantheon/pull/1503) ([shemnon](https://github.com/shemnon))
+- Simplify text [\#1501](https://github.com/PegaSysEng/pantheon/pull/1501) (thanks to [bgravenorst](https://github.com/bgravenorst))
+- \[PAN-1625\] Clique AT mining continues if validator offline [\#1500](https://github.com/PegaSysEng/pantheon/pull/1500) ([jframe](https://github.com/jframe))
+- Acceptance Test DSL Node refactoring [\#1498](https://github.com/PegaSysEng/pantheon/pull/1498) ([CjHare](https://github.com/CjHare))
+- Updated an incorrect command [\#1497](https://github.com/PegaSysEng/pantheon/pull/1497) (thanks to [bgravenorst](https://github.com/bgravenorst))
+- Acceptance Test and DSL rename for IBFT2 [\#1493](https://github.com/PegaSysEng/pantheon/pull/1493) ([CjHare](https://github.com/CjHare))
+- \[PIE-1580\] Metrics for smart contract permissioning actions [\#1492](https://github.com/PegaSysEng/pantheon/pull/1492) ([Errorific](https://github.com/Errorific))
+- Handle RLPException when processing incoming DevP2P messages [\#1491](https://github.com/PegaSysEng/pantheon/pull/1491) ([ajsutton](https://github.com/ajsutton))
+- Limit spotless checks to java classes in expected java  dirs [\#1490](https://github.com/PegaSysEng/pantheon/pull/1490) ([shemnon](https://github.com/shemnon))
+- \[PAN-2560\] Add LocalNode class [\#1489](https://github.com/PegaSysEng/pantheon/pull/1489) ([mbaxter](https://github.com/mbaxter))
+- Changed Enode length error String implementation. [\#1486](https://github.com/PegaSysEng/pantheon/pull/1486) ([mark-terry](https://github.com/mark-terry))
+- PAN-2715 - return block not found reasons in error [\#1485](https://github.com/PegaSysEng/pantheon/pull/1485) ([shemnon](https://github.com/shemnon))
+- \[PAN-2652\] Refactor Privacy acceptance test and add Privacy Ibft test [\#1483](https://github.com/PegaSysEng/pantheon/pull/1483) ([iikirilov](https://github.com/iikirilov))
+- \[PAN-2603\] Onchain account permissioning support [\#1475](https://github.com/PegaSysEng/pantheon/pull/1475) ([lucassaldanha](https://github.com/lucassaldanha))
+- Make CLI options names with hyphen-minus searchable and reduce index size [\#1476](https://github.com/PegaSysEng/pantheon/pull/1476) ([NicolasMassart](https://github.com/NicolasMassart))
+- Added warning banner when using latest version [\#1454](https://github.com/PegaSysEng/pantheon/pull/1454) ([NicolasMassart](https://github.com/NicolasMassart))
+- add RTD config file to fix Python version issue [\#1453](https://github.com/PegaSysEng/pantheon/pull/1453) ([NicolasMassart](https://github.com/NicolasMassart))
+- \[PAN-2647\] Validate Private Transaction nonce before submitting to Transaction Pool [\#1449](https://github.com/PegaSysEng/pantheon/pull/1449) ([iikirilov](https://github.com/iikirilov))
+- Add placeholders system to have global variables in markdown [\#1425](https://github.com/PegaSysEng/pantheon/pull/1425) ([NicolasMassart](https://github.com/NicolasMassart))
+
+## 1.1.1 
 
 ### Additions and Improvements 
 
