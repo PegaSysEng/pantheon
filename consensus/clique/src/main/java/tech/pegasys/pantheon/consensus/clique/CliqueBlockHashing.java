@@ -47,10 +47,10 @@ public class CliqueBlockHashing {
    */
   public static Address recoverProposerAddress(
       final BlockHeader header, final CliqueExtraData cliqueExtraData) {
-    if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
-      return Address.ZERO;
-    }
     if (!cliqueExtraData.getProposerSeal().isPresent()) {
+      if (header.getNumber() == BlockHeader.GENESIS_BLOCK_NUMBER) {
+        return Address.ZERO;
+      }
       throw new IllegalArgumentException(
           "Supplied cliqueExtraData does not include a proposer " + "seal");
     }
