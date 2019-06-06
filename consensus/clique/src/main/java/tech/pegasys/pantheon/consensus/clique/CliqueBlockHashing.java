@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.function.Supplier;
 
 public class CliqueBlockHashing {
+  private static final Address ADDRESS_ZERO = Address.extract(Hash.ZERO);
 
   /**
    * Constructs a hash of the block header, suitable for use when creating the proposer seal. The
@@ -48,6 +49,9 @@ public class CliqueBlockHashing {
    */
   public static Address recoverProposerAddress(
       final BlockHeader header, final CliqueExtraData cliqueExtraData) {
+    if (header.getNumber() == 0) {
+      return ADDRESS_ZERO;
+    }
     if (!cliqueExtraData.getProposerSeal().isPresent()) {
       throw new IllegalArgumentException(
           "Supplied cliqueExtraData does not include a proposer " + "seal");
