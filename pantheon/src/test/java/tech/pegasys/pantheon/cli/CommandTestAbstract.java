@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.Runner;
@@ -142,9 +143,9 @@ public abstract class CommandTestAbstract {
 
     // doReturn used because of generic PantheonController
     doReturn(mockController).when(mockControllerBuilder).build();
-    when(mockController.getProtocolManager()).thenReturn(mockEthProtocolManager);
-    when(mockController.getProtocolSchedule()).thenReturn(mockProtocolSchedule);
-    when(mockController.getProtocolContext()).thenReturn(mockProtocolContext);
+    lenient().when(mockController.getProtocolManager()).thenReturn(mockEthProtocolManager);
+    lenient().when(mockController.getProtocolSchedule()).thenReturn(mockProtocolSchedule);
+    lenient().when(mockController.getProtocolContext()).thenReturn(mockProtocolContext);
 
     when(mockEthProtocolManager.getBlockBroadcaster()).thenReturn(mockBlockBroadcaster);
 
@@ -175,7 +176,6 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.metricsSystem(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.metricsConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.staticNodes(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.permissioningConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.accountPermissioningController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.build()).thenReturn(mockRunner);
   }
