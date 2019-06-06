@@ -19,9 +19,8 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORM
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
 
-import io.vertx.core.json.Json;
 import tech.pegasys.pantheon.cli.PantheonCommand;
-import tech.pegasys.pantheon.cli.rlp.RLPType;
+import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
@@ -34,13 +33,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
@@ -61,6 +61,8 @@ public class OperatorSubCommand implements Runnable {
   private static final Logger LOG = LogManager.getLogger();
 
   public static final String COMMAND_NAME = "operator";
+  public static final String GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME =
+      "generate-blockchain-config";
 
   @SuppressWarnings("unused")
   @ParentCommand
@@ -141,10 +143,12 @@ public class OperatorSubCommand implements Runnable {
       generateBlockchainConfig();
     }
 
-
-    private void checkPreconditions(){
+    private void checkPreconditions() {
       checkNotNull(parentCommand);
       checkNotNull(parentCommand.parentCommand);
+      if (isAnyDuplicate(genesisFileName, publicKeyFileName, privateKeyFileName)) {
+        throw new IllegalArgumentException("Output file paths must be unique.");
+      }
     }
 
     /** Generates output directory with all required configuration files. */
@@ -238,10 +242,8 @@ public class OperatorSubCommand implements Runnable {
      */
     private void processExtraData() throws IOException {
       LOG.info("Generating genesis extra data.");
-      final Gson gson = new GsonBuilder().setPrettyPrinting().create();
       final String jsonAddresses = Json.encodePrettily(addressesForGenesisExtraData);
-      final String extraData =
-          RLPType.IBFT_EXTRA_DATA.getAdapter().encode(jsonAddresses).toString();
+      final String extraData = IbftExtraData.fromJsonAddresses(jsonAddresses).encode().toString();
       genesisConfig.put("extraData", extraData);
     }
 
@@ -301,5 +303,17 @@ public class OperatorSubCommand implements Runnable {
       LOG.info("Writing genesis file.");
       Files.write(genesisPath, genesis.encodePrettily().getBytes(UTF_8));
     }
+  }
+
+  private static boolean isAnyDuplicate(String... values) {
+    final Map<String, Integer> occurences = new HashMap<>();
+    for (String value : values) {
+      Integer counter = occurences.getOrDefault(value, 0);
+      if (counter >= 1) {
+        return true;
+      }
+      occurences.put(value, ++counter);
+    }
+    return false;
   }
 }

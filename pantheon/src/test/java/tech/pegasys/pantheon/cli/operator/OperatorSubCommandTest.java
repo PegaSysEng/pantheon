@@ -12,14 +12,19 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.vertx.core.json.JsonObject;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import picocli.CommandLine.Model.CommandSpec;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createTempDirectory;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
+import static org.junit.Assert.assertTrue;
+import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
+import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME;
+import static tech.pegasys.pantheon.cli.operator.OperatorSubCommandTest.Cmd.cmd;
+
 import tech.pegasys.pantheon.cli.CommandTestAbstract;
 
 import java.io.File;
@@ -31,17 +36,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createTempDirectory;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.singletonList;
-import static java.util.Objects.requireNonNull;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static tech.pegasys.pantheon.cli.operator.OperatorSubCommandTest.Cmd.cmd;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vertx.core.json.JsonObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
 
 public class OperatorSubCommandTest extends CommandTestAbstract {
 
@@ -60,9 +63,6 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
           + System.lineSeparator()
           + "                                configuration files.";
 
-  private static final String OPERATOR_SUBCOMMAND_NAME = "operator";
-  private static final String GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME =
-      "generate-blockchain-config";
   private static Path tmpOutputDirectoryPath;
 
   @BeforeClass
@@ -73,8 +73,8 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
   @Test
   public void operatorSubCommandExistAndHaveSubCommands() {
     final CommandSpec spec = parseCommand();
-    assertThat(spec.subcommands()).containsKeys(OPERATOR_SUBCOMMAND_NAME);
-    assertThat(spec.subcommands().get(OPERATOR_SUBCOMMAND_NAME).getSubcommands())
+    assertThat(spec.subcommands()).containsKeys(COMMAND_NAME);
+    assertThat(spec.subcommands().get(COMMAND_NAME).getSubcommands())
         .containsKeys(GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -82,21 +82,21 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void callingOperatorSubCommandWithoutSubSubcommandMustDisplayUsage() {
-    parseCommand(OPERATOR_SUBCOMMAND_NAME);
+    parseCommand(COMMAND_NAME);
     assertThat(commandOutput.toString()).startsWith(EXPECTED_OPERATOR_USAGE);
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
   public void callingOperatorCommandHelpMustDisplayUsage() {
-    parseCommand(OPERATOR_SUBCOMMAND_NAME, "--help");
+    parseCommand(COMMAND_NAME, "--help");
     assertThat(commandOutput.toString()).startsWith(EXPECTED_OPERATOR_USAGE);
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
   public void generateBlockchainConfigMustGenerateKeysWhenGenerateIsTrue() throws IOException {
-    generateBlockchainConfig(
+    runCmdAndCheckOutput(
         cmd(),
         "/operator/config_generate_keys.json",
         tmpOutputDirectoryPath,
@@ -107,7 +107,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void generateBlockchainConfigMustImportKeysWhenGenerateIsFalse() throws IOException {
-    generateBlockchainConfig(
+    runCmdAndCheckOutput(
         cmd(),
         "/operator/config_import_keys.json",
         tmpOutputDirectoryPath,
@@ -118,7 +118,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void genesisFileNameShouldBeEqualToOption() throws IOException {
-    generateBlockchainConfig(
+    runCmdAndCheckOutput(
         cmd("--genesis-file-name", "option.json"),
         "/operator/config_generate_keys.json",
         tmpOutputDirectoryPath,
@@ -129,7 +129,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void publicKeyFileNameShouldBeEqualToOption() throws IOException {
-    generateBlockchainConfig(
+    runCmdAndCheckOutput(
         cmd("--public-key-file-name", "pub.test"),
         "/operator/config_generate_keys.json",
         tmpOutputDirectoryPath,
@@ -140,7 +140,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Test
   public void privateKeyFileNameShouldBeEqualToOption() throws IOException {
-    generateBlockchainConfig(
+    runCmdAndCheckOutput(
         cmd("--private-key-file-name", "priv.test"),
         "/operator/config_generate_keys.json",
         tmpOutputDirectoryPath,
@@ -149,17 +149,29 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
         asList("key.pub", "priv.test"));
   }
 
-  private void generateBlockchainConfig(
+  @Test(expected = CommandLine.ExecutionException.class)
+  public void shouldFailIfDuplicateFiles() throws IOException {
+    runCmdAndCheckOutput(
+        cmd("--private-key-file-name", "dup.test", "--public-key-file-name", "dup.test"),
+        "/operator/config_generate_keys.json",
+        tmpOutputDirectoryPath,
+        "genesis.json",
+        true,
+        asList("key.pub", "priv.test"));
+  }
+
+  private void runCmdAndCheckOutput(
       final Cmd cmd,
       final String configFile,
       final Path outputDirectoryPath,
       final String genesisFileName,
       final boolean generate,
-      final Collection<String> expectedKeyFiles) throws IOException {
+      final Collection<String> expectedKeyFiles)
+      throws IOException {
     final URL configFilePath = this.getClass().getResource(configFile);
     parseCommand(
         cmd(
-                OPERATOR_SUBCOMMAND_NAME,
+                COMMAND_NAME,
                 GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME,
                 "--config-file",
                 configFilePath.getPath(),
@@ -187,8 +199,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
       jp.setCodec(new ObjectMapper());
       final JsonNode jsonNode = jp.readValueAsTree();
       final int nodeCount = jsonNode.get("blockchain").get("nodes").get("count").asInt();
-      assertEquals(
-          nodesKeysFolders.length,nodeCount);
+      assertThat(nodeCount).isEqualTo(nodesKeysFolders.length);
     }
     final Stream<File> nodesKeysFoldersStream = stream(nodesKeysFolders);
 
