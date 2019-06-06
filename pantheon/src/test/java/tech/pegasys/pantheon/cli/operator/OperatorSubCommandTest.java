@@ -70,7 +70,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void operatorSubCommandExistAnbHaveSubCommands() {
+  public void operatorSubCommandExistAndHaveSubCommands() {
     final CommandSpec spec = parseCommand();
     assertThat(spec.subcommands()).containsKeys(OPERATOR_SUBCOMMAND_NAME);
     assertThat(spec.subcommands().get(OPERATOR_SUBCOMMAND_NAME).getSubcommands())
