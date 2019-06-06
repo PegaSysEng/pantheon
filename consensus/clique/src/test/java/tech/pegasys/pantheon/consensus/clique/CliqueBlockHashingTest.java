@@ -62,7 +62,7 @@ public class CliqueBlockHashingTest {
     final Address proposerAddress =
         CliqueBlockHashing.recoverProposerAddress(genesisBlockHeader, cliqueExtraData);
 
-    assertThat(proposerAddress).isEqualTo(Address.fromHexString("0x0"));
+    assertThat(proposerAddress).isEqualTo(Address.ZERO);
   }
 
   @Test
