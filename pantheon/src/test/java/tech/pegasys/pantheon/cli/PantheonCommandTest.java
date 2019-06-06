@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.atLeast;
@@ -48,6 +49,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -462,7 +464,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void accountPermissionsSmartContractMustUseOption() {
-
     String smartContractAddress = "0x0000000000000000000000000000000000001234";
 
     parseCommand(
@@ -475,13 +476,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         Address.fromHexString(smartContractAddress));
     smartContractPermissioningConfiguration.setSmartContractAccountWhitelistEnabled(true);
 
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
-
-    PermissioningConfiguration config = permissioningConfigurationArgumentCaptor.getValue();
-    assertThat(config.getSmartContractConfig().get())
-        .isEqualToComparingFieldByField(smartContractPermissioningConfiguration);
+    verify(mockController.getProtocolSchedule()).addTransactionFilterToTransactionValidators(any());
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
@@ -625,13 +620,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
     localPermissioningConfiguration.setAccountWhitelist(
         Collections.singletonList("0x0000000000000000000000000000000000000009"));
 
-    verify(mockRunnerBuilder)
-        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    verify(mockRunnerBuilder).build();
+    verify(mockRunnerBuilder).accountPermissioningController(accountPermissioningControllerArgumentCaptor.capture());
 
-    PermissioningConfiguration config = permissioningConfigurationArgumentCaptor.getValue();
-    assertThat(config.getLocalConfig().get())
-        .isEqualToComparingFieldByField(localPermissioningConfiguration);
+    AccountPermissioningController controller = accountPermissioningControllerArgumentCaptor.getValue();
+    assertThat(controller.getAccountLocalConfigPermissioningController()).isPresent();
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
