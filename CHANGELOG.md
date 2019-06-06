@@ -14,9 +14,11 @@ Documentation updates include:
 - Added [troubleshooting point about illegal reflective access error](https://docs.pantheon.pegasys.tech/en/latest/Troubleshooting/Troubleshooting/#illegal-reflective-access-error-on-startup)
 - Added [trusted bootnode behaviour for permissioning](https://docs.pantheon.pegasys.tech/en/latest/Permissions/Onchain-Permissioning/#bootnodes)
 - Added [how to obtain a WS authentication token](https://docs.pantheon.pegasys.tech/en/latest/Pantheon-API/Authentication/#obtaining-an-authentication-token)
+- Updated [example scripts and added package.json file for creating signed transactions](https://docs.pantheon.pegasys.tech/en/stable/Using-Pantheon/Transactions/Transactions/)
 
 ### Technical Improvements 
 
+- Replaced Void datatype with void [\#1530](https://github.com/PegaSysEng/pantheon/pull/1530) 
 - Fix estimate gas RPC failing for clique when no blocks have been created [\#1528](https://github.com/PegaSysEng/pantheon/pull/1528) 
 - Avoid auto-boxing for gauge metrics [\#1526](https://github.com/PegaSysEng/pantheon/pull/1526)
 - Add AT to ensure 0-miner Clique/IBFT are valid [\#1525](https://github.com/PegaSysEng/pantheon/pull/1525) 
