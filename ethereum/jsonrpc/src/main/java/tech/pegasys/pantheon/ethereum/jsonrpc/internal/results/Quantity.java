@@ -58,15 +58,7 @@ public class Quantity {
     return uint256ToHex(UInt256.of(value));
   }
 
-  public static String format(final BigInteger input) {
-    return formatMinimalValue(input.toString(16));
-  }
-
-  public static String format(final byte value) {
-    return formatMinimalValue(Integer.toHexString(value));
-  }
-
-  public static String format(final int value) {
+  public static String create(final byte value) {
     return formatMinimalValue(Integer.toHexString(value));
   }
 
