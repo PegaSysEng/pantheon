@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
 import static java.util.Arrays.asList;
@@ -41,7 +43,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.json.JsonObject;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
@@ -63,11 +65,11 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
           + System.lineSeparator()
           + "                                configuration files.";
 
-  private static Path tmpOutputDirectoryPath;
+  private Path tmpOutputDirectoryPath;
 
-  @BeforeClass
-  public static void init() throws IOException {
-    tmpOutputDirectoryPath = createTempDirectory("output");
+  @Before
+  public void init() throws IOException {
+    tmpOutputDirectoryPath = createTempDirectory(format("output-%d", currentTimeMillis()));
   }
 
   @Test
