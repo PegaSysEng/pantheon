@@ -20,8 +20,8 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORM
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
 
 import tech.pegasys.pantheon.cli.PantheonCommand;
-import tech.pegasys.pantheon.cli.rlp.IbftExtraDataCLIAdapter;
 import tech.pegasys.pantheon.config.JsonGenesisConfigOptions;
+import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
@@ -41,7 +41,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
@@ -135,7 +134,7 @@ public class OperatorSubCommand implements Runnable {
     private JsonObject blockchainConfig;
     private JsonObject nodesConfig;
     private boolean generateNodesKeys;
-    private List<String> addressesForGenesisExtraData = new ArrayList<>();
+    private List<Address> addressesForGenesisExtraData = new ArrayList<>();
     private Path keysDirectory;
     private boolean forceOverwrite = false;
 
@@ -228,7 +227,7 @@ public class OperatorSubCommand implements Runnable {
         final SECP256K1.PublicKey publicKey, final SECP256K1.PrivateKey privateKey)
         throws IOException {
       final Address nodeAddress = Util.publicKeyToAddress(publicKey);
-      addressesForGenesisExtraData.add(nodeAddress.toUnprefixedString());
+      addressesForGenesisExtraData.add(nodeAddress);
       final Path nodeDirectoryPath = keysDirectory.resolve(nodeAddress.toString());
       Files.createDirectory(nodeDirectoryPath);
       createFileAndWrite(nodeDirectoryPath, publicKeyFileName, publicKey.toString());
@@ -247,9 +246,8 @@ public class OperatorSubCommand implements Runnable {
           JsonGenesisConfigOptions.fromJsonObject(genesisConfig.getJsonObject("config"));
       if (genesisConfigOptions.isIbft2() || genesisConfigOptions.isIbftLegacy()) {
         LOG.info("Generating IBFT extra data.");
-        final String jsonAddresses = Json.encodePrettily(addressesForGenesisExtraData);
         final String extraData =
-            IbftExtraDataCLIAdapter.fromJsonAddresses(jsonAddresses).encode().toString();
+            IbftExtraData.fromAddresses(addressesForGenesisExtraData).encode().toString();
         genesisConfig.put("extraData", extraData);
       }
     }
