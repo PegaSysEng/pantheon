@@ -252,7 +252,6 @@ public class OperatorSubCommand implements Runnable {
     private void createFileAndWrite(
         final Path directory, final String fileName, final String content) throws IOException {
       final Path filePath = directory.resolve(fileName);
-      Files.createFile(filePath);
       Files.write(filePath, content.getBytes(UTF_8), StandardOpenOption.CREATE_NEW);
     }
 
