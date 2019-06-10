@@ -21,6 +21,7 @@ import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME
 
 import tech.pegasys.pantheon.cli.PantheonCommand;
 import tech.pegasys.pantheon.cli.rlp.IbftExtraDataCLIAdapter;
+import tech.pegasys.pantheon.config.JsonGenesisConfigOptions;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
@@ -33,9 +34,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -136,6 +137,7 @@ public class OperatorSubCommand implements Runnable {
     private boolean generateNodesKeys;
     private List<String> addressesForGenesisExtraData = new ArrayList<>();
     private Path keysDirectory;
+    private boolean forceOverwrite = false;
 
     @Override
     public void run() {
@@ -154,7 +156,7 @@ public class OperatorSubCommand implements Runnable {
     /** Generates output directory with all required configuration files. */
     private void generateBlockchainConfig() {
       try {
-        createOutputDirectory();
+        handleOutputDirectory();
         parseConfig();
         if (generateNodesKeys) {
           generateNodesKeys();
@@ -241,11 +243,15 @@ public class OperatorSubCommand implements Runnable {
      * @throws IOException
      */
     private void processExtraData() throws IOException {
-      LOG.info("Generating genesis extra data.");
-      final String jsonAddresses = Json.encodePrettily(addressesForGenesisExtraData);
-      final String extraData =
-          IbftExtraDataCLIAdapter.fromJsonAddresses(jsonAddresses).encode().toString();
-      genesisConfig.put("extraData", extraData);
+      final JsonGenesisConfigOptions genesisConfigOptions =
+          JsonGenesisConfigOptions.fromJsonObject(genesisConfig.getJsonObject("config"));
+      if (genesisConfigOptions.isIbft2() || genesisConfigOptions.isIbftLegacy()) {
+        LOG.info("Generating IBFT extra data.");
+        final String jsonAddresses = Json.encodePrettily(addressesForGenesisExtraData);
+        final String extraData =
+            IbftExtraDataCLIAdapter.fromJsonAddresses(jsonAddresses).encode().toString();
+        genesisConfig.put("extraData", extraData);
+      }
     }
 
     private void createFileAndWrite(
@@ -271,20 +277,27 @@ public class OperatorSubCommand implements Runnable {
     }
 
     /**
-     * Creates the output directory if not exists.
+     * Checks if the output directory exists. If forceOverwrite the output directory will be
+     * flushed.
      *
      * @throws IOException
      */
-    private void createOutputDirectory() throws IOException {
+    private void handleOutputDirectory() throws IOException {
+      checkNotNull(outputDirectory);
       final Path outputDirectoryPath = outputDirectory.toPath();
 
-      if (outputDirectory.exists() && outputDirectory.isDirectory()) {
+      if (outputDirectory.exists() && outputDirectory.isDirectory() && forceOverwrite) {
         try (Stream<Path> stream = Files.walk(outputDirectoryPath)) {
           stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
           deleteIfExists(outputDirectoryPath);
         }
+      } else if (outputDirectory.exists()
+          && outputDirectory.list() != null
+          && outputDirectory.list().length > 0) {
+        throw new IllegalArgumentException("Output directory must be empty.");
+      } else if (!outputDirectory.exists()) {
+        Files.createDirectory(outputDirectoryPath);
       }
-      Files.createDirectory(outputDirectoryPath);
       keysDirectory = outputDirectoryPath.resolve("keys");
       Files.createDirectory(keysDirectory);
     }
@@ -306,14 +319,12 @@ public class OperatorSubCommand implements Runnable {
     }
   }
 
-  private static boolean isAnyDuplicate(String... values) {
-    final Map<String, Integer> occurences = new HashMap<>();
-    for (String value : values) {
-      Integer counter = occurences.getOrDefault(value, 0);
-      if (counter >= 1) {
+  private static <T> boolean isAnyDuplicate(final T... values) {
+    final Set<T> set = new HashSet<>();
+    for (T value : values) {
+      if (!set.add(value)) {
         return true;
       }
-      occurences.put(value, ++counter);
     }
     return false;
   }
