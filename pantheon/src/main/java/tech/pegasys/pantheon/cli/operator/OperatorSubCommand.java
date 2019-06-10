@@ -319,9 +319,9 @@ public class OperatorSubCommand implements Runnable {
     }
   }
 
-  private static <T> boolean isAnyDuplicate(final T... values) {
-    final Set<T> set = new HashSet<>();
-    for (T value : values) {
+  private static boolean isAnyDuplicate(final String... values) {
+    final Set<String> set = new HashSet<>();
+    for (String value : values) {
       if (!set.add(value)) {
         return true;
       }
