@@ -12,27 +12,6 @@
  */
 package tech.pegasys.pantheon.cli.operator;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.vertx.core.json.JsonObject;
-import org.junit.Before;
-import org.junit.Test;
-import picocli.CommandLine;
-import picocli.CommandLine.Model.CommandSpec;
-import tech.pegasys.pantheon.cli.CommandTestAbstract;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -47,6 +26,28 @@ import static org.junit.Assert.assertTrue;
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME;
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommandTest.Cmd.cmd;
+
+import tech.pegasys.pantheon.cli.CommandTestAbstract;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vertx.core.json.JsonObject;
+import org.junit.Before;
+import org.junit.Test;
+import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
 
 public class OperatorSubCommandTest extends CommandTestAbstract {
 
