@@ -31,7 +31,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   private static final String CLIQUE_CONFIG_KEY = "clique";
   private final JsonObject configRoot;
 
-  public static JsonGenesisConfigOptions fromJsonObject(final JsonObject configRoot){
+  public static JsonGenesisConfigOptions fromJsonObject(final JsonObject configRoot) {
     return new JsonGenesisConfigOptions(configRoot);
   }
 
