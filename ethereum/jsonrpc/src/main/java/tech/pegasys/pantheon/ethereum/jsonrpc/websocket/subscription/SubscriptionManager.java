@@ -53,16 +53,18 @@ public class SubscriptionManager extends AbstractVerticle {
   private final LabelledMetric<Counter> unsubscribeCounter;
 
   public SubscriptionManager(final MetricsSystem metricsSystem) {
-    subscribeCounter = metricsSystem.createLabelledCounter(
-        MetricCategory.RPC,
-        "subscription_subscribe_total",
-        "Total number of subscriptions",
-        "type");
-    unsubscribeCounter = metricsSystem.createLabelledCounter(
-        MetricCategory.RPC,
-        "subscription_unsubscribe_total",
-        "Total number of unsubscriptions",
-        "type");
+    subscribeCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.RPC,
+            "subscription_subscribe_total",
+            "Total number of subscriptions",
+            "type");
+    unsubscribeCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.RPC,
+            "subscription_unsubscribe_total",
+            "Total number of unsubscriptions",
+            "type");
   }
 
   @Override
