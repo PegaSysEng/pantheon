@@ -237,10 +237,10 @@ public class OperatorSubCommand implements Runnable {
      *
      * @throws IOException
      */
-    private void processExtraData() throws IOException {
+    private void processExtraData() {
       final JsonGenesisConfigOptions genesisConfigOptions =
           JsonGenesisConfigOptions.fromJsonObject(genesisConfig.getJsonObject("config"));
-      if (genesisConfigOptions.isIbft2() || genesisConfigOptions.isIbftLegacy()) {
+      if (genesisConfigOptions.isIbft2()) {
         LOG.info("Generating IBFT extra data.");
         final String extraData =
             IbftExtraData.fromAddresses(addressesForGenesisExtraData).encode().toString();
@@ -271,8 +271,7 @@ public class OperatorSubCommand implements Runnable {
     }
 
     /**
-     * Checks if the output directory exists. If forceOverwrite the output directory will be
-     * flushed.
+     * Checks if the output directory exists.
      *
      * @throws IOException
      */
@@ -301,12 +300,8 @@ public class OperatorSubCommand implements Runnable {
      */
     private void writeGenesisFile(
         final File directory, final String fileName, final JsonObject genesis) throws IOException {
-      final Path genesisPath = directory.toPath().resolve(fileName);
-      if (Files.exists(genesisPath)) {
-        throw new IllegalArgumentException("Output genesis file must not exist.");
-      }
       LOG.info("Writing genesis file.");
-      Files.write(genesisPath, genesis.encodePrettily().getBytes(UTF_8));
+      Files.write(directory.toPath().resolve(fileName), genesis.encodePrettily().getBytes(UTF_8));
     }
   }
 

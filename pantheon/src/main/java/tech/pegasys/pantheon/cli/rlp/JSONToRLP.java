@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.IOException;
 
 /** Behaviour of objects that can be encoded from JSON to RLP */
-public interface JSONToRLP {
+interface JSONToRLP {
 
   /**
    * Encodes the object into an RLP value.
