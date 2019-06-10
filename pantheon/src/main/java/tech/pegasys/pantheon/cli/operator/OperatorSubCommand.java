@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -252,7 +253,7 @@ public class OperatorSubCommand implements Runnable {
         final Path directory, final String fileName, final String content) throws IOException {
       final Path filePath = directory.resolve(fileName);
       Files.createFile(filePath);
-      Files.write(filePath, content.getBytes(UTF_8));
+      Files.write(filePath, content.getBytes(UTF_8), StandardOpenOption.CREATE_NEW);
     }
 
     /**
@@ -301,7 +302,10 @@ public class OperatorSubCommand implements Runnable {
     private void writeGenesisFile(
         final File directory, final String fileName, final JsonObject genesis) throws IOException {
       LOG.info("Writing genesis file.");
-      Files.write(directory.toPath().resolve(fileName), genesis.encodePrettily().getBytes(UTF_8));
+      Files.write(
+          directory.toPath().resolve(fileName),
+          genesis.encodePrettily().getBytes(UTF_8),
+          StandardOpenOption.CREATE_NEW);
     }
   }
 
