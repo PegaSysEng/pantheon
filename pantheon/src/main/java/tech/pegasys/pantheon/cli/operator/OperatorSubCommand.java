@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.cli.operator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.deleteIfExists;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
@@ -33,12 +32,10 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import com.google.common.io.Resources;
 import io.vertx.core.json.JsonArray;
@@ -136,7 +133,6 @@ public class OperatorSubCommand implements Runnable {
     private boolean generateNodesKeys;
     private List<Address> addressesForGenesisExtraData = new ArrayList<>();
     private Path keysDirectory;
-    private boolean forceOverwrite = false;
 
     @Override
     public void run() {
@@ -283,13 +279,8 @@ public class OperatorSubCommand implements Runnable {
     private void handleOutputDirectory() throws IOException {
       checkNotNull(outputDirectory);
       final Path outputDirectoryPath = outputDirectory.toPath();
-
-      if (outputDirectory.exists() && outputDirectory.isDirectory() && forceOverwrite) {
-        try (Stream<Path> stream = Files.walk(outputDirectoryPath)) {
-          stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-          deleteIfExists(outputDirectoryPath);
-        }
-      } else if (outputDirectory.exists()
+      if (outputDirectory.exists()
+          && outputDirectory.isDirectory()
           && outputDirectory.list() != null
           && outputDirectory.list().length > 0) {
         throw new IllegalArgumentException("Output directory must be empty.");
@@ -311,7 +302,9 @@ public class OperatorSubCommand implements Runnable {
     private void writeGenesisFile(
         final File directory, final String fileName, final JsonObject genesis) throws IOException {
       final Path genesisPath = directory.toPath().resolve(fileName);
-      deleteIfExists(genesisPath);
+      if (Files.exists(genesisPath)) {
+        throw new IllegalArgumentException("Output genesis file must not exist.");
+      }
       LOG.info("Writing genesis file.");
       Files.write(genesisPath, genesis.encodePrettily().getBytes(UTF_8));
     }
