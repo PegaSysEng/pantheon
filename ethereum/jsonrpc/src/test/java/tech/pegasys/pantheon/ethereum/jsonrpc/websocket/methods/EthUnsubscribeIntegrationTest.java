@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketRequestHandler;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.HashMap;
 
@@ -45,7 +46,7 @@ public class EthUnsubscribeIntegrationTest {
   @Before
   public void before() {
     vertx = Vertx.vertx();
-    subscriptionManager = new SubscriptionManager();
+    subscriptionManager = new SubscriptionManager(new NoOpMetricsSystem());
     webSocketMethodsFactory = new WebSocketMethodsFactory(subscriptionManager, new HashMap<>());
     webSocketRequestHandler = new WebSocketRequestHandler(vertx, webSocketMethodsFactory.methods());
   }
@@ -54,14 +55,11 @@ public class EthUnsubscribeIntegrationTest {
   public void shouldRemoveConnectionWithSingleSubscriptionFromMap(final TestContext context) {
     final Async async = context.async();
 
-    // Check the connectionMap is empty
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(0);
-
     // Add the subscription we'd like to remove
     final SubscribeRequest subscribeRequest =
         new SubscribeRequest(SubscriptionType.SYNCING, null, null, CONNECTION_ID);
     final Long subscriptionId = subscriptionManager.subscribe(subscribeRequest);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId)).isNotNull();
 
     final JsonRpcRequest unsubscribeRequest =
         createEthUnsubscribeRequest(subscriptionId, CONNECTION_ID);
@@ -71,7 +69,7 @@ public class EthUnsubscribeIntegrationTest {
         .consumer(CONNECTION_ID)
         .handler(
             msg -> {
-              assertThat(subscriptionManager.getConnectionSubscriptionsMap().isEmpty()).isTrue();
+              assertThat(subscriptionManager.getSubscriptionById(subscriptionId)).isNull();
               async.complete();
             })
         .completionHandler(
@@ -86,20 +84,14 @@ public class EthUnsubscribeIntegrationTest {
   public void shouldRemoveSubscriptionAndKeepConnection(final TestContext context) {
     final Async async = context.async();
 
-    // Check the connectionMap is empty
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(0);
-
     // Add the subscriptions we'd like to remove
     final SubscribeRequest subscribeRequest =
         new SubscribeRequest(SubscriptionType.SYNCING, null, null, CONNECTION_ID);
     final Long subscriptionId1 = subscriptionManager.subscribe(subscribeRequest);
     final Long subscriptionId2 = subscriptionManager.subscribe(subscribeRequest);
 
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().containsKey(CONNECTION_ID))
-        .isTrue();
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(2);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId1)).isNotNull();
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId2)).isNotNull();
 
     final JsonRpcRequest unsubscribeRequest =
         createEthUnsubscribeRequest(subscriptionId2, CONNECTION_ID);
@@ -109,18 +101,8 @@ public class EthUnsubscribeIntegrationTest {
         .consumer(CONNECTION_ID)
         .handler(
             msg -> {
-              assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-              assertThat(
-                      subscriptionManager
-                          .getConnectionSubscriptionsMap()
-                          .containsKey(CONNECTION_ID))
-                  .isTrue();
-              assertThat(
-                      subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-                  .isEqualTo(1);
-              assertThat(
-                      subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).get(0))
-                  .isEqualTo(subscriptionId1);
+              assertThat(subscriptionManager.getSubscriptionById(subscriptionId1)).isNotNull();
+              assertThat(subscriptionManager.getSubscriptionById(subscriptionId2)).isNull();
               async.complete();
             })
         .completionHandler(
