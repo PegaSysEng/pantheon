@@ -23,16 +23,12 @@ import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,20 +65,9 @@ public class IbftExtraData implements ParsedExtraData {
     this.vote = vote;
   }
 
-  public static IbftExtraData fromJsonAddresses(String jsonAddresses) throws IOException {
-    final ObjectMapper mapper = new ObjectMapper();
-    final TypeReference<Collection<String>> typeRef = new TypeReference<Collection<String>>() {};
-    final Collection<String> validatorAddresses = mapper.readValue(jsonAddresses, typeRef);
-    return fromAddresses(validatorAddresses);
-  }
-
-  public static IbftExtraData fromAddresses(Collection<String> addresses) {
+  public static IbftExtraData fromAddresses(final Collection<Address> addresses) {
     return new IbftExtraData(
-        BytesValue.wrap(new byte[32]),
-        Collections.emptyList(),
-        Optional.empty(),
-        0,
-        addresses.stream().map(Address::fromHexString).collect(Collectors.toList()));
+        BytesValue.wrap(new byte[32]), Collections.emptyList(), Optional.empty(), 0, addresses);
   }
 
   public static IbftExtraData decode(final BlockHeader blockHeader) {

@@ -20,7 +20,7 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORM
 import static tech.pegasys.pantheon.cli.operator.OperatorSubCommand.COMMAND_NAME;
 
 import tech.pegasys.pantheon.cli.PantheonCommand;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
+import tech.pegasys.pantheon.cli.rlp.IbftExtraDataCLIAdapter;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
@@ -243,7 +243,8 @@ public class OperatorSubCommand implements Runnable {
     private void processExtraData() throws IOException {
       LOG.info("Generating genesis extra data.");
       final String jsonAddresses = Json.encodePrettily(addressesForGenesisExtraData);
-      final String extraData = IbftExtraData.fromJsonAddresses(jsonAddresses).encode().toString();
+      final String extraData =
+          IbftExtraDataCLIAdapter.fromJsonAddresses(jsonAddresses).encode().toString();
       genesisConfig.put("extraData", extraData);
     }
 

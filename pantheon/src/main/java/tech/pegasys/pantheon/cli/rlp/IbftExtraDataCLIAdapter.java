@@ -13,18 +13,33 @@
 package tech.pegasys.pantheon.cli.rlp;
 
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Adapter to convert a typed JSON to an IbftExtraData object This adapter handles the JSON to RLP
  * encoding
  */
 public class IbftExtraDataCLIAdapter implements JSONToRLP {
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final TypeReference<Collection<String>> TYPE_REF =
+      new TypeReference<Collection<String>>() {};
 
   @Override
   public BytesValue encode(final String json) throws IOException {
-    return IbftExtraData.fromJsonAddresses(json).encode();
+    return fromJsonAddresses(json).encode();
+  }
+
+  public static IbftExtraData fromJsonAddresses(final String jsonAddresses) throws IOException {
+    final Collection<String> validatorAddresses = MAPPER.readValue(jsonAddresses, TYPE_REF);
+    return IbftExtraData.fromAddresses(
+        validatorAddresses.stream().map(Address::fromHexString).collect(Collectors.toList()));
   }
 }
