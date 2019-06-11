@@ -23,8 +23,8 @@ dropping the oldest local transactions.
 
 ## Replacing Transactions with Same Nonce
 
-Submitting a transaction with the same sender and nonce as a pending transaction and a higher gas price replaces the pending transaction
-with the new one.
+If a transaction is received with the same sender and nonce as a pending transaction but a higher gas price, the pending transaction
+is replaced by the new one with the higher gas price.
 
 ## Size of Transaction Pool
 
