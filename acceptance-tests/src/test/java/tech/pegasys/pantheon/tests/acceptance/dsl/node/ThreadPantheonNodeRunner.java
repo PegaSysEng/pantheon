@@ -14,16 +14,27 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static tech.pegasys.pantheon.cli.NetworkName.DEV;
 
+import java.util.Optional;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
+import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
+import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
+import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
+import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
@@ -123,8 +134,23 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       throw new RuntimeException("Error building PantheonController", e);
     }
 
+    //TODO fix this mess
     final RunnerBuilder runnerBuilder = new RunnerBuilder();
-    node.getPermissioningConfiguration().ifPresent(runnerBuilder::permissioningConfiguration);
+    if (node.getPermissioningConfiguration().isPresent()) {
+      PermissioningConfiguration permissioningConfiguration = node.getPermissioningConfiguration()
+          .get();
+
+      runnerBuilder.permissioningConfiguration(permissioningConfiguration);
+
+      final AccountPermissioningController accountPermissioningController =
+          buildAccountPermissioningController(node.getPermissioningConfiguration(),
+              pantheonController);
+      pantheonController
+          .getProtocolSchedule()
+          .setTransactionFilter(accountPermissioningController::isPermitted);
+
+      runnerBuilder.accountPermissioningController(accountPermissioningController);
+    }
 
     pantheonPluginContext.addService(
         PantheonEvents.class,
@@ -198,5 +224,57 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         throw new RuntimeException("Error shutting down node " + name, e);
       }
     }
+  }
+
+  //TODO remove this from here
+  private AccountPermissioningController buildAccountPermissioningController(
+      final Optional<PermissioningConfiguration> permissioningConfiguration,
+      final PantheonController<?> pantheonController) {
+
+    Optional<AccountLocalConfigPermissioningController> accountLocalConfigPermissioningController =
+        Optional.empty();
+    Optional<TransactionSmartContractPermissioningController>
+        transactionSmartContractPermissioningController = Optional.empty();
+
+    if (permissioningConfiguration.isPresent()) {
+      final PermissioningConfiguration config = permissioningConfiguration.get();
+      if (config.getLocalConfig().isPresent()) {
+        final LocalPermissioningConfiguration localPermissioningConfiguration =
+            config.getLocalConfig().get();
+
+        if (localPermissioningConfiguration.isAccountWhitelistEnabled()) {
+          accountLocalConfigPermissioningController =
+              Optional.of(
+                  new AccountLocalConfigPermissioningController(
+                      localPermissioningConfiguration, new NoOpMetricsSystem()));
+        }
+      }
+
+      if (config.getSmartContractConfig().isPresent()) {
+        final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
+            config.getSmartContractConfig().get();
+
+        if (smartContractPermissioningConfiguration.isSmartContractAccountWhitelistEnabled()) {
+          final Address accountSmartContractAddress =
+              smartContractPermissioningConfiguration.getAccountSmartContractAddress();
+          final ProtocolContext<?> protocolContext = pantheonController.getProtocolContext();
+          final ProtocolSchedule<?> protocolSchedule = pantheonController.getProtocolSchedule();
+
+          final TransactionSimulator transactionSimulator =
+              new TransactionSimulator(
+                  protocolContext.getBlockchain(),
+                  protocolContext.getWorldStateArchive(),
+                  protocolSchedule);
+
+          transactionSmartContractPermissioningController =
+              Optional.of(
+                  new TransactionSmartContractPermissioningController(
+                      accountSmartContractAddress, transactionSimulator, new NoOpMetricsSystem()));
+        }
+      }
+    }
+
+    return new AccountPermissioningController(
+        accountLocalConfigPermissioningController, transactionSmartContractPermissioningController);
   }
 }
