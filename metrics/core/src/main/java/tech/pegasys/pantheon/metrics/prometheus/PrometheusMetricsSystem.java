@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.StandardMetricCategories;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
@@ -49,7 +50,6 @@ import io.prometheus.client.hotspot.ThreadExports;
 
 public class PrometheusMetricsSystem implements MetricsSystem {
 
-  private static final String PANTHEON_PREFIX = "pantheon_";
   private final Map<MetricCategory, Collection<Collector>> collectors = new ConcurrentHashMap<>();
   private final CollectorRegistry registry = new CollectorRegistry(true);
   private final Map<String, LabelledMetric<tech.pegasys.pantheon.metrics.Counter>> cachedCounters =
@@ -58,9 +58,12 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       cachedTimers = new ConcurrentHashMap<>();
 
   private final Set<MetricCategory> enabledCategories;
+  private final String applicationPrefix;
 
-  PrometheusMetricsSystem(final Set<MetricCategory> enabledCategories) {
+  PrometheusMetricsSystem(
+      final Set<MetricCategory> enabledCategories, final String applicationPrefix) {
     this.enabledCategories = ImmutableSet.copyOf(enabledCategories);
+    this.applicationPrefix = applicationPrefix;
   }
 
   public static MetricsSystem init(final MetricsConfiguration metricsConfiguration) {
@@ -68,15 +71,17 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       return new NoOpMetricsSystem();
     }
     final PrometheusMetricsSystem metricsSystem =
-        new PrometheusMetricsSystem(metricsConfiguration.getMetricCategories());
-    if (metricsSystem.isCategoryEnabled(MetricCategory.PROCESS)) {
+        new PrometheusMetricsSystem(
+            metricsConfiguration.getMetricCategories(),
+            metricsConfiguration.getApplicationPrefix());
+    if (metricsSystem.isCategoryEnabled(StandardMetricCategories.PROCESS)) {
       metricsSystem.collectors.put(
-          MetricCategory.PROCESS,
+          StandardMetricCategories.PROCESS,
           singleton(new StandardExports().register(metricsSystem.registry)));
     }
-    if (metricsSystem.isCategoryEnabled(MetricCategory.JVM)) {
+    if (metricsSystem.isCategoryEnabled(StandardMetricCategories.JVM)) {
       metricsSystem.collectors.put(
-          MetricCategory.JVM,
+          StandardMetricCategories.JVM,
           asList(
               new MemoryPoolsExports().register(metricsSystem.registry),
               new BufferPoolsExports().register(metricsSystem.registry),
@@ -173,6 +178,11 @@ public class PrometheusMetricsSystem implements MetricsSystem {
         .flatMap(familySamples -> convertSamplesToObservations(category, familySamples));
   }
 
+  @Override
+  public Stream<Observation> streamObservations() {
+    return collectors.keySet().stream().flatMap(this::streamObservations);
+  }
+
   private Stream<Observation> convertSamplesToObservations(
       final MetricCategory category, final MetricFamilySamples familySamples) {
     return familySamples.samples.stream()
@@ -226,7 +236,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
         labelValues);
   }
 
-  public static String convertToPrometheusName(final MetricCategory category, final String name) {
+  public String convertToPrometheusName(final MetricCategory category, final String name) {
     return prometheusPrefix(category) + name;
   }
 
@@ -235,9 +245,9 @@ public class PrometheusMetricsSystem implements MetricsSystem {
     return metricName.startsWith(prefix) ? metricName.substring(prefix.length()) : metricName;
   }
 
-  private static String prometheusPrefix(final MetricCategory category) {
-    return category.isPantheonSpecific()
-        ? PANTHEON_PREFIX + category.getName() + "_"
+  private String prometheusPrefix(final MetricCategory category) {
+    return category.isApplicationSpecific()
+        ? applicationPrefix + category.getName() + "_"
         : category.getName() + "_";
   }
 

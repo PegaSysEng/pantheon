@@ -24,7 +24,7 @@ import static tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration.DEFAUL
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
-import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategories.DEFAULT_METRIC_CATEGORIES;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 
@@ -68,6 +68,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioning
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.StandardMetricCategories;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
@@ -655,6 +657,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+    commandLine.registerConverter(
+        MetricCategory.class,
+        arg -> {
+          try {
+            return PantheonMetricCategories.valueOf(arg);
+          } catch (final IllegalArgumentException e) {
+            return StandardMetricCategories.valueOf(arg);
+          }
+        });
 
     // Add performance options
     UnstableOptionsSubCommand.createUnstableOptions(
@@ -1000,6 +1011,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .pushInterval(metricsPushInterval)
         .hostsWhitelist(hostsWhitelist)
         .prometheusJob(metricsPrometheusJob)
+        .applicationPrefix("pantheon_")
         .build();
   }
 

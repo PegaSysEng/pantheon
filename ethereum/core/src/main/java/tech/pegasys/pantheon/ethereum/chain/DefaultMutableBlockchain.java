@@ -23,8 +23,8 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
@@ -64,12 +64,12 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
     totalDifficulty = blockchainStorage.getTotalDifficulty(chainHead).get();
 
     metricsSystem.createLongGauge(
-        MetricCategory.BLOCKCHAIN,
+        PantheonMetricCategories.BLOCKCHAIN,
         "height",
         "Height of the chainhead",
         this::getChainHeadBlockNumber);
     metricsSystem.createLongGauge(
-        MetricCategory.BLOCKCHAIN,
+        PantheonMetricCategories.BLOCKCHAIN,
         "difficulty_total",
         "Total difficulty of the chainhead",
         () ->
@@ -77,7 +77,7 @@ public class DefaultMutableBlockchain implements MutableBlockchain {
                 .longValue());
 
     metricsSystem.createLongGauge(
-        MetricCategory.BLOCKCHAIN,
+        PantheonMetricCategories.BLOCKCHAIN,
         "chain_head_timestamp",
         "Timestamp from the current chain head",
         () -> getChainHeadHeader().getTimestamp());

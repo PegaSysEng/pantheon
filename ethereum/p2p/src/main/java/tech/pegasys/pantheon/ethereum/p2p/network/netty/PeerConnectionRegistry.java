@@ -19,8 +19,8 @@ import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
@@ -38,16 +38,16 @@ public class PeerConnectionRegistry implements DisconnectCallback {
   public PeerConnectionRegistry(final MetricsSystem metricsSystem) {
     disconnectCounter =
         metricsSystem.createLabelledCounter(
-            MetricCategory.PEERS,
+            PantheonMetricCategories.PEERS,
             "disconnected_total",
             "Total number of peers disconnected",
             "initiator",
             "disconnectReason");
     connectedPeersCounter =
         metricsSystem.createCounter(
-            MetricCategory.PEERS, "connected_total", "Total number of peers connected");
+            PantheonMetricCategories.PEERS, "connected_total", "Total number of peers connected");
     metricsSystem.createGauge(
-        MetricCategory.PEERS,
+        PantheonMetricCategories.PEERS,
         "peer_count_current",
         "Number of peers currently connected",
         () -> (double) connections.size());

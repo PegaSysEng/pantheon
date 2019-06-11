@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.metrics.prometheus;
 
-import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategories.DEFAULT_METRIC_CATEGORIES;
 
 import tech.pegasys.pantheon.metrics.MetricCategory;
 
@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import com.google.common.base.MoreObjects;
 
 public class MetricsConfiguration {
   private static final String DEFAULT_METRICS_HOST = "127.0.0.1";
@@ -40,6 +42,7 @@ public class MetricsConfiguration {
   private final int pushInterval;
   private final String prometheusJob;
   private final List<String> hostsWhitelist;
+  private final String applicationPrefix;
 
   public static MetricsConfiguration createDefault() {
     return builder().build();
@@ -59,7 +62,8 @@ public class MetricsConfiguration {
       final String pushHost,
       final int pushInterval,
       final String prometheusJob,
-      final List<String> hostsWhitelist) {
+      final List<String> hostsWhitelist,
+      final String applicationPrefix) {
     this.enabled = enabled;
     this.port = port;
     this.host = host;
@@ -70,6 +74,7 @@ public class MetricsConfiguration {
     this.pushInterval = pushInterval;
     this.prometheusJob = prometheusJob;
     this.hostsWhitelist = hostsWhitelist;
+    this.applicationPrefix = applicationPrefix;
   }
 
   public boolean isEnabled() {
@@ -112,50 +117,47 @@ public class MetricsConfiguration {
     return Collections.unmodifiableCollection(this.hostsWhitelist);
   }
 
+  public String getApplicationPrefix() {
+    return applicationPrefix;
+  }
+
   @Override
   public String toString() {
-    return "MetricsConfiguration{"
-        + "enabled="
-        + enabled
-        + ", port="
-        + port
-        + ", host='"
-        + host
-        + '\''
-        + ", categories="
-        + metricCategories.toString()
-        + ", pushEnabled="
-        + pushEnabled
-        + ", pushPort="
-        + pushPort
-        + ", pushHost='"
-        + pushHost
-        + '\''
-        + ", pushInterval="
-        + pushInterval
-        + ", prometheusJob='"
-        + prometheusJob
-        + '\''
-        + ", hostsWhitelist="
-        + hostsWhitelist
-        + '}';
+    return MoreObjects.toStringHelper(this)
+        .add("enabled", enabled)
+        .add("port", port)
+        .add("host", host)
+        .add("metricCategories", metricCategories)
+        .add("pushEnabled", pushEnabled)
+        .add("pushPort", pushPort)
+        .add("pushHost", pushHost)
+        .add("pushInterval", pushInterval)
+        .add("prometheusJob", prometheusJob)
+        .add("hostsWhitelist", hostsWhitelist)
+        .add("applicationPrefix", applicationPrefix)
+        .toString();
   }
 
   @Override
   public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     final MetricsConfiguration that = (MetricsConfiguration) o;
     return enabled == that.enabled
         && port == that.port
-        && Objects.equals(metricCategories, that.metricCategories)
         && pushEnabled == that.pushEnabled
         && pushPort == that.pushPort
         && pushInterval == that.pushInterval
         && Objects.equals(host, that.host)
+        && Objects.equals(metricCategories, that.metricCategories)
         && Objects.equals(pushHost, that.pushHost)
         && Objects.equals(prometheusJob, that.prometheusJob)
-        && Objects.equals(hostsWhitelist, that.hostsWhitelist);
+        && Objects.equals(hostsWhitelist, that.hostsWhitelist)
+        && Objects.equals(applicationPrefix, that.applicationPrefix);
   }
 
   @Override
@@ -170,7 +172,8 @@ public class MetricsConfiguration {
         pushHost,
         pushInterval,
         prometheusJob,
-        hostsWhitelist);
+        hostsWhitelist,
+        applicationPrefix);
   }
 
   public static class Builder {
@@ -184,6 +187,7 @@ public class MetricsConfiguration {
     private int pushInterval = 15;
     private String prometheusJob = "pantheon-client";
     private List<String> hostsWhitelist = Arrays.asList("localhost", "127.0.0.1");
+    private String applicationPrefix = "";
 
     private Builder() {}
 
@@ -237,6 +241,11 @@ public class MetricsConfiguration {
       return this;
     }
 
+    public Builder applicationPrefix(final String applicationPrefix) {
+      this.applicationPrefix = applicationPrefix;
+      return this;
+    }
+
     public MetricsConfiguration build() {
       return new MetricsConfiguration(
           enabled,
@@ -248,7 +257,8 @@ public class MetricsConfiguration {
           pushHost,
           pushInterval,
           prometheusJob,
-          hostsWhitelist);
+          hostsWhitelist,
+          applicationPrefix);
     }
   }
 }

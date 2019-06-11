@@ -50,7 +50,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfigurat
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
-import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.StandardMetricCategories;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -107,6 +107,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     "enode://" + VALID_NODE_ID + "@192.168.0.3:4567"
   };
 
+  private static final String APPLICATION_PREFIX = "pantheon_";
+
   static {
     defaultJsonRpcConfiguration = JsonRpcConfiguration.createDefault();
 
@@ -114,7 +116,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     defaultWebSocketConfiguration = WebSocketConfiguration.createDefault();
 
-    defaultMetricsConfiguration = MetricsConfiguration.createDefault();
+    defaultMetricsConfiguration =
+        MetricsConfiguration.builder().applicationPrefix(APPLICATION_PREFIX).build();
   }
 
   @Test
@@ -300,7 +303,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
     webSocketConfiguration.setRpcApis(expectedApis);
 
     final MetricsConfiguration metricsConfiguration =
-        MetricsConfiguration.builder().enabled(false).host("8.6.7.5").port(309).build();
+        MetricsConfiguration.builder()
+            .enabled(false)
+            .host("8.6.7.5")
+            .port(309)
+            .applicationPrefix(APPLICATION_PREFIX)
+            .build();
 
     parseCommand("--config-file", toml.toString());
 
@@ -686,7 +694,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
 
-    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    final MetricsConfiguration metricsConfiguration =
+        MetricsConfiguration.builder().applicationPrefix(APPLICATION_PREFIX).build();
 
     verify(mockRunnerBuilder).discovery(eq(true));
     verify(mockRunnerBuilder)
@@ -2041,13 +2050,14 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsCategoryPropertyMustBeUsed() {
-    parseCommand("--metrics-enabled", "--metrics-category", MetricCategory.JVM.toString());
+    parseCommand(
+        "--metrics-enabled", "--metrics-category", StandardMetricCategories.JVM.toString());
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(metricsConfigArgumentCaptor.getValue().getMetricCategories())
-        .containsExactly(MetricCategory.JVM);
+        .containsExactly(StandardMetricCategories.JVM);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();

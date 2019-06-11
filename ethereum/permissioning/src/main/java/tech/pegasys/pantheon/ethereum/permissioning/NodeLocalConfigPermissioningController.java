@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.ethereum.permissioning;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -80,17 +80,17 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
     this.checkCounter =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategories.PERMISSIONING,
             "node_local_check_count",
             "Number of times the node local permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategories.PERMISSIONING,
             "node_local_check_count_permitted",
             "Number of times the node local permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategories.PERMISSIONING,
             "node_local_check_count_unpermitted",
             "Number of times the node local permissioning provider has been checked and returned unpermitted");
   }
