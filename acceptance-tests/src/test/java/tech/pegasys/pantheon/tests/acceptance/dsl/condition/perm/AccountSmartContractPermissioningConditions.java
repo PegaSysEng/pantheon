@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.condition.perm;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.AccountSmartContractPermissioningTransactions;
 
@@ -24,11 +25,11 @@ public class AccountSmartContractPermissioningConditions {
     this.transactions = transactions;
   }
 
-  public Condition accountIsAllowed(final String address, final String account) {
+  public Condition accountIsAllowed(final String address, final Account account) {
     return new WaitForTrueResponse(transactions.isAccountAllowed(address, account));
   }
 
-  public Condition accountIsForbidden(final String address, final String account) {
+  public Condition accountIsForbidden(final String address, final Account account) {
     return new WaitForFalseResponse(transactions.isAccountAllowed(address, account));
   }
 }

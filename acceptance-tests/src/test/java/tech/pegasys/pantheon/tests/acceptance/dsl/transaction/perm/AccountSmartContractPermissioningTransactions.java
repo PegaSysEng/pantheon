@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Accounts;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
@@ -25,22 +26,22 @@ public class AccountSmartContractPermissioningTransactions {
     this.accounts = accounts;
   }
 
-  public Transaction<Hash> allowAccount(final String contractAddress, final String account) {
+  public Transaction<Hash> allowAccount(final String contractAddress, final Account account) {
     return new AccountSmartContractPermissioningAllowAccountTransaction(
         accounts.getPrimaryBenefactor(),
         Address.fromHexString(contractAddress),
-        Address.fromHexString(account));
+        Address.fromHexString(account.getAddress()));
   }
 
-  public Transaction<Hash> forbidAccount(final String contractAddress, final String account) {
+  public Transaction<Hash> forbidAccount(final String contractAddress, final Account account) {
     return new AccountSmartContractPermissioningForbidAccountTransaction(
         accounts.getPrimaryBenefactor(),
         Address.fromHexString(contractAddress),
-        Address.fromHexString(account));
+        Address.fromHexString(account.getAddress()));
   }
 
-  public Transaction<Boolean> isAccountAllowed(final String contractAddress, final String account) {
+  public Transaction<Boolean> isAccountAllowed(final String contractAddress, final Account account) {
     return new AccountSmartContractPermissioningIsAllowedTransaction(
-        Address.fromHexString(contractAddress), Address.fromHexString(account));
+        Address.fromHexString(contractAddress), Address.fromHexString(account.getAddress()));
   }
 }
