@@ -62,6 +62,19 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
   private final Map<Node, PantheonPluginContextImpl> pantheonPluginContextMap = new HashMap<>();
 
+  private PantheonPluginContextImpl buildPluginContext(final PantheonNode node) {
+    PantheonPluginContextImpl pantheonPluginContext = new PantheonPluginContextImpl();
+    final Path pluginsPath = node.homeDirectory().resolve("plugins");
+    final File pluginsDirFile = pluginsPath.toFile();
+    if (!pluginsDirFile.isDirectory()) {
+      pluginsDirFile.mkdirs();
+      pluginsDirFile.deleteOnExit();
+    }
+    System.setProperty("pantheon.plugins.dir", pluginsPath.toString());
+    pantheonPluginContext.registerPlugins(pluginsPath);
+    return pantheonPluginContext;
+  }
+
   @Override
   @SuppressWarnings("UnstableApiUsage")
   public void startNode(final PantheonNode node) {
@@ -71,16 +84,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     final CommandLine commandLine = new CommandLine(CommandSpec.create());
     final PantheonPluginContextImpl pantheonPluginContext =
-        pantheonPluginContextMap.computeIfAbsent(node, n -> new PantheonPluginContextImpl());
+        pantheonPluginContextMap.computeIfAbsent(node, n -> buildPluginContext(node));
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
-    final Path pluginsPath = node.homeDirectory().resolve("plugins");
-    final File pluginsDirFile = pluginsPath.toFile();
-    if (!pluginsDirFile.isDirectory()) {
-      pluginsDirFile.mkdirs();
-      pluginsDirFile.deleteOnExit();
-    }
-    System.setProperty("pantheon.plugins.dir", pluginsPath.toString());
-    pantheonPluginContext.registerPlugins(pluginsPath);
+
     commandLine.parseArgs(node.getConfiguration().getExtraCLIOptions().toArray(new String[0]));
 
     final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();

@@ -46,7 +46,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   private final Logger PROCESS_LOG = LogManager.getLogger("tech.pegasys.pantheon.SubProcessLog");
 
   private final Map<String, Process> pantheonProcesses = new HashMap<>();
-  private final ExecutorService outputProcessorExecutor = Executors.newCachedThreadPool();
+  private ExecutorService outputProcessorExecutor = Executors.newCachedThreadPool();
 
   ProcessPantheonNodeRunner() {
     Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
@@ -54,6 +54,10 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public void startNode(final PantheonNode node) {
+    if (outputProcessorExecutor == null || outputProcessorExecutor.isShutdown()) {
+      outputProcessorExecutor = Executors.newCachedThreadPool();
+    }
+
     final Path dataDir = node.homeDirectory();
 
     final List<String> params = new ArrayList<>();

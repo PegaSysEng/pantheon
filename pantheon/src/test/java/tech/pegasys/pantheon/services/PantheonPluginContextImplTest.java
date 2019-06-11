@@ -64,6 +64,9 @@ public class PantheonPluginContextImplTest {
 
     contextImpl.stopPlugins();
     assertThat(testPicoCLIPlugin.getState()).isEqualTo("stopped");
+
+    contextImpl.startPlugins();
+    assertThat(testPicoCLIPlugin.getState()).isEqualTo("started");
   }
 
   @Test
@@ -144,7 +147,6 @@ public class PantheonPluginContextImplTest {
 
     contextImpl.stopPlugins();
     assertThatExceptionOfType(IllegalStateException.class).isThrownBy(registerPlugins);
-    assertThatExceptionOfType(IllegalStateException.class).isThrownBy(contextImpl::startPlugins);
     assertThatExceptionOfType(IllegalStateException.class).isThrownBy(contextImpl::stopPlugins);
   }
 
