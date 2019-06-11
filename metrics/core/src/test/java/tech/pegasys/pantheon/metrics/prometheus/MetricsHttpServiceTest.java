@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.metrics.prometheus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
 import java.net.InetSocketAddress;
 import java.util.Collections;
@@ -45,7 +46,7 @@ public class MetricsHttpServiceTest {
 
     // Build an OkHttp client.
     client = new OkHttpClient();
-    baseUrl = service.url();
+    baseUrl = urlForSocketAddress("http", service.socketAddress());
   }
 
   private static MetricsHttpService createMetricsHttpService(final MetricsConfiguration config) {
@@ -111,7 +112,7 @@ public class MetricsHttpServiceTest {
     final InetSocketAddress socketAddress = service.socketAddress();
     assertThat("0.0.0.0").isEqualTo(socketAddress.getAddress().getHostAddress());
     assertThat(0).isEqualTo(socketAddress.getPort());
-    assertThat("").isEqualTo(service.url());
+    assertThat(new InetSocketAddress("0.0.0.0", 0)).isEqualTo(service.socketAddress());
   }
 
   @Test
@@ -124,7 +125,6 @@ public class MetricsHttpServiceTest {
       final InetSocketAddress socketAddress = service.socketAddress();
       assertThat("0.0.0.0").isEqualTo(socketAddress.getAddress().getHostAddress());
       assertThat(socketAddress.getPort() > 0).isTrue();
-      assertThat(!service.url().contains("0.0.0.0")).isTrue();
     } finally {
       service.stop().join();
     }
