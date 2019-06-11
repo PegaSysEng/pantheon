@@ -24,7 +24,7 @@ import static tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration.DEFAUL
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
-import static tech.pegasys.pantheon.metrics.PantheonMetricCategories.DEFAULT_METRIC_CATEGORIES;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 
@@ -68,8 +68,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioning
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
-import tech.pegasys.pantheon.metrics.StandardMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
@@ -98,7 +98,10 @@ import java.nio.file.Paths;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -657,14 +660,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+
+    final Map<String, MetricCategory> metricCategories = new HashMap<>();
+    addCategories(metricCategories, PantheonMetricCategory.class);
+    addCategories(metricCategories, StandardMetricCategory.class);
     commandLine.registerConverter(
         MetricCategory.class,
         arg -> {
-          try {
-            return PantheonMetricCategories.valueOf(arg);
-          } catch (final IllegalArgumentException e) {
-            return StandardMetricCategories.valueOf(arg);
+          final MetricCategory category = metricCategories.get(arg);
+          if (category == null) {
+            throw new IllegalArgumentException("Unknown category: " + arg);
           }
+          return category;
         });
 
     // Add performance options
@@ -688,6 +695,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         new ConfigOptionSearchAndRunHandler(
             resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME, isDocker);
     commandLine.parseWithHandlers(configParsingHandler, exceptionHandler, args);
+  }
+
+  private <T extends Enum<T> & MetricCategory> void addCategories(
+      final Map<String, MetricCategory> categories, final Class<T> categoryEnum) {
+    EnumSet.allOf(categoryEnum).forEach(category -> categories.put(category.name(), category));
   }
 
   @Override

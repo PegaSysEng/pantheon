@@ -46,7 +46,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningContro
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -219,7 +219,7 @@ public class DefaultP2PNetwork implements P2PNetwork {
 
     outboundMessagesCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategories.NETWORK,
+            PantheonMetricCategory.NETWORK,
             "p2p_messages_outbound",
             "Count of each P2P message sent outbound.",
             "protocol",
@@ -227,19 +227,19 @@ public class DefaultP2PNetwork implements P2PNetwork {
             "code");
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategories.NETWORK,
+        PantheonMetricCategory.NETWORK,
         "netty_workers_pending_tasks",
         "The number of pending tasks in the Netty workers event loop",
         pendingTaskCounter(workers));
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategories.NETWORK,
+        PantheonMetricCategory.NETWORK,
         "netty_boss_pending_tasks",
         "The number of pending tasks in the Netty boss event loop",
         pendingTaskCounter(boss));
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategories.NETWORK,
+        PantheonMetricCategory.NETWORK,
         "peers_limit",
         "Maximum P2P peer connections that can be established",
         () -> maxPeers);

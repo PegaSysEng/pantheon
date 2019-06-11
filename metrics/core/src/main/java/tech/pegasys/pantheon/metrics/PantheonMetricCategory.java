@@ -17,7 +17,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-public enum PantheonMetricCategories implements MetricCategory {
+public enum PantheonMetricCategory implements MetricCategory {
   BLOCKCHAIN("blockchain"),
   EXECUTORS("executors"),
   NETWORK("network"),
@@ -33,24 +33,24 @@ public enum PantheonMetricCategories implements MetricCategory {
 
   static {
     // Why not ROCKSDB and KVSTORE_ROCKSDB_STATS?  They hurt performance under load.
-    final EnumSet<PantheonMetricCategories> pantheonCategories =
+    final EnumSet<PantheonMetricCategory> pantheonCategories =
         EnumSet.complementOf(EnumSet.of(KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS));
 
     DEFAULT_METRIC_CATEGORIES =
         ImmutableSet.<MetricCategory>builder()
             .addAll(pantheonCategories)
-            .addAll(EnumSet.allOf(StandardMetricCategories.class))
+            .addAll(EnumSet.allOf(StandardMetricCategory.class))
             .build();
   }
 
   private final String name;
   private final boolean pantheonSpecific;
 
-  PantheonMetricCategories(final String name) {
+  PantheonMetricCategory(final String name) {
     this(name, true);
   }
 
-  PantheonMetricCategories(final String name, final boolean pantheonSpecific) {
+  PantheonMetricCategory(final String name, final boolean pantheonSpecific) {
     this.name = name;
     this.pantheonSpecific = pantheonSpecific;
   }

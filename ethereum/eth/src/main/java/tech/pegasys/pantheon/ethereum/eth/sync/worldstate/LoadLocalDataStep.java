@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.services.pipeline.Pipe;
 import tech.pegasys.pantheon.services.tasks.Task;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -33,7 +33,7 @@ public class LoadLocalDataStep {
     this.worldStateStorage = worldStateStorage;
     existingNodeCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategories.SYNCHRONIZER,
+            PantheonMetricCategory.SYNCHRONIZER,
             "world_state_existing_nodes_total",
             "Total number of node data requests completed using existing data");
   }

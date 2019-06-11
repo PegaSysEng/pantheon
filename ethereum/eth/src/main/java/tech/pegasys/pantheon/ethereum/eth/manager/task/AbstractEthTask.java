@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.Collection;
@@ -50,7 +50,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   private static OperationTimer buildOperationTimer(final MetricsSystem metricsSystem) {
     final LabelledMetric<OperationTimer> ethTasksTimer =
         metricsSystem.createLabelledTimer(
-            PantheonMetricCategories.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
+            PantheonMetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
     if (ethTasksTimer == NoOpMetricsSystem.NO_OP_LABELLED_1_OPERATION_TIMER) {
       return () ->
           new OperationTimer.TimingContext() {

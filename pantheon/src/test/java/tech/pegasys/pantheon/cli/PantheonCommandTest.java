@@ -50,7 +50,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfigurat
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
-import tech.pegasys.pantheon.metrics.StandardMetricCategories;
+import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
@@ -2050,14 +2050,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsCategoryPropertyMustBeUsed() {
-    parseCommand(
-        "--metrics-enabled", "--metrics-category", StandardMetricCategories.JVM.toString());
+    parseCommand("--metrics-enabled", "--metrics-category", StandardMetricCategory.JVM.toString());
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(metricsConfigArgumentCaptor.getValue().getMetricCategories())
-        .containsExactly(StandardMetricCategories.JVM);
+        .containsExactly(StandardMetricCategory.JVM);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();

@@ -31,7 +31,7 @@ import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -172,21 +172,21 @@ public class PeerDiscoveryController {
     this.peerPermissions = new PeerDiscoveryPermissions(localPeer, peerPermissions);
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategories.NETWORK,
+        PantheonMetricCategory.NETWORK,
         "discovery_inflight_interactions_current",
         "Current number of inflight discovery interactions",
         inflightInteractions::size);
 
     interactionCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategories.NETWORK,
+            PantheonMetricCategory.NETWORK,
             "discovery_interaction_count",
             "Total number of discovery interactions initiated",
             "type");
 
     interactionRetryCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategories.NETWORK,
+            PantheonMetricCategory.NETWORK,
             "discovery_interaction_retry_count",
             "Total number of interaction retries performed",
             "type");

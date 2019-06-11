@@ -12,13 +12,13 @@
  */
 package tech.pegasys.pantheon.metrics;
 
-public enum StandardMetricCategories implements MetricCategory {
+public enum StandardMetricCategory implements MetricCategory {
   JVM("jvm"),
   PROCESS("process");
 
   private final String name;
 
-  StandardMetricCategories(final String name) {
+  StandardMetricCategory(final String name) {
     this.name = name;
   }
 

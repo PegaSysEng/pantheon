@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
 import tech.pegasys.pantheon.metrics.OperationTimer;
-import tech.pegasys.pantheon.metrics.StandardMetricCategories;
+import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.ArrayList;
@@ -74,14 +74,14 @@ public class PrometheusMetricsSystem implements MetricsSystem {
         new PrometheusMetricsSystem(
             metricsConfiguration.getMetricCategories(),
             metricsConfiguration.getApplicationPrefix());
-    if (metricsSystem.isCategoryEnabled(StandardMetricCategories.PROCESS)) {
+    if (metricsSystem.isCategoryEnabled(StandardMetricCategory.PROCESS)) {
       metricsSystem.collectors.put(
-          StandardMetricCategories.PROCESS,
+          StandardMetricCategory.PROCESS,
           singleton(new StandardExports().register(metricsSystem.registry)));
     }
-    if (metricsSystem.isCategoryEnabled(StandardMetricCategories.JVM)) {
+    if (metricsSystem.isCategoryEnabled(StandardMetricCategory.JVM)) {
       metricsSystem.collectors.put(
-          StandardMetricCategories.JVM,
+          StandardMetricCategory.JVM,
           asList(
               new MemoryPoolsExports().register(metricsSystem.registry),
               new BufferPoolsExports().register(metricsSystem.registry),

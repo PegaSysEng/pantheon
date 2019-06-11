@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.Discon
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +57,7 @@ public class NetworkRunner implements AutoCloseable {
     this.subProtocols = subProtocols;
     inboundMessageCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategories.NETWORK,
+            PantheonMetricCategory.NETWORK,
             "p2p_messages_inbound",
             "Count of each P2P message received inbound.",
             "protocol",

@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.response.Su
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.util.List;
 import java.util.Map;
@@ -55,13 +55,13 @@ public class SubscriptionManager extends AbstractVerticle {
   public SubscriptionManager(final MetricsSystem metricsSystem) {
     subscribeCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategories.RPC,
+            PantheonMetricCategory.RPC,
             "subscription_subscribe_total",
             "Total number of subscriptions",
             "type");
     unsubscribeCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategories.RPC,
+            PantheonMetricCategory.RPC,
             "subscription_unsubscribe_total",
             "Total number of unsubscriptions",
             "type");

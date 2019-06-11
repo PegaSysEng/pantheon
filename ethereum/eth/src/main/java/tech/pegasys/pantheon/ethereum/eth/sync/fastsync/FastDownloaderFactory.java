@@ -24,7 +24,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.FlatFileTaskCollection;
 
@@ -123,13 +123,13 @@ public class FastDownloaderFactory {
                 dataDirectory, NodeDataRequest::serialize, NodeDataRequest::deserialize));
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategories.SYNCHRONIZER,
+        PantheonMetricCategory.SYNCHRONIZER,
         "world_state_pending_requests_current",
         "Number of pending requests for fast sync world state download",
         taskCollection::size);
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategories.SYNCHRONIZER,
+        PantheonMetricCategory.SYNCHRONIZER,
         "world_state_pending_requests_cache_size",
         "Pending request cache size for fast sync world state download",
         taskCollection::cacheSize);

@@ -29,7 +29,7 @@ import static tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermis
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.IOException;
@@ -74,19 +74,19 @@ public class NodeLocalConfigPermissioningControllerTest {
     bootnodesList.clear();
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategories.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "node_local_check_count",
             "Number of times the node local permissioning provider has been checked"))
         .thenReturn(checkCounter);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategories.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "node_local_check_count_permitted",
             "Number of times the node local permissioning provider has been checked and returned permitted"))
         .thenReturn(checkPermittedCounter);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategories.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "node_local_check_count_unpermitted",
             "Number of times the node local permissioning provider has been checked and returned unpermitted"))
         .thenReturn(checkUnpermittedCounter);

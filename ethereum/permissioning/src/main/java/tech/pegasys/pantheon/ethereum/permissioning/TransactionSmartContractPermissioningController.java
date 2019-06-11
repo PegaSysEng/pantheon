@@ -24,7 +24,7 @@ import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategories;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
@@ -84,17 +84,17 @@ public class TransactionSmartContractPermissioningController
 
     this.checkCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategories.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count",
             "Number of times the transaction smart contract permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategories.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count_permitted",
             "Number of times the transaction smart contract permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategories.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count_unpermitted",
             "Number of times the transaction smart contract permissioning provider has been checked and returned unpermitted");
   }
