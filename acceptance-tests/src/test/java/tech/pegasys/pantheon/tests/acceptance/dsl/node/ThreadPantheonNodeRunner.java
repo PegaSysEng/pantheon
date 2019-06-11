@@ -156,13 +156,20 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public void stopNode(final PantheonNode node) {
-    pantheonPluginContextMap.get(node).stopPlugins();
+    PantheonPluginContextImpl pluginContext = pantheonPluginContextMap.remove(node);
+    if (pluginContext != null) {
+      pluginContext.stopPlugins();
+    }
     node.stop();
     killRunner(node.getName());
   }
 
   @Override
   public void shutdown() {
+    // stop all plugins from pluginContext
+    pantheonPluginContextMap.values().forEach(PantheonPluginContextImpl::stopPlugins);
+    pantheonPluginContextMap.clear();
+
     // iterate over a copy of the set so that pantheonRunner can be updated when a runner is killed
     new HashSet<>(pantheonRunners.keySet()).forEach(this::killRunner);
     try {
