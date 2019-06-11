@@ -78,7 +78,8 @@ public class AccountSmartContractPermissioningIsAllowedTransaction implements Tr
   }
 
   private org.web3j.protocol.core.methods.request.Transaction payload() {
-    final BytesValue payload = BytesValues.concatenate(IS_ACCOUNT_ALLOWED_SIGNATURE, account);
+    final BytesValue payload = BytesValues.concatenate(IS_ACCOUNT_ALLOWED_SIGNATURE,
+        BytesValue.fromHexString("0x000000000000000000000000"), account);
 
     return org.web3j.protocol.core.methods.request.Transaction.createFunctionCallTransaction(
         null, null, null, null, contractAddress.toString(), payload.toString());
