@@ -2705,7 +2705,7 @@ Reruns the transaction with the same state as when the transaction was executed.
 
 ### debug_traceBlock
 
-Returns full stack trace of all invoked opcodes of all transactions included in the block.
+Returns full trace of all invoked opcodes of all transactions included in the block.
 
 **Parameters**
 
@@ -2754,7 +2754,7 @@ Returns full stack trace of all invoked opcodes of all transactions included in 
 
 ### debug_traceBlockByHash
 
-Returns full stack trace of all invoked opcodes of all transactions included in the block.
+Returns full trace of all invoked opcodes of all transactions included in the block.
 
 **Parameters**
 
@@ -2808,7 +2808,7 @@ Returns full stack trace of all invoked opcodes of all transactions included in 
     
 ### debug_traceBlockByNumber
 
-Returns full stack trace of all invoked opcodes of all transactions included in the block.
+Returns full trace of all invoked opcodes of all transactions included in the block.
 
 **Parameters**
 
