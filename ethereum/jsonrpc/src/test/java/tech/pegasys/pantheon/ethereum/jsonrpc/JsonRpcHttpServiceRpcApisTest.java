@@ -250,9 +250,7 @@ public class JsonRpcHttpServiceRpcApisTest {
   }
 
   private MetricsConfiguration createMetricsConfiguration() {
-    final MetricsConfiguration config = MetricsConfiguration.createDefault();
-    config.setEnabled(true);
-    return config;
+    return MetricsConfiguration.builder().enabled(true).port(0).build();
   }
 
   private JsonRpcHttpService createJsonRpcHttpService(

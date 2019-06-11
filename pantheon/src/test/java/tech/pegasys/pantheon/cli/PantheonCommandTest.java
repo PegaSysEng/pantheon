@@ -299,10 +299,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     webSocketConfiguration.setPort(9101);
     webSocketConfiguration.setRpcApis(expectedApis);
 
-    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
-    metricsConfiguration.setEnabled(false);
-    metricsConfiguration.setHost("8.6.7.5");
-    metricsConfiguration.setPort(309);
+    final MetricsConfiguration metricsConfiguration =
+        MetricsConfiguration.builder().enabled(false).host("8.6.7.5").port(309).build();
 
     parseCommand("--config-file", toml.toString());
 
