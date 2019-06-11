@@ -70,7 +70,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
 
     final Condition atLeastLighterForkBlockNumber = blockchain.blockNumberMustBeLatest(minerNode);
 
-    cluster.close();
+    cluster.stop();
 
     // Create the heavy fork
     final PantheonNode minerNodeTwo = pantheon.createMinerNode("miner-node2");
@@ -105,7 +105,7 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
     final Condition atLeastHeavierForkBlockNumber =
         blockchain.blockNumberMustBeLatest(minerNodeTwo);
 
-    cluster.close();
+    cluster.stop();
 
     // Restart the two nodes on the light fork with the additional node from the heavy fork
     cluster.start(minerNode, archiveNode, minerNodeTwo);
