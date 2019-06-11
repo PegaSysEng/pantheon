@@ -17,17 +17,18 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.Sub
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.LabelledMetric;
+import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
@@ -46,11 +47,25 @@ public class SubscriptionManager extends AbstractVerticle {
       "SubscriptionManager::removeSubscriptions";
 
   private final AtomicLong subscriptionCounter = new AtomicLong(0);
-  private final Map<Long, Subscription> subscriptions = new HashMap<>();
-  private final Map<String, List<Long>> connectionSubscriptionsMap = new HashMap<>();
+  private final Map<Long, Subscription> subscriptions = new ConcurrentHashMap<>();
   private final SubscriptionBuilder subscriptionBuilder = new SubscriptionBuilder();
+  private final LabelledMetric<Counter> subscribeCounter;
+  private final LabelledMetric<Counter> unsubscribeCounter;
 
-  public SubscriptionManager() {}
+  public SubscriptionManager(final MetricsSystem metricsSystem) {
+    subscribeCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.RPC,
+            "subscription_subscribe_total",
+            "Total number of subscriptions",
+            "type");
+    unsubscribeCounter =
+        metricsSystem.createLabelledCounter(
+            MetricCategory.RPC,
+            "subscription_unsubscribe_total",
+            "Total number of unsubscriptions",
+            "type");
+  }
 
   @Override
   public void start() {
@@ -59,25 +74,14 @@ public class SubscriptionManager extends AbstractVerticle {
 
   public Long subscribe(final SubscribeRequest request) {
     LOG.debug("Subscribe request {}", request);
+    subscribeCounter.labels(request.getSubscriptionType().getCode()).inc();
 
     final long subscriptionId = subscriptionCounter.incrementAndGet();
-    final Subscription subscription = subscriptionBuilder.build(subscriptionId, request);
-    addSubscription(subscription, request.getConnectionId());
+    final Subscription subscription =
+        subscriptionBuilder.build(subscriptionId, request.getConnectionId(), request);
+    subscriptions.put(subscription.getSubscriptionId(), subscription);
 
-    return subscription.getId();
-  }
-
-  private void addSubscription(final Subscription subscription, final String connectionId) {
-    subscriptions.put(subscription.getId(), subscription);
-    mapSubscriptionToConnection(connectionId, subscription.getId());
-  }
-
-  private void mapSubscriptionToConnection(final String connectionId, final Long subscriptionId) {
-    if (connectionSubscriptionsMap.containsKey(connectionId)) {
-      connectionSubscriptionsMap.get(connectionId).add(subscriptionId);
-    } else {
-      connectionSubscriptionsMap.put(connectionId, Lists.newArrayList(subscriptionId));
-    }
+    return subscription.getSubscriptionId();
   }
 
   public boolean unsubscribe(final UnsubscribeRequest request) {
@@ -86,66 +90,42 @@ public class SubscriptionManager extends AbstractVerticle {
 
     LOG.debug("Unsubscribe request subscriptionId = {}", subscriptionId);
 
-    if (!subscriptions.containsKey(subscriptionId)
-        || !connectionOwnsSubscription(subscriptionId, connectionId)) {
+    final Subscription subscription = subscriptions.get(subscriptionId);
+    if (subscription == null || !subscription.getConnectionId().equals(connectionId)) {
       throw new SubscriptionNotFoundException(subscriptionId);
     }
 
-    destroySubscription(subscriptionId, connectionId);
+    destroySubscription(subscriptionId);
 
     return true;
   }
 
-  private boolean connectionOwnsSubscription(final Long subscriptionId, final String connectionId) {
-    return connectionSubscriptionsMap.get(connectionId) != null
-        && connectionSubscriptionsMap.get(connectionId).contains(subscriptionId);
-  }
-
-  private void destroySubscription(final long subscriptionId, final String connectionId) {
-    subscriptions.remove(subscriptionId);
-
-    if (connectionSubscriptionsMap.containsKey(connectionId)) {
-      removeSubscriptionToConnectionMapping(connectionId, subscriptionId);
+  private void destroySubscription(final long subscriptionId) {
+    final Subscription removed = subscriptions.remove(subscriptionId);
+    if (removed != null) {
+      unsubscribeCounter.labels(removed.getSubscriptionType().getCode()).inc();
     }
   }
 
-  private void removeSubscriptionToConnectionMapping(
-      final String connectionId, final Long subscriptionId) {
-    if (connectionSubscriptionsMap.get(connectionId).size() > 1) {
-      connectionSubscriptionsMap.get(connectionId).remove(subscriptionId);
-    } else {
-      connectionSubscriptionsMap.remove(connectionId);
-    }
-  }
-
-  @VisibleForTesting
-  void removeSubscriptions(final Message<String> message) {
+  private void removeSubscriptions(final Message<String> message) {
     final String connectionId = message.body();
     if (connectionId == null || "".equals(connectionId)) {
-      LOG.warn("Received invalid connectionId ({}). No subscriptions removed.");
+      LOG.warn("Received invalid connectionId ({}). No subscriptions removed.", connectionId);
     }
 
-    LOG.debug("Removing subscription for connectionId = {}", connectionId);
+    LOG.debug("Removing subscription for connectionId {}", connectionId);
 
-    final List<Long> subscriptionIds =
-        Lists.newArrayList(
-            connectionSubscriptionsMap.getOrDefault(connectionId, Lists.newArrayList()));
-    subscriptionIds.forEach(subscriptionId -> destroySubscription(subscriptionId, connectionId));
+    subscriptions.values().stream()
+        .filter(subscription -> subscription.getConnectionId().equals(connectionId))
+        .forEach(subscription -> destroySubscription(subscription.getSubscriptionId()));
   }
 
-  @VisibleForTesting
-  Map<Long, Subscription> subscriptions() {
-    return Maps.newHashMap(subscriptions);
-  }
-
-  @VisibleForTesting
-  public Map<String, List<Long>> getConnectionSubscriptionsMap() {
-    return Maps.newHashMap(connectionSubscriptionsMap);
+  public Subscription getSubscriptionById(final Long subscriptionId) {
+    return subscriptions.get(subscriptionId);
   }
 
   public <T> List<T> subscriptionsOfType(final SubscriptionType type, final Class<T> clazz) {
-    return subscriptions.entrySet().stream()
-        .map(Entry::getValue)
+    return subscriptions.values().stream()
         .filter(subscription -> subscription.isType(type))
         .map(subscriptionBuilder.mapToSubscriptionClass(clazz))
         .collect(Collectors.toList());
@@ -154,10 +134,26 @@ public class SubscriptionManager extends AbstractVerticle {
   public void sendMessage(final Long subscriptionId, final JsonRpcResult msg) {
     final SubscriptionResponse response = new SubscriptionResponse(subscriptionId, msg);
 
-    connectionSubscriptionsMap.entrySet().stream()
-        .filter(e -> e.getValue().contains(subscriptionId))
-        .map(Entry::getKey)
-        .findFirst()
-        .ifPresent(connectionId -> vertx.eventBus().send(connectionId, Json.encode(response)));
+    final Subscription subscription = subscriptions.get(subscriptionId);
+    if (subscription != null) {
+      vertx.eventBus().send(subscription.getConnectionId(), Json.encode(response));
+    }
+  }
+
+  public <T> void notifySubscribersOnWorkerThread(
+      final SubscriptionType subscriptionType,
+      final Class<T> clazz,
+      final Consumer<List<T>> runnable) {
+    vertx.executeBlocking(
+        future -> {
+          final List<T> syncingSubscriptions = subscriptionsOfType(subscriptionType, clazz);
+          runnable.accept(syncingSubscriptions);
+          future.complete();
+        },
+        result -> {
+          if (result.failed()) {
+            LOG.error("Failed to notify subscribers.", result.cause());
+          }
+        });
   }
 }
