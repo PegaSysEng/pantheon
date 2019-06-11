@@ -121,9 +121,9 @@ public class PantheonPluginContextImpl implements PantheonContext {
 
   public void startPlugins() {
     checkState(
-        state == Lifecycle.REGISTERED || state == Lifecycle.STOPPED,
+        state == Lifecycle.REGISTERED,
         "PantheonContext should be in state %s but it was in %s",
-        Lifecycle.REGISTERED + " or " + Lifecycle.STOPPED,
+        Lifecycle.REGISTERED,
         state);
     state = Lifecycle.STARTING;
     final Iterator<PantheonPlugin> pluginsIterator = plugins.iterator();
