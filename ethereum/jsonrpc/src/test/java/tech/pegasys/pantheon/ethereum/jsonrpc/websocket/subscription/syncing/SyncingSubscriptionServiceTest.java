@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +25,10 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.SyncingResult;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
-import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,27 +54,46 @@ public class SyncingSubscriptionServiceTest {
 
   @Test
   public void shouldSendSyncStatusWhenReceiveSyncStatus() {
-    final SyncingSubscription subscription = new SyncingSubscription(9L, SubscriptionType.SYNCING);
-    when(subscriptionManager.subscriptionsOfType(any(), any()))
-        .thenReturn(Lists.newArrayList(subscription));
+    final SyncingSubscription subscription =
+        new SyncingSubscription(9L, "conn", SubscriptionType.SYNCING);
+    final List<SyncingSubscription> subscriptions = Collections.singletonList(subscription);
     final SyncStatus syncStatus = new SyncStatus(0L, 1L, 3L);
     final SyncingResult expectedSyncingResult = new SyncingResult(syncStatus);
 
-    syncStatusListener.onSyncStatus(syncStatus);
-
-    verify(subscriptionManager).sendMessage(eq(subscription.getId()), eq(expectedSyncingResult));
-  }
-
-  @Test
-  public void shouldSendNotSyncingStatusWhenReceiveSyncStatusAtHead() {
-    final SyncingSubscription subscription = new SyncingSubscription(9L, SubscriptionType.SYNCING);
-    when(subscriptionManager.subscriptionsOfType(any(), any()))
-        .thenReturn(Lists.newArrayList(subscription));
-    final SyncStatus syncStatus = new SyncStatus(0L, 1L, 1L);
+    doAnswer(
+            invocation -> {
+              Consumer<List<SyncingSubscription>> consumer = invocation.getArgument(2);
+              consumer.accept(subscriptions);
+              return null;
+            })
+        .when(subscriptionManager)
+        .notifySubscribersOnWorkerThread(any(), any(), any());
 
     syncStatusListener.onSyncStatus(syncStatus);
 
     verify(subscriptionManager)
-        .sendMessage(eq(subscription.getId()), any(NotSynchronisingResult.class));
+        .sendMessage(eq(subscription.getSubscriptionId()), eq(expectedSyncingResult));
+  }
+
+  @Test
+  public void shouldSendNotSyncingStatusWhenReceiveSyncStatusAtHead() {
+    final SyncingSubscription subscription =
+        new SyncingSubscription(9L, "conn", SubscriptionType.SYNCING);
+    final List<SyncingSubscription> subscriptions = Collections.singletonList(subscription);
+    final SyncStatus syncStatus = new SyncStatus(0L, 1L, 1L);
+
+    doAnswer(
+            invocation -> {
+              Consumer<List<SyncingSubscription>> consumer = invocation.getArgument(2);
+              consumer.accept(subscriptions);
+              return null;
+            })
+        .when(subscriptionManager)
+        .notifySubscribersOnWorkerThread(any(), any(), any());
+
+    syncStatusListener.onSyncStatus(syncStatus);
+
+    verify(subscriptionManager)
+        .sendMessage(eq(subscription.getSubscriptionId()), any(NotSynchronisingResult.class));
   }
 }

@@ -38,7 +38,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2Request
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.CustomNetJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -479,7 +478,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public void getBootnodes(final List<URI> bootnodes) {
+  public void setBootnodes(final List<URI> bootnodes) {
     this.bootnodes.clear();
     this.bootnodes.addAll(bootnodes);
   }
@@ -568,10 +567,5 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   @Override
   public void verify(final Condition expected) {
     expected.verify(this);
-  }
-
-  @Override
-  public void waitUntil(final WaitCondition expected) {
-    expected.waitUntil(this);
   }
 }

@@ -122,16 +122,20 @@ public class PendingTransactions {
   public boolean addRemoteTransaction(final Transaction transaction) {
     final TransactionInfo transactionInfo =
         new TransactionInfo(transaction, false, clock.instant());
-    final boolean addTransaction = addTransaction(transactionInfo);
-    remoteTransactionAddedCounter.inc();
-    return addTransaction;
+    final boolean transactionAdded = addTransaction(transactionInfo);
+    if (transactionAdded) {
+      remoteTransactionAddedCounter.inc();
+    }
+    return transactionAdded;
   }
 
   boolean addLocalTransaction(final Transaction transaction) {
-    final boolean addTransaction =
+    final boolean transactionAdded =
         addTransaction(new TransactionInfo(transaction, true, clock.instant()));
-    localTransactionAddedCounter.inc();
-    return addTransaction;
+    if (transactionAdded) {
+      localTransactionAddedCounter.inc();
+    }
+    return transactionAdded;
   }
 
   void removeTransaction(final Transaction transaction) {
@@ -273,6 +277,10 @@ public class PendingTransactions {
 
   public int size() {
     return pendingTransactions.size();
+  }
+
+  public boolean containsTransaction(final Hash transactionHash) {
+    return pendingTransactions.containsKey(transactionHash);
   }
 
   public Optional<Transaction> getTransactionByHash(final Hash transactionHash) {
