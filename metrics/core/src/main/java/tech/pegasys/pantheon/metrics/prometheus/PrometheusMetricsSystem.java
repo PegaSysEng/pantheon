@@ -25,13 +25,14 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 
+import com.google.common.collect.ImmutableSet;
 import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.MetricFamilySamples;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
@@ -56,22 +57,24 @@ public class PrometheusMetricsSystem implements MetricsSystem {
   private final Map<String, LabelledMetric<tech.pegasys.pantheon.metrics.OperationTimer>>
       cachedTimers = new ConcurrentHashMap<>();
 
-  private final EnumSet<MetricCategory> enabledCategories = EnumSet.allOf(MetricCategory.class);
+  private final Set<MetricCategory> enabledCategories;
 
-  PrometheusMetricsSystem() {}
+  PrometheusMetricsSystem(final Set<MetricCategory> enabledCategories) {
+    this.enabledCategories = ImmutableSet.copyOf(enabledCategories);
+  }
 
   public static MetricsSystem init(final MetricsConfiguration metricsConfiguration) {
     if (!metricsConfiguration.isEnabled() && !metricsConfiguration.isPushEnabled()) {
       return new NoOpMetricsSystem();
     }
-    final PrometheusMetricsSystem metricsSystem = new PrometheusMetricsSystem();
-    metricsSystem.enabledCategories.retainAll(metricsConfiguration.getMetricCategories());
-    if (metricsSystem.enabledCategories.contains(MetricCategory.PROCESS)) {
+    final PrometheusMetricsSystem metricsSystem =
+        new PrometheusMetricsSystem(metricsConfiguration.getMetricCategories());
+    if (metricsSystem.isCategoryEnabled(MetricCategory.PROCESS)) {
       metricsSystem.collectors.put(
           MetricCategory.PROCESS,
           singleton(new StandardExports().register(metricsSystem.registry)));
     }
-    if (metricsSystem.enabledCategories.contains(MetricCategory.JVM)) {
+    if (metricsSystem.isCategoryEnabled(MetricCategory.JVM)) {
       metricsSystem.collectors.put(
           MetricCategory.JVM,
           asList(
@@ -94,7 +97,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
     return cachedCounters.computeIfAbsent(
         metricName,
         (k) -> {
-          if (enabledCategories.contains(category)) {
+          if (isCategoryEnabled(category)) {
             final Counter counter = Counter.build(metricName, help).labelNames(labelNames).create();
             addCollectorUnchecked(category, counter);
             return new PrometheusCounter(counter);
@@ -114,7 +117,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
     return cachedTimers.computeIfAbsent(
         metricName,
         (k) -> {
-          if (enabledCategories.contains(category)) {
+          if (isCategoryEnabled(category)) {
             final Summary summary =
                 Summary.build(metricName, help)
                     .quantile(0.2, 0.02)
@@ -140,14 +143,18 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       final String help,
       final DoubleSupplier valueSupplier) {
     final String metricName = convertToPrometheusName(category, name);
-    if (enabledCategories.contains(category)) {
+    if (isCategoryEnabled(category)) {
       final Collector collector = new CurrentValueCollector(metricName, help, valueSupplier);
       addCollectorUnchecked(category, collector);
     }
   }
 
+  private boolean isCategoryEnabled(final MetricCategory category) {
+    return enabledCategories.contains(category);
+  }
+
   public void addCollector(final MetricCategory category, final Collector metric) {
-    if (enabledCategories.contains(category)) {
+    if (isCategoryEnabled(category)) {
       addCollectorUnchecked(category, metric);
     }
   }
