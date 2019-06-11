@@ -336,6 +336,28 @@ public class TransactionPoolTest {
   }
 
   @Test
+  public void shouldDiscardRemoteTransactionThatAlreadyExistsBeforeValidation() {
+    final PendingTransactions pendingTransactions = mock(PendingTransactions.class);
+    final TransactionPool transactionPool =
+        new TransactionPool(
+            pendingTransactions,
+            protocolSchedule,
+            protocolContext,
+            batchAddedListener,
+            syncState,
+            ethContext,
+            peerTransactionTracker);
+
+    when(pendingTransactions.containsTransaction(transaction1.hash())).thenReturn(true);
+
+    transactionPool.addRemoteTransactions(singletonList(transaction1));
+
+    verify(pendingTransactions).containsTransaction(transaction1.hash());
+    verifyZeroInteractions(transactionValidator);
+    verifyNoMoreInteractions(pendingTransactions);
+  }
+
+  @Test
   public void shouldNotNotifyBatchListenerWhenRemoteTransactionDoesNotReplaceExisting() {
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transaction1 =

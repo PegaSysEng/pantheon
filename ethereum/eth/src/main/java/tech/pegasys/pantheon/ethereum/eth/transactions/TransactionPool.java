@@ -111,6 +111,10 @@ public class TransactionPool implements BlockAddedObserver {
     }
     final Set<Transaction> addedTransactions = new HashSet<>();
     for (final Transaction transaction : transactions) {
+      if (pendingTransactions.containsTransaction(transaction.hash())) {
+        // We already have this transaction, don't even validate it.
+        continue;
+      }
       final ValidationResult<TransactionInvalidReason> validationResult =
           validateTransaction(transaction);
       if (validationResult.isValid()) {
