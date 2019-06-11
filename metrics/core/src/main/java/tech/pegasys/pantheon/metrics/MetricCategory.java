@@ -16,7 +16,6 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public enum MetricCategory {
-  BIG_QUEUE("big_queue"),
   BLOCKCHAIN("blockchain"),
   EXECUTORS("executors"),
   JVM("jvm", false),
@@ -30,9 +29,9 @@ public enum MetricCategory {
   SYNCHRONIZER("synchronizer"),
   TRANSACTION_POOL("transaction_pool");
 
-  // Why not BIG_QUEUE and ROCKSDB?  They hurt performance under load.
+  // Why not ROCKSDB and KVSTORE_ROCKSDB_STATS?  They hurt performance under load.
   public static final Set<MetricCategory> DEFAULT_METRIC_CATEGORIES =
-      EnumSet.complementOf(EnumSet.of(BIG_QUEUE, KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS));
+      EnumSet.complementOf(EnumSet.of(KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS));
 
   private final String name;
   private final boolean pantheonSpecific;
