@@ -128,7 +128,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            metricsSystem);
     blockchain.observeBlockAdded(transactionPool);
   }
 
@@ -346,7 +347,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            metricsSystem);
 
     when(pendingTransactions.containsTransaction(transaction1.hash())).thenReturn(true);
 
@@ -487,7 +489,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            metricsSystem);
 
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transaction1 = builder.nonce(1).createTransaction(KEY_PAIR1);
@@ -551,7 +554,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            metricsSystem);
 
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transactionLocal = builder.nonce(1).createTransaction(KEY_PAIR1);
