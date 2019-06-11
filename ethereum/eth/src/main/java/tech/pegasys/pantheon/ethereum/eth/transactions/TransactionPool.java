@@ -124,13 +124,13 @@ public class TransactionPool implements BlockAddedObserver {
 
   public void addRemoteTransactions(final Collection<Transaction> transactions) {
     if (!syncState.isInSync(SYNC_TOLERANCE)) {
-      duplicateTransactionCounter.labels(REMOTE).inc();
       return;
     }
     final Set<Transaction> addedTransactions = new HashSet<>();
     for (final Transaction transaction : transactions) {
       if (pendingTransactions.containsTransaction(transaction.hash())) {
         // We already have this transaction, don't even validate it.
+        duplicateTransactionCounter.labels(REMOTE).inc();
         continue;
       }
       final ValidationResult<TransactionInvalidReason> validationResult =
