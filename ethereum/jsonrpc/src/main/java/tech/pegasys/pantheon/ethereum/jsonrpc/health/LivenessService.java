@@ -18,22 +18,10 @@ import org.apache.logging.log4j.Logger;
 public class LivenessService extends HealthService {
   private static final Logger LOG = LogManager.getLogger();
 
-  private static final int LIVE_STATUS_CODE = 200;
-  private static final int NOT_LIVE_STATUS_CODE = 503;
-
   @Override
   public boolean isHealthy() {
     LOG.debug("Invoking liveness service.");
+
     return true;
-  }
-
-  @Override
-  public int healthyStatusCode() {
-    return LIVE_STATUS_CODE;
-  }
-
-  @Override
-  public int nonHealthyStatusCode() {
-    return NOT_LIVE_STATUS_CODE;
   }
 }

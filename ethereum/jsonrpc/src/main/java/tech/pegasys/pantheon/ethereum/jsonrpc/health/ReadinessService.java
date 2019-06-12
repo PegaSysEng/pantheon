@@ -12,28 +12,25 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.health;
 
+import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ReadinessService extends HealthService {
   private static final Logger LOG = LogManager.getLogger();
+  private final P2PNetwork p2PNetwork;
 
-  private static final int READY_STATUS_CODE = HttpResponseStatus.OK.code();
-  private static final int NOT_READY_STATUS_CODE = 503;
+  public ReadinessService(P2PNetwork p2PNetwork) {
+    this.p2PNetwork = p2PNetwork;
+  }
 
   @Override
   public boolean isHealthy() {
     LOG.debug("Invoking readiness service.");
+    if (p2PNetwork.isP2pEnabled()) {
+      return p2PNetwork.isListening();
+    }
     return true;
-  }
-
-  @Override
-  public int healthyStatusCode() {
-    return READY_STATUS_CODE;
-  }
-
-  @Override
-  public int nonHealthyStatusCode() {
-    return NOT_READY_STATUS_CODE;
   }
 }

@@ -12,12 +12,16 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.health;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.ext.web.RoutingContext;
 
 public abstract class HealthService {
 
   public static final String LIVENESS_PATH = "/liveness";
   public static final String READINESS_PATH = "/readiness";
+
+  private static final int HEALTHY_STATUS_CODE = HttpResponseStatus.OK.code();
+  private static final int NON_HEALTHY_STATUS_CODE = HttpResponseStatus.SERVICE_UNAVAILABLE.code();
 
   public void handleRequest(final RoutingContext routingContext) {
     routingContext
@@ -28,7 +32,25 @@ public abstract class HealthService {
 
   public abstract boolean isHealthy();
 
-  public abstract int healthyStatusCode();
+  public static HealthService fromHealthCheck(final HealthCheck healthCheck) {
+    return new HealthService() {
+      @Override
+      public boolean isHealthy() {
+        return healthCheck.isHealthy();
+      }
+    };
+  }
 
-  public abstract int nonHealthyStatusCode();
+  public int healthyStatusCode() {
+    return HEALTHY_STATUS_CODE;
+  }
+
+  public int nonHealthyStatusCode() {
+    return NON_HEALTHY_STATUS_CODE;
+  }
+
+  @FunctionalInterface
+  public interface HealthCheck {
+    boolean isHealthy();
+  }
 }
