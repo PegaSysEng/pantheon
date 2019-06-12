@@ -21,7 +21,7 @@ public class ReadinessService extends HealthService {
   private static final Logger LOG = LogManager.getLogger();
   private final P2PNetwork p2PNetwork;
 
-  public ReadinessService(P2PNetwork p2PNetwork) {
+  public ReadinessService(final P2PNetwork p2PNetwork) {
     this.p2PNetwork = p2PNetwork;
   }
 
