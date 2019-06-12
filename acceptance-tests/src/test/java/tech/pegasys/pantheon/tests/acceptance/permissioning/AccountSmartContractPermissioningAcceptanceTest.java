@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.permissioning;
 
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class AccountSmartContractPermissioningAcceptanceTest
     extends AccountSmartContractPermissioningAcceptanceTestBase {

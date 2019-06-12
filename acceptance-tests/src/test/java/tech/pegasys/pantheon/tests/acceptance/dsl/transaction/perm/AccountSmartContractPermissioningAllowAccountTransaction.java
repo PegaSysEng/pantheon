@@ -60,8 +60,9 @@ public class AccountSmartContractPermissioningAllowAccountTransaction implements
   }
 
   private String signedTransactionData() {
-    final BytesValue payload = BytesValues.concatenate(ADD_ACCOUNT_SIGNATURE,
-        BytesValue.fromHexString("0x000000000000000000000000"), account);
+    final BytesValue payload =
+        BytesValues.concatenate(
+            ADD_ACCOUNT_SIGNATURE, BytesValue.fromHexString("0x000000000000000000000000"), account);
 
     final RawTransaction transaction =
         RawTransaction.createTransaction(

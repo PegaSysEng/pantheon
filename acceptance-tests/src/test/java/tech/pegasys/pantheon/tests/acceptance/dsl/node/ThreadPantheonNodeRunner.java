@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static tech.pegasys.pantheon.cli.NetworkName.DEV;
 
-import java.util.Optional;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
@@ -53,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -134,17 +134,17 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       throw new RuntimeException("Error building PantheonController", e);
     }
 
-    //TODO fix this mess
+    // TODO fix this mess
     final RunnerBuilder runnerBuilder = new RunnerBuilder();
     if (node.getPermissioningConfiguration().isPresent()) {
-      PermissioningConfiguration permissioningConfiguration = node.getPermissioningConfiguration()
-          .get();
+      PermissioningConfiguration permissioningConfiguration =
+          node.getPermissioningConfiguration().get();
 
       runnerBuilder.permissioningConfiguration(permissioningConfiguration);
 
       final AccountPermissioningController accountPermissioningController =
-          buildAccountPermissioningController(node.getPermissioningConfiguration(),
-              pantheonController);
+          buildAccountPermissioningController(
+              node.getPermissioningConfiguration(), pantheonController);
       pantheonController
           .getProtocolSchedule()
           .setTransactionFilter(accountPermissioningController::isPermitted);
@@ -226,7 +226,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
   }
 
-  //TODO remove this from here
+  // TODO remove this from here
   private AccountPermissioningController buildAccountPermissioningController(
       final Optional<PermissioningConfiguration> permissioningConfiguration,
       final PantheonController<?> pantheonController) {

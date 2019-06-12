@@ -40,7 +40,8 @@ public class AccountSmartContractPermissioningTransactions {
         Address.fromHexString(account.getAddress()));
   }
 
-  public Transaction<Boolean> isAccountAllowed(final String contractAddress, final Account account) {
+  public Transaction<Boolean> isAccountAllowed(
+      final String contractAddress, final Account account) {
     return new AccountSmartContractPermissioningIsAllowedTransaction(
         Address.fromHexString(contractAddress), Address.fromHexString(account.getAddress()));
   }

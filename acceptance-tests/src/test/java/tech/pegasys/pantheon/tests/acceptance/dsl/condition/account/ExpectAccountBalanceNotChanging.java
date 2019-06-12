@@ -15,13 +15,15 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.account;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.utils.Convert.toWei;
 
-import java.util.concurrent.TimeUnit;
-import org.awaitility.Awaitility;
-import org.web3j.utils.Convert.Unit;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
+
+import java.util.concurrent.TimeUnit;
+
+import org.awaitility.Awaitility;
+import org.web3j.utils.Convert.Unit;
 
 public class ExpectAccountBalanceNotChanging implements Condition {
 
@@ -46,8 +48,9 @@ public class ExpectAccountBalanceNotChanging implements Condition {
     Awaitility.await()
         .ignoreExceptions()
         .pollDelay(5, TimeUnit.SECONDS)
-        .untilAsserted(() ->
-            assertThat(node.execute(eth.getBalance((account))))
-                .isEqualTo(toWei(startBalance, balanceUnit).toBigIntegerExact()));
+        .untilAsserted(
+            () ->
+                assertThat(node.execute(eth.getBalance((account))))
+                    .isEqualTo(toWei(startBalance, balanceUnit).toBigIntegerExact()));
   }
 }

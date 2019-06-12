@@ -61,8 +61,11 @@ public class AccountSmartContractPermissioningForbidAccountTransaction
   }
 
   private String signedTransactionData() {
-    final BytesValue payload = BytesValues.concatenate(REMOVE_ACCOUNT_SIGNATURE,
-        BytesValue.fromHexString("0x000000000000000000000000"), account);
+    final BytesValue payload =
+        BytesValues.concatenate(
+            REMOVE_ACCOUNT_SIGNATURE,
+            BytesValue.fromHexString("0x000000000000000000000000"),
+            account);
 
     RawTransaction transaction =
         RawTransaction.createTransaction(

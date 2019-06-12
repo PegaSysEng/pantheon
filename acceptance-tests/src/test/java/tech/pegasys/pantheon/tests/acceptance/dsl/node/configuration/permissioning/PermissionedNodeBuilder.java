@@ -219,14 +219,14 @@ public class PermissionedNodeBuilder {
     SmartContractPermissioningConfiguration config =
         SmartContractPermissioningConfiguration.createDefault();
     if (nodePermissioningSmartContractAddress != null) {
-      config.setNodeSmartContractAddress(Address.fromHexString(
-          nodePermissioningSmartContractAddress));
+      config.setNodeSmartContractAddress(
+          Address.fromHexString(nodePermissioningSmartContractAddress));
       config.setSmartContractNodeWhitelistEnabled(true);
     }
 
     if (accountPermissioningSmartContractAddress != null) {
-      config.setAccountSmartContractAddress(Address.fromHexString(
-          accountPermissioningSmartContractAddress));
+      config.setAccountSmartContractAddress(
+          Address.fromHexString(accountPermissioningSmartContractAddress));
       config.setSmartContractAccountWhitelistEnabled(true);
     }
 
