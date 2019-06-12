@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockWithMetadata;
@@ -2029,6 +2030,22 @@ public class JsonRpcHttpServiceTest {
       final JsonRpcError expectedError = JsonRpcError.INVALID_PARAMS;
       testHelper.assertValidJsonRpcError(
           json, id, expectedError.getCode(), expectedError.getMessage());
+    }
+  }
+
+  @Test
+  public void assertThatLivenessProbeWorks() throws Exception {
+    try (final Response resp =
+        client.newCall(buildGetRequest(HealthService.LIVENESS_PATH)).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+    }
+  }
+
+  @Test
+  public void assertThatReadinessProbeWorks() throws Exception {
+    try (final Response resp =
+        client.newCall(buildGetRequest(HealthService.READINESS_PATH)).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
     }
   }
 

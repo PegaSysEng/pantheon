@@ -19,6 +19,9 @@ import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.LivenessService;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.ReadinessService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequestId;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
@@ -87,6 +90,8 @@ public class JsonRpcHttpService {
   @VisibleForTesting public final Optional<AuthenticationService> authenticationService;
 
   private HttpServer httpServer;
+  private final LivenessService livenessService;
+  private final ReadinessService readinessService;
 
   /**
    * Construct a JsonRpcHttpService handler
@@ -131,6 +136,8 @@ public class JsonRpcHttpService {
     this.vertx = vertx;
     this.rpcMethods = new RpcMethods(methods);
     this.authenticationService = authenticationService;
+    this.livenessService = new LivenessService();
+    this.readinessService = new ReadinessService();
   }
 
   private void validateConfig(final JsonRpcConfiguration config) {
@@ -166,6 +173,14 @@ public class JsonRpcHttpService {
                 .setUploadsDirectory(dataDir.resolve("uploads").toString())
                 .setDeleteUploadedFilesOnEnd(true));
     router.route("/").method(HttpMethod.GET).handler(this::handleEmptyRequest);
+    router
+        .route(HealthService.LIVENESS_PATH)
+        .method(HttpMethod.GET)
+        .handler(livenessService::handleRequest);
+    router
+        .route(HealthService.READINESS_PATH)
+        .method(HttpMethod.GET)
+        .handler(readinessService::handleRequest);
     router
         .route("/")
         .method(HttpMethod.POST)
