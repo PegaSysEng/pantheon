@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 public class ReadinessService extends HealthService {
   private static final Logger LOG = LogManager.getLogger();
 
-  private static final int READY_STATUS_CODE = 200;
+  private static final int READY_STATUS_CODE = HttpResponseStatus.OK.code();
   private static final int NOT_READY_STATUS_CODE = 503;
 
   @Override
