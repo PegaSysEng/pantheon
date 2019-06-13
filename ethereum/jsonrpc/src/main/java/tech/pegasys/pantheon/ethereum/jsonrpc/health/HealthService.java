@@ -58,7 +58,7 @@ public class HealthService {
     private int statusCode;
     private String responseBody;
 
-    private HealthCheckResponse(int statusCode, String responseBody) {
+    private HealthCheckResponse(final int statusCode, final String responseBody) {
       this.statusCode = statusCode;
       this.responseBody = responseBody;
     }
