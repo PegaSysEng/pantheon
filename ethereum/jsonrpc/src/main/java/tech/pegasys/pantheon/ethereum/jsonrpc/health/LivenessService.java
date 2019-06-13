@@ -18,10 +18,15 @@ import org.apache.logging.log4j.Logger;
 public class LivenessService extends HealthService {
   private static final Logger LOG = LogManager.getLogger();
 
-  @Override
-  public boolean isHealthy() {
-    LOG.debug("Invoking liveness service.");
+  public LivenessService() {
+    super(buildHeathCheck());
+  }
 
-    return true;
+  private static HealthCheck buildHeathCheck() {
+    return () -> {
+      LOG.debug("Invoking liveness service.");
+
+      return true;
+    };
   }
 }

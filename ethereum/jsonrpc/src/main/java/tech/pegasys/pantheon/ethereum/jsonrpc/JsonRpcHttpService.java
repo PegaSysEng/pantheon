@@ -113,8 +113,8 @@ public class JsonRpcHttpService {
         metricsSystem,
         methods,
         AuthenticationService.create(vertx, config),
-        HealthService.fromHealthCheck(() -> true),
-        HealthService.fromHealthCheck(() -> true));
+        new HealthService(() -> true),
+        new HealthService(() -> true));
   }
 
   public JsonRpcHttpService(

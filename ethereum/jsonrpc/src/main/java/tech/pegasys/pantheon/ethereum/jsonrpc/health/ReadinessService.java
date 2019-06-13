@@ -19,18 +19,18 @@ import org.apache.logging.log4j.Logger;
 
 public class ReadinessService extends HealthService {
   private static final Logger LOG = LogManager.getLogger();
-  private final P2PNetwork p2PNetwork;
 
   public ReadinessService(final P2PNetwork p2PNetwork) {
-    this.p2PNetwork = p2PNetwork;
+    super(buildHealthCheck(p2PNetwork));
   }
 
-  @Override
-  public boolean isHealthy() {
-    LOG.debug("Invoking readiness service.");
-    if (p2PNetwork.isP2pEnabled()) {
-      return p2PNetwork.isListening();
-    }
-    return true;
+  private static HealthCheck buildHealthCheck(final P2PNetwork p2PNetwork) {
+    return () -> {
+      LOG.debug("Invoking readiness service.");
+      if (p2PNetwork.isP2pEnabled()) {
+        return p2PNetwork.isListening();
+      }
+      return true;
+    };
   }
 }

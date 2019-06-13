@@ -12,10 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.health;
 
+import com.google.common.collect.ImmutableMap;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-public abstract class HealthService {
+public class HealthService {
 
   public static final String LIVENESS_PATH = "/liveness";
   public static final String READINESS_PATH = "/readiness";
@@ -23,34 +25,42 @@ public abstract class HealthService {
   private static final int HEALTHY_STATUS_CODE = HttpResponseStatus.OK.code();
   private static final int NON_HEALTHY_STATUS_CODE = HttpResponseStatus.SERVICE_UNAVAILABLE.code();
 
+  private final HealthCheck healthCheck;
+
+  public HealthService(final HealthCheck healthCheck) {
+    this.healthCheck = healthCheck;
+  }
+
   public void handleRequest(final RoutingContext routingContext) {
+    final HealthCheckResponse healthCheckResponse = buildResponse(isHealthy());
     routingContext
         .response()
-        .setStatusCode(isHealthy() ? healthyStatusCode() : nonHealthyStatusCode())
-        .end();
+        .setStatusCode(healthCheckResponse.statusCode)
+        .end(healthCheckResponse.responseBody);
   }
 
-  public abstract boolean isHealthy();
-
-  public static HealthService fromHealthCheck(final HealthCheck healthCheck) {
-    return new HealthService() {
-      @Override
-      public boolean isHealthy() {
-        return healthCheck.isHealthy();
-      }
-    };
+  public boolean isHealthy() {
+    return healthCheck.isHealthy();
   }
 
-  public int healthyStatusCode() {
-    return HEALTHY_STATUS_CODE;
-  }
-
-  public int nonHealthyStatusCode() {
-    return NON_HEALTHY_STATUS_CODE;
+  private HealthCheckResponse buildResponse(final boolean healthy) {
+    return new HealthCheckResponse(
+        healthy ? HEALTHY_STATUS_CODE : NON_HEALTHY_STATUS_CODE,
+        new JsonObject(ImmutableMap.of("status", healthy ? "UP" : "DOWN")).encodePrettily());
   }
 
   @FunctionalInterface
   public interface HealthCheck {
     boolean isHealthy();
+  }
+
+  private static class HealthCheckResponse {
+    private int statusCode;
+    private String responseBody;
+
+    private HealthCheckResponse(int statusCode, String responseBody) {
+      this.statusCode = statusCode;
+      this.responseBody = responseBody;
+    }
   }
 }
