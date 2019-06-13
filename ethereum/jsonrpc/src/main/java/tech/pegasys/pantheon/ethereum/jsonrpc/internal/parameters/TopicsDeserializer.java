@@ -42,6 +42,7 @@ public class TopicsDeserializer extends StdDeserializer<TopicsParameter> {
     } catch (MismatchedInputException mie) {
       // single list case
       String topics = jsonparser.getText();
+      jsonparser.nextToken(); // consume end of array character
       if (topics == null) {
         return new TopicsParameter(Collections.singletonList(topicsList));
       } else {
