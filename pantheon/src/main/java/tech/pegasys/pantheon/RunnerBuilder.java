@@ -30,6 +30,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.LivenessService;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.ReadinessService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterRepository;
@@ -240,12 +242,16 @@ public class RunnerBuilder {
             .flatMap(protocolManager -> protocolManager.getSupportedCapabilities().stream())
             .collect(Collectors.toSet());
 
+    final RlpxConfiguration rlpxConfiguration =
+        RlpxConfiguration.create()
+            .setBindPort(p2pListenPort)
+            .setMaxPeers(maxPeers)
+            .setSupportedProtocols(subProtocols)
+            .setClientId(PantheonInfo.version());
     final NetworkingConfiguration networkConfig =
         new NetworkingConfiguration()
-            .setRlpx(RlpxConfiguration.create().setBindPort(p2pListenPort).setMaxPeers(maxPeers))
-            .setDiscovery(discoveryConfiguration)
-            .setClientId(PantheonInfo.version())
-            .setSupportedProtocols(subProtocols);
+            .setRlpx(rlpxConfiguration)
+            .setDiscovery(discoveryConfiguration);
 
     final PeerPermissionsBlacklist bannedNodes = PeerPermissionsBlacklist.create();
     bannedNodeIds.forEach(bannedNodes::add);
@@ -336,7 +342,13 @@ public class RunnerBuilder {
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
-                  vertx, dataDir, jsonRpcConfiguration, metricsSystem, jsonRpcMethods));
+                  vertx,
+                  dataDir,
+                  jsonRpcConfiguration,
+                  metricsSystem,
+                  jsonRpcMethods,
+                  new LivenessService(),
+                  new ReadinessService(peerNetwork)));
     }
 
     Optional<GraphQLHttpService> graphQLHttpService = Optional.empty();
@@ -503,7 +515,7 @@ public class RunnerBuilder {
 
   private SubscriptionManager createSubscriptionManager(
       final Vertx vertx, final TransactionPool transactionPool) {
-    final SubscriptionManager subscriptionManager = new SubscriptionManager();
+    final SubscriptionManager subscriptionManager = new SubscriptionManager(metricsSystem);
     final PendingTransactionSubscriptionService pendingTransactions =
         new PendingTransactionSubscriptionService(subscriptionManager);
     final PendingTransactionDroppedSubscriptionService pendingTransactionsRemoved =
