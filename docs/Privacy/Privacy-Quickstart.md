@@ -64,11 +64,14 @@ npm install
 
 In the `pantheon-quickstart/privacy` directory, start the network: 
 
+```bash tab="Linux/MacOS"
+docker-compose build
+```
+This can take a few minutes but you'll only need to do it once. The Docker images are now built and the network started.
+
 ```bash
 ./run.sh
 ```
-
-The Docker images are pulled and network started.  Pulling the images takes a few minutes the first time.
 The network details are displayed. 
 
 ```bash
