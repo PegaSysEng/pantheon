@@ -37,10 +37,10 @@ public class TopicsDeserializer extends StdDeserializer<TopicsParameter> {
     List<String> topicsList = new ArrayList<>();
 
     try {
-      // try standard method
+      // parse as list of lists
       return jsonparser.readValueAs(TopicsParameter.class);
     } catch (MismatchedInputException mie) {
-      // is there a single string value instead of expected list of list
+      // single list case
       String topics = jsonparser.getText();
       if (topics == null) {
         return new TopicsParameter(Collections.singletonList(topicsList));
