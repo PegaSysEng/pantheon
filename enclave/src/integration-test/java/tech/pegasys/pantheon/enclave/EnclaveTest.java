@@ -19,6 +19,8 @@ import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
+import tech.pegasys.pantheon.enclave.types.CreatePrivacyGroupRequest;
+import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
@@ -78,6 +80,18 @@ public class EnclaveTest {
 
     assertEquals(PAYLOAD, new String(rr.getPayload(), UTF_8));
     assertNotNull(rr.getPrivacyGroupId());
+  }
+
+  @Test
+  public void testCreatePrivacyGroup() throws Exception {
+    List<String> publicKeys = testHarness.getPublicKeys();
+    CreatePrivacyGroupRequest privacyGroupRequest =
+        new CreatePrivacyGroupRequest(
+            publicKeys.toArray(new String[0]), publicKeys.get(0), "test", "test");
+
+    PrivacyGroup privacyGroupResponse = enclave.privacyGroups(privacyGroupRequest);
+
+    assertNotNull(privacyGroupResponse.getPrivacyGroupId());
   }
 
   @Test(expected = IOException.class)
