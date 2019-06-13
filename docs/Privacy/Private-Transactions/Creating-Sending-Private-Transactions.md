@@ -3,9 +3,9 @@ description: Creating and sending private transactions
 
 # Creating and Sending Private Transactions 
 
-To create and send private transactions use: 
+To create and send private transactions use one of: 
 
-* [web3.js-ees client library](https://github.com/PegaSysEng/eeajs)
+* [web3.js-eea client library](eeajs.md)
 * [`eea_sendTransaction` with EthSigner](https://docs.ethsigner.pegasys.tech/en/latest/Using-EthSigner/Using-EthSigner/) 
 
 !!! note

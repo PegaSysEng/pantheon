@@ -3,11 +3,12 @@ description: web3.js-eea Client Library
 
 # web3.js-eea Client Library
 
-The web3-eea library adds an additional property to your web3 instance by extending web3. Use the library to 
-create and send RLP-encoded transactions using JSON-RPC.
+The [web3.js-eea library](https://github.com/PegaSysEng/eeajs) adds an additional property to your web3 
+instance by extending [web3](https://github.com/ethereum/web3.js/). Use the library to create and send 
+RLP-encoded transactions using JSON-RPC.
 
 !!! note
-    web3-eea supports JSON-RPC over HTTP only. 
+    web3.js-eea supports JSON-RPC over HTTP only. 
 
 ## Prerequisites
 
