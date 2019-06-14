@@ -267,7 +267,8 @@ public class RunnerBuilder {
             bootnodes, synchronizer, transactionSimulator, localNodeId);
 
     final Optional<AccountPermissioningController> accountPermissioningController =
-        buildAccountPermissioningController(permissioningConfiguration, pantheonController, transactionSimulator);
+        buildAccountPermissioningController(
+            permissioningConfiguration, pantheonController, transactionSimulator);
 
     NetworkBuilder inactiveNetwork = (caps) -> new NoopP2PNetwork();
     NetworkBuilder activeNetwork =
@@ -312,8 +313,10 @@ public class RunnerBuilder {
     final Optional<NodeLocalConfigPermissioningController> nodeLocalConfigPermissioningController =
         nodePermissioningController.flatMap(NodePermissioningController::localConfigController);
 
-    final Optional<AccountLocalConfigPermissioningController> accountLocalConfigPermissioningController =
-        accountPermissioningController.flatMap(AccountPermissioningController::getAccountLocalConfigPermissioningController);
+    final Optional<AccountLocalConfigPermissioningController>
+        accountLocalConfigPermissioningController =
+            accountPermissioningController.flatMap(
+                AccountPermissioningController::getAccountLocalConfigPermissioningController);
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
@@ -447,7 +450,8 @@ public class RunnerBuilder {
 
   private Optional<AccountPermissioningController> buildAccountPermissioningController(
       final Optional<PermissioningConfiguration> permissioningConfiguration,
-      final PantheonController<?> pantheonController, final TransactionSimulator transactionSimulator) {
+      final PantheonController<?> pantheonController,
+      final TransactionSimulator transactionSimulator) {
 
     Optional<AccountLocalConfigPermissioningController> accountLocalConfigPermissioningController =
         Optional.empty();
@@ -484,19 +488,18 @@ public class RunnerBuilder {
         }
       }
 
-      if (accountLocalConfigPermissioningController.isPresent() || transactionSmartContractPermissioningController.isPresent()) {
-        final AccountPermissioningController controller = new AccountPermissioningController(
-            accountLocalConfigPermissioningController,
-            transactionSmartContractPermissioningController);
+      if (accountLocalConfigPermissioningController.isPresent()
+          || transactionSmartContractPermissioningController.isPresent()) {
+        final AccountPermissioningController controller =
+            new AccountPermissioningController(
+                accountLocalConfigPermissioningController,
+                transactionSmartContractPermissioningController);
 
-        pantheonController
-            .getProtocolSchedule()
-            .setTransactionFilter(controller::isPermitted);
+        pantheonController.getProtocolSchedule().setTransactionFilter(controller::isPermitted);
 
         accountPermissioningController = Optional.of(controller);
       }
     }
-
 
     return accountPermissioningController;
   }

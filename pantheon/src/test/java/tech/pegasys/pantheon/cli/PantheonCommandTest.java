@@ -17,7 +17,6 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.atLeast;
@@ -49,7 +48,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -478,13 +476,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    PermissioningConfiguration permissioningConfiguration = permissioningConfigurationArgumentCaptor.getValue();
+    PermissioningConfiguration permissioningConfiguration =
+        permissioningConfigurationArgumentCaptor.getValue();
     assertThat(permissioningConfiguration.getSmartContractConfig()).isPresent();
 
-    SmartContractPermissioningConfiguration effectiveSmartContractConfig = permissioningConfiguration
-        .getSmartContractConfig().get();
+    SmartContractPermissioningConfiguration effectiveSmartContractConfig =
+        permissioningConfiguration.getSmartContractConfig().get();
     assertThat(effectiveSmartContractConfig.isSmartContractAccountWhitelistEnabled()).isTrue();
-    assertThat(effectiveSmartContractConfig.getAccountSmartContractAddress()).isEqualTo(Address.fromHexString(smartContractAddress));
+    assertThat(effectiveSmartContractConfig.getAccountSmartContractAddress())
+        .isEqualTo(Address.fromHexString(smartContractAddress));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
@@ -630,13 +630,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     verify(mockRunnerBuilder)
         .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
-    PermissioningConfiguration permissioningConfiguration = permissioningConfigurationArgumentCaptor.getValue();
+    PermissioningConfiguration permissioningConfiguration =
+        permissioningConfigurationArgumentCaptor.getValue();
     assertThat(permissioningConfiguration.getLocalConfig()).isPresent();
 
-    LocalPermissioningConfiguration effectiveLocalPermissioningConfig = permissioningConfiguration
-        .getLocalConfig().get();
+    LocalPermissioningConfiguration effectiveLocalPermissioningConfig =
+        permissioningConfiguration.getLocalConfig().get();
     assertThat(effectiveLocalPermissioningConfig.isAccountWhitelistEnabled()).isTrue();
-    assertThat(effectiveLocalPermissioningConfig.getAccountPermissioningConfigFilePath()).isEqualTo(permToml.toString());
+    assertThat(effectiveLocalPermissioningConfig.getAccountPermissioningConfigFilePath())
+        .isEqualTo(permToml.toString());
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
