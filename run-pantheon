@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+
+#Change to directory of this script to use relative paths in rest of script
+cd "$(dirname "$0")"
+
+./gradlew build -x test
+version=$(grep "^version=" gradle.properties | sed 's/^version=//')
+distribution_dir=build/distributions
+bin_path=./$distribution_dir/pantheon-"$version"/bin/pantheon
+if [ ! -f "$bin_path" ]; then
+    tar -xzf "$distribution_dir"/pantheon-"$version".tar.gz --directory "$distribution_dir/"
+fi
+$bin_path "$@"

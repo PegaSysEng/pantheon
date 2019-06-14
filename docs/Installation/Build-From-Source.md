@@ -36,29 +36,18 @@ git clone --recursive https://github.com/PegaSysEng/pantheon.git
 
 ### Build Pantheon
 
-After cloning, go to the `pantheon` directory.
-
-Build Pantheon with the Gradle wrapper `gradlew`, omitting tests as follows:
+Run the script to build and run pantheon:
 
 ```bash
-./gradlew build -x test
+./run-pantheon <args...>
 ```
 
-Go to the distribution directory: 
+To see configuration options:
+
 ```bash
-cd build/distributions/
+./run-pantheon --help
 ```
 
-Expand the distribution archive: 
-```bash
-tar -xzf pantheon-<version>.tar.gz
-```
-
-Move to the expanded folder and display the Pantheon help to confirm installation. 
-````bash
-cd pantheon-<version>/
-bin/pantheon --help
-````
 
 !!! note "Linux Open File Limit"
     If synchronizing to MainNet on Linux  or other chains with large data requirements, increase the maximum number 
