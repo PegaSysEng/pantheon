@@ -49,7 +49,7 @@ if (env.BRANCH_NAME != "master") {
 }
 
 try {
-    timeout(time: 1, unit: 'MINUTES') {
+    timeout(time: 1, unit: 'HOURS') {
         parallel UnitTests: {
             def stage_name = "Unit tests node: "
             node {
