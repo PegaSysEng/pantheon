@@ -476,7 +476,15 @@ public class PantheonCommandTest extends CommandTestAbstract {
         Address.fromHexString(smartContractAddress));
     smartContractPermissioningConfiguration.setSmartContractAccountWhitelistEnabled(true);
 
-    verify(mockController.getProtocolSchedule()).setTransactionFilter(any());
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    PermissioningConfiguration permissioningConfiguration = permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(permissioningConfiguration.getSmartContractConfig()).isPresent();
+
+    SmartContractPermissioningConfiguration effectiveSmartContractConfig = permissioningConfiguration
+        .getSmartContractConfig().get();
+    assertThat(effectiveSmartContractConfig.isSmartContractAccountWhitelistEnabled()).isTrue();
+    assertThat(effectiveSmartContractConfig.getAccountSmartContractAddress()).isEqualTo(Address.fromHexString(smartContractAddress));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
@@ -621,11 +629,14 @@ public class PantheonCommandTest extends CommandTestAbstract {
         Collections.singletonList("0x0000000000000000000000000000000000000009"));
 
     verify(mockRunnerBuilder)
-        .accountPermissioningController(accountPermissioningControllerArgumentCaptor.capture());
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    PermissioningConfiguration permissioningConfiguration = permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(permissioningConfiguration.getLocalConfig()).isPresent();
 
-    AccountPermissioningController controller =
-        accountPermissioningControllerArgumentCaptor.getValue();
-    assertThat(controller.getAccountLocalConfigPermissioningController()).isPresent();
+    LocalPermissioningConfiguration effectiveLocalPermissioningConfig = permissioningConfiguration
+        .getLocalConfig().get();
+    assertThat(effectiveLocalPermissioningConfig.isAccountWhitelistEnabled()).isTrue();
+    assertThat(effectiveLocalPermissioningConfig.getAccountPermissioningConfigFilePath()).isEqualTo(permToml.toString());
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();

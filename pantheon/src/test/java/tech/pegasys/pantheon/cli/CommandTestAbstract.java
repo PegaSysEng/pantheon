@@ -108,11 +108,7 @@ public abstract class CommandTestAbstract {
   @Captor ArgumentCaptor<GraphQLConfiguration> graphQLConfigArgumentCaptor;
   @Captor ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
   @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
-
   @Captor ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
-
-  @Captor
-  ArgumentCaptor<AccountPermissioningController> accountPermissioningControllerArgumentCaptor;
 
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
@@ -176,7 +172,6 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.metricsSystem(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.metricsConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.staticNodes(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.accountPermissioningController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.build()).thenReturn(mockRunner);
   }
 

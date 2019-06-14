@@ -134,22 +134,12 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       throw new RuntimeException("Error building PantheonController", e);
     }
 
-    // TODO fix this mess
     final RunnerBuilder runnerBuilder = new RunnerBuilder();
     if (node.getPermissioningConfiguration().isPresent()) {
       PermissioningConfiguration permissioningConfiguration =
           node.getPermissioningConfiguration().get();
 
       runnerBuilder.permissioningConfiguration(permissioningConfiguration);
-
-      final AccountPermissioningController accountPermissioningController =
-          buildAccountPermissioningController(
-              node.getPermissioningConfiguration(), pantheonController);
-      pantheonController
-          .getProtocolSchedule()
-          .setTransactionFilter(accountPermissioningController::isPermitted);
-
-      runnerBuilder.accountPermissioningController(accountPermissioningController);
     }
 
     pantheonPluginContext.addService(
@@ -224,57 +214,5 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         throw new RuntimeException("Error shutting down node " + name, e);
       }
     }
-  }
-
-  // TODO remove this from here
-  private AccountPermissioningController buildAccountPermissioningController(
-      final Optional<PermissioningConfiguration> permissioningConfiguration,
-      final PantheonController<?> pantheonController) {
-
-    Optional<AccountLocalConfigPermissioningController> accountLocalConfigPermissioningController =
-        Optional.empty();
-    Optional<TransactionSmartContractPermissioningController>
-        transactionSmartContractPermissioningController = Optional.empty();
-
-    if (permissioningConfiguration.isPresent()) {
-      final PermissioningConfiguration config = permissioningConfiguration.get();
-      if (config.getLocalConfig().isPresent()) {
-        final LocalPermissioningConfiguration localPermissioningConfiguration =
-            config.getLocalConfig().get();
-
-        if (localPermissioningConfiguration.isAccountWhitelistEnabled()) {
-          accountLocalConfigPermissioningController =
-              Optional.of(
-                  new AccountLocalConfigPermissioningController(
-                      localPermissioningConfiguration, new NoOpMetricsSystem()));
-        }
-      }
-
-      if (config.getSmartContractConfig().isPresent()) {
-        final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
-            config.getSmartContractConfig().get();
-
-        if (smartContractPermissioningConfiguration.isSmartContractAccountWhitelistEnabled()) {
-          final Address accountSmartContractAddress =
-              smartContractPermissioningConfiguration.getAccountSmartContractAddress();
-          final ProtocolContext<?> protocolContext = pantheonController.getProtocolContext();
-          final ProtocolSchedule<?> protocolSchedule = pantheonController.getProtocolSchedule();
-
-          final TransactionSimulator transactionSimulator =
-              new TransactionSimulator(
-                  protocolContext.getBlockchain(),
-                  protocolContext.getWorldStateArchive(),
-                  protocolSchedule);
-
-          transactionSmartContractPermissioningController =
-              Optional.of(
-                  new TransactionSmartContractPermissioningController(
-                      accountSmartContractAddress, transactionSimulator, new NoOpMetricsSystem()));
-        }
-      }
-    }
-
-    return new AccountPermissioningController(
-        accountLocalConfigPermissioningController, transactionSmartContractPermissioningController);
   }
 }
