@@ -181,7 +181,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
               }
               if (permissioningConfiguration.getAccountSmartContractAddress() != null) {
                 params.add("--permissions-accounts-contract-address");
-                params.add(permissioningConfiguration.getNodeSmartContractAddress().toString());
+                params.add(permissioningConfiguration.getAccountSmartContractAddress().toString());
               }
             });
     params.addAll(node.getExtraCLIOptions());
