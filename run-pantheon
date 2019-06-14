@@ -2,14 +2,21 @@
 
 set -e
 
-#Change to directory of this script to use relative paths in rest of script
+# Change to directory of this script to use relative paths in rest of script
 cd "$(dirname "$0")"
 
+# Run build without tests
 ./gradlew build -x test
+
+# Determine output path
 version=$(grep "^version=" gradle.properties | sed 's/^version=//')
 distribution_dir=build/distributions
 bin_path=./$distribution_dir/pantheon-"$version"/bin/pantheon
+
+# Check if it already exists
 if [ ! -f "$bin_path" ]; then
     tar -xzf "$distribution_dir"/pantheon-"$version".tar.gz --directory "$distribution_dir/"
 fi
+
+# Run pantheon
 $bin_path "$@"
