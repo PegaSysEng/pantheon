@@ -17,10 +17,9 @@ import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 
 import tech.pegasys.pantheon.ethereum.p2p.peers.LocalNode.NodeNotReadyException;
 import tech.pegasys.pantheon.ethereum.p2p.peers.MutableLocalNode.NodeAlreadySetException;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.p2p.wire.PeerInfo;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.PeerInfo;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Arrays;
 import java.util.List;

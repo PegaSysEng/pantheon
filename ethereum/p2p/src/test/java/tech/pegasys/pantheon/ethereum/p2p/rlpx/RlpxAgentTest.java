@@ -28,11 +28,10 @@ import static tech.pegasys.pantheon.ethereum.p2p.peers.PeerTestHelper.enode;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.PeerTestHelper.enodeBuilder;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.p2p.peers.MutableLocalNode;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerProperties;
@@ -42,14 +41,15 @@ import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions.Action;
 import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissionsException;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.MockConnectionInitializer;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.MockPeerConnection;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.PingMessage;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.PingMessage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Arrays;
 import java.util.List;
@@ -557,7 +557,7 @@ public class RlpxAgentTest {
         .isPermitted(
             eq(localNode.getPeer()),
             eq(nonPermittedPeer),
-            eq(Action.RLPX_ALLOW_ONGOING_CONNECTION));
+            eq(Action.RLPX_ALLOW_ONGOING_LOCALLY_INITIATED_CONNECTION));
     peerPermissions.testDispatchUpdate(true, Optional.empty());
 
     assertThat(agent.getConnectionCount()).isEqualTo(1);
@@ -584,7 +584,7 @@ public class RlpxAgentTest {
         .isPermitted(
             eq(localNode.getPeer()),
             eq(nonPermittedPeer),
-            eq(Action.RLPX_ALLOW_ONGOING_CONNECTION));
+            eq(Action.RLPX_ALLOW_ONGOING_LOCALLY_INITIATED_CONNECTION));
     peerPermissions.testDispatchUpdate(true, Optional.of(Arrays.asList(nonPermittedPeer)));
 
     assertThat(agent.getConnectionCount()).isEqualTo(1);
@@ -592,6 +592,64 @@ public class RlpxAgentTest {
     assertThat(agent.getPeerConnection(nonPermittedPeer)).isEmpty();
     assertThat(permittedConnection.isDisconnected()).isFalse();
     assertThat(nonPermittedConnection.isDisconnected()).isTrue();
+  }
+
+  @Test
+  public void permissionsUpdate_permissionsRestrictedForRemotelyInitiatedConnections()
+      throws ExecutionException, InterruptedException {
+    final Peer locallyConnectedPeer = createPeer();
+    final Peer remotelyConnectedPeer = createPeer();
+    startAgent();
+    final PeerConnection locallyInitiatedConnection = agent.connect(locallyConnectedPeer).get();
+    final PeerConnection remotelyInitiatedConnection =
+        MockPeerConnection.create(remotelyConnectedPeer);
+    connectionInitializer.simulateIncomingConnection(remotelyInitiatedConnection);
+
+    // Sanity check
+    assertThat(agent.getConnectionCount()).isEqualTo(2);
+
+    doReturn(false)
+        .when(peerPermissions)
+        .isPermitted(
+            eq(localNode.getPeer()),
+            any(),
+            eq(Action.RLPX_ALLOW_ONGOING_REMOTELY_INITIATED_CONNECTION));
+    peerPermissions.testDispatchUpdate(true, Optional.empty());
+
+    assertThat(agent.getConnectionCount()).isEqualTo(1);
+    assertThat(agent.getPeerConnection(locallyConnectedPeer)).isNotEmpty();
+    assertThat(agent.getPeerConnection(remotelyConnectedPeer)).isEmpty();
+    assertThat(locallyInitiatedConnection.isDisconnected()).isFalse();
+    assertThat(remotelyInitiatedConnection.isDisconnected()).isTrue();
+  }
+
+  @Test
+  public void permissionsUpdate_permissionsRestrictedForLocallyInitiatedConnections()
+      throws ExecutionException, InterruptedException {
+    final Peer locallyConnectedPeer = createPeer();
+    final Peer remotelyConnectedPeer = createPeer();
+    startAgent();
+    final PeerConnection locallyInitiatedConnection = agent.connect(locallyConnectedPeer).get();
+    final PeerConnection remotelyInitiatedConnection =
+        MockPeerConnection.create(remotelyConnectedPeer);
+    connectionInitializer.simulateIncomingConnection(remotelyInitiatedConnection);
+
+    // Sanity check
+    assertThat(agent.getConnectionCount()).isEqualTo(2);
+
+    doReturn(false)
+        .when(peerPermissions)
+        .isPermitted(
+            eq(localNode.getPeer()),
+            any(),
+            eq(Action.RLPX_ALLOW_ONGOING_LOCALLY_INITIATED_CONNECTION));
+    peerPermissions.testDispatchUpdate(true, Optional.empty());
+
+    assertThat(agent.getConnectionCount()).isEqualTo(1);
+    assertThat(agent.getPeerConnection(locallyConnectedPeer)).isEmpty();
+    assertThat(agent.getPeerConnection(remotelyConnectedPeer)).isNotEmpty();
+    assertThat(locallyInitiatedConnection.isDisconnected()).isTrue();
+    assertThat(remotelyInitiatedConnection.isDisconnected()).isFalse();
   }
 
   @Test
