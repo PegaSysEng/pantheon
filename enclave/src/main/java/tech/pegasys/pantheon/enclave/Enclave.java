@@ -68,9 +68,8 @@ public class Enclave {
     return executePost(request, ReceiveResponse.class);
   }
 
-  public PrivacyGroup createPrivacyGroups(final CreatePrivacyGroupRequest content)
-      throws Exception {
-    Request request = buildPostRequest(ORION, content, "/privacyGroupId");
+  public PrivacyGroup createPrivacyGroup(final CreatePrivacyGroupRequest content) throws Exception {
+    Request request = buildPostRequest(JSON, content, "/privacyGroupId");
     return executePost(request, PrivacyGroup.class);
   }
 

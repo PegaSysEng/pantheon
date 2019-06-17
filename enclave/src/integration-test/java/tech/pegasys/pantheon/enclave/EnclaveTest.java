@@ -85,13 +85,18 @@ public class EnclaveTest {
   @Test
   public void testCreatePrivacyGroup() throws Exception {
     List<String> publicKeys = testHarness.getPublicKeys();
+    String name = "testName";
+    String description = "testDesc";
     CreatePrivacyGroupRequest privacyGroupRequest =
         new CreatePrivacyGroupRequest(
-            publicKeys.toArray(new String[0]), publicKeys.get(0), "testName", "testDesc");
+            publicKeys.toArray(new String[0]), publicKeys.get(0), name, description);
 
-    PrivacyGroup privacyGroupResponse = enclave.createPrivacyGroups(privacyGroupRequest);
+    PrivacyGroup privacyGroupResponse = enclave.createPrivacyGroup(privacyGroupRequest);
 
     assertNotNull(privacyGroupResponse.getPrivacyGroupId());
+    assertEquals(name, privacyGroupResponse.getName());
+    assertEquals(description, privacyGroupResponse.getDescription());
+    assertEquals(PrivacyGroup.Type.PANTHEON, privacyGroupResponse.getType());
   }
 
   @Test(expected = IOException.class)
