@@ -1175,13 +1175,11 @@ fast-sync-min-peers=2
 
 Minimum number of peers required before starting fast sync. Default is 5. 
 
-## Commands
-
-Pantheon subcommands are: 
+## Subcommands
 
 ### blocks
 
-This command provides blocks related actions.
+Provides blocks related actions.
 
 ### import
 
@@ -1235,7 +1233,7 @@ Outputs the node public key address to standard output or writes it to the speci
 
 ### password
 
-This command provides password related actions.
+Provides password related actions.
 
 ### hash
 
@@ -1250,9 +1248,28 @@ pantheon password hash --password=<my-password>
 pantheon password hash --password=myPassword123
 ```
 
+### operator
+
+Provides password related actions.
+
+### generate-blockchain-config
+
+This command generates [IBFT 2.0 configuration files](../Tutorials/Create-IBFT-Network.md). 
+
+```bash tab="Syntax"
+pantheon operator generate-blockchain-config --config-file=<FILE> --to=<DIRECTORY> [--genesis-file-name=<PATH>] [--private-key-file-name=<PATH>] [--public-key-file-name=<PATH>]
+```
+
+```bash tab="Example"
+pantheon operator generate-blockchain-config --config-file=config.json --to=myNetworkFiles
+```
+
+The configuration file is an IBFT 2.0 genesis file except instead of the extraData property, the number of key pairs to 
+generate or the public node keys are included.
+
 ### rlp
 
-This command provides RLP related actions.
+Provides RLP related actions.
 
 ### encode
 
@@ -1315,3 +1332,4 @@ This data is included in the [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT
         ``` tab="RLP Output"
         0xf853a00000000000000000000000000000000000000000000000000000000000000000ea94be068f726a13c8d46c44be6ce9d275600e1735a4945ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193808400000000c0
         ```
+
