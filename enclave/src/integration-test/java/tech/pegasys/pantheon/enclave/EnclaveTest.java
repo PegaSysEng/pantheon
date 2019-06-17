@@ -87,9 +87,9 @@ public class EnclaveTest {
     List<String> publicKeys = testHarness.getPublicKeys();
     CreatePrivacyGroupRequest privacyGroupRequest =
         new CreatePrivacyGroupRequest(
-            publicKeys.toArray(new String[0]), publicKeys.get(0), "test", "test");
+            publicKeys.toArray(new String[0]), publicKeys.get(0), "testName", "testDesc");
 
-    PrivacyGroup privacyGroupResponse = enclave.privacyGroups(privacyGroupRequest);
+    PrivacyGroup privacyGroupResponse = enclave.createPrivacyGroups(privacyGroupRequest);
 
     assertNotNull(privacyGroupResponse.getPrivacyGroupId());
   }

@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.enclave;
 
-import tech.pegasys.pantheon.enclave.types.ErrorResponse;
 import tech.pegasys.pantheon.enclave.types.CreatePrivacyGroupRequest;
+import tech.pegasys.pantheon.enclave.types.ErrorResponse;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
@@ -68,7 +68,8 @@ public class Enclave {
     return executePost(request, ReceiveResponse.class);
   }
 
-  public PrivacyGroup privacyGroups(final CreatePrivacyGroupRequest content) throws Exception {
+  public PrivacyGroup createPrivacyGroups(final CreatePrivacyGroupRequest content)
+      throws Exception {
     Request request = buildPostRequest(ORION, content, "/privacyGroupId");
     return executePost(request, PrivacyGroup.class);
   }

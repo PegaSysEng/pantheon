@@ -58,9 +58,10 @@ public class EeaCreatePrivacyGroup implements JsonRpcMethod {
         new CreatePrivacyGroupRequest(addresses, from, name, description);
     PrivacyGroup response;
     try {
-      response = enclave.privacyGroups(createPrivacyGroupRequest);
+      response = enclave.createPrivacyGroups(createPrivacyGroupRequest);
     } catch (Exception e) {
       LOG.error("Failed to fetch transaction from Enclave with error " + e.getMessage());
+      LOG.error(e);
       return new JsonRpcSuccessResponse(request.getId(), JsonRpcError.CREATE_PRIVACY_GROUP_ERROR);
     }
     return new JsonRpcSuccessResponse(request.getId(), response.getPrivacyGroupId());
